@@ -37,3 +37,13 @@ The auth-service migration and Zod contracts are under
 **TBD:** no token/session transport contract is defined. Do not add a protected
 HTTP route or claim role enforcement at the request boundary until the session/JWT
 and cookie/refresh policy is decided.
+
+## F02A media storage
+
+Media bytes are owned by `content-service` through its `MediaStorage` provider;
+they are not stored in PostgreSQL in F02A. The local adapter writes to an
+ignored filesystem directory for development/tests. The ImageKit adapter calls
+ImageKit server-side with `IMAGEKIT_PRIVATE_KEY`; no `VITE_*` variable or
+browser upload flow is allowed. F02A exposes no public upload endpoint and
+defines no RabbitMQ event. F02/F09 must define authorization and persistence
+before adding an API contract.

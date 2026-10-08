@@ -8,3 +8,5 @@ coverage/
 !.env.example
 *.log
 pnpm-debug.log*
+storage/media/*
+!storage/media/.gitkeep

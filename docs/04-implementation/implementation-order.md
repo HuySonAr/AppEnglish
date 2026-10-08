@@ -3,6 +3,7 @@
 |---|---|---|
 | F00 | Khảo sát repository/baseline | Kiến trúc và lệnh chạy được xác minh |
 | F01 | Auth/account | Auth và roles theo chính sách hiện tại |
+| F02A | Media storage foundation | Local/test adapter, ImageKit adapter, validation and backend-only configuration are verified; no public upload API |
 | F02 | Content unit/lesson/vocabulary/exercises | Content Manager tạo và xuất bản nội dung |
 | F03 | Placement | Đề cố định 23 câu, result đúng, không progress/XP |
 | F04 | Lesson flow | Review bắt buộc, gate >=80%, tuần tự |

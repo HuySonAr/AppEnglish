@@ -24,6 +24,22 @@
 4. Chạy các NestJS services và API Gateway cần cho feature.
 5. Chạy web client React/Vite.
 
+## Media storage (F02A)
+
+Development and tests default to `MEDIA_STORAGE_ADAPTER=local`. Set
+`MEDIA_LOCAL_ROOT` to a directory outside build output; the repository default
+`storage/media` is ignored except for `.gitkeep`. F02A has no upload route, so
+this adapter is only a service-level dependency for later content modules.
+
+To use ImageKit in a deployed backend, set `MEDIA_STORAGE_ADAPTER=imagekit`,
+`IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, and `IMAGEKIT_URL_ENDPOINT` in a
+runtime secret store. Never put the private key in the web client or any
+`VITE_*` variable. Tests inject a fake SDK client and do not call ImageKit.
+
+The current official Node SDK/upload documentation was checked for the
+server-side integration. Protected audio delivery is intentionally not claimed
+until ImageKit's current private-file/signed-URL documentation is verified.
+
 ## Docker Compose
 Dùng file Compose và service names có sẵn trong repository. Chỉ khởi chạy Redis và RabbitMQ; không dùng lệnh compose khởi chạy PostgreSQL. Trước khi chạy, kiểm tra compose config để chắc chắn service/volume/port mappings không kéo theo database container.
 

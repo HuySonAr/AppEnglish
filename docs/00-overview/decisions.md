@@ -19,6 +19,7 @@
 | D14 | Không XP hoặc streak từ lesson, từ vựng, ôn tập |
 | D15 | F00 bootstrap 2026-10-08: tạo monorepo/apps/packages scaffold theo stack đã chốt; chỉ health/runtime boundaries, không triển khai nghiệp vụ hoặc domain contracts |
 | D16 | F01 public registration tạo STUDENT và credential verification dùng scrypt; chưa phát hành session/JWT/cookie/refresh token cho đến khi chính sách auth được chốt |
+| D17 | F02A uses a reusable content-service media-storage boundary with an ignored local adapter for development/tests and the official ImageKit Node SDK for configured environments; credentials stay backend-only and no upload endpoint or media database model is introduced |
 
 ## TBD — không tự giả định
 - Công thức tổng hợp progress và loại test được tính vào progress.
@@ -28,3 +29,5 @@
 - Làm tròn XP, hòa hạng và chu kỳ leaderboard.
 - Quy tắc versioning khi đề đã xuất bản được sửa.
 - Quy trình OTP/OAuth, session/token: đối chiếu auth hiện tại.
+- ImageKit private-file/signed-URL behavior for protected audio must be verified
+  from current official documentation before F09 exposes audio delivery.

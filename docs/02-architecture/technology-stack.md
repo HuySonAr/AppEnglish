@@ -16,6 +16,7 @@
 | Data ownership | PostgreSQL database-per-service | Mapping xem database-allocation.md; không query DB service khác trực tiếp |
 | ORM | TypeORM `0.3.31` + PostgreSQL `pg` | DataSource/EntitySchema và F01 account migration đã tạo |
 | Local database UI | pgAdmin 4 hoặc DBeaver | Kết nối vào PostgreSQL Server local; GUI không tự thay thế server |
+| Media storage | `@imagekit/nodejs@7.12.1` official Node SDK + local adapter | F02A; backend-only ImageKit credentials; local adapter is default for development/tests |
 | Local runtime | PostgreSQL native Windows; Redis `7-alpine` + RabbitMQ `3-management-alpine` trong Compose | Đã xác minh Compose không có PostgreSQL |
 
 ## F00 — bằng chứng repository
@@ -42,6 +43,13 @@ entities and migrations are intentionally not implemented in F00.
 - Database/service mapping mục tiêu: app_identity, app_content, app_learning, app_progress (xem database-allocation.md); xác minh code trước khi migrate. TypeORM theo tài liệu kiến trúc hiện tại.
 - Test/lint/format tools: kiểm tra package scripts và config.
 - Không ghi secrets hoặc giá trị env nhạy cảm vào tài liệu.
+
+## F02A media storage
+
+`content-service` owns the `MediaStorage` provider and selects `local` or
+`imagekit` via `MEDIA_STORAGE_ADAPTER`. Local/test runs do not call ImageKit.
+The adapter validates MP3 audio and JPEG/PNG/WebP image inputs before upload.
+F02A intentionally has no media database model or upload API.
 
 ## Quy tắc giao tiếp
 1. Browser/client đi qua public BFF/Gateway; private services không phơi trực tiếp ra client.
