@@ -1,35 +1,39 @@
 # Công nghệ và kiến trúc AppEnglish
 
-## Stack mục tiêu đã được xác định cho dự án
+## Stack đã khởi tạo và được xác minh
 | Lớp | Công nghệ/quyết định | Chỉ dẫn cho AI |
 |---|---|---|
-| Monorepo/package manager | pnpm workspaces | Dùng pnpm, không dùng npm/yarn để quản lý workspace |
-| Build/task orchestration | Turborepo v1 | Dùng task graph/scripts có sẵn; không thay bằng công cụ khác |
-| Backend | 6 NestJS services trong apps/* | Mục tiêu; chưa xác minh vì repository hiện chưa có `apps/*` |
-| Web client | React + Vite, JavaScript/JSX | Không dùng Next.js; dùng cấu trúc feature-first trong frontend-architecture.md |
-| Shared code | packages/* | Mục tiêu; chưa xác minh vì chưa có `packages/*` |
+| Monorepo/package manager | pnpm workspaces, manifest pin `pnpm@9.0.0` | Workspace được xác minh; máy hiện chạy pnpm 11, không tự thay công cụ hệ thống |
+| Build/task orchestration | Turborepo `1.13.4` | Được pin trong root manifest/lockfile |
+| Backend | 4 NestJS services + api-gateway trong apps/* | JavaScript/ESM skeleton; lockfile resolves NestJS `11.2.7` |
+| Web client | React `19.3.0` + Vite `7.3.7`, JavaScript/JSX | Đã tạo; không dùng Next.js |
+| Shared code | `packages/config`, `packages/backend-common` | Đã tạo |
 | UI styling/components/icons | Tailwind CSS, shadcn/ui, lucide-react | Dùng cho web client; giữ component source trong repo và theo cấu hình Vite hiện có |
 | Public entrypoint/BFF | Gateway/BFF | Web client gọi public entrypoint; không gọi trực tiếp private service |
 | Synchronous service communication | gRPC | Tôn trọng proto/contracts hiện hữu; không tự chuyển sang REST giữa services |
 | Asynchronous messaging | RabbitMQ | Dùng event/message cho luồng async theo patterns hiện có |
 | Cache/short-lived infrastructure | Redis | Dùng theo cấu hình/purpose đang có; không coi Redis là source of truth nghiệp vụ |
 | Data ownership | PostgreSQL database-per-service | Mapping xem database-allocation.md; không query DB service khác trực tiếp |
-| ORM | TypeORM (theo tài liệu kiến trúc AppEnglish) | Xác minh package/migration hiện tại; không thêm Prisma song song |
+| ORM | TypeORM `0.3.31` + PostgreSQL `pg` | DataSource/EntitySchema và F01 account migration đã tạo |
 | Local database UI | pgAdmin 4 hoặc DBeaver | Kết nối vào PostgreSQL Server local; GUI không tự thay thế server |
-| Local runtime | PostgreSQL native Windows; Redis + RabbitMQ trong Docker Compose; apps chạy local qua pnpm | Quyết định local mục tiêu; chưa có Compose/script để xác minh |
+| Local runtime | PostgreSQL native Windows; Redis `7-alpine` + RabbitMQ `3-management-alpine` trong Compose | Đã xác minh Compose không có PostgreSQL |
 
 ## F00 — bằng chứng repository
 
-**VERIFIED:** [README.md](../../README.md), `AGENTS.md` và thư mục `docs/` là các
-file duy nhất hiện có trong repository tại thời điểm khảo sát 2026-10-08.
+**VERIFIED:** root manifests, six app directories, two shared packages,
+`docker-compose.yml`, `.env.example` và PostgreSQL script đã được tạo và install
+thành công. Lockfile resolves NestJS `11.2.7`, TypeORM `0.3.31`, React `19.3.0`,
+Vite `7.3.7`, Tailwind `3.4.19`, gRPC `1.14.6`, amqplib `0.10.9`, ioredis
+`5.11.1`, and pg `8.23.1`. gRPC/RabbitMQ/Redis client dependencies are present
+in service manifests.
 
-**NOT VERIFIED / TBD:** không tìm thấy `package.json`, `pnpm-workspace.yaml`,
-`pnpm-lock.yaml`, `turbo.json`, `apps/`, `packages/`, `Dockerfile`, Docker Compose,
-`.env.example`, `*.proto`, cấu hình NestJS/TypeORM/Vite, migration, test hoặc
-script. Do đó chưa thể xác minh pnpm 9.0.0, Node/Turbo/NestJS/React/Vite/
-Tailwind/gRPC/RabbitMQ/Redis versions, service names, package scripts, ports,
-connection keys, ORM usage hoặc migration paths. Không coi các chi tiết này là đã
-cài đặt.
+The repository pins pnpm `9.0.0`; the validation host currently reports pnpm
+`11.23.0`. The install succeeded with that host version and generated a
+lockfile v9. Use Corepack or another project-approved pnpm 9 setup before
+enforcing the exact package-manager version in CI.
+
+**TBD:** proto/RPC contracts, RabbitMQ exchanges/queues, Redis usage, domain
+entities and migrations are intentionally not implemented in F00.
 
 ## Phiên bản và chi tiết cần xác minh
 - pnpm được pin ở 9.0.0 theo project setup; kiểm tra package.json/packageManager và lockfile.

@@ -4,16 +4,40 @@ Bộ tài liệu này hướng dẫn AI hiểu nghiệp vụ, kiến trúc công
 
 ## Trạng thái repository
 
-**F00 — baseline khảo sát (2026-10-08):** repository hiện là **docs-only**. Cây
-repository chỉ có `AGENTS.md`, `README.md` và các tài liệu dưới `docs/`; chưa có
-source code, workspace pnpm/Turborepo, app/service, package manifest, lockfile,
-Docker Compose, env template, proto, migration hoặc test để xác minh kiến trúc
-runtime.
+**F00 — bootstrap (2026-10-08):** monorepo scaffold đã được tạo. Repository có
+workspace pnpm/Turborepo, năm NestJS apps, một React/Vite client, shared packages,
+Docker Compose cho Redis/RabbitMQ và script tạo bốn database PostgreSQL native.
+Health endpoint đã được tạo; nghiệp vụ sản phẩm chưa triển khai.
 
-Các bảng và quyết định mang nhãn “mục tiêu”, “cần xác minh” hoặc `TBD` không được
-coi là bằng chứng repository đã triển khai. Xem
+Các chi tiết runtime đã tạo có bằng chứng trong `package.json`, `pnpm-lock.yaml`,
+`apps/*/package.json`, `docker-compose.yml` và `scripts/postgres/`. Xem
 [feature-status](docs/04-implementation/feature-status.md) và
 [service-boundaries](docs/02-architecture/service-boundaries.md) để biết chi tiết.
+
+## Quick start
+
+```powershell
+pnpm install
+Copy-Item .env.example .env
+docker compose up -d redis rabbitmq
+pnpm dev
+```
+
+PostgreSQL không chạy trong Compose. Cài/chạy PostgreSQL native trên Windows, sau
+đó chạy `psql -h localhost -U postgres -f scripts/postgres/create-databases.sql`
+hoặc mở script trong pgAdmin/DBeaver. Script chỉ tạo database còn thiếu, không
+drop/reset database hiện có. Xem [development guide](docs/05-operations/development.md).
+
+## Apps
+
+| App | Local port | Database |
+|---|---:|---|
+| api-gateway | 3000 | none |
+| auth-service | 3001 | app_identity |
+| content-service | 3002 | app_content |
+| learning-service | 3003 | app_learning |
+| progress-service | 3004 | app_progress |
+| web-client | 5173 | none |
 
 ## Đọc theo thứ tự
 1. AGENTS.md

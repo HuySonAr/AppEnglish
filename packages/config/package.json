@@ -1,0 +1,17 @@
+{
+  "name": "@appenglish/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./env": "./src/env.js"
+  },
+  "scripts": {
+    "build": "node --check src/env.js",
+    "lint": "node --check src/env.js",
+    "test": "node --check src/env.js"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  }
+}

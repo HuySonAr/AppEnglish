@@ -22,10 +22,19 @@ Tên bốn database trên được lấy từ thiết kế AppEnglish hiện có
 
 ## F00 verification
 
-**VERIFIED:** đây là mapping mục tiêu trong tài liệu; repository chưa có source,
-`.env.example`, TypeORM config, entity, migration hoặc script nên chưa thể xác
-minh service nào đang kết nối database nào, port/host/user/connection key hay
-schema thực tế. Không tạo, đổi hoặc xóa database trong F00.
+**VERIFIED (2026-10-08):** mapping đã được đưa vào bốn TypeORM DataSource
+factories và `.env.example`; database creation script là
+`scripts/postgres/create-databases.sql`. Script không drop/reset database.
+PostgreSQL server native trả `accepting connections`. Database existence chưa
+được xác nhận qua CLI vì phiên xác thực yêu cầu mật khẩu; người dùng có thể xác
+nhận bằng pgAdmin/DBeaver.
+
+## F01 auth schema
+
+`auth-service` owns the `accounts` table in `app_identity`. The non-destructive
+TypeORM migration creates email, scrypt password hash, role, status, and audit
+timestamps. F01 does not run the migration automatically and does not access any
+other service database.
 
 ## Service ngoài phạm vi
 Payment service không thuộc nghiệp vụ Reading/Listening hiện tại. Nếu repository có service này, không gán nó vào content/learning và không xóa service/schema hiện hữu tự động. Kiểm tra code, migrations và dependencies; ghi lại trạng thái hiện tại, sau đó chỉ loại bỏ khi có quyết định riêng. Nếu còn một service khác không có trong mapping, không tự tạo database cho nó: trước tiên xác minh trách nhiệm và quyết định owner.

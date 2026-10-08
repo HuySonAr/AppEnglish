@@ -3,8 +3,8 @@ Trạng thái: PENDING → IN_PROGRESS → REVIEW → DONE. DONE chỉ khi accep
 
 | ID | Feature | Trạng thái | Bằng chứng/ghi chú |
 |---|---|---|---|
-| F00 | Repository discovery | REVIEW | Đã khảo sát 2026-10-08. Baseline là docs-only; kiến trúc mục tiêu và local runtime đã đối chiếu nhưng service/version/script/DB/Compose chưa thể xác minh vì repository thiếu source/config. Chưa DONE vì acceptance yêu cầu kiến trúc và lệnh chạy được xác minh. Xem README.md và các tài liệu F00 trong docs/02-architecture. |
-| F01 | Auth/account | PENDING | |
+| F00 | Repository discovery/bootstrap | DONE | Scaffold monorepo, 5 NestJS backend apps, React/Vite client, shared packages, Compose Redis/RabbitMQ, PostgreSQL creation script và health endpoint đã tạo. `pnpm install`, build/lint/test thành công; Compose không có PostgreSQL; gateway health smoke test thành công. Database existence chưa xác nhận do CLI yêu cầu local password, nhưng PostgreSQL native đã sẵn sàng. |
+| F01 | Auth/account | REVIEW | Account persistence, password verification, approved roles, gateway routes, client auth form, error handling and tests are implemented. Not DONE: session/JWT/cookie/refresh/TTL and protected HTTP authorization policy remain TBD, so the authenticated request lifecycle cannot be completed without a product decision. |
 | F02 | Content | PENDING | |
 | F03 | Placement | PENDING | |
 | F04 | Lesson flow | PENDING | |
@@ -16,4 +16,5 @@ Trạng thái: PENDING → IN_PROGRESS → REVIEW → DONE. DONE chỉ khi accep
 ## Nhật ký
 | Ngày | Feature | Tài liệu/code cập nhật | Checks |
 |---|---|---|---|
-| 2026-10-08 | F00 | README.md; docs/00-overview/decisions.md; docs/02-architecture/{technology-stack,system-overview,service-boundaries,data-api-events,database-allocation}.md; docs/05-operations/development.md | Khảo sát cây repository bằng PowerShell; xác nhận chỉ có Markdown, không có runtime/config. Không có test/build command để chạy. |
+| 2026-10-08 | F00 | AGENTS.md; README.md; root manifests; apps/*; packages/*; docker-compose.yml; scripts/postgres/*; docs/02-architecture/*; docs/05-operations/development.md | `pnpm install`, `pnpm build`, `pnpm lint`, `pnpm test` PASS; `docker compose config` PASS; Redis/RabbitMQ healthy; `GET /health` PASS; `pg_isready` PASS. |
+| 2026-10-08 | F01 | auth-service account/auth modules and tests; gateway auth proxy; web auth feature; auth-service spec; auth workflow; API/data/database docs | Auth unit tests 4/4 PASS; auth/gateway/client builds PASS; Nest route bootstrap PASS; invalid payload HTTP check PASS; no migration or broker restart run. |

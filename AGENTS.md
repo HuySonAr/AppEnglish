@@ -27,3 +27,13 @@
 
 ## Mâu thuẫn
 Yêu cầu mới nhất của người dùng ưu tiên hơn tài liệu cũ. Nếu code và kiến trúc docs không khớp, ghi bằng chứng và cập nhật docs; không tự tái kiến trúc trong một feature.
+
+## Bootstrap baseline (F00)
+- Monorepo root uses pnpm workspaces with `packageManager: pnpm@9.0.0` and Turborepo v1.
+- Runtime source is JavaScript/ESM for NestJS and JavaScript/JSX for React/Vite.
+- Backend validation uses Zod; do not add class-validator for the same payload rules.
+- PostgreSQL stays native on Windows. Docker Compose contains Redis and RabbitMQ only.
+- F00 creates scaffolding and health endpoints only. Do not implement lesson, placement,
+  mock test, progress, XP, or excluded product domains in the bootstrap.
+- Run `pnpm install`, `pnpm build`, `pnpm lint`, and `pnpm test` from the repository root.
+- Run `docker compose up -d redis rabbitmq`; never add a PostgreSQL container or volume.

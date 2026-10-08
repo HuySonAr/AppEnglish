@@ -2,10 +2,9 @@
 ## Trạng thái xác minh
 VERIFIED / INFERRED / TBD
 
-> **F00 baseline (2026-10-08):** repository chưa có source/config runtime hoặc
-> service inventory. Không tạo service spec cụ thể từ template này cho đến khi
-> app/service thực tế xuất hiện; mọi tên service, database, contract và dependency
-> phải có đường dẫn bằng chứng.
+> **F00 baseline (2026-10-08):** app/service scaffold đã có. Service spec cụ thể
+> chỉ được tạo khi feature triển khai trách nhiệm, contract, model và migration;
+> mọi kết luận phải có đường dẫn bằng chứng.
 
 ## Trách nhiệm và nghiệp vụ liên quan
 Liên kết workflow cụ thể.

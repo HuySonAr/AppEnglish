@@ -1,0 +1,24 @@
+{
+  "name": "appenglish",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "compose:up": "docker compose up -d redis rabbitmq",
+    "compose:ps": "docker compose ps",
+    "compose:logs": "docker compose logs -f redis rabbitmq",
+    "compose:down": "docker compose stop redis rabbitmq",
+    "db:create": "psql -h localhost -U postgres -f scripts/postgres/create-databases.sql"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "turbo": "^1.13.4"
+  }
+}

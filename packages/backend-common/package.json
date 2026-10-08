@@ -1,0 +1,20 @@
+{
+  "name": "@appenglish/backend-common",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./zod-validation.pipe": "./src/zod-validation.pipe.js"
+  },
+  "scripts": {
+    "build": "node --check src/zod-validation.pipe.js",
+    "lint": "node --check src/zod-validation.pipe.js",
+    "test": "node --check src/zod-validation.pipe.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.0",
+    "amqplib": "^0.10.9",
+    "ioredis": "^5.8.1",
+    "zod": "^3.25.76"
+  }
+}

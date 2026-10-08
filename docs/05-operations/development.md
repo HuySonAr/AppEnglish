@@ -37,16 +37,14 @@ Không chạy docker compose down -v hoặc reset volumes trong quy trình thư�
 
 ## F00 verification result
 
-**VERIFIED (2026-10-08):** repository chưa có Docker Compose, `package.json`,
-`pnpm-workspace.yaml`, lockfile, `.env.example`, app/service hoặc script. Do đó
-chưa có lệnh chạy local, service name, port mapping, health check, database
-connection key hay migration command nào có thể báo là đã xác minh/chạy thành
-công.
+**VERIFIED (2026-10-08):** `pnpm install`, `pnpm build`, `pnpm lint` và
+`pnpm test` thành công. `docker compose up -d redis rabbitmq` thành công; cả hai
+container healthy. `GET http://localhost:3000/health` trả về status `ok`.
+`pg_isready -h localhost -p 5432` trả `accepting connections`.
 
-Không chạy `pnpm`, `turbo`, `docker compose`, migration hoặc test trong F00 vì
-không có file/config tương ứng. Khi source/config được bổ sung, phải cập nhật tài
-liệu này bằng lệnh thực tế và vẫn giữ PostgreSQL native; Compose chỉ được khởi
-chạy Redis/RabbitMQ.
+CLI query database bị dừng vì cần mật khẩu PostgreSQL local; không ghi mật khẩu
+vào repository. Xác nhận database qua pgAdmin/DBeaver hoặc chạy script với
+credential local của người dùng.
 
 ## PostgreSQL local
 - Một PostgreSQL Server có thể host bốn logical databases riêng.

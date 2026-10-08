@@ -1,0 +1,22 @@
+{
+  "name": "@appenglish/api-gateway",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node --check src/main.js",
+    "dev": "node --watch src/main.js",
+    "start": "node src/main.js",
+    "lint": "node --check src/main.js",
+    "test": "node --check src/main.js"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/microservices": "^11.1.6",
+    "@nestjs/platform-express": "^11.1.6",
+    "@grpc/grpc-js": "^1.14.0",
+    "reflect-metadata": "^0.2.2",
+    "zod": "^3.25.76"
+  }
+}

@@ -17,7 +17,8 @@
 | D12 | Làm lại mock chỉ tính thành tích cao nhất, không cộng trùng |
 | D13 | Progress tách Reading/Listening, loại placement |
 | D14 | Không XP hoặc streak từ lesson, từ vựng, ôn tập |
-| D15 | F00 baseline 2026-10-08: repository hiện chỉ có tài liệu; không coi stack/service/database/script/version mục tiêu là runtime đã xác minh cho đến khi source/config xuất hiện |
+| D15 | F00 bootstrap 2026-10-08: tạo monorepo/apps/packages scaffold theo stack đã chốt; chỉ health/runtime boundaries, không triển khai nghiệp vụ hoặc domain contracts |
+| D16 | F01 public registration tạo STUDENT và credential verification dùng scrypt; chưa phát hành session/JWT/cookie/refresh token cho đến khi chính sách auth được chốt |
 
 ## TBD — không tự giả định
 - Công thức tổng hợp progress và loại test được tính vào progress.
