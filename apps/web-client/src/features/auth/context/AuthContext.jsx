@@ -11,7 +11,7 @@ import {
   loginAccount,
   logoutAccount,
 } from '../api/auth-api.js';
-import { responseData } from '../../../lib/api/response.js';
+import { accountFromEnvelope } from '../flow/auth-flow.js';
 
 const AuthContext = createContext(null);
 
@@ -22,12 +22,13 @@ export function AuthProvider({ children }) {
     setState((current) => ({ ...current, status: 'loading' }));
     try {
       const result = await getCurrentUser();
-      setState({
-        status: 'authenticated',
-        account: responseData(result).account,
-      });
+      const account = accountFromEnvelope(result);
+      if (!account) throw new Error('Session response did not include an account');
+      setState({ status: 'authenticated', account });
+      return account;
     } catch {
       setState({ status: 'anonymous', account: null });
+      return null;
     }
   }, []);
 
@@ -37,9 +38,10 @@ export function AuthProvider({ children }) {
 
   const signIn = useCallback(async (values) => {
     const result = await loginAccount(values);
-    const account = responseData(result).account;
-    if (account) setState({ status: 'authenticated', account });
-    return result;
+    const account = accountFromEnvelope(result);
+    if (!account) throw new Error('Login response did not include an account');
+    setState({ status: 'authenticated', account });
+    return account;
   }, []);
 
   const signOut = useCallback(async () => {

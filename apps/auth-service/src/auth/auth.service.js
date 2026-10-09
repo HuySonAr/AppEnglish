@@ -40,6 +40,7 @@ export class AuthService {
   async verifyEmail(input) {
     const account = await this.accountRepository.findByEmail(input.email.trim().toLowerCase());
     if (!account) throw authErrors.accountNotFound();
+    this.assertLoginStatus(account);
     await this.verifyOtp(account, OtpPurpose.VERIFY_EMAIL, input.otp);
     account.status = AccountStatus.ACTIVE;
     account.emailVerifiedAt = new Date();
@@ -48,9 +49,10 @@ export class AuthService {
   }
 
   async resendVerification(email) {
-    const account = await this.accountRepository.findByEmail(email.trim().toLowerCase());
-    if (!account) return { code: 1, msg: 'additional', data: { nextAction: 'VERIFY_EMAIL', email: email.trim().toLowerCase(), expiresInSeconds: 300, resendAfterSeconds: 60 } };
-    if (account.status === AccountStatus.ACTIVE) return this.createSessionResponse(account);
+    const normalizedEmail = email.trim().toLowerCase();
+    const account = await this.accountRepository.findByEmail(normalizedEmail);
+    if (!account) return { code: 1, msg: 'additional', data: { nextAction: 'VERIFY_EMAIL', email: normalizedEmail, expiresInSeconds: 300, resendAfterSeconds: 60 } };
+    if (account.status === AccountStatus.ACTIVE) return { code: 1, msg: 'additional', data: { nextAction: 'LOGIN', email: account.email, expiresInSeconds: 300, resendAfterSeconds: 60 } };
     await this.issueOtp(account, OtpPurpose.VERIFY_EMAIL);
     return { code: 1, msg: 'additional', data: { nextAction: 'VERIFY_EMAIL', email: account.email, expiresInSeconds: 300, resendAfterSeconds: 60 } };
   }

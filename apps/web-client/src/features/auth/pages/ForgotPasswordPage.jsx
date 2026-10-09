@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { forgotPassword } from '../api/auth-api.js';
 import { AuthCard } from '../components/AuthCard.jsx';
-import { getApiErrorMessage, responseData } from '../../../lib/api/response.js';
+import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { useToast } from '../../../components/shared/ToastProvider.jsx';
 
 export function ForgotPasswordPage() {
@@ -22,7 +22,7 @@ export function ForgotPasswordPage() {
       navigate('/reset-password', {
         state: {
           email,
-          resendAfterSeconds: responseData(result).resendAfterSeconds,
+          resendAfterSeconds: result?.data?.resendAfterSeconds,
         },
       });
     } catch (error) {

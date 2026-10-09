@@ -11,6 +11,10 @@ Không tự giả định OTP/OAuth, cookie/token, TTL hoặc reset password. Ki
 
 - `POST /auth/register` qua API Gateway tạo tài khoản Student trong `app_identity`.
 - `POST /auth/login` qua API Gateway xác minh email/password và tạo phiên.
+- `POST /auth/verify-email` qua API Gateway tạo phiên cookie sau khi xác minh
+  OTP; DISABLED/SUSPENDED bị từ chối 403 và không được kích hoạt lại.
+- `POST /auth/resend-verification` chỉ cấp lại OTP; tài khoản ACTIVE nhận
+  `nextAction: LOGIN` và không nhận session (không cấp cookie chỉ theo email).
 - `POST /auth/refresh` xoay refresh token; token cũ bị dùng lại sẽ thu hồi family.
 - `GET /auth/me` xác minh chữ ký, hạn JWT, account status và trả principal.
 - `POST /auth/logout` thu hồi family và xóa cookie.

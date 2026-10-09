@@ -36,8 +36,8 @@ Public routes are exposed through the gateway:
 |---|---|---|---|
 | POST | `/auth/register` | `/auth/register` | Create a Student account |
 | POST | `/auth/login` | `/auth/login` | Verify credentials and return the principal |
-| POST | `/auth/verify-email` | `/auth/verify-email` | Verify email OTP and create a session |
-| POST | `/auth/resend-verification` | `/auth/resend-verification` | Issue a replacement verification OTP |
+| POST | `/auth/verify-email` | `/auth/verify-email` | Verify email OTP and create a session; DISABLED/SUSPENDED accounts are rejected with 403 and never re-activated |
+| POST | `/auth/resend-verification` | `/auth/resend-verification` | Issue a replacement verification OTP; never creates a session (an ACTIVE account gets `nextAction: LOGIN` without cookies) |
 | POST | `/auth/refresh` | `/auth/refresh` | Rotate refresh token and issue a new access token |
 | POST | `/auth/logout` | `/auth/logout` | Revoke refresh-token family and clear cookies |
 | GET | `/auth/me` | `/auth/me` | Validate access cookie and return current account |
@@ -80,7 +80,12 @@ raw tokens or secrets. OTP verification and password reset use
 ## Kiểm thử
 
 - `apps/auth-service/test/auth.service.test.js`: registration, duplicate account,
-  invalid credentials, disabled account, password hashing and role authorization.
+  invalid credentials, disabled/suspended login and OTP rejection, OTP
+  wrong/expired/used handling, resend without session creation, password
+  hashing and role authorization.
+- Web client `src/features/auth/flow/auth-flow.test.js`: envelope unwrapping,
+  single verify-OTP outcome, OTP vs session-load error separation, role-based
+  route mapping and guard behavior.
 - Gateway and auth service bootstrap logs confirm all five auth routes and cookie
   relay.
 

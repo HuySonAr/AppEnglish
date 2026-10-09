@@ -15,12 +15,13 @@ import { StudentDashboardPage } from '../features/student/pages/StudentDashboard
 import { AdminDashboardPage } from '../features/admin/pages/AdminDashboardPage.jsx';
 import { ContentManagerDashboardPage } from '../features/content-manager/pages/ContentManagerDashboardPage.jsx';
 import { Roles } from '../constants/auth.js';
+import { dashboardPathForRole } from '../features/auth/flow/auth-flow.js';
 import { useAuth } from '../features/auth/context/AuthContext.jsx';
 
 function DashboardRedirect() {
   const { account } = useAuth();
   if (!account) return <Navigate to="/login" replace />;
-  return <Navigate to={`/${account.role.toLowerCase().replace('_', '-')}`} replace />;
+  return <Navigate to={dashboardPathForRole(account.role)} replace />;
 }
 
 export function AppRouter() {

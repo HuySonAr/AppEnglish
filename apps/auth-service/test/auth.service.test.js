@@ -99,6 +99,71 @@ test('rejects expired access tokens and disabled accounts', async () => {
   await assert.rejects(() => harness.service.me(harness.tokenService.createAccessToken(account)), { code: 14 });
 });
 
+test('disabled and suspended accounts cannot log in or verify an OTP', async () => {
+  const harness = createHarness();
+  const passwordHash = harness.passwordService.hash('correct horse battery staple');
+  const disabled = { id: crypto.randomUUID(), email: 'disabled2@example.com', passwordHash, role: 'STUDENT', status: 'DISABLED', createdAt: new Date() };
+  const suspended = { id: crypto.randomUUID(), email: 'suspended@example.com', passwordHash, role: 'STUDENT', status: 'SUSPENDED', createdAt: new Date() };
+  harness.accounts.push(disabled, suspended);
+  await assert.rejects(() => harness.service.login({ email: disabled.email, password: 'correct horse battery staple' }), { code: 14 });
+  await assert.rejects(() => harness.service.login({ email: suspended.email, password: 'correct horse battery staple' }), { code: 22 });
+  await assert.rejects(() => harness.service.verifyEmail({ email: disabled.email, otp: '123456' }), { code: 14 });
+  await assert.rejects(() => harness.service.verifyEmail({ email: suspended.email, otp: '123456' }), { code: 22 });
+  assert.equal(disabled.status, 'DISABLED');
+  assert.equal(suspended.status, 'SUSPENDED');
+  assert.equal(harness.refreshTokens.length, 0);
+});
+
+test('wrong and already-used OTPs are rejected and never create extra sessions', async () => {
+  const harness = createHarness();
+  await harness.service.register({ email: 'otp@example.com', password: 'correct horse battery staple' });
+  const account = harness.accounts[0];
+  const challenge = await harness.service.accountRepository.findLatestOtp(account.id, 'VERIFY_EMAIL');
+  await harness.service.accountRepository.updateOtp(challenge.id, { codeHash: harness.service.otpHash(account.id, 'VERIFY_EMAIL', '123456') });
+  await assert.rejects(() => harness.service.verifyEmail({ email: account.email, otp: '654321' }), { code: 15 });
+  assert.equal(harness.refreshTokens.length, 0);
+  const session = await harness.service.verifyEmail({ email: account.email, otp: '123456' });
+  assert.equal(session.account.status, 'ACTIVE');
+  assert.equal(harness.refreshTokens.length, 1);
+  await assert.rejects(() => harness.service.verifyEmail({ email: account.email, otp: '123456' }), { code: 15 });
+  assert.equal(harness.refreshTokens.length, 1);
+});
+
+test('expired OTP is rejected without activating the account', async () => {
+  const harness = createHarness();
+  await harness.service.register({ email: 'expired@example.com', password: 'correct horse battery staple' });
+  const account = harness.accounts[0];
+  const challenge = await harness.service.accountRepository.findLatestOtp(account.id, 'VERIFY_EMAIL');
+  await harness.service.accountRepository.updateOtp(challenge.id, { expiresAt: new Date(Date.now() - 1000) });
+  await assert.rejects(() => harness.service.verifyEmail({ email: account.email, otp: '123456' }), { code: 16 });
+  assert.equal(account.status, 'PENDING_VERIFICATION');
+  assert.equal(harness.refreshTokens.length, 0);
+});
+
+test('resend verification does not create a session for an active account', async () => {
+  const harness = createHarness();
+  harness.accounts.push({ id: crypto.randomUUID(), email: 'active@example.com', passwordHash: harness.passwordService.hash('correct horse battery staple'), role: 'STUDENT', status: 'ACTIVE', emailVerifiedAt: new Date(), createdAt: new Date() });
+  const result = await harness.service.resendVerification('active@example.com');
+  assert.equal(result.code, 1);
+  assert.equal(result.data.nextAction, 'LOGIN');
+  assert.equal(harness.refreshTokens.length, 0);
+});
+
+test('resend verification for a pending account issues a replacement OTP without a session', async () => {
+  const harness = createHarness();
+  let sent = 0;
+  harness.service.emailService.sendOtp = async () => { sent += 1; };
+  await harness.service.register({ email: 'pending@example.com', password: 'correct horse battery staple' });
+  const account = harness.accounts[0];
+  const latest = await harness.service.accountRepository.findLatestOtp(account.id, 'VERIFY_EMAIL');
+  await harness.service.accountRepository.updateOtp(latest.id, { resendAfter: new Date(Date.now() - 1000) });
+  const result = await harness.service.resendVerification('pending@example.com');
+  assert.equal(result.code, 1);
+  assert.equal(result.data.nextAction, 'VERIFY_EMAIL');
+  assert.equal(sent, 2);
+  assert.equal(harness.refreshTokens.length, 0);
+});
+
 test('authorizes only explicitly allowed roles', () => {
   const authorization = new AuthorizationService();
   assert.equal(authorization.assertRole({ role: 'ADMIN' }, ['ADMIN']).role, 'ADMIN');

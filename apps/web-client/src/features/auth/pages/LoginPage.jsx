@@ -5,11 +5,8 @@ import { authFormSchema } from '../schemas/auth-schemas.js';
 import { AuthCard } from '../components/AuthCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
+import { dashboardPathForRole } from '../flow/auth-flow.js';
 import { useToast } from '../../../components/shared/ToastProvider.jsx';
-
-function dashboardPath(role) {
-  return `/${role.toLowerCase().replace('_', '-')}`;
-}
 
 export function LoginPage() {
   const { signIn } = useAuth();
@@ -22,10 +19,10 @@ export function LoginPage() {
   });
   const submit = form.handleSubmit(async (values) => {
     try {
-      const result = await signIn(values);
+      const account = await signIn(values);
       const target =
         location.state?.from?.pathname ||
-        dashboardPath(result.data.account.role);
+        dashboardPathForRole(account.role);
       toast('Signed in successfully.', 'success');
       navigate(target, { replace: true });
     } catch (error) {

@@ -24,6 +24,7 @@
 | D19 | Refresh tokens are rotated on every refresh. A reused/revoked token revokes its entire token family; refresh rows retain family, expiry, replacement and revocation timestamps |
 | D20 | Access and refresh tokens use HttpOnly, SameSite=Lax cookies. Secure is false only for local development and must be true in production. Public registration always creates STUDENT |
 | D21 | F01 includes email OTP verification/resend, login/session/refresh/logout/me and forgot/reset password; it excludes OAuth, SMTP delivery claims require configured SMTP |
+| D22 | F01 fix 2026-10-09: verify-email rejects DISABLED/SUSPENDED accounts (403, không kích hoạt lại); resend-verification không bao giờ tạo session — tài khoản ACTIVE nhận `nextAction: LOGIN` mà không cấp cookie, chỉ PENDING_VERIFICATION nhận OTP mới. Web client luôn unwrap envelope `{code,msg,data}` của auth-api qua `accountFromEnvelope` trong `features/auth/flow/auth-flow.js`; verify OTP thành công nhưng tải session thất bại hiển thị lỗi tải session và chuyển về /login, không hiển thị "OTP sai" |
 
 ## TBD — không tự giả định
 - Công thức tổng hợp progress và loại test được tính vào progress.
