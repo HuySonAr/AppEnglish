@@ -35,10 +35,15 @@ export function VerifyEmailPage() {
     event.preventDefault();
     setPending(true);
     try {
-      const { account, restoredAccount } = await verifyOtpAndRestoreSession({
+      const { alreadyVerified, account, restoredAccount } = await verifyOtpAndRestoreSession({
         verifyEmail: () => verifyEmail({ email, otp }),
         restoreSession,
       });
+      if (alreadyVerified) {
+        toast('This email is already verified. Please sign in.', 'info');
+        navigate('/login', { replace: true, state: { email } });
+        return;
+      }
       if (!restoredAccount) {
         toast(
           `Email verified for ${account.email}, but the session could not be loaded. Please sign in.`,

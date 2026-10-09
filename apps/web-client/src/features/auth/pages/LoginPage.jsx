@@ -5,7 +5,10 @@ import { authFormSchema } from '../schemas/auth-schemas.js';
 import { AuthCard } from '../components/AuthCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
-import { dashboardPathForRole } from '../flow/auth-flow.js';
+import {
+  dashboardPathForRole,
+  isVerificationRequiredError,
+} from '../flow/auth-flow.js';
 import { useToast } from '../../../components/shared/ToastProvider.jsx';
 
 export function LoginPage() {
@@ -15,7 +18,7 @@ export function LoginPage() {
   const location = useLocation();
   const form = useForm({
     resolver: zodResolver(authFormSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: location.state?.email || '', password: '' },
   });
   const submit = form.handleSubmit(async (values) => {
     try {
@@ -26,6 +29,13 @@ export function LoginPage() {
       toast('Signed in successfully.', 'success');
       navigate(target, { replace: true });
     } catch (error) {
+      if (isVerificationRequiredError(error)) {
+        // Credentials matched but the account is PENDING_VERIFICATION; guide
+        // the user to the OTP step instead of a generic error toast.
+        toast('Verify your email before signing in.', 'info');
+        navigate('/verify-email', { state: { email: values.email } });
+        return;
+      }
       toast(getApiErrorMessage(error), 'error');
     }
   });

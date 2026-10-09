@@ -34,9 +34,9 @@ Public routes are exposed through the gateway:
 
 | Method | Gateway route | Auth service route | Purpose |
 |---|---|---|---|
-| POST | `/auth/register` | `/auth/register` | Create a Student account |
-| POST | `/auth/login` | `/auth/login` | Verify credentials and return the principal |
-| POST | `/auth/verify-email` | `/auth/verify-email` | Verify email OTP and create a session; DISABLED/SUSPENDED accounts are rejected with 403 and never re-activated |
+| POST | `/auth/register` | `/auth/register` | Create a Student account; a `PENDING_VERIFICATION` email resumes with `ADDITIONAL` + `nextAction: VERIFY_EMAIL` (no duplicate account, no password change, no auto OTP); an `ACTIVE` email gets `AUTH_EMAIL_ALREADY_REGISTERED` |
+| POST | `/auth/login` | `/auth/login` | Verify credentials and return the principal; a `PENDING_VERIFICATION` account with correct credentials gets 403 `AUTH_EMAIL_NOT_VERIFIED` + `nextAction: VERIFY_EMAIL`, wrong credentials stay `AUTH_INVALID_CREDENTIALS` |
+| POST | `/auth/verify-email` | `/auth/verify-email` | Verify email OTP and create a session; DISABLED/SUSPENDED accounts are rejected with 403 and never re-activated; an already ACTIVE email returns `nextAction: LOGIN` without a session; used OTP challenges (`usedAt` set) are rejected |
 | POST | `/auth/resend-verification` | `/auth/resend-verification` | Issue a replacement verification OTP; never creates a session (an ACTIVE account gets `nextAction: LOGIN` without cookies) |
 | POST | `/auth/refresh` | `/auth/refresh` | Rotate refresh token and issue a new access token |
 | POST | `/auth/logout` | `/auth/logout` | Revoke refresh-token family and clear cookies |
@@ -47,7 +47,10 @@ Public routes are exposed through the gateway:
 Registration accepts `{ email, password }`, creates `PENDING_VERIFICATION`, and
 sends a six-digit OTP. A public request cannot select `CONTENT_MANAGER` or
 `ADMIN`. OTPs expire after five minutes, allow five attempts, and resend is
-limited to once per minute and five per hour per account/purpose.
+limited to once per minute and five per hour per account/purpose. Controllers
+relay service envelopes without re-wrapping, so `ADDITIONAL` responses keep
+`data.nextAction` at the top level; login keeps the service's `setCookies` and
+emits them as HttpOnly `Set-Cookie` headers.
 
 All API responses use the shared envelope `{ code, msg, data }`; `data` is always
 an object. `SUCCESS=0`, `ADDITIONAL=1`, and failures use the numeric auth codes
@@ -79,13 +82,19 @@ raw tokens or secrets. OTP verification and password reset use
 
 ## Kiểm thử
 
-- `apps/auth-service/test/auth.service.test.js`: registration, duplicate account,
-  invalid credentials, disabled/suspended login and OTP rejection, OTP
-  wrong/expired/used handling, resend without session creation, password
-  hashing and role authorization.
+- `apps/auth-service/test/auth.service.test.js`: registration, pending
+  registration resume (no duplicate account/password change/OTP), active-email
+  rejection, invalid vs unverified credentials, disabled/suspended login and
+  OTP rejection, OTP wrong/expired/single-use handling, already-verified
+  verify-email guidance, resend without session creation, resend rate limit,
+  password hashing and role authorization.
+- `apps/auth-service/test/auth.controller.test.js`: single additional envelope
+  (no double wrap), login Set-Cookie relay, 403 `VERIFY_EMAIL` guidance and
+  `LOGIN` guidance for verified accounts at the HTTP-shaping layer.
 - Web client `src/features/auth/flow/auth-flow.test.js`: envelope unwrapping,
-  single verify-OTP outcome, OTP vs session-load error separation, role-based
-  route mapping and guard behavior.
+  single verify-OTP outcome, OTP vs session-load error separation, verify-email
+  redirect detection, register next-screen decision, role-based route mapping
+  and guard behavior.
 - Gateway and auth service bootstrap logs confirm all five auth routes and cookie
   relay.
 

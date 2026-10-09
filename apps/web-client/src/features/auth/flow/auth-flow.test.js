@@ -1,11 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ResponseCode } from '@appenglish/auth-contracts';
+import { NextAction, ResponseCode } from '@appenglish/auth-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import {
   accountFromEnvelope,
   accountHasRole,
   dashboardPathForRole,
+  isVerificationRequiredError,
+  registerOutcome,
   verifyOtpAndRestoreSession
 } from './auth-flow.js';
 
@@ -53,8 +55,38 @@ test('valid OTP with a backend session produces one successful outcome', async (
   });
   assert.equal(calls.verify, 1);
   assert.equal(calls.restore, 1);
+  assert.equal(result.alreadyVerified, false);
   assert.equal(result.account.role, 'STUDENT');
   assert.equal(result.restoredAccount.role, 'STUDENT');
+});
+
+test('an already verified account is directed to login without loading a session', async () => {
+  let restoreCalls = 0;
+  const result = await verifyOtpAndRestoreSession({
+    verifyEmail: async () => ({ code: ResponseCode.ADDITIONAL, msg: 'additional', data: { nextAction: NextAction.LOGIN, email: 'student@example.com' } }),
+    restoreSession: async () => { restoreCalls += 1; return null; }
+  });
+  assert.equal(result.alreadyVerified, true);
+  assert.equal(result.account, null);
+  assert.equal(result.restoredAccount, null);
+  assert.equal(restoreCalls, 0);
+});
+
+test('login errors carrying VERIFY_EMAIL nextAction trigger the verification redirect', () => {
+  const unverified = { response: { status: 403, data: { code: ResponseCode.AUTH_EMAIL_NOT_VERIFIED, msg: 'fail', data: { nextAction: NextAction.VERIFY_EMAIL } } } };
+  assert.equal(isVerificationRequiredError(unverified), true);
+  const wrongPassword = { response: { status: 401, data: { code: ResponseCode.AUTH_INVALID_CREDENTIALS, msg: 'fail', data: {} } } };
+  assert.equal(isVerificationRequiredError(wrongPassword), false);
+  const disabled = { response: { status: 403, data: { code: ResponseCode.AUTH_ACCOUNT_DISABLED, msg: 'fail', data: {} } } };
+  assert.equal(isVerificationRequiredError(disabled), false);
+  assert.equal(isVerificationRequiredError(new Error('network down')), false);
+});
+
+test('register responses decide between the OTP screen and a plain failure', () => {
+  const pending = { code: ResponseCode.ADDITIONAL, msg: 'additional', data: { nextAction: NextAction.VERIFY_EMAIL, email: 'student@example.com' } };
+  assert.equal(registerOutcome(pending), 'verify-email');
+  assert.equal(registerOutcome(undefined), null);
+  assert.equal(registerOutcome({ code: ResponseCode.SUCCESS, msg: 'success', data: {} }), null);
 });
 
 test('invalid, expired or reused OTP keeps its own error and never loads a session', async () => {

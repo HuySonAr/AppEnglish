@@ -23,8 +23,18 @@ export function responseCode(response) {
   return response?.data?.code;
 }
 
+export function errorCode(error) {
+  return error?.response?.data?.code;
+}
+
+// Reads data.nextAction from an error envelope, e.g.
+// { code: 13, msg: 'fail', data: { nextAction: 'VERIFY_EMAIL' } }.
+export function errorNextAction(error) {
+  return error?.response?.data?.data?.nextAction ?? null;
+}
+
 export function getApiErrorMessage(error) {
-  const code = error?.response?.data?.code;
+  const code = errorCode(error);
   return messages[code] || error?.response?.data?.data?.message || 'Something went wrong. Please try again.';
 }
 

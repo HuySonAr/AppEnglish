@@ -9,7 +9,9 @@ export class AccountRepository {
 
   async findByEmail(email) {
     await this.ensureInitialized();
-    return this.dataSource.getRepository(AccountEntity).findOne({ where: { email } });
+    return this.dataSource
+      .getRepository(AccountEntity)
+      .findOne({ where: { email } });
   }
 
   async createAccount(account) {
@@ -28,20 +30,22 @@ export class AccountRepository {
 
   async findRefreshToken(tokenHash) {
     await this.ensureInitialized();
-    return this.dataSource.getRepository(RefreshTokenEntity).findOne({ where: { tokenHash } });
+    return this.dataSource
+      .getRepository(RefreshTokenEntity)
+      .findOne({ where: { tokenHash } });
   }
 
   async revokeRefreshToken(tokenHash, replacedByHash = null) {
     await this.ensureInitialized();
-    await this.dataSource.getRepository(RefreshTokenEntity).update(
-      { tokenHash },
-      { revokedAt: new Date(), replacedByHash }
-    );
+    await this.dataSource
+      .getRepository(RefreshTokenEntity)
+      .update({ tokenHash }, { revokedAt: new Date(), replacedByHash });
   }
 
   async revokeFamily(familyId) {
     await this.ensureInitialized();
-    await this.dataSource.getRepository(RefreshTokenEntity)
+    await this.dataSource
+      .getRepository(RefreshTokenEntity)
       .createQueryBuilder()
       .update()
       .set({ revokedAt: new Date() })
@@ -51,7 +55,9 @@ export class AccountRepository {
 
   async findAccountById(id) {
     await this.ensureInitialized();
-    return this.dataSource.getRepository(AccountEntity).findOne({ where: { id } });
+    return this.dataSource
+      .getRepository(AccountEntity)
+      .findOne({ where: { id } });
   }
 
   async saveOtp(otp) {
@@ -61,13 +67,38 @@ export class AccountRepository {
 
   async invalidateOtps(accountId, purpose) {
     await this.ensureInitialized();
-    await this.dataSource.getRepository(OtpEntity).createQueryBuilder().update()
-      .set({ usedAt: new Date() }).where('"accountId" = :accountId AND "purpose" = :purpose AND "usedAt" IS NULL', { accountId, purpose }).execute();
+    await this.dataSource
+      .getRepository(OtpEntity)
+      .createQueryBuilder()
+      .update()
+      .set({ usedAt: new Date() })
+      .where(
+        '"accountId" = :accountId AND "purpose" = :purpose AND "usedAt" IS NULL',
+        { accountId, purpose },
+      )
+      .execute();
   }
 
   async findLatestOtp(accountId, purpose) {
     await this.ensureInitialized();
-    return this.dataSource.getRepository(OtpEntity).findOne({ where: { accountId, purpose, usedAt: null }, order: { createdAt: 'DESC' } });
+    return this.dataSource
+      .getRepository(OtpEntity)
+      .findOne({
+        where: { accountId, purpose, usedAt: null },
+        order: { createdAt: 'DESC' },
+      });
+  }
+
+  // Latest challenge regardless of usedAt; verification uses this to reject
+  // already-used codes explicitly instead of relying on the unused filter.
+  async findLatestOtpChallenge(accountId, purpose) {
+    await this.ensureInitialized();
+    return this.dataSource
+      .getRepository(OtpEntity)
+      .findOne({
+        where: { accountId, purpose },
+        order: { createdAt: 'DESC' },
+      });
   }
 
   async updateOtp(id, values) {
@@ -77,18 +108,31 @@ export class AccountRepository {
 
   async countRecentOtps(accountId, purpose, since) {
     await this.ensureInitialized();
-    return this.dataSource.getRepository(OtpEntity).createQueryBuilder('otp')
-      .where('otp."accountId" = :accountId AND otp."purpose" = :purpose AND otp."createdAt" >= :since', { accountId, purpose, since }).getCount();
+    return this.dataSource
+      .getRepository(OtpEntity)
+      .createQueryBuilder('otp')
+      .where(
+        'otp."accountId" = :accountId AND otp."purpose" = :purpose AND otp."createdAt" >= :since',
+        { accountId, purpose, since },
+      )
+      .getCount();
   }
 
   async incrementSessionVersion(accountId) {
     await this.ensureInitialized();
-    await this.dataSource.getRepository(AccountEntity).increment({ id: accountId }, 'sessionVersion', 1);
+    await this.dataSource
+      .getRepository(AccountEntity)
+      .increment({ id: accountId }, 'sessionVersion', 1);
   }
 
   async revokeAccountSessions(accountId) {
     await this.ensureInitialized();
-    await this.dataSource.getRepository(RefreshTokenEntity).createQueryBuilder().update()
-      .set({ revokedAt: new Date() }).where('"accountId" = :accountId AND "revokedAt" IS NULL', { accountId }).execute();
+    await this.dataSource
+      .getRepository(RefreshTokenEntity)
+      .createQueryBuilder()
+      .update()
+      .set({ revokedAt: new Date() })
+      .where('"accountId" = :accountId AND "revokedAt" IS NULL', { accountId })
+      .execute();
   }
 }

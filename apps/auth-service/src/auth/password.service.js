@@ -14,6 +14,9 @@ export class PasswordService {
     if (algorithm !== 'scrypt' || !salt || !storedKey) return false;
     const derivedKey = scryptSync(password, salt, keyLength);
     const expectedKey = Buffer.from(storedKey, 'hex');
-    return expectedKey.length === derivedKey.length && timingSafeEqual(expectedKey, derivedKey);
+    return (
+      expectedKey.length === derivedKey.length &&
+      timingSafeEqual(expectedKey, derivedKey)
+    );
   }
 }

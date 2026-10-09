@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { forgotPassword } from '../api/auth-api.js';
 import { AuthCard } from '../components/AuthCard.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { useToast } from '../../../components/shared/ToastProvider.jsx';
 
 export function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
+  const location = useLocation();
+  const [email, setEmail] = useState(location.state?.email || '');
   const [pending, setPending] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();

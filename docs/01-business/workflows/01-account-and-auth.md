@@ -10,9 +10,19 @@ Không tự giả định OTP/OAuth, cookie/token, TTL hoặc reset password. Ki
 ## F01 đã triển khai
 
 - `POST /auth/register` qua API Gateway tạo tài khoản Student trong `app_identity`.
+  Email PENDING_VERIFICATION đăng ký lại trả `ADDITIONAL` + `nextAction: VERIFY_EMAIL`
+  (không tạo account trùng, không đổi password, không gửi lại OTP tự động);
+  email ACTIVE trả `AUTH_EMAIL_ALREADY_REGISTERED` và UI hướng dẫn đăng nhập
+  hoặc quên mật khẩu.
 - `POST /auth/login` qua API Gateway xác minh email/password và tạo phiên.
+  Chỉ sau khi email+password khớp, tài khoản PENDING_VERIFICATION trả 403
+  `AUTH_EMAIL_NOT_VERIFIED` + `nextAction: VERIFY_EMAIL`; UI chuyển sang
+  `/verify-email` với email trong route state. Sai password luôn trả
+  `AUTH_INVALID_CREDENTIALS` (không lộ trạng thái xác minh).
 - `POST /auth/verify-email` qua API Gateway tạo phiên cookie sau khi xác minh
-  OTP; DISABLED/SUSPENDED bị từ chối 403 và không được kích hoạt lại.
+  OTP; DISABLED/SUSPENDED bị từ chối 403 và không được kích hoạt lại; email đã
+  ACTIVE trả `nextAction: LOGIN` (không verify lại, không tạo session thứ hai).
+  OTP là một lần dùng: challenge có `usedAt` bị từ chối tường minh.
 - `POST /auth/resend-verification` chỉ cấp lại OTP; tài khoản ACTIVE nhận
   `nextAction: LOGIN` và không nhận session (không cấp cookie chỉ theo email).
 - `POST /auth/refresh` xoay refresh token; token cũ bị dùng lại sẽ thu hồi family.
