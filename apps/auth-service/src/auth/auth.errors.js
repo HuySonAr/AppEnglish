@@ -25,6 +25,10 @@ export const authErrors = Object.freeze({
     new AuthError(20, 'Refresh token reuse detected', 401),
   sessionExpired: () => new AuthError(21, 'Session is expired or invalid', 401),
   accountSuspended: () => new AuthError(22, 'Account is suspended', 403),
+  lastAdmin: () =>
+    new AuthError(23, 'The last active administrator cannot be demoted or disabled', 409),
+  emailVerificationRequired: () =>
+    new AuthError(25, 'Email verification is required before activation', 409),
   invalidRole: () =>
     new AuthError(30, 'Role is not allowed for public registration', 403),
   emailSend: () => new AuthError(31, 'Unable to send verification email', 503),

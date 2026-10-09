@@ -31,14 +31,15 @@ Module({
     },
     {
       provide: AuthService,
-      useFactory: (repository, passwordService, tokenService, emailService) =>
+      useFactory: (repository, passwordService, tokenService, emailService, authorizationService) =>
         new AuthService(
           repository,
           passwordService,
           tokenService,
           emailService,
+          authorizationService,
         ),
-      inject: [AUTH_REPOSITORY, PasswordService, TokenService, EmailService],
+      inject: [AUTH_REPOSITORY, PasswordService, TokenService, EmailService, AuthorizationService],
     },
     {
       provide: AuthController,

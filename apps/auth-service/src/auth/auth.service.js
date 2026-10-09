@@ -2,15 +2,27 @@ import { accountResponseSchema, authResponseSchema } from './auth.schemas.js';
 import { authErrors } from './auth.errors.js';
 import { AccountResponseDto } from './auth.dto.js';
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
-import { AccountStatus } from './auth.constants.js';
-import { NextAction, OtpPurpose, ResponseCode, ResponseMsg } from '@appenglish/auth-contracts';
+import { AccountRole, AccountStatus } from './auth.constants.js';
+import {
+  NextAction,
+  OtpPurpose,
+  ResponseCode,
+  ResponseMsg,
+} from '@appenglish/auth-contracts';
 
 export class AuthService {
-  constructor(accountRepository, passwordService, tokenService, emailService) {
+  constructor(
+    accountRepository,
+    passwordService,
+    tokenService,
+    emailService,
+    authorizationService,
+  ) {
     this.accountRepository = accountRepository;
     this.passwordService = passwordService;
     this.tokenService = tokenService;
     this.emailService = emailService;
+    this.authorizationService = authorizationService;
   }
 
   async register(input) {
@@ -244,6 +256,77 @@ export class AuthService {
     });
   }
 
+  async adminList(accessToken, query) {
+    const actor = await this.requireAdmin(accessToken);
+    const result = await this.accountRepository.listAccounts(query);
+    return {
+      actorId: actor.id,
+      items: result.items.map((account) => this.toAdminResponse(account)),
+      pagination: {
+        page: query.page,
+        pageSize: query.pageSize,
+        total: result.total,
+        totalPages: Math.ceil(result.total / query.pageSize),
+      },
+    };
+  }
+
+  async adminGet(accessToken, accountId) {
+    await this.requireAdmin(accessToken);
+    const account = await this.accountRepository.findAccountById(accountId);
+    if (!account) throw authErrors.accountNotFound();
+    return { account: this.toAdminResponse(account) };
+  }
+
+  async adminUpdate(accessToken, accountId, changes) {
+    const actor = await this.requireAdmin(accessToken);
+    const target = await this.accountRepository.findAccountById(accountId);
+    if (!target) throw authErrors.accountNotFound();
+    const nextRole = changes.role ?? target.role;
+    const nextStatus = changes.status ?? target.status;
+    if (
+      target.status === AccountStatus.PENDING_VERIFICATION &&
+      nextStatus === AccountStatus.ACTIVE
+    )
+      throw authErrors.emailVerificationRequired();
+    if (
+      target.role === AccountRole.ADMIN &&
+      target.status === AccountStatus.ACTIVE &&
+      (nextRole !== AccountRole.ADMIN || nextStatus !== AccountStatus.ACTIVE) &&
+      (await this.accountRepository.countActiveAdmins()) <= 1
+    ) {
+      throw authErrors.lastAdmin();
+    }
+    if (nextRole === target.role && nextStatus === target.status)
+      return { account: this.toAdminResponse(target), changed: false };
+    const previous = { role: target.role, status: target.status };
+    target.role = nextRole;
+    target.status = nextStatus;
+    target.sessionVersion = (target.sessionVersion || 0) + 1;
+    await this.accountRepository.updateAccountAndAudit(target, {
+      actorId: actor.id,
+      targetAccountId: target.id,
+      action:
+        changes.role !== undefined && changes.status !== undefined
+          ? 'ROLE_STATUS_UPDATED'
+          : changes.role !== undefined
+            ? 'ROLE_UPDATED'
+            : 'STATUS_UPDATED',
+      previousRole: previous.role,
+      nextRole: target.role,
+      previousStatus: previous.status,
+      nextStatus: target.status,
+    });
+    return { account: this.toAdminResponse(target), changed: true };
+  }
+
+  async requireAdmin(accessToken) {
+    const account = await this.me(accessToken);
+    return this.authorizationService.assertRole(account.account, [
+      AccountRole.ADMIN,
+    ]);
+  }
+
   async refresh(rawToken) {
     if (!rawToken) throw authErrors.sessionExpired();
     const tokenHash = this.tokenService.hashRefreshToken(rawToken);
@@ -319,5 +402,14 @@ export class AuthService {
         createdAt: new Date(account.createdAt).toISOString(),
       }),
     );
+  }
+
+  toAdminResponse(account) {
+    return {
+      ...this.toResponse(account),
+      emailVerifiedAt: account.emailVerifiedAt
+        ? new Date(account.emailVerifiedAt).toISOString()
+        : null,
+    };
   }
 }

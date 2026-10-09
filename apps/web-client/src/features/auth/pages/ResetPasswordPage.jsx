@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../api/auth-api.js';
-import { AuthCard } from '../components/AuthCard.jsx';
+import { AuthCard, AuthLink } from '../components/AuthCard.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
-import { useToast } from '../../../components/shared/ToastProvider.jsx';
+import { useToast } from '../../../hooks/use-toast.js';
+import { Button } from '../../../components/ui/button.jsx';
+import { Input } from '../../../components/ui/input.jsx';
+import { Label } from '../../../components/ui/label.jsx';
 
 export function ResetPasswordPage() {
   const location = useLocation();
@@ -18,21 +21,72 @@ export function ResetPasswordPage() {
     setPending(true);
     try {
       await resetPassword({ email, otp, password });
-      toast('Password reset successfully. Please sign in.', 'success');
+      toast({ title: 'Password reset', description: 'Please sign in.' });
       navigate('/login', { replace: true });
     } catch (error) {
-      toast(getApiErrorMessage(error), 'error');
+      toast({
+        title: 'Password reset failed',
+        description: getApiErrorMessage(error),
+        variant: 'destructive',
+      });
     } finally {
       setPending(false);
     }
   }
-  return <AuthCard title="Reset password" description="Enter the reset code and choose a new password.">
-    <form className="space-y-5" onSubmit={submit}>
-      <label className="block text-sm">Email<input className="mt-2 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label>
-      <label className="block text-sm">Reset code<input className="mt-2 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 tracking-[0.3em]" inputMode="numeric" pattern="\d{6}" maxLength="6" value={otp} onChange={(event) => setOtp(event.target.value)} required /></label>
-      <label className="block text-sm">New password<input className="mt-2 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2" type="password" minLength="8" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
-      <button className="w-full rounded-md bg-cyan-500 px-4 py-2 font-medium text-slate-950 disabled:opacity-60" disabled={pending} type="submit">{pending ? 'Resetting…' : 'Reset password'}</button>
-    </form>
-    <p className="mt-6 text-sm text-slate-400"><Link className="text-cyan-300 underline" to="/login">Back to sign in</Link></p>
-  </AuthCard>;
+  return (
+    <AuthCard
+      title="Reset password"
+      description="Enter the reset code and choose a new password."
+    >
+      <form className="space-y-5" onSubmit={submit}>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+            disabled={pending}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="otp">Reset code</Label>
+          <Input
+            id="otp"
+            inputMode="numeric"
+            pattern="\d{6}"
+            maxLength="6"
+            value={otp}
+            onChange={(event) => setOtp(event.target.value)}
+            required
+            disabled={pending}
+            className="tracking-[0.3em]"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="password">New password</Label>
+          <Input
+            id="password"
+            type="password"
+            minLength="8"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+            disabled={pending}
+          />
+        </div>
+        <Button
+          className="w-full"
+          disabled={pending}
+          type="submit"
+        >
+          {pending ? 'Resetting…' : 'Reset password'}
+        </Button>
+      </form>
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        <AuthLink to="/login">Back to sign in</AuthLink>
+      </p>
+    </AuthCard>
+  );
 }

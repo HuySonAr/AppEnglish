@@ -26,6 +26,7 @@ No teacher/instructor or excluded product role is defined.
 - Migration: `apps/auth-service/src/database/migrations/1710000000000-create-accounts.js`.
 - Refresh migration: `apps/auth-service/src/database/migrations/1710000001000-create-refresh-tokens.js`.
 - OTP migration: `apps/auth-service/src/database/migrations/1710000002000-add-auth-verification-otp.js`.
+- Account audit migration: `apps/auth-service/src/database/migrations/1710000003000-create-account-audits.js`.
 - Passwords are stored as scrypt-derived hashes; plaintext passwords are never persisted.
 
 ## API/events
@@ -43,6 +44,9 @@ Public routes are exposed through the gateway:
 | GET | `/auth/me` | `/auth/me` | Validate access cookie and return current account |
 | POST | `/auth/forgot-password` | `/auth/forgot-password` | Start password reset without email enumeration |
 | POST | `/auth/reset-password` | `/auth/reset-password` | Verify reset OTP and revoke sessions |
+| GET | `/auth/admin/accounts` | `/auth/admin/accounts` | ADMIN-only account list with email/role/status filters and pagination |
+| GET | `/auth/admin/accounts/:id` | `/auth/admin/accounts/:id` | ADMIN-only safe account detail |
+| PATCH | `/auth/admin/accounts/:id` | `/auth/admin/accounts/:id` | ADMIN-only role/status update; invalidates sessions and writes audit |
 
 Registration accepts `{ email, password }`, creates `PENDING_VERIFICATION`, and
 sends a six-digit OTP. A public request cannot select `CONTENT_MANAGER` or
@@ -69,6 +73,21 @@ Error responses use the same envelope and never expose password hashes, OTPs,
 raw tokens or secrets. OTP verification and password reset use
 `AUTH_OTP_INVALID`, `AUTH_OTP_EXPIRED`, `AUTH_OTP_ATTEMPTS_EXCEEDED` and
 `AUTH_EMAIL_NOT_VERIFIED`.
+
+Admin account APIs re-validate the access session and `ADMIN` role on every
+request. They return only identity metadata and `emailVerifiedAt`; passwords,
+OTP/session data and tokens are never returned. Status updates accept only
+`ACTIVE`, `DISABLED`, or `SUSPENDED`; a `PENDING_VERIFICATION` account cannot be
+activated by an administrator. Role/status changes increment `sessionVersion`,
+revoke refresh sessions, and append an audit row containing actor, target,
+before/after values, and timestamp. The last active administrator cannot be
+demoted or disabled.
+
+For a first administrator, set `ADMIN_BOOTSTRAP_EMAIL` and
+`ADMIN_BOOTSTRAP_PASSWORD` only in the local environment and run
+`pnpm --filter @appenglish/auth-service admin:bootstrap` once after migrations.
+The command is idempotent, never logs the password, and public registration
+cannot create an administrator.
 
 ## Dependencies/config
 

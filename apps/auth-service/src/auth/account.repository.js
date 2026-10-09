@@ -60,6 +60,43 @@ export class AccountRepository {
       .findOne({ where: { id } });
   }
 
+  async listAccounts({ email, role, status, page, pageSize }) {
+    await this.ensureInitialized();
+    const query = this.dataSource.getRepository(AccountEntity).createQueryBuilder('account');
+    if (email) query.andWhere('LOWER(account.email) LIKE LOWER(:email)', { email: `%${email}%` });
+    if (role) query.andWhere('account.role = :role', { role });
+    if (status) query.andWhere('account.status = :status', { status });
+    query.orderBy('account.createdAt', 'DESC').skip((page - 1) * pageSize).take(pageSize);
+    const [items, total] = await query.getManyAndCount();
+    return { items, total };
+  }
+
+  async countActiveAdmins() {
+    await this.ensureInitialized();
+    return this.dataSource.getRepository(AccountEntity).count({
+      where: { role: 'ADMIN', status: 'ACTIVE' },
+    });
+  }
+
+  async saveAudit(audit) {
+    await this.ensureInitialized();
+    return this.dataSource.getRepository('AccountAudit').save(audit);
+  }
+
+  async updateAccountAndAudit(account, audit) {
+    await this.ensureInitialized();
+    return this.dataSource.transaction(async (manager) => {
+      await manager.getRepository(AccountEntity).save(account);
+      await manager.getRepository(RefreshTokenEntity)
+        .createQueryBuilder()
+        .update()
+        .set({ revokedAt: new Date() })
+        .where('"accountId" = :accountId AND "revokedAt" IS NULL', { accountId: account.id })
+        .execute();
+      return manager.getRepository('AccountAudit').save(audit);
+    });
+  }
+
   async saveOtp(otp) {
     await this.ensureInitialized();
     return this.dataSource.getRepository(OtpEntity).save(otp);

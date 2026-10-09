@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Param, Patch, Post, Query, Req, Res } from '@nestjs/common';
 
 export class AuthGatewayController {
   async register(body, request, response) {
@@ -25,9 +25,19 @@ export class AuthGatewayController {
   async me(request, response) {
     return this.forward('/auth/me', undefined, request, response);
   }
+  async adminList(query, request, response) {
+    const params = new URLSearchParams(query).toString();
+    return this.forward(`/auth/admin/accounts${params ? `?${params}` : ''}`, undefined, request, response);
+  }
+  async adminGet(accountId, request, response) {
+    return this.forward(`/auth/admin/accounts/${accountId}`, undefined, request, response);
+  }
+  async adminUpdate(accountId, body, request, response) {
+    return this.forward(`/auth/admin/accounts/${accountId}`, body, request, response);
+  }
 
   async forward(path, body, request, response) {
-    const method = path === '/auth/me' ? 'GET' : 'POST';
+    const method = path === '/auth/me' || path.startsWith('/auth/admin/accounts') && !body ? 'GET' : body && path.startsWith('/auth/admin/accounts') ? 'PATCH' : 'POST';
     let upstream;
     try {
       upstream = await fetch(`http://localhost:${process.env.AUTH_SERVICE_PORT || 3001}${path}`, {
@@ -86,3 +96,16 @@ Res({ passthrough: true })(AuthGatewayController.prototype, 'logout', 1);
 Get('me')(AuthGatewayController.prototype, 'me', Object.getOwnPropertyDescriptor(AuthGatewayController.prototype, 'me'));
 Req()(AuthGatewayController.prototype, 'me', 0);
 Res({ passthrough: true })(AuthGatewayController.prototype, 'me', 1);
+Get('admin/accounts')(AuthGatewayController.prototype, 'adminList', Object.getOwnPropertyDescriptor(AuthGatewayController.prototype, 'adminList'));
+Query()(AuthGatewayController.prototype, 'adminList', 0);
+Req()(AuthGatewayController.prototype, 'adminList', 1);
+Res({ passthrough: true })(AuthGatewayController.prototype, 'adminList', 2);
+Get('admin/accounts/:id')(AuthGatewayController.prototype, 'adminGet', Object.getOwnPropertyDescriptor(AuthGatewayController.prototype, 'adminGet'));
+Param('id')(AuthGatewayController.prototype, 'adminGet', 0);
+Req()(AuthGatewayController.prototype, 'adminGet', 1);
+Res({ passthrough: true })(AuthGatewayController.prototype, 'adminGet', 2);
+Patch('admin/accounts/:id')(AuthGatewayController.prototype, 'adminUpdate', Object.getOwnPropertyDescriptor(AuthGatewayController.prototype, 'adminUpdate'));
+Param('id')(AuthGatewayController.prototype, 'adminUpdate', 0);
+Body()(AuthGatewayController.prototype, 'adminUpdate', 1);
+Req()(AuthGatewayController.prototype, 'adminUpdate', 2);
+Res({ passthrough: true })(AuthGatewayController.prototype, 'adminUpdate', 3);

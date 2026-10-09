@@ -1,27 +1,41 @@
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '../../../components/ui/card.jsx';
+import { cn } from '../../../lib/utils.js';
+
 export function AuthCard({
   eyebrow = 'AppEnglish',
   title,
   description,
   children,
+  className,
 }) {
   return (
-    <section className="mx-auto w-full max-w-md px-6 py-12">
-      <p className="text-sm font-medium uppercase tracking-widest text-cyan-400">
-        {eyebrow}
-      </p>
-      <h1 className="mt-3 text-3xl font-bold">{title}</h1>
-      {description && (
-        <p className="mt-2 text-sm text-slate-400">{description}</p>
-      )}
-      <div className="mt-8">{children}</div>
-    </section>
+    <div className="flex w-full items-center justify-center">
+      <Card className={cn('w-full max-w-md', className)}>
+        <CardHeader className="text-center">
+          <p className="text-sm font-medium uppercase tracking-widest text-primary">
+            {eyebrow}
+          </p>
+          <CardTitle className="text-2xl">{title}</CardTitle>
+          {description && (
+            <CardDescription className="text-sm">{description}</CardDescription>
+          )}
+        </CardHeader>
+        <CardContent className="pt-0">{children}</CardContent>
+      </Card>
+    </div>
   );
 }
 
 export function AuthLink({ children, ...props }) {
   return (
     <a
-      className="text-sm text-cyan-300 underline underline-offset-4"
+      className="text-sm text-primary underline underline-offset-4 hover:text-primary/80"
       {...props}
     >
       {children}

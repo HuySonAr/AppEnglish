@@ -9,7 +9,8 @@
     "start": "node --env-file=../../.env src/main.js",
     "lint": "node --check src/main.js",
     "test": "node --test test/*.test.js",
-    "migration:run": "node --env-file=../../.env src/database/run-migrations.js"
+    "migration:run": "node --env-file=../../.env src/database/run-migrations.js",
+    "admin:bootstrap": "node --env-file=../../.env src/database/bootstrap-admin.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.6",

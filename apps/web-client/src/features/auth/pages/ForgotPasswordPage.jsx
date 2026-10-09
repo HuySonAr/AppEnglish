@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { forgotPassword } from '../api/auth-api.js';
-import { AuthCard } from '../components/AuthCard.jsx';
+import { AuthCard, AuthLink } from '../components/AuthCard.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
-import { useToast } from '../../../components/shared/ToastProvider.jsx';
+import { useToast } from '../../../hooks/use-toast.js';
+import { Button } from '../../../components/ui/button.jsx';
+import { Input } from '../../../components/ui/input.jsx';
+import { Label } from '../../../components/ui/label.jsx';
 
 export function ForgotPasswordPage() {
   const location = useLocation();
@@ -16,10 +19,11 @@ export function ForgotPasswordPage() {
     setPending(true);
     try {
       const result = await forgotPassword({ email });
-      toast(
-        'If the account can receive mail, a reset code has been sent.',
-        'success',
-      );
+      toast({
+        title: 'Reset code requested',
+        description:
+          'If the account can receive mail, a reset code has been sent.',
+      });
       navigate('/reset-password', {
         state: {
           email,
@@ -27,7 +31,11 @@ export function ForgotPasswordPage() {
         },
       });
     } catch (error) {
-      toast(getApiErrorMessage(error), 'error');
+      toast({
+        title: 'Request failed',
+        description: getApiErrorMessage(error),
+        variant: 'destructive',
+      });
     } finally {
       setPending(false);
     }
@@ -38,28 +46,27 @@ export function ForgotPasswordPage() {
       description="Request a password reset code without revealing account details."
     >
       <form className="space-y-5" onSubmit={submit}>
-        <label className="block text-sm">
-          Email
-          <input
-            className="mt-2 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2"
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
+            disabled={pending}
           />
-        </label>
-        <button
-          className="w-full rounded-md bg-cyan-500 px-4 py-2 font-medium text-slate-950 disabled:opacity-60"
+        </div>
+        <Button
+          className="w-full"
           disabled={pending}
           type="submit"
         >
           {pending ? 'Sending…' : 'Send reset code'}
-        </button>
+        </Button>
       </form>
-      <p className="mt-6 text-sm text-slate-400">
-        <Link className="text-cyan-300 underline" to="/login">
-          Back to sign in
-        </Link>
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        <AuthLink to="/login">Back to sign in</AuthLink>
       </p>
     </AuthCard>
   );

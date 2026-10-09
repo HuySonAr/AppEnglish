@@ -2,14 +2,17 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { authFormSchema } from '../schemas/auth-schemas.js';
-import { AuthCard } from '../components/AuthCard.jsx';
+import { AuthCard, AuthLink } from '../components/AuthCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import {
   dashboardPathForRole,
   isVerificationRequiredError,
 } from '../flow/auth-flow.js';
-import { useToast } from '../../../components/shared/ToastProvider.jsx';
+import { useToast } from '../../../hooks/use-toast.js';
+import { Button } from '../../../components/ui/button.jsx';
+import { Input } from '../../../components/ui/input.jsx';
+import { Label } from '../../../components/ui/label.jsx';
 
 export function LoginPage() {
   const { signIn } = useAuth();
@@ -24,66 +27,66 @@ export function LoginPage() {
     try {
       const account = await signIn(values);
       const target =
-        location.state?.from?.pathname ||
-        dashboardPathForRole(account.role);
-      toast('Signed in successfully.', 'success');
+        location.state?.from?.pathname || dashboardPathForRole(account.role);
+      toast({ title: 'Signed in successfully.' });
       navigate(target, { replace: true });
     } catch (error) {
       if (isVerificationRequiredError(error)) {
-        // Credentials matched but the account is PENDING_VERIFICATION; guide
-        // the user to the OTP step instead of a generic error toast.
-        toast('Verify your email before signing in.', 'info');
+        toast({ title: 'Verify your email before signing in.' });
         navigate('/verify-email', { state: { email: values.email } });
         return;
       }
-      toast(getApiErrorMessage(error), 'error');
+      toast({
+        title: 'Sign in failed',
+        description: getApiErrorMessage(error),
+        variant: 'destructive',
+      });
     }
   });
 
   return (
     <AuthCard title="Sign in" description="Use your AppEnglish credentials.">
       <form className="space-y-5" onSubmit={submit}>
-        <label className="block text-sm">
-          Email
-          <input
-            className="mt-2 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2"
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
             type="email"
+            placeholder="you@example.com"
             {...form.register('email')}
+            disabled={form.formState.isSubmitting}
           />
           {form.formState.errors.email && (
-            <span className="mt-1 block text-xs text-rose-300">
+            <p className="text-sm text-destructive" role="alert">
               {form.formState.errors.email.message}
-            </span>
+            </p>
           )}
-        </label>
-        <label className="block text-sm">
-          Password
-          <input
-            className="mt-2 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2"
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
             type="password"
             {...form.register('password')}
+            disabled={form.formState.isSubmitting}
           />
           {form.formState.errors.password && (
-            <span className="mt-1 block text-xs text-rose-300">
+            <p className="text-sm text-destructive" role="alert">
               {form.formState.errors.password.message}
-            </span>
+            </p>
           )}
-        </label>
-        <button
-          className="w-full rounded-md bg-cyan-500 px-4 py-2 font-medium text-slate-950 disabled:opacity-60"
+        </div>
+        <Button
+          className="w-full"
           disabled={form.formState.isSubmitting}
           type="submit"
         >
           {form.formState.isSubmitting ? 'Signing in…' : 'Sign in'}
-        </button>
+        </Button>
       </form>
       <div className="mt-6 flex justify-between gap-4">
-        <Link className="text-sm text-cyan-300 underline" to="/register">
-          Create account
-        </Link>
-        <Link className="text-sm text-cyan-300 underline" to="/forgot-password">
-          Forgot password?
-        </Link>
+        <AuthLink to="/register">Create account</AuthLink>
+        <AuthLink to="/forgot-password">Forgot password?</AuthLink>
       </div>
     </AuthCard>
   );
