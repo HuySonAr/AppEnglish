@@ -8,7 +8,7 @@
     "dev": "vite",
     "start": "vite",
     "lint": "vite build",
-    "test": "node --check src/lib/api/http-client.js"
+    "test": "node --test src/lib/api/*.test.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

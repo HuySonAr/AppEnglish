@@ -1,3 +1,9 @@
+export const AccountRole = Object.freeze({
+  STUDENT: 'STUDENT',
+  CONTENT_MANAGER: 'CONTENT_MANAGER',
+  ADMIN: 'ADMIN'
+});
+
 export const AccountStatus = Object.freeze({
   PENDING_VERIFICATION: 'PENDING_VERIFICATION',
   ACTIVE: 'ACTIVE',
