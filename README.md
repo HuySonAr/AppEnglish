@@ -19,6 +19,7 @@ Các chi tiết runtime đã tạo có bằng chứng trong `package.json`, `pnp
 ```powershell
 pnpm install
 Copy-Item .env.example .env
+pnpm --filter @appenglish/auth-service migration:run
 docker compose up -d redis rabbitmq
 pnpm dev
 ```
@@ -27,6 +28,10 @@ PostgreSQL không chạy trong Compose. Cài/chạy PostgreSQL native trên Wind
 đó chạy `psql -h localhost -U postgres -f scripts/postgres/create-databases.sql`
 hoặc mở script trong pgAdmin/DBeaver. Script chỉ tạo database còn thiếu, không
 drop/reset database hiện có. Xem [development guide](docs/05-operations/development.md).
+
+F01 web auth is available at `http://localhost:5173/auth`; the gateway API is at
+`http://localhost:3000` and readiness is `GET /health/ready`. Fill the local
+`POSTGRES_PASSWORD` in `.env`; never commit `.env`.
 
 ## Apps
 

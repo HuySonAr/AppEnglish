@@ -9,3 +9,20 @@ export async function loginAccount(payload) {
   const response = await httpClient.post('/auth/login', payload);
   return response.data;
 }
+
+export async function getCurrentUser() {
+  try {
+    const response = await httpClient.get('/auth/me');
+    return response.data;
+  } catch (error) {
+    if (error.response?.status !== 401) throw error;
+    await httpClient.post('/auth/refresh');
+    const response = await httpClient.get('/auth/me');
+    return response.data;
+  }
+}
+
+export async function logoutAccount() {
+  const response = await httpClient.post('/auth/logout');
+  return response.data;
+}

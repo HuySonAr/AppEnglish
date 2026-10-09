@@ -31,10 +31,10 @@ nhận bằng pgAdmin/DBeaver.
 
 ## F01 auth schema
 
-`auth-service` owns the `accounts` table in `app_identity`. The non-destructive
-TypeORM migration creates email, scrypt password hash, role, status, and audit
-timestamps. F01 does not run the migration automatically and does not access any
-other service database.
+`auth-service` owns `accounts` and `refresh_tokens` in `app_identity`. The
+append-only TypeORM migrations create refresh-token family/revocation data
+without dropping existing tables. F01 does not access any other service
+database.
 
 ## Service ngoài phạm vi
 Payment service không thuộc nghiệp vụ Reading/Listening hiện tại. Nếu repository có service này, không gán nó vào content/learning và không xóa service/schema hiện hữu tự động. Kiểm tra code, migrations và dependencies; ghi lại trạng thái hiện tại, sau đó chỉ loại bỏ khi có quyết định riêng. Nếu còn một service khác không có trong mapping, không tự tạo database cho nó: trước tiên xác minh trách nhiệm và quyết định owner.

@@ -23,5 +23,5 @@ export const accountResponseSchema = z.object({
 export const authResponseSchema = z.object({
   account: accountResponseSchema,
   authenticated: z.literal(true),
-  authentication: z.literal('credential_verified')
+  authentication: z.enum(['credential_verified', 'session'])
 });

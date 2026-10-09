@@ -19,10 +19,27 @@
 
 ## Trình tự khởi chạy (mục tiêu sau khi có source/config)
 1. Khởi động Windows service PostgreSQL.
-2. Xác nhận bốn database đã được tạo và migrations phù hợp đã chạy.
+2. Xác nhận bốn database đã được tạo và chạy migration auth:
+   `pnpm --filter @appenglish/auth-service migration:run`.
 3. Khởi động riêng các container Redis và RabbitMQ bằng Compose.
 4. Chạy các NestJS services và API Gateway cần cho feature.
 5. Chạy web client React/Vite.
+
+## F01 PowerShell
+
+```powershell
+pnpm install
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+# Điền POSTGRES_PASSWORD trong .env; không commit .env.
+pnpm --filter @appenglish/auth-service migration:run
+docker compose up -d redis rabbitmq
+pnpm dev
+```
+
+Open `http://localhost:5173/auth`; the public API is
+`http://localhost:3000` and readiness is `http://localhost:3000/health/ready`.
+Vite proxies `/auth` and `/health` to the gateway, keeping browser requests
+same-origin in development.
 
 ## Media storage (F02A)
 

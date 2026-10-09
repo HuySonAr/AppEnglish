@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "build": "node --check src/main.js",
-    "dev": "node --watch src/main.js",
-    "start": "node src/main.js",
+    "dev": "node --env-file=../../.env --watch src/main.js",
+    "start": "node --env-file=../../.env src/main.js",
     "lint": "node --check src/main.js",
     "test": "node --test test/auth.service.test.js",
-    "migration:run": "typeorm migration:run -d src/database/data-source.js"
+    "migration:run": "node --env-file=../../.env src/database/run-migrations.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.6",

@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 export const httpClient = axios.create({
-  baseURL: import.meta.env.VITE_GATEWAY_URL || 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_GATEWAY_URL || '',
+  withCredentials: true,
   timeout: 5000
 });
 
