@@ -11,12 +11,15 @@ export const registerSchema = z.object({
 }).strict();
 
 export const loginSchema = z.object({ email, password }).strict();
+export const verifyEmailSchema = z.object({ email, otp: z.string().regex(/^\d{6}$/) }).strict();
+export const forgotPasswordSchema = z.object({ email }).strict();
+export const resetPasswordSchema = z.object({ email, otp: z.string().regex(/^\d{6}$/), password }).strict();
 
 export const accountResponseSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   role: z.enum(Object.values(AccountRole)),
-  status: z.enum(['ACTIVE', 'DISABLED']),
+  status: z.enum(['PENDING_VERIFICATION', 'ACTIVE', 'DISABLED', 'SUSPENDED']),
   createdAt: z.string()
 });
 

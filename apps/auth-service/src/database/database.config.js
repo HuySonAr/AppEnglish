@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { AccountEntity } from './account.entity.js';
 import { RefreshTokenEntity } from './refresh-token.entity.js';
+import { OtpEntity } from './otp.entity.js';
 
 export function createAuthDataSource() {
   return new DataSource({
@@ -10,7 +11,7 @@ export function createAuthDataSource() {
     username: process.env.POSTGRES_USER || 'postgres',
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.AUTH_DATABASE_NAME || 'app_identity',
-    entities: [AccountEntity, RefreshTokenEntity],
+    entities: [AccountEntity, RefreshTokenEntity, OtpEntity],
     migrations: ['src/database/migrations/*.js']
   });
 }

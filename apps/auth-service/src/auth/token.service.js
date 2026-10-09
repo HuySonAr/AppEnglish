@@ -41,6 +41,7 @@ export class TokenService {
       iat: now,
       exp: now + this.accessTtlSeconds,
       type: 'access'
+      ,sv: account.sessionVersion || 0
     });
   }
 

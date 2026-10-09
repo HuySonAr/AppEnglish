@@ -9,6 +9,11 @@ export class AuthGatewayController {
     return this.forward('/auth/login', body, request, response);
   }
 
+  async verifyEmail(body, request, response) { return this.forward('/auth/verify-email', body, request, response); }
+  async resendVerification(body, request, response) { return this.forward('/auth/resend-verification', body, request, response); }
+  async forgotPassword(body, request, response) { return this.forward('/auth/forgot-password', body, request, response); }
+  async resetPassword(body, request, response) { return this.forward('/auth/reset-password', body, request, response); }
+
   async refresh(request, response) {
     return this.forward('/auth/refresh', undefined, request, response);
   }
@@ -22,10 +27,11 @@ export class AuthGatewayController {
   }
 
   async forward(path, body, request, response) {
+    const method = path === '/auth/me' ? 'GET' : 'POST';
     let upstream;
     try {
       upstream = await fetch(`http://localhost:${process.env.AUTH_SERVICE_PORT || 3001}${path}`, {
-        method: 'POST',
+        method,
         headers: { ...(body ? { 'content-type': 'application/json' } : {}), ...(request.headers.cookie ? { cookie: request.headers.cookie } : {}) },
         body: body ? JSON.stringify(body) : undefined
       });
@@ -55,6 +61,22 @@ Post('login')(AuthGatewayController.prototype, 'login', Object.getOwnPropertyDes
 Body()(AuthGatewayController.prototype, 'login', 0);
 Req()(AuthGatewayController.prototype, 'login', 1);
 Res({ passthrough: true })(AuthGatewayController.prototype, 'login', 2);
+Post('verify-email')(AuthGatewayController.prototype, 'verifyEmail', Object.getOwnPropertyDescriptor(AuthGatewayController.prototype, 'verifyEmail'));
+Body()(AuthGatewayController.prototype, 'verifyEmail', 0);
+Req()(AuthGatewayController.prototype, 'verifyEmail', 1);
+Res({ passthrough: true })(AuthGatewayController.prototype, 'verifyEmail', 2);
+Post('resend-verification')(AuthGatewayController.prototype, 'resendVerification', Object.getOwnPropertyDescriptor(AuthGatewayController.prototype, 'resendVerification'));
+Body()(AuthGatewayController.prototype, 'resendVerification', 0);
+Req()(AuthGatewayController.prototype, 'resendVerification', 1);
+Res({ passthrough: true })(AuthGatewayController.prototype, 'resendVerification', 2);
+Post('forgot-password')(AuthGatewayController.prototype, 'forgotPassword', Object.getOwnPropertyDescriptor(AuthGatewayController.prototype, 'forgotPassword'));
+Body()(AuthGatewayController.prototype, 'forgotPassword', 0);
+Req()(AuthGatewayController.prototype, 'forgotPassword', 1);
+Res({ passthrough: true })(AuthGatewayController.prototype, 'forgotPassword', 2);
+Post('reset-password')(AuthGatewayController.prototype, 'resetPassword', Object.getOwnPropertyDescriptor(AuthGatewayController.prototype, 'resetPassword'));
+Body()(AuthGatewayController.prototype, 'resetPassword', 0);
+Req()(AuthGatewayController.prototype, 'resetPassword', 1);
+Res({ passthrough: true })(AuthGatewayController.prototype, 'resetPassword', 2);
 Post('refresh')(AuthGatewayController.prototype, 'refresh', Object.getOwnPropertyDescriptor(AuthGatewayController.prototype, 'refresh'));
 Req()(AuthGatewayController.prototype, 'refresh', 0);
 Res({ passthrough: true })(AuthGatewayController.prototype, 'refresh', 1);

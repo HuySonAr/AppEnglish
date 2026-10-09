@@ -1,5 +1,6 @@
 import { AccountEntity } from '../database/account.entity.js';
 import { RefreshTokenEntity } from '../database/refresh-token.entity.js';
+import { OtpEntity } from '../database/otp.entity.js';
 
 export class AccountRepository {
   constructor(dataSource) {
@@ -51,5 +52,43 @@ export class AccountRepository {
   async findAccountById(id) {
     await this.ensureInitialized();
     return this.dataSource.getRepository(AccountEntity).findOne({ where: { id } });
+  }
+
+  async saveOtp(otp) {
+    await this.ensureInitialized();
+    return this.dataSource.getRepository(OtpEntity).save(otp);
+  }
+
+  async invalidateOtps(accountId, purpose) {
+    await this.ensureInitialized();
+    await this.dataSource.getRepository(OtpEntity).createQueryBuilder().update()
+      .set({ usedAt: new Date() }).where('"accountId" = :accountId AND "purpose" = :purpose AND "usedAt" IS NULL', { accountId, purpose }).execute();
+  }
+
+  async findLatestOtp(accountId, purpose) {
+    await this.ensureInitialized();
+    return this.dataSource.getRepository(OtpEntity).findOne({ where: { accountId, purpose, usedAt: null }, order: { createdAt: 'DESC' } });
+  }
+
+  async updateOtp(id, values) {
+    await this.ensureInitialized();
+    return this.dataSource.getRepository(OtpEntity).update({ id }, values);
+  }
+
+  async countRecentOtps(accountId, purpose, since) {
+    await this.ensureInitialized();
+    return this.dataSource.getRepository(OtpEntity).createQueryBuilder('otp')
+      .where('otp."accountId" = :accountId AND otp."purpose" = :purpose AND otp."createdAt" >= :since', { accountId, purpose, since }).getCount();
+  }
+
+  async incrementSessionVersion(accountId) {
+    await this.ensureInitialized();
+    await this.dataSource.getRepository(AccountEntity).increment({ id: accountId }, 'sessionVersion', 1);
+  }
+
+  async revokeAccountSessions(accountId) {
+    await this.ensureInitialized();
+    await this.dataSource.getRepository(RefreshTokenEntity).createQueryBuilder().update()
+      .set({ revokedAt: new Date() }).where('"accountId" = :accountId AND "revokedAt" IS NULL', { accountId }).execute();
   }
 }

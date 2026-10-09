@@ -31,6 +31,7 @@
 pnpm install
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 # Điền POSTGRES_PASSWORD trong .env; không commit .env.
+# Điền SMTP_HOST/SMTP_FROM và SMTP credentials nếu cần gửi OTP thật.
 pnpm --filter @appenglish/auth-service migration:run
 docker compose up -d redis rabbitmq
 pnpm dev

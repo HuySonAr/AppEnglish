@@ -41,6 +41,9 @@ importers:
 
   apps/auth-service:
     dependencies:
+      '@appenglish/auth-contracts':
+        specifier: workspace:*
+        version: link:../../packages/auth-contracts
       '@grpc/grpc-js':
         specifier: ^1.14.0
         version: 1.14.6
@@ -62,6 +65,9 @@ importers:
       ioredis:
         specifier: ^5.8.1
         version: 5.11.1
+      nodemailer:
+        specifier: ^7.0.6
+        version: 7.0.13
       pg:
         specifier: ^8.16.3
         version: 8.23.1
@@ -188,6 +194,9 @@ importers:
 
   apps/web-client:
     dependencies:
+      '@appenglish/auth-contracts':
+        specifier: workspace:*
+        version: link:../../packages/auth-contracts
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.9.1(react-hook-form@7.89.0(react@19.3.0))(zod@3.25.76)
@@ -240,6 +249,8 @@ importers:
       vite:
         specifier: ^7.1.7
         version: 7.3.7(@types/node@26.6.4)(jiti@1.21.7)
+
+  packages/auth-contracts: {}
 
   packages/backend-common:
     dependencies:
@@ -1548,6 +1559,10 @@ packages:
   node-releases@2.0.58:
     resolution: {integrity: sha512-BdiKAgbfRlvfMq/XzO/AF9NPmaA8a+YpLAyAFTVFBj3gARrAIfWvNq7Q7NE4se3KgFu0KkrvQMxTS0XVnsGzHg==}
     engines: {node: '>=18'}
+
+  nodemailer@7.0.13:
+    resolution: {integrity: sha512-PNDFSJdP+KFgdsG3ZzMXCgquO7I6McjY2vlqILjtJd0hy8wEvtugS9xKRF2NWlPNGxvLCXlTNIae4serI7dinw==}
+    engines: {node: '>=6.0.0'}
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -3307,6 +3322,8 @@ snapshots:
       content-type: 2.1.0
 
   node-releases@2.0.58: {}
+
+  nodemailer@7.0.13: {}
 
   normalize-path@3.0.0: {}
 

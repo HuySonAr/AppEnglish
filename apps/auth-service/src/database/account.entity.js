@@ -8,7 +8,9 @@ export const AccountEntity = new EntitySchema({
     email: { type: 'varchar', length: 320, unique: true },
     passwordHash: { type: 'text' },
     role: { type: 'varchar', length: 32, default: 'STUDENT' },
-    status: { type: 'varchar', length: 32, default: 'ACTIVE' },
+    status: { type: 'varchar', length: 32, default: 'PENDING_VERIFICATION' },
+    emailVerifiedAt: { type: 'timestamptz', nullable: true },
+    sessionVersion: { type: 'int', default: 0 },
     createdAt: { type: 'timestamptz', createDate: true },
     updatedAt: { type: 'timestamptz', updateDate: true }
   }

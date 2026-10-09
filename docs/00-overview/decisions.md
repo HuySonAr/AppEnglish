@@ -18,12 +18,12 @@
 | D13 | Progress tách Reading/Listening, loại placement |
 | D14 | Không XP hoặc streak từ lesson, từ vựng, ôn tập |
 | D15 | F00 bootstrap 2026-10-08: tạo monorepo/apps/packages scaffold theo stack đã chốt; chỉ health/runtime boundaries, không triển khai nghiệp vụ hoặc domain contracts |
-| D16 | F01 public registration tạo STUDENT và credential verification dùng scrypt; chưa phát hành session/JWT/cookie/refresh token cho đến khi chính sách auth được chốt |
+| D16 | F01 public registration tạo STUDENT, bắt buộc xác minh email bằng OTP trước login; password dùng scrypt |
 | D17 | F02A uses a reusable content-service media-storage boundary with an ignored local adapter for development/tests and the official ImageKit Node SDK for configured environments; credentials stay backend-only and no upload endpoint or media database model is introduced |
 | D18 | F01 uses a short-lived HS256 JWT access token (default 15 minutes, configurable) and a cryptographically random refresh token (default 7 days, configurable); only the SHA-256 refresh hash is stored in app_identity |
 | D19 | Refresh tokens are rotated on every refresh. A reused/revoked token revokes its entire token family; refresh rows retain family, expiry, replacement and revocation timestamps |
 | D20 | Access and refresh tokens use HttpOnly, SameSite=Lax cookies. Secure is false only for local development and must be true in production. Public registration always creates STUDENT |
-| D21 | F01 scope is register/login/session restore/logout/me only. It does not include OTP, OAuth, email verification, password reset or SMTP |
+| D21 | F01 includes email OTP verification/resend, login/session/refresh/logout/me and forgot/reset password; it excludes OAuth, SMTP delivery claims require configured SMTP |
 
 ## TBD — không tự giả định
 - Công thức tổng hợp progress và loại test được tính vào progress.

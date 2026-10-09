@@ -5,8 +5,10 @@ export const AccountRole = Object.freeze({
 });
 
 export const AccountStatus = Object.freeze({
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
   ACTIVE: 'ACTIVE',
-  DISABLED: 'DISABLED'
+  DISABLED: 'DISABLED',
+  SUSPENDED: 'SUSPENDED'
 });
 
 export const publicRoles = Object.freeze(Object.values(AccountRole));
