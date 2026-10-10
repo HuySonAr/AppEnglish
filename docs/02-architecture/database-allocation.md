@@ -51,3 +51,12 @@ Payment service không thuộc nghiệp vụ Reading/Listening hiện tại. N�
 
 ## Reset dữ liệu local
 Tạo lệnh/script riêng cho từng database hoặc service. Không dùng một lệnh xóa toàn bộ bốn DB làm lệnh mặc định. Luôn nêu rõ dữ liệu nào bị xóa trước khi reset.
+
+## F02 content schema
+
+`content-service` owns `units`, `lessons`, `lesson_versions` and `media_assets`
+in `app_content` (migration
+`apps/content-service/src/database/migrations/1720000000000-create-content.js`).
+Lesson content is stored as a JSONB snapshot per version; published versions are
+immutable (D40). No table references another service's database: `createdBy`,
+`publishedBy` and `uploadedBy` hold account ids without a foreign key.

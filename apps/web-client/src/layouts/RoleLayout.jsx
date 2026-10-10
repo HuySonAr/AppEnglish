@@ -48,6 +48,7 @@ export function RoleLayout({ role }) {
               }`
             }
             to={`/${role.toLowerCase().replace('_', '-')}`}
+            end
           >
             Dashboard
           </NavLink>
@@ -63,6 +64,20 @@ export function RoleLayout({ role }) {
               to="/admin/accounts"
             >
               Accounts
+            </NavLink>
+          ) : null}
+          {role === Roles.CONTENT_MANAGER ? (
+            <NavLink
+              className={({ isActive }) =>
+                `block rounded-md px-3 py-2 text-sm ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground font-medium'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                }`
+              }
+              to="/content-manager/units"
+            >
+              Units and lessons
             </NavLink>
           ) : null}
         </nav>

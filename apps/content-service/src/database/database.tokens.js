@@ -1,0 +1,2 @@
+export const CONTENT_DATA_SOURCE = Symbol('CONTENT_DATA_SOURCE');
+export const CONTENT_REPOSITORY = Symbol('CONTENT_REPOSITORY');

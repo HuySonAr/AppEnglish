@@ -1,42 +1,20 @@
 import { Body, Controller, Get, HttpException, Inject, Param, Patch, Post, Query, Req, Res } from '@nestjs/common';
 import { AuthCookie } from '@appenglish/auth-contracts';
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
+import { callService, gatewayFailure } from '../grpc/grpc-call.js';
+
+export { gatewayFailure };
 
 export const AUTH_GRPC_CLIENT = 'AUTH_GRPC_CLIENT';
 
-// Gateway-originated failures use the shared { code, msg, data } envelope with
-// SYSTEM_ERROR (32) from @appenglish/auth-contracts.
-export function gatewayFailure(message) {
-  return { code: 32, msg: 'fail', data: { message } };
+// Calls one AuthService RPC and returns { status, payload, setCookies }.
+export function callAuth(auth, rpc, message = {}) {
+  return callService(auth, rpc, message, 'Authentication');
 }
 
-// gRPC status codes that mean auth-service could not be reached in time.
-const UNAVAILABLE_GRPC_CODES = [4, 14];
-
-// Calls one AuthService RPC and returns { status, payload, setCookies }.
-// Transport failures become a gateway envelope with 503/500.
-export async function callAuth(auth, rpc, message = {}) {
-  let reply;
-  try {
-    reply = await new Promise((resolve, reject) => {
-      auth[rpc](message).subscribe({ next: resolve, error: reject });
-    });
-  } catch (error) {
-    if (UNAVAILABLE_GRPC_CODES.includes(error?.code))
-      throw new HttpException(gatewayFailure('Authentication service is unavailable'), 503);
-    throw new HttpException(gatewayFailure('Authentication service failed'), 500);
-  }
-  let data;
-  try {
-    data = JSON.parse(reply.dataJson || '{}');
-  } catch {
-    throw new HttpException(gatewayFailure('Authentication service returned an invalid response'), 500);
-  }
-  return {
-    status: reply.httpStatus,
-    payload: { code: reply.code, msg: reply.msg, data },
-    setCookies: reply.setCookies || [],
-  };
+// Reads the session cookies the auth RPCs take as tokens.
+export function sessionTokens(request) {
+  return cookies(request);
 }
 
 // JSON body values become proto strings; auth-service validates them.

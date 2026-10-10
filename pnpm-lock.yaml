@@ -20,6 +20,9 @@ importers:
       '@appenglish/auth-contracts':
         specifier: workspace:*
         version: link:../../packages/auth-contracts
+      '@appenglish/content-contracts':
+        specifier: workspace:*
+        version: link:../../packages/content-contracts
       '@grpc/grpc-js':
         specifier: ^1.14.0
         version: 1.14.6
@@ -92,9 +95,18 @@ importers:
 
   apps/content-service:
     dependencies:
+      '@appenglish/auth-contracts':
+        specifier: workspace:*
+        version: link:../../packages/auth-contracts
+      '@appenglish/content-contracts':
+        specifier: workspace:*
+        version: link:../../packages/content-contracts
       '@grpc/grpc-js':
         specifier: ^1.14.0
         version: 1.14.6
+      '@grpc/proto-loader':
+        specifier: ^0.8.0
+        version: 0.8.1
       '@imagekit/nodejs':
         specifier: ^7.12.1
         version: 7.12.1
@@ -206,6 +218,9 @@ importers:
       '@appenglish/auth-contracts':
         specifier: workspace:*
         version: link:../../packages/auth-contracts
+      '@appenglish/content-contracts':
+        specifier: workspace:*
+        version: link:../../packages/content-contracts
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.9.1(react-hook-form@7.89.0(react@19.3.0))(zod@3.25.76)
@@ -311,6 +326,8 @@ importers:
       zod:
         specifier: ^3.25.76
         version: 3.25.76
+
+  packages/content-contracts: {}
 
 packages:
 

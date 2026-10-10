@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package appenglish.content.v1;
+
+// Internal contract between api-gateway and content-service. The gateway
+// authenticates the caller through auth-service and passes the actor;
+// content-service enforces the role, validates payloads and owns the rules.
+service ContentService {
+  rpc ListUnits(ContentRequest) returns (ContentReply);
+  rpc CreateUnit(ContentRequest) returns (ContentReply);
+  rpc UpdateUnit(ContentRequest) returns (ContentReply);
+  rpc PublishUnit(ContentRequest) returns (ContentReply);
+  rpc CreateLesson(ContentRequest) returns (ContentReply);
+  rpc UpdateLesson(ContentRequest) returns (ContentReply);
+  rpc GetLesson(ContentRequest) returns (ContentReply);
+  rpc SaveLessonDraft(ContentRequest) returns (ContentReply);
+  rpc PublishLesson(ContentRequest) returns (ContentReply);
+  rpc UploadMedia(UploadMediaRequest) returns (ContentReply);
+  rpc AutofillPronunciation(ContentRequest) returns (ContentReply);
+  rpc DeleteMedia(ContentRequest) returns (ContentReply);
+}
+
+// The authenticated account as verified by auth-service.
+message Actor {
+  string id = 1;
+  string role = 2;
+}
+
+message ContentRequest {
+  Actor actor = 1;
+  // Target unit, lesson or media id; empty when the call has none.
+  string id = 2;
+  // JSON request body validated by content-service; empty when there is none.
+  string payload_json = 3;
+}
+
+message UploadMediaRequest {
+  Actor actor = 1;
+  string kind = 2;
+  string file_name = 3;
+  string mime_type = 4;
+  bytes data = 5;
+  // Lesson and section (vocabulary/test) the file belongs to; decide its folder.
+  string lesson_id = 6;
+  string section = 7;
+}
+
+message ContentReply {
+  // HTTP status the gateway answers with when it is an error (>= 400).
+  int32 http_status = 1;
+  // Envelope code and msg; codes are in @appenglish/content-contracts.
+  int32 code = 2;
+  string msg = 3;
+  // JSON object for the envelope's data; its shape depends on the call.
+  string data_json = 4;
+  // Unused by content calls; keeps the reply shape shared with AuthReply.
+  repeated string set_cookies = 5;
+}

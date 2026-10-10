@@ -48,7 +48,7 @@ entities and migrations are intentionally not implemented in F00.
 
 `content-service` owns the `MediaStorage` provider and selects `local` or
 `imagekit` via `MEDIA_STORAGE_ADAPTER`. Local/test runs do not call ImageKit.
-The adapter validates MP3 audio and JPEG/PNG/WebP image inputs before upload.
+The adapter validates MP3/MP4 audio and JPEG/PNG/WebP image inputs before upload.
 F02A intentionally has no media database model or upload API.
 
 ## Quy tắc giao tiếp
@@ -69,8 +69,11 @@ F02A intentionally has no media database model or upload API.
   `/health/ready`.
 - RabbitMQ exchange/queue và Redis client chưa được dùng trong `apps/*/src`; chỉ
   có dependency trong manifest và helper cấu hình ở
-  `packages/backend-common/src/infrastructure.js`. content/learning/progress
-  chưa có proto.
+  `packages/backend-common/src/infrastructure.js`. learning/progress chưa có
+  proto.
+- Gateway gọi content-service qua gRPC (D42): proto ở
+  `packages/content-contracts/proto/content.proto`; gateway xác thực phiên qua
+  auth-service rồi chuyển actor sang content-service.
 
 ## Checks hiện có
 

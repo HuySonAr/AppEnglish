@@ -11,7 +11,7 @@
 | Domain | Service owner | Model/schema thật | gRPC proto/API | RabbitMQ event | Bằng chứng |
 |---|---|---|---|---|---|
 | User/Auth | auth-service | app_identity (PostgreSQL) | `packages/auth-contracts/proto/auth.proto` | TBD | `apps/auth-service/src/database/database.config.js` |
-| Content/lesson | content-service | app_content (PostgreSQL) | TBD | TBD | `apps/content-service/src/database/database.config.js` |
+| Content/lesson | content-service | app_content (PostgreSQL) | `packages/content-contracts/proto/content.proto` | TBD | `apps/content-service/src/database/database.config.js` |
 | Placement/test attempt | learning-service | app_learning (PostgreSQL) | TBD | TBD | `apps/learning-service/src/database/database.config.js` |
 | Progress/XP | progress-service | app_progress (PostgreSQL) | TBD | TBD | `apps/progress-service/src/database/database.config.js` |
 
@@ -60,3 +60,13 @@ ImageKit server-side with `IMAGEKIT_PRIVATE_KEY`; no `VITE_*` variable or
 browser upload flow is allowed. F02A exposes no public upload endpoint and
 defines no RabbitMQ event. F02 and the audio-playing features F03/F04/F05 (D28) must define authorization and persistence
 before adding an API contract.
+
+## F02 content contract
+
+**VERIFIED (2026-10-10):** the gateway exposes ten `/content/*` HTTP routes
+(listed in `docs/03-service-specs/content-service.md`) and calls
+`appenglish.content.v1.ContentService` over gRPC. Every request carries the
+actor (`id`, `role`) that the gateway obtained from auth-service `Me`;
+content-service authorizes it (D42). Requests use `ContentRequest { actor, id,
+payload_json }` (or `UploadMediaRequest` with bytes) and replies use the same
+shape as `AuthReply`. No RabbitMQ event is defined for content.

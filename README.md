@@ -9,9 +9,10 @@ workspace pnpm/Turborepo, năm NestJS apps, một React/Vite client, shared pack
 Docker Compose cho Redis/RabbitMQ và script tạo bốn database PostgreSQL native.
 Health endpoint đã được tạo.
 
-**Hiện tại (2026-10-10):** F01 auth/account và F01B admin account management đã
-có code và đang ở REVIEW; F02A media storage foundation DONE. Nghiệp vụ học
-(content, placement, lesson, practice/mock, progress, XP) chưa triển khai.
+**Hiện tại (2026-10-10):** F01 auth/account, F01B admin account management và
+F02A media storage foundation DONE. F02 content (backend API, upload media và giao diện Content Manager tại
+`/content-manager/units`) ở REVIEW. Placement, lesson flow,
+practice/mock, progress và XP chưa triển khai.
 
 Các chi tiết runtime đã tạo có bằng chứng trong `package.json`, `pnpm-lock.yaml`,
 `apps/*/package.json`, `docker-compose.yml` và `scripts/postgres/`. Xem
@@ -24,6 +25,7 @@ Các chi tiết runtime đã tạo có bằng chứng trong `package.json`, `pnp
 pnpm install
 Copy-Item .env.example .env
 pnpm --filter @appenglish/auth-service migration:run
+pnpm --filter @appenglish/content-service migration:run
 docker compose up -d redis rabbitmq
 pnpm dev
 ```
@@ -44,7 +46,7 @@ there); the gateway API is at
 |---|---:|---|
 | api-gateway | 3000 | none |
 | auth-service | 3001 (HTTP health), 50051 (gRPC) | app_identity |
-| content-service | 3002 | app_content |
+| content-service | 3002 (HTTP health), 50052 (gRPC) | app_content |
 | learning-service | 3003 | app_learning |
 | progress-service | 3004 | app_progress |
 | web-client | 5173 | none |

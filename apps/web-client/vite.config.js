@@ -6,7 +6,7 @@ export default defineConfig({
   preview: { port: Number(process.env.WEB_CLIENT_PORT || 5173) },
   server: {
     port: Number(process.env.WEB_CLIENT_PORT || 5173),
-    proxy: { '/auth': 'http://localhost:3000', '/health': 'http://localhost:3000' }
+    proxy: { '/auth': 'http://localhost:3000', '/content': 'http://localhost:3000', '/health': 'http://localhost:3000' }
   },
   resolve: { alias: { '@': '/src' } }
 });

@@ -15,6 +15,8 @@ import { StudentDashboardPage } from '../features/student/pages/StudentDashboard
 import { AdminDashboardPage } from '../features/admin/pages/AdminDashboardPage.jsx';
 import { AdminAccountsPage } from '../features/admin/pages/AdminAccountsPage.jsx';
 import { ContentManagerDashboardPage } from '../features/content-manager/pages/ContentManagerDashboardPage.jsx';
+import { ContentUnitsPage } from '../features/content-manager/pages/ContentUnitsPage.jsx';
+import { LessonEditorPage } from '../features/content-manager/pages/LessonEditorPage.jsx';
 import { Roles } from '../constants/auth.js';
 import { dashboardPathForRole } from '../features/auth/flow/auth-flow.js';
 import { useAuth } from '../features/auth/context/AuthContext.jsx';
@@ -61,6 +63,8 @@ export function AppRouter() {
         >
           <Route element={<RoleLayout role={Roles.CONTENT_MANAGER} />}>
             <Route index element={<ContentManagerDashboardPage />} />
+            <Route path="units" element={<ContentUnitsPage />} />
+            <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
           </Route>
         </Route>
       </Route>

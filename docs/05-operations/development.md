@@ -33,6 +33,7 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 # Điền POSTGRES_PASSWORD trong .env; không commit .env.
 # Điền SMTP_HOST/SMTP_FROM và SMTP credentials nếu cần gửi OTP thật.
 pnpm --filter @appenglish/auth-service migration:run
+pnpm --filter @appenglish/content-service migration:run
 docker compose up -d redis rabbitmq
 pnpm dev
 ```
@@ -42,6 +43,9 @@ Open `http://localhost:5173/login`; the public API is
 The gateway reaches auth-service over gRPC at `AUTH_GRPC_HOST`:`AUTH_GRPC_PORT`
 (default `localhost:50051`; no `.env` change is needed for the default). Until
 that port is listening the gateway answers `/auth/*` and readiness with 503.
+content-service serves gRPC at `CONTENT_GRPC_HOST`:`CONTENT_GRPC_PORT` (default
+`localhost:50052`) and now loads `.env` like auth-service; restart `pnpm dev`
+after pulling F02 so it picks up the new start command.
 Vite proxies `/auth` and `/health` to the gateway, keeping browser requests
 same-origin in development.
 
@@ -52,7 +56,7 @@ Development and tests default to `MEDIA_STORAGE_ADAPTER=local`. Set
 `storage/media` is ignored except for `.gitkeep`. F02A has no upload route, so
 this adapter is only a service-level dependency for later content modules.
 
-To use ImageKit in a deployed backend, set `MEDIA_STORAGE_ADAPTER=imagekit`,
+To upload to ImageKit (also possible locally), set `MEDIA_STORAGE_ADAPTER=imagekit`,
 `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, and `IMAGEKIT_URL_ENDPOINT` in a
 runtime secret store. Never put the private key in the web client or any
 `VITE_*` variable. Tests inject a fake SDK client and do not call ImageKit.

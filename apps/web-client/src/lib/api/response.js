@@ -1,4 +1,5 @@
 import { ResponseCode } from '@appenglish/auth-contracts';
+import { ContentResponseCode } from '@appenglish/content-contracts';
 
 const messages = Object.freeze({
   [ResponseCode.AUTH_INVALID_CREDENTIALS]: 'Email or password is invalid.',
@@ -15,7 +16,19 @@ const messages = Object.freeze({
   [ResponseCode.AUTH_EMAIL_VERIFICATION_REQUIRED]: 'This account must verify its email before it can be activated.',
   [ResponseCode.AUTH_FORBIDDEN_ROLE]: 'You do not have permission to do this.',
   [ResponseCode.EMAIL_SEND_ERROR]: 'We could not send the email. Check the server email configuration.',
-  [ResponseCode.VALIDATION_ERROR]: 'Please check the highlighted fields.'
+  [ResponseCode.VALIDATION_ERROR]: 'Please check the highlighted fields.',
+  [ContentResponseCode.CONTENT_NOT_FOUND]: 'This content no longer exists.',
+  [ContentResponseCode.CONTENT_INVALID_STATE]: 'There is no draft to publish.',
+  [ContentResponseCode.CONTENT_NOT_PUBLISHABLE]: 'This content does not meet the publishing requirements yet.',
+  [ContentResponseCode.MEDIA_INVALID]: 'This file type or size is not allowed.',
+  [ContentResponseCode.PRONUNCIATION_UNAVAILABLE]: 'The dictionary is not answering. Try again, or enter the pronunciation yourself.'
+});
+
+// data.reason of a MEDIA_INVALID error says which upload rule failed.
+const mediaReasons = Object.freeze({
+  MEDIA_MIME_TYPE_NOT_ALLOWED: 'This file format is not allowed. Use MP3, MP4 or M4A for audio and JPEG, PNG or WebP for images.',
+  MEDIA_EXTENSION_NOT_ALLOWED: 'This file extension is not allowed. Use .mp3, .mp4 or .m4a for audio and .jpg, .jpeg, .png or .webp for images.',
+  MEDIA_FILE_TOO_LARGE: 'This file is larger than the upload limit.',
 });
 
 export function responseData(response) {
@@ -38,6 +51,10 @@ export function errorNextAction(error) {
 
 export function getApiErrorMessage(error) {
   const code = errorCode(error);
+  // The gateway refuses files above its own limit before content-service sees them.
+  if (error?.response?.status === 413) return mediaReasons.MEDIA_FILE_TOO_LARGE;
+  const reason = mediaReasons[error?.response?.data?.data?.reason];
+  if (code === ContentResponseCode.MEDIA_INVALID && reason) return reason;
   return messages[code] || error?.response?.data?.data?.message || 'Something went wrong. Please try again.';
 }
 
