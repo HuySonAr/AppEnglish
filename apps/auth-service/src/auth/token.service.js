@@ -5,6 +5,7 @@ import {
   timingSafeEqual,
   createHash,
 } from 'node:crypto';
+import { AuthCookie } from '@appenglish/auth-contracts';
 import { authErrors } from './auth.errors.js';
 
 function base64Url(value) {
@@ -97,17 +98,17 @@ export class TokenService {
   }
 
   accessCookie(token) {
-    return this.cookie('appenglish_access', token, this.accessTtlSeconds);
+    return this.cookie(AuthCookie.ACCESS, token, this.accessTtlSeconds);
   }
 
   refreshCookie(token) {
-    return this.cookie('appenglish_refresh', token, this.refreshTtlSeconds);
+    return this.cookie(AuthCookie.REFRESH, token, this.refreshTtlSeconds);
   }
 
   clearCookies() {
     return [
-      this.cookie('appenglish_access', '', 0),
-      this.cookie('appenglish_refresh', '', 0),
+      this.cookie(AuthCookie.ACCESS, '', 0),
+      this.cookie(AuthCookie.REFRESH, '', 0),
     ];
   }
 

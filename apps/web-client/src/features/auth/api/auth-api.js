@@ -12,15 +12,10 @@ export async function loginAccount(payload) {
 }
 
 export async function getCurrentUser() {
-  try {
-    const response = await httpClient.get('/auth/me');
-    return response.data;
-  } catch (error) {
-    if (error.response?.status !== 401) throw error;
-    await httpClient.post('/auth/refresh');
-    const response = await httpClient.get('/auth/me');
-    return response.data;
-  }
+  // An expired access cookie is refreshed and replayed by the httpClient
+  // interceptor (lib/api/session-refresh.js).
+  const response = await httpClient.get('/auth/me');
+  return response.data;
 }
 
 export async function logoutAccount() {

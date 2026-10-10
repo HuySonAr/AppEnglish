@@ -11,6 +11,11 @@ export const AccountStatus = Object.freeze({
   SUSPENDED: 'SUSPENDED'
 });
 
+export const AuthCookie = Object.freeze({
+  ACCESS: 'appenglish_access',
+  REFRESH: 'appenglish_refresh'
+});
+
 export const OtpPurpose = Object.freeze({
   VERIFY_EMAIL: 'VERIFY_EMAIL',
   RESET_PASSWORD: 'RESET_PASSWORD'
@@ -35,10 +40,12 @@ export const ResponseCode = Object.freeze({
   AUTH_ACCOUNT_SUSPENDED: 22,
   AUTH_ADMIN_LAST_ACCOUNT: 23,
   AUTH_ADMIN_AUDIT_ERROR: 24,
+  AUTH_EMAIL_VERIFICATION_REQUIRED: 25,
+  AUTH_FORBIDDEN_ROLE: 26,
   VALIDATION_ERROR: 30,
   EMAIL_SEND_ERROR: 31,
   SYSTEM_ERROR: 32
 });
 
 export const ResponseMsg = Object.freeze({ SUCCESS: 'success', ADDITIONAL: 'additional', FAIL: 'fail' });
-export const NextAction = Object.freeze({ VERIFY_EMAIL: 'VERIFY_EMAIL', LOGIN: 'LOGIN' });
+export const NextAction = Object.freeze({ VERIFY_EMAIL: 'VERIFY_EMAIL', LOGIN: 'LOGIN', RESET_PASSWORD: 'RESET_PASSWORD' });

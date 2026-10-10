@@ -1,20 +1,9 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpException,
-  Inject,
-  Post,
-  Patch,
-  Param,
-  Query,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 import {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
+  resendVerificationSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   adminAccountQuerySchema,
@@ -23,8 +12,11 @@ import {
 } from './auth.schemas.js';
 import { RegisterAccountDto, LoginDto } from './auth.dto.js';
 import { AuthError } from './auth.errors.js';
-import { AuthService } from './auth.service.js';
 
+// Transport-agnostic auth request handlers: validate the payload, call the
+// service and shape the { code, msg, data } envelope. AuthGrpcController exposes
+// them over gRPC; HttpException only carries the HTTP status the gateway answers
+// with.
 export class AuthController {
   constructor(authService) {
     this.authService = authService;
@@ -73,7 +65,9 @@ export class AuthController {
   async resendVerification(body) {
     try {
       // Already an ADDITIONAL envelope from the service; no re-wrap.
-      return await this.authService.resendVerification(body.email);
+      return await this.authService.resendVerification(
+        resendVerificationSchema.parse(body).email,
+      );
     } catch (error) {
       throw this.normalizeError(error);
     }
@@ -96,68 +90,64 @@ export class AuthController {
       throw this.normalizeError(error);
     }
   }
-  async me(request) {
+  async me(accessToken) {
     try {
-      return this.envelope(
-        await this.authService.me(
-          parseCookies(request.headers.cookie).appenglish_access,
-        ),
-      );
+      return this.envelope(await this.authService.me(accessToken));
     } catch (error) {
       throw this.normalizeError(error);
     }
   }
-  async refresh(request, response) {
+  async refresh(refreshToken, response) {
     try {
       return this.withCookies(
-        this.envelope(
-          await this.authService.refresh(
-            parseCookies(request.headers.cookie).appenglish_refresh,
-          ),
-        ),
+        this.envelope(await this.authService.refresh(refreshToken)),
         response,
       );
     } catch (error) {
       throw this.normalizeError(error);
     }
   }
-  async logout(request, response) {
+  async logout(refreshToken, response) {
     try {
       return this.withCookies(
-        this.envelope(
-          await this.authService.logout(
-            parseCookies(request.headers.cookie).appenglish_refresh,
-          ),
-        ),
+        this.envelope(await this.authService.logout(refreshToken)),
         response,
       );
     } catch (error) {
       throw this.normalizeError(error);
     }
   }
-    async adminList(query, request) {
+    async adminList(query, accessToken) {
       try {
         const parsedQuery = adminAccountQuerySchema.parse(query);
         return this.envelope(await this.authService.adminList(
-          parseCookies(request.headers.cookie).appenglish_access,
+          accessToken,
           parsedQuery,
         ));
       } catch (error) {
         throw this.normalizeError(error);
       }
     }
-    async adminGet(accountId, request) {
-      return this.envelope(await this.authService.adminGet(
-        parseCookies(request.headers.cookie).appenglish_access,
-        adminAccountIdSchema.parse(accountId),
-      ));
+    async adminGet(accountId, accessToken) {
+      try {
+        return this.envelope(await this.authService.adminGet(
+          accessToken,
+          adminAccountIdSchema.parse(accountId),
+        ));
+      } catch (error) {
+        throw this.normalizeError(error);
+      }
     }
-    async adminUpdate(accountId, body, request) {
-      return this.envelope(await this.authService.adminUpdate(
-        parseCookies(request.headers.cookie).appenglish_access,
-        adminAccountIdSchema.parse(accountId),
-        adminAccountUpdateSchema.parse(body),
-      ));
+    async adminUpdate(accountId, body, accessToken) {
+      try {
+        return this.envelope(await this.authService.adminUpdate(
+          accessToken,
+          adminAccountIdSchema.parse(accountId),
+          adminAccountUpdateSchema.parse(body),
+        ));
+      } catch (error) {
+        throw this.normalizeError(error);
+      }
     }
   envelope(data) {
     return { code: 0, msg: 'success', data: data || {} };
@@ -189,44 +179,4 @@ export class AuthController {
       );
     return error;
   }
-}
-Controller('auth')(AuthController);
-Inject(AuthService)(AuthController, undefined, 0);
-const routes = [
-  ['register', 'register', [Body()]],
-  ['login', 'login', [Body(), Res({ passthrough: true })]],
-  ['verify-email', 'verifyEmail', [Body(), Res({ passthrough: true })]],
-  ['resend-verification', 'resendVerification', [Body()]],
-  ['forgot-password', 'forgotPassword', [Body()]],
-  ['reset-password', 'resetPassword', [Body()]],
-  ['me', 'me', [Req()]],
-  ['refresh', 'refresh', [Req(), Res({ passthrough: true })]],
-  ['logout', 'logout', [Req(), Res({ passthrough: true })]],
-  ['admin/accounts', 'adminList', [Query(), Req()]],
-  ['admin/accounts/:id', 'adminGet', [Param('id'), Req()]],
-  ['admin/accounts/:id', 'adminUpdate', [Param('id'), Body(), Req()]],
-];
-for (const [path, method, params] of routes) {
-  (method === 'adminList' ? Get(path) : method === 'adminGet' ? Get(path) : method === 'adminUpdate' ? Patch(path) : path === 'me' ? Get(path) : Post(path))(
-    AuthController.prototype,
-    method,
-    Object.getOwnPropertyDescriptor(AuthController.prototype, method),
-  );
-  params.forEach((decorator, index) =>
-    decorator(AuthController.prototype, method, index),
-  );
-}
-function parseCookies(header = '') {
-  return Object.fromEntries(
-    header
-      .split(';')
-      .filter(Boolean)
-      .map((part) => {
-        const index = part.indexOf('=');
-        return [
-          part.slice(0, index).trim(),
-          decodeURIComponent(part.slice(index + 1).trim()),
-        ];
-      }),
-  );
 }

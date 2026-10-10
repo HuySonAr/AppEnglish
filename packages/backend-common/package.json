@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "node --check src/zod-validation.pipe.js",
-    "lint": "node --check src/zod-validation.pipe.js",
+    "lint": "node ../../scripts/check-syntax.mjs src test",
     "test": "node --check src/zod-validation.pipe.js"
   },
   "dependencies": {

@@ -7,7 +7,7 @@
     "build": "node --check src/main.js",
     "dev": "node --watch src/main.js",
     "start": "node src/main.js",
-    "lint": "node --check src/main.js",
+    "lint": "node ../../scripts/check-syntax.mjs src test",
     "test": "node --test test/media-storage.test.js"
   },
   "dependencies": {

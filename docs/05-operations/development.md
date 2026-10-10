@@ -37,8 +37,11 @@ docker compose up -d redis rabbitmq
 pnpm dev
 ```
 
-Open `http://localhost:5173/auth`; the public API is
+Open `http://localhost:5173/login`; the public API is
 `http://localhost:3000` and readiness is `http://localhost:3000/health/ready`.
+The gateway reaches auth-service over gRPC at `AUTH_GRPC_HOST`:`AUTH_GRPC_PORT`
+(default `localhost:50051`; no `.env` change is needed for the default). Until
+that port is listening the gateway answers `/auth/*` and readiness with 503.
 Vite proxies `/auth` and `/health` to the gateway, keeping browser requests
 same-origin in development.
 

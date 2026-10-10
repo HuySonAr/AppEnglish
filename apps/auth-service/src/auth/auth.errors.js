@@ -29,6 +29,8 @@ export const authErrors = Object.freeze({
     new AuthError(23, 'The last active administrator cannot be demoted or disabled', 409),
   emailVerificationRequired: () =>
     new AuthError(25, 'Email verification is required before activation', 409),
+  forbiddenRole: () =>
+    new AuthError(26, 'Account does not have the required role', 403),
   invalidRole: () =>
     new AuthError(30, 'Role is not allowed for public registration', 403),
   emailSend: () => new AuthError(31, 'Unable to send verification email', 503),

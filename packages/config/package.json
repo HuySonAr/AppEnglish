@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "node --check src/env.js",
-    "lint": "node --check src/env.js",
+    "lint": "node ../../scripts/check-syntax.mjs src test",
     "test": "node --check src/env.js"
   },
   "dependencies": {

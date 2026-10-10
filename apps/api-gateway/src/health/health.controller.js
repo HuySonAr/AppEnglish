@@ -1,10 +1,17 @@
-import { Controller, Get, HttpException } from '@nestjs/common';
+import { Controller, Get, HttpException, Inject } from '@nestjs/common';
+import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { HealthService } from './health.service.js';
 import { healthResponseSchema } from './health.schema.js';
+import { AUTH_GRPC_CLIENT, callAuth } from '../auth/auth-gateway.controller.js';
 
 export class HealthController {
-  constructor() {
+  constructor(client) {
     this.healthService = new HealthService();
+    this.client = client;
+  }
+
+  onModuleInit() {
+    this.auth = this.client.getService(AUTH_GRPC_SERVICE);
   }
 
   check() {
@@ -12,18 +19,13 @@ export class HealthController {
   }
 
   async ready() {
-    try {
-      const response = await fetch(`http://localhost:${process.env.AUTH_SERVICE_PORT || 3001}/health/ready`);
-      const payload = await response.json();
-      if (!response.ok) throw new HttpException(payload, response.status);
-      return payload;
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      throw new HttpException({ code: 'AUTH_SERVICE_UNAVAILABLE', message: 'Authentication service is unavailable' }, 503);
-    }
+    const { status, payload } = await callAuth(this.auth, 'Ready');
+    if (status >= 400) throw new HttpException(payload, status);
+    return payload.data;
   }
 }
 
 Controller('health')(HealthController);
+Inject(AUTH_GRPC_CLIENT)(HealthController, undefined, 0);
 Get()(HealthController.prototype, 'check', Object.getOwnPropertyDescriptor(HealthController.prototype, 'check'));
 Get('ready')(HealthController.prototype, 'ready', Object.getOwnPropertyDescriptor(HealthController.prototype, 'ready'));

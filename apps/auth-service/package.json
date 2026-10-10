@@ -7,7 +7,7 @@
     "build": "node --check src/main.js",
     "dev": "node --env-file=../../.env --watch src/main.js",
     "start": "node --env-file=../../.env src/main.js",
-    "lint": "node --check src/main.js",
+    "lint": "node ../../scripts/check-syntax.mjs src test",
     "test": "node --test test/*.test.js",
     "migration:run": "node --env-file=../../.env src/database/run-migrations.js",
     "admin:bootstrap": "node --env-file=../../.env src/database/bootstrap-admin.js"
@@ -19,6 +19,7 @@
     "@nestjs/platform-express": "^11.1.6",
     "pg": "^8.16.3",
     "@grpc/grpc-js": "^1.14.0",
+    "@grpc/proto-loader": "^0.8.0",
     "amqplib": "^0.10.9",
     "ioredis": "^5.8.1",
     "reflect-metadata": "^0.2.2",

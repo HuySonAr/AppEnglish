@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package appenglish.auth.v1;
+
+// Internal contract between api-gateway and auth-service. The gateway owns the
+// HTTP surface (routes, cookies); auth-service owns validation and business
+// rules and answers every call with the shared { code, msg, data } envelope.
+service AuthService {
+  rpc Register(RegisterRequest) returns (AuthReply);
+  rpc Login(CredentialsRequest) returns (AuthReply);
+  rpc VerifyEmail(VerifyEmailRequest) returns (AuthReply);
+  rpc ResendVerification(EmailRequest) returns (AuthReply);
+  rpc ForgotPassword(EmailRequest) returns (AuthReply);
+  rpc ResetPassword(ResetPasswordRequest) returns (AuthReply);
+  rpc Me(AccessRequest) returns (AuthReply);
+  rpc Refresh(RefreshRequest) returns (AuthReply);
+  rpc Logout(RefreshRequest) returns (AuthReply);
+  rpc AdminListAccounts(AdminListAccountsRequest) returns (AuthReply);
+  rpc AdminGetAccount(AdminGetAccountRequest) returns (AuthReply);
+  rpc AdminUpdateAccount(AdminUpdateAccountRequest) returns (AuthReply);
+  rpc Ready(ReadyRequest) returns (AuthReply);
+}
+
+// Empty strings mean "not provided"; auth-service validates every field.
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+  string role = 3;
+}
+
+message CredentialsRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message VerifyEmailRequest {
+  string email = 1;
+  string otp = 2;
+}
+
+message EmailRequest {
+  string email = 1;
+}
+
+message ResetPasswordRequest {
+  string email = 1;
+  string otp = 2;
+  string password = 3;
+}
+
+message AccessRequest {
+  string access_token = 1;
+}
+
+message RefreshRequest {
+  string refresh_token = 1;
+}
+
+message AdminListAccountsRequest {
+  string access_token = 1;
+  // Raw HTTP query. A map keeps "filter omitted" distinct from "filter sent
+  // empty", which adminAccountQuerySchema treats differently (D25).
+  map<string, string> query = 2;
+}
+
+message AdminGetAccountRequest {
+  string access_token = 1;
+  string account_id = 2;
+}
+
+message AdminUpdateAccountRequest {
+  string access_token = 1;
+  string account_id = 2;
+  string role = 3;
+  string status = 4;
+}
+
+message ReadyRequest {}
+
+message AuthReply {
+  // HTTP status the gateway answers with when it is an error (>= 400).
+  int32 http_status = 1;
+  // Envelope code and msg from @appenglish/auth-contracts.
+  int32 code = 2;
+  string msg = 3;
+  // JSON object for the envelope's data; its shape depends on the call.
+  string data_json = 4;
+  // Set-Cookie header values the gateway must emit unchanged.
+  repeated string set_cookies = 5;
+}

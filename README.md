@@ -7,7 +7,11 @@ Bộ tài liệu này hướng dẫn AI hiểu nghiệp vụ, kiến trúc công
 **F00 — bootstrap (2026-10-08):** monorepo scaffold đã được tạo. Repository có
 workspace pnpm/Turborepo, năm NestJS apps, một React/Vite client, shared packages,
 Docker Compose cho Redis/RabbitMQ và script tạo bốn database PostgreSQL native.
-Health endpoint đã được tạo; nghiệp vụ sản phẩm chưa triển khai.
+Health endpoint đã được tạo.
+
+**Hiện tại (2026-10-10):** F01 auth/account và F01B admin account management đã
+có code và đang ở REVIEW; F02A media storage foundation DONE. Nghiệp vụ học
+(content, placement, lesson, practice/mock, progress, XP) chưa triển khai.
 
 Các chi tiết runtime đã tạo có bằng chứng trong `package.json`, `pnpm-lock.yaml`,
 `apps/*/package.json`, `docker-compose.yml` và `scripts/postgres/`. Xem
@@ -29,7 +33,8 @@ PostgreSQL không chạy trong Compose. Cài/chạy PostgreSQL native trên Wind
 hoặc mở script trong pgAdmin/DBeaver. Script chỉ tạo database còn thiếu, không
 drop/reset database hiện có. Xem [development guide](docs/05-operations/development.md).
 
-F01 web auth is available at `http://localhost:5173/auth`; the gateway API is at
+F01 web auth is available at `http://localhost:5173/login` (`/auth` redirects
+there); the gateway API is at
 `http://localhost:3000` and readiness is `GET /health/ready`. Fill the local
 `POSTGRES_PASSWORD` in `.env`; never commit `.env`.
 
@@ -38,7 +43,7 @@ F01 web auth is available at `http://localhost:5173/auth`; the gateway API is at
 | App | Local port | Database |
 |---|---:|---|
 | api-gateway | 3000 | none |
-| auth-service | 3001 | app_identity |
+| auth-service | 3001 (HTTP health), 50051 (gRPC) | app_identity |
 | content-service | 3002 | app_content |
 | learning-service | 3003 | app_learning |
 | progress-service | 3004 | app_progress |

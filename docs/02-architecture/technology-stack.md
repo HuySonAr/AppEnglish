@@ -39,7 +39,7 @@ entities and migrations are intentionally not implemented in F00.
 ## Phiên bản và chi tiết cần xác minh
 - pnpm được pin ở 9.0.0 theo project setup; kiểm tra package.json/packageManager và lockfile.
 - Phiên bản Node.js, Turbo chính xác, NestJS, React/Vite, Tailwind, gRPC libraries, RabbitMQ/Redis versions: lấy từ package manifests, lockfile, Dockerfiles và compose.
-- Danh sách đủ sáu service: lấy từ apps/* và workspace config. README có thể thiếu payment-service; không kết luận service không tồn tại chỉ vì README không liệt kê.
+- Danh sách app: lấy từ apps/* và workspace config. Đã xác minh 2026-10-10: sáu app gồm năm backend (api-gateway, auth-service, content-service, learning-service, progress-service) và web-client; repository không có payment-service.
 - Database/service mapping mục tiêu: app_identity, app_content, app_learning, app_progress (xem database-allocation.md); xác minh code trước khi migrate. TypeORM theo tài liệu kiến trúc hiện tại.
 - Test/lint/format tools: kiểm tra package scripts và config.
 - Không ghi secrets hoặc giá trị env nhạy cảm vào tài liệu.
@@ -58,8 +58,31 @@ F02A intentionally has no media database model or upload API.
 4. Không truy cập database của service khác; trao đổi qua API/event.
 5. Redis phục vụ cache/ephemeral coordination theo code hiện tại; dữ liệu nghiệp vụ chuẩn thuộc DB service owner.
 
+## Hiện trạng giao tiếp (xác minh 2026-10-10)
+
+- Gateway gọi auth-service qua gRPC (D27): proto ở
+  `packages/auth-contracts/proto/auth.proto`, client đăng ký bằng `ClientsModule`
+  trong `apps/api-gateway/src/app.module.js`, server là
+  `apps/auth-service/src/auth/auth.grpc.controller.js`. Proto được nạp lúc chạy
+  bằng `@grpc/proto-loader@0.8.x`; không có bước sinh code.
+- auth-service là hybrid app: gRPC cho contract auth, HTTP chỉ còn `/health` và
+  `/health/ready`.
+- RabbitMQ exchange/queue và Redis client chưa được dùng trong `apps/*/src`; chỉ
+  có dependency trong manifest và helper cấu hình ở
+  `packages/backend-common/src/infrastructure.js`. content/learning/progress
+  chưa có proto.
+
+## Checks hiện có
+
+- Backend apps và shared packages: `lint` chạy `scripts/check-syntax.mjs` (gọi
+  `node --check` cho mọi file `.js` trong `src` và `test`); `build` vẫn là
+  `node --check` trên entry file. Đây là kiểm tra cú pháp, không phải linter.
+- web-client: `lint` và `build` đều là `vite build`.
+- Test dùng `node --test`; api-gateway, learning-service và progress-service chưa
+  có test riêng (script `test` chỉ kiểm tra cú pháp entry file).
+
 ## Quy tắc triển khai theo nghiệp vụ mới
 - Đọc service map trước khi quyết định feature thuộc service nào.
 - Tái sử dụng services/contracts hiện có khi phù hợp; không tạo service chỉ vì tài liệu có một domain.
-- Không xóa payment-service hoặc service hiện hữu tự động. Xác minh chức năng, dependencies và yêu cầu người dùng trước khi loại bỏ hoặc tái sử dụng.
+- Không xóa service hiện hữu tự động (repository hiện không có payment-service). Xác minh chức năng, dependencies và yêu cầu người dùng trước khi loại bỏ hoặc tái sử dụng.
 - Reading/Listening là phạm vi sản phẩm, nhưng codebase có thể còn service cũ ngoài phạm vi. Ghi rõ giữ, migrate, deprecate hay bỏ chỉ sau khi phân tích dependencies và có quyết định.

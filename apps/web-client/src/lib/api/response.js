@@ -11,6 +11,9 @@ const messages = Object.freeze({
   [ResponseCode.AUTH_OTP_RATE_LIMITED]: 'Please wait before requesting another code.',
   [ResponseCode.AUTH_EMAIL_ALREADY_REGISTERED]: 'This email is already registered.',
   [ResponseCode.AUTH_SESSION_EXPIRED]: 'Your session has expired. Please sign in again.',
+  [ResponseCode.AUTH_ADMIN_LAST_ACCOUNT]: 'The last active administrator cannot be demoted or disabled.',
+  [ResponseCode.AUTH_EMAIL_VERIFICATION_REQUIRED]: 'This account must verify its email before it can be activated.',
+  [ResponseCode.AUTH_FORBIDDEN_ROLE]: 'You do not have permission to do this.',
   [ResponseCode.EMAIL_SEND_ERROR]: 'We could not send the email. Check the server email configuration.',
   [ResponseCode.VALIDATION_ERROR]: 'Please check the highlighted fields.'
 });

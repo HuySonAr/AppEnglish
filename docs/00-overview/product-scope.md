@@ -17,8 +17,11 @@ AppEnglish hỗ trợ học viên học và luyện Reading/Listening qua unit, 
 
 ## Test, tiến độ, XP
 - Placement dùng đề cố định 23 câu cho mọi học viên; chỉ lưu/hiển thị kết quả.
-- Placement không cấp CEFR, không vào tiến độ và không cộng XP.
-- Tiến độ có hai phần: Reading và Listening, dùng kết quả test sau placement.
+- Placement không cấp CEFR, không vào tiến độ và không cộng XP; kết quả quyết định unit bắt đầu (dưới 60% unit 1, từ 60% unit 2, từ 80% unit 3; Admin cấu hình được). Làm trước lesson 1, được bỏ qua, chỉ làm một lần.
+- Điểm lần làm đầu tiên của lesson test dùng để xếp hạng học viên trong chính lesson đó, tách khỏi XP.
+- Mock test và lesson test xáo ngẫu nhiên thứ tự lựa chọn A/B/C/D mỗi lần làm.
+- Tiến độ gồm mức hoàn thành lesson và mức thành thạo Reading/Listening, tính từ điểm cao nhất của lesson test và mock test; không tính placement và practice.
+- Practice luyện tự do theo kỹ năng từ câu hỏi của lesson đã hoàn thành, có đáp án và giải thích ngay sau mỗi câu.
 - Chỉ mock test cộng XP; lesson, placement, practice thường không cộng.
 
 ## Ngoài phạm vi

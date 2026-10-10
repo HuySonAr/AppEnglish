@@ -38,6 +38,14 @@ Access token mặc định 15 phút và refresh token mặc định 7 ngày, đ�
 env. Public registration luôn tạo `STUDENT`; UI không thay thế authorization
 backend.
 
+## Bổ sung 2026-10-10
+
+- `verify-email` và `reset-password` trả `AUTH_OTP_INVALID` cho email không tồn
+  tại (giống OTP sai), không tiết lộ email nào đã đăng ký.
+- Khi access cookie hết hạn giữa phiên, web client tự gọi `/auth/refresh` một lần
+  rồi gửi lại request; refresh thất bại thì request trả 401 như cũ.
+- Thiếu quyền trả 403 với mã số `AUTH_FORBIDDEN_ROLE` (26).
+
 ## F01B Admin account list
 
 - The Admin Accounts UI represents an unselected filter as an empty string.

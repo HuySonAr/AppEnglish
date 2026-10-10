@@ -41,7 +41,7 @@ test('STUDENT and CONTENT_MANAGER cannot use admin APIs', async () => {
   for (const role of ['STUDENT', 'CONTENT_MANAGER']) {
     const actor = account(role);
     const h = harness([actor, account('ADMIN')]);
-    await assert.rejects(() => h.service.adminList(h.token(actor), { page: 1, pageSize: 20 }), { code: 'FORBIDDEN_ROLE' });
+    await assert.rejects(() => h.service.adminList(h.token(actor), { page: 1, pageSize: 20 }), { code: 26 });
   }
 });
 

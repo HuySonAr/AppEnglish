@@ -237,5 +237,11 @@ test('resend verification inside the cooldown is rate limited by the backend', a
 test('authorizes only explicitly allowed roles', () => {
   const authorization = new AuthorizationService();
   assert.equal(authorization.assertRole({ role: 'ADMIN' }, ['ADMIN']).role, 'ADMIN');
-  assert.throws(() => authorization.assertRole({ role: 'STUDENT' }, ['ADMIN']), { code: 'FORBIDDEN_ROLE' });
+  assert.throws(() => authorization.assertRole({ role: 'STUDENT' }, ['ADMIN']), { code: 26 });
+});
+
+test('verify-email and reset-password answer an unknown email like a wrong OTP', async () => {
+  const harness = createHarness();
+  await assert.rejects(() => harness.service.verifyEmail({ email: 'nobody@example.com', otp: '123456' }), { code: 15, status: 400 });
+  await assert.rejects(() => harness.service.resetPassword({ email: 'nobody@example.com', otp: '123456', password: 'correct horse battery staple' }), { code: 15, status: 400 });
 });

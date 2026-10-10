@@ -80,7 +80,9 @@ export class AuthService {
     const account = await this.accountRepository.findByEmail(
       input.email.trim().toLowerCase(),
     );
-    if (!account) throw authErrors.accountNotFound();
+    // An unknown email answers like a wrong code so this public route does not
+    // reveal which emails are registered.
+    if (!account) throw authErrors.otpInvalid();
     this.assertLoginStatus(account);
     if (account.status === AccountStatus.ACTIVE) {
       // The email is already verified (e.g. an old OTP was re-submitted):
@@ -147,7 +149,7 @@ export class AuthService {
       code: 1,
       msg: 'additional',
       data: {
-        nextAction: 'RESET_PASSWORD',
+        nextAction: NextAction.RESET_PASSWORD,
         email: email.trim().toLowerCase(),
         expiresInSeconds: 300,
         resendAfterSeconds: 60,
@@ -159,7 +161,8 @@ export class AuthService {
     const account = await this.accountRepository.findByEmail(
       input.email.trim().toLowerCase(),
     );
-    if (!account) throw authErrors.accountNotFound();
+    // Same non-enumerating answer as forgot-password: unknown email == bad OTP.
+    if (!account) throw authErrors.otpInvalid();
     await this.verifyOtp(account, OtpPurpose.RESET_PASSWORD, input.otp);
     account.passwordHash = this.passwordService.hash(input.password);
     account.sessionVersion = (account.sessionVersion || 0) + 1;

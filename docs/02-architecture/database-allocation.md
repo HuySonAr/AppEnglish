@@ -31,9 +31,12 @@ nhận bằng pgAdmin/DBeaver.
 
 ## F01 auth schema
 
-`auth-service` owns `accounts` and `refresh_tokens` in `app_identity`. The
-append-only TypeORM migrations create refresh-token family/revocation data
-without dropping existing tables. F01 does not access any other service
+`auth-service` owns `accounts`, `refresh_tokens`, `otp_challenges` and
+`account_audits` in `app_identity` (entities under
+`apps/auth-service/src/database/*.entity.js`, four migrations under
+`src/database/migrations/`). The append-only TypeORM migrations create
+refresh-token family/revocation, OTP challenge and account audit data without
+dropping existing tables. F01 does not access any other service
 database.
 
 ## Service ngoài phạm vi

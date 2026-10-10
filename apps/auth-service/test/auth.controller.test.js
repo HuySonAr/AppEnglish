@@ -119,3 +119,41 @@ test('resend and forgot-password return their additional envelopes unchanged', a
   assert.equal(forgot.data.nextAction, 'RESET_PASSWORD');
   assert.equal(forgot.data.resendAfterSeconds, 60);
 });
+
+test('resend-verification rejects a missing email with the 400 validation envelope', async () => {
+  const controller = createController();
+  await assert.rejects(() => controller.resendVerification({}), (error) => {
+    assert.equal(error instanceof HttpException, true);
+    assert.equal(error.getStatus(), 400);
+    assert.equal(error.getResponse().code, 30);
+    return true;
+  });
+});
+
+test('admin detail/update map auth and validation errors to their HTTP envelopes', async () => {
+  const accessToken = 'access-token';
+  const controller = createController({
+    async adminGet() { throw authErrors.forbiddenRole(); },
+    async adminUpdate() { throw authErrors.lastAdmin(); }
+  });
+  await assert.rejects(() => controller.adminGet(account.id, accessToken), (error) => {
+    assert.equal(error.getStatus(), 403);
+    assert.deepEqual(error.getResponse(), { code: 26, msg: 'fail', data: {} });
+    return true;
+  });
+  await assert.rejects(() => controller.adminUpdate(account.id, { status: 'DISABLED' }, accessToken), (error) => {
+    assert.equal(error.getStatus(), 409);
+    assert.equal(error.getResponse().code, 23);
+    return true;
+  });
+  for (const call of [
+    () => controller.adminGet('not-a-uuid', accessToken),
+    () => controller.adminUpdate(account.id, {}, accessToken)
+  ]) {
+    await assert.rejects(call, (error) => {
+      assert.equal(error.getStatus(), 400);
+      assert.equal(error.getResponse().code, 30);
+      return true;
+    });
+  }
+});

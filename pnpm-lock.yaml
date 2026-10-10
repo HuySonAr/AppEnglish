@@ -17,9 +17,15 @@ importers:
 
   apps/api-gateway:
     dependencies:
+      '@appenglish/auth-contracts':
+        specifier: workspace:*
+        version: link:../../packages/auth-contracts
       '@grpc/grpc-js':
         specifier: ^1.14.0
         version: 1.14.6
+      '@grpc/proto-loader':
+        specifier: ^0.8.0
+        version: 0.8.1
       '@nestjs/common':
         specifier: ^11.1.6
         version: 11.2.7(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -47,6 +53,9 @@ importers:
       '@grpc/grpc-js':
         specifier: ^1.14.0
         version: 1.14.6
+      '@grpc/proto-loader':
+        specifier: ^0.8.0
+        version: 0.8.1
       '@nestjs/common':
         specifier: ^11.1.6
         version: 11.2.7(reflect-metadata@0.2.2)(rxjs@7.8.2)

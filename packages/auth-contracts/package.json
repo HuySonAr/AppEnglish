@@ -4,9 +4,13 @@
   "private": true,
   "type": "module",
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./grpc": "./src/grpc.js"
+  },
   "scripts": {
     "build": "node --check src/index.js",
-    "lint": "node --check src/index.js",
+    "lint": "node ../../scripts/check-syntax.mjs src test",
     "test": "node --check src/index.js"
   }
 }

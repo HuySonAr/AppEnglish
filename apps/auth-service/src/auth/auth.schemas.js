@@ -24,7 +24,8 @@ export const loginSchema = z.object({ email, password }).strict();
 export const verifyEmailSchema = z
   .object({ email, otp: z.string().regex(/^\d{6}$/) })
   .strict();
-export const forgotPasswordSchema = z.object({ email }).strict();
+export const resendVerificationSchema = z.object({ email }).strict();
+export const forgotPasswordSchema =z.object({ email }).strict();
 export const resetPasswordSchema = z
   .object({ email, otp: z.string().regex(/^\d{6}$/), password })
   .strict();

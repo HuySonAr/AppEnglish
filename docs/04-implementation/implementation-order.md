@@ -12,6 +12,19 @@
 | F07 | XP/leaderboard | Mock best score, không XP trùng |
 | F08 | Client integration/e2e | Luồng đầu cuối đạt acceptance |
 
+## Đối chiếu ID và file prompt
+
+ID trong bảng trên và trong feature-status.md là chuẩn. Tên file prompt lệch số
+từ F05 trở đi; chưa đổi tên file:
+
+| ID chuẩn | File prompt hiện có |
+|---|---|
+| F05 Practice/mock | `prompts/F05-tests.md` |
+| F06 Progress + F07 XP/leaderboard | `prompts/F06-progress-xp.md` (gộp hai feature) |
+| F08 Client integration/e2e | `prompts/F07-integration.md` |
+| F01B Admin account management | Không có file prompt riêng |
+| F09 | Không tồn tại. Phát audio thuộc F03 placement, F04 lesson test và F05 mock test (D28) |
+
 Đối chiếu dependency thật trước khi đổi thứ tự. Nếu TBD chặn feature, dừng và hỏi; không tự chọn nghiệp vụ.
 
 
