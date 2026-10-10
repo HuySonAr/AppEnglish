@@ -31,6 +31,9 @@ import {
   Label,
   Skeleton,
 } from '../../../components/ui';
+import { EmptyState } from '../../../components/shared/EmptyState.jsx';
+import { PageHeader } from '../../../components/shared/PageHeader.jsx';
+import { Users } from 'lucide-react';
 
 const editableStatuses = [
   AccountStatus.ACTIVE,
@@ -60,9 +63,7 @@ function StatusBadge({ status }) {
         : status === AccountStatus.SUSPENDED
           ? 'warning'
           : 'info';
-  return (
-    <Badge variant={variant}>{statusLabels[status] || status}</Badge>
-  );
+  return <Badge variant={variant}>{statusLabels[status] || status}</Badge>;
 }
 
 function RoleBadge({ role }) {
@@ -129,13 +130,12 @@ export function AdminAccountsPage() {
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium uppercase tracking-widest text-primary">
-            Admin
-          </p>
-          <h1 className="mt-2 text-3xl font-bold">Account management</h1>
-        </div>
+      <PageHeader
+        eyebrow="Admin"
+        title="Account management"
+        description="Search accounts, change roles, lock and unlock access."
+      />
+      <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center">
         <Input
           placeholder="Search email"
           value={filters.email}
@@ -144,10 +144,13 @@ export function AdminAccountsPage() {
           }
           className="w-full sm:w-[300px]"
         />
-      </div>
-      <div className="flex flex-wrap gap-3">
-        <Select value={filters.role} onValueChange={(value) => setFilters({ ...filters, role: value, page: 1 })}>
-          <SelectTrigger className="w-[200px]">
+        <Select
+          value={filters.role}
+          onValueChange={(value) =>
+            setFilters({ ...filters, role: value, page: 1 })
+          }
+        >
+          <SelectTrigger className="w-full sm:w-[200px]">
             <SelectValue placeholder="All roles" />
           </SelectTrigger>
           <SelectContent>
@@ -159,8 +162,13 @@ export function AdminAccountsPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={filters.status} onValueChange={(value) => setFilters({ ...filters, status: value, page: 1 })}>
-          <SelectTrigger className="w-[200px]">
+        <Select
+          value={filters.status}
+          onValueChange={(value) =>
+            setFilters({ ...filters, status: value, page: 1 })
+          }
+        >
+          <SelectTrigger className="w-full sm:w-[200px]">
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
           <SelectContent>
@@ -174,7 +182,7 @@ export function AdminAccountsPage() {
         </Select>
       </div>
       {state === 'loading' ? (
-        <div className="rounded-lg border border-border">
+        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
           <Table>
             <TableHeader>
               <TableRow>
@@ -189,23 +197,41 @@ export function AdminAccountsPage() {
             <TableBody>
               {[...Array(5)].map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-[40px]" /></TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[200px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[100px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[120px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[100px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[100px]" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-[40px]" />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
       ) : state === 'error' ? (
-        <Button variant="outline" onClick={load}>Try again</Button>
+        <Button variant="outline" onClick={load}>
+          Try again
+        </Button>
       ) : items.length === 0 ? (
-        <p className="text-center text-muted-foreground py-8">No accounts found.</p>
+        <EmptyState
+          icon={Users}
+          title="No accounts found"
+          description="Try a different search or filter."
+        />
       ) : (
-        <div className="rounded-lg border border-border">
+        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
@@ -221,8 +247,12 @@ export function AdminAccountsPage() {
               {items.map((account) => (
                 <TableRow key={account.id}>
                   <TableCell className="font-medium">{account.email}</TableCell>
-                  <TableCell><RoleBadge role={account.role} /></TableCell>
-                  <TableCell><StatusBadge status={account.status} /></TableCell>
+                  <TableCell>
+                    <RoleBadge role={account.role} />
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={account.status} />
+                  </TableCell>
                   <TableCell className="hidden md:table-cell">
                     {new Date(account.createdAt).toLocaleDateString()}
                   </TableCell>
@@ -263,7 +293,9 @@ export function AdminAccountsPage() {
           >
             Previous
           </Button>
-          <span>Page {pagination.page} of {pagination.totalPages}</span>
+          <span>
+            Page {pagination.page} of {pagination.totalPages}
+          </span>
           <Button
             variant="outline"
             size="sm"
@@ -274,7 +306,10 @@ export function AdminAccountsPage() {
           </Button>
         </div>
       ) : null}
-      <Dialog open={!!pending} onOpenChange={(open) => !open && setPending(null)}>
+      <Dialog
+        open={!!pending}
+        onOpenChange={(open) => !open && setPending(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Update {pending?.email}</DialogTitle>

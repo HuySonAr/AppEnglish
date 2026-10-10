@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDown, ArrowUp, Pencil, Plus } from 'lucide-react';
+import { ArrowDown, ArrowUp, Library, Pencil, Plus } from 'lucide-react';
 import { MIN_PUBLISHED_LESSONS_PER_UNIT, UnitStatus } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { useToast } from '../../../hooks/use-toast.js';
@@ -30,6 +30,8 @@ import {
   Skeleton,
 } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
+import { EmptyState } from '../../../components/shared/EmptyState.jsx';
+import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 
 function MoveButtons({ label, index, count, onMove, disabled }) {
   return (
@@ -143,19 +145,13 @@ export function ContentUnitsPage() {
 
   return (
     <section className="space-y-6">
-      <div>
-        <p className="text-sm font-medium uppercase tracking-widest text-primary">
-          Content Manager
-        </p>
-        <h1 className="mt-2 text-3xl font-bold">Units and lessons</h1>
-        <p className="mt-2 text-muted-foreground">
-          Learners see a unit once it is published, and only its published
-          lessons. A unit needs at least {MIN_PUBLISHED_LESSONS_PER_UNIT}{' '}
-          published lessons.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Content Manager"
+        title="Units and lessons"
+        description={`Learners see a unit once it is published, and only its published lessons. A unit needs at least ${MIN_PUBLISHED_LESSONS_PER_UNIT} published lessons.`}
+      />
 
-      <form onSubmit={addUnit} className="flex flex-col gap-3 sm:flex-row">
+      <form onSubmit={addUnit} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row">
         <Input
           aria-label="New unit title"
           placeholder="New unit title"
@@ -178,9 +174,7 @@ export function ContentUnitsPage() {
       ) : state === 'error' ? (
         <Button variant="outline" onClick={() => load()}>Try again</Button>
       ) : units.length === 0 ? (
-        <p className="py-8 text-center text-muted-foreground">
-          No units yet. Add the first unit above.
-        </p>
+        <EmptyState icon={Library} title="No units yet" description="Add the first unit above." />
       ) : (
         units.map((unit, unitIndex) => {
           const publishedLessons = unit.lessons.filter((lesson) => lesson.publishedVersionNumber).length;
@@ -241,9 +235,9 @@ export function ContentUnitsPage() {
                 {unit.lessons.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No lessons in this unit yet.</p>
                 ) : (
-                  <ul className="divide-y divide-border rounded-md border border-border">
+                  <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border">
                     {unit.lessons.map((lesson, lessonIndex) => (
-                      <li key={lesson.id} className="flex flex-wrap items-center justify-between gap-3 px-3 py-2">
+                      <li key={lesson.id} className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 transition-colors hover:bg-muted/50">
                         <div className="flex min-w-0 flex-wrap items-center gap-3">
                           <span className="text-sm text-muted-foreground">{lesson.position}.</span>
                           <Link

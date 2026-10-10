@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthLayout } from '../layouts/AuthLayout.jsx';
-import { RoleLayout } from '../layouts/RoleLayout.jsx';
+import { ManagementLayout } from '../layouts/ManagementLayout.jsx';
+import { StudentLayout } from '../layouts/StudentLayout.jsx';
 import { PublicOnlyRoute } from '../routes/PublicOnlyRoute.jsx';
 import { ProtectedRoute } from '../routes/ProtectedRoute.jsx';
 import { RoleRoute } from '../routes/RoleRoute.jsx';
@@ -47,12 +48,12 @@ export function AppRouter() {
           path="/student"
           element={<RoleRoute allowedRole={Roles.STUDENT} />}
         >
-          <Route element={<RoleLayout role={Roles.STUDENT} />}>
+          <Route element={<StudentLayout />}>
             <Route index element={<StudentDashboardPage />} />
           </Route>
         </Route>
         <Route path="/admin" element={<RoleRoute allowedRole={Roles.ADMIN} />}>
-          <Route element={<RoleLayout role={Roles.ADMIN} />}>
+          <Route element={<ManagementLayout role={Roles.ADMIN} />}>
             <Route index element={<AdminDashboardPage />} />
             <Route path="accounts" element={<AdminAccountsPage />} />
           </Route>
@@ -61,7 +62,7 @@ export function AppRouter() {
           path="/content-manager"
           element={<RoleRoute allowedRole={Roles.CONTENT_MANAGER} />}
         >
-          <Route element={<RoleLayout role={Roles.CONTENT_MANAGER} />}>
+          <Route element={<ManagementLayout role={Roles.CONTENT_MANAGER} />}>
             <Route index element={<ContentManagerDashboardPage />} />
             <Route path="units" element={<ContentUnitsPage />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />

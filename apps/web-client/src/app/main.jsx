@@ -5,7 +5,10 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import { AuthProvider } from '../features/auth/context/AuthContext.jsx';
 import { Toaster } from '../components/ui/toaster.jsx';
+import { applyStoredTheme } from '../hooks/use-theme.js';
 import '../styles/index.css';
+
+applyStoredTheme();
 
 const queryClient = new QueryClient();
 createRoot(document.getElementById('root')).render(

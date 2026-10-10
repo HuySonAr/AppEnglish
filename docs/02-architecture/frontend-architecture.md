@@ -7,85 +7,39 @@
 - Client gọi public API Gateway/BFF qua HTTP; không gọi thẳng private microservices hoặc gRPC từ trình duyệt.
 - Vite dev server proxy có thể chuyển /api đến gateway local theo cấu hình môi trường hiện tại.
 
-## Cấu trúc feature-first đề xuất
+## Cấu trúc hiện tại (D54)
 
 ~~~text
-apps/web-client/
-  public/
-  src/
-    app/
-      App.jsx
-      main.jsx
-      router.jsx
-      providers/
-        AppProviders.jsx
-      layouts/
-        AppLayout.jsx
-        AuthLayout.jsx
-    routes/
-      ProtectedRoute.jsx
-      RoleRoute.jsx
-    features/
-      auth/
-        api/
-        components/
-        hooks/
-        pages/
-        schemas/
-      placement/
-        api/
-        components/
-        hooks/
-        pages/
-      learning/
-        components/
-        pages/
-      lessons/
-        api/
-        components/
-        hooks/
-        pages/
-      vocabulary/
-        api/
-        components/
-        hooks/
-      practice/
-        api/
-        components/
-        hooks/
-        pages/
-      mock-tests/
-        api/
-        components/
-        hooks/
-        pages/
-      progress/
-        api/
-        components/
-        hooks/
-        pages/
-      leaderboard/
-        api/
-        components/
-        pages/
-    components/
-      ui/                  # shadcn/ui components generated into the repo
-      shared/              # reusable product-level components
-    lib/
-      api/
-        http-client.js
-      utils.js             # cn helper if configured
-    hooks/
-    constants/
-    assets/
-    styles/
-      index.css
-    test/
-  components.json
-  vite.config.js
+apps/web-client/src/
+  app/
+    main.jsx, App.jsx
+    router.jsx           # route của mọi role
+    navigation.js        # menu của từng role (thêm trang: 1 route + 1 mục ở đây)
+  layouts/
+    AuthLayout.jsx       # đăng nhập/đăng ký: form + panel thương hiệu
+    StudentLayout.jsx    # học viên: thanh trên, thanh dưới trên điện thoại
+    ManagementLayout.jsx # Admin, Content Manager: sidebar, drawer trên điện thoại
+    components/          # Brand, SidebarNav, UserMenu, ThemeToggle
+  routes/                # ProtectedRoute, PublicOnlyRoute, RoleRoute
+  features/              # mỗi role/nghiệp vụ một thư mục
+    auth/                # api, components, context, flow, pages, schemas
+    student/             # pages
+    admin/               # api, pages
+    content-manager/     # api, lib, components, pages
+  components/
+    ui/                  # shadcn/ui (Radix) primitives
+    shared/              # PageHeader, FeatureCard, EmptyState
+  hooks/                 # use-toast, use-theme
+  lib/                   # api/ (HTTP client, response), utils.js (cn)
+  constants/
+  styles/index.css       # design tokens sáng/tối
 ~~~
 
-Điều chỉnh chính xác tên và thư mục theo codebase đã có; không tạo tất cả thư mục rỗng. Mỗi feature sở hữu API calls, UI nghiệp vụ, hooks và schema liên quan. Chỉ đưa component dùng chung thật sự vào components/shared.
+Mỗi feature sở hữu API calls, UI nghiệp vụ, hooks và schema liên quan; chỉ đưa
+component dùng chung thật sự vào components/shared. Màu sắc chỉ dùng token trong
+`styles/index.css` (`primary`, `muted`, `success`, `warning`, `info`…); đổi giao
+diện toàn app bằng cách sửa token. Chế độ tối bật bằng class `dark` trên `<html>`
+(`hooks/use-theme.js`, lưu lựa chọn trong localStorage).
 
 ## Công cụ
 

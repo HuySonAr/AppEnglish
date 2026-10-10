@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import {
   Accent,
   ContentResponseCode,
   FILL_IN_BLANK,
   LESSON_TEST_PARTS,
-  MediaKind,
   MediaSection,
-  PartOfSpeech,
-  Skill,
 } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { useToast } from '../../../hooks/use-toast.js';
@@ -29,15 +26,12 @@ import {
   newVocabulary,
   setIn,
   uploadPending,
-  withCorrectOption,
   withFillInPassage,
   workingContent,
 } from '../lib/lesson-draft.js';
 import {
   Badge,
   Button,
-  Card,
-  CardContent,
   Input,
   Label,
   Select,
@@ -51,168 +45,12 @@ import {
   TabsList,
   TabsTrigger,
 } from '../../../components/ui';
-import { Textarea } from '../../../components/ui/textarea.jsx';
-
-const optionLetters = ['A', 'B', 'C', 'D'];
-const skillLabels = { [Skill.LISTENING]: 'Listening', [Skill.READING]: 'Reading' };
-const audioAccept = '.mp3,.mp4,.m4a,audio/mpeg,audio/mp4,video/mp4,audio/x-m4a';
-const imageAccept = '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp';
-
-// "question 1" or "questions 10–15": a part's numbers in the 23-question test.
-function questionRange(spec, prefix = spec.questionCount === 1 ? 'question ' : 'questions ') {
-  const last = spec.firstQuestionNumber + spec.questionCount - 1;
-  return `${prefix}${spec.firstQuestionNumber}${last > spec.firstQuestionNumber ? `–${last}` : ''}`;
-}
+import { PartEditor, questionRange } from '../components/PartEditor.jsx';
+import { TextField } from '../components/TextField.jsx';
+import { VocabularyCard } from '../components/VocabularyCard.jsx';
 
 const saveErrorMessage = (error) =>
   `${error?.fileName ? `${error.fileName}: ` : ''}${getApiErrorMessage(error)}`;
-
-// File control for one media reference. media = { choose(kind, file, path),
-// clear(path, mediaId), fileNames, pending, stored } from the page. A chosen
-// file is only previewed; it is uploaded when the lesson is saved. Stored
-// files can be played or viewed again when they have a delivery URL.
-function MediaField({ id, label, kind, path, mediaId, media }) {
-  const chosen = media.pending[mediaId];
-  const url = chosen?.url || media.stored[mediaId]?.url;
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      {mediaId ? (
-        <div className="space-y-2 rounded-md border border-border p-3 text-sm">
-          <div className="flex items-center justify-between gap-3">
-            <span className="truncate">
-              {chosen?.file.name || media.fileNames[mediaId] || media.stored[mediaId]?.fileName || `${kind === MediaKind.AUDIO ? 'Audio' : 'Image'} attached`}
-            </span>
-            <Button variant="ghost" size="sm" onClick={() => media.clear(path, mediaId)}>Remove</Button>
-          </div>
-          {url && kind === MediaKind.AUDIO ? <audio controls src={url} className="w-full" /> : null}
-          {url && kind === MediaKind.IMAGE ? <img src={url} alt="" className="max-h-48 rounded-md" /> : null}
-          {chosen ? <p className="text-muted-foreground">Preview only — uploaded when you save.</p> : null}
-        </div>
-      ) : (
-        <Input
-          id={id}
-          type="file"
-          accept={kind === MediaKind.AUDIO ? audioAccept : imageAccept}
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            event.target.value = '';
-            if (file) media.choose(kind, file, path);
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-function TextField({ id, label, value, onChange, multiline = false, ...props }) {
-  const Field = multiline ? Textarea : Input;
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      <Field id={id} value={value} onChange={(event) => onChange(event.target.value)} {...props} />
-    </div>
-  );
-}
-
-// Audio always travels with its transcript.
-function AudioWithTranscript({ id, label, path, item, edit, media, transcriptMax }) {
-  return (
-    <div className="grid gap-3 md:grid-cols-2">
-      <MediaField id={`${id}-audio`} label={`${label} audio (MP3, MP4 or M4A)`} kind={MediaKind.AUDIO} path={[...path, 'audioMediaId']} mediaId={item.audioMediaId} media={media} />
-      <TextField id={`${id}-transcript`} label={`${label} transcript`} value={item.transcript} maxLength={transcriptMax} multiline={transcriptMax > 1000} onChange={(value) => edit([...path, 'transcript'], value)} />
-    </div>
-  );
-}
-
-function PartEditor({ spec, part, edit, media }) {
-  const base = ['test', spec.key];
-  // Parts 1 and 2: the part recording reads the options, so only letters show.
-  const lettersOnly = !spec.option.text;
-  return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-lg font-semibold">
-          Part {spec.number}: {spec.title}
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          {skillLabels[spec.skill]} · {questionRange(spec)} · options{' '}
-          {optionLetters.slice(0, spec.optionCount).join(', ')}
-          {lettersOnly ? ' (one recording for the whole part reads the questions and options; learners see only the letters)' : ''}
-        </p>
-      </div>
-
-      {spec.group.audio || spec.group.passage ? (
-        <Card>
-          <CardContent className="space-y-4 pt-6">
-            {spec.group.audio ? (
-              <AudioWithTranscript id={`${spec.key}-group`} label={spec.title} path={base} item={part} edit={edit} media={media} transcriptMax={10000} />
-            ) : null}
-            {spec.group.passage ? (
-              <TextField
-                id={`${spec.key}-passage`}
-                label={spec.group.blanks ? `Passage with exactly ${spec.questionCount} blanks, typed as ${FILL_IN_BLANK}` : 'Document (letter, form, report, notice…)'}
-                value={part.passage}
-                maxLength={10000}
-                multiline
-                rows={8}
-                onChange={(value) => edit([...base, 'passage'], value)}
-              />
-            ) : null}
-            {spec.group.optionalImage ? (
-              <MediaField id={`${spec.key}-image`} label="Document image (optional)" kind={MediaKind.IMAGE} path={[...base, 'imageMediaId']} mediaId={part.imageMediaId} media={media} />
-            ) : null}
-          </CardContent>
-        </Card>
-      ) : null}
-
-      {part.questions.map((question, index) => {
-        const path = [...base, 'questions', index];
-        const id = `${spec.key}-q${index}`;
-        return (
-          <Card key={question.id}>
-            <CardContent className="space-y-4 pt-6">
-              <p className="font-medium">
-                Question {spec.firstQuestionNumber + index}
-                {spec.group.blanks ? ` (blank ${index + 1})` : ''}
-              </p>
-              {spec.question.image ? (
-                <MediaField id={`${id}-image`} label="Photograph (JPEG, PNG or WebP)" kind={MediaKind.IMAGE} path={[...path, 'imageMediaId']} mediaId={question.imageMediaId} media={media} />
-              ) : null}
-              {spec.question.prompt ? (
-                <TextField id={`${id}-prompt`} label="Question text" value={question.prompt} maxLength={1000} onChange={(value) => edit([...path, 'prompt'], value)} />
-              ) : null}
-              <fieldset className="space-y-3">
-                <legend className="text-sm font-medium">Options — select the correct answer</legend>
-                {question.options.map((option, optionIndex) => {
-                  const letter = optionLetters[optionIndex];
-                  const optionPath = [...path, 'options', optionIndex];
-                  return (
-                    <div key={option.id} className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name={`correct-${question.id}`}
-                        aria-label={`Option ${letter} is correct`}
-                        checked={option.isCorrect}
-                        onChange={() => edit(path, withCorrectOption(question, option.id))}
-                        className="h-4 w-4 accent-primary"
-                      />
-                      <span className="w-4 text-sm font-medium">{letter}</span>
-                      {lettersOnly ? null : (
-                        <Input className="flex-1" aria-label={`Option ${letter} text`} value={option.text} maxLength={300} onChange={(event) => edit([...optionPath, 'text'], event.target.value)} />
-                      )}
-                    </div>
-                  );
-                })}
-              </fieldset>
-              <TextField id={`${id}-explanation`} label="Explanation of the answer" value={question.explanation} maxLength={2000} multiline onChange={(value) => edit([...path, 'explanation'], value)} />
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
-  );
-}
 
 export function LessonEditorPage() {
   const { lessonId } = useParams();
@@ -470,7 +308,7 @@ export function LessonEditorPage() {
         Units and lessons
       </Link>
 
-      <div className="space-y-3">
+      <div className="sticky top-16 z-10 -mx-4 space-y-3 border-b bg-background/90 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
         <div className="flex flex-wrap items-center gap-2">
           {status.publishedVersion ? (
             <Badge variant="success">Published v{status.publishedVersion}</Badge>
@@ -480,7 +318,7 @@ export function LessonEditorPage() {
           {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
           {dirty ? <Badge variant="info">Unsaved changes</Badge> : null}
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-col gap-2 lg:flex-row">
           <Input
             aria-label="Lesson title"
             value={title}
@@ -495,8 +333,6 @@ export function LessonEditorPage() {
           >
             Rename
           </Button>
-        </div>
-        <div className="flex flex-wrap gap-3">
           <Button variant="outline" disabled={busy || !dirty} onClick={onSave}>
             {busy ? 'Working…' : 'Save draft'}
           </Button>
@@ -504,6 +340,8 @@ export function LessonEditorPage() {
             Publish
           </Button>
         </div>
+      </div>
+      <div>
         <p className="text-sm text-muted-foreground">
           Learners keep the published version until you publish again.
           Publishing creates a new version; earlier versions are kept unchanged.
@@ -512,7 +350,7 @@ export function LessonEditorPage() {
       </div>
 
       {issues.length ? (
-        <div role="alert" className="rounded-md border border-destructive/50 bg-destructive/10 p-4 text-sm">
+        <div role="alert" className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
           <p className="font-medium">Fix these before publishing ({issues.length}):</p>
           <ul className="mt-2 max-h-64 list-disc space-y-1 overflow-y-auto pl-5">
             {issues.map((issue, index) => (
@@ -528,7 +366,7 @@ export function LessonEditorPage() {
       ) : null}
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
+        <TabsList className="h-auto flex-wrap justify-start">
           <TabsTrigger value="vocabulary">Vocabulary ({content.vocabulary.length})</TabsTrigger>
           <TabsTrigger value="fillIn">Fill-in ({content.fillIn.answers.length})</TabsTrigger>
           <TabsTrigger value="test">Lesson test</TabsTrigger>
@@ -538,64 +376,9 @@ export function LessonEditorPage() {
           {content.vocabulary.length === 0 ? (
             <p className="text-sm text-muted-foreground">No vocabulary yet.</p>
           ) : null}
-          {content.vocabulary.map((item, index) => {
-            const path = ['vocabulary', index];
-            return (
-              <Card key={item.id}>
-                <CardContent className="space-y-3 pt-6">
-                  <div className="grid gap-3 md:grid-cols-[1fr_12rem_1fr_auto]">
-                    <TextField id={`word-${item.id}`} label={`Word ${index + 1}`} value={item.word} maxLength={100} onChange={(value) => edit([...path, 'word'], value)} />
-                    <div className="space-y-2">
-                      <Label htmlFor={`pos-${item.id}`}>Part of speech</Label>
-                      <Select value={item.partOfSpeech || undefined} onValueChange={(value) => edit([...path, 'partOfSpeech'], value)}>
-                        <SelectTrigger id={`pos-${item.id}`}>
-                          <SelectValue placeholder="Choose" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.values(PartOfSpeech).map((value) => (
-                            <SelectItem key={value} value={value}>{value}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <TextField id={`phonetic-${item.id}`} label="Phonetic (IPA, optional)" value={item.phonetic} maxLength={100} placeholder="/ˈtɪkɪt/" onChange={(value) => edit([...path, 'phonetic'], value)} />
-                    <div className="flex items-end">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label={`Remove word ${index + 1}`}
-                        onClick={() => update((current) => ({ ...current, vocabulary: current.vocabulary.filter((entry) => entry.id !== item.id) }))}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <TextField id={`meaning-${item.id}`} label="Meaning (for this part of speech)" value={item.meaning} maxLength={300} onChange={(value) => edit([...path, 'meaning'], value)} />
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <TextField id={`example-${item.id}`} label="Example sentence" value={item.example} maxLength={500} onChange={(value) => edit([...path, 'example'], value)} />
-                    <TextField id={`example-meaning-${item.id}`} label="Example translation (optional)" value={item.exampleMeaning} maxLength={500} onChange={(value) => edit([...path, 'exampleMeaning'], value)} />
-                  </div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <MediaField id={`uk-${item.id}`} label="Pronunciation — British (optional)" kind={MediaKind.AUDIO} path={[...path, 'audioUkMediaId']} mediaId={item.audioUkMediaId} media={media} />
-                    <MediaField id={`us-${item.id}`} label="Pronunciation — American (optional)" kind={MediaKind.AUDIO} path={[...path, 'audioUsMediaId']} mediaId={item.audioUsMediaId} media={media} />
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={!item.word.trim() || filling !== null || (item.phonetic && item.audioUkMediaId && item.audioUsMediaId)}
-                      onClick={() => onAutofill(item)}
-                    >
-                      {filling === item.id ? 'Looking up…' : 'Auto-fill pronunciation'}
-                    </Button>
-                    <span className="text-sm text-muted-foreground">
-                      Fills the empty phonetic and audio fields from a free dictionary. Check them; replace anything wrong.
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {content.vocabulary.map((item, index) => (
+            <VocabularyCard key={item.id} item={item} index={index} edit={edit} update={update} media={media} filling={filling} onAutofill={onAutofill} />
+          ))}
           <Button
             variant="outline"
             className="flex items-center gap-2"

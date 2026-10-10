@@ -93,3 +93,11 @@ export {
 } from './toast.jsx';
 export { Toaster } from './toaster.jsx';
 export { LoadingScreen } from './loading-screen.jsx';
+export {
+  Sheet,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
+  SheetDescription,
+} from './sheet.jsx';

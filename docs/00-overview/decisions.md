@@ -56,6 +56,7 @@
 | D51 | 2026-10-10 (sửa tạm D43): khi xuất bản lesson, phiên âm, audio phát âm Anh-Anh/Anh-Mỹ và bản dịch câu ví dụ của từ vựng không bắt buộc; từ, loại từ, nghĩa và câu ví dụ vẫn bắt buộc. Audio nếu có thì phải là file audio hợp lệ. Sẽ xem lại khi có giải pháp nhập phiên âm và audio cho từ |
 | D52 | 2026-10-10: câu hỏi của đề 7 part được đánh số liên tục 1–23 qua các part (Part 1: 1; Part 2: 2–3; Part 3: 4–6; Part 4: 7–9; Part 5: 10–15; Part 6: 16–18; Part 7: 19–23), không đánh lại từ 1 ở mỗi part. Trang soạn cho Content Manager nghe/xem lại file đã lưu của lesson |
 | D53 | 2026-10-10: trên ImageKit, file của lesson lưu theo loại file, rồi unit và số thứ tự lesson, rồi phần của lesson: `/appenglish/audio/unit<số unit>-lesson<số lesson>/vocabulary` cho audio từ vựng, `/appenglish/audio/unit<số unit>-lesson<số lesson>/test` cho audio lesson test, `/appenglish/image/unit<số unit>-lesson<số lesson>/test` cho hình lesson test. Số lấy theo thứ tự lúc upload; đổi thứ tự unit/lesson sau đó không đổi thư mục của file đã upload |
+| D54 | 2026-10-10: làm lại giao diện web client bằng stack sẵn có (React + Vite, Tailwind, shadcn/ui trên Radix), không thêm thư viện. Hai layout theo role: học viên dùng thanh điều hướng trên (thanh dưới trên điện thoại); Admin và Content Manager dùng sidebar (drawer trên điện thoại). Menu từng role khai báo ở `src/app/navigation.js`. Có chế độ sáng/tối. Không thêm trang hay nghiệp vụ mới |
 
 ## TBD — không tự giả định
 - Quyền riêng tư của leaderboard (tên hiển thị, ai xem được).

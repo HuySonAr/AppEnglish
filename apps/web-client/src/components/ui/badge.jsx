@@ -13,13 +13,13 @@ export function Badge({ className, variant = 'default', ...props }) {
             variant === 'secondary',
           'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80':
             variant === 'destructive',
-          'border-transparent bg-green-500/20 text-green-500 hover:bg-green-500/30':
+          'border-transparent bg-success/15 text-success':
             variant === 'success',
-          'border-transparent bg-amber-500/20 text-amber-500 hover:bg-amber-500/30':
+          'border-transparent bg-warning/15 text-warning':
             variant === 'warning',
-          'border-transparent bg-sky-500/20 text-sky-500 hover:bg-sky-500/30':
+          'border-transparent bg-info/15 text-info':
             variant === 'info',
-          'border-transparent bg-muted text-muted-foreground hover:bg-muted/80':
+          'border-border bg-transparent text-muted-foreground':
             variant === 'outline',
         },
         className

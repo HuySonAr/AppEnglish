@@ -16,17 +16,19 @@ export function AuthCard({
 }) {
   return (
     <div className="flex w-full items-center justify-center">
-      <Card className={cn('w-full max-w-md', className)}>
-        <CardHeader className="text-center">
-          <p className="text-sm font-medium uppercase tracking-widest text-primary">
+      <Card className={cn('w-full max-w-md rounded-2xl shadow-lg', className)}>
+        <CardHeader className="space-y-2 p-6 sm:p-8 sm:pb-6">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary">
             {eyebrow}
           </p>
-          <CardTitle className="text-2xl">{title}</CardTitle>
+          <CardTitle className="text-2xl sm:text-3xl">{title}</CardTitle>
           {description && (
             <CardDescription className="text-sm">{description}</CardDescription>
           )}
         </CardHeader>
-        <CardContent className="pt-0">{children}</CardContent>
+        <CardContent className="p-6 pt-0 sm:p-8 sm:pt-0">
+          {children}
+        </CardContent>
       </Card>
     </div>
   );
