@@ -37,3 +37,14 @@ Không tự giả định OTP/OAuth, cookie/token, TTL hoặc reset password. Ki
 Access token mặc định 15 phút và refresh token mặc định 7 ngày, đều cấu hình qua
 env. Public registration luôn tạo `STUDENT`; UI không thay thế authorization
 backend.
+
+## F01B Admin account list
+
+- The Admin Accounts UI represents an unselected filter as an empty string.
+  `listAdminAccounts()` omits empty email/role/status filters from the HTTP query;
+  selecting a role/status sends its existing enum value, clearing it omits it again.
+- `GET /auth/admin/accounts` still validates with `adminAccountQuerySchema`.
+  Explicit `role=`/`status=` and unknown enum values are invalid and return HTTP
+  400 with the existing validation envelope, rather than an unhandled 500.
+- Empty filters do not change an account's status. Account status must pass
+  `accountResponseSchema` before a successful list response is returned.

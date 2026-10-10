@@ -83,6 +83,18 @@ revoke refresh sessions, and append an audit row containing actor, target,
 before/after values, and timestamp. The last active administrator cannot be
 demoted or disabled.
 
+Admin list queries omit optional role/status filters when requesting all accounts.
+Explicit empty strings and unknown enums are rejected by `adminAccountQuerySchema`.
+`AuthController.adminList()` maps these validation errors to HTTP 400 with
+`{ code: 30, msg: 'fail', data: { issues } }`. The web client's
+`adminAccountListParams()` removes empty UI filter values before Axios serializes
+the query. This does not normalize or repair persisted account statuses.
+
+`test/admin-list.http.test.js` exercises real Gateway/AuthController HTTP routing,
+query preservation, empty/omitted/invalid filters, account response validation and
+role rejection. Session lookup and the repository use fixtures; this test does not
+connect to PostgreSQL or establish the migration state of a running environment.
+
 For a first administrator, set `ADMIN_BOOTSTRAP_EMAIL` and
 `ADMIN_BOOTSTRAP_PASSWORD` only in the local environment and run
 `pnpm --filter @appenglish/auth-service admin:bootstrap` once after migrations.

@@ -1,4 +1,5 @@
 import { httpClient } from '../../../lib/api/http-client.js';
+import { adminAccountListParams } from '../../admin/api/account-query.js';
 
 export async function registerAccount(payload) {
   const response = await httpClient.post('/auth/register', payload);
@@ -40,7 +41,9 @@ export async function resetPassword(payload) {
   return (await httpClient.post('/auth/reset-password', payload)).data;
 }
 export async function listAdminAccounts(params = {}) {
-  return (await httpClient.get('/auth/admin/accounts', { params })).data;
+  return (await httpClient.get('/auth/admin/accounts', {
+    params: adminAccountListParams(params),
+  })).data;
 }
 export async function getAdminAccount(id) {
   return (await httpClient.get(`/auth/admin/accounts/${id}`)).data;

@@ -136,10 +136,15 @@ export class AuthController {
     }
   }
     async adminList(query, request) {
-      return this.envelope(await this.authService.adminList(
-        parseCookies(request.headers.cookie).appenglish_access,
-        adminAccountQuerySchema.parse(query),
-      ));
+      try {
+        const parsedQuery = adminAccountQuerySchema.parse(query);
+        return this.envelope(await this.authService.adminList(
+          parseCookies(request.headers.cookie).appenglish_access,
+          parsedQuery,
+        ));
+      } catch (error) {
+        throw this.normalizeError(error);
+      }
     }
     async adminGet(accountId, request) {
       return this.envelope(await this.authService.adminGet(
