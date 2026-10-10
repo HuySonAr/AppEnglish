@@ -1,5 +1,6 @@
 import { ResponseCode } from '@appenglish/auth-contracts';
 import { ContentResponseCode } from '@appenglish/content-contracts';
+import { LearningResponseCode } from '@appenglish/learning-contracts';
 
 const messages = Object.freeze({
   [ResponseCode.AUTH_INVALID_CREDENTIALS]: 'Email or password is invalid.',
@@ -21,7 +22,10 @@ const messages = Object.freeze({
   [ContentResponseCode.CONTENT_INVALID_STATE]: 'There is no draft to publish.',
   [ContentResponseCode.CONTENT_NOT_PUBLISHABLE]: 'This content does not meet the publishing requirements yet.',
   [ContentResponseCode.MEDIA_INVALID]: 'This file type or size is not allowed.',
-  [ContentResponseCode.PRONUNCIATION_UNAVAILABLE]: 'The dictionary is not answering. Try again, or enter the pronunciation yourself.'
+  [ContentResponseCode.PRONUNCIATION_UNAVAILABLE]: 'The dictionary is not answering. Try again, or enter the pronunciation yourself.',
+  [LearningResponseCode.PLACEMENT_NOT_AVAILABLE]: 'The placement test is not available yet.',
+  [LearningResponseCode.PLACEMENT_ALREADY_TAKEN]: 'You have already taken or skipped the placement test.',
+  [LearningResponseCode.PLACEMENT_NOT_IN_PROGRESS]: 'There is no placement test in progress.'
 });
 
 // data.reason of a MEDIA_INVALID error says which upload rule failed.

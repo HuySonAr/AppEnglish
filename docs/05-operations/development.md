@@ -34,6 +34,7 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 # Điền SMTP_HOST/SMTP_FROM và SMTP credentials nếu cần gửi OTP thật.
 pnpm --filter @appenglish/auth-service migration:run
 pnpm --filter @appenglish/content-service migration:run
+pnpm --filter @appenglish/learning-service migration:run
 docker compose up -d redis rabbitmq
 pnpm dev
 ```
@@ -100,3 +101,12 @@ Không giả định phiên bản/port/lệnh chưa kiểm tra. Xác minh packag
 - PostgreSQL native data và Docker broker volumes là hai vùng dữ liệu độc lập.
 - Không xóa hoặc reset PostgreSQL data khi dừng broker containers.
 - Mọi lệnh reset phải nêu rõ database/volume sẽ bị xóa và yêu cầu xác nhận trước khi chạy lệnh phá hủy.
+
+## learning-service (F03)
+
+learning-service serves gRPC at `LEARNING_GRPC_HOST`:`LEARNING_GRPC_PORT`
+(default `localhost:50053`), loads `.env`, and calls content-service over gRPC.
+Add the two `LEARNING_GRPC_*` variables to `.env` only to change the default.
+Restart `pnpm dev` after pulling F03 so the gateway and learning-service start
+with the new contract. The Vite dev server proxies `/placement` to the gateway.
+

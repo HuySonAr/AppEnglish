@@ -221,18 +221,19 @@ test('a published version is immutable and edits create the next version', async
   assert.deepEqual(units[0].lessons[0], { id: lesson.id, title: 'Lesson', position: 1, publishedVersionNumber: 2, hasDraft: false });
 });
 
-test('a unit needs five published lessons and learners only see published content', async () => {
+test('a unit needs a published lesson and learners only see published content', async () => {
   const context = await harness();
   const { service } = context;
   const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
-  const lessons = [];
-  for (let index = 1; index <= 4; index++) lessons.push(await publishedLesson(context, unit.id, `L${index}`));
   const draftOnly = (await service.createLesson(manager, unit.id, { title: 'Draft only' })).lesson;
+  // Draft lessons do not count.
   await assert.rejects(() => service.publishUnit(manager, unit.id), (error) => {
     assert.equal(error.code, 42);
-    assert.match(error.data.issues[0].message, /it has 4/);
+    assert.match(error.data.issues[0].message, /at least 1 published lesson; it has 0/);
     return true;
   });
+  const lessons = [];
+  for (let index = 1; index <= 4; index++) lessons.push(await publishedLesson(context, unit.id, `L${index}`));
   // Published lessons of an unpublished unit stay hidden from learners.
   assert.deepEqual((await service.listUnits(student)).units, []);
   await assert.rejects(() => service.getLesson(student, lessons[0].id), { code: 40, status: 404 });

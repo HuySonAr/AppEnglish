@@ -148,7 +148,7 @@ export function ContentUnitsPage() {
       <PageHeader
         eyebrow="Content Manager"
         title="Units and lessons"
-        description={`Learners see a unit once it is published, and only its published lessons. A unit needs at least ${MIN_PUBLISHED_LESSONS_PER_UNIT} published lessons.`}
+        description={`Learners see a unit once it is published, and only its published lessons. A unit needs at least ${MIN_PUBLISHED_LESSONS_PER_UNIT} published lesson${MIN_PUBLISHED_LESSONS_PER_UNIT === 1 ? '' : 's'}.`}
       />
 
       <form onSubmit={addUnit} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row">

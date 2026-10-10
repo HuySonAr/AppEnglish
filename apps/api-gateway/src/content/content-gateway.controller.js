@@ -52,6 +52,15 @@ export class ContentGatewayController {
   autofillPronunciation(body, request) {
     return this.forward('AutofillPronunciation', request, { body });
   }
+  getPlacement(request) {
+    return this.forward('GetPlacement', request);
+  }
+  savePlacementDraft(body, request) {
+    return this.forward('SavePlacementDraft', request, { body });
+  }
+  publishPlacement(request) {
+    return this.forward('PublishPlacement', request);
+  }
   deleteMedia(id, request) {
     return this.forward('DeleteMedia', request, { id });
   }
@@ -117,6 +126,9 @@ const routes = [
   [Put, 'lessons/:id/draft', 'saveLessonDraft', [Param('id'), Body(), Req()]],
   [Post, 'lessons/:id/publish', 'publishLesson', [Param('id'), Req()]],
   [Post, 'pronunciation', 'autofillPronunciation', [Body(), Req()]],
+  [Get, 'placement', 'getPlacement', [Req()]],
+  [Put, 'placement/draft', 'savePlacementDraft', [Body(), Req()]],
+  [Post, 'placement/publish', 'publishPlacement', [Req()]],
   [Delete, 'media/:id', 'deleteMedia', [Param('id'), Req()]],
   [Post, 'media', 'uploadMedia', [UploadedFile(), Body(), Req()]],
 ];

@@ -23,10 +23,12 @@ export const contentErrors = Object.freeze({
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Lesson was not found', 404),
   mediaNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Media was not found', 404),
+  placementNotFound: () =>
+    new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Placement test is not published', 404),
   noDraft: () =>
     new ContentError(
       ContentResponseCode.CONTENT_INVALID_STATE,
-      'Lesson has no draft to publish',
+      'There is no draft to publish',
       409,
     ),
   notPublishable: (issues) =>

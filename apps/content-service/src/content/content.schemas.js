@@ -83,6 +83,14 @@ const partSchema = z
   })
   .strict();
 
+// The seven-part, 23-question test used by lessons and by placement.
+const testSchema = z
+  .object(
+    Object.fromEntries(LESSON_TEST_PARTS.map((part) => [part.key, partSchema.default({})])),
+  )
+  .strict()
+  .default({});
+
 // A draft may be incomplete: only shapes and sizes are enforced here. The
 // publishing requirements are checked by publishIssues().
 export const lessonContentSchema = z
@@ -112,16 +120,14 @@ export const lessonContentSchema = z
       })
       .strict()
       .default({}),
-    test: z
-      .object(
-        Object.fromEntries(
-          LESSON_TEST_PARTS.map((part) => [part.key, partSchema.default({})]),
-        ),
-      )
-      .strict()
-      .default({}),
+    test: testSchema,
   })
   .strict();
+
+// The placement test is one seven-part test (D46).
+export const placementContentSchema = z.object({ test: testSchema }).strict();
+
+export const placementPaperSchema = z.object({ versionId: z.string().uuid().optional() }).strict();
 
 export const pronunciationSchema = z
   .object({
@@ -145,11 +151,11 @@ function duplicates(values) {
   return values.some((value) => seen.size === seen.add(value).size);
 }
 
-// Every media asset id a lesson content refers to.
+// Every media asset id a lesson or placement content refers to.
 export function contentMediaIds(content) {
   const parts = Object.values(content.test);
   return [
-    ...content.vocabulary.flatMap((item) => [item.audioUkMediaId, item.audioUsMediaId]),
+    ...(content.vocabulary || []).flatMap((item) => [item.audioUkMediaId, item.audioUsMediaId]),
     ...parts.flatMap((part) => [
       part.audioMediaId,
       part.imageMediaId,
@@ -162,12 +168,11 @@ export function contentMediaIds(content) {
   ].filter(Boolean);
 }
 
-// Returns the reasons a lesson draft cannot be published; empty when it can.
-// mediaById maps the ids of existing media assets to their rows.
-export function publishIssues(content, mediaById) {
-  const issues = [];
+const lower = (value) => value.toLowerCase();
+
+// The checks shared by every publishing rule; they add to `issues`.
+function issueChecks(issues, mediaById) {
   const issue = (path, message) => issues.push({ path, message });
-  const lower = (value) => value.toLowerCase();
   const required = (path, value) => {
     if (!value) issue(path, 'Required');
   };
@@ -180,6 +185,14 @@ export function publishIssues(content, mediaById) {
     requiredMedia(`${path}.audioMediaId`, item.audioMediaId, MediaKind.AUDIO);
     required(`${path}.transcript`, item.transcript);
   };
+  return { issue, required, requiredMedia, requiredAudio };
+}
+
+// Returns the reasons a lesson draft cannot be published; empty when it can.
+// mediaById maps the ids of existing media assets to their rows.
+export function publishIssues(content, mediaById) {
+  const issues = [];
+  const { issue, required, requiredMedia } = issueChecks(issues, mediaById);
 
   if (!content.vocabulary.length) issue('vocabulary', 'At least one vocabulary item is required');
   content.vocabulary.forEach((item, index) => {
@@ -207,8 +220,33 @@ export function publishIssues(content, mediaById) {
       issue(`fillIn.answers[${index}]`, 'Answer must be one of the lesson vocabulary words');
   });
 
+  testIssues(content.test, issues, mediaById);
+
+  const questions = Object.values(content.test).flatMap((part) => part.questions);
+  const ids = [
+    ...content.vocabulary,
+    ...questions,
+    ...questions.flatMap((question) => question.options),
+  ].map((item) => item.id);
+  if (duplicates(ids)) issue('content', 'Item ids must be unique');
+  return issues;
+}
+
+// Returns the reasons a placement draft cannot be published.
+export function placementIssues(content, mediaById) {
+  const issues = [];
+  testIssues(content.test, issues, mediaById);
+  const questions = Object.values(content.test).flatMap((part) => part.questions);
+  const ids = [...questions, ...questions.flatMap((question) => question.options)].map((item) => item.id);
+  if (duplicates(ids)) issues.push({ path: 'content', message: 'Item ids must be unique' });
+  return issues;
+}
+
+// Publishing rules of the seven-part test (D45, D48).
+function testIssues(test, issues, mediaById) {
+  const { issue, required, requiredMedia, requiredAudio } = issueChecks(issues, mediaById);
   for (const spec of LESSON_TEST_PARTS) {
-    const part = content.test[spec.key];
+    const part = test[spec.key];
     const partPath = `test.${spec.key}`;
     if (spec.group.audio) requiredAudio(partPath, part);
     if (spec.group.passage) required(`${partPath}.passage`, part.passage);
@@ -234,13 +272,4 @@ export function publishIssues(content, mediaById) {
       }
     });
   }
-
-  const questions = Object.values(content.test).flatMap((part) => part.questions);
-  const ids = [
-    ...content.vocabulary,
-    ...questions,
-    ...questions.flatMap((question) => question.options),
-  ].map((item) => item.id);
-  if (duplicates(ids)) issue('content', 'Item ids must be unique');
-  return issues;
 }

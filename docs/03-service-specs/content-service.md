@@ -110,7 +110,7 @@ matching RPC of `appenglish.content.v1.ContentService`
 | GET | `/content/units` | `ListUnits` | any role | Content Manager: all units/lessons with publishing state. Others: published units and published lessons only |
 | POST | `/content/units` | `CreateUnit` | Content Manager | Create a draft unit at the end |
 | PATCH | `/content/units/:id` | `UpdateUnit` | Content Manager | Title, description, position (reorders) |
-| POST | `/content/units/:id/publish` | `PublishUnit` | Content Manager | Needs at least 5 published lessons |
+| POST | `/content/units/:id/publish` | `PublishUnit` | Content Manager | Needs at least 1 published lesson (D55) |
 | POST | `/content/units/:id/lessons` | `CreateLesson` | Content Manager | Create a lesson with an empty draft |
 | PATCH | `/content/lessons/:id` | `UpdateLesson` | Content Manager | Title, position (reorders within the unit) |
 | GET | `/content/lessons/:id` | `GetLesson` | any role | Content Manager: draft and published content. Others: published study material without answers |
@@ -118,6 +118,10 @@ matching RPC of `appenglish.content.v1.ContentService`
 | POST | `/content/lessons/:id/publish` | `PublishLesson` | Content Manager | Validate and freeze the draft as the next version |
 | POST | `/content/media` | `UploadMedia` | Content Manager | Multipart `file` + `kind` (`audio`/`image`) + `lessonId` + `section` (`vocabulary`/`test`); returns the media id |
 | DELETE | `/content/media/:id` | `DeleteMedia` | Content Manager | Deletes the file from storage and its row when no saved lesson version uses it; returns `{ deleted }` (`false` when it is still in use or storage refused) |
+| GET | `/content/placement` | `GetPlacement` | Content Manager | Draft and published version of the placement test, with `media` |
+| PUT | `/content/placement/draft` | `SavePlacementDraft` | Content Manager | Replace the draft `{ test }`; creates the next draft version after a publish |
+| POST | `/content/placement/publish` | `PublishPlacement` | Content Manager | Validate the seven parts and freeze the draft as the next version |
+| — | not exposed | `GetPlacementPaper` | learning-service | `{ versionId? }` → a published version with answers, media URLs and `publishedUnitCount`; takes no actor |
 | POST | `/content/pronunciation` | `AutofillPronunciation` | Content Manager | `{ word, accents? }`; looks the word up in the free dictionary and returns `{ found, phonetic, audio: { uk, us } }` with stored media or `null` |
 
 Responses use the `{ code, msg, data }` envelope. Content codes
@@ -125,6 +129,18 @@ Responses use the `{ code, msg, data }` envelope. Content codes
 (no draft to publish), 42 not publishable (`data.issues` lists `{ path,
 message }`), 43 media rejected (`data.reason`); 26 forbidden role, 30
 validation, 32 gateway/system keep their meaning from auth.
+
+### Placement test (F03, D46, D57, D58)
+
+The single placement test lives in `placement_versions` (migration
+`1720000002000-create-placement.js`): one `DRAFT` row and immutable
+`PUBLISHED` rows, like `lesson_versions` without a parent row. Its content is
+`{ test }` with the same seven parts as a lesson test
+(`placementContentSchema`) and it is published under the same test rules
+(`placementIssues`). Uploads with `section=placement` go to
+`/appenglish/<kind>/placement`. Media referenced by a placement version is
+protected from deletion like lesson media. Attempts and scoring are in
+learning-service (`docs/03-service-specs/learning-service.md`).
 
 ### Rules
 

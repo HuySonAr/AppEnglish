@@ -26,6 +26,7 @@ pnpm install
 Copy-Item .env.example .env
 pnpm --filter @appenglish/auth-service migration:run
 pnpm --filter @appenglish/content-service migration:run
+pnpm --filter @appenglish/learning-service migration:run
 docker compose up -d redis rabbitmq
 pnpm dev
 ```
@@ -47,7 +48,7 @@ there); the gateway API is at
 | api-gateway | 3000 | none |
 | auth-service | 3001 (HTTP health), 50051 (gRPC) | app_identity |
 | content-service | 3002 (HTTP health), 50052 (gRPC) | app_content |
-| learning-service | 3003 | app_learning |
+| learning-service | 3003 (HTTP health), 50053 (gRPC) | app_learning |
 | progress-service | 3004 | app_progress |
 | web-client | 5173 | none |
 

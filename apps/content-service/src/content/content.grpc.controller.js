@@ -11,12 +11,14 @@ import {
   lessonCreateSchema,
   lessonUpdateSchema,
   mediaUploadSchema,
+  placementContentSchema,
+  placementPaperSchema,
   pronunciationSchema,
   unitCreateSchema,
   unitUpdateSchema,
 } from './content.schemas.js';
 
-// Each RPC: whether it targets an id, the schema of its JSON payload (if any)
+// Each RPC: whether it targets an id (internal ones take no actor), the schema of its JSON payload (if any)
 // and the service call.
 const rpcs = {
   ListUnits: { run: (service, { actor }) => service.listUnits(actor) },
@@ -60,6 +62,18 @@ const rpcs = {
     id: true,
     run: (service, { actor, id }) => service.deleteMedia(actor, id),
   },
+  GetPlacement: { run: (service, { actor }) => service.getPlacement(actor) },
+  SavePlacementDraft: {
+    payload: placementContentSchema,
+    run: (service, { actor, payload }) => service.savePlacementDraft(actor, payload),
+  },
+  PublishPlacement: { run: (service, { actor }) => service.publishPlacement(actor) },
+  // Called by learning-service, not by the gateway: there is no actor.
+  GetPlacementPaper: {
+    internal: true,
+    payload: placementPaperSchema,
+    run: (service, { payload }) => service.getPlacementPaper(payload),
+  },
   AutofillPronunciation: {
     payload: pronunciationSchema,
     run: (service, { actor, payload }) => service.autofillPronunciation(actor, payload),
@@ -87,7 +101,7 @@ export class ContentGrpcController {
   handle(spec, request) {
     return this.reply(() =>
       spec.run(this.contentService, {
-        actor: actorSchema.parse(request.actor),
+        actor: spec.internal ? undefined : actorSchema.parse(request.actor),
         id: spec.id ? idSchema.parse(request.id) : undefined,
         payload: spec.payload ? spec.payload.parse(parseJson(request.payloadJson)) : undefined,
       }),

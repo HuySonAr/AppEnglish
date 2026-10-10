@@ -2,7 +2,7 @@
 1. Một placement cố định 23 câu cho mọi Student.
 2. Placement không cấp CEFR, không vào progress, không XP. Placement quyết định unit bắt đầu: dưới 60% unit 1, từ 60% unit 2, từ 80% unit 3 (mặc định, Admin cấu hình được); làm trước lesson 1, được bỏ qua, chỉ làm một lần; lesson mở sẵn không tính là hoàn thành (D29, D35).
 3. Không có khóa học; có khoảng 50 lesson, tổ chức theo unit.
-4. Mỗi unit có từ 5 lesson trở lên, không cố định.
+4. Mỗi unit có một hoặc nhiều lesson, không cố định (D55).
 5. Lesson: học từ vựng → điền từ vào đoạn văn → lesson test 7 part, 23 câu (D43–D45).
 6. Hoàn thành đủ phần bắt buộc và đạt >=80% test cuối để mở lesson kế.
 7. Dưới 80% phải làm lại lesson test.

@@ -70,3 +70,22 @@ export const MediaAssetEntity = new EntitySchema({
     createdAt: { type: 'timestamptz', createDate: true },
   },
 });
+
+// One row per version of the single placement test; same life cycle as
+// LessonVersion.
+export const PlacementVersionEntity = new EntitySchema({
+  name: 'PlacementVersion',
+  tableName: 'placement_versions',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    versionNumber: { type: 'int' },
+    status: { type: 'varchar', length: 16, default: 'DRAFT' },
+    content: { type: 'jsonb' },
+    createdBy: { type: 'uuid' },
+    publishedBy: { type: 'uuid', nullable: true },
+    publishedAt: { type: 'timestamptz', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'UQ_placement_versions_number', columns: ['versionNumber'], unique: true }],
+});

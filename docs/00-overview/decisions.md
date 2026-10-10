@@ -6,7 +6,7 @@
 | D01 | Chỉ triển khai Reading và Listening |
 | D02 | Không có giáo viên, Speaking/Writing, lớp học hoặc assignment |
 | D03 | Không có khóa học; khoảng 50 lesson, nhóm theo unit |
-| D04 | Unit có ít nhất 5 lesson, không cố định số lesson |
+| D04 | Unit có ít nhất 5 lesson, không cố định số lesson (thay bằng D55: ít nhất 1 lesson) |
 | D05 | Placement là đề cố định 23 câu, dùng chung |
 | D06 | Placement chỉ lưu/hiển thị; không CEFR, progress hoặc XP (được sửa bởi D29: điểm cao mở khóa trước một số unit) |
 | D07 | Lesson gồm từ vựng, bài điền từ và test cuối |
@@ -57,6 +57,10 @@
 | D52 | 2026-10-10: câu hỏi của đề 7 part được đánh số liên tục 1–23 qua các part (Part 1: 1; Part 2: 2–3; Part 3: 4–6; Part 4: 7–9; Part 5: 10–15; Part 6: 16–18; Part 7: 19–23), không đánh lại từ 1 ở mỗi part. Trang soạn cho Content Manager nghe/xem lại file đã lưu của lesson |
 | D53 | 2026-10-10: trên ImageKit, file của lesson lưu theo loại file, rồi unit và số thứ tự lesson, rồi phần của lesson: `/appenglish/audio/unit<số unit>-lesson<số lesson>/vocabulary` cho audio từ vựng, `/appenglish/audio/unit<số unit>-lesson<số lesson>/test` cho audio lesson test, `/appenglish/image/unit<số unit>-lesson<số lesson>/test` cho hình lesson test. Số lấy theo thứ tự lúc upload; đổi thứ tự unit/lesson sau đó không đổi thư mục của file đã upload |
 | D54 | 2026-10-10: làm lại giao diện web client bằng stack sẵn có (React + Vite, Tailwind, shadcn/ui trên Radix), không thêm thư viện. Hai layout theo role: học viên dùng thanh điều hướng trên (thanh dưới trên điện thoại); Admin và Content Manager dùng sidebar (drawer trên điện thoại). Menu từng role khai báo ở `src/app/navigation.js`. Có chế độ sáng/tối. Không thêm trang hay nghiệp vụ mới |
+| D55 | 2026-10-10 (thay D04): unit có một hoặc nhiều lesson; unit xuất bản được khi có ít nhất 1 lesson đã xuất bản |
+| D56 | 2026-10-10 (F03 placement): audio phát cho học viên bằng link ImageKit công khai, chấp nhận ở giai đoạn này (đóng TBD về link có chữ ký cho placement/lesson test/mock/practice). Trang kết quả placement chỉ hiện điểm và unit bắt đầu, không hiện đáp án, giải thích hay transcript. Placement không xáo lựa chọn (câu về sửa đề được thay bằng D57) |
+| D57 | 2026-10-10 (F03): placement làm trong 25 phút, đồng hồ do server giữ; hết giờ bài được chấm với các câu đã chọn (câu trả lời được lưu tự động trong lúc làm). Mỗi học viên chỉ làm đúng một lần; bỏ qua cũng tính là đã dùng lượt. Content Manager sửa được đề khi gặp lỗi: mỗi lần xuất bản tạo version mới, người chưa làm nhận version mới, người đang làm dở hoàn thành trên version đã bắt đầu, kết quả cũ giữ nguyên (D40) |
+| D58 | 2026-10-10 (F03): content-service giữ đề placement (bảng `placement_versions`, soạn bằng trình soạn 7 part của lesson test); learning-service giữ lượt làm, điểm và ngưỡng (`app_learning`). Gateway → learning-service dùng gRPC (`packages/learning-contracts/proto/learning.proto`); learning-service đọc đề kèm đáp án từ content-service qua RPC nội bộ `GetPlacementPaper`, không đọc database của content-service. Unit bắt đầu không vượt quá số unit đã xuất bản. Ngưỡng do Admin đổi chỉ áp dụng cho bài nộp sau đó |
 
 ## TBD — không tự giả định
 - Quyền riêng tư của leaderboard (tên hiển thị, ai xem được).
@@ -66,5 +70,3 @@
 - Nguồn từ điển miễn phí (D47) không ổn định khi thử ngày 2026-10-10: phần lớn lượt tra trả lỗi hoặc quá thời gian, nhiều từ chỉ có audio Anh-Mỹ, cụm từ thường không có. Nếu tình trạng kéo dài cần chọn nguồn khác (TTS hoặc dữ liệu IPA mở).
 - Practice (D32, D38) lấy câu hỏi lẻ theo kỹ năng, nhưng Part 3, 4, 6, 7 là nhóm câu hỏi dùng chung audio/đoạn văn: practice lấy cả nhóm hay chỉ các part câu lẻ.
 - Rate limiting and operational account recovery are outside F01.
-- ImageKit private-file/signed-URL behavior for protected audio must be verified
-  from current official documentation before F03/F04/F05 and practice expose audio delivery (D28, D32).

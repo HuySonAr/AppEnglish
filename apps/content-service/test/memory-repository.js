@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 // In-memory stand-in for ContentRepository; rows are copied on the way in and
 // out like a database would.
 export function createMemoryRepository() {
-  const tables = { units: [], lessons: [], versions: [], media: [] };
+  const tables = { units: [], lessons: [], versions: [], media: [], placement: [] };
   const copy = (row) => (row ? structuredClone(row) : null);
   const byPosition = (a, b) => a.position - b.position;
   function save(table, row) {
@@ -49,7 +49,17 @@ export function createMemoryRepository() {
     async findMediaByIds(ids) { return tables.media.filter((asset) => ids.includes(asset.id)).map(copy); },
     async saveMedia(asset) { return save('media', asset); },
     async deleteMedia(id) { tables.media = tables.media.filter((asset) => asset.id !== id); },
-    async isMediaReferenced(id) { return tables.versions.some((version) => JSON.stringify(version.content).includes(id)); },
+    async isMediaReferenced(id) {
+      return [...tables.versions, ...tables.placement].some((version) => JSON.stringify(version.content).includes(id));
+    },
+    async countPublishedUnits() { return tables.units.filter((unit) => unit.status === 'PUBLISHED').length; },
+    async findPlacementDraft() { return copy(tables.placement.find((version) => version.status === 'DRAFT')); },
+    async findPlacementVersion(id) { return copy(tables.placement.find((version) => version.id === id)); },
+    async findPublishedPlacement() {
+      return copy(tables.placement.filter((version) => version.status === 'PUBLISHED').sort((a, b) => b.versionNumber - a.versionNumber)[0]);
+    },
+    async maxPlacementVersionNumber() { return Math.max(0, ...tables.placement.map((version) => version.versionNumber)); },
+    async savePlacementVersion(version) { return save('placement', version); },
   };
 }
 

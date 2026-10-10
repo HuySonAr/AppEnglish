@@ -19,7 +19,11 @@ export const MediaKind = Object.freeze({
 });
 
 // Which part of a lesson a file belongs to; decides its storage folder.
-export const MediaSection = Object.freeze({ VOCABULARY: 'vocabulary', TEST: 'test' });
+export const MediaSection = Object.freeze({
+  VOCABULARY: 'vocabulary',
+  TEST: 'test',
+  PLACEMENT: 'placement'
+});
 
 export const Accent = Object.freeze({ UK: 'uk', US: 'us' });
 
@@ -69,8 +73,8 @@ export const LESSON_TEST_QUESTION_COUNT = LESSON_TEST_PARTS.reduce(
   0
 );
 
-// A unit needs this many published lessons before it can be published (D04).
-export const MIN_PUBLISHED_LESSONS_PER_UNIT = 5;
+// A unit needs this many published lessons before it can be published (D55).
+export const MIN_PUBLISHED_LESSONS_PER_UNIT = 1;
 
 // Content codes share the numeric space of @appenglish/auth-contracts
 // ResponseCode: 0/1 success, 21 session expired, 26 forbidden role,

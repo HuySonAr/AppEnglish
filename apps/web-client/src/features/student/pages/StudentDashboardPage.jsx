@@ -1,4 +1,4 @@
-import { BookOpen, Headphones, Trophy } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Headphones, Trophy } from 'lucide-react';
 import { FeatureCard } from '../../../components/shared/FeatureCard.jsx';
 import { useAuth } from '../../auth/context/AuthContext.jsx';
 
@@ -16,6 +16,13 @@ export function StudentDashboardPage() {
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <FeatureCard
+          icon={ClipboardCheck}
+          title="Placement test"
+          description="Find the unit you start at"
+          to="/student/placement"
+          tone="success"
+        />
         <FeatureCard icon={BookOpen} title="Reading" description="Practice reading comprehension" />
         <FeatureCard icon={Headphones} title="Listening" description="Improve listening skills" tone="info" />
         <FeatureCard icon={Trophy} title="Progress" description="Track your learning journey" tone="warning" />

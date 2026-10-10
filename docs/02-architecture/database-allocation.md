@@ -60,3 +60,13 @@ in `app_content` (migration
 Lesson content is stored as a JSONB snapshot per version; published versions are
 immutable (D40). No table references another service's database: `createdBy`,
 `publishedBy` and `uploadedBy` hold account ids without a foreign key.
+
+## F03 placement schema
+
+`content-service` adds `placement_versions` to `app_content` (migration
+`1720000002000-create-placement.js`). `learning-service` owns
+`placement_attempts` and `placement_settings` in `app_learning` (migration
+`apps/learning-service/src/database/migrations/1730000000000-create-placement.js`).
+`placement_attempts.accountId` and `placementVersionId` hold ids of other
+services' rows without a foreign key.
+

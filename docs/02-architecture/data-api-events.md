@@ -12,7 +12,7 @@
 |---|---|---|---|---|---|
 | User/Auth | auth-service | app_identity (PostgreSQL) | `packages/auth-contracts/proto/auth.proto` | TBD | `apps/auth-service/src/database/database.config.js` |
 | Content/lesson | content-service | app_content (PostgreSQL) | `packages/content-contracts/proto/content.proto` | TBD | `apps/content-service/src/database/database.config.js` |
-| Placement/test attempt | learning-service | app_learning (PostgreSQL) | TBD | TBD | `apps/learning-service/src/database/database.config.js` |
+| Placement/test attempt | learning-service | app_learning (PostgreSQL) | `packages/learning-contracts/proto/learning.proto` (placement only) | TBD | `apps/learning-service/src/database/database.config.js` |
 | Progress/XP | progress-service | app_progress (PostgreSQL) | TBD | TBD | `apps/progress-service/src/database/database.config.js` |
 
 Chỉ sửa/định nghĩa contract theo patterns và versions đang có. Không tự giả định tên RPC/event hoặc schema.
@@ -70,3 +70,15 @@ actor (`id`, `role`) that the gateway obtained from auth-service `Me`;
 content-service authorizes it (D42). Requests use `ContentRequest { actor, id,
 payload_json }` (or `UploadMediaRequest` with bytes) and replies use the same
 shape as `AuthReply`. No RabbitMQ event is defined for content.
+
+## F03 placement contract
+
+**VERIFIED (2026-10-10):** the gateway exposes seven `/placement/*` routes
+(listed in `docs/03-service-specs/learning-service.md`) and calls
+`appenglish.learning.v1.LearningService` over gRPC with the actor from
+auth-service `Me` (D58). learning-service reads the published placement test
+from content-service through the service-to-service RPC `GetPlacementPaper` of
+`appenglish.content.v1.ContentService`; the gateway does not expose it. The
+Content Manager edits the test through three `/content/placement*` routes. No
+RabbitMQ event is defined: placement updates neither progress nor XP.
+

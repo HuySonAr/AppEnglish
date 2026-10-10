@@ -170,7 +170,7 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
         const saved = await call('PUT', `/content/lessons/${id}/draft`, { as: 'manager', body: publishableContent({ audioId, imageId }) });
         assert.equal(saved.status, 200);
         assert.equal(saved.json.data.draft.content.test.part5.questions.length, 6);
-        if (index === 5) {
+        if (index === 1) {
           const early = await call('POST', `/content/units/${unitId}/publish`, { as: 'manager' });
           assert.equal(early.status, 409);
           assert.equal(early.json.code, 42);

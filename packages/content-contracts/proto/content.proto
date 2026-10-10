@@ -18,6 +18,13 @@ service ContentService {
   rpc UploadMedia(UploadMediaRequest) returns (ContentReply);
   rpc AutofillPronunciation(ContentRequest) returns (ContentReply);
   rpc DeleteMedia(ContentRequest) returns (ContentReply);
+  // The single placement test (F03), edited and published by a Content Manager.
+  rpc GetPlacement(ContentRequest) returns (ContentReply);
+  rpc SavePlacementDraft(ContentRequest) returns (ContentReply);
+  rpc PublishPlacement(ContentRequest) returns (ContentReply);
+  // Service-to-service only (learning-service): a published placement version
+  // with its answers. Takes no actor and is not exposed by the gateway.
+  rpc GetPlacementPaper(ContentRequest) returns (ContentReply);
 }
 
 // The authenticated account as verified by auth-service.

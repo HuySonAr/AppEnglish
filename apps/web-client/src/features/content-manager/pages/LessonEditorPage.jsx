@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Plus } from 'lucide-react';
 import {
@@ -12,20 +12,18 @@ import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { useToast } from '../../../hooks/use-toast.js';
 import {
   autofillPronunciation,
-  deleteMedia,
   getLesson,
   publishLesson,
   saveLessonDraft,
   updateLesson,
-  uploadMedia,
 } from '../api/content-api.js';
+import { useDraftMedia } from '../hooks/use-draft-media.js';
 import {
   issueLabel,
   issueLocation,
   lessonState,
   newVocabulary,
   setIn,
-  uploadPending,
   withFillInPassage,
   workingContent,
 } from '../lib/lesson-draft.js';
@@ -62,24 +60,16 @@ export function LessonEditorPage() {
   const [content, setContent] = useState(null);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
-  // Files chosen but not uploaded yet, by temporary id: { kind, file, section, url }.
-  const [pending, setPending] = useState({});
-  // Files the saved lesson uses, by media id: { kind, fileName, url }.
-  const [stored, setStored] = useState({});
-  const pendingRef = useRef(pending);
-  pendingRef.current = pending;
   const [issues, setIssues] = useState([]);
   const [tab, setTab] = useState('vocabulary');
   const [partTab, setPartTab] = useState(LESSON_TEST_PARTS[0].key);
-  // File names of media uploaded in this session; the API only stores ids.
-  const [fileNames, setFileNames] = useState({});
   // Id of the vocabulary item whose pronunciation is being looked up.
   const [filling, setFilling] = useState(null);
 
   function apply(data) {
     setLesson(data.lesson);
     setTitle(data.lesson.title);
-    setStored(data.media || {});
+    draftMedia.setStored(data.media || {});
     setStatus(lessonState(data));
     setContent(workingContent(data));
     setDirty(false);
@@ -119,45 +109,17 @@ export function LessonEditorPage() {
     setContent((current) => change(current));
     setDirty(true);
   }
-  const edit = (path, value) => update((current) => setIn(current, path, value));
+  const edit = (path, value) =>
+    update((current) => setIn(current, path, value));
 
-  const media = {
-    fileNames,
-    pending,
-    stored,
-    // A file that was never uploaded is just dropped. Removing a stored file
-    // also deletes it unless a saved version still uses it; in that case the
-    // server deletes it when the draft is saved.
-    clear(path, mediaId) {
-      edit(path, null);
-      if (pending[mediaId]) forgetPending([mediaId]);
-      else deleteMedia(mediaId).catch(() => {});
-    },
-    choose(kind, file, path) {
-      const temporaryId = crypto.randomUUID();
-      // Vocabulary files and test files are stored in separate folders.
-      const section = path[0] === 'vocabulary' ? MediaSection.VOCABULARY : MediaSection.TEST;
-      setPending((current) => ({ ...current, [temporaryId]: { kind, file, section, url: URL.createObjectURL(file) } }));
-      edit(path, temporaryId);
-    },
-  };
-
-  function forgetPending(ids) {
-    setPending((current) => {
-      const next = { ...current };
-      for (const id of ids) {
-        if (next[id]) URL.revokeObjectURL(next[id].url);
-        delete next[id];
-      }
-      return next;
-    });
-  }
-
-  // Previews are released when the page is left.
-  useEffect(
-    () => () => Object.values(pendingRef.current).forEach((item) => URL.revokeObjectURL(item.url)),
-    [],
-  );
+  // Vocabulary files and test files are stored in separate folders.
+  const draftMedia = useDraftMedia({
+    edit,
+    lessonId,
+    sectionFor: (path) =>
+      path[0] === 'vocabulary' ? MediaSection.VOCABULARY : MediaSection.TEST,
+  });
+  const { media } = draftMedia;
 
   // Fills the phonetic text and the audio slots that are still empty from the
   // free dictionary; anything it lacks stays for manual entry or upload.
@@ -168,9 +130,11 @@ export function LessonEditorPage() {
     ].filter(Boolean);
     setFilling(item.id);
     try {
-      const { found, phonetic, audio } = (await autofillPronunciation(item.word.trim(), missing, lessonId)).data;
+      const { found, phonetic, audio } = (
+        await autofillPronunciation(item.word.trim(), missing, lessonId)
+      ).data;
       const uploaded = Object.values(audio).filter(Boolean);
-      setFileNames((names) => ({ ...names, ...Object.fromEntries(uploaded.map((asset) => [asset.id, asset.fileName])) }));
+      draftMedia.rememberFileNames(uploaded);
       update((current) => ({
         ...current,
         vocabulary: current.vocabulary.map((entry) =>
@@ -178,25 +142,44 @@ export function LessonEditorPage() {
             ? {
                 ...entry,
                 phonetic: entry.phonetic || phonetic,
-                audioUkMediaId: entry.audioUkMediaId || audio[Accent.UK]?.id || null,
-                audioUsMediaId: entry.audioUsMediaId || audio[Accent.US]?.id || null,
+                audioUkMediaId:
+                  entry.audioUkMediaId || audio[Accent.UK]?.id || null,
+                audioUsMediaId:
+                  entry.audioUsMediaId || audio[Accent.US]?.id || null,
               }
             : entry,
         ),
       }));
       const lacking = [
         item.phonetic || phonetic ? null : 'phonetic',
-        ...missing.map((accent) => (audio[accent] ? null : accent === Accent.UK ? 'British audio' : 'American audio')),
+        ...missing.map((accent) =>
+          audio[accent]
+            ? null
+            : accent === Accent.UK
+              ? 'British audio'
+              : 'American audio',
+        ),
       ].filter(Boolean);
       toast(
         !found
-          ? { title: `"${item.word.trim()}" is not in the dictionary`, description: 'Enter the phonetic and upload the audio yourself.', variant: 'destructive' }
+          ? {
+              title: `"${item.word.trim()}" is not in the dictionary`,
+              description: 'Enter the phonetic and upload the audio yourself.',
+              variant: 'destructive',
+            }
           : lacking.length
-            ? { title: 'Partly filled', description: `The dictionary has no ${lacking.join(', ')} for this word. Add it yourself.` }
+            ? {
+                title: 'Partly filled',
+                description: `The dictionary has no ${lacking.join(', ')} for this word. Add it yourself.`,
+              }
             : { title: 'Pronunciation filled' },
       );
     } catch (error) {
-      toast({ title: 'Auto-fill failed', description: getApiErrorMessage(error), variant: 'destructive' });
+      toast({
+        title: 'Auto-fill failed',
+        description: getApiErrorMessage(error),
+        variant: 'destructive',
+      });
     } finally {
       setFilling(null);
     }
@@ -210,26 +193,14 @@ export function LessonEditorPage() {
 
   // Saving first uploads the files chosen since the last save.
   async function saveDraft({ quiet = false } = {}) {
-    const result = await uploadPending(content, pending, async ({ kind, file, section }) => {
-      try {
-        return (await uploadMedia({ kind, file, lessonId, section })).data.media;
-      } catch (error) {
-        // Several files may upload in one save; say which one failed.
-        error.fileName = file.name;
-        throw error;
-      }
-    });
-    const done = Object.entries(result.uploaded);
-    if (done.length) {
-      setFileNames((names) => ({ ...names, ...Object.fromEntries(done.map(([, uploaded]) => [uploaded.id, uploaded.fileName])) }));
-      setContent(result.content);
-      forgetPending(done.map(([temporaryId]) => temporaryId));
-    }
+    const result = await draftMedia.uploadAll(content);
+    if (result.uploadedAny) setContent(result.content);
     if (result.error) throw result.error;
     const data = (await saveLessonDraft(lessonId, result.content)).data;
     apply(data);
-    forgetPending(Object.keys(pending));
-    if (!quiet) toast({ title: `Draft saved (version ${data.draft.versionNumber})` });
+    draftMedia.reset();
+    if (!quiet)
+      toast({ title: `Draft saved (version ${data.draft.versionNumber})` });
   }
 
   async function onSave() {
@@ -238,7 +209,11 @@ export function LessonEditorPage() {
       await saveDraft();
       setIssues([]);
     } catch (error) {
-      toast({ title: 'Could not save the draft', description: saveErrorMessage(error), variant: 'destructive' });
+      toast({
+        title: 'Could not save the draft',
+        description: saveErrorMessage(error),
+        variant: 'destructive',
+      });
     } finally {
       setBusy(false);
     }
@@ -254,7 +229,10 @@ export function LessonEditorPage() {
       toast({ title: `Published version ${data.published.versionNumber}` });
     } catch (error) {
       const found = error?.response?.data?.data?.issues;
-      if (errorCode(error) === ContentResponseCode.CONTENT_NOT_PUBLISHABLE && found?.length) {
+      if (
+        errorCode(error) === ContentResponseCode.CONTENT_NOT_PUBLISHABLE &&
+        found?.length
+      ) {
         setIssues(found);
         showIssue(found[0].path);
         toast({
@@ -263,7 +241,11 @@ export function LessonEditorPage() {
           variant: 'destructive',
         });
       } else {
-        toast({ title: 'Could not publish the lesson', description: saveErrorMessage(error), variant: 'destructive' });
+        toast({
+          title: 'Could not publish the lesson',
+          description: saveErrorMessage(error),
+          variant: 'destructive',
+        });
       }
     } finally {
       setBusy(false);
@@ -278,7 +260,11 @@ export function LessonEditorPage() {
       setTitle(data.lesson.title);
       toast({ title: 'Lesson renamed' });
     } catch (error) {
-      toast({ title: 'Could not rename the lesson', description: getApiErrorMessage(error), variant: 'destructive' });
+      toast({
+        title: 'Could not rename the lesson',
+        description: getApiErrorMessage(error),
+        variant: 'destructive',
+      });
     } finally {
       setBusy(false);
     }
@@ -288,14 +274,23 @@ export function LessonEditorPage() {
   if (state === 'error')
     return (
       <div className="space-y-4">
-        <Button variant="outline" onClick={load}>Try again</Button>
-        <Link className="block text-sm text-primary underline-offset-4 hover:underline" to="/content-manager/units">
+        <Button variant="outline" onClick={load}>
+          Try again
+        </Button>
+        <Link
+          className="block text-sm text-primary underline-offset-4 hover:underline"
+          to="/content-manager/units"
+        >
           Back to units
         </Link>
       </div>
     );
 
-  const words = [...new Set(content.vocabulary.map((item) => item.word.trim()).filter(Boolean))];
+  const words = [
+    ...new Set(
+      content.vocabulary.map((item) => item.word.trim()).filter(Boolean),
+    ),
+  ];
   const canPublish = dirty || status.hasDraft;
 
   return (
@@ -311,11 +306,15 @@ export function LessonEditorPage() {
       <div className="sticky top-16 z-10 -mx-4 space-y-3 border-b bg-background/90 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
         <div className="flex flex-wrap items-center gap-2">
           {status.publishedVersion ? (
-            <Badge variant="success">Published v{status.publishedVersion}</Badge>
+            <Badge variant="success">
+              Published v{status.publishedVersion}
+            </Badge>
           ) : (
             <Badge variant="outline">Not published</Badge>
           )}
-          {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
+          {status.hasDraft ? (
+            <Badge variant="warning">Draft v{status.draftVersion}</Badge>
+          ) : null}
           {dirty ? <Badge variant="info">Unsaved changes</Badge> : null}
         </div>
         <div className="flex flex-col gap-2 lg:flex-row">
@@ -326,36 +325,52 @@ export function LessonEditorPage() {
             onChange={(event) => setTitle(event.target.value)}
             className="text-lg font-semibold"
           />
-          <Button
-            variant="outline"
-            disabled={busy || !title.trim() || title.trim() === lesson.title}
-            onClick={onRename}
-          >
-            Rename
-          </Button>
-          <Button variant="outline" disabled={busy || !dirty} onClick={onSave}>
-            {busy ? 'Working…' : 'Save draft'}
-          </Button>
-          <Button disabled={busy || !canPublish} onClick={onPublish}>
-            Publish
-          </Button>
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              disabled={busy || !title.trim() || title.trim() === lesson.title}
+              onClick={onRename}
+            >
+              Rename
+            </Button>
+            <Button
+              variant="outline"
+              disabled={busy || !dirty}
+              onClick={onSave}
+            >
+              {busy ? 'Working…' : 'Save draft'}
+            </Button>
+            <Button disabled={busy || !canPublish} onClick={onPublish}>
+              Publish
+            </Button>
+          </div>
         </div>
       </div>
       <div>
         <p className="text-sm text-muted-foreground">
           Learners keep the published version until you publish again.
           Publishing creates a new version; earlier versions are kept unchanged.
-          Audio and images you choose are previewed here and uploaded when you save.
+          Audio and images you choose are previewed here and uploaded when you
+          save.
         </p>
       </div>
 
       {issues.length ? (
-        <div role="alert" className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
-          <p className="font-medium">Fix these before publishing ({issues.length}):</p>
+        <div
+          role="alert"
+          className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm"
+        >
+          <p className="font-medium">
+            Fix these before publishing ({issues.length}):
+          </p>
           <ul className="mt-2 max-h-64 list-disc space-y-1 overflow-y-auto pl-5">
             {issues.map((issue, index) => (
               <li key={index}>
-                <button type="button" className="font-medium underline-offset-4 hover:underline" onClick={() => showIssue(issue.path)}>
+                <button
+                  type="button"
+                  className="font-medium underline-offset-4 hover:underline"
+                  onClick={() => showIssue(issue.path)}
+                >
                   {issueLabel(issue.path)}
                 </button>
                 : {issue.message}
@@ -367,8 +382,12 @@ export function LessonEditorPage() {
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="h-auto flex-wrap justify-start">
-          <TabsTrigger value="vocabulary">Vocabulary ({content.vocabulary.length})</TabsTrigger>
-          <TabsTrigger value="fillIn">Fill-in ({content.fillIn.answers.length})</TabsTrigger>
+          <TabsTrigger value="vocabulary">
+            Vocabulary ({content.vocabulary.length})
+          </TabsTrigger>
+          <TabsTrigger value="fillIn">
+            Fill-in ({content.fillIn.answers.length})
+          </TabsTrigger>
           <TabsTrigger value="test">Lesson test</TabsTrigger>
         </TabsList>
 
@@ -377,12 +396,26 @@ export function LessonEditorPage() {
             <p className="text-sm text-muted-foreground">No vocabulary yet.</p>
           ) : null}
           {content.vocabulary.map((item, index) => (
-            <VocabularyCard key={item.id} item={item} index={index} edit={edit} update={update} media={media} filling={filling} onAutofill={onAutofill} />
+            <VocabularyCard
+              key={item.id}
+              item={item}
+              index={index}
+              edit={edit}
+              update={update}
+              media={media}
+              filling={filling}
+              onAutofill={onAutofill}
+            />
           ))}
           <Button
             variant="outline"
             className="flex items-center gap-2"
-            onClick={() => update((current) => ({ ...current, vocabulary: [...current.vocabulary, newVocabulary()] }))}
+            onClick={() =>
+              update((current) => ({
+                ...current,
+                vocabulary: [...current.vocabulary, newVocabulary()],
+              }))
+            }
           >
             <Plus className="h-4 w-4" />
             Add word
@@ -401,22 +434,42 @@ export function LessonEditorPage() {
             maxLength={5000}
             multiline
             rows={8}
-            onChange={(value) => update((current) => ({ ...current, fillIn: withFillInPassage(current.fillIn, value) }))}
+            onChange={(value) =>
+              update((current) => ({
+                ...current,
+                fillIn: withFillInPassage(current.fillIn, value),
+              }))
+            }
           />
           {content.fillIn.answers.length === 0 ? (
-            <p className="text-sm text-muted-foreground">The passage has no blanks yet.</p>
+            <p className="text-sm text-muted-foreground">
+              The passage has no blanks yet.
+            </p>
           ) : (
             <div className="grid gap-3 md:grid-cols-3">
               {content.fillIn.answers.map((answer, index) => (
                 <div key={index} className="space-y-2">
                   <Label htmlFor={`blank-${index}`}>Blank {index + 1}</Label>
-                  <Select value={words.includes(answer) ? answer : undefined} onValueChange={(value) => edit(['fillIn', 'answers', index], value)}>
+                  <Select
+                    value={words.includes(answer) ? answer : undefined}
+                    onValueChange={(value) =>
+                      edit(['fillIn', 'answers', index], value)
+                    }
+                  >
                     <SelectTrigger id={`blank-${index}`}>
-                      <SelectValue placeholder={words.length ? 'Choose a word' : 'Add vocabulary first'} />
+                      <SelectValue
+                        placeholder={
+                          words.length
+                            ? 'Choose a word'
+                            : 'Add vocabulary first'
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {words.map((word) => (
-                        <SelectItem key={word} value={word}>{word}</SelectItem>
+                        <SelectItem key={word} value={word}>
+                          {word}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -442,7 +495,12 @@ export function LessonEditorPage() {
             </TabsList>
             {LESSON_TEST_PARTS.map((spec) => (
               <TabsContent key={spec.key} value={spec.key}>
-                <PartEditor spec={spec} part={content.test[spec.key]} edit={edit} media={media} />
+                <PartEditor
+                  spec={spec}
+                  part={content.test[spec.key]}
+                  edit={edit}
+                  media={media}
+                />
               </TabsContent>
             ))}
           </Tabs>

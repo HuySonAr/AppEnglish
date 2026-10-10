@@ -29,7 +29,7 @@ export function ManagementLayout({ role }) {
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-5">
         <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          {label} workspace
+          {label}
         </p>
         <SidebarNav items={items} label={`${label} navigation`} onNavigate={onNavigate} />
       </div>

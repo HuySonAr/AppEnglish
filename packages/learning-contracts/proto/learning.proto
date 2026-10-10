@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package appenglish.learning.v1;
+
+// Internal contract between api-gateway and learning-service. The gateway
+// authenticates the caller through auth-service and passes the actor;
+// learning-service enforces the role, validates payloads and owns the rules.
+service LearningService {
+  // Placement (F03). Student: state, start, save answers, submit, skip.
+  rpc GetPlacement(LearningRequest) returns (LearningReply);
+  rpc StartPlacement(LearningRequest) returns (LearningReply);
+  rpc SavePlacementAnswers(LearningRequest) returns (LearningReply);
+  rpc SubmitPlacement(LearningRequest) returns (LearningReply);
+  rpc SkipPlacement(LearningRequest) returns (LearningReply);
+  // Admin: the score thresholds that decide the starting unit.
+  rpc GetPlacementSettings(LearningRequest) returns (LearningReply);
+  rpc UpdatePlacementSettings(LearningRequest) returns (LearningReply);
+}
+
+// The authenticated account as verified by auth-service.
+message Actor {
+  string id = 1;
+  string role = 2;
+}
+
+message LearningRequest {
+  Actor actor = 1;
+  // Target id; empty when the call has none.
+  string id = 2;
+  // JSON request body validated by learning-service; empty when there is none.
+  string payload_json = 3;
+}
+
+message LearningReply {
+  // HTTP status the gateway answers with when it is an error (>= 400).
+  int32 http_status = 1;
+  // Envelope code and msg; codes are in @appenglish/learning-contracts.
+  int32 code = 2;
+  string msg = 3;
+  // JSON object for the envelope's data; its shape depends on the call.
+  string data_json = 4;
+  // Unused by learning calls; keeps the reply shape shared with AuthReply.
+  repeated string set_cookies = 5;
+}

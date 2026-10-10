@@ -10,7 +10,7 @@ AppEnglish hỗ trợ học viên học và luyện Reading/Listening qua unit, 
 ## Nội dung
 - Không có khóa học.
 - Dự kiến khoảng 50 lesson, được nhóm vào unit.
-- Mỗi unit có ít nhất 5 lesson, số lượng không cố định.
+- Mỗi unit có một hoặc nhiều lesson, số lượng không cố định (D55).
 - Mỗi lesson gồm học từ vựng (có phiên âm, phát âm Anh-Anh/Anh-Mỹ, loại từ, ví dụ kèm bản dịch), bài điền từ vào một đoạn văn và bài test cuối 7 part, 23 câu (Part 1–4 Listening, Part 5–7 Reading).
 - Hoàn thành hết phần bắt buộc và đạt ít nhất 80% test cuối mới mở lesson kế tiếp.
 - Bắt đầu lesson mới phải làm bài ôn từ vựng lesson trước.

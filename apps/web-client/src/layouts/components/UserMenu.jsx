@@ -2,6 +2,7 @@ import { ChevronDown, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { RoleLabels } from '../../constants/auth.js';
 import { useAuth } from '../../features/auth/context/AuthContext.jsx';
+import { canLeave } from '../../lib/leave-guard.js';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +35,8 @@ export function UserMenu() {
         <DropdownMenuItem
           className="gap-2"
           onSelect={async () => {
+            // A page such as a test in progress may refuse to be left.
+            if (!canLeave()) return;
             await signOut();
             navigate('/login', { replace: true });
           }}

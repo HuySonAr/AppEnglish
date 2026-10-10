@@ -1,4 +1,4 @@
-import { Library } from 'lucide-react';
+import { ClipboardCheck, Library } from 'lucide-react';
 import { FeatureCard } from '../../../components/shared/FeatureCard.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 
@@ -16,6 +16,13 @@ export function ContentManagerDashboardPage() {
           title="Units and lessons"
           description="Create, order, edit and publish content"
           to="/content-manager/units"
+        />
+        <FeatureCard
+          icon={ClipboardCheck}
+          title="Placement test"
+          description="Write and publish the test new learners take"
+          to="/content-manager/placement"
+          tone="success"
         />
       </div>
     </section>

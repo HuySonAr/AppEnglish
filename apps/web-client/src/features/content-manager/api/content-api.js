@@ -27,6 +27,15 @@ export async function saveLessonDraft(id, content) {
 export async function publishLesson(id) {
   return (await httpClient.post(`/content/lessons/${id}/publish`)).data;
 }
+export async function getPlacementTest() {
+  return (await httpClient.get('/content/placement')).data;
+}
+export async function savePlacementDraft(content) {
+  return (await httpClient.put('/content/placement/draft', content)).data;
+}
+export async function publishPlacementTest() {
+  return (await httpClient.post('/content/placement/publish')).data;
+}
 export async function autofillPronunciation(word, accents, lessonId) {
   // The dictionary lookup and audio downloads can take a while.
   return (await httpClient.post('/content/pronunciation', { word, accents, lessonId }, { timeout: 90000 })).data;
@@ -39,7 +48,7 @@ export async function deleteMedia(id) {
 export async function uploadMedia({ kind, file, lessonId, section }) {
   const form = new FormData();
   form.set('kind', kind);
-  form.set('lessonId', lessonId);
+  if (lessonId) form.set('lessonId', lessonId);
   form.set('section', section);
   form.set('file', file);
   // Uploads can be large; the default 5s client timeout is too short.

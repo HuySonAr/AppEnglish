@@ -13,6 +13,8 @@ import { contentErrors } from './content.errors.js';
 import {
   contentMediaIds,
   lessonContentSchema,
+  placementContentSchema,
+  placementIssues,
   publishIssues,
 } from './content.schemas.js';
 
@@ -41,8 +43,7 @@ function reorder(items, id, position) {
 function withIds(content) {
   const identified = (item) => ({ ...item, id: item.id || randomUUID() });
   return {
-    vocabulary: content.vocabulary.map(identified),
-    fillIn: content.fillIn,
+    ...(content.vocabulary ? { vocabulary: content.vocabulary.map(identified), fillIn: content.fillIn } : {}),
     test: Object.fromEntries(
       Object.entries(content.test).map(([key, part]) => [
         key,
@@ -137,7 +138,7 @@ export class ContentService {
         throw contentErrors.notPublishable([
           {
             path: 'lessons',
-            message: `A unit needs at least ${MIN_PUBLISHED_LESSONS_PER_UNIT} published lessons; it has ${published}`,
+            message: `A unit needs at least ${MIN_PUBLISHED_LESSONS_PER_UNIT} published lesson${MIN_PUBLISHED_LESSONS_PER_UNIT === 1 ? '' : 's'}; it has ${published}`,
           },
         ]);
       unit.status = UnitStatus.PUBLISHED;
@@ -289,7 +290,8 @@ export class ContentService {
     this.assertManager(actor);
     // Files of a lesson go to that lesson's folder, vocabulary apart from the test.
     let folder;
-    if (input.lessonId) {
+    if (input.section === MediaSection.PLACEMENT) folder = `${input.kind}/placement`;
+    else if (input.lessonId) {
       const lesson = await this.repository.findLesson(input.lessonId);
       if (!lesson) throw contentErrors.lessonNotFound();
       const unit = await this.repository.findUnit(lesson.unitId);
@@ -328,6 +330,84 @@ export class ContentService {
         mimeType: asset.mimeType,
         sizeBytes: asset.sizeBytes,
       },
+    };
+  }
+
+  // ----- Placement test (F03): one shared test, versioned like a lesson.
+
+  async getPlacement(actor) {
+    this.assertManager(actor);
+    return this.managedPlacementView(
+      await this.repository.findPlacementDraft(),
+      await this.repository.findPublishedPlacement(),
+    );
+  }
+
+  async savePlacementDraft(actor, content) {
+    this.assertManager(actor);
+    let draft = await this.repository.findPlacementDraft();
+    const previous = draft ? placementContentSchema.safeParse(draft.content) : null;
+    const previousMediaIds = previous?.success ? contentMediaIds(previous.data) : [];
+    if (draft) draft.content = withIds(content);
+    else
+      draft = {
+        versionNumber: (await this.repository.maxPlacementVersionNumber()) + 1,
+        status: LessonVersionStatus.DRAFT,
+        content: withIds(content),
+        createdBy: actor.id,
+      };
+    draft = await this.repository.savePlacementVersion(draft);
+    const kept = new Set(contentMediaIds(draft.content));
+    await this.removeUnusedMedia(previousMediaIds.filter((id) => !kept.has(id)));
+    return this.managedPlacementView(draft, await this.repository.findPublishedPlacement());
+  }
+
+  // Publishing freezes the draft as the next version. Attempts already in
+  // progress finish on the version they started (D40).
+  async publishPlacement(actor) {
+    this.assertManager(actor);
+    const draft = await this.repository.findPlacementDraft();
+    if (!draft) throw contentErrors.noDraft();
+    draft.content = placementContentSchema.parse(draft.content);
+    const mediaIds = contentMediaIds(draft.content);
+    const media = mediaIds.length ? await this.repository.findMediaByIds(mediaIds) : [];
+    const issues = placementIssues(draft.content, new Map(media.map((asset) => [asset.id, asset])));
+    if (issues.length) throw contentErrors.notPublishable(issues);
+    draft.status = LessonVersionStatus.PUBLISHED;
+    draft.publishedAt = new Date();
+    draft.publishedBy = actor.id;
+    return this.managedPlacementView(null, await this.repository.savePlacementVersion(draft));
+  }
+
+  // For learning-service: the given published version, or the latest one,
+  // with answers, the delivery URL of its files and the number of published
+  // units (the highest unit a learner can start at).
+  async getPlacementPaper({ versionId } = {}) {
+    const version = versionId
+      ? await this.repository.findPlacementVersion(versionId)
+      : await this.repository.findPublishedPlacement();
+    if (!version || version.status !== LessonVersionStatus.PUBLISHED) throw contentErrors.placementNotFound();
+    return {
+      versionId: version.id,
+      versionNumber: version.versionNumber,
+      test: version.content.test,
+      media: await this.mediaOf([version], placementContentSchema),
+      publishedUnitCount: await this.repository.countPublishedUnits(),
+    };
+  }
+
+  async managedPlacementView(draft, published) {
+    return {
+      media: await this.mediaOf([draft, published], placementContentSchema),
+      draft: draft ? { versionNumber: draft.versionNumber, content: draft.content } : null,
+      published: published
+        ? {
+            versionId: published.id,
+            versionNumber: published.versionNumber,
+            publishedAt: new Date(published.publishedAt).toISOString(),
+            content: published.content,
+          }
+        : null,
     };
   }
 
@@ -391,21 +471,25 @@ export class ContentService {
     };
   }
 
-  // media lists the files the contents refer to so the editor can show and
-  // play them. Locally stored files have no delivery URL yet.
-  async managedLessonView(lesson, draft, published) {
-    const mediaIds = [draft, published].flatMap((version) => {
-      const parsed = version ? lessonContentSchema.safeParse(version.content) : null;
+  // The files the given versions refer to, by media id, so an editor can show
+  // and play them. Locally stored files have no delivery URL yet.
+  async mediaOf(versions, schema) {
+    const mediaIds = versions.flatMap((version) => {
+      const parsed = version ? schema.safeParse(version.content) : null;
       return parsed?.success ? contentMediaIds(parsed.data) : [];
     });
     const assets = mediaIds.length ? await this.repository.findMediaByIds([...new Set(mediaIds)]) : [];
+    return Object.fromEntries(
+      assets.map((asset) => [
+        asset.id,
+        { kind: asset.kind, fileName: asset.fileName, url: asset.storage === 'local' ? null : asset.url },
+      ]),
+    );
+  }
+
+  async managedLessonView(lesson, draft, published) {
     return {
-      media: Object.fromEntries(
-        assets.map((asset) => [
-          asset.id,
-          { kind: asset.kind, fileName: asset.fileName, url: asset.storage === 'local' ? null : asset.url },
-        ]),
-      ),
+      media: await this.mediaOf([draft, published], lessonContentSchema),
       lesson: this.lessonView(lesson),
       draft: draft ? { versionNumber: draft.versionNumber, content: draft.content } : null,
       published: published

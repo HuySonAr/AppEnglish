@@ -85,6 +85,13 @@ export function workingContent(lessonData) {
   );
 }
 
+// The placement test is edited like a lesson test: the draft, else a copy of
+// the published version, with every part and question slot present.
+export function workingPlacement(placementData) {
+  const source = placementData?.draft?.content || placementData?.published?.content || {};
+  return { test: normalizeContent(structuredClone(source)).test };
+}
+
 export function lessonState(lessonData) {
   return {
     hasDraft: Boolean(lessonData?.draft),

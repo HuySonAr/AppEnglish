@@ -18,6 +18,9 @@ import { AdminAccountsPage } from '../features/admin/pages/AdminAccountsPage.jsx
 import { ContentManagerDashboardPage } from '../features/content-manager/pages/ContentManagerDashboardPage.jsx';
 import { ContentUnitsPage } from '../features/content-manager/pages/ContentUnitsPage.jsx';
 import { LessonEditorPage } from '../features/content-manager/pages/LessonEditorPage.jsx';
+import { PlacementEditorPage } from '../features/content-manager/pages/PlacementEditorPage.jsx';
+import { PlacementPage } from '../features/student/pages/PlacementPage.jsx';
+import { PlacementSettingsPage } from '../features/admin/pages/PlacementSettingsPage.jsx';
 import { Roles } from '../constants/auth.js';
 import { dashboardPathForRole } from '../features/auth/flow/auth-flow.js';
 import { useAuth } from '../features/auth/context/AuthContext.jsx';
@@ -50,12 +53,14 @@ export function AppRouter() {
         >
           <Route element={<StudentLayout />}>
             <Route index element={<StudentDashboardPage />} />
+            <Route path="placement" element={<PlacementPage />} />
           </Route>
         </Route>
         <Route path="/admin" element={<RoleRoute allowedRole={Roles.ADMIN} />}>
           <Route element={<ManagementLayout role={Roles.ADMIN} />}>
             <Route index element={<AdminDashboardPage />} />
             <Route path="accounts" element={<AdminAccountsPage />} />
+            <Route path="placement" element={<PlacementSettingsPage />} />
           </Route>
         </Route>
         <Route
@@ -65,6 +70,7 @@ export function AppRouter() {
           <Route element={<ManagementLayout role={Roles.CONTENT_MANAGER} />}>
             <Route index element={<ContentManagerDashboardPage />} />
             <Route path="units" element={<ContentUnitsPage />} />
+            <Route path="placement" element={<PlacementEditorPage />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
           </Route>
         </Route>

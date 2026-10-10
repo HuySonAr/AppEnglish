@@ -1,4 +1,4 @@
-import { Activity, Library, Users } from 'lucide-react';
+import { Activity, ClipboardCheck, Library, Users } from 'lucide-react';
 import { FeatureCard } from '../../../components/shared/FeatureCard.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 
@@ -16,6 +16,13 @@ export function AdminDashboardPage() {
           title="Account management"
           description="View accounts, change roles, lock and unlock access"
           to="/admin/accounts"
+        />
+        <FeatureCard
+          icon={ClipboardCheck}
+          title="Placement"
+          description="Set the scores that decide a learner's starting unit"
+          to="/admin/placement"
+          tone="warning"
         />
         <FeatureCard
           icon={Library}

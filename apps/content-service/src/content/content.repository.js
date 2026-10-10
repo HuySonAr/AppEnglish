@@ -3,6 +3,7 @@ import {
   LessonEntity,
   LessonVersionEntity,
   MediaAssetEntity,
+  PlacementVersionEntity,
   UnitEntity,
 } from '../database/content.entities.js';
 
@@ -120,12 +121,43 @@ export class ContentRepository {
     await (await this.repo(MediaAssetEntity)).delete({ id });
   }
 
-  // True when any saved lesson version, draft or published, refers to the media.
+  // True when any saved lesson or placement version, draft or published,
+  // refers to the media.
   async isMediaReferenced(id) {
-    const count = await (await this.repo(LessonVersionEntity))
-      .createQueryBuilder('version')
-      .where('CAST(version.content AS text) LIKE :pattern', { pattern: `%${id}%` })
-      .getCount();
-    return count > 0;
+    for (const entity of [LessonVersionEntity, PlacementVersionEntity]) {
+      const count = await (await this.repo(entity))
+        .createQueryBuilder('version')
+        .where('CAST(version.content AS text) LIKE :pattern', { pattern: `%${id}%` })
+        .getCount();
+      if (count > 0) return true;
+    }
+    return false;
+  }
+
+  async countPublishedUnits() {
+    return (await this.repo(UnitEntity)).count({ where: { status: 'PUBLISHED' } });
+  }
+
+  async findPlacementDraft() {
+    return (await this.repo(PlacementVersionEntity)).findOne({ where: { status: 'DRAFT' } });
+  }
+
+  async findPlacementVersion(id) {
+    return (await this.repo(PlacementVersionEntity)).findOne({ where: { id } });
+  }
+
+  async findPublishedPlacement() {
+    return (await this.repo(PlacementVersionEntity)).findOne({
+      where: { status: 'PUBLISHED' },
+      order: { versionNumber: 'DESC' },
+    });
+  }
+
+  async maxPlacementVersionNumber() {
+    return (await (await this.repo(PlacementVersionEntity)).maximum('versionNumber', {})) || 0;
+  }
+
+  async savePlacementVersion(version) {
+    return (await this.repo(PlacementVersionEntity)).save(version);
   }
 }
