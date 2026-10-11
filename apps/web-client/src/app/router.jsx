@@ -20,6 +20,9 @@ import { ContentUnitsPage } from '../features/content-manager/pages/ContentUnits
 import { LessonEditorPage } from '../features/content-manager/pages/LessonEditorPage.jsx';
 import { PlacementEditorPage } from '../features/content-manager/pages/PlacementEditorPage.jsx';
 import { PlacementPage } from '../features/student/pages/PlacementPage.jsx';
+import { LessonsPage } from '../features/student/pages/LessonsPage.jsx';
+import { LessonPage } from '../features/student/pages/LessonPage.jsx';
+import { LessonTestPage } from '../features/student/pages/LessonTestPage.jsx';
 import { PlacementSettingsPage } from '../features/admin/pages/PlacementSettingsPage.jsx';
 import { Roles } from '../constants/auth.js';
 import { dashboardPathForRole } from '../features/auth/flow/auth-flow.js';
@@ -54,6 +57,9 @@ export function AppRouter() {
           <Route element={<StudentLayout />}>
             <Route index element={<StudentDashboardPage />} />
             <Route path="placement" element={<PlacementPage />} />
+            <Route path="lessons" element={<LessonsPage />} />
+            <Route path="lessons/:lessonId" element={<LessonPage />} />
+            <Route path="lessons/:lessonId/test" element={<LessonTestPage />} />
           </Route>
         </Route>
         <Route path="/admin" element={<RoleRoute allowedRole={Roles.ADMIN} />}>

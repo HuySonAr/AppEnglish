@@ -82,3 +82,13 @@ from content-service through the service-to-service RPC `GetPlacementPaper` of
 Content Manager edits the test through three `/content/placement*` routes. No
 RabbitMQ event is defined: placement updates neither progress nor XP.
 
+## F04 lesson-flow contract
+
+**VERIFIED (2026-10-11):** the gateway exposes twelve `/learning/*` routes
+(listed in `docs/03-service-specs/learning-service.md`) relayed to
+`appenglish.learning.v1.LearningService`; the actor now carries the account
+email for the lesson ranking (D60). learning-service reads the curriculum and
+lesson papers from content-service through `GetCurriculum` and
+`GetLessonPaper`. No RabbitMQ event is defined yet; F06 decides how lesson
+results reach progress.
+

@@ -82,16 +82,7 @@ export {
 } from './tabs.jsx';
 export { Checkbox } from './checkbox.jsx';
 export { Switch } from './switch.jsx';
-export {
-  ToastProvider,
-  ToastViewport,
-  Toast,
-  ToastTitle,
-  ToastDescription,
-  ToastClose,
-  ToastAction,
-} from './toast.jsx';
-export { Toaster } from './toaster.jsx';
+export { Toaster } from './sonner.jsx';
 export { LoadingScreen } from './loading-screen.jsx';
 export {
   Sheet,

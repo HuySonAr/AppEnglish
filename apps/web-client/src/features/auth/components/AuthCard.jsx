@@ -6,6 +6,7 @@ import {
   CardContent,
 } from '../../../components/ui/card.jsx';
 import { cn } from '../../../lib/utils.js';
+import { Link } from 'react-router-dom';
 
 export function AuthCard({
   eyebrow = 'AppEnglish',
@@ -36,11 +37,11 @@ export function AuthCard({
 
 export function AuthLink({ children, ...props }) {
   return (
-    <a
-      className="text-sm text-primary underline underline-offset-4 hover:text-primary/80"
+    <Link
+      className="text-sm text-primary underline underline-offset-4 hover:text-primary/80 cursor-pointer"
       {...props}
     >
       {children}
-    </a>
+    </Link>
   );
 }

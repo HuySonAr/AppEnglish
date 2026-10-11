@@ -25,6 +25,10 @@ service ContentService {
   // Service-to-service only (learning-service): a published placement version
   // with its answers. Takes no actor and is not exposed by the gateway.
   rpc GetPlacementPaper(ContentRequest) returns (ContentReply);
+  // Service-to-service only (learning-service, F04): the published units
+  // and lessons in order, and one lesson's published version with answers.
+  rpc GetCurriculum(ContentRequest) returns (ContentReply);
+  rpc GetLessonPaper(ContentRequest) returns (ContentReply);
 }
 
 // The authenticated account as verified by auth-service.

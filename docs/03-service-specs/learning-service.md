@@ -2,8 +2,8 @@
 
 ## Trạng thái xác minh
 
-VERIFIED 2026-10-10 for placement (F03). Lesson attempts, practice and mock
-tests (F04, F05) are not implemented.
+VERIFIED 2026-10-10 for placement (F03) and 2026-10-11 for the lesson flow
+(F04). Practice and mock tests (F05) are not implemented.
 
 ## Trách nhiệm và nghiệp vụ liên quan
 
@@ -72,13 +72,84 @@ transcripts. The result has `status`, `startUnit` and, when completed,
 - An attempt keeps the placement version it started on; a version published
   meanwhile is used by learners who start afterwards (D40, D57).
 
+## Lesson flow (F04, D59–D61)
+
+Workflows `03-units-lessons.md`, `04-vocabulary-exercises.md` and
+`05-lesson-test-unlock.md`. Code in `apps/learning-service/src/lesson/`; the
+pure rules are in `lesson.rules.js`.
+
+### Data (`app_learning`)
+
+Migration `1730000001000-create-lesson-flow.js`.
+
+| Table | Purpose |
+|---|---|
+| `lesson_progress` | One row per account and lesson: `reviewPassedAt`, `vocabularyStudiedAt`, `vocabularyQuizPassedAt`, `fillInPassedAt`, `completedAt`. Belongs to the lesson, not to a lesson version |
+| `lesson_test_attempts` | One row per attempt: `attemptNumber`, lesson version, status `IN_PROGRESS`/`COMPLETED`, `startedAt`, `expiresAt`, `submittedAt`, `optionOrder`, `answers`, `totalCount`, `correctCount`, `listeningCorrect`, `readingCorrect`, `durationSeconds`, `passed`, `accountEmail` (for the ranking). At most one in progress per account and lesson |
+
+### API
+
+Gateway controller `LessonGatewayController` in
+`apps/api-gateway/src/learning/learning-gateway.controller.js`. All routes are
+for Students; `:id` is a lesson id.
+
+| Method | Gateway route | RPC | Purpose |
+|---|---|---|---|
+| GET | `/learning/curriculum` | `GetCurriculum` | Published units and lessons with `state` (`LOCKED`/`OPEN`/`COMPLETED`), best test score, `startUnit`, `placementRequired` |
+| GET | `/learning/lessons/:id` | `GetLesson` | Lesson, its steps with status, vocabulary, fill-in passage and word bank, review target, test summary. No answers |
+| POST | `/learning/lessons/:id/vocabulary/studied` | `MarkVocabularyStudied` | The learner opened every word |
+| GET | `/learning/lessons/:id/quiz/:kind` | `GetVocabularyQuiz` | `kind` `vocabulary` or `review`: one question per word, up to four meanings, random order |
+| POST | `/learning/lessons/:id/quiz/:kind` | `SubmitVocabularyQuiz` | `{ answers: { vocabularyId: meaning } }` → `{ passed, total, wrongIds }` |
+| POST | `/learning/lessons/:id/fill-in` | `SubmitFillIn` | `{ answers: [word, …] }` → `{ passed, total, wrongBlanks }` |
+| GET | `/learning/lessons/:id/test` | `GetLessonTest` | `LOCKED`, `READY`, or `IN_PROGRESS` with the paper, saved answers and clock; finished attempts with per-skill counts; `progression` |
+| POST | `/learning/lessons/:id/test/start` | `StartLessonTest` | New attempt, or the one in progress |
+| PUT | `/learning/lessons/:id/test/answers` | `SaveLessonTestAnswers` | Saves `{ answers }` chosen so far |
+| POST | `/learning/lessons/:id/test/submit` | `SubmitLessonTest` | Scores and returns the result with the review |
+| GET | `/learning/lessons/:id/test/review` and `/review/:attemptNumber` | `GetLessonTestReview` | One finished attempt (the latest, or the numbered one): correct answers, the learner's answers, explanations, transcripts |
+| GET | `/learning/lessons/:id/ranking` | `GetLessonRanking` | First attempts ranked: `{ total, entries (top 50), me }` |
+
+Codes: 53 lesson not found, 54 lesson locked (`data.placementRequired`), 55 an
+earlier step is not finished (`data.step`), 56 no lesson test in progress.
+
+### Rules
+
+- A learner sees lessons once the placement test is taken or skipped. Units
+  before the starting unit are open freely; from the starting unit on a lesson
+  opens when the lesson before it (in curriculum order, across units) is
+  completed. Opening is not completing.
+- Steps in order: review (when required) → vocabulary → word quiz → fill-in →
+  test. The review is required when the learner completed the lesson before,
+  except for the first lesson of the starting unit, and is not imposed on a
+  lesson already started.
+- Word quiz, review and fill-in need every answer right; wrong items are named
+  and tries are unlimited. They are checked on the server from the published
+  lesson; the correct answers are not sent.
+- Lesson test: 25 minutes on the server clock, 30 seconds of grace, answers
+  saved during the test; a test left open is scored when its time is over.
+  Options of Parts 3–7 are shuffled per attempt. 80% or more
+  (`lessonTestPassed`) completes the lesson; retakes are unlimited and a worse
+  retake does not undo completion.
+- Ranking: first attempts only, by right answers, then `durationSeconds`
+  (capped at the time allowed), then earlier submit.
+- Progression (D62, `testProgression`): from the second finished attempt,
+  `{ trend, changeFromPrevious, changeFromFirst, listeningChange,
+  readingChange, bestCorrectCount }` in right answers, the latest attempt
+  against the one before it and against the first. It informs the learner
+  only: ranking, completion and XP are unaffected.
+- An attempt keeps the lesson version it started on; steps stay done when a
+  lesson is republished.
+- No XP, no progress event yet: Reading/Listening mastery (D33) is F06 and
+  will read the per-skill counts stored on each attempt.
+
 ## Dependencies/config
 
 - gRPC server at `LEARNING_GRPC_HOST`:`LEARNING_GRPC_PORT` (default
   `localhost:50053`); HTTP `LEARNING_SERVICE_PORT` (3003) serves health only.
-- gRPC client to content-service (`CONTENT_GRPC_HOST`/`CONTENT_GRPC_PORT`) for
-  `GetPlacementPaper` (`src/placement/content.client.js`): the published
-  version with answers, media URLs and the number of published units.
+- gRPC client to content-service (`CONTENT_GRPC_HOST`/`CONTENT_GRPC_PORT`),
+  `src/placement/content.client.js`: `GetPlacementPaper` (published placement
+  version with answers, media URLs, number of published units),
+  `GetCurriculum` (published units and lessons in order) and `GetLessonPaper`
+  (a lesson's published version with answers and media URLs).
 - PostgreSQL `LEARNING_DATABASE_NAME` (`app_learning`). The service loads the
   repository `.env`; run `pnpm --filter @appenglish/learning-service migration:run`.
 

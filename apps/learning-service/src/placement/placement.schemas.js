@@ -4,6 +4,8 @@ import { AccountRole } from '@appenglish/auth-contracts';
 export const actorSchema = z.object({
   id: z.string().uuid(),
   role: z.enum(Object.values(AccountRole)),
+  // gRPC sends '' when the gateway passed none.
+  email: z.string().max(320).optional(),
 });
 
 // Chosen option id by question id. Unknown ids are ignored when scoring.

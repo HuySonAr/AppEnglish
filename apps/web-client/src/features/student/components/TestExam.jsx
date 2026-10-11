@@ -13,8 +13,8 @@ import {
 } from '../../../components/ui';
 import { setLeaveGuard } from '../../../lib/leave-guard.js';
 import { cn } from '../../../lib/utils.js';
-import { savePlacementAnswers } from '../api/placement-api.js';
 import { answeredCount, formatRemaining, numberBlanks, remainingTime } from '../lib/placement.js';
+import { AnswerProgress } from './AnswerProgress.jsx';
 
 const optionLetters = ['A', 'B', 'C', 'D'];
 const skillLabels = { LISTENING: 'Listening', READING: 'Reading' };
@@ -68,9 +68,14 @@ function Question({ question, chosen, onChoose, blankNumber }) {
   );
 }
 
-// The test in progress: one part at a time, the server's clock on top.
-// attempt is the IN_PROGRESS state from the API; onSubmit(answers) ends it.
-export function PlacementExam({ attempt, onSubmit, submitting }) {
+// A seven-part test in progress (placement or lesson test): one part at a
+// time, the server's clock on top.
+//   attempt         the IN_PROGRESS state from the API
+//   saveAnswers     saves the answers chosen so far
+//   onSubmit        ends the test with the given answers
+//   name            what the test is called, e.g. "placement test"
+//   retakeAllowed   whether the test can be taken again after submitting
+export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, retakeAllowed = false }) {
   const [answers, setAnswers] = useState(attempt.answers || {});
   const [partIndex, setPartIndex] = useState(0);
   const [confirming, setConfirming] = useState(false);
@@ -102,7 +107,7 @@ export function PlacementExam({ attempt, onSubmit, submitting }) {
   // count if the time runs out.
   useEffect(() => {
     if (answers === attempt.answers) return undefined;
-    const timer = setTimeout(() => savePlacementAnswers(answers).catch(() => {}), 800);
+    const timer = setTimeout(() => saveAnswers(answers).catch(() => {}), 800);
     return () => clearTimeout(timer);
   }, [answers]);
 
@@ -158,6 +163,11 @@ export function PlacementExam({ attempt, onSubmit, submitting }) {
   const part = attempt.parts[partIndex];
   const total = attempt.parts.reduce((sum, item) => sum + item.questions.length, 0);
   const answered = answeredCount(attempt.parts, answers);
+  // Numbers of the questions still without an answer.
+  const unanswered = attempt.parts
+    .flatMap((item) => item.questions)
+    .filter((question) => !answers[question.id])
+    .map((question) => question.number);
   const isBlankPart = part.passage.includes('___') && part.questions.every((question) => !question.prompt);
   const lowTime = remaining <= 2 * 60 * 1000;
 
@@ -175,139 +185,146 @@ export function PlacementExam({ attempt, onSubmit, submitting }) {
           <Clock className="h-4 w-4" />
           {formatRemaining(remaining)}
         </span>
-        <span className="text-sm text-muted-foreground">
-          {answered} of {total} answered
+        <span className="rounded-full bg-muted px-3 py-1.5 text-sm font-medium tabular-nums">
+          <span className="font-bold text-primary">{answered}</span> / {total} answered
         </span>
         <Button className="ml-auto" disabled={submitting} onClick={() => setConfirming(true)}>
           {submitting ? 'Submitting…' : 'Submit'}
         </Button>
       </div>
 
-      <nav aria-label="Parts" className="flex flex-wrap gap-2">
-        {attempt.parts.map((item, index) => {
-          const done = item.questions.every((question) => answers[question.id]);
-          return (
-            <button
-              key={item.key}
-              type="button"
-              aria-current={index === partIndex ? 'step' : undefined}
-              onClick={() => showPart(index)}
-              className={cn(
-                'rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                index === partIndex
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : done
-                    ? 'border-success/40 bg-success/10 text-success'
-                    : 'text-muted-foreground hover:bg-accent',
-              )}
-            >
-              Part {item.number}
-            </button>
-          );
-        })}
-      </nav>
-
-      <div className="rounded-xl border bg-card p-4 shadow-sm">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-medium">Questions</p>
-          <p className="flex items-center gap-4 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <span className="h-3 w-3 rounded-sm bg-primary" /> Answered
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-3 w-3 rounded-sm border border-input" /> Not answered
-            </span>
-          </p>
-        </div>
-        <ol aria-label="Questions" className="flex flex-wrap gap-2">
-          {attempt.parts.map((item, index) =>
-            item.questions.map((question) => {
-              const done = Boolean(answers[question.id]);
-              return (
-                <li key={question.id}>
-                  <button
-                    type="button"
-                    aria-label={`Question ${question.number}, ${done ? 'answered' : 'not answered'}`}
-                    onClick={() => showQuestion(index, question.number)}
-                    className={cn(
-                      'flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                      done
-                        ? 'border-primary bg-primary text-primary-foreground'
-                        : 'border-input text-muted-foreground hover:bg-accent',
-                      index === partIndex && 'ring-2 ring-primary/40 ring-offset-1 ring-offset-background',
-                    )}
-                  >
-                    {question.number}
-                  </button>
-                </li>
-              );
-            }),
-          )}
-        </ol>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-            {skillLabels[part.skill]}
-          </p>
-          <h2 className="text-xl font-bold">
-            Part {part.number}: {part.title}
-          </h2>
-        </div>
-        {part.audioUrl ? (
+      {/* Laptop: the question list stays on the right; phone: it comes first. */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
+        <aside className="lg:order-2 lg:sticky lg:top-36 lg:self-start">
           <div className="rounded-xl border bg-card p-4 shadow-sm">
-            <p className="mb-2 text-sm text-muted-foreground">
-              Listen, then answer the question{part.questions.length === 1 ? '' : 's'} of this part.
-            </p>
-            <audio controls src={part.audioUrl} className="w-full" />
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-medium">Questions</p>
+              <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-3 w-3 rounded-sm bg-primary" /> Answered
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-3 w-3 rounded-sm border border-input" /> Not answered
+                </span>
+              </p>
+            </div>
+            <ol aria-label="Questions" className="flex flex-wrap gap-2 lg:grid lg:grid-cols-5">
+              {attempt.parts.map((item, index) =>
+                item.questions.map((question) => {
+                  const done = Boolean(answers[question.id]);
+                  return (
+                    <li key={question.id}>
+                      <button
+                        type="button"
+                        aria-label={`Question ${question.number}, ${done ? 'answered' : 'not answered'}`}
+                        onClick={() => showQuestion(index, question.number)}
+                        className={cn(
+                          'flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                          done
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-input text-muted-foreground hover:bg-accent',
+                          index === partIndex && 'ring-2 ring-primary/40 ring-offset-1 ring-offset-background',
+                        )}
+                      >
+                        {question.number}
+                      </button>
+                    </li>
+                  );
+                }),
+              )}
+            </ol>
           </div>
-        ) : null}
-        {part.imageUrl ? <img src={part.imageUrl} alt="" className="max-h-96 rounded-lg border" /> : null}
-        {part.passage ? (
-          <div className="whitespace-pre-wrap rounded-xl border bg-card p-4 leading-relaxed shadow-sm sm:p-5">
-            {isBlankPart ? numberBlanks(part.passage, part.questions[0].number) : part.passage}
-          </div>
-        ) : null}
-        {part.questions.map((question) => (
-          <Question
-            key={question.id}
-            question={question}
-            chosen={answers[question.id]}
-            onChoose={choose}
-            blankNumber={isBlankPart}
-          />
-        ))}
-      </div>
+        </aside>
 
-      <div className="flex justify-between gap-3">
-        <Button variant="outline" disabled={partIndex === 0} onClick={() => showPart(partIndex - 1)}>
-          <ChevronLeft className="mr-1 h-4 w-4" />
-          Previous part
-        </Button>
-        {partIndex < attempt.parts.length - 1 ? (
-          <Button variant="outline" onClick={() => showPart(partIndex + 1)}>
-            Next part
-            <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
-        ) : (
-          <Button disabled={submitting} onClick={() => setConfirming(true)}>
-            Submit
-          </Button>
-        )}
+        <div className="min-w-0 space-y-6 lg:order-1">
+          <nav aria-label="Parts" className="flex flex-wrap gap-2">
+            {attempt.parts.map((item, index) => {
+              const done = item.questions.every((question) => answers[question.id]);
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  aria-current={index === partIndex ? 'step' : undefined}
+                  onClick={() => showPart(index)}
+                  className={cn(
+                    'rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    index === partIndex
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : done
+                        ? 'border-success/40 bg-success/10 text-success'
+                        : 'text-muted-foreground hover:bg-accent',
+                  )}
+                >
+                  Part {item.number}
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="space-y-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+                {skillLabels[part.skill]}
+              </p>
+              <h2 className="text-xl font-bold">
+                Part {part.number}: {part.title}
+              </h2>
+            </div>
+            {part.audioUrl ? (
+              <div className="rounded-xl border bg-card p-4 shadow-sm">
+                <p className="mb-2 text-sm text-muted-foreground">
+                  Listen, then answer the question{part.questions.length === 1 ? '' : 's'} of this part.
+                </p>
+                <audio controls src={part.audioUrl} className="w-full" />
+              </div>
+            ) : null}
+            {part.imageUrl ? <img src={part.imageUrl} alt="" className="max-h-96 rounded-lg border" /> : null}
+            {part.passage ? (
+              <div className="whitespace-pre-wrap rounded-xl border bg-card p-4 leading-relaxed shadow-sm sm:p-5">
+                {isBlankPart ? numberBlanks(part.passage, part.questions[0].number) : part.passage}
+              </div>
+            ) : null}
+            {part.questions.map((question) => (
+              <Question
+                key={question.id}
+                question={question}
+                chosen={answers[question.id]}
+                onChoose={choose}
+                blankNumber={isBlankPart}
+              />
+            ))}
+          </div>
+
+          <div className="flex justify-between gap-3">
+            <Button variant="outline" disabled={partIndex === 0} onClick={() => showPart(partIndex - 1)}>
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Previous part
+            </Button>
+            {partIndex < attempt.parts.length - 1 ? (
+              <Button variant="outline" onClick={() => showPart(partIndex + 1)}>
+                Next part
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            ) : (
+              <Button disabled={submitting} onClick={() => setConfirming(true)}>
+                Submit
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
 
       <AlertDialog open={confirming} onOpenChange={setConfirming}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Submit the placement test?</AlertDialogTitle>
+            <AlertDialogTitle>Submit the {name}?</AlertDialogTitle>
             <AlertDialogDescription>
-              {answered < total
-                ? `You have answered ${answered} of ${total} questions; unanswered questions count as wrong. `
-                : 'You have answered every question. '}
-              You cannot change your answers or take the test again after submitting.
+              {retakeAllowed
+                ? 'You cannot change your answers after submitting.'
+                : 'You cannot change your answers or take the test again after submitting.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <AnswerProgress answered={answered} total={total} unanswered={unanswered} />
           <AlertDialogFooter>
             <AlertDialogCancel>Keep working</AlertDialogCancel>
             <AlertDialogAction
@@ -325,16 +342,14 @@ export function PlacementExam({ attempt, onSubmit, submitting }) {
       <AlertDialog open={leaving} onOpenChange={setLeaving}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>You are taking the placement test</AlertDialogTitle>
+            <AlertDialogTitle>You are taking the {name}</AlertDialogTitle>
             <AlertDialogDescription>
               You cannot open another page during the test, and the clock keeps
-              running. Submit the test first if you want to leave.{' '}
-              {answered < total
-                ? `You have answered ${answered} of ${total} questions; unanswered questions count as wrong.`
-                : 'You have answered every question.'}{' '}
-              You cannot take the test again after submitting.
+              running. Submit the test first if you want to leave.
+              {retakeAllowed ? '' : ' You cannot take the test again after submitting.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <AnswerProgress answered={answered} total={total} unanswered={unanswered} />
           <AlertDialogFooter>
             <AlertDialogCancel>Keep working</AlertDialogCancel>
             <AlertDialogAction

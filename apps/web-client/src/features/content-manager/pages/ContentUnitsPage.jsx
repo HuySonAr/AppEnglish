@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowUp, Library, Pencil, Plus } from 'lucide-react';
 import { MIN_PUBLISHED_LESSONS_PER_UNIT, UnitStatus } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import {
   createLesson,
   createUnit,
@@ -72,7 +72,6 @@ function LessonBadges({ lesson }) {
 }
 
 export function ContentUnitsPage() {
-  const { toast } = useToast();
   const [units, setUnits] = useState([]);
   const [state, setState] = useState('loading');
   const [busy, setBusy] = useState(false);
@@ -87,7 +86,7 @@ export function ContentUnitsPage() {
       setState('ready');
     } catch (error) {
       setState('error');
-      toast({
+      notify({
         title: 'Could not load content',
         description: getApiErrorMessage(error),
         variant: 'destructive',
@@ -104,12 +103,12 @@ export function ContentUnitsPage() {
     setBusy(true);
     try {
       await action();
-      if (success) toast({ title: success });
+      if (success) notify({ title: success });
       await load({ quiet: true });
       return true;
     } catch (error) {
       const issues = error?.response?.data?.data?.issues;
-      toast({
+      notify({
         title: failure,
         description: issues?.[0]?.message || getApiErrorMessage(error),
         variant: 'destructive',

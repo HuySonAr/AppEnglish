@@ -70,3 +70,10 @@ immutable (D40). No table references another service's database: `createdBy`,
 `placement_attempts.accountId` and `placementVersionId` hold ids of other
 services' rows without a foreign key.
 
+## F04 lesson-flow schema
+
+`learning-service` adds `lesson_progress` and `lesson_test_attempts` to
+`app_learning` (migration `1730000001000-create-lesson-flow.js`). `accountId`,
+`lessonId` and `lessonVersionId` hold ids of other services' rows without a
+foreign key; `accountEmail` is a copy taken when the attempt starts.
+

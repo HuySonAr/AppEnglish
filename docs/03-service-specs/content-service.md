@@ -122,6 +122,8 @@ matching RPC of `appenglish.content.v1.ContentService`
 | PUT | `/content/placement/draft` | `SavePlacementDraft` | Content Manager | Replace the draft `{ test }`; creates the next draft version after a publish |
 | POST | `/content/placement/publish` | `PublishPlacement` | Content Manager | Validate the seven parts and freeze the draft as the next version |
 | — | not exposed | `GetPlacementPaper` | learning-service | `{ versionId? }` → a published version with answers, media URLs and `publishedUnitCount`; takes no actor |
+| — | not exposed | `GetCurriculum` | learning-service | Published units in order with their published lessons; takes no actor |
+| — | not exposed | `GetLessonPaper` | learning-service | Lesson id + `{ versionId? }` → a published lesson version with answers and media URLs; 404 when the lesson or its unit is not published |
 | POST | `/content/pronunciation` | `AutofillPronunciation` | Content Manager | `{ word, accents? }`; looks the word up in the free dictionary and returns `{ found, phonetic, audio: { uk, us } }` with stored media or `null` |
 
 Responses use the `{ code, msg, data }` envelope. Content codes

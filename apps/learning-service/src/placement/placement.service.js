@@ -1,32 +1,19 @@
 import { AccountRole } from '@appenglish/auth-contracts';
-import { LESSON_TEST_PARTS, Skill } from '@appenglish/content-contracts';
 import {
   DEFAULT_PLACEMENT_THRESHOLDS,
   PLACEMENT_DURATION_MINUTES,
   PlacementStatus,
   placementStartUnit,
 } from '@appenglish/learning-contracts';
+import { scoreTest, testParts } from '../lesson/lesson.rules.js';
 import { placementErrors } from './placement.errors.js';
 
 // A submit that arrives this long after the deadline still counts: the page
 // submits on its own when the clock runs out and the request takes a moment.
 const SUBMIT_GRACE_MS = 30 * 1000;
 
-// Counts the right answers of a paper, in total and per skill.
-export function scorePlacement(test, answers) {
-  const score = { totalCount: 0, correctCount: 0, listeningCorrect: 0, readingCorrect: 0 };
-  for (const spec of LESSON_TEST_PARTS) {
-    for (const question of test[spec.key]?.questions || []) {
-      score.totalCount++;
-      const chosen = question.options.find((option) => option.id === answers[question.id]);
-      if (!chosen?.isCorrect) continue;
-      score.correctCount++;
-      if (spec.skill === Skill.LISTENING) score.listeningCorrect++;
-      else score.readingCorrect++;
-    }
-  }
-  return score;
-}
+// Kept under this name for placement callers.
+export { scoreTest as scorePlacement };
 
 export class PlacementService {
   // contentClient.getPlacementPaper(versionId?) reads the test from
@@ -145,7 +132,7 @@ export class PlacementService {
   async complete(attempt, answers) {
     const paper = await this.contentClient.getPlacementPaper(attempt.placementVersionId);
     if (!paper) throw placementErrors.notAvailable();
-    const score = scorePlacement(paper.test, answers);
+    const score = scoreTest(paper.test, answers);
     Object.assign(attempt, score, {
       answers,
       status: PlacementStatus.COMPLETED,
@@ -171,7 +158,8 @@ export class PlacementService {
         serverNow: this.now().toISOString(),
         durationMinutes: PLACEMENT_DURATION_MINUTES,
         answers: attempt.answers,
-        parts: this.learnerParts(source),
+        // No correct answers, explanations or transcripts.
+        parts: testParts(source),
       };
     }
     // The result shows the score and the starting unit only (D56).
@@ -186,30 +174,5 @@ export class PlacementService {
           : 0,
       });
     return result;
-  }
-
-  // The paper as the learner sees it: no correct answers, explanations or
-  // transcripts.
-  learnerParts(paper) {
-    const url = (mediaId) => (mediaId && paper.media[mediaId]?.url) || null;
-    return LESSON_TEST_PARTS.map((spec) => {
-      const part = paper.test[spec.key];
-      return {
-        key: spec.key,
-        number: spec.number,
-        title: spec.title,
-        skill: spec.skill,
-        audioUrl: url(part.audioMediaId),
-        imageUrl: url(part.imageMediaId),
-        passage: part.passage,
-        questions: part.questions.map((question, index) => ({
-          id: question.id,
-          number: spec.firstQuestionNumber + index,
-          prompt: question.prompt,
-          imageUrl: url(question.imageMediaId),
-          options: question.options.map((option) => ({ id: option.id, text: option.text })),
-        })),
-      };
-    });
   }
 }

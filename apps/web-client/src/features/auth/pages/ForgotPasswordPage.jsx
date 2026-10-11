@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { forgotPassword } from '../api/auth-api.js';
 import { AuthCard, AuthLink } from '../components/AuthCard.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui/button.jsx';
 import { Input } from '../../../components/ui/input.jsx';
 import { Label } from '../../../components/ui/label.jsx';
@@ -13,13 +13,12 @@ export function ForgotPasswordPage() {
   const [email, setEmail] = useState(location.state?.email || '');
   const [pending, setPending] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
   async function submit(event) {
     event.preventDefault();
     setPending(true);
     try {
       const result = await forgotPassword({ email });
-      toast({
+      notify({
         title: 'Reset code requested',
         description:
           'If the account can receive mail, a reset code has been sent.',
@@ -31,7 +30,7 @@ export function ForgotPasswordPage() {
         },
       });
     } catch (error) {
-      toast({
+      notify({
         title: 'Request failed',
         description: getApiErrorMessage(error),
         variant: 'destructive',

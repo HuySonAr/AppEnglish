@@ -23,14 +23,14 @@ apps/web-client/src/
   routes/                # ProtectedRoute, PublicOnlyRoute, RoleRoute
   features/              # mỗi role/nghiệp vụ một thư mục
     auth/                # api, components, context, flow, pages, schemas
-    student/             # pages
+    student/             # api, lib, components (TestExam, quizzes, review), pages
     admin/               # api, pages
     content-manager/     # api, lib, components, pages
   components/
     ui/                  # shadcn/ui (Radix) primitives
     shared/              # PageHeader, FeatureCard, EmptyState
-  hooks/                 # use-toast, use-theme
-  lib/                   # api/ (HTTP client, response), utils.js (cn)
+  hooks/                 # use-theme
+  lib/                   # api/ (HTTP client, response), utils.js (cn), notify.js (Sonner notifications), leave-guard.js
   constants/
   styles/index.css       # design tokens sáng/tối
 ~~~

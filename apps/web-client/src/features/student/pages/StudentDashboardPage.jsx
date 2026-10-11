@@ -11,11 +11,17 @@ export function StudentDashboardPage() {
         <p className="relative text-sm font-medium text-primary-foreground/80">{account?.email}</p>
         <h1 className="relative mt-2 text-3xl font-bold sm:text-4xl">Welcome to AppEnglish</h1>
         <p className="relative mt-3 max-w-xl text-primary-foreground/85">
-          Your Reading and Listening learning space is ready. Lessons and progress
-          will appear here when those features are available.
+          Your Reading and Listening learning space is ready. Take the placement
+          test, then work through the lessons one by one.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <FeatureCard
+          icon={BookOpen}
+          title="Lessons"
+          description="Vocabulary, exercises and a test in every lesson"
+          to="/student/lessons"
+        />
         <FeatureCard
           icon={ClipboardCheck}
           title="Placement test"

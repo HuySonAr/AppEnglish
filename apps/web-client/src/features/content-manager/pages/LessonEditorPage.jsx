@@ -9,7 +9,7 @@ import {
   MediaSection,
 } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import {
   autofillPronunciation,
   getLesson,
@@ -52,7 +52,6 @@ const saveErrorMessage = (error) =>
 
 export function LessonEditorPage() {
   const { lessonId } = useParams();
-  const { toast } = useToast();
   const [state, setState] = useState('loading');
   const [lesson, setLesson] = useState(null);
   const [status, setStatus] = useState(lessonState(null));
@@ -83,7 +82,7 @@ export function LessonEditorPage() {
       setState('ready');
     } catch (error) {
       setState('error');
-      toast({
+      notify({
         title: 'Could not load the lesson',
         description: getApiErrorMessage(error),
         variant: 'destructive',
@@ -160,7 +159,7 @@ export function LessonEditorPage() {
               : 'American audio',
         ),
       ].filter(Boolean);
-      toast(
+      notify(
         !found
           ? {
               title: `"${item.word.trim()}" is not in the dictionary`,
@@ -170,12 +169,13 @@ export function LessonEditorPage() {
           : lacking.length
             ? {
                 title: 'Partly filled',
+                variant: 'warning',
                 description: `The dictionary has no ${lacking.join(', ')} for this word. Add it yourself.`,
               }
             : { title: 'Pronunciation filled' },
       );
     } catch (error) {
-      toast({
+      notify({
         title: 'Auto-fill failed',
         description: getApiErrorMessage(error),
         variant: 'destructive',
@@ -200,7 +200,7 @@ export function LessonEditorPage() {
     apply(data);
     draftMedia.reset();
     if (!quiet)
-      toast({ title: `Draft saved (version ${data.draft.versionNumber})` });
+      notify({ title: `Draft saved (version ${data.draft.versionNumber})` });
   }
 
   async function onSave() {
@@ -209,7 +209,7 @@ export function LessonEditorPage() {
       await saveDraft();
       setIssues([]);
     } catch (error) {
-      toast({
+      notify({
         title: 'Could not save the draft',
         description: saveErrorMessage(error),
         variant: 'destructive',
@@ -226,7 +226,7 @@ export function LessonEditorPage() {
       const data = (await publishLesson(lessonId)).data;
       apply(data);
       setIssues([]);
-      toast({ title: `Published version ${data.published.versionNumber}` });
+      notify({ title: `Published version ${data.published.versionNumber}` });
     } catch (error) {
       const found = error?.response?.data?.data?.issues;
       if (
@@ -235,13 +235,13 @@ export function LessonEditorPage() {
       ) {
         setIssues(found);
         showIssue(found[0].path);
-        toast({
+        notify({
           title: 'Lesson cannot be published yet',
           description: `${found.length} item${found.length === 1 ? '' : 's'} to fix. The draft was saved.`,
           variant: 'destructive',
         });
       } else {
-        toast({
+        notify({
           title: 'Could not publish the lesson',
           description: saveErrorMessage(error),
           variant: 'destructive',
@@ -258,9 +258,9 @@ export function LessonEditorPage() {
       const data = (await updateLesson(lessonId, { title: title.trim() })).data;
       setLesson(data.lesson);
       setTitle(data.lesson.title);
-      toast({ title: 'Lesson renamed' });
+      notify({ title: 'Lesson renamed' });
     } catch (error) {
-      toast({
+      notify({
         title: 'Could not rename the lesson',
         description: getApiErrorMessage(error),
         variant: 'destructive',

@@ -1,5 +1,10 @@
 import { DataSource } from 'typeorm';
-import { PlacementAttemptEntity, PlacementSettingsEntity } from './learning.entities.js';
+import {
+  LessonProgressEntity,
+  LessonTestAttemptEntity,
+  PlacementAttemptEntity,
+  PlacementSettingsEntity,
+} from './learning.entities.js';
 
 export function createLearningDataSource() {
   return new DataSource({
@@ -9,7 +14,12 @@ export function createLearningDataSource() {
     username: process.env.POSTGRES_USER || 'postgres',
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.LEARNING_DATABASE_NAME || 'app_learning',
-    entities: [PlacementAttemptEntity, PlacementSettingsEntity],
+    entities: [
+      PlacementAttemptEntity,
+      PlacementSettingsEntity,
+      LessonProgressEntity,
+      LessonTestAttemptEntity,
+    ],
     migrations: ['src/database/migrations/*.js'],
   });
 }

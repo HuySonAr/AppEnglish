@@ -15,12 +15,27 @@ service LearningService {
   // Admin: the score thresholds that decide the starting unit.
   rpc GetPlacementSettings(LearningRequest) returns (LearningReply);
   rpc UpdatePlacementSettings(LearningRequest) returns (LearningReply);
+  // Lesson flow (F04). Student only; id is the lesson id where there is one.
+  rpc GetCurriculum(LearningRequest) returns (LearningReply);
+  rpc GetLesson(LearningRequest) returns (LearningReply);
+  rpc MarkVocabularyStudied(LearningRequest) returns (LearningReply);
+  rpc GetVocabularyQuiz(LearningRequest) returns (LearningReply);
+  rpc SubmitVocabularyQuiz(LearningRequest) returns (LearningReply);
+  rpc SubmitFillIn(LearningRequest) returns (LearningReply);
+  rpc GetLessonTest(LearningRequest) returns (LearningReply);
+  rpc StartLessonTest(LearningRequest) returns (LearningReply);
+  rpc SaveLessonTestAnswers(LearningRequest) returns (LearningReply);
+  rpc SubmitLessonTest(LearningRequest) returns (LearningReply);
+  rpc GetLessonTestReview(LearningRequest) returns (LearningReply);
+  rpc GetLessonRanking(LearningRequest) returns (LearningReply);
 }
 
 // The authenticated account as verified by auth-service.
 message Actor {
   string id = 1;
   string role = 2;
+  // Shown in the lesson ranking (D60).
+  string email = 3;
 }
 
 message LearningRequest {

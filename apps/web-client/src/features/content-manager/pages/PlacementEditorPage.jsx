@@ -6,7 +6,7 @@ import {
 } from '@appenglish/content-contracts';
 import { PLACEMENT_DURATION_MINUTES } from '@appenglish/learning-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import {
   getPlacementTest,
   publishPlacementTest,
@@ -38,7 +38,6 @@ const saveErrorMessage = (error) =>
 // Editor of the single placement test: the same seven parts and 23 questions
 // as a lesson test.
 export function PlacementEditorPage() {
-  const { toast } = useToast();
   const [state, setState] = useState('loading');
   const [status, setStatus] = useState(lessonState(null));
   const [content, setContent] = useState(null);
@@ -69,7 +68,7 @@ export function PlacementEditorPage() {
       setState('ready');
     } catch (error) {
       setState('error');
-      toast({
+      notify({
         title: 'Could not load the placement test',
         description: getApiErrorMessage(error),
         variant: 'destructive',
@@ -97,7 +96,7 @@ export function PlacementEditorPage() {
     const data = (await savePlacementDraft(result.content)).data;
     apply(data);
     draftMedia.reset();
-    if (!quiet) toast({ title: `Draft saved (version ${data.draft.versionNumber})` });
+    if (!quiet) notify({ title: `Draft saved (version ${data.draft.versionNumber})` });
   }
 
   async function onSave() {
@@ -106,7 +105,7 @@ export function PlacementEditorPage() {
       await saveDraft();
       setIssues([]);
     } catch (error) {
-      toast({
+      notify({
         title: 'Could not save the draft',
         description: saveErrorMessage(error),
         variant: 'destructive',
@@ -123,20 +122,20 @@ export function PlacementEditorPage() {
       const data = (await publishPlacementTest()).data;
       apply(data);
       setIssues([]);
-      toast({ title: `Published version ${data.published.versionNumber}` });
+      notify({ title: `Published version ${data.published.versionNumber}` });
     } catch (error) {
       const found = error?.response?.data?.data?.issues;
       if (errorCode(error) === ContentResponseCode.CONTENT_NOT_PUBLISHABLE && found?.length) {
         setIssues(found);
         const location = issueLocation(found[0].path);
         if (location.part) setPartTab(location.part);
-        toast({
+        notify({
           title: 'The placement test cannot be published yet',
           description: `${found.length} item${found.length === 1 ? '' : 's'} to fix. The draft was saved.`,
           variant: 'destructive',
         });
       } else {
-        toast({
+        notify({
           title: 'Could not publish the placement test',
           description: saveErrorMessage(error),
           variant: 'destructive',

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { LESSON_TEST_QUESTION_COUNT } from '@appenglish/content-contracts';
 import { PlacementStatus } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,11 +21,12 @@ import { EmptyState } from '../../../components/shared/EmptyState.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import {
   getPlacement,
+  savePlacementAnswers,
   skipPlacement,
   startPlacement,
   submitPlacement,
 } from '../api/placement-api.js';
-import { PlacementExam } from '../components/PlacementExam.jsx';
+import { TestExam } from '../components/TestExam.jsx';
 
 function Fact({ icon: Icon, title, text }) {
   return (
@@ -75,7 +76,6 @@ function PlacementResult({ placement }) {
 }
 
 export function PlacementPage() {
-  const { toast } = useToast();
   const [state, setState] = useState('loading');
   const [placement, setPlacement] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -88,7 +88,7 @@ export function PlacementPage() {
       setState('ready');
     } catch (error) {
       setState('error');
-      toast({
+      notify({
         title: 'Could not load the placement test',
         description: getApiErrorMessage(error),
         variant: 'destructive',
@@ -106,7 +106,7 @@ export function PlacementPage() {
     try {
       setPlacement((await action()).data);
     } catch (error) {
-      toast({ title: failure, description: getApiErrorMessage(error), variant: 'destructive' });
+      notify({ title: failure, description: getApiErrorMessage(error), variant: 'destructive' });
       // The state may have changed on the server (e.g. the time ran out).
       await load();
     } finally {
@@ -124,7 +124,9 @@ export function PlacementPage() {
 
   if (placement.status === PlacementStatus.IN_PROGRESS)
     return (
-      <PlacementExam
+      <TestExam
+        name="placement test"
+        saveAnswers={savePlacementAnswers}
         attempt={placement}
         submitting={busy}
         onSubmit={(answers) => run(() => submitPlacement(answers), 'Could not submit the test')}

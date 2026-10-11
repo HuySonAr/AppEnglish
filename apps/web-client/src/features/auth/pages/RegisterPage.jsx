@@ -8,14 +8,13 @@ import { registerAccount } from '../api/auth-api.js';
 import { AuthCard, AuthLink } from '../components/AuthCard.jsx';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { registerOutcome } from '../flow/auth-flow.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui/button.jsx';
 import { Input } from '../../../components/ui/input.jsx';
 import { Label } from '../../../components/ui/label.jsx';
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [existingEmail, setExistingEmail] = useState('');
   const form = useForm({
     resolver: zodResolver(authFormSchema),
@@ -25,7 +24,7 @@ export function RegisterPage() {
     try {
       const result = await registerAccount(values);
       if (registerOutcome(result) !== 'verify-email') {
-        toast({
+        notify({
           title: 'Registration failed',
           description: 'Something went wrong. Please try again.',
           variant: 'destructive',
@@ -33,7 +32,7 @@ export function RegisterPage() {
         return;
       }
       setExistingEmail('');
-      toast({
+      notify({
         title: 'Check your email',
         description: 'A verification code was sent.',
       });
@@ -42,7 +41,7 @@ export function RegisterPage() {
       if (errorCode(error) === ResponseCode.AUTH_EMAIL_ALREADY_REGISTERED) {
         setExistingEmail(values.email);
       }
-      toast({
+      notify({
         title: 'Registration failed',
         description: getApiErrorMessage(error),
         variant: 'destructive',

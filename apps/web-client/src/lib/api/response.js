@@ -25,7 +25,11 @@ const messages = Object.freeze({
   [ContentResponseCode.PRONUNCIATION_UNAVAILABLE]: 'The dictionary is not answering. Try again, or enter the pronunciation yourself.',
   [LearningResponseCode.PLACEMENT_NOT_AVAILABLE]: 'The placement test is not available yet.',
   [LearningResponseCode.PLACEMENT_ALREADY_TAKEN]: 'You have already taken or skipped the placement test.',
-  [LearningResponseCode.PLACEMENT_NOT_IN_PROGRESS]: 'There is no placement test in progress.'
+  [LearningResponseCode.PLACEMENT_NOT_IN_PROGRESS]: 'There is no placement test in progress.',
+  [LearningResponseCode.LESSON_NOT_FOUND]: 'This lesson is not available.',
+  [LearningResponseCode.LESSON_LOCKED]: 'This lesson is still locked.',
+  [LearningResponseCode.LESSON_STEP_REQUIRED]: 'Finish the earlier step of the lesson first.',
+  [LearningResponseCode.LESSON_TEST_NOT_IN_PROGRESS]: 'There is no lesson test in progress.'
 });
 
 // data.reason of a MEDIA_INVALID error says which upload rule failed.

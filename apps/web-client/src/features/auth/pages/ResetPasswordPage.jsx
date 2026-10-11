@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { resetPassword } from '../api/auth-api.js';
 import { AuthCard, AuthLink } from '../components/AuthCard.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui/button.jsx';
 import { Input } from '../../../components/ui/input.jsx';
 import { Label } from '../../../components/ui/label.jsx';
@@ -11,7 +11,6 @@ import { Label } from '../../../components/ui/label.jsx';
 export function ResetPasswordPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [email, setEmail] = useState(location.state?.email || '');
   const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
@@ -21,10 +20,10 @@ export function ResetPasswordPage() {
     setPending(true);
     try {
       await resetPassword({ email, otp, password });
-      toast({ title: 'Password reset', description: 'Please sign in.' });
+      notify({ title: 'Password reset', description: 'Please sign in.' });
       navigate('/login', { replace: true });
     } catch (error) {
-      toast({
+      notify({
         title: 'Password reset failed',
         description: getApiErrorMessage(error),
         variant: 'destructive',

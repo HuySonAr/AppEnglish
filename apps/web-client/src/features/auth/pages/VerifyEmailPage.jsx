@@ -8,7 +8,7 @@ import {
   dashboardPathForRole,
   verifyOtpAndRestoreSession,
 } from '../flow/auth-flow.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { Button } from '../../../components/ui/button.jsx';
 import { Input } from '../../../components/ui/input.jsx';
@@ -18,7 +18,6 @@ export function VerifyEmailPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { restoreSession } = useAuth();
-  const { toast } = useToast();
   const [email, setEmail] = useState(location.state?.email || '');
   const [otp, setOtp] = useState('');
   const [pending, setPending] = useState(false);
@@ -44,15 +43,16 @@ export function VerifyEmailPage() {
           restoreSession,
         });
       if (alreadyVerified) {
-        toast({
+        notify({
           title: 'Email already verified',
+          variant: 'info',
           description: 'Please sign in.',
         });
         navigate('/login', { replace: true, state: { email } });
         return;
       }
       if (!restoredAccount) {
-        toast({
+        notify({
           title: 'Session could not be loaded',
           description: `Email verified for ${account.email}. Please sign in.`,
           variant: 'destructive',
@@ -60,10 +60,10 @@ export function VerifyEmailPage() {
         navigate('/login', { replace: true, state: { email } });
         return;
       }
-      toast({ title: 'Email verified', description: 'You are signed in.' });
+      notify({ title: 'Email verified', description: 'You are signed in.' });
       navigate(dashboardPathForRole(restoredAccount.role), { replace: true });
     } catch (error) {
-      toast({
+      notify({
         title: 'Verification failed',
         description: getApiErrorMessage(error),
         variant: 'destructive',
@@ -78,16 +78,17 @@ export function VerifyEmailPage() {
     try {
       const result = await resendVerification({ email });
       if (result?.data?.nextAction === NextAction.LOGIN) {
-        toast({
+        notify({
           title: 'Email already verified',
+          variant: 'info',
           description: 'Please sign in.',
         });
         return;
       }
       setCooldown(result?.data?.resendAfterSeconds || 60);
-      toast({ title: 'Verification code sent' });
+      notify({ title: 'Verification code sent' });
     } catch (error) {
-      toast({
+      notify({
         title: 'Resend failed',
         description: getApiErrorMessage(error),
         variant: 'destructive',

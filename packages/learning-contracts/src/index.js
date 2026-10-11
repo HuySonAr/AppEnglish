@@ -26,6 +26,53 @@ export function placementStartUnit(correctCount, totalCount, thresholds, publish
   return Math.max(1, Math.min(unit, publishedUnitCount));
 }
 
+// Lesson flow (F04). A lesson is LOCKED until the one before it is completed
+// (lessons of units before the starting unit are open freely), OPEN while the
+// learner works on it and COMPLETED once the lesson test is passed.
+export const LessonState = Object.freeze({
+  LOCKED: 'LOCKED',
+  OPEN: 'OPEN',
+  COMPLETED: 'COMPLETED'
+});
+
+// The steps of a lesson, in order. REVIEW (vocabulary of the previous lesson)
+// is only part of a lesson when it is required.
+export const LessonStep = Object.freeze({
+  REVIEW: 'review',
+  VOCABULARY: 'vocabulary',
+  VOCABULARY_QUIZ: 'quiz',
+  FILL_IN: 'fillIn',
+  TEST: 'test'
+});
+
+export const StepStatus = Object.freeze({ DONE: 'DONE', CURRENT: 'CURRENT', LOCKED: 'LOCKED' });
+
+// The two vocabulary quizzes: this lesson's words, or the previous lesson's.
+export const QuizKind = Object.freeze({ VOCABULARY: 'vocabulary', REVIEW: 'review' });
+
+export const LessonTestStatus = Object.freeze({
+  LOCKED: 'LOCKED',
+  READY: 'READY',
+  IN_PROGRESS: 'IN_PROGRESS'
+});
+
+// How the latest lesson-test attempt compares with the one before it (D62).
+export const TestTrend = Object.freeze({
+  IMPROVED: 'IMPROVED',
+  DECLINED: 'DECLINED',
+  UNCHANGED: 'UNCHANGED'
+});
+
+export const LESSON_TEST_DURATION_MINUTES = 25;
+// Minimum lesson-test score (percent) that completes the lesson.
+export const LESSON_PASS_PERCENT = 80;
+
+// True when correctCount of totalCount reaches the pass mark; exact fractions,
+// so 79.9% does not pass.
+export function lessonTestPassed(correctCount, totalCount) {
+  return totalCount > 0 && correctCount * 100 >= LESSON_PASS_PERCENT * totalCount;
+}
+
 // Learning codes share the numeric space of @appenglish/auth-contracts
 // ResponseCode and @appenglish/content-contracts ContentResponseCode:
 // 0 success, 26 forbidden role, 30 validation, 32 system; 50-59 are learning.
@@ -36,5 +83,9 @@ export const LearningResponseCode = Object.freeze({
   SYSTEM_ERROR: 32,
   PLACEMENT_NOT_AVAILABLE: 50,
   PLACEMENT_ALREADY_TAKEN: 51,
-  PLACEMENT_NOT_IN_PROGRESS: 52
+  PLACEMENT_NOT_IN_PROGRESS: 52,
+  LESSON_NOT_FOUND: 53,
+  LESSON_LOCKED: 54,
+  LESSON_STEP_REQUIRED: 55,
+  LESSON_TEST_NOT_IN_PROGRESS: 56
 });

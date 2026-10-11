@@ -1,4 +1,4 @@
-import { ClipboardCheck, Home, LayoutDashboard, Library, Users } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Home, LayoutDashboard, Library, Users } from 'lucide-react';
 import { Roles } from '../constants/auth.js';
 
 // The menu of each role. To add a page: add its route in router.jsx and one
@@ -9,6 +9,7 @@ export const navigation = Object.freeze({
     home: '/student',
     items: [
       { to: '/student', label: 'Home', icon: Home, end: true },
+      { to: '/student/lessons', label: 'Lessons', icon: BookOpen },
       { to: '/student/placement', label: 'Placement', icon: ClipboardCheck },
     ],
   },

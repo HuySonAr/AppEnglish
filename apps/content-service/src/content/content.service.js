@@ -396,6 +396,48 @@ export class ContentService {
     };
   }
 
+  // ----- Reads for learning-service (F04). No actor: not exposed by the gateway.
+
+  // Published units in order, each with its published lessons in order.
+  async getCurriculum() {
+    const [units, lessons] = await Promise.all([
+      this.repository.listUnits(),
+      this.repository.listLessons(),
+    ]);
+    return {
+      units: units
+        .filter((unit) => unit.status === UnitStatus.PUBLISHED)
+        .map((unit) => ({
+          id: unit.id,
+          title: unit.title,
+          description: unit.description,
+          lessons: lessons
+            .filter((lesson) => lesson.unitId === unit.id && lesson.publishedVersionId)
+            .map((lesson) => ({ id: lesson.id, title: lesson.title })),
+        })),
+    };
+  }
+
+  // The lesson's published version (the current one, or the given earlier
+  // one) with answers and the delivery URL of its files.
+  async getLessonPaper(lessonId, { versionId } = {}) {
+    const lesson = await this.repository.findLesson(lessonId);
+    const unit = lesson ? await this.repository.findUnit(lesson.unitId) : null;
+    if (!lesson?.publishedVersionId || unit?.status !== UnitStatus.PUBLISHED)
+      throw contentErrors.lessonNotFound();
+    const version = await this.repository.findVersion(versionId || lesson.publishedVersionId);
+    if (version?.lessonId !== lesson.id || version.status !== LessonVersionStatus.PUBLISHED)
+      throw contentErrors.lessonNotFound();
+    const content = lessonContentSchema.parse(version.content);
+    return {
+      lesson: { id: lesson.id, title: lesson.title, unitId: unit.id, unitTitle: unit.title },
+      versionId: version.id,
+      versionNumber: version.versionNumber,
+      content,
+      media: await this.mediaOf([version], lessonContentSchema),
+    };
+  }
+
   async managedPlacementView(draft, published) {
     return {
       media: await this.mediaOf([draft, published], placementContentSchema),

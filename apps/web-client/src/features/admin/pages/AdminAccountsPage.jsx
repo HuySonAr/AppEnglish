@@ -5,7 +5,7 @@ import {
   listAdminAccounts,
   updateAdminAccount,
 } from '../../auth/api/auth-api.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import {
   Button,
   Input,
@@ -71,7 +71,6 @@ function RoleBadge({ role }) {
 }
 
 export function AdminAccountsPage() {
-  const { toast } = useToast();
   const [filters, setFilters] = useState({
     email: '',
     role: '',
@@ -89,7 +88,7 @@ export function AdminAccountsPage() {
       setState('ready');
     } catch (error) {
       setState('error');
-      toast({
+      notify({
         title: 'Could not load accounts',
         description: getApiErrorMessage(error),
         variant: 'destructive',
@@ -103,19 +102,20 @@ export function AdminAccountsPage() {
 
   async function save() {
     if (!pending) return;
-    const loadingToast = toast({
+    const loadingToast = notify({
       title: 'Updating account…',
+      variant: 'loading',
     });
     try {
       const changes = { role: pending.role };
       if (editableStatuses.includes(pending.status))
         changes.status = pending.status;
       await updateAdminAccount(pending.id, changes);
-      toast({ title: 'Account updated' });
+      notify({ title: 'Account updated' });
       setPending(null);
       await load();
     } catch (error) {
-      toast({
+      notify({
         title: 'Account update failed',
         description: getApiErrorMessage(error),
         variant: 'destructive',

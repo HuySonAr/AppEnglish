@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import { Button, Input, Label, Skeleton } from '../../../components/ui';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import {
@@ -16,7 +16,6 @@ function percent(text) {
 
 // The score thresholds that decide the unit a learner starts at.
 export function PlacementSettingsPage() {
-  const { toast } = useToast();
   const [state, setState] = useState('loading');
   const [saved, setSaved] = useState(null);
   const [durationMinutes, setDurationMinutes] = useState(null);
@@ -39,7 +38,7 @@ export function PlacementSettingsPage() {
       setState('ready');
     } catch (error) {
       setState('error');
-      toast({
+      notify({
         title: 'Could not load the placement settings',
         description: getApiErrorMessage(error),
         variant: 'destructive',
@@ -74,9 +73,9 @@ export function PlacementSettingsPage() {
     setBusy(true);
     try {
       apply((await updatePlacementSettings({ unit2Threshold: unit2, unit3Threshold: unit3 })).data);
-      toast({ title: 'Placement thresholds saved' });
+      notify({ title: 'Placement thresholds saved' });
     } catch (error) {
-      toast({
+      notify({
         title: 'Could not save the thresholds',
         description: getApiErrorMessage(error),
         variant: 'destructive',

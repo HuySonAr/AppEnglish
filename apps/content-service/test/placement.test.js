@@ -109,3 +109,47 @@ test('placement files are kept while a saved version uses them', async () => {
   await service.publishPlacement(manager);
   assert.deepEqual(await service.deleteMedia(manager, audioId), { deleted: false });
 });
+
+test('learning-service reads the published curriculum and a lesson paper', async () => {
+  const { service, audioId, imageId } = await harness();
+  const lessonContent = () => publishableContent({ audioId, imageId });
+  const { unit } = await service.createUnit(manager, { title: 'Unit A', description: 'About A' });
+  const draftUnit = (await service.createUnit(manager, { title: 'Unit B', description: '' })).unit;
+  const publish = async (unitId, title) => {
+    const { lesson } = await service.createLesson(manager, unitId, { title });
+    await service.saveLessonDraft(manager, lesson.id, lessonContent());
+    await service.publishLesson(manager, lesson.id);
+    return lesson;
+  };
+  const first = await publish(unit.id, 'L1');
+  const second = await publish(unit.id, 'L2');
+  const draftOnly = (await service.createLesson(manager, unit.id, { title: 'Draft' })).lesson;
+  const hidden = await publish(draftUnit.id, 'Hidden');
+  await service.updateLesson(manager, second.id, { position: 1 });
+  await service.publishUnit(manager, unit.id);
+
+  // Only published units and their published lessons, in order.
+  assert.deepEqual(await service.getCurriculum(), {
+    units: [{ id: unit.id, title: 'Unit A', description: 'About A', lessons: [{ id: second.id, title: 'L2' }, { id: first.id, title: 'L1' }] }],
+  });
+
+  const paper = await service.getLessonPaper(first.id);
+  assert.deepEqual(paper.lesson, { id: first.id, title: 'L1', unitId: unit.id, unitTitle: 'Unit A' });
+  assert.equal(paper.versionNumber, 1);
+  assert.equal(paper.content.fillIn.answers.length, 2);
+  assert.equal(paper.content.test.part5.questions[0].options.some((option) => option.isCorrect), true);
+  assert.equal(paper.media[audioId].url, 'https://media.test/a.mp3');
+
+  // A new version is served by default; the earlier one stays readable by id.
+  await service.saveLessonDraft(manager, first.id, { ...lessonContent(), fillIn: { passage: 'A ___ only.', answers: ['ticket'] } });
+  await service.publishLesson(manager, first.id);
+  assert.equal((await service.getLessonPaper(first.id)).versionNumber, 2);
+  assert.equal((await service.getLessonPaper(first.id, { versionId: paper.versionId })).content.fillIn.answers.length, 2);
+
+  for (const id of [draftOnly.id, hidden.id, '00000000-0000-4000-8000-000000000000'])
+    await assert.rejects(() => service.getLessonPaper(id), { code: 40, status: 404 });
+  // A version of another lesson is not served.
+  const other = await service.getLessonPaper(second.id);
+  await assert.rejects(() => service.getLessonPaper(first.id, { versionId: other.versionId }), { code: 40 });
+});
+

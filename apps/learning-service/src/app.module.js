@@ -7,8 +7,12 @@ import {
   CONTENT_CLIENT,
   CONTENT_GRPC_CLIENT,
   LEARNING_DATA_SOURCE,
+  LESSON_REPOSITORY,
   PLACEMENT_REPOSITORY,
 } from './database/database.tokens.js';
+import { LessonGrpcController } from './lesson/lesson.grpc.controller.js';
+import { LessonRepository } from './lesson/lesson.repository.js';
+import { LessonService } from './lesson/lesson.service.js';
 import { ContentClient } from './placement/content.client.js';
 import { PlacementGrpcController } from './placement/placement.grpc.controller.js';
 import { PlacementRepository } from './placement/placement.repository.js';
@@ -21,12 +25,17 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [HealthController, PlacementGrpcController],
+  controllers: [HealthController, PlacementGrpcController, LessonGrpcController],
   providers: [
     { provide: LEARNING_DATA_SOURCE, useFactory: createLearningDataSource },
     {
       provide: PLACEMENT_REPOSITORY,
       useFactory: (dataSource) => new PlacementRepository(dataSource),
+      inject: [LEARNING_DATA_SOURCE],
+    },
+    {
+      provide: LESSON_REPOSITORY,
+      useFactory: (dataSource) => new LessonRepository(dataSource),
       inject: [LEARNING_DATA_SOURCE],
     },
     {
@@ -38,6 +47,12 @@ Module({
       provide: PlacementService,
       useFactory: (repository, contentClient) => new PlacementService(repository, contentClient),
       inject: [PLACEMENT_REPOSITORY, CONTENT_CLIENT],
+    },
+    {
+      provide: LessonService,
+      useFactory: (repository, placementRepository, contentClient) =>
+        new LessonService(repository, placementRepository, contentClient),
+      inject: [LESSON_REPOSITORY, PLACEMENT_REPOSITORY, CONTENT_CLIENT],
     },
   ],
 })(AppModule);

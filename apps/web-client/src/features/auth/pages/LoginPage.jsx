@@ -9,14 +9,13 @@ import {
   dashboardPathForRole,
   isVerificationRequiredError,
 } from '../flow/auth-flow.js';
-import { useToast } from '../../../hooks/use-toast.js';
+import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui/button.jsx';
 import { Input } from '../../../components/ui/input.jsx';
 import { Label } from '../../../components/ui/label.jsx';
 
 export function LoginPage() {
   const { signIn } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const form = useForm({
@@ -28,15 +27,15 @@ export function LoginPage() {
       const account = await signIn(values);
       const target =
         location.state?.from?.pathname || dashboardPathForRole(account.role);
-      toast({ title: 'Signed in successfully.' });
+      notify({ title: 'Signed in successfully.' });
       navigate(target, { replace: true });
     } catch (error) {
       if (isVerificationRequiredError(error)) {
-        toast({ title: 'Verify your email before signing in.' });
+        notify({ title: 'Verify your email before signing in.', variant: 'info' });
         navigate('/verify-email', { state: { email: values.email } });
         return;
       }
-      toast({
+      notify({
         title: 'Sign in failed',
         description: getApiErrorMessage(error),
         variant: 'destructive',

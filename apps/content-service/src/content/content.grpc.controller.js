@@ -74,6 +74,13 @@ const rpcs = {
     payload: placementPaperSchema,
     run: (service, { payload }) => service.getPlacementPaper(payload),
   },
+  GetCurriculum: { internal: true, run: (service) => service.getCurriculum() },
+  GetLessonPaper: {
+    internal: true,
+    id: true,
+    payload: placementPaperSchema,
+    run: (service, { id, payload }) => service.getLessonPaper(id, payload),
+  },
   AutofillPronunciation: {
     payload: pronunciationSchema,
     run: (service, { actor, payload }) => service.autofillPronunciation(actor, payload),
