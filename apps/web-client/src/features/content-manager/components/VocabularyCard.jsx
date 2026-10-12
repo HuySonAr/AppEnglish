@@ -58,7 +58,7 @@ export function VocabularyCard({ item, index, edit, update, media, filling, onAu
             <MediaField id={`us-${item.id}`} label="Pronunciation — American (optional)" kind={MediaKind.AUDIO} path={[...path, 'audioUsMediaId']} mediaId={item.audioUsMediaId} media={media} />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Button
+            <Button loading={filling === item.id}
               variant="outline"
               size="sm"
               disabled={!item.word.trim() || filling !== null || (item.phonetic && item.audioUkMediaId && item.audioUsMediaId)}

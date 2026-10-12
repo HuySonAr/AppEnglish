@@ -28,6 +28,17 @@ service LearningService {
   rpc SubmitLessonTest(LearningRequest) returns (LearningReply);
   rpc GetLessonTestReview(LearningRequest) returns (LearningReply);
   rpc GetLessonRanking(LearningRequest) returns (LearningReply);
+  // Mock tests (F05A). Student: full tests and mini tests; id is the mock
+  // test id. Admin: the estimated-score conversion table.
+  rpc ListMockTests(LearningRequest) returns (LearningReply);
+  rpc GetMockTest(LearningRequest) returns (LearningReply);
+  rpc GetMockAttempt(LearningRequest) returns (LearningReply);
+  rpc StartMockAttempt(LearningRequest) returns (LearningReply);
+  rpc SaveMockAnswers(LearningRequest) returns (LearningReply);
+  rpc SubmitMockAttempt(LearningRequest) returns (LearningReply);
+  rpc GetMockReview(LearningRequest) returns (LearningReply);
+  rpc GetScoreConversion(LearningRequest) returns (LearningReply);
+  rpc UpdateScoreConversion(LearningRequest) returns (LearningReply);
 }
 
 // The authenticated account as verified by auth-service.

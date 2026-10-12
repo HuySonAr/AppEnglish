@@ -2,8 +2,10 @@ import { DataSource } from 'typeorm';
 import {
   LessonProgressEntity,
   LessonTestAttemptEntity,
+  MockAttemptEntity,
   PlacementAttemptEntity,
   PlacementSettingsEntity,
+  ScoreConversionEntity,
 } from './learning.entities.js';
 
 export function createLearningDataSource() {
@@ -19,6 +21,8 @@ export function createLearningDataSource() {
       PlacementSettingsEntity,
       LessonProgressEntity,
       LessonTestAttemptEntity,
+      MockAttemptEntity,
+      ScoreConversionEntity,
     ],
     migrations: ['src/database/migrations/*.js'],
   });

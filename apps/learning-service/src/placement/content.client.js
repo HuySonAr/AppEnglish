@@ -37,4 +37,18 @@ export class ContentClient {
       payloadJson: JSON.stringify(versionId ? { versionId } : {}),
     });
   }
+
+  // Published mock tests with the number of questions in each part.
+  listPublishedMockTests() {
+    return this.call('listPublishedMockTests', {});
+  }
+
+  // A mock test's published version (the current one, or the given one) with
+  // its answers; null when the mock test is not published.
+  getMockPaper(mockTestId, versionId) {
+    return this.call('getMockPaper', {
+      id: mockTestId,
+      payloadJson: JSON.stringify(versionId ? { versionId } : {}),
+    });
+  }
 }

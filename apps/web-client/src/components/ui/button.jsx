@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
+import { Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils.js';
 
 const buttonVariants = cva(
@@ -30,12 +31,24 @@ const buttonVariants = cva(
   }
 );
 
-export function Button({ className, variant, size, asChild = false, ...props }) {
+// loading shows a spinner and blocks the button while its action runs.
+export function Button({ className, variant, size, asChild = false, loading = false, disabled, children, ...props }) {
   const Comp = asChild ? Slot : 'button';
+  if (asChild)
+    return (
+      <Comp className={cn(buttonVariants({ variant, size, className }))} disabled={disabled} {...props}>
+        {children}
+      </Comp>
+    );
   return (
     <Comp
       className={cn(buttonVariants({ variant, size, className }))}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       {...props}
-    />
+    >
+      {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+      {children}
+    </Comp>
   );
 }

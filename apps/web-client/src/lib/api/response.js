@@ -22,6 +22,7 @@ const messages = Object.freeze({
   [ContentResponseCode.CONTENT_INVALID_STATE]: 'There is no draft to publish.',
   [ContentResponseCode.CONTENT_NOT_PUBLISHABLE]: 'This content does not meet the publishing requirements yet.',
   [ContentResponseCode.MEDIA_INVALID]: 'This file type or size is not allowed.',
+  [ContentResponseCode.EXAM_TYPE_INVALID]: 'This exam type cannot be used here.',
   [ContentResponseCode.PRONUNCIATION_UNAVAILABLE]: 'The dictionary is not answering. Try again, or enter the pronunciation yourself.',
   [LearningResponseCode.PLACEMENT_NOT_AVAILABLE]: 'The placement test is not available yet.',
   [LearningResponseCode.PLACEMENT_ALREADY_TAKEN]: 'You have already taken or skipped the placement test.',
@@ -29,7 +30,9 @@ const messages = Object.freeze({
   [LearningResponseCode.LESSON_NOT_FOUND]: 'This lesson is not available.',
   [LearningResponseCode.LESSON_LOCKED]: 'This lesson is still locked.',
   [LearningResponseCode.LESSON_STEP_REQUIRED]: 'Finish the earlier step of the lesson first.',
-  [LearningResponseCode.LESSON_TEST_NOT_IN_PROGRESS]: 'There is no lesson test in progress.'
+  [LearningResponseCode.LESSON_TEST_NOT_IN_PROGRESS]: 'There is no lesson test in progress.',
+  [LearningResponseCode.MOCK_TEST_NOT_FOUND]: 'This mock test is not available.',
+  [LearningResponseCode.MOCK_TEST_NOT_IN_PROGRESS]: 'There is no mock test in progress.'
 });
 
 // data.reason of a MEDIA_INVALID error says which upload rule failed.

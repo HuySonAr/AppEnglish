@@ -27,6 +27,25 @@ export async function saveLessonDraft(id, content) {
 export async function publishLesson(id) {
   return (await httpClient.post(`/content/lessons/${id}/publish`)).data;
 }
+export async function listMockTests() {
+  return (await httpClient.get('/content/mock-tests')).data;
+}
+export async function createMockTest(payload) {
+  return (await httpClient.post('/content/mock-tests', payload)).data;
+}
+export async function updateMockTest(id, payload) {
+  return (await httpClient.patch(`/content/mock-tests/${id}`, payload)).data;
+}
+export async function getMockTest(id) {
+  return (await httpClient.get(`/content/mock-tests/${id}`)).data;
+}
+// A full mock test is a large draft; give it time.
+export async function saveMockTestDraft(id, content) {
+  return (await httpClient.put(`/content/mock-tests/${id}/draft`, content, { timeout: 30000 })).data;
+}
+export async function publishMockTest(id) {
+  return (await httpClient.post(`/content/mock-tests/${id}/publish`, undefined, { timeout: 30000 })).data;
+}
 export async function getPlacementTest() {
   return (await httpClient.get('/content/placement')).data;
 }
@@ -52,5 +71,5 @@ export async function uploadMedia({ kind, file, lessonId, section }) {
   form.set('section', section);
   form.set('file', file);
   // Uploads can be large; the default 5s client timeout is too short.
-  return (await httpClient.post('/content/media', form, { timeout: 60000 })).data;
+  return (await httpClient.post('/content/media', form, { timeout: 180000 })).data;
 }

@@ -63,6 +63,10 @@ export const TestTrend = Object.freeze({
   UNCHANGED: 'UNCHANGED'
 });
 
+// A mock test is taken in full (timed, the first attempt earns XP) or one
+// part at a time as a mini test (untimed, no XP) (D63).
+export const MockAttemptKind = Object.freeze({ FULL: 'FULL', MINI: 'MINI' });
+
 export const LESSON_TEST_DURATION_MINUTES = 25;
 // Minimum lesson-test score (percent) that completes the lesson.
 export const LESSON_PASS_PERCENT = 80;
@@ -87,5 +91,7 @@ export const LearningResponseCode = Object.freeze({
   LESSON_NOT_FOUND: 53,
   LESSON_LOCKED: 54,
   LESSON_STEP_REQUIRED: 55,
-  LESSON_TEST_NOT_IN_PROGRESS: 56
+  LESSON_TEST_NOT_IN_PROGRESS: 56,
+  MOCK_TEST_NOT_FOUND: 57,
+  MOCK_TEST_NOT_IN_PROGRESS: 58
 });

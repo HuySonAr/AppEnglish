@@ -98,3 +98,57 @@ export const LessonTestAttemptEntity = new EntitySchema({
   ],
 });
 
+// One attempt at a mock test: the full test (kind FULL, partKey '') or the
+// mini test of one part (kind MINI, partKey e.g. 'part5'). listeningScore and
+// readingScore are the estimated TOEIC section scores of a full attempt.
+export const MockAttemptEntity = new EntitySchema({
+  name: 'MockAttempt',
+  tableName: 'mock_attempts',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    accountId: { type: 'uuid' },
+    mockTestId: { type: 'uuid' },
+    mockVersionId: { type: 'uuid' },
+    kind: { type: 'varchar', length: 8 },
+    partKey: { type: 'varchar', length: 8, default: '' },
+    attemptNumber: { type: 'int' },
+    status: { type: 'varchar', length: 16 },
+    startedAt: { type: 'timestamptz' },
+    expiresAt: { type: 'timestamptz', nullable: true },
+    submittedAt: { type: 'timestamptz', nullable: true },
+    optionOrder: { type: 'jsonb', default: {} },
+    answers: { type: 'jsonb', default: {} },
+    totalCount: { type: 'int', nullable: true },
+    correctCount: { type: 'int', nullable: true },
+    listeningCorrect: { type: 'int', nullable: true },
+    listeningTotal: { type: 'int', nullable: true },
+    readingCorrect: { type: 'int', nullable: true },
+    readingTotal: { type: 'int', nullable: true },
+    listeningScore: { type: 'int', nullable: true },
+    readingScore: { type: 'int', nullable: true },
+    durationSeconds: { type: 'int', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [
+    {
+      name: 'UQ_mock_attempts_number',
+      columns: ['accountId', 'mockTestId', 'kind', 'partKey', 'attemptNumber'],
+      unique: true,
+    },
+  ],
+});
+
+// Single row (id 1): estimated section score for 0-100 right answers.
+export const ScoreConversionEntity = new EntitySchema({
+  name: 'ScoreConversion',
+  tableName: 'score_conversion',
+  columns: {
+    id: { type: 'smallint', primary: true },
+    listening: { type: 'jsonb' },
+    reading: { type: 'jsonb' },
+    updatedBy: { type: 'uuid', nullable: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+});
+

@@ -27,6 +27,7 @@ import {
   submitPlacement,
 } from '../api/placement-api.js';
 import { TestExam } from '../components/TestExam.jsx';
+import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 function Fact({ icon: Icon, title, text }) {
   return (
@@ -114,7 +115,7 @@ export function PlacementPage() {
     }
   }
 
-  if (state === 'loading') return <Skeleton className="h-96 w-full" />;
+  if (state === 'loading') return <DetailPageSkeleton />;
   if (state === 'error')
     return (
       <Button variant="outline" onClick={load}>

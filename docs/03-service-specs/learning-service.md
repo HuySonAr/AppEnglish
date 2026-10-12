@@ -3,7 +3,7 @@
 ## Trạng thái xác minh
 
 VERIFIED 2026-10-10 for placement (F03) and 2026-10-11 for the lesson flow
-(F04). Practice and mock tests (F05) are not implemented.
+(F04) and mock tests (F05A). Practice (F05B) is not implemented.
 
 ## Trách nhiệm và nghiệp vụ liên quan
 
@@ -141,6 +141,59 @@ earlier step is not finished (`data.step`), 56 no lesson test in progress.
 - No XP, no progress event yet: Reading/Listening mastery (D33) is F06 and
   will read the per-skill counts stored on each attempt.
 
+## Mock tests (F05A, D63, D64)
+
+Workflow `06-practice-mock.md`. Code in `apps/learning-service/src/mock/`.
+
+### Data (`app_learning`)
+
+Migration `1730000002000-create-mock-attempts.js`.
+
+| Table | Purpose |
+|---|---|
+| `mock_attempts` | One row per attempt: `kind` `FULL` or `MINI`, `partKey` (`''` for a full attempt), `attemptNumber` within that series, mock version, status, `startedAt`, `expiresAt` (null for a mini test), `optionOrder`, `answers`, counts per skill with their totals, `listeningScore`/`readingScore` (estimated, full attempts only), `durationSeconds`. One attempt in progress per learner for the full test and for each part |
+| `score_conversion` | Single row (id 1): `listening` and `reading`, 101 estimated section scores for 0–100 right answers. No row means the default table |
+
+### API
+
+Gateway controller `MockGatewayController`. A reference says which series a
+call is about: `{ kind: 'FULL' }` or `{ kind: 'MINI', partKey }` (query string
+on GET, body otherwise).
+
+| Method | Gateway route | RPC | Who | Purpose |
+|---|---|---|---|---|
+| GET | `/mock-tests` | `ListMockTests` | Student | Published mock tests with the learner's full attempts (count, best percent, latest estimated total), `recommended`, and `recommendedLevel` |
+| GET | `/mock-tests/:id` | `GetMockTest` | Student | The test, the full series and each part's mini series: finished attempts, `progression`, `inProgress` |
+| GET | `/mock-tests/:id/attempt` | `GetMockAttempt` | Student | The attempt in progress with its paper, or `{ status: 'NONE' }` |
+| POST | `/mock-tests/:id/attempt/start` | `StartMockAttempt` | Student | New attempt, or the one in progress |
+| PUT | `/mock-tests/:id/attempt/answers` | `SaveMockAnswers` | Student | Saves `{ answers }` chosen so far |
+| POST | `/mock-tests/:id/attempt/submit` | `SubmitMockAttempt` | Student | Scores and returns the result with the review |
+| GET | `/mock-tests/:id/review` | `GetMockReview` | Student | One finished attempt (`attemptNumber`, default the latest) with answers, explanations, transcripts |
+| GET, PUT | `/mock-tests/score-conversion` | `GetScoreConversion`, `UpdateScoreConversion` | Admin | The conversion table; 101 non-decreasing multiples of 5 from 5 to 495 per section |
+
+Codes: 57 mock test not found, 58 no mock attempt in progress.
+
+### Rules
+
+- Full attempt: `expiresAt = startedAt + durationMinutes` of the mock test, 30
+  seconds of grace, answers saved during the test; one left open is scored
+  when its time is over. Mini attempt: no time limit.
+- Both kinds can be repeated without limit and shuffle the options of Parts
+  3–7 per attempt. `countsForXp` is true only for the first full attempt of a
+  mock test; XP itself is F07.
+- Score: right answers in total and per skill. A full attempt also stores the
+  estimated section scores from the conversion table (`estimatedScores`): a
+  section with another number of questions than 100 is scaled by its share of
+  right answers. Later changes of the table do not rewrite stored attempts.
+- Suggested level (`recommendedLevel`): from the estimated total of the
+  latest full attempt (below 450: 1, below 700: 2, else 3); before any, from
+  the placement's starting unit; else 1. It never locks a test.
+- `progression` per series as in the lesson test (D62).
+- The paper carries `audioUrl` on each Part 1–2 question and on each Part
+  3–4 set (`groups`); the review adds their transcripts (D66). The graphic of
+  a Part 3–4 set is the `imageUrl` of its "Look at the graphic" question (D71).
+- An attempt keeps the mock version it started on.
+
 ## Dependencies/config
 
 - gRPC server at `LEARNING_GRPC_HOST`:`LEARNING_GRPC_PORT` (default
@@ -148,8 +201,9 @@ earlier step is not finished (`data.step`), 56 no lesson test in progress.
 - gRPC client to content-service (`CONTENT_GRPC_HOST`/`CONTENT_GRPC_PORT`),
   `src/placement/content.client.js`: `GetPlacementPaper` (published placement
   version with answers, media URLs, number of published units),
-  `GetCurriculum` (published units and lessons in order) and `GetLessonPaper`
-  (a lesson's published version with answers and media URLs).
+  `GetCurriculum` (published units and lessons in order), `GetLessonPaper`
+  (a lesson's published version with answers and media URLs),
+  `ListPublishedMockTests` and `GetMockPaper`.
 - PostgreSQL `LEARNING_DATABASE_NAME` (`app_learning`). The service loads the
   repository `.env`; run `pnpm --filter @appenglish/learning-service migration:run`.
 

@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { Logger } from '@nestjs/common';
 import { AccountRole } from '@appenglish/auth-contracts';
 import {
+  ExamFormat,
   LESSON_TEST_QUESTION_COUNT,
   LessonVersionStatus,
   MIN_PUBLISHED_LESSONS_PER_UNIT,
@@ -13,6 +14,8 @@ import { contentErrors } from './content.errors.js';
 import {
   contentMediaIds,
   lessonContentSchema,
+  mockContentSchema,
+  mockIssues,
   placementContentSchema,
   placementIssues,
   publishIssues,
@@ -49,6 +52,7 @@ function withIds(content) {
         key,
         {
           ...part,
+          ...(part.groups ? { groups: part.groups.map(identified) } : {}),
           questions: part.questions.map((question) => ({
             ...identified(question),
             options: question.options.map(identified),
@@ -291,6 +295,7 @@ export class ContentService {
     // Files of a lesson go to that lesson's folder, vocabulary apart from the test.
     let folder;
     if (input.section === MediaSection.PLACEMENT) folder = `${input.kind}/placement`;
+    else if (input.section === MediaSection.MOCK) folder = `${input.kind}/mock`;
     else if (input.lessonId) {
       const lesson = await this.repository.findLesson(input.lessonId);
       if (!lesson) throw contentErrors.lessonNotFound();
@@ -393,6 +398,246 @@ export class ContentService {
       test: version.content.test,
       media: await this.mediaOf([version], placementContentSchema),
       publishedUnitCount: await this.repository.countPublishedUnits(),
+    };
+  }
+
+  // ----- Mock tests (F05A): versioned like lessons.
+
+  // ----- Exam types (D69)
+
+  examTypeView(examType) {
+    return {
+      id: examType.id,
+      code: examType.code,
+      name: examType.name,
+      format: examType.format,
+      // Tests can be written only for a type that has an editor.
+      hasEditor: examType.format === ExamFormat.TOEIC,
+    };
+  }
+
+  // Every role may read the list: it names and filters tests.
+  async listExamTypes() {
+    return { examTypes: (await this.repository.listExamTypes()).map((item) => this.examTypeView(item)) };
+  }
+
+  assertAdmin(actor) {
+    if (actor.role !== AccountRole.ADMIN) throw contentErrors.forbiddenRole();
+  }
+
+  // Lower-case letters and digits of the name, e.g. "HSK 1" -> "hsk-1".
+  examTypeCode(name) {
+    return name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 40);
+  }
+
+  async assertExamTypeNameFree(name, exceptId) {
+    const code = this.examTypeCode(name);
+    const clash = (await this.repository.listExamTypes()).some(
+      (item) => item.id !== exceptId && (item.code === code || item.name.toLowerCase() === name.toLowerCase()),
+    );
+    if (!code || clash)
+      throw contentErrors.examTypeInvalid('NAME_TAKEN', 'An exam type with this name already exists');
+    return code;
+  }
+
+  // A new type has no editor yet; its tests come with a later feature.
+  async createExamType(actor, { name }) {
+    this.assertAdmin(actor);
+    const code = await this.assertExamTypeNameFree(name);
+    const examType = await this.repository.saveExamType({ code, name, format: null, createdBy: actor.id });
+    return { examType: this.examTypeView(examType) };
+  }
+
+  // Renames a type; its code and format stay.
+  async updateExamType(actor, examTypeId, { name }) {
+    this.assertAdmin(actor);
+    const examType = await this.repository.findExamType(examTypeId);
+    if (!examType) throw contentErrors.examTypeNotFound();
+    await this.assertExamTypeNameFree(name, examTypeId);
+    examType.name = name;
+    await this.repository.saveExamType(examType);
+    return { examType: this.examTypeView(examType) };
+  }
+
+  // ----- Mock tests
+
+  async mockView(mockTest) {
+    const examType = await this.repository.findExamType(mockTest.examTypeId);
+    return {
+      id: mockTest.id,
+      title: mockTest.title,
+      level: mockTest.level,
+      durationMinutes: mockTest.durationMinutes,
+      examType: examType ? { id: examType.id, code: examType.code, name: examType.name } : null,
+    };
+  }
+
+  questionCount(content) {
+    return Object.values(content.test).reduce((sum, part) => sum + part.questions.length, 0);
+  }
+
+  async listMockTests(actor) {
+    this.assertManager(actor);
+    const [mockTests, versions] = await Promise.all([
+      this.repository.listMockTests(),
+      this.repository.listMockVersionSummaries(),
+    ]);
+    return {
+      mockTests: await Promise.all(mockTests.map(async (mockTest) => {
+        const own = versions.filter((version) => version.mockTestId === mockTest.id);
+        return {
+          ...(await this.mockView(mockTest)),
+          createdAt: mockTest.createdAt ? new Date(mockTest.createdAt).toISOString() : null,
+          publishedVersionNumber:
+            own.find((version) => version.id === mockTest.publishedVersionId)?.versionNumber ?? null,
+          hasDraft: own.some((version) => version.status === LessonVersionStatus.DRAFT),
+        };
+      })),
+    };
+  }
+
+  async createMockTest(actor, input) {
+    this.assertManager(actor);
+    const examType = await this.repository.findExamType(input.examTypeId);
+    if (!examType) throw contentErrors.examTypeNotFound();
+    if (examType.format !== ExamFormat.TOEIC)
+      throw contentErrors.examTypeInvalid('NO_EDITOR', 'Tests cannot be written for this exam type yet');
+    const mockTest = await this.repository.saveMockTest({ ...input, publishedVersionId: null, createdBy: actor.id });
+    const draft = await this.repository.saveMockVersion({
+      mockTestId: mockTest.id,
+      versionNumber: 1,
+      status: LessonVersionStatus.DRAFT,
+      content: mockContentSchema.parse({}),
+      createdBy: actor.id,
+    });
+    return this.managedMockView(mockTest, draft, null);
+  }
+
+  async findMockOrThrow(mockTestId) {
+    const mockTest = await this.repository.findMockTest(mockTestId);
+    if (!mockTest) throw contentErrors.mockNotFound();
+    return mockTest;
+  }
+
+  // Title, level and time allowed apply at once, also to the published test.
+  async updateMockTest(actor, mockTestId, changes) {
+    this.assertManager(actor);
+    const mockTest = await this.findMockOrThrow(mockTestId);
+    for (const [field, value] of Object.entries(changes)) if (value !== undefined) mockTest[field] = value;
+    await this.repository.saveMockTest(mockTest);
+    return { mockTest: await this.mockView(mockTest) };
+  }
+
+  async publishedMockVersion(mockTest) {
+    return mockTest.publishedVersionId ? this.repository.findMockVersion(mockTest.publishedVersionId) : null;
+  }
+
+  async getMockTest(actor, mockTestId) {
+    this.assertManager(actor);
+    const mockTest = await this.findMockOrThrow(mockTestId);
+    return this.managedMockView(
+      mockTest,
+      await this.repository.findMockDraft(mockTestId),
+      await this.publishedMockVersion(mockTest),
+    );
+  }
+
+  async saveMockTestDraft(actor, mockTestId, content) {
+    this.assertManager(actor);
+    const mockTest = await this.findMockOrThrow(mockTestId);
+    let draft = await this.repository.findMockDraft(mockTestId);
+    const previous = draft ? mockContentSchema.safeParse(draft.content) : null;
+    const previousMediaIds = previous?.success ? contentMediaIds(previous.data) : [];
+    if (draft) draft.content = withIds(content);
+    else
+      draft = {
+        mockTestId,
+        versionNumber: (await this.repository.maxMockVersionNumber(mockTestId)) + 1,
+        status: LessonVersionStatus.DRAFT,
+        content: withIds(content),
+        createdBy: actor.id,
+      };
+    draft = await this.repository.saveMockVersion(draft);
+    const kept = new Set(contentMediaIds(draft.content));
+    await this.removeUnusedMedia(previousMediaIds.filter((id) => !kept.has(id)));
+    return this.managedMockView(mockTest, draft, await this.publishedMockVersion(mockTest));
+  }
+
+  async publishMockTest(actor, mockTestId) {
+    this.assertManager(actor);
+    const mockTest = await this.findMockOrThrow(mockTestId);
+    const draft = await this.repository.findMockDraft(mockTestId);
+    if (!draft) throw contentErrors.noDraft();
+    draft.content = mockContentSchema.parse(draft.content);
+    const mediaIds = contentMediaIds(draft.content);
+    const media = mediaIds.length ? await this.repository.findMediaByIds(mediaIds) : [];
+    const issues = mockIssues(draft.content, new Map(media.map((asset) => [asset.id, asset])));
+    if (issues.length) throw contentErrors.notPublishable(issues);
+    draft.status = LessonVersionStatus.PUBLISHED;
+    draft.publishedAt = new Date();
+    draft.publishedBy = actor.id;
+    mockTest.publishedVersionId = draft.id;
+    await this.repository.publishMockVersion(mockTest, draft);
+    return this.managedMockView(mockTest, null, draft);
+  }
+
+  async managedMockView(mockTest, draft, published) {
+    return {
+      mockTest: await this.mockView(mockTest),
+      media: await this.mediaOf([draft, published], mockContentSchema),
+      draft: draft ? { versionNumber: draft.versionNumber, content: draft.content } : null,
+      published: published
+        ? {
+            versionId: published.id,
+            versionNumber: published.versionNumber,
+            publishedAt: new Date(published.publishedAt).toISOString(),
+            content: published.content,
+          }
+        : null,
+    };
+  }
+
+  // For learning-service: published mock tests with the number of questions
+  // in each part.
+  async listPublishedMockTests() {
+    const mockTests = (await this.repository.listMockTests()).filter((mockTest) => mockTest.publishedVersionId);
+    return {
+      mockTests: await Promise.all(
+        mockTests.map(async (mockTest) => {
+          const version = await this.repository.findMockVersion(mockTest.publishedVersionId);
+          const content = mockContentSchema.parse(version.content);
+          return {
+            ...(await this.mockView(mockTest)),
+            questionCount: this.questionCount(content),
+            partCounts: Object.fromEntries(
+              Object.entries(content.test).map(([key, part]) => [key, part.questions.length]),
+            ),
+          };
+        }),
+      ),
+    };
+  }
+
+  // For learning-service: a mock test's published version (the current one,
+  // or the given earlier one) with answers and media URLs.
+  async getMockPaper(mockTestId, { versionId } = {}) {
+    const mockTest = await this.repository.findMockTest(mockTestId);
+    if (!mockTest?.publishedVersionId) throw contentErrors.mockNotFound();
+    const version = await this.repository.findMockVersion(versionId || mockTest.publishedVersionId);
+    if (version?.mockTestId !== mockTest.id || version.status !== LessonVersionStatus.PUBLISHED)
+      throw contentErrors.mockNotFound();
+    return {
+      mockTest: await this.mockView(mockTest),
+      versionId: version.id,
+      versionNumber: version.versionNumber,
+      test: mockContentSchema.parse(version.content).test,
+      media: await this.mediaOf([version], mockContentSchema),
     };
   }
 

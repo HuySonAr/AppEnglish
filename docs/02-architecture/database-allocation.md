@@ -77,3 +77,10 @@ services' rows without a foreign key.
 `lessonId` and `lessonVersionId` hold ids of other services' rows without a
 foreign key; `accountEmail` is a copy taken when the attempt starts.
 
+## F05A mock-test schema
+
+`content-service` adds `mock_tests` and `mock_test_versions` to `app_content`
+(migration `1720000003000-create-mock-tests.js`). `learning-service` adds
+`mock_attempts` and `score_conversion` to `app_learning` (migration
+`1730000002000-create-mock-attempts.js`).
+

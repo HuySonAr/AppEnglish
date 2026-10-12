@@ -129,7 +129,7 @@ export function VerifyEmailPage() {
             className="tracking-[0.3em]"
           />
         </div>
-        <Button
+        <Button loading={pending}
           className="w-full"
           disabled={pending}
           type="submit"

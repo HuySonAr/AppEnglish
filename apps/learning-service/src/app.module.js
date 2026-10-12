@@ -8,11 +8,15 @@ import {
   CONTENT_GRPC_CLIENT,
   LEARNING_DATA_SOURCE,
   LESSON_REPOSITORY,
+  MOCK_REPOSITORY,
   PLACEMENT_REPOSITORY,
 } from './database/database.tokens.js';
 import { LessonGrpcController } from './lesson/lesson.grpc.controller.js';
 import { LessonRepository } from './lesson/lesson.repository.js';
 import { LessonService } from './lesson/lesson.service.js';
+import { MockGrpcController } from './mock/mock.grpc.controller.js';
+import { MockRepository } from './mock/mock.repository.js';
+import { MockService } from './mock/mock.service.js';
 import { ContentClient } from './placement/content.client.js';
 import { PlacementGrpcController } from './placement/placement.grpc.controller.js';
 import { PlacementRepository } from './placement/placement.repository.js';
@@ -25,7 +29,7 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [HealthController, PlacementGrpcController, LessonGrpcController],
+  controllers: [HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController],
   providers: [
     { provide: LEARNING_DATA_SOURCE, useFactory: createLearningDataSource },
     {
@@ -36,6 +40,11 @@ Module({
     {
       provide: LESSON_REPOSITORY,
       useFactory: (dataSource) => new LessonRepository(dataSource),
+      inject: [LEARNING_DATA_SOURCE],
+    },
+    {
+      provide: MOCK_REPOSITORY,
+      useFactory: (dataSource) => new MockRepository(dataSource),
       inject: [LEARNING_DATA_SOURCE],
     },
     {
@@ -53,6 +62,12 @@ Module({
       useFactory: (repository, placementRepository, contentClient) =>
         new LessonService(repository, placementRepository, contentClient),
       inject: [LESSON_REPOSITORY, PLACEMENT_REPOSITORY, CONTENT_CLIENT],
+    },
+    {
+      provide: MockService,
+      useFactory: (repository, placementRepository, contentClient) =>
+        new MockService(repository, placementRepository, contentClient),
+      inject: [MOCK_REPOSITORY, PLACEMENT_REPOSITORY, CONTENT_CLIENT],
     },
   ],
 })(AppModule);

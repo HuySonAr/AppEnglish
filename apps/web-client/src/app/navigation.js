@@ -1,4 +1,15 @@
-import { BookOpen, ClipboardCheck, Home, LayoutDashboard, Library, Users } from 'lucide-react';
+import {
+  BookOpen,
+  Calculator,
+  ClipboardCheck,
+  FileText,
+  Home,
+  Layers,
+  LayoutDashboard,
+  Library,
+  Timer,
+  Users,
+} from 'lucide-react';
 import { Roles } from '../constants/auth.js';
 
 // The menu of each role. To add a page: add its route in router.jsx and one
@@ -10,6 +21,7 @@ export const navigation = Object.freeze({
     items: [
       { to: '/student', label: 'Home', icon: Home, end: true },
       { to: '/student/lessons', label: 'Lessons', icon: BookOpen },
+      { to: '/student/mock-tests', label: 'Mock tests', icon: Timer },
       { to: '/student/placement', label: 'Placement', icon: ClipboardCheck },
     ],
   },
@@ -24,6 +36,7 @@ export const navigation = Object.freeze({
         match: ['/content-manager/lessons'],
       },
       { to: '/content-manager/placement', label: 'Placement test', icon: ClipboardCheck },
+      { to: '/content-manager/mock-tests', label: 'Mock tests', icon: FileText },
     ],
   },
   [Roles.ADMIN]: {
@@ -32,6 +45,8 @@ export const navigation = Object.freeze({
       { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
       { to: '/admin/accounts', label: 'Accounts', icon: Users },
       { to: '/admin/placement', label: 'Placement', icon: ClipboardCheck },
+      { to: '/admin/exam-types', label: 'Exam types', icon: Layers },
+      { to: '/admin/score-conversion', label: 'Score table', icon: Calculator },
     ],
   },
 });

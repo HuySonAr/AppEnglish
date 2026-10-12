@@ -87,7 +87,7 @@ export function FillInExercise({ lessonId, fillIn, onPassed }) {
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <Button disabled={busy || passed || answers.some((answer) => !answer)} onClick={check}>
+        <Button loading={busy} disabled={busy || passed || answers.some((answer) => !answer)} onClick={check}>
           {busy ? 'Checking…' : 'Check answers'}
         </Button>
         {wrongBlanks.length ? (

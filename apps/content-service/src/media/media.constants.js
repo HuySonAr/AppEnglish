@@ -16,4 +16,5 @@ export const allowedMediaTypes = Object.freeze({
   })
 });
 
-export const defaultMaxFileSizeBytes = 10 * 1024 * 1024;
+// A mock-test part can be one long recording.
+export const defaultMaxFileSizeBytes = 40 * 1024 * 1024;

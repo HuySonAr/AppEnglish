@@ -7,7 +7,8 @@
 | F02 | Content unit/lesson/vocabulary/exercises | Content Manager tạo và xuất bản nội dung |
 | F03 | Placement | Đề cố định 23 câu, result đúng, không progress/XP |
 | F04 | Lesson flow | Review bắt buộc, gate >=80%, tuần tự |
-| F05 | Practice/mock | Attempts, scoring, history |
+| F05A | Mock tests (full + mini) | Soạn đề, làm bài, chấm, điểm ước tính, lịch sử |
+| F05B | Practice | Luyện từ vựng và luyện nghe theo D65 |
 | F06 | Progress | Reading/Listening theo policy đã chốt |
 | F07 | XP/leaderboard | Mock best score, không XP trùng |
 | F08 | Client integration/e2e | Luồng đầu cuối đạt acceptance |

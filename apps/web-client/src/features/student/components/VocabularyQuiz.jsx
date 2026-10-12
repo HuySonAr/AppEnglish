@@ -4,6 +4,7 @@ import { notify } from '../../../lib/notify.js';
 import { Badge, Button, Skeleton } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import { getVocabularyQuiz, submitVocabularyQuiz } from '../api/lessons-api.js';
+import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 const optionLetters = ['A', 'B', 'C', 'D'];
 
@@ -59,7 +60,7 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
     }
   }
 
-  if (state === 'loading') return <Skeleton className="h-64 w-full" />;
+  if (state === 'loading') return <RowsSkeleton rows={3} tall />;
   if (state === 'error')
     return (
       <Button variant="outline" onClick={load}>
@@ -127,7 +128,7 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
         })}
       </ol>
       <div className="flex flex-wrap items-center gap-3">
-        <Button disabled={busy || passed || answered < questions.length} onClick={check}>
+        <Button loading={busy} disabled={busy || passed || answered < questions.length} onClick={check}>
           {busy ? 'Checking…' : 'Check answers'}
         </Button>
         <span className="text-sm text-muted-foreground">

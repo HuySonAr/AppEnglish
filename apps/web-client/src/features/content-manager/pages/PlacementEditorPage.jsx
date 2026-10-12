@@ -31,6 +31,7 @@ import {
 } from '../../../components/ui';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { PartEditor, questionRange } from '../components/PartEditor.jsx';
+import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 const saveErrorMessage = (error) =>
   `${error?.fileName ? `${error.fileName}: ` : ''}${getApiErrorMessage(error)}`;
@@ -146,7 +147,7 @@ export function PlacementEditorPage() {
     }
   }
 
-  if (state === 'loading') return <Skeleton className="h-96 w-full" />;
+  if (state === 'loading') return <EditorPageSkeleton />;
   if (state === 'error')
     return (
       <Button variant="outline" onClick={load}>
@@ -171,7 +172,7 @@ export function PlacementEditorPage() {
         {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
         {dirty ? <Badge variant="info">Unsaved changes</Badge> : null}
         <div className="ml-auto flex gap-2">
-          <Button variant="outline" disabled={busy || !dirty} onClick={onSave}>
+          <Button loading={busy} variant="outline" disabled={busy || !dirty} onClick={onSave}>
             {busy ? 'Working…' : 'Save draft'}
           </Button>
           <Button disabled={busy || !(dirty || status.hasDraft)} onClick={onPublish}>

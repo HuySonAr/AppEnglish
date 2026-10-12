@@ -108,7 +108,7 @@ export function RegisterPage() {
             </p>
           )}
         </div>
-        <Button
+        <Button loading={form.formState.isSubmitting}
           className="w-full"
           disabled={form.formState.isSubmitting}
           type="submit"

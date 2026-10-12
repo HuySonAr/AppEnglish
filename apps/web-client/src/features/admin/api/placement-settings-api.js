@@ -6,3 +6,9 @@ export async function getPlacementSettings() {
 export async function updatePlacementSettings(settings) {
   return (await httpClient.put('/placement/settings', settings)).data;
 }
+export async function getScoreConversion() {
+  return (await httpClient.get('/mock-tests/score-conversion')).data;
+}
+export async function updateScoreConversion(conversion) {
+  return (await httpClient.put('/mock-tests/score-conversion', conversion)).data;
+}

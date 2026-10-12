@@ -75,7 +75,7 @@ export function ResetPasswordPage() {
             disabled={pending}
           />
         </div>
-        <Button
+        <Button loading={pending}
           className="w-full"
           disabled={pending}
           type="submit"

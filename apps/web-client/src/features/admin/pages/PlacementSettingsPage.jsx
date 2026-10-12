@@ -7,6 +7,7 @@ import {
   getPlacementSettings,
   updatePlacementSettings,
 } from '../api/placement-settings-api.js';
+import { FormPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 // Whole percent between 1 and 100, or null.
 function percent(text) {
@@ -50,7 +51,7 @@ export function PlacementSettingsPage() {
     load();
   }, []);
 
-  if (state === 'loading') return <Skeleton className="h-64 w-full" />;
+  if (state === 'loading') return <FormPageSkeleton />;
   if (state === 'error')
     return (
       <Button variant="outline" onClick={load}>
@@ -128,7 +129,7 @@ export function PlacementSettingsPage() {
           Changes apply to tests finished from now on; earlier results keep
           their starting unit.
         </p>
-        <Button type="submit" disabled={busy || Boolean(problem) || !changed}>
+        <Button loading={busy} type="submit" disabled={busy || Boolean(problem) || !changed}>
           {busy ? 'Saving…' : 'Save'}
         </Button>
       </form>

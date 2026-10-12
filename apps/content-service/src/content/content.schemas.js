@@ -3,6 +3,13 @@ import { AccountRole } from '@appenglish/auth-contracts';
 import {
   FILL_IN_BLANK,
   LESSON_TEST_PARTS,
+  MOCK_GROUPED_PARTS,
+  MOCK_GROUP_AUDIO_PARTS,
+  MOCK_GRAPHIC_SET_INDEXES,
+  MOCK_SET_QUESTION_COUNT,
+  MOCK_TEST_PART_COUNTS,
+  MOCK_QUESTION_AUDIO_PARTS,
+  MOCK_TEST_LEVELS,
   MediaKind,
   MediaSection,
   PartOfSpeech,
@@ -64,6 +71,8 @@ const questionSchema = z
     audioMediaId: mediaId,
     transcript: text(2000).default(''),
     imageMediaId: mediaId,
+    // Mock tests only: the passage group the question belongs to.
+    groupId: z.string().uuid().nullable().default(null),
     options: z.array(optionSchema).max(4).default([]),
     explanation: text(2000).default(''),
   })
@@ -127,6 +136,53 @@ export const lessonContentSchema = z
 // The placement test is one seven-part test (D46).
 export const placementContentSchema = z.object({ test: testSchema }).strict();
 
+// A mock-test part: like a lesson-test part, with as many questions as the
+// test needs and, in Parts 3, 4, 6 and 7, sets (`groups`) the questions refer
+// to: a recording with its transcript, or a passage.
+const mockPartSchema = partSchema.extend({
+  groups: z
+    .array(
+      z
+        .object({
+          id: optionalId,
+          audioMediaId: mediaId,
+          transcript: text(10000).default(''),
+          passage: text(10000).default(''),
+          imageMediaId: mediaId,
+        })
+        .strict(),
+    )
+    .max(40)
+    .default([]),
+  questions: z.array(questionSchema).max(100).default([]),
+});
+
+export const mockContentSchema = z
+  .object({
+    test: z
+      .object(
+        Object.fromEntries(LESSON_TEST_PARTS.map((part) => [part.key, mockPartSchema.default({})])),
+      )
+      .strict()
+      .default({}),
+  })
+  .strict();
+
+export const examTypeSchema = z.object({ name: requiredText(100) }).strict();
+
+const mockMeta = {
+  title: requiredText(200),
+  level: z.number().int().refine((value) => MOCK_TEST_LEVELS.includes(value), { message: 'Level must be 1, 2 or 3' }),
+  durationMinutes: z.number().int().min(1).max(300),
+};
+export const mockCreateSchema = z.object({ ...mockMeta, examTypeId: z.string().uuid() }).strict();
+export const mockUpdateSchema = z
+  .object({ title: mockMeta.title.optional(), level: mockMeta.level.optional(), durationMinutes: mockMeta.durationMinutes.optional() })
+  .strict()
+  .refine((value) => Object.values(value).some((field) => field !== undefined), {
+    message: 'At least one field is required',
+  });
+
 export const placementPaperSchema = z.object({ versionId: z.string().uuid().optional() }).strict();
 
 export const pronunciationSchema = z
@@ -159,6 +215,7 @@ export function contentMediaIds(content) {
     ...parts.flatMap((part) => [
       part.audioMediaId,
       part.imageMediaId,
+      ...(part.groups || []).flatMap((group) => [group.audioMediaId, group.imageMediaId]),
       ...part.questions.flatMap((question) => [
         question.audioMediaId,
         question.imageMediaId,
@@ -273,3 +330,76 @@ function testIssues(test, issues, mediaById) {
     });
   }
 }
+
+// Returns the reasons a mock-test draft cannot be published. A mock test may
+// hold any number of questions, but every part needs at least one (D63).
+export function mockIssues(content, mediaById) {
+  const issues = [];
+  const { issue, required, requiredMedia, requiredAudio } = issueChecks(issues, mediaById);
+  for (const spec of LESSON_TEST_PARTS) {
+    const part = content.test[spec.key];
+    const partPath = `test.${spec.key}`;
+    const grouped = MOCK_GROUPED_PARTS.includes(spec.key);
+    const groupAudio = MOCK_GROUP_AUDIO_PARTS.includes(spec.key);
+    const groupNoun = groupAudio ? 'recording' : 'passage';
+    if (!part.questions.length) issue(`${partPath}.questions`, `Part ${spec.number} needs at least one question`);
+    if (part.questions.length > MOCK_TEST_PART_COUNTS[spec.key])
+      issue(`${partPath}.questions`, `Part ${spec.number} has at most ${MOCK_TEST_PART_COUNTS[spec.key]} questions`);
+    if (grouped) {
+      if (!part.groups.length) issue(`${partPath}.groups`, `Part ${spec.number} needs at least one ${groupNoun}`);
+      part.groups.forEach((group, index) => {
+        const path = `${partPath}.groups[${index}]`;
+        const count = part.questions.filter((question) => question.groupId === group.id).length;
+        // A set is a recording with its transcript (Parts 3-4) or a passage.
+        if (groupAudio) requiredAudio(path, group);
+        else required(`${path}.passage`, group.passage);
+        if (!count) issue(path, `The ${groupNoun} needs at least one question`);
+        if (groupAudio && count > MOCK_SET_QUESTION_COUNT)
+          issue(path, `The ${groupNoun} has at most ${MOCK_SET_QUESTION_COUNT} questions`);
+        if (spec.group.blanks && group.passage && countBlanks(group.passage) !== count)
+          issue(`${path}.passage`, `The passage has ${countBlanks(group.passage)} blanks (${FILL_IN_BLANK}) but ${count} questions`);
+        if (group.imageMediaId) requiredMedia(`${path}.imageMediaId`, group.imageMediaId, MediaKind.IMAGE);
+        // Parts 3-4: the graphic sets have it on exactly one question (D71).
+        if (groupAudio) {
+          const graphics = part.questions.filter((question) => question.groupId === group.id && question.imageMediaId).length;
+          const graphicSets = MOCK_GRAPHIC_SET_INDEXES[spec.key];
+          if (!graphicSets.includes(index)) {
+            if (graphics)
+              issue(`${path}.imageMediaId`, `Only ${groupNoun}s ${graphicSets[0] + 1}–${graphicSets.at(-1) + 1} of Part ${spec.number} have a graphic`);
+          } else if (graphics !== 1)
+            issue(`${path}.imageMediaId`, `Exactly one question of the ${groupNoun} needs a graphic`);
+        }
+      });
+    }
+    part.questions.forEach((question, index) => {
+      const path = `${partPath}.questions[${index}]`;
+      if (grouped && !part.groups.some((group) => group.id === question.groupId))
+        issue(path, `The question does not belong to a ${groupNoun}`);
+      // Parts 1 and 2: every question has its own recording.
+      if (MOCK_QUESTION_AUDIO_PARTS.includes(spec.key)) requiredAudio(path, question);
+      if (spec.question.prompt) required(`${path}.prompt`, question.prompt);
+      if (spec.question.image || (groupAudio && question.imageMediaId))
+        requiredMedia(`${path}.imageMediaId`, question.imageMediaId, MediaKind.IMAGE);
+      required(`${path}.explanation`, question.explanation);
+      if (question.options.length !== spec.optionCount)
+        issue(`${path}.options`, `Exactly ${spec.optionCount} options are required`);
+      if (question.options.filter((option) => option.isCorrect).length !== 1)
+        issue(`${path}.options`, 'Exactly one option must be correct');
+      if (spec.option.text) {
+        const texts = question.options.map((option) => lower(option.text));
+        if (texts.some((value) => !value)) issue(`${path}.options`, 'Every option needs text');
+        else if (duplicates(texts)) issue(`${path}.options`, 'Options must be different');
+      }
+    });
+  }
+  const parts = Object.values(content.test);
+  const questions = parts.flatMap((part) => part.questions);
+  const ids = [
+    ...parts.flatMap((part) => part.groups),
+    ...questions,
+    ...questions.flatMap((question) => question.options),
+  ].map((item) => item.id);
+  if (duplicates(ids)) issue('content', 'Item ids must be unique');
+  return issues;
+}
+

@@ -1,8 +1,11 @@
 import { DataSource } from 'typeorm';
 import {
+  ExamTypeEntity,
   LessonEntity,
   LessonVersionEntity,
   MediaAssetEntity,
+  MockTestEntity,
+  MockTestVersionEntity,
   PlacementVersionEntity,
   UnitEntity,
 } from './content.entities.js';
@@ -15,7 +18,16 @@ export function createContentDataSource() {
     username: process.env.POSTGRES_USER || 'postgres',
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.CONTENT_DATABASE_NAME || 'app_content',
-    entities: [UnitEntity, LessonEntity, LessonVersionEntity, MediaAssetEntity, PlacementVersionEntity],
+    entities: [
+      UnitEntity,
+      LessonEntity,
+      LessonVersionEntity,
+      MediaAssetEntity,
+      PlacementVersionEntity,
+      MockTestEntity,
+      MockTestVersionEntity,
+      ExamTypeEntity,
+    ],
     migrations: ['src/database/migrations/*.js'],
   });
 }

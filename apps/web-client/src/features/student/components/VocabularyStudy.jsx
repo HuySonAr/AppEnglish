@@ -30,7 +30,7 @@ export function VocabularyStudy({ vocabulary, done, busy, onAllOpened }) {
           Open every word to see its meaning: {opened.size} of {vocabulary.length} opened.
         </p>
         {done ? null : (
-          <Button disabled={!allOpened || busy} onClick={onAllOpened}>
+          <Button loading={busy} disabled={!allOpened || busy} onClick={onAllOpened}>
             {busy ? 'Saving…' : 'I have studied these words'}
           </Button>
         )}

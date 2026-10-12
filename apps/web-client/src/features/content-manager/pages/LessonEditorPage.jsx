@@ -46,6 +46,7 @@ import {
 import { PartEditor, questionRange } from '../components/PartEditor.jsx';
 import { TextField } from '../components/TextField.jsx';
 import { VocabularyCard } from '../components/VocabularyCard.jsx';
+import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 const saveErrorMessage = (error) =>
   `${error?.fileName ? `${error.fileName}: ` : ''}${getApiErrorMessage(error)}`;
@@ -270,7 +271,7 @@ export function LessonEditorPage() {
     }
   }
 
-  if (state === 'loading') return <Skeleton className="h-96 w-full" />;
+  if (state === 'loading') return <EditorPageSkeleton />;
   if (state === 'error')
     return (
       <div className="space-y-4">
@@ -333,7 +334,7 @@ export function LessonEditorPage() {
             >
               Rename
             </Button>
-            <Button
+            <Button loading={busy}
               variant="outline"
               disabled={busy || !dirty}
               onClick={onSave}

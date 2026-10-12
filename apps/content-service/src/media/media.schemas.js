@@ -16,5 +16,5 @@ export const mediaObjectSchema = z.object({
   mimeType: z.string().min(1),
   sizeBytes: z.number().int().positive(),
   url: z.string().url(),
-  storage: z.enum(['local', 'imagekit'])
+  storage: z.enum(['local', 'imagekit', 'r2'])
 });

@@ -1,8 +1,11 @@
 import { In } from 'typeorm';
 import {
+  ExamTypeEntity,
   LessonEntity,
   LessonVersionEntity,
   MediaAssetEntity,
+  MockTestEntity,
+  MockTestVersionEntity,
   PlacementVersionEntity,
   UnitEntity,
 } from '../database/content.entities.js';
@@ -121,10 +124,10 @@ export class ContentRepository {
     await (await this.repo(MediaAssetEntity)).delete({ id });
   }
 
-  // True when any saved lesson or placement version, draft or published,
-  // refers to the media.
+  // True when any saved lesson, placement or mock-test version, draft or
+  // published, refers to the media.
   async isMediaReferenced(id) {
-    for (const entity of [LessonVersionEntity, PlacementVersionEntity]) {
+    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity]) {
       const count = await (await this.repo(entity))
         .createQueryBuilder('version')
         .where('CAST(version.content AS text) LIKE :pattern', { pattern: `%${id}%` })
@@ -132,6 +135,61 @@ export class ContentRepository {
       if (count > 0) return true;
     }
     return false;
+  }
+
+  async listExamTypes() {
+    return (await this.repo(ExamTypeEntity)).find({ order: { createdAt: 'ASC' } });
+  }
+
+  async findExamType(id) {
+    return (await this.repo(ExamTypeEntity)).findOne({ where: { id } });
+  }
+
+  async saveExamType(examType) {
+    return (await this.repo(ExamTypeEntity)).save(examType);
+  }
+
+  async listMockTests() {
+    return (await this.repo(MockTestEntity)).find({ order: { level: 'ASC', createdAt: 'ASC' } });
+  }
+
+  async findMockTest(id) {
+    return (await this.repo(MockTestEntity)).findOne({ where: { id } });
+  }
+
+  async saveMockTest(mockTest) {
+    return (await this.repo(MockTestEntity)).save(mockTest);
+  }
+
+  // Version metadata without the content payload.
+  async listMockVersionSummaries() {
+    return (await this.repo(MockTestVersionEntity)).find({
+      select: { id: true, mockTestId: true, versionNumber: true, status: true },
+    });
+  }
+
+  async findMockDraft(mockTestId) {
+    return (await this.repo(MockTestVersionEntity)).findOne({ where: { mockTestId, status: 'DRAFT' } });
+  }
+
+  async findMockVersion(id) {
+    return (await this.repo(MockTestVersionEntity)).findOne({ where: { id } });
+  }
+
+  async maxMockVersionNumber(mockTestId) {
+    return (await (await this.repo(MockTestVersionEntity)).maximum('versionNumber', { mockTestId })) || 0;
+  }
+
+  async saveMockVersion(version) {
+    return (await this.repo(MockTestVersionEntity)).save(version);
+  }
+
+  async publishMockVersion(mockTest, version) {
+    await this.repo(MockTestEntity);
+    return this.dataSource.transaction(async (manager) => {
+      await manager.getRepository(MockTestVersionEntity).save(version);
+      await manager.getRepository(MockTestEntity).save(mockTest);
+    });
   }
 
   async countPublishedUnits() {

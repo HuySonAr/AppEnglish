@@ -57,6 +57,26 @@ Development and tests default to `MEDIA_STORAGE_ADAPTER=local`. Set
 `storage/media` is ignored except for `.gitkeep`. F02A has no upload route, so
 this adapter is only a service-level dependency for later content modules.
 
+### Cloudflare R2 (D67)
+
+Set `MEDIA_STORAGE_ADAPTER=r2` and fill `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
+`R2_SECRET_ACCESS_KEY`, `R2_BUCKET` and `R2_PUBLIC_BASE_URL` (the bucket's
+public address, e.g. its `r2.dev` URL or a custom domain, without a path). The
+API token needs read and write access to objects of that bucket; the bucket
+needs public access enabled so learners can play the files. All five values
+are required or content-service does not start. To move the files already on
+ImageKit, keep the ImageKit keys in place and run once:
+
+```powershell
+pnpm --filter @appenglish/content-service media:migrate-to-r2
+```
+
+It copies each ImageKit file to R2 under the same folder, updates its
+`media_assets` row and then deletes the ImageKit copy; files that cannot be
+copied exactly are left alone and listed.
+
+### ImageKit
+
 To upload to ImageKit (also possible locally), set `MEDIA_STORAGE_ADAPTER=imagekit`,
 `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, and `IMAGEKIT_URL_ENDPOINT` in a
 runtime secret store. Never put the private key in the web client or any

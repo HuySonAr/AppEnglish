@@ -6,6 +6,7 @@ import path from 'node:path';
 import { MediaKind } from '../src/media/media.constants.js';
 import { createMediaStorage } from '../src/media/media-storage.factory.js';
 import { ImageKitMediaStorageAdapter } from '../src/media/imagekit-media-storage.adapter.js';
+import { R2MediaStorageAdapter } from '../src/media/r2-media-storage.adapter.js';
 
 const audio = (overrides = {}) => ({
   kind: MediaKind.AUDIO,
@@ -93,3 +94,43 @@ test('imagekit adapter is not selected without explicit credentials', () => {
   assert.equal(adapter.constructor.name, 'LocalMediaStorageAdapter');
   assert.throws(() => createMediaStorage({ MEDIA_STORAGE_ADAPTER: 'imagekit' }), /credentials are required/);
 });
+
+test('r2 adapter stores under the folder, returns the public URL and deletes by key', async () => {
+  const sent = [];
+  const local = [];
+  const adapter = new R2MediaStorageAdapter({
+    client: { send: async (command) => sent.push([command.constructor.name, command.input]) },
+    bucket: 'appenglish-media',
+    publicBaseUrl: 'https://media.example.test/',
+    otherStorages: { local: { delete: async (asset) => local.push(asset.storageId) } },
+  });
+  const stored = await adapter.upload(audio({ fileName: 'Part 1 (final).mp3', folder: 'audio/unit1-lesson2/test' }));
+  assert.equal(stored.storage, 'r2');
+  assert.match(stored.id, /^appenglish\/audio\/unit1-lesson2\/test\/[0-9a-f-]{36}-Part_1__final_.mp3$/);
+  assert.equal(stored.url, `https://media.example.test/${stored.id}`);
+  assert.deepEqual(sent[0][0], 'PutObjectCommand');
+  assert.deepEqual({ ...sent[0][1], Body: sent[0][1].Body.length }, { Bucket: 'appenglish-media', Key: stored.id, Body: 3, ContentType: 'audio/mpeg' });
+  // Without a folder files go by kind; the same rules apply as elsewhere.
+  assert.match((await adapter.upload(audio())).id, /^appenglish\/audio\/[0-9a-f-]{36}-question.mp3$/);
+  await assert.rejects(() => adapter.upload(audio({ mimeType: 'audio/wav' })), { code: 'MEDIA_MIME_TYPE_NOT_ALLOWED' });
+
+  await adapter.delete({ storage: 'r2', storageId: stored.id });
+  assert.deepEqual(sent.at(-1), ['DeleteObjectCommand', { Bucket: 'appenglish-media', Key: stored.id }]);
+  // Files stored before R2 was enabled are deleted where they are.
+  await adapter.delete({ storage: 'local', storageId: 'old-local' });
+  assert.deepEqual(local, ['old-local']);
+  await assert.rejects(() => adapter.delete({ storage: 'imagekit', storageId: 'ik-1' }), /not configured/);
+});
+
+test('r2 adapter is selected only with its settings', () => {
+  const settings = { MEDIA_STORAGE_ADAPTER: 'r2', R2_ACCOUNT_ID: 'account', R2_ACCESS_KEY_ID: 'key', R2_SECRET_ACCESS_KEY: 'secret', R2_BUCKET: 'bucket', R2_PUBLIC_BASE_URL: 'https://media.example.test' };
+  const adapter = createMediaStorage(settings);
+  assert.equal(adapter.constructor.name, 'R2MediaStorageAdapter');
+  assert.deepEqual(Object.keys(adapter.otherStorages), ['local']);
+  // With the ImageKit keys present, files left there can still be deleted.
+  const both = createMediaStorage({ ...settings, IMAGEKIT_PRIVATE_KEY: 'private', IMAGEKIT_PUBLIC_KEY: 'public', IMAGEKIT_URL_ENDPOINT: 'https://ik.imagekit.io/demo' });
+  assert.deepEqual(Object.keys(both.otherStorages), ['local', 'imagekit']);
+  for (const missing of ['R2_ACCOUNT_ID', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_BUCKET', 'R2_PUBLIC_BASE_URL'])
+    assert.throws(() => createMediaStorage({ ...settings, [missing]: '' }), /are required/, missing);
+});
+

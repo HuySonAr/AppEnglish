@@ -6,9 +6,14 @@ import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { Badge, Button, Skeleton } from '../../../components/ui';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
+import { FilterSelect, SearchField } from '../../../components/shared/ListFilter.jsx';
+import { Pagination } from '../../../components/shared/Pagination.jsx';
+import { paginate } from '../../../lib/list.js';
+import { filterCurriculum, lessonStateOptions } from '../lib/student-list.js';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { cn } from '../../../lib/utils.js';
 import { getCurriculum } from '../api/lessons-api.js';
+import { ListPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 function LessonRow({ lesson }) {
   const locked = lesson.state === LessonState.LOCKED;
@@ -56,10 +61,19 @@ function LessonRow({ lesson }) {
   );
 }
 
+const UNITS_PER_PAGE = 5;
+
 // Units and lessons with what is open, locked and completed for the learner.
 export function LessonsPage() {
   const [state, setState] = useState('loading');
   const [curriculum, setCurriculum] = useState(null);
+  // Search and filter of the list; changing one goes back to page 1.
+  const [filters, setFilters] = useState({ search: '', state: 'all' });
+  const [page, setPage] = useState(1);
+  const setFilter = (name) => (value) => {
+    setFilters((current) => ({ ...current, [name]: value }));
+    setPage(1);
+  };
 
   async function load() {
     setState('loading');
@@ -80,13 +94,16 @@ export function LessonsPage() {
     load();
   }, []);
 
-  if (state === 'loading') return <Skeleton className="h-96 w-full" />;
+  if (state === 'loading') return <ListPageSkeleton rows={6} />;
   if (state === 'error')
     return (
       <Button variant="outline" onClick={load}>
         Try again
       </Button>
     );
+
+  // Lessons stay in learning order; the list is searched, filtered and paged by unit.
+  const shown = paginate(filterCurriculum(curriculum.units, filters), page, UNITS_PER_PAGE);
 
   return (
     <section className="space-y-6">
@@ -111,7 +128,15 @@ export function LessonsPage() {
       {curriculum.units.length === 0 ? (
         <EmptyState icon={BookOpen} title="No lessons yet" description="Lessons will appear here when they are published." />
       ) : (
-        curriculum.units.map((unit) => (
+        <>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search units and lessons by title" />
+          <FilterSelect label="Lesson state" value={filters.state} onChange={setFilter('state')} options={lessonStateOptions} />
+        </div>
+        {shown.total === 0 ? (
+          <EmptyState icon={BookOpen} title="No lesson matches" description="Try another search or filter." />
+        ) : null}
+        {shown.items.map((unit) => (
           <div key={unit.id} className="overflow-hidden rounded-xl border bg-card shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/40 px-4 py-3">
               <div className="min-w-0">
@@ -134,7 +159,9 @@ export function LessonsPage() {
               </ul>
             )}
           </div>
-        ))
+        ))}
+        <Pagination page={shown.page} pageCount={shown.pageCount} total={shown.total} noun="unit" onChange={setPage} />
+        </>
       )}
     </section>
   );

@@ -6,11 +6,15 @@ import { ContentError } from './content.errors.js';
 import { ContentService } from './content.service.js';
 import {
   actorSchema,
+  examTypeSchema,
   idSchema,
   lessonContentSchema,
   lessonCreateSchema,
   lessonUpdateSchema,
   mediaUploadSchema,
+  mockContentSchema,
+  mockCreateSchema,
+  mockUpdateSchema,
   placementContentSchema,
   placementPaperSchema,
   pronunciationSchema,
@@ -73,6 +77,40 @@ const rpcs = {
     internal: true,
     payload: placementPaperSchema,
     run: (service, { payload }) => service.getPlacementPaper(payload),
+  },
+  ListExamTypes: { run: (service) => service.listExamTypes() },
+  CreateExamType: {
+    payload: examTypeSchema,
+    run: (service, { actor, payload }) => service.createExamType(actor, payload),
+  },
+  UpdateExamType: {
+    id: true,
+    payload: examTypeSchema,
+    run: (service, { actor, id, payload }) => service.updateExamType(actor, id, payload),
+  },
+  ListMockTests: { run: (service, { actor }) => service.listMockTests(actor) },
+  CreateMockTest: {
+    payload: mockCreateSchema,
+    run: (service, { actor, payload }) => service.createMockTest(actor, payload),
+  },
+  UpdateMockTest: {
+    id: true,
+    payload: mockUpdateSchema,
+    run: (service, { actor, id, payload }) => service.updateMockTest(actor, id, payload),
+  },
+  GetMockTest: { id: true, run: (service, { actor, id }) => service.getMockTest(actor, id) },
+  SaveMockTestDraft: {
+    id: true,
+    payload: mockContentSchema,
+    run: (service, { actor, id, payload }) => service.saveMockTestDraft(actor, id, payload),
+  },
+  PublishMockTest: { id: true, run: (service, { actor, id }) => service.publishMockTest(actor, id) },
+  ListPublishedMockTests: { internal: true, run: (service) => service.listPublishedMockTests() },
+  GetMockPaper: {
+    internal: true,
+    id: true,
+    payload: placementPaperSchema,
+    run: (service, { id, payload }) => service.getMockPaper(id, payload),
   },
   GetCurriculum: { internal: true, run: (service) => service.getCurriculum() },
   GetLessonPaper: {

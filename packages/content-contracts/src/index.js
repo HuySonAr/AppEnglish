@@ -22,7 +22,8 @@ export const MediaKind = Object.freeze({
 export const MediaSection = Object.freeze({
   VOCABULARY: 'vocabulary',
   TEST: 'test',
-  PLACEMENT: 'placement'
+  PLACEMENT: 'placement',
+  MOCK: 'mock'
 });
 
 export const Accent = Object.freeze({ UK: 'uk', US: 'us' });
@@ -68,6 +69,45 @@ export const LESSON_TEST_PARTS = Object.freeze([
   return Object.freeze({ ...part, firstQuestionNumber });
 }));
 
+// Mock tests (F05A) use the same seven parts with the question counts of a
+// full TOEIC test (200 questions, 120 minutes). A mock test may hold fewer
+// questions; these are the counts the editor aims for. Audio in a mock test
+// (D66): Parts 1 and 2 have one recording per question; Parts 3 and 4 are made
+// of sets, one recording (a conversation or a talk) with its questions,
+// usually three. Parts 6 and 7 are made of sets too: one passage with its
+// questions.
+export const MOCK_TEST_PART_COUNTS = Object.freeze({
+  part1: 6,
+  part2: 25,
+  part3: 39,
+  part4: 30,
+  part5: 30,
+  part6: 16,
+  part7: 54
+});
+export const MOCK_TEST_DURATION_MINUTES = 120;
+
+// How the tests of an exam type are written and taken (D69). An exam type
+// without a format has no editor yet, so no test can be created for it.
+export const ExamFormat = Object.freeze({ TOEIC: 'toeic' });
+export const MOCK_TEST_LEVELS = Object.freeze([1, 2, 3]);
+// Parts whose questions belong to sets (`groups`) in a mock test, and what a
+// set holds: a recording or a passage.
+export const MOCK_GROUPED_PARTS = Object.freeze(['part3', 'part4', 'part6', 'part7']);
+export const MOCK_GROUP_AUDIO_PARTS = Object.freeze(['part3', 'part4']);
+// Questions of one conversation (Part 3) or talk (Part 4); a set cannot hold
+// more, and a part cannot hold more than its MOCK_TEST_PART_COUNTS (D72).
+export const MOCK_SET_QUESTION_COUNT = 3;
+// The sets of Parts 3 and 4 that come with a graphic (0-based: conversations
+// 11-13 and talks 9-10 of a full test). One question of such a set, usually
+// the middle one, is the "Look at the graphic" question and holds the image.
+export const MOCK_GRAPHIC_SET_INDEXES = Object.freeze({
+  part3: Object.freeze([10, 11, 12]),
+  part4: Object.freeze([8, 9])
+});
+// Parts where each question has its own recording in a mock test.
+export const MOCK_QUESTION_AUDIO_PARTS = Object.freeze(['part1', 'part2']);
+
 export const LESSON_TEST_QUESTION_COUNT = LESSON_TEST_PARTS.reduce(
   (total, part) => total + part.questionCount,
   0
@@ -88,5 +128,6 @@ export const ContentResponseCode = Object.freeze({
   CONTENT_INVALID_STATE: 41,
   CONTENT_NOT_PUBLISHABLE: 42,
   MEDIA_INVALID: 43,
-  PRONUNCIATION_UNAVAILABLE: 44
+  PRONUNCIATION_UNAVAILABLE: 44,
+  EXAM_TYPE_INVALID: 45
 });

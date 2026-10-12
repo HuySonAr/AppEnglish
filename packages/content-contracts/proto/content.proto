@@ -29,6 +29,21 @@ service ContentService {
   // and lessons in order, and one lesson's published version with answers.
   rpc GetCurriculum(ContentRequest) returns (ContentReply);
   rpc GetLessonPaper(ContentRequest) returns (ContentReply);
+  // Exam types (D69): any role lists them, an Admin adds and renames them.
+  rpc ListExamTypes(ContentRequest) returns (ContentReply);
+  rpc CreateExamType(ContentRequest) returns (ContentReply);
+  rpc UpdateExamType(ContentRequest) returns (ContentReply);
+  // Mock tests (F05A), edited and published by a Content Manager.
+  rpc ListMockTests(ContentRequest) returns (ContentReply);
+  rpc CreateMockTest(ContentRequest) returns (ContentReply);
+  rpc UpdateMockTest(ContentRequest) returns (ContentReply);
+  rpc GetMockTest(ContentRequest) returns (ContentReply);
+  rpc SaveMockTestDraft(ContentRequest) returns (ContentReply);
+  rpc PublishMockTest(ContentRequest) returns (ContentReply);
+  // Service-to-service only (learning-service): published mock tests, and
+  // one of them with its answers.
+  rpc ListPublishedMockTests(ContentRequest) returns (ContentReply);
+  rpc GetMockPaper(ContentRequest) returns (ContentReply);
 }
 
 // The authenticated account as verified by auth-service.

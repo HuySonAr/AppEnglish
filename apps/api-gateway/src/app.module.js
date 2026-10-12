@@ -10,6 +10,7 @@ import {
   LEARNING_GRPC_CLIENT,
   LearningGatewayController,
   LessonGatewayController,
+  MockGatewayController,
 } from './learning/learning-gateway.controller.js';
 
 export class AppModule {}
@@ -27,5 +28,6 @@ Module({
     ContentGatewayController,
     LearningGatewayController,
     LessonGatewayController,
+    MockGatewayController,
   ],
 })(AppModule);

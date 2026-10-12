@@ -82,9 +82,11 @@ export function TestProgression({ attempts, progression, passPercent }) {
             </li>
           ))}
         </ol>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Green bars reached the pass mark of {passPercent}%.
-        </p>
+        {passPercent ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Green bars reached the pass mark of {passPercent}%.
+          </p>
+        ) : null}
       </div>
     </div>
   );

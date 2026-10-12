@@ -92,3 +92,12 @@ lesson papers from content-service through `GetCurriculum` and
 `GetLessonPaper`. No RabbitMQ event is defined yet; F06 decides how lesson
 results reach progress.
 
+## F05A mock-test contract
+
+**VERIFIED (2026-10-11):** the gateway exposes nine `/mock-tests/*` routes
+relayed to `appenglish.learning.v1.LearningService` and six
+`/content/mock-tests*` routes for the Content Manager. learning-service reads
+published mock tests through `ListPublishedMockTests` and `GetMockPaper`. No
+RabbitMQ event is defined; F06/F07 decide how mock results reach progress and
+XP (each attempt already carries per-skill counts and `countsForXp`).
+

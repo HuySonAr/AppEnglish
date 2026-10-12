@@ -23,6 +23,13 @@ export const contentErrors = Object.freeze({
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Lesson was not found', 404),
   mediaNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Media was not found', 404),
+  examTypeNotFound: () =>
+    new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Exam type was not found', 404),
+  // reason: NAME_TAKEN, or NO_EDITOR when tests cannot be written for the type yet.
+  examTypeInvalid: (reason, message) =>
+    new ContentError(ContentResponseCode.EXAM_TYPE_INVALID, message, 409, { reason }),
+  mockNotFound: () =>
+    new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Mock test was not found', 404),
   placementNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Placement test is not published', 404),
   noDraft: () =>

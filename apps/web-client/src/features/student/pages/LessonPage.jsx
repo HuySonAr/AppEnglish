@@ -15,6 +15,7 @@ import { getLesson, markVocabularyStudied } from '../api/lessons-api.js';
 import { FillInExercise } from '../components/FillInExercise.jsx';
 import { VocabularyQuiz } from '../components/VocabularyQuiz.jsx';
 import { VocabularyStudy } from '../components/VocabularyStudy.jsx';
+import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 const stepLabels = {
   [LessonStep.REVIEW]: 'Review',
@@ -58,7 +59,7 @@ export function LessonPage() {
     load();
   }, [lessonId]);
 
-  if (state === 'loading') return <Skeleton className="h-96 w-full" />;
+  if (state === 'loading') return <DetailPageSkeleton />;
   if (state === 'error')
     return (
       <div className="space-y-4">

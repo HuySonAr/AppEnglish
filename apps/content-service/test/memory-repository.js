@@ -3,7 +3,11 @@ import { randomUUID } from 'node:crypto';
 // In-memory stand-in for ContentRepository; rows are copied on the way in and
 // out like a database would.
 export function createMemoryRepository() {
-  const tables = { units: [], lessons: [], versions: [], media: [], placement: [] };
+  const tables = {
+    units: [], lessons: [], versions: [], media: [], placement: [], mockTests: [], mockVersions: [],
+    // The migration creates TOEIC.
+    examTypes: [{ id: toeicExamTypeId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
+  };
   const copy = (row) => (row ? structuredClone(row) : null);
   const byPosition = (a, b) => a.position - b.position;
   function save(table, row) {
@@ -50,7 +54,28 @@ export function createMemoryRepository() {
     async saveMedia(asset) { return save('media', asset); },
     async deleteMedia(id) { tables.media = tables.media.filter((asset) => asset.id !== id); },
     async isMediaReferenced(id) {
-      return [...tables.versions, ...tables.placement].some((version) => JSON.stringify(version.content).includes(id));
+      return [...tables.versions, ...tables.placement, ...tables.mockVersions].some((version) => JSON.stringify(version.content).includes(id));
+    },
+    async listExamTypes() { return tables.examTypes.map(copy); },
+    async findExamType(id) { return copy(tables.examTypes.find((item) => item.id === id)); },
+    async saveExamType(examType) { return save('examTypes', examType); },
+    async listMockTests() { return tables.mockTests.map(copy).sort((a, b) => a.level - b.level); },
+    async findMockTest(id) { return copy(tables.mockTests.find((item) => item.id === id)); },
+    async saveMockTest(mockTest) { return save('mockTests', mockTest); },
+    async listMockVersionSummaries() {
+      return tables.mockVersions.map(({ id, mockTestId, versionNumber, status }) => ({ id, mockTestId, versionNumber, status }));
+    },
+    async findMockDraft(mockTestId) {
+      return copy(tables.mockVersions.find((version) => version.mockTestId === mockTestId && version.status === 'DRAFT'));
+    },
+    async findMockVersion(id) { return copy(tables.mockVersions.find((version) => version.id === id)); },
+    async maxMockVersionNumber(mockTestId) {
+      return Math.max(0, ...tables.mockVersions.filter((version) => version.mockTestId === mockTestId).map((version) => version.versionNumber));
+    },
+    async saveMockVersion(version) { return save('mockVersions', version); },
+    async publishMockVersion(mockTest, version) {
+      save('mockVersions', version);
+      save('mockTests', mockTest);
     },
     async countPublishedUnits() { return tables.units.filter((unit) => unit.status === 'PUBLISHED').length; },
     async findPlacementDraft() { return copy(tables.placement.find((version) => version.status === 'DRAFT')); },
@@ -63,6 +88,7 @@ export function createMemoryRepository() {
   };
 }
 
+export const toeicExamTypeId = '66666666-6666-4666-8666-666666666666';
 export const manager = { id: '11111111-1111-4111-8111-111111111111', role: 'CONTENT_MANAGER' };
 export const student = { id: '22222222-2222-4222-8222-222222222222', role: 'STUDENT' };
 export const admin = { id: '33333333-3333-4333-8333-333333333333', role: 'ADMIN' };

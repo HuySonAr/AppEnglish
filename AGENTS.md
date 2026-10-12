@@ -18,6 +18,10 @@
 - Không gọi DB service khác trực tiếp; dùng PostgreSQL databases app_identity, app_content, app_learning, app_progress theo database-allocation.md và contract hiện hữu. PostgreSQL local chạy ngoài Docker; Redis/RabbitMQ chạy Docker Compose theo development.md. Không đổi business logic để né broker.
 - Không xóa hay đổi schema/dữ liệu chưa kiểm tra ảnh hưởng.
 
+## Giao diện web client
+- Trước khi viết hoặc sửa giao diện, đọc mục "Quy ước giao diện bắt buộc" trong docs/02-architecture/frontend-architecture.md và làm theo: skeleton theo hình dạng trang, `<Button loading>`, bốn trạng thái của trang, tìm kiếm/sắp xếp/phân trang cho danh sách, `notify()` cho thông báo.
+- Dùng lại component trong src/components/shared và hàm trong src/lib; không tạo biến thể riêng cho cùng một việc.
+
 ## Sau mỗi feature
 - Cập nhật docs/04-implementation/feature-status.md.
 - Cập nhật workflow, API/data/service docs bị ảnh hưởng.

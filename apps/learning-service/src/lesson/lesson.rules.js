@@ -110,11 +110,15 @@ export function wrongBlanks(expected, answers) {
     .filter((index) => index !== null);
 }
 
+// The parts a call is about: all seven, or only the given keys (a mini test).
+const partsOf = (partKeys) =>
+  LESSON_TEST_PARTS.filter((spec) => !partKeys || partKeys.includes(spec.key));
+
 // Counts the right answers of a seven-part test, in total and per skill.
 // answers maps question id to the chosen option id.
-export function scoreTest(test, answers) {
+export function scoreTest(test, answers, partKeys) {
   const score = { totalCount: 0, correctCount: 0, listeningCorrect: 0, readingCorrect: 0 };
-  for (const spec of LESSON_TEST_PARTS) {
+  for (const spec of partsOf(partKeys)) {
     for (const question of test[spec.key]?.questions || []) {
       score.totalCount++;
       const chosen = question.options.find((option) => option.id === answers[question.id]);
@@ -130,9 +134,9 @@ export function scoreTest(test, answers) {
 // A random option order for every question whose options are written out
 // (Parts 3-7). Parts 1 and 2 keep their order: the recording reads the
 // options in it (D31, D48). Returns { questionId: [optionId, ...] }.
-export function shuffledOptionOrder(test, random = Math.random) {
+export function shuffledOptionOrder(test, random = Math.random, partKeys) {
   const order = {};
-  for (const spec of LESSON_TEST_PARTS) {
+  for (const spec of partsOf(partKeys)) {
     if (!spec.option.text) continue;
     for (const question of test[spec.key].questions)
       order[question.id] = shuffled(question.options.map((option) => option.id), random);
@@ -151,11 +155,14 @@ function orderedOptions(question, optionOrder) {
 
 // The test as the learner sees it. Without `answers` it is the paper to work
 // on: no correct answers, explanations or transcripts. With `answers` it is
-// the review of a finished attempt and includes all of them.
-export function testParts({ test, media }, { optionOrder, answers } = {}) {
+// the review of a finished attempt and includes all of them. Questions are
+// numbered from 1 across the parts shown. A mock-test part may have passage
+// groups; its questions then carry their groupId.
+export function testParts({ test, media }, { optionOrder, answers, partKeys } = {}) {
   const url = (mediaId) => (mediaId && media[mediaId]?.url) || null;
   const review = Boolean(answers);
-  return LESSON_TEST_PARTS.map((spec) => {
+  let number = 0;
+  return partsOf(partKeys).map((spec) => {
     const part = test[spec.key];
     return {
       key: spec.key,
@@ -166,12 +173,29 @@ export function testParts({ test, media }, { optionOrder, answers } = {}) {
       imageUrl: url(part.imageMediaId),
       passage: part.passage,
       ...(review ? { transcript: part.transcript } : {}),
-      questions: part.questions.map((question, index) => ({
+      // Sets of a mock-test part: a recording (Parts 3-4) or a passage.
+      groups: (part.groups || []).map((group) => ({
+        id: group.id,
+        audioUrl: url(group.audioMediaId),
+        passage: group.passage,
+        imageUrl: url(group.imageMediaId),
+        ...(review ? { transcript: group.transcript || '' } : {}),
+      })),
+      questions: part.questions.map((question) => ({
         id: question.id,
-        number: spec.firstQuestionNumber + index,
+        number: ++number,
+        groupId: question.groupId ?? null,
         prompt: question.prompt,
         imageUrl: url(question.imageMediaId),
-        ...(review ? { explanation: question.explanation, chosenOptionId: answers[question.id] || null } : {}),
+        // Mock-test Parts 1-2: each question has its own recording.
+        audioUrl: url(question.audioMediaId),
+        ...(review
+          ? {
+              explanation: question.explanation,
+              transcript: question.transcript || '',
+              chosenOptionId: answers[question.id] || null,
+            }
+          : {}),
         options: orderedOptions(question, optionOrder).map((option) => ({
           id: option.id,
           text: option.text,
@@ -204,5 +228,13 @@ export function testProgression(attempts) {
     readingChange: latest.readingCorrect - previous.readingCorrect,
     bestCorrectCount: Math.max(...attempts.map((attempt) => attempt.correctCount)),
   };
+}
+
+// Number of questions per skill in a test (or in some of its parts).
+export function skillTotals(test, partKeys) {
+  const totals = { listening: 0, reading: 0 };
+  for (const spec of partsOf(partKeys))
+    totals[spec.skill === Skill.LISTENING ? 'listening' : 'reading'] += test[spec.key]?.questions.length || 0;
+  return totals;
 }
 

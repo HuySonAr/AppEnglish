@@ -13,7 +13,7 @@ import {
 } from '../../../components/ui';
 import { setLeaveGuard } from '../../../lib/leave-guard.js';
 import { cn } from '../../../lib/utils.js';
-import { answeredCount, formatRemaining, numberBlanks, remainingTime } from '../lib/placement.js';
+import { answeredCount, formatRemaining, numberBlanks, partSections, remainingTime } from '../lib/placement.js';
 import { AnswerProgress } from './AnswerProgress.jsx';
 
 const optionLetters = ['A', 'B', 'C', 'D'];
@@ -30,6 +30,7 @@ function Question({ question, chosen, onChoose, blankNumber }) {
         <span className="mr-2 text-primary">{question.number}.</span>
         {question.prompt || (blankNumber ? `Blank (${question.number})` : 'Choose the best answer.')}
       </p>
+      {question.audioUrl ? <audio controls src={question.audioUrl} className="mt-3 w-full" /> : null}
       {question.imageUrl ? (
         <img src={question.imageUrl} alt="" className="mt-3 max-h-80 rounded-lg" />
       ) : null}
@@ -90,8 +91,10 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
   answersRef.current = answers;
   const submitted = useRef(false);
 
-  // The clock; when it runs out the test is handed in as it is.
+  // The clock; when it runs out the test is handed in as it is. A test
+  // without a time limit (expiresAt null) has none.
   useEffect(() => {
+    if (!attempt.expiresAt) return undefined;
     const timer = setInterval(() => {
       const left = remainingTime(attempt.expiresAt, offset);
       setRemaining(left);
@@ -168,27 +171,33 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
     .flatMap((item) => item.questions)
     .filter((question) => !answers[question.id])
     .map((question) => question.number);
-  const isBlankPart = part.passage.includes('___') && part.questions.every((question) => !question.prompt);
   const lowTime = remaining <= 2 * 60 * 1000;
 
   return (
     <section className="space-y-6">
       <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-        <span
-          role="timer"
-          aria-label="Time left"
-          className={cn(
-            'flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums',
-            lowTime ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary',
-          )}
-        >
-          <Clock className="h-4 w-4" />
-          {formatRemaining(remaining)}
-        </span>
+        {attempt.expiresAt ? (
+          <span
+            role="timer"
+            aria-label="Time left"
+            className={cn(
+              'flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums',
+              lowTime ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary',
+            )}
+          >
+            <Clock className="h-4 w-4" />
+            {formatRemaining(remaining)}
+          </span>
+        ) : (
+          <span className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary">
+            <Clock className="h-4 w-4" />
+            No time limit
+          </span>
+        )}
         <span className="rounded-full bg-muted px-3 py-1.5 text-sm font-medium tabular-nums">
           <span className="font-bold text-primary">{answered}</span> / {total} answered
         </span>
-        <Button className="ml-auto" disabled={submitting} onClick={() => setConfirming(true)}>
+        <Button loading={submitting} className="ml-auto" disabled={submitting} onClick={() => setConfirming(true)}>
           {submitting ? 'Submitting…' : 'Submit'}
         </Button>
       </div>
@@ -208,7 +217,10 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
                 </span>
               </p>
             </div>
-            <ol aria-label="Questions" className="flex flex-wrap gap-2 lg:grid lg:grid-cols-5">
+            <ol
+              aria-label="Questions"
+              className="flex max-h-40 flex-wrap gap-2 overflow-y-auto p-0.5 lg:grid lg:max-h-[60vh] lg:grid-cols-5"
+            >
               {attempt.parts.map((item, index) =>
                 item.questions.map((question) => {
                   const done = Boolean(answers[question.id]);
@@ -278,20 +290,33 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
                 <audio controls src={part.audioUrl} className="w-full" />
               </div>
             ) : null}
-            {part.imageUrl ? <img src={part.imageUrl} alt="" className="max-h-96 rounded-lg border" /> : null}
-            {part.passage ? (
-              <div className="whitespace-pre-wrap rounded-xl border bg-card p-4 leading-relaxed shadow-sm sm:p-5">
-                {isBlankPart ? numberBlanks(part.passage, part.questions[0].number) : part.passage}
+            {partSections(part).map((section) => (
+              <div key={section.id} className="space-y-4">
+                {section.audioUrl ? (
+                  <div className="rounded-xl border bg-card p-4 shadow-sm">
+                    <p className="mb-2 text-sm text-muted-foreground">
+                      Listen, then answer question{section.questions.length === 1 ? '' : 's'}{' '}
+                      {section.questions.map((question) => question.number).join(', ')}.
+                    </p>
+                    <audio controls src={section.audioUrl} className="w-full" />
+                  </div>
+                ) : null}
+                {section.imageUrl ? <img src={section.imageUrl} alt="" className="max-h-96 rounded-lg border" /> : null}
+                {section.passage ? (
+                  <div className="whitespace-pre-wrap rounded-xl border bg-card p-4 leading-relaxed shadow-sm sm:p-5">
+                    {section.blanks ? numberBlanks(section.passage, section.questions[0].number) : section.passage}
+                  </div>
+                ) : null}
+                {section.questions.map((question) => (
+                  <Question
+                    key={question.id}
+                    question={question}
+                    chosen={answers[question.id]}
+                    onChoose={choose}
+                    blankNumber={section.blanks}
+                  />
+                ))}
               </div>
-            ) : null}
-            {part.questions.map((question) => (
-              <Question
-                key={question.id}
-                question={question}
-                chosen={answers[question.id]}
-                onChoose={choose}
-                blankNumber={isBlankPart}
-              />
             ))}
           </div>
 

@@ -89,3 +89,59 @@ export const PlacementVersionEntity = new EntitySchema({
   },
   indices: [{ name: 'UQ_placement_versions_number', columns: ['versionNumber'], unique: true }],
 });
+
+// A mock test: title, suggested level (1-3) and time allowed. Its questions
+// live in MockTestVersion rows with the same life cycle as LessonVersion.
+// A kind of exam the content is written for, e.g. TOEIC. format says which
+// editor and test screen its tests use; null means none exists yet.
+export const ExamTypeEntity = new EntitySchema({
+  name: 'ExamType',
+  tableName: 'exam_types',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    code: { type: 'varchar', length: 40 },
+    name: { type: 'varchar', length: 100 },
+    format: { type: 'varchar', length: 20, nullable: true },
+    createdBy: { type: 'uuid', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'UQ_exam_types_code', columns: ['code'], unique: true }],
+});
+
+export const MockTestEntity = new EntitySchema({
+  name: 'MockTest',
+  tableName: 'mock_tests',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    examTypeId: { type: 'uuid' },
+    title: { type: 'varchar', length: 200 },
+    level: { type: 'int' },
+    durationMinutes: { type: 'int' },
+    publishedVersionId: { type: 'uuid', nullable: true },
+    createdBy: { type: 'uuid' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+});
+
+export const MockTestVersionEntity = new EntitySchema({
+  name: 'MockTestVersion',
+  tableName: 'mock_test_versions',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    mockTestId: { type: 'uuid' },
+    versionNumber: { type: 'int' },
+    status: { type: 'varchar', length: 16, default: 'DRAFT' },
+    content: { type: 'jsonb' },
+    createdBy: { type: 'uuid' },
+    publishedBy: { type: 'uuid', nullable: true },
+    publishedAt: { type: 'timestamptz', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [
+    { name: 'UQ_mock_test_versions_number', columns: ['mockTestId', 'versionNumber'], unique: true },
+  ],
+});
+

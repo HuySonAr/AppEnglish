@@ -9,7 +9,7 @@ export const CONTENT_GRPC_CLIENT = 'CONTENT_GRPC_CLIENT';
 
 // Upper bound for one uploaded file held in memory; content-service applies the
 // configured MEDIA_MAX_FILE_SIZE_BYTES and the type rules.
-const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = 48 * 1024 * 1024;
 
 export class ContentGatewayController {
   constructor(authClient, contentClient) {
@@ -60,6 +60,33 @@ export class ContentGatewayController {
   }
   publishPlacement(request) {
     return this.forward('PublishPlacement', request);
+  }
+  listExamTypes(request) {
+    return this.forward('ListExamTypes', request);
+  }
+  createExamType(body, request) {
+    return this.forward('CreateExamType', request, { body });
+  }
+  updateExamType(id, body, request) {
+    return this.forward('UpdateExamType', request, { id, body });
+  }
+  listMockTests(request) {
+    return this.forward('ListMockTests', request);
+  }
+  createMockTest(body, request) {
+    return this.forward('CreateMockTest', request, { body });
+  }
+  updateMockTest(id, body, request) {
+    return this.forward('UpdateMockTest', request, { id, body });
+  }
+  getMockTest(id, request) {
+    return this.forward('GetMockTest', request, { id });
+  }
+  saveMockTestDraft(id, body, request) {
+    return this.forward('SaveMockTestDraft', request, { id, body });
+  }
+  publishMockTest(id, request) {
+    return this.forward('PublishMockTest', request, { id });
   }
   deleteMedia(id, request) {
     return this.forward('DeleteMedia', request, { id });
@@ -126,6 +153,15 @@ const routes = [
   [Put, 'lessons/:id/draft', 'saveLessonDraft', [Param('id'), Body(), Req()]],
   [Post, 'lessons/:id/publish', 'publishLesson', [Param('id'), Req()]],
   [Post, 'pronunciation', 'autofillPronunciation', [Body(), Req()]],
+  [Get, 'exam-types', 'listExamTypes', [Req()]],
+  [Post, 'exam-types', 'createExamType', [Body(), Req()]],
+  [Patch, 'exam-types/:id', 'updateExamType', [Param('id'), Body(), Req()]],
+  [Get, 'mock-tests', 'listMockTests', [Req()]],
+  [Post, 'mock-tests', 'createMockTest', [Body(), Req()]],
+  [Patch, 'mock-tests/:id', 'updateMockTest', [Param('id'), Body(), Req()]],
+  [Get, 'mock-tests/:id', 'getMockTest', [Param('id'), Req()]],
+  [Put, 'mock-tests/:id/draft', 'saveMockTestDraft', [Param('id'), Body(), Req()]],
+  [Post, 'mock-tests/:id/publish', 'publishMockTest', [Param('id'), Req()]],
   [Get, 'placement', 'getPlacement', [Req()]],
   [Put, 'placement/draft', 'savePlacementDraft', [Body(), Req()]],
   [Post, 'placement/publish', 'publishPlacement', [Req()]],

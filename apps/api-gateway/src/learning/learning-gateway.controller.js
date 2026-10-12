@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Inject, Param, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Inject, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
 import { AUTH_GRPC_CLIENT, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
@@ -152,3 +152,66 @@ for (const [verb, path, method, params] of lessonRoutes) {
   verb(path)(LessonGatewayController.prototype, method, descriptor);
   params.forEach((decorator, index) => decorator(LessonGatewayController.prototype, method, index));
 }
+
+// Public /mock-tests/* routes (F05A): full mock tests and mini tests of a
+// student, and the Admin's score conversion table.
+export class MockGatewayController extends LearningRelay {
+  // Which attempt a GET is about, from ?kind=FULL or ?kind=MINI&partKey=part5.
+  reference(query) {
+    return {
+      kind: query?.kind,
+      ...(query?.partKey ? { partKey: query.partKey } : {}),
+      ...(query?.attemptNumber ? { attemptNumber: Number(query.attemptNumber) } : {}),
+    };
+  }
+
+  getScoreConversion(request) {
+    return this.forward('GetScoreConversion', request);
+  }
+  updateScoreConversion(body, request) {
+    return this.forward('UpdateScoreConversion', request, { body });
+  }
+  listMockTests(request) {
+    return this.forward('ListMockTests', request);
+  }
+  getMockTest(id, request) {
+    return this.forward('GetMockTest', request, { id });
+  }
+  getMockAttempt(id, query, request) {
+    return this.forward('GetMockAttempt', request, { id, body: this.reference(query) });
+  }
+  startMockAttempt(id, body, request) {
+    return this.forward('StartMockAttempt', request, { id, body });
+  }
+  saveMockAnswers(id, body, request) {
+    return this.forward('SaveMockAnswers', request, { id, body });
+  }
+  submitMockAttempt(id, body, request) {
+    return this.forward('SubmitMockAttempt', request, { id, body });
+  }
+  getMockReview(id, query, request) {
+    return this.forward('GetMockReview', request, { id, body: this.reference(query) });
+  }
+}
+
+Controller('mock-tests')(MockGatewayController);
+Inject(AUTH_GRPC_CLIENT)(MockGatewayController, undefined, 0);
+Inject(LEARNING_GRPC_CLIENT)(MockGatewayController, undefined, 1);
+// The fixed paths come before ':id' so they are not read as a mock test id.
+const mockRoutes = [
+  [Get, 'score-conversion', 'getScoreConversion', [Req()]],
+  [Put, 'score-conversion', 'updateScoreConversion', [Body(), Req()]],
+  [Get, '', 'listMockTests', [Req()]],
+  [Get, ':id', 'getMockTest', [Param('id'), Req()]],
+  [Get, ':id/attempt', 'getMockAttempt', [Param('id'), Query(), Req()]],
+  [Post, ':id/attempt/start', 'startMockAttempt', [Param('id'), Body(), Req()]],
+  [Put, ':id/attempt/answers', 'saveMockAnswers', [Param('id'), Body(), Req()]],
+  [Post, ':id/attempt/submit', 'submitMockAttempt', [Param('id'), Body(), Req()]],
+  [Get, ':id/review', 'getMockReview', [Param('id'), Query(), Req()]],
+];
+for (const [verb, path, method, params] of mockRoutes) {
+  const descriptor = Object.getOwnPropertyDescriptor(MockGatewayController.prototype, method);
+  verb(path)(MockGatewayController.prototype, method, descriptor);
+  params.forEach((decorator, index) => decorator(MockGatewayController.prototype, method, index));
+}
+

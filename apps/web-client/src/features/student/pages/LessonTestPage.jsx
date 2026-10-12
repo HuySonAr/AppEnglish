@@ -20,6 +20,7 @@ import { TestExam } from '../components/TestExam.jsx';
 import { TestProgression } from '../components/TestProgression.jsx';
 import { TestReview } from '../components/TestReview.jsx';
 import { formatRemaining } from '../lib/placement.js';
+import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 // The lesson test: start, take it (same exam screen as the placement test),
 // then the score with every answer explained, the history of attempts with how
@@ -97,7 +98,7 @@ export function LessonTestPage() {
     }
   }
 
-  if (state === 'loading') return <Skeleton className="h-96 w-full" />;
+  if (state === 'loading') return <DetailPageSkeleton aside />;
   if (state === 'error')
     return (
       <div className="space-y-4">

@@ -26,3 +26,39 @@ export function answeredCount(parts, answers) {
     .flatMap((part) => part.questions)
     .filter((question) => answers[question.id]).length;
 }
+
+// A test part as sections to show one after another. A lesson-test part is
+// one section (its passage, if any, and all its questions); a mock-test part
+// made of sets is one section per set: a recording (Parts 3-4) or a passage
+// (Parts 6-7) with its questions. blanks is true when the
+// passage has numbered blanks answered by questions without a prompt (Part 6).
+export function partSections(part) {
+  const sections = part.groups?.length
+    ? part.groups.map((group) => ({
+        id: group.id,
+        audioUrl: group.audioUrl || null,
+        transcript: group.transcript || '',
+        passage: group.passage,
+        imageUrl: group.imageUrl,
+        questions: part.questions.filter((question) => question.groupId === group.id),
+      }))
+    : [
+        {
+          id: part.key,
+          // The part's own recording and transcript are shown by the part.
+          audioUrl: null,
+          transcript: '',
+          passage: part.passage,
+          imageUrl: part.imageUrl,
+          questions: part.questions,
+        },
+      ];
+  return sections.map((section) => ({
+    ...section,
+    blanks:
+      section.passage.includes(FILL_IN_BLANK) &&
+      section.questions.length > 0 &&
+      section.questions.every((question) => !question.prompt),
+  }));
+}
+

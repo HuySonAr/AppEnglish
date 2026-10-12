@@ -24,6 +24,12 @@ import { LessonsPage } from '../features/student/pages/LessonsPage.jsx';
 import { LessonPage } from '../features/student/pages/LessonPage.jsx';
 import { LessonTestPage } from '../features/student/pages/LessonTestPage.jsx';
 import { PlacementSettingsPage } from '../features/admin/pages/PlacementSettingsPage.jsx';
+import { MockTestsManagePage } from '../features/content-manager/pages/MockTestsManagePage.jsx';
+import { MockTestEditorPage } from '../features/content-manager/pages/MockTestEditorPage.jsx';
+import { MockTestsPage } from '../features/student/pages/MockTestsPage.jsx';
+import { MockTestPage } from '../features/student/pages/MockTestPage.jsx';
+import { ScoreConversionPage } from '../features/admin/pages/ScoreConversionPage.jsx';
+import { ExamTypesPage } from '../features/admin/pages/ExamTypesPage.jsx';
 import { Roles } from '../constants/auth.js';
 import { dashboardPathForRole } from '../features/auth/flow/auth-flow.js';
 import { useAuth } from '../features/auth/context/AuthContext.jsx';
@@ -60,6 +66,8 @@ export function AppRouter() {
             <Route path="lessons" element={<LessonsPage />} />
             <Route path="lessons/:lessonId" element={<LessonPage />} />
             <Route path="lessons/:lessonId/test" element={<LessonTestPage />} />
+            <Route path="mock-tests" element={<MockTestsPage />} />
+            <Route path="mock-tests/:mockTestId" element={<MockTestPage />} />
           </Route>
         </Route>
         <Route path="/admin" element={<RoleRoute allowedRole={Roles.ADMIN} />}>
@@ -67,6 +75,8 @@ export function AppRouter() {
             <Route index element={<AdminDashboardPage />} />
             <Route path="accounts" element={<AdminAccountsPage />} />
             <Route path="placement" element={<PlacementSettingsPage />} />
+            <Route path="score-conversion" element={<ScoreConversionPage />} />
+            <Route path="exam-types" element={<ExamTypesPage />} />
           </Route>
         </Route>
         <Route
@@ -77,6 +87,8 @@ export function AppRouter() {
             <Route index element={<ContentManagerDashboardPage />} />
             <Route path="units" element={<ContentUnitsPage />} />
             <Route path="placement" element={<PlacementEditorPage />} />
+            <Route path="mock-tests" element={<MockTestsManagePage />} />
+            <Route path="mock-tests/:mockTestId" element={<MockTestEditorPage />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
           </Route>
         </Route>

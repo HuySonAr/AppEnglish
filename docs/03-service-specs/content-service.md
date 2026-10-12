@@ -11,14 +11,21 @@ versions, media assets and the gRPC contract described below.
 The `MediaStorage` contract is represented by the `MEDIA_STORAGE` provider in
 `apps/content-service/src/media/media-storage.js`. Adapters expose
 `upload({ kind, fileName, mimeType, sizeBytes, data })` and return a normalized
-media object with an identifier, delivery URL, and storage type, and
+media object with an identifier, delivery URL, and storage type (`local`,
+`imagekit` or `r2`), and
 `delete({ storage, storageId })`, which treats an already missing file as
-deleted. The ImageKit adapter also deletes files stored locally before it was
-enabled.
+deleted. An adapter also deletes files stored elsewhere before it was
+enabled (R2: local files, and ImageKit files while the ImageKit keys are set).
 
 - `local` is the default when no ImageKit credentials are configured. It writes
   outside build output to `MEDIA_LOCAL_ROOT`.
+- `r2` (D67) stores files in a Cloudflare R2 bucket through the S3 API
+  (`@aws-sdk/client-s3`, `src/media/r2-media-storage.adapter.js`) under
+  `appenglish/<folder>/<uuid>-<file name>` and serves them unchanged from
+  `R2_PUBLIC_BASE_URL`. The object key is the asset's `storageId`.
 - `@imagekit/nodejs` uses the official ImageKit Node SDK and backend-only credentials.
+  ImageKit treats MP4/M4A uploads as video and re-encodes them on delivery,
+  which uses up the free plan's video processing allowance.
   Files of a lesson go to `/appenglish/<kind>/unit<n>-lesson<m>/vocabulary`
   or `.../test` (D53; `n` and `m` are the unit and lesson positions at upload
   time): `UploadMedia` takes `lessonId` and `section`, and
@@ -122,6 +129,14 @@ matching RPC of `appenglish.content.v1.ContentService`
 | PUT | `/content/placement/draft` | `SavePlacementDraft` | Content Manager | Replace the draft `{ test }`; creates the next draft version after a publish |
 | POST | `/content/placement/publish` | `PublishPlacement` | Content Manager | Validate the seven parts and freeze the draft as the next version |
 | — | not exposed | `GetPlacementPaper` | learning-service | `{ versionId? }` → a published version with answers, media URLs and `publishedUnitCount`; takes no actor |
+| GET | `/content/exam-types` | `ListExamTypes` | any role | Exam types with `hasEditor` (D69) |
+| POST, PATCH | `/content/exam-types`, `/content/exam-types/:id` | `CreateExamType`, `UpdateExamType` | Admin | Add `{ name }` (no editor yet) or rename; names must differ. Code 45 with `data.reason` `NAME_TAKEN` |
+| GET, POST | `/content/mock-tests` | `ListMockTests`, `CreateMockTest` | Content Manager | List with publishing state, `examType` and `createdAt`; create `{ title, examTypeId, level, durationMinutes }` with an empty draft. The exam type must have an editor (code 45, reason `NO_EDITOR`) |
+| GET, PATCH | `/content/mock-tests/:id` | `GetMockTest`, `UpdateMockTest` | Content Manager | Draft and published version with `media`; change title, level or minutes (applies at once) |
+| PUT | `/content/mock-tests/:id/draft` | `SaveMockTestDraft` | Content Manager | Replace the draft `{ test }` |
+| POST | `/content/mock-tests/:id/publish` | `PublishMockTest` | Content Manager | Validate and freeze the draft as the next version |
+| — | not exposed | `ListPublishedMockTests` | learning-service | Published mock tests with `questionCount` and `partCounts` |
+| — | not exposed | `GetMockPaper` | learning-service | Mock test id + `{ versionId? }` → a published version with answers and media URLs |
 | — | not exposed | `GetCurriculum` | learning-service | Published units in order with their published lessons; takes no actor |
 | — | not exposed | `GetLessonPaper` | learning-service | Lesson id + `{ versionId? }` → a published lesson version with answers and media URLs; 404 when the lesson or its unit is not published |
 | POST | `/content/pronunciation` | `AutofillPronunciation` | Content Manager | `{ word, accents? }`; looks the word up in the free dictionary and returns `{ found, phonetic, audio: { uk, us } }` with stored media or `null` |
@@ -143,6 +158,43 @@ The single placement test lives in `placement_versions` (migration
 `/appenglish/<kind>/placement`. Media referenced by a placement version is
 protected from deletion like lesson media. Attempts and scoring are in
 learning-service (`docs/03-service-specs/learning-service.md`).
+
+### Mock tests (F05A, D63)
+
+`exam_types` (migration `1720000004000-create-exam-types.js`): `code`, `name`
+and `format` (`ExamFormat`; null means no editor). TOEIC is created by the
+migration. `mock_tests.examTypeId` is required; every mock-test view carries
+`examType: { id, code, name }`.
+
+`mock_tests` (title, level 1–3, `durationMinutes`, `publishedVersionId`) and
+`mock_test_versions` (migration `1720000003000-create-mock-tests.js`), with
+the life cycle of lesson versions. Content is `{ test }` over the same seven
+parts (`mockContentSchema`), with these differences from a lesson test
+(D63, D66):
+
+- a part holds from one question up to its TOEIC count
+  (`MOCK_TEST_PART_COUNTS`), and a Part 3–4 set up to
+  `MOCK_SET_QUESTION_COUNT` (3) questions (D72);
+- Parts 1 and 2: every question has its own `audioMediaId` and `transcript`;
+- Parts 3, 4, 6 and 7 are made of sets, `groups` (`{ id, audioMediaId,
+  transcript, passage, imageMediaId }`), that their questions reference by
+  `groupId`: a recording with its transcript in Parts 3–4 (one conversation or
+  talk, usually three questions), a passage in Parts 6–7;
+- the graphic of a Part 3–4 set is the `imageMediaId` of one of its questions,
+  the "Look at the graphic" one (D71); the set's own `imageMediaId` is only
+  used by Part 7;
+- the part-level `audioMediaId`/`transcript` are not used.
+
+Publishing (`mockIssues`): every part has at least one question and no more
+than its TOEIC count, a Part 3–4 set no more than three (D72); every Part
+1–2 question has audio and transcript, Part 1 questions also a photograph;
+Parts 3, 4, 6 and 7 have at least one set and every set has at least one
+question; a Part 3–4 set has audio and transcript; conversations 11–13 of Part 3 and talks 9–10 of Part 4 (`MOCK_GRAPHIC_SET_INDEXES`) have an image on exactly one question and no other Part 3–4 question has one (D71); a Part 6–7 set has a
+passage, and a Part 6 passage has one blank per question; options, correct
+answer and explanation as in a lesson test. Uploads with `section=mock` go to
+`/appenglish/<kind>/mock`. The default upload limit is 40 MB
+(`MEDIA_MAX_FILE_SIZE_BYTES`); the gateway accepts up to 48 MB and gRPC
+messages up to 64 MB.
 
 ### Rules
 

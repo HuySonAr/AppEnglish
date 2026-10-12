@@ -31,7 +31,19 @@ import {
 } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
+import { FilterSelect, SearchField } from '../../../components/shared/ListFilter.jsx';
+import { Pagination } from '../../../components/shared/Pagination.jsx';
+import { paginate } from '../../../lib/list.js';
+import {
+  LessonSort,
+  StatusFilter,
+  filterUnits,
+  isReorderable,
+  lessonSortOptions,
+  statusOptions,
+} from '../lib/content-list.js';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
+import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 function MoveButtons({ label, index, count, onMove, disabled }) {
   return (
@@ -71,6 +83,8 @@ function LessonBadges({ lesson }) {
   );
 }
 
+const UNITS_PER_PAGE = 5;
+
 export function ContentUnitsPage() {
   const [units, setUnits] = useState([]);
   const [state, setState] = useState('loading');
@@ -78,6 +92,13 @@ export function ContentUnitsPage() {
   const [newUnitTitle, setNewUnitTitle] = useState('');
   const [lessonTitles, setLessonTitles] = useState({});
   const [editing, setEditing] = useState(null);
+  // Search, filter and sort of the list; changing one goes back to page 1.
+  const [filters, setFilters] = useState({ search: '', status: StatusFilter.ALL, sort: LessonSort.ORDER });
+  const [page, setPage] = useState(1);
+  const setFilter = (name) => (value) => {
+    setFilters((current) => ({ ...current, [name]: value }));
+    setPage(1);
+  };
 
   async function load({ quiet = false } = {}) {
     if (!quiet) setState('loading');
@@ -142,6 +163,10 @@ export function ContentUnitsPage() {
       setEditing(null);
   }
 
+  // Units and lessons can be moved only while the list is shown as stored.
+  const reorderable = isReorderable(filters);
+  const shown = paginate(filterUnits(units, filters), page, UNITS_PER_PAGE);
+
   return (
     <section className="space-y-6">
       <PageHeader
@@ -164,19 +189,33 @@ export function ContentUnitsPage() {
         </Button>
       </form>
 
-      {state === 'loading' ? (
-        <div className="space-y-4">
-          {[...Array(2)].map((_, index) => (
-            <Skeleton key={index} className="h-40 w-full" />
-          ))}
+      {units.length ? (
+        <div className="space-y-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search units and lessons by title" />
+            <FilterSelect label="Lesson status" value={filters.status} onChange={setFilter('status')} options={statusOptions} />
+            <FilterSelect label="Sort by" value={filters.sort} onChange={setFilter('sort')} options={lessonSortOptions} />
+          </div>
+          {reorderable ? null : (
+            <p className="text-sm text-muted-foreground">
+              Moving units and lessons is off while the list is searched, filtered or sorted by title.
+            </p>
+          )}
         </div>
+      ) : null}
+
+      {state === 'loading' ? (
+        <RowsSkeleton rows={5} tall />
       ) : state === 'error' ? (
         <Button variant="outline" onClick={() => load()}>Try again</Button>
       ) : units.length === 0 ? (
         <EmptyState icon={Library} title="No units yet" description="Add the first unit above." />
+      ) : shown.total === 0 ? (
+        <EmptyState icon={Library} title="Nothing matches" description="Try another search or filter." />
       ) : (
-        units.map((unit, unitIndex) => {
-          const publishedLessons = unit.lessons.filter((lesson) => lesson.publishedVersionNumber).length;
+        shown.items.map((unit) => {
+          const unitIndex = units.findIndex((item) => item.id === unit.id);
+          const publishedLessons = unit.publishedCount;
           const isPublished = unit.status === UnitStatus.PUBLISHED;
           return (
             <Card key={unit.id}>
@@ -191,7 +230,7 @@ export function ContentUnitsPage() {
                         {isPublished ? 'Published' : 'Draft'}
                       </Badge>
                       <span>
-                        {publishedLessons} of {unit.lessons.length} lessons published
+                        {publishedLessons} of {unit.lessonCount} lessons published
                       </span>
                     </div>
                     {unit.description ? (
@@ -203,7 +242,7 @@ export function ContentUnitsPage() {
                       label={`unit ${unit.title}`}
                       index={unitIndex}
                       count={units.length}
-                      disabled={busy}
+                      disabled={busy || !reorderable}
                       onMove={(position) =>
                         run(() => updateUnit(unit.id, { position }), { failure: 'Could not move the unit' })
                       }
@@ -232,7 +271,9 @@ export function ContentUnitsPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {unit.lessons.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No lessons in this unit yet.</p>
+                  <p className="text-sm text-muted-foreground">
+                    {unit.lessonCount ? 'No lesson of this unit matches.' : 'No lessons in this unit yet.'}
+                  </p>
                 ) : (
                   <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border">
                     {unit.lessons.map((lesson, lessonIndex) => (
@@ -251,7 +292,7 @@ export function ContentUnitsPage() {
                           label={`lesson ${lesson.title}`}
                           index={lessonIndex}
                           count={unit.lessons.length}
-                          disabled={busy}
+                          disabled={busy || !reorderable}
                           onMove={(position) =>
                             run(() => updateLesson(lesson.id, { position }), { failure: 'Could not move the lesson' })
                           }
@@ -283,6 +324,9 @@ export function ContentUnitsPage() {
           );
         })
       )}
+      {state === 'ready' ? (
+        <Pagination page={shown.page} pageCount={shown.pageCount} total={shown.total} noun="unit" onChange={setPage} />
+      ) : null}
 
       <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent>

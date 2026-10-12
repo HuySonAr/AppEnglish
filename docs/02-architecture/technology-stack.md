@@ -16,7 +16,7 @@
 | Data ownership | PostgreSQL database-per-service | Mapping xem database-allocation.md; không query DB service khác trực tiếp |
 | ORM | TypeORM `0.3.31` + PostgreSQL `pg` | DataSource/EntitySchema và F01 account migration đã tạo |
 | Local database UI | pgAdmin 4 hoặc DBeaver | Kết nối vào PostgreSQL Server local; GUI không tự thay thế server |
-| Media storage | `@imagekit/nodejs@7.12.1` official Node SDK + local adapter | F02A; backend-only ImageKit credentials; local adapter is default for development/tests |
+| Media storage | Cloudflare R2 through `@aws-sdk/client-s3` (D67), `@imagekit/nodejs@7.12.1` official Node SDK, local adapter | F02A; backend-only ImageKit credentials; local adapter is default for development/tests |
 | Local runtime | PostgreSQL native Windows; Redis `7-alpine` + RabbitMQ `3-management-alpine` trong Compose | Đã xác minh Compose không có PostgreSQL |
 
 ## F00 — bằng chứng repository
