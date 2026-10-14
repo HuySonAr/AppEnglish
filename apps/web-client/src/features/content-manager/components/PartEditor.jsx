@@ -1,7 +1,11 @@
 import { FILL_IN_BLANK, MediaKind, Skill } from '@appenglish/content-contracts';
+import { PassageText } from '../../../components/shared/PassageText.jsx';
 import { Card, CardContent, Input } from '../../../components/ui';
+import { hasTable } from '../../../lib/passage.js';
 import { withCorrectOption } from '../lib/lesson-draft.js';
+import { LESSON_PASTE_PARTS, lessonPasteDescription, lessonPastePlan } from '../lib/lesson-paste.js';
 import { MediaField } from './MediaField.jsx';
+import { PasteQuestionsDialog } from './PasteQuestionsDialog.jsx';
 import { TextField } from './TextField.jsx';
 
 const optionLetters = ['A', 'B', 'C', 'D'];
@@ -31,9 +35,23 @@ export function PartEditor({ spec, part, edit, media }) {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold">
-          Part {spec.number}: {spec.title}
-        </h3>
+        <div className="flex flex-wrap items-center gap-3">
+          <h3 className="text-lg font-semibold">
+            Part {spec.number}: {spec.title}
+          </h3>
+          {LESSON_PASTE_PARTS.includes(spec.key) ? (
+            <PasteQuestionsDialog
+              spec={spec}
+              part={part}
+              setName={null}
+              planFor={lessonPastePlan}
+              firstNumber={spec.firstQuestionNumber}
+              exampleCount={spec.questionCount}
+              description={lessonPasteDescription(spec)}
+              onApply={(pasted) => edit(base, pasted)}
+            />
+          ) : null}
+        </div>
         <p className="text-sm text-muted-foreground">
           {skillLabels[spec.skill]} · {questionRange(spec)} · options{' '}
           {optionLetters.slice(0, spec.optionCount).join(', ')}
@@ -50,13 +68,21 @@ export function PartEditor({ spec, part, edit, media }) {
             {spec.group.passage ? (
               <TextField
                 id={`${spec.key}-passage`}
-                label={spec.group.blanks ? `Passage with exactly ${spec.questionCount} blanks, typed as ${FILL_IN_BLANK}` : 'Document (letter, form, report, notice…)'}
+                label={spec.group.blanks ? `Passage with exactly ${spec.questionCount} blanks, typed as ${FILL_IN_BLANK}` : 'Document (letter, form, report, notice…). A table: one line per row, written | cell | cell |'}
                 value={part.passage}
                 maxLength={10000}
                 multiline
                 rows={8}
                 onChange={(value) => edit([...base, 'passage'], value)}
               />
+            ) : null}
+            {spec.group.passage && !spec.group.blanks && hasTable(part.passage) ? (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">As learners see it</p>
+                <div className="rounded-xl border bg-card p-4 leading-relaxed">
+                  <PassageText text={part.passage} />
+                </div>
+              </div>
             ) : null}
             {spec.group.optionalImage ? (
               <MediaField id={`${spec.key}-image`} label="Document image (optional)" kind={MediaKind.IMAGE} path={[...base, 'imageMediaId']} mediaId={part.imageMediaId} media={media} />

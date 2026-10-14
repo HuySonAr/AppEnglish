@@ -110,6 +110,11 @@ test('Gateway HTTP to learning-service gRPC contract for mock tests', async () =
     assert.deepEqual(miniStart.json.data.parts.map((part) => part.key), ['part5']);
     assert.equal(miniStart.json.data.expiresAt, null);
     assert.equal((await call('GET', `${mock}/attempt?kind=MINI&partKey=part5`)).json.data.status, 'IN_PROGRESS');
+    // Leaving without submitting removes the attempt (D82).
+    assert.equal((await call('POST', `${mock}/attempt/discard`, { body: { kind: 'MINI' } })).status, 400);
+    assert.deepEqual((await call('POST', `${mock}/attempt/discard`, { body: { kind: 'MINI', partKey: 'part5' } })).json.data, { discarded: true });
+    assert.equal((await call('POST', `${mock}/attempt/discard`, { body: { kind: 'MINI', partKey: 'part5' } })).status, 409);
+    await call('POST', `${mock}/attempt/start`, { body: { kind: 'MINI', partKey: 'part5' } });
     const miniResult = await call('POST', `${mock}/attempt/submit`, { body: { kind: 'MINI', partKey: 'part5', answers: answers(first.id, 1, ['part5']) } });
     assert.equal(miniResult.json.data.attempt.scorePercent, 50);
     assert.equal(miniResult.json.data.attempt.estimated, null);

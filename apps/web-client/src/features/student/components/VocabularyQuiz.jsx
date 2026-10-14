@@ -1,12 +1,28 @@
 import { useEffect, useState } from 'react';
+import { Lightbulb } from 'lucide-react';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { Badge, Button, Skeleton } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import { getVocabularyQuiz, submitVocabularyQuiz } from '../api/lessons-api.js';
 import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { QuizLight, checkedLights, lightOf, withAnswerChanged } from '../lib/quiz-lights.js';
 
 const optionLetters = ['A', 'B', 'C', 'D'];
+const lightStyles = {
+  [QuizLight.UNCHECKED]: { tone: 'bg-muted text-muted-foreground', label: 'not checked' },
+  [QuizLight.RIGHT]: { tone: 'bg-success/15 text-success', label: 'right' },
+  [QuizLight.WRONG]: { tone: 'bg-destructive/10 text-destructive', label: 'not right' },
+};
+
+// The light of one word: grey until checked, then green or red (D83).
+function WordLight({ light, className }) {
+  return (
+    <span className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-full', lightStyles[light].tone, className)}>
+      <Lightbulb className="h-4 w-4" aria-hidden="true" />
+    </span>
+  );
+}
 
 // Choose the meaning of every word (kind is QuizKind: this lesson's words or
 // the review of the previous lesson). Every word must be right; the wrong ones
@@ -15,7 +31,8 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
   const [state, setState] = useState('loading');
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
-  const [wrongIds, setWrongIds] = useState([]);
+  // Question id → QuizLight of the words checked and not changed since.
+  const [lights, setLights] = useState({});
   const [busy, setBusy] = useState(false);
   const [passed, setPassed] = useState(false);
 
@@ -24,7 +41,7 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
     try {
       setQuestions((await getVocabularyQuiz(lessonId, kind)).data.questions);
       setAnswers({});
-      setWrongIds([]);
+      setLights({});
       setPassed(false);
       setState('ready');
     } catch (error) {
@@ -41,7 +58,7 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
     setBusy(true);
     try {
       const result = (await submitVocabularyQuiz(lessonId, kind, answers)).data;
-      setWrongIds(result.wrongIds);
+      setLights(checkedLights(questions, result.wrongIds));
       if (result.passed) {
         setPassed(true);
         notify({ title: 'All correct' });
@@ -69,19 +86,51 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
     );
 
   const answered = questions.filter((question) => answers[question.id]).length;
+  const wordId = (index) => `quiz-${kind}-word-${index + 1}`;
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
         Choose the meaning of each word. All {questions.length} must be right; you can try as often as you need.
       </p>
+      {/* One light per word: grey until checked, then green or red. */}
+      <div className="rounded-xl border bg-card p-3 shadow-sm">
+        <ol aria-label="Results" className="flex flex-wrap gap-2">
+          {questions.map((question, index) => {
+            const light = lightOf(lights, question.id);
+            return (
+              <li key={question.id}>
+                <button
+                  type="button"
+                  aria-label={`Word ${index + 1}: ${lightStyles[light].label}`}
+                  title={`${question.word}: ${lightStyles[light].label}`}
+                  className="flex flex-col items-center gap-0.5 rounded-lg p-1 text-xs font-medium text-muted-foreground tabular-nums hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  onClick={() => document.getElementById(wordId(index))?.scrollIntoView({ block: 'center', behavior: 'smooth' })}
+                >
+                  <WordLight light={light} />
+                  {index + 1}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
       <ol className="space-y-3">
         {questions.map((question, index) => {
-          const wrong = wrongIds.includes(question.id);
+          const light = lightOf(lights, question.id);
+          const wrong = light === QuizLight.WRONG;
           return (
-            <li key={question.id}>
-              <fieldset className={cn('rounded-xl border bg-card p-4 shadow-sm', wrong && 'border-destructive/60')}>
+            <li key={question.id} id={wordId(index)} className="scroll-mt-24">
+              <fieldset
+                className={cn(
+                  'rounded-xl border bg-card p-4 shadow-sm',
+                  wrong && 'border-destructive/60',
+                  light === QuizLight.RIGHT && 'border-success/40',
+                )}
+              >
                 <legend className="sr-only">Word {index + 1}</legend>
                 <p className="flex flex-wrap items-center gap-2 font-medium">
+                  <WordLight light={light} />
+                  <span className="sr-only">{lightStyles[light].label}</span>
                   <span className="text-primary">{index + 1}.</span>
                   {question.word}
                   <Badge variant="secondary">{question.partOfSpeech}</Badge>
@@ -106,7 +155,7 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
                           disabled={passed}
                           onChange={() => {
                             setAnswers((current) => ({ ...current, [question.id]: option }));
-                            setWrongIds((current) => current.filter((id) => id !== question.id));
+                            setLights((current) => withAnswerChanged(current, question.id));
                           }}
                         />
                         <span

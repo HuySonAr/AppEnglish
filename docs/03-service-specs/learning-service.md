@@ -105,6 +105,7 @@ for Students; `:id` is a lesson id.
 | POST | `/learning/lessons/:id/test/start` | `StartLessonTest` | New attempt, or the one in progress |
 | PUT | `/learning/lessons/:id/test/answers` | `SaveLessonTestAnswers` | Saves `{ answers }` chosen so far |
 | POST | `/learning/lessons/:id/test/submit` | `SubmitLessonTest` | Scores and returns the result with the review |
+| POST | `/learning/lessons/:id/test/discard` | `DiscardLessonTest` | Removes the attempt in progress without scoring it (D82): `{ discarded: true }`; an attempt whose time ran out is scored instead and 56 is returned |
 | GET | `/learning/lessons/:id/test/review` and `/review/:attemptNumber` | `GetLessonTestReview` | One finished attempt (the latest, or the numbered one): correct answers, the learner's answers, explanations, transcripts |
 | GET | `/learning/lessons/:id/ranking` | `GetLessonRanking` | First attempts ranked: `{ total, entries (top 50), me }` |
 
@@ -168,6 +169,7 @@ on GET, body otherwise).
 | POST | `/mock-tests/:id/attempt/start` | `StartMockAttempt` | Student | New attempt, or the one in progress |
 | PUT | `/mock-tests/:id/attempt/answers` | `SaveMockAnswers` | Student | Saves `{ answers }` chosen so far |
 | POST | `/mock-tests/:id/attempt/submit` | `SubmitMockAttempt` | Student | Scores and returns the result with the review |
+| POST | `/mock-tests/:id/attempt/discard` | `DiscardMockAttempt` | Student | Body `{ kind, partKey? }`. Removes the attempt in progress without scoring it (D82): `{ discarded: true }`; a full attempt whose time ran out is scored instead and 58 is returned |
 | GET | `/mock-tests/:id/review` | `GetMockReview` | Student | One finished attempt (`attemptNumber`, default the latest) with answers, explanations, transcripts |
 | GET, PUT | `/mock-tests/score-conversion` | `GetScoreConversion`, `UpdateScoreConversion` | Admin | The conversion table; 101 non-decreasing multiples of 5 from 5 to 495 per section |
 

@@ -44,6 +44,7 @@ import {
   TabsTrigger,
 } from '../../../components/ui';
 import { PartEditor, questionRange } from '../components/PartEditor.jsx';
+import { PasteVocabularyDialog } from '../components/PasteVocabularyDialog.jsx';
 import { TextField } from '../components/TextField.jsx';
 import { VocabularyCard } from '../components/VocabularyCard.jsx';
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
@@ -408,19 +409,25 @@ export function LessonEditorPage() {
               onAutofill={onAutofill}
             />
           ))}
-          <Button
-            variant="outline"
-            className="flex items-center gap-2"
-            onClick={() =>
-              update((current) => ({
-                ...current,
-                vocabulary: [...current.vocabulary, newVocabulary()],
-              }))
-            }
-          >
-            <Plus className="h-4 w-4" />
-            Add word
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() =>
+                update((current) => ({
+                  ...current,
+                  vocabulary: [...current.vocabulary, newVocabulary()],
+                }))
+              }
+            >
+              <Plus className="h-4 w-4" />
+              Add word
+            </Button>
+            <PasteVocabularyDialog
+              vocabulary={content.vocabulary}
+              onApply={(vocabulary) => update((current) => ({ ...current, vocabulary }))}
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="fillIn" className="space-y-4">

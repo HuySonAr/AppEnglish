@@ -26,6 +26,8 @@ service LearningService {
   rpc StartLessonTest(LearningRequest) returns (LearningReply);
   rpc SaveLessonTestAnswers(LearningRequest) returns (LearningReply);
   rpc SubmitLessonTest(LearningRequest) returns (LearningReply);
+  // Leaves the test in progress without submitting; the attempt is removed.
+  rpc DiscardLessonTest(LearningRequest) returns (LearningReply);
   rpc GetLessonTestReview(LearningRequest) returns (LearningReply);
   rpc GetLessonRanking(LearningRequest) returns (LearningReply);
   // Mock tests (F05A). Student: full tests and mini tests; id is the mock
@@ -36,6 +38,8 @@ service LearningService {
   rpc StartMockAttempt(LearningRequest) returns (LearningReply);
   rpc SaveMockAnswers(LearningRequest) returns (LearningReply);
   rpc SubmitMockAttempt(LearningRequest) returns (LearningReply);
+  // Leaves the attempt in progress without submitting; the attempt is removed.
+  rpc DiscardMockAttempt(LearningRequest) returns (LearningReply);
   rpc GetMockReview(LearningRequest) returns (LearningReply);
   rpc GetScoreConversion(LearningRequest) returns (LearningReply);
   rpc UpdateScoreConversion(LearningRequest) returns (LearningReply);

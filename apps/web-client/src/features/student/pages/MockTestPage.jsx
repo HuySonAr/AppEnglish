@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, Clock, ListChecks, Minus, TrendingDown, TrendingUp } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { MockAttemptKind, TestTrend } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { Badge, Button, Skeleton } from '../../../components/ui';
+import { Badge, Button } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import {
+  discardMockAttempt,
   getMockAttempt,
   getMockReview,
   getMockTest,
@@ -15,14 +16,13 @@ import {
   submitMockAttempt,
 } from '../api/mock-api.js';
 import { AttemptList } from '../components/AttemptList.jsx';
+import { MockAttemptResult } from '../components/MockAttemptResult.jsx';
 import { TestExam } from '../components/TestExam.jsx';
 import { TestProgression } from '../components/TestProgression.jsx';
-import { TestReview } from '../components/TestReview.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 const FULL = { kind: MockAttemptKind.FULL };
 const mini = (partKey) => ({ kind: MockAttemptKind.MINI, partKey });
-const sameSeries = (a, b) => a.kind === b.kind && (a.partKey || null) === (b.partKey || null);
 const skillLabels = { LISTENING: 'Listening', READING: 'Reading' };
 const trendIcons = {
   [TestTrend.IMPROVED]: { icon: TrendingUp, tone: 'text-success', label: 'Improving' },
@@ -31,18 +31,19 @@ const trendIcons = {
 };
 
 // One mock test: take it in full (timed; the first attempt counts for XP) or
-// one part at a time as a mini test (no time limit, no XP), with the history
-// of both and the answers of every finished attempt.
+// one part at a time as a mini test (no time limit, no XP). The history of
+// the full test and the answers of its attempts are below; each part's mini
+// tests have their own history page (MockMiniHistoryPage).
 export function MockTestPage() {
   const { mockTestId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
   // The attempt being taken (from the API), or null.
   const [exam, setExam] = useState(null);
-  // { reference, attempt, parts } of the attempt whose answers are shown.
+  // { attempt, parts } of the full attempt whose answers are shown.
   const [review, setReview] = useState(null);
-  // The series whose history is open: FULL or a part's mini test.
-  const [history, setHistory] = useState(FULL);
   const [busy, setBusy] = useState(false);
 
   async function load({ quiet = false } = {}) {
@@ -59,9 +60,16 @@ export function MockTestPage() {
   useEffect(() => {
     setExam(null);
     setReview(null);
-    setHistory(FULL);
     load();
   }, [mockTestId]);
+
+  // A mini-test history page sends the learner here to take its part.
+  useEffect(() => {
+    const partKey = location.state?.startMini;
+    if (!partKey) return;
+    navigate(location.pathname, { replace: true, state: null });
+    onStart(mini(partKey));
+  }, [location.state]);
 
   // Starts the attempt, or resumes the one in progress.
   async function onStart(reference) {
@@ -82,8 +90,13 @@ export function MockTestPage() {
     setBusy(true);
     try {
       const result = (await submitMockAttempt(mockTestId, reference, answers)).data;
-      setReview({ reference, ...result });
-      setHistory(reference);
+      // A mini test ends on the history page of its part, on this attempt.
+      if (reference.partKey) {
+        const shown = result.attempt ? `?attempt=${result.attempt.attemptNumber}` : '';
+        navigate(`/student/mock-tests/${mockTestId}/mini/${reference.partKey}${shown}`);
+        return;
+      }
+      setReview(result);
     } catch (error) {
       notify({ title: 'Could not submit the test', description: getApiErrorMessage(error), variant: 'destructive' });
     } finally {
@@ -95,10 +108,34 @@ export function MockTestPage() {
     }
   }
 
-  async function onReview(reference, attemptNumber) {
+  // Leaving without submitting: the attempt is thrown away (D82), or a mini
+  // test is kept to resume. A mini test goes back to the history page of its
+  // part, the full test to this page. True when the learner left.
+  async function onLeave(discard) {
+    const reference = exam.partKey ? mini(exam.partKey) : FULL;
+    try {
+      if (discard) await discardMockAttempt(mockTestId, reference);
+    } catch (error) {
+      notify({ title: 'Could not leave the test', description: getApiErrorMessage(error), variant: 'destructive' });
+      // The attempt may be over already (its time ran out).
+      setExam(null);
+      await load({ quiet: true });
+      return false;
+    }
+    if (reference.partKey) {
+      navigate(`/student/mock-tests/${mockTestId}/mini/${reference.partKey}`);
+      return true;
+    }
+    setExam(null);
+    await load({ quiet: true });
+    window.scrollTo({ top: 0 });
+    return true;
+  }
+
+  async function onReview(attemptNumber) {
     setBusy(true);
     try {
-      setReview({ reference, ...(await getMockReview(mockTestId, reference, attemptNumber)).data });
+      setReview((await getMockReview(mockTestId, FULL, attemptNumber)).data);
     } catch (error) {
       notify({ title: 'Could not load the answers', description: getApiErrorMessage(error), variant: 'destructive' });
     } finally {
@@ -145,13 +182,12 @@ export function MockTestPage() {
         saveAnswers={(answers) => saveMockAnswers(mockTestId, exam.partKey ? mini(exam.partKey) : FULL, answers)}
         submitting={busy}
         onSubmit={onSubmit}
+        onDiscard={() => onLeave(true)}
+        onLeaveForLater={exam.partKey ? () => onLeave(false) : undefined}
       />
     );
 
   const { mockTest, full, parts } = data;
-  const openPart = history.partKey ? parts.find((part) => part.key === history.partKey) : null;
-  const series = openPart ? openPart.mini : full;
-  const shownNumber = review?.attempt && sameSeries(review.reference, history) ? review.attempt.attemptNumber : null;
 
   return (
     <section className="space-y-6">
@@ -193,9 +229,6 @@ export function MockTestPage() {
               {full.attempts.length ? 'Take the full test again' : 'Start the full test'}
             </Button>
           )}
-          <Button variant={history.kind === MockAttemptKind.FULL ? 'secondary' : 'outline'} onClick={() => setHistory(FULL)}>
-            Full test history ({full.attempts.length})
-          </Button>
         </div>
       </div>
 
@@ -211,9 +244,8 @@ export function MockTestPage() {
           {parts.map((part) => {
             const latest = part.mini.attempts.at(-1);
             const trend = part.mini.progression ? trendIcons[part.mini.progression.trend] : null;
-            const open = history.partKey === part.key;
             return (
-              <li key={part.key} className={cn('flex flex-col rounded-xl border bg-card p-4 shadow-sm', open && 'border-primary/50')}>
+              <li key={part.key} className="flex flex-col rounded-xl border bg-card p-4 shadow-sm">
                 <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                   {skillLabels[part.skill]}
                 </p>
@@ -248,9 +280,15 @@ export function MockTestPage() {
                       {latest ? 'Again' : 'Start'}
                     </Button>
                   )}
-                  <Button size="sm" variant={open ? 'secondary' : 'outline'} disabled={!part.mini.attempts.length} onClick={() => setHistory(mini(part.key))}>
-                    History ({part.mini.attempts.length})
-                  </Button>
+                  {part.mini.attempts.length ? (
+                    <Button asChild size="sm" variant="outline">
+                      <Link to={`/student/mock-tests/${mockTestId}/mini/${part.key}`}>History ({part.mini.attempts.length})</Link>
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="outline" disabled>
+                      History (0)
+                    </Button>
+                  )}
                 </div>
               </li>
             );
@@ -259,45 +297,18 @@ export function MockTestPage() {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold">
-          {openPart ? `History of Part ${openPart.number} mini tests` : 'History of the full test'}
-        </h2>
-        {series.attempts.length ? (
+        <h2 className="text-lg font-semibold">History of the full test ({full.attempts.length})</h2>
+        {full.attempts.length ? (
           <>
-            <TestProgression attempts={series.attempts} progression={series.progression} />
-            <AttemptList
-              attempts={series.attempts}
-              shownNumber={shownNumber}
-              busy={busy}
-              onReview={(attemptNumber) => onReview(history, attemptNumber)}
-            />
+            <TestProgression attempts={full.attempts} progression={full.progression} />
+            <AttemptList attempts={full.attempts} shownNumber={review?.attempt?.attemptNumber ?? null} busy={busy} onReview={onReview} />
           </>
         ) : (
           <p className="text-sm text-muted-foreground">No finished attempt yet.</p>
         )}
       </div>
 
-      {review?.attempt && sameSeries(review.reference, history) ? (
-        <div className="space-y-4">
-          <div className="rounded-2xl border bg-card p-6 text-center shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-              {review.reference.partKey ? 'Mini test' : 'Full test'} · attempt {review.attempt.attemptNumber}
-            </p>
-            <p className="mt-2 text-5xl font-bold tracking-tight text-primary">{review.attempt.scorePercent}%</p>
-            <p className="mt-1 text-muted-foreground">
-              {review.attempt.correctCount} of {review.attempt.totalCount} correct
-            </p>
-            {review.attempt.estimated ? (
-              <p className="mt-3 text-sm">
-                Estimated score <span className="text-lg font-bold">{review.attempt.estimated.totalScore}</span> / 990
-                {' · '}Listening {review.attempt.estimated.listeningScore} · Reading {review.attempt.estimated.readingScore}
-              </p>
-            ) : null}
-          </div>
-          <h2 className="text-lg font-semibold">Answers and explanations</h2>
-          <TestReview parts={review.parts} />
-        </div>
-      ) : null}
+      {review?.attempt ? <MockAttemptResult label="Full test" attempt={review.attempt} parts={review.parts} /> : null}
     </section>
   );
 }

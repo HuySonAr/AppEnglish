@@ -1,6 +1,7 @@
-import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, BookOpen, Flag, Headphones, Minus, Target, TrendingDown, TrendingUp } from 'lucide-react';
 import { TestTrend } from '@appenglish/learning-contracts';
 import { cn } from '../../../lib/utils.js';
+import { ScoreChart } from './ScoreChart.jsx';
 
 const trends = {
   [TestTrend.IMPROVED]: {
@@ -22,24 +23,30 @@ const trends = {
 
 const signed = (value) => (value > 0 ? `+${value}` : String(value));
 
-function Change({ label, value }) {
+// One change in right answers: what is compared (with its icon), then the
+// change with an arrow, green when up and red when down.
+function Change({ icon: Icon, label, value }) {
+  const Direction = value > 0 ? ArrowUp : value < 0 ? ArrowDown : Minus;
+  const tone = value > 0 ? 'text-success' : value < 0 ? 'text-destructive' : 'text-muted-foreground';
   return (
-    <div className="rounded-lg border bg-card px-3 py-2">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p
-        className={cn(
-          'text-lg font-bold tabular-nums',
-          value > 0 ? 'text-success' : value < 0 ? 'text-destructive' : 'text-muted-foreground',
-        )}
-      >
-        {signed(value)}
-      </p>
+    <div className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <Icon className="h-4 w-4" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className={cn('flex items-center gap-1 text-lg font-bold tabular-nums', tone)}>
+          <Direction className="h-4 w-4" />
+          {signed(value)}
+        </p>
+      </div>
     </div>
   );
 }
 
-// How the learner's lesson-test results develop over the retakes: the latest
-// attempt against the one before it, per skill, and against the first one.
+// How the learner's results on one test develop over the retakes: the latest
+// attempt against the one before it, per skill, and against the first one,
+// then the score of each attempt as a line chart.
 // attempts are the finished attempts (oldest first); progression comes from
 // the API and is null with fewer than two attempts.
 export function TestProgression({ attempts, progression, passPercent }) {
@@ -62,32 +69,13 @@ export function TestProgression({ attempts, progression, passPercent }) {
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Change label="Listening vs last time" value={progression.listeningChange} />
-        <Change label="Reading vs last time" value={progression.readingChange} />
-        <Change label="Total vs last time" value={progression.changeFromPrevious} />
-        <Change label="Total vs first attempt" value={progression.changeFromFirst} />
+        <Change icon={Headphones} label="Listening vs last time" value={progression.listeningChange} />
+        <Change icon={BookOpen} label="Reading vs last time" value={progression.readingChange} />
+        <Change icon={Target} label="Total vs last time" value={progression.changeFromPrevious} />
+        <Change icon={Flag} label="Total vs first attempt" value={progression.changeFromFirst} />
       </div>
 
-      <div>
-        <p className="mb-2 text-sm font-medium">Score of each attempt</p>
-        <ol className="flex h-32 items-end gap-2" aria-label="Score of each attempt">
-          {attempts.map((attempt) => (
-            <li key={attempt.attemptNumber} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1">
-              <span className="text-xs font-semibold tabular-nums">{attempt.scorePercent}%</span>
-              <span
-                className={cn('w-full max-w-[3rem] rounded-t-md', attempt.passed ? 'bg-success' : 'bg-primary/60')}
-                style={{ height: `${Math.max(4, attempt.scorePercent * 0.8)}%` }}
-              />
-              <span className="text-xs text-muted-foreground tabular-nums">#{attempt.attemptNumber}</span>
-            </li>
-          ))}
-        </ol>
-        {passPercent ? (
-          <p className="mt-2 text-xs text-muted-foreground">
-            Green bars reached the pass mark of {passPercent}%.
-          </p>
-        ) : null}
-      </div>
+      <ScoreChart attempts={attempts} passPercent={passPercent} />
     </div>
   );
 }

@@ -333,6 +333,26 @@ test('the lesson test clock is kept by the server', async () => {
   assert.deepEqual(await context.states(), [['COMPLETED', 'OPEN'], ['LOCKED', 'LOCKED']]);
 });
 
+test('a lesson test left without submitting is removed (D82)', async () => {
+  const { service, content, lessons, study, advance } = await harness();
+  const [first] = lessons;
+  await study(learner, first);
+  await assert.rejects(() => service.discardLessonTest(learner, first.id), { code: 56, status: 409 });
+  await service.startLessonTest(learner, first.id);
+  await service.saveLessonTestAnswers(learner, first.id, { answers: testAnswers(content.paperOf(first.id), 23) });
+  assert.deepEqual(await service.discardLessonTest(learner, first.id), { discarded: true });
+  const view = await service.getLessonTest(learner, first.id);
+  assert.deepEqual([view.status, view.attempts], ['READY', []]);
+  // The next attempt is number 1 again, with a full clock and no answers.
+  const again = await service.startLessonTest(learner, first.id);
+  assert.deepEqual([again.attemptNumber, again.answers, again.expiresAt], [1, {}, new Date(Date.parse(again.startedAt) + 25 * 60 * 1000).toISOString()]);
+
+  // An attempt whose time ran out is scored instead.
+  advance(30);
+  await assert.rejects(() => service.discardLessonTest(learner, first.id), { code: 56 });
+  assert.equal((await service.getLessonTest(learner, first.id)).attempts.length, 1);
+});
+
 test('an attempt finishes on the lesson version it started', async () => {
   const { service, content, lessons, study } = await harness();
   const [first] = lessons;

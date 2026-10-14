@@ -28,6 +28,7 @@ import { MockTestsManagePage } from '../features/content-manager/pages/MockTests
 import { MockTestEditorPage } from '../features/content-manager/pages/MockTestEditorPage.jsx';
 import { MockTestsPage } from '../features/student/pages/MockTestsPage.jsx';
 import { MockTestPage } from '../features/student/pages/MockTestPage.jsx';
+import { MockMiniHistoryPage } from '../features/student/pages/MockMiniHistoryPage.jsx';
 import { ScoreConversionPage } from '../features/admin/pages/ScoreConversionPage.jsx';
 import { ExamTypesPage } from '../features/admin/pages/ExamTypesPage.jsx';
 import { Roles } from '../constants/auth.js';
@@ -68,6 +69,7 @@ export function AppRouter() {
             <Route path="lessons/:lessonId/test" element={<LessonTestPage />} />
             <Route path="mock-tests" element={<MockTestsPage />} />
             <Route path="mock-tests/:mockTestId" element={<MockTestPage />} />
+            <Route path="mock-tests/:mockTestId/mini/:partKey" element={<MockMiniHistoryPage />} />
           </Route>
         </Route>
         <Route path="/admin" element={<RoleRoute allowedRole={Roles.ADMIN} />}>

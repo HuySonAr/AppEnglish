@@ -49,6 +49,7 @@ const rpcs = {
     payload: answersSchema,
     run: (service, { actor, id, payload }) => service.submitLessonTest(actor, id, payload),
   },
+  DiscardLessonTest: { id: true, run: (service, { actor, id }) => service.discardLessonTest(actor, id) },
   GetLessonTestReview: {
     id: true,
     payload: reviewRequestSchema,

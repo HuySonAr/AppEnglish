@@ -1,4 +1,5 @@
 import { Check, X } from 'lucide-react';
+import { PassageText } from '../../../components/shared/PassageText.jsx';
 import { Badge } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import { numberBlanks, partSections } from '../lib/placement.js';
@@ -101,7 +102,7 @@ export function TestReview({ parts }) {
                 {section.imageUrl ? <img src={section.imageUrl} alt="" className="max-h-96 rounded-lg border" /> : null}
                 {section.passage ? (
                   <div className="whitespace-pre-wrap rounded-xl border bg-card p-4 leading-relaxed shadow-sm">
-                    {section.blanks ? numberBlanks(section.passage, section.questions[0].number) : section.passage}
+                    {section.blanks ? numberBlanks(section.passage, section.questions[0].number) : <PassageText text={section.passage} />}
                   </div>
                 ) : null}
                 {section.questions.map((question) => (

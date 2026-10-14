@@ -128,6 +128,7 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
   định, `destructive` cho lỗi, `info`, `warning`, `loading`.
 - Tiêu đề trang dùng `PageHeader`; danh sách rỗng dùng `EmptyState`; ô dashboard
   dùng `FeatureCard`.
+- Biểu đồ dùng `ChartContainer` của shadcn chart (`components/ui/chart.jsx`, Recharts) với màu `--chart-1`…`--chart-5`; không tự vẽ biểu đồ bằng `div` hay thêm thư viện biểu đồ khác (D78).
 - Màu chỉ lấy từ token trong `styles/index.css`; mọi trang phải dùng được ở
   chế độ sáng, tối và trên màn hình điện thoại.
 - Chữ trên giao diện viết bằng tiếng Anh.

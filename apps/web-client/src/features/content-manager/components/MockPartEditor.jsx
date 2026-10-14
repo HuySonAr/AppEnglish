@@ -10,10 +10,13 @@ import {
   MediaKind,
   Skill,
 } from '@appenglish/content-contracts';
+import { PassageText } from '../../../components/shared/PassageText.jsx';
 import { Badge, Button, Card, CardContent, Input } from '../../../components/ui';
+import { hasTable } from '../../../lib/passage.js';
 import { withCorrectOption } from '../lib/lesson-draft.js';
-import { MOCK_FIRST_QUESTION_NUMBERS, graphicQuestion, mockQuestionNumber, withGraphicOn, withGroup, withQuestion, withoutGroup, withoutQuestion } from '../lib/mock-draft.js';
+import { MOCK_FIRST_QUESTION_NUMBERS, MOCK_PASTE_PARTS, graphicQuestion, mockQuestionNumber, withGraphicOn, withGroup, withQuestion, withoutGroup, withoutQuestion } from '../lib/mock-draft.js';
 import { MediaField } from './MediaField.jsx';
+import { PasteQuestionsDialog } from './PasteQuestionsDialog.jsx';
 import { TextField } from './TextField.jsx';
 
 const optionLetters = ['A', 'B', 'C', 'D'];
@@ -144,6 +147,9 @@ export function MockPartEditor({ spec, part, edit, updatePart, media }) {
           {spec.option.text ? '' : ' · each recording reads its options; learners see only the letters'}
           {groupAudio ? ` · one recording per ${setName.toLowerCase()}, with up to ${MOCK_SET_QUESTION_COUNT} questions · ${setName.toLowerCase()}s ${graphicSets[0] + 1}–${graphicSets.at(-1) + 1} each have a graphic on one question, usually the middle one` : ''}
         </span>
+        {MOCK_PASTE_PARTS.includes(spec.key) ? (
+          <PasteQuestionsDialog spec={spec} part={part} setName={groupAudio ? setName : null} onApply={(pasted) => updatePart(() => pasted)} />
+        ) : null}
       </div>
 
       {grouped ? (
@@ -173,7 +179,7 @@ export function MockPartEditor({ spec, part, edit, updatePart, media }) {
                 ) : (
                 <TextField
                   id={`${spec.key}-${group.id}-passage`}
-                  label={spec.group.blanks ? `Passage: type ${FILL_IN_BLANK} for each blank, one per question` : 'Document (letter, form, report, notice…)'}
+                  label={spec.group.blanks ? `Passage: type ${FILL_IN_BLANK} for each blank, one per question` : 'Document (letter, form, report, notice…). A table: one line per row, written | cell | cell |'}
                   value={group.passage}
                   maxLength={10000}
                   multiline
@@ -181,6 +187,14 @@ export function MockPartEditor({ spec, part, edit, updatePart, media }) {
                   onChange={(value) => edit([...path, 'passage'], value)}
                 />
                 )}
+                {!groupAudio && !spec.group.blanks && hasTable(group.passage) ? (
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">As learners see it</p>
+                    <div className="rounded-xl border bg-card p-4 leading-relaxed">
+                      <PassageText text={group.passage} />
+                    </div>
+                  </div>
+                ) : null}
                 {spec.group.optionalImage ? (
                   <MediaField id={`${spec.key}-${group.id}-image`} label="Document image (optional)" kind={MediaKind.IMAGE} path={[...path, 'imageMediaId']} mediaId={group.imageMediaId} media={media} />
                 ) : null}

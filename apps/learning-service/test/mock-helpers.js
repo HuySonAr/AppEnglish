@@ -61,6 +61,9 @@ export function createMockRepository() {
       tables.attempts[tables.attempts.findIndex((row) => row.id === attempt.id)] = structuredClone(attempt);
       return copy(attempt);
     },
+    async deleteOpenAttempt(id) {
+      tables.attempts = tables.attempts.filter((row) => row.id !== id || row.status !== 'IN_PROGRESS');
+    },
     async findConversion() { return copy(tables.conversion); },
     async saveConversion(conversion) { tables.conversion = { ...conversion, id: 1 }; return copy(tables.conversion); },
   };

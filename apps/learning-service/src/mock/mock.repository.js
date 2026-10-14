@@ -44,6 +44,12 @@ export class MockRepository {
     return (await this.repo(MockAttemptEntity)).save(attempt);
   }
 
+  // Removes an attempt the learner left without submitting (D82). Only an
+  // attempt still in progress goes, so a submit racing it is kept.
+  async deleteOpenAttempt(id) {
+    await (await this.repo(MockAttemptEntity)).delete({ id, status: 'IN_PROGRESS' });
+  }
+
   async findConversion() {
     return (await this.repo(ScoreConversionEntity)).findOne({ where: { id: 1 } });
   }

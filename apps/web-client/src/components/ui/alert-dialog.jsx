@@ -21,7 +21,7 @@ function AlertDialogOverlay({ className, ...props }) {
     <AlertDialogPrimitive.Overlay
       className={cn(
         'fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-        className
+        className,
       )}
       {...props}
     />
@@ -35,7 +35,7 @@ function AlertDialogContent({ className, ...props }) {
       <AlertDialogPrimitive.Content
         className={cn(
           'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg',
-          className
+          className,
         )}
         {...props}
       />
@@ -46,7 +46,10 @@ function AlertDialogContent({ className, ...props }) {
 function AlertDialogHeader({ className, ...props }) {
   return (
     <div
-      className={cn('flex flex-col space-y-2 text-center sm:text-left', className)}
+      className={cn(
+        'flex flex-col space-y-2 text-center sm:text-left',
+        className,
+      )}
       {...props}
     />
   );
@@ -55,7 +58,10 @@ function AlertDialogHeader({ className, ...props }) {
 function AlertDialogFooter({ className, ...props }) {
   return (
     <div
-      className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
+      className={cn(
+        'flex flex-col-reverse gap-2 sm:gap-0 sm:flex-row sm:justify-end sm:space-x-2',
+        className,
+      )}
       {...props}
     />
   );
@@ -84,7 +90,7 @@ function AlertDialogAction({ className, ...props }) {
     <AlertDialogPrimitive.Action
       className={cn(
         'btn btn-primary inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4',
-        className
+        className,
       )}
       {...props}
     />
@@ -96,7 +102,7 @@ function AlertDialogCancel({ className, ...props }) {
     <AlertDialogPrimitive.Cancel
       className={cn(
         'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4',
-        className
+        className,
       )}
       {...props}
     />
@@ -111,7 +117,8 @@ AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
 AlertDialogHeader.displayName = 'AlertDialogHeader';
 AlertDialogFooter.displayName = 'AlertDialogFooter';
 AlertDialogTitle.displayName = AlertDialogPrimitive.Title.displayName;
-AlertDialogDescription.displayName = AlertDialogPrimitive.Description.displayName;
+AlertDialogDescription.displayName =
+  AlertDialogPrimitive.Description.displayName;
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
 AlertDialogCancel.displayName = AlertDialogPrimitive.Cancel.displayName;
 

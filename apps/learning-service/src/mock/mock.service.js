@@ -242,6 +242,19 @@ export class MockService {
     return { saved: true };
   }
 
+  // Throws away the attempt in progress: it is not scored and leaves no trace
+  // in the history (D82). An attempt whose time already ran out is finished
+  // instead, as it would be on the next visit.
+  async discardMockAttempt(actor, mockTestId, reference) {
+    const attempt = await this.openAttempt(actor, mockTestId, reference);
+    if (this.isExpired(attempt)) {
+      await this.complete(attempt, attempt.answers);
+      throw mockErrors.notInProgress();
+    }
+    await this.repository.deleteOpenAttempt(attempt.id);
+    return { discarded: true };
+  }
+
   // Scores the attempt and returns the result with every answer explained.
   async submitMockAttempt(actor, mockTestId, { answers, ...reference }) {
     const attempt = await this.openAttempt(actor, mockTestId, reference);

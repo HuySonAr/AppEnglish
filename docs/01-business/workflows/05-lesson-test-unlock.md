@@ -5,7 +5,7 @@
 4. Nếu đạt >=80% và các phần bắt buộc hoàn tất, lesson chuyển sang hoàn thành và lesson kế mở.
 5. Nếu dưới 80%, lesson chưa hoàn thành; Student làm lại test cuối.
 
-Lesson test làm trong 25 phút, đồng hồ do server giữ; trong lúc làm có danh sách câu 1–23, tự lưu câu trả lời và cảnh báo khi rời trang như placement. Sau khi nộp, Student thấy điểm, đáp án đúng, giải thích và transcript (D59). Mọi Student xem được bảng xếp hạng của lesson, hiển thị bằng email (D60).
+Lesson test làm trong 25 phút, đồng hồ do server giữ; trong lúc làm có danh sách câu 1–23, tự lưu câu trả lời và cảnh báo khi rời trang như placement. Nút "Exit" cho rời bài không nộp: lượt đang làm bị xóa, không tính điểm, không vào lịch sử hay bảng xếp hạng (D82). Sau khi nộp, Student thấy điểm, đáp án đúng, giải thích và transcript (D59). Mọi Student xem được bảng xếp hạng của lesson, hiển thị bằng email (D60).
 
 Student xem lại được từng lượt đã làm (đáp án, giải thích, transcript). Từ lượt thứ hai, trang lesson test cho biết kết quả đang tăng, giảm hay giữ nguyên so với lượt liền trước, theo tổng số câu đúng và riêng từng kỹ năng Listening/Reading, cùng mức thay đổi so với lượt đầu (D62).
 

@@ -62,6 +62,12 @@ export class LessonRepository {
     return (await this.repo(LessonTestAttemptEntity)).save(attempt);
   }
 
+  // Removes an attempt the learner left without submitting (D82). Only an
+  // attempt still in progress goes, so a submit racing it is kept.
+  async deleteOpenAttempt(id) {
+    await (await this.repo(LessonTestAttemptEntity)).delete({ id, status: 'IN_PROGRESS' });
+  }
+
   // First attempts of a lesson, best first: more right answers, then less
   // time, then the earlier submit (D30, D36).
   async listRanking(lessonId) {

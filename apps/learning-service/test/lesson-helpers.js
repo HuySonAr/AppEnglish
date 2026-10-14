@@ -47,6 +47,9 @@ export function createLessonRepository() {
       tables.attempts[tables.attempts.findIndex((row) => row.id === attempt.id)] = structuredClone(attempt);
       return copy(attempt);
     },
+    async deleteOpenAttempt(id) {
+      tables.attempts = tables.attempts.filter((row) => row.id !== id || row.status !== 'IN_PROGRESS');
+    },
     async listRanking(lessonId) {
       return tables.attempts
         .filter((row) => row.lessonId === lessonId && row.attemptNumber === 1 && row.status === 'COMPLETED')

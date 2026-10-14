@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, LogOut } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
   Button,
 } from '../../../components/ui';
+import { PassageText } from '../../../components/shared/PassageText.jsx';
 import { setLeaveGuard } from '../../../lib/leave-guard.js';
 import { cn } from '../../../lib/utils.js';
 import { answeredCount, formatRemaining, numberBlanks, partSections, remainingTime } from '../lib/placement.js';
@@ -76,7 +77,11 @@ function Question({ question, chosen, onChoose, blankNumber }) {
 //   onSubmit        ends the test with the given answers
 //   name            what the test is called, e.g. "placement test"
 //   retakeAllowed   whether the test can be taken again after submitting
-export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, retakeAllowed = false }) {
+//   onDiscard       throws the attempt away and leaves (D82); resolves to
+//                   true when it did. Without it there is no Exit button.
+//   onLeaveForLater leaves with the attempt kept, to resume it later (mini
+//                   tests, which have no clock)
+export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, retakeAllowed = false, onDiscard, onLeaveForLater }) {
   const [answers, setAnswers] = useState(attempt.answers || {});
   const [partIndex, setPartIndex] = useState(0);
   const [confirming, setConfirming] = useState(false);
@@ -84,6 +89,9 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
   const [target, setTarget] = useState(null);
   // True after the learner tried to leave the page during the test.
   const [leaving, setLeaving] = useState(false);
+  // True while the Exit dialog is open; discarding while the attempt goes.
+  const [exiting, setExiting] = useState(false);
+  const [discarding, setDiscarding] = useState(false);
   // Server time minus browser time at load.
   const [offset] = useState(() => new Date(attempt.serverNow).getTime() - Date.now());
   const [remaining, setRemaining] = useState(() => remainingTime(attempt.expiresAt, offset));
@@ -161,6 +169,33 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
     };
   }, []);
 
+  async function discard() {
+    // The clock must not hand the attempt in while it is being removed.
+    submitted.current = true;
+    setDiscarding(true);
+    const done = await onDiscard();
+    if (!done) {
+      submitted.current = false;
+      setDiscarding(false);
+    }
+  }
+
+  // The ways out of the test without submitting, for both dialogs.
+  const leaveButtons = (
+    <>
+      {onLeaveForLater ? (
+        <Button variant="outline" disabled={discarding} onClick={onLeaveForLater}>
+          Leave and continue later
+        </Button>
+      ) : null}
+      {onDiscard ? (
+        <Button variant="destructive" loading={discarding} disabled={discarding} onClick={discard}>
+          Discard and leave
+        </Button>
+      ) : null}
+    </>
+  );
+
   const choose = (questionId, optionId) =>
     setAnswers((current) => ({ ...current, [questionId]: optionId }));
   const part = attempt.parts[partIndex];
@@ -197,9 +232,17 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
         <span className="rounded-full bg-muted px-3 py-1.5 text-sm font-medium tabular-nums">
           <span className="font-bold text-primary">{answered}</span> / {total} answered
         </span>
-        <Button loading={submitting} className="ml-auto" disabled={submitting} onClick={() => setConfirming(true)}>
-          {submitting ? 'Submitting…' : 'Submit'}
-        </Button>
+        <div className="ml-auto flex items-center gap-2">
+          {onDiscard ? (
+            <Button variant="outline" disabled={submitting || discarding} onClick={() => setExiting(true)}>
+              <LogOut className="h-4 w-4" />
+              Exit
+            </Button>
+          ) : null}
+          <Button loading={submitting} disabled={submitting || discarding} onClick={() => setConfirming(true)}>
+            {submitting ? 'Submitting…' : 'Submit'}
+          </Button>
+        </div>
       </div>
 
       {/* Laptop: the question list stays on the right; phone: it comes first. */}
@@ -231,11 +274,11 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
                         aria-label={`Question ${question.number}, ${done ? 'answered' : 'not answered'}`}
                         onClick={() => showQuestion(index, question.number)}
                         className={cn(
-                          'flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                          'flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                           done
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-input text-muted-foreground hover:bg-accent',
-                          index === partIndex && 'ring-2 ring-primary/40 ring-offset-1 ring-offset-background',
+                          index === partIndex && 'ring-1 ring-primary/40 ring-offset-1 ring-offset-background',
                         )}
                       >
                         {question.number}
@@ -304,7 +347,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
                 {section.imageUrl ? <img src={section.imageUrl} alt="" className="max-h-96 rounded-lg border" /> : null}
                 {section.passage ? (
                   <div className="whitespace-pre-wrap rounded-xl border bg-card p-4 leading-relaxed shadow-sm sm:p-5">
-                    {section.blanks ? numberBlanks(section.passage, section.questions[0].number) : section.passage}
+                    {section.blanks ? numberBlanks(section.passage, section.questions[0].number) : <PassageText text={section.passage} />}
                   </div>
                 ) : null}
                 {section.questions.map((question) => (
@@ -369,15 +412,18 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
           <AlertDialogHeader>
             <AlertDialogTitle>You are taking the {name}</AlertDialogTitle>
             <AlertDialogDescription>
-              You cannot open another page during the test, and the clock keeps
-              running. Submit the test first if you want to leave.
+              {onDiscard
+                ? `You cannot open another page during the test. Submit it, or leave without submitting${onLeaveForLater ? ' and continue later' : ': your answers are then thrown away'}.`
+                : 'You cannot open another page during the test, and the clock keeps running. Submit the test first if you want to leave.'}
               {retakeAllowed ? '' : ' You cannot take the test again after submitting.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AnswerProgress answered={answered} total={total} unanswered={unanswered} />
-          <AlertDialogFooter>
-            <AlertDialogCancel>Keep working</AlertDialogCancel>
+          <AlertDialogFooter className="flex-wrap gap-y-2">
+            <AlertDialogCancel disabled={discarding}>Keep working</AlertDialogCancel>
+            {leaveButtons}
             <AlertDialogAction
+              disabled={discarding}
               onClick={() => {
                 submitted.current = true;
                 onSubmit(answers);
@@ -385,6 +431,24 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
             >
               Submit the test
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={exiting} onOpenChange={(open) => !discarding && setExiting(open)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave without submitting?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {onLeaveForLater
+                ? 'Continue later to keep your answers and resume this attempt from the page of the part. Discard to throw them away: the attempt will not count and will not appear in your history.'
+                : 'Your answers will be thrown away. The attempt will not count and will not appear in your history; next time the test starts again with the full time.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AnswerProgress answered={answered} total={total} unanswered={unanswered} />
+          <AlertDialogFooter className="flex-wrap gap-y-2">
+            <AlertDialogCancel disabled={discarding}>Keep working</AlertDialogCancel>
+            {leaveButtons}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

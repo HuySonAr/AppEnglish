@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowDown, ArrowUp } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { LESSON_TEST_QUESTION_COUNT } from '@appenglish/content-contracts';
 import { LessonTestStatus } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
@@ -8,6 +8,7 @@ import { notify } from '../../../lib/notify.js';
 import { Badge, Button, Skeleton } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import {
+  discardLessonTest,
   getLessonRanking,
   getLessonTest,
   getLessonTestReview,
@@ -27,6 +28,7 @@ import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx'
 // the results develop, and the lesson ranking.
 export function LessonTestPage() {
   const { lessonId } = useParams();
+  const navigate = useNavigate();
   const [state, setState] = useState('loading');
   const [test, setTest] = useState(null);
   const [ranking, setRanking] = useState(null);
@@ -85,6 +87,21 @@ export function LessonTestPage() {
     }
   }
 
+  // Leaves the test without submitting: the attempt is thrown away (D82) and
+  // the learner is back on the lesson. True when it went.
+  async function onDiscard() {
+    try {
+      await discardLessonTest(lessonId);
+      navigate(`/student/lessons/${lessonId}`);
+      return true;
+    } catch (error) {
+      notify({ title: 'Could not leave the test', description: getApiErrorMessage(error), variant: 'destructive' });
+      // The attempt may be over already (its time ran out).
+      await load();
+      return false;
+    }
+  }
+
   // Shows the answers of one finished attempt.
   async function onReview(attemptNumber) {
     setBusy(true);
@@ -120,6 +137,7 @@ export function LessonTestPage() {
         saveAnswers={(answers) => saveLessonTestAnswers(lessonId, answers)}
         submitting={busy}
         onSubmit={onSubmit}
+        onDiscard={onDiscard}
       />
     );
 

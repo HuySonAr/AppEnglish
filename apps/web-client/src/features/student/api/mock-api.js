@@ -21,6 +21,10 @@ export async function saveMockAnswers(id, reference, answers) {
 export async function submitMockAttempt(id, reference, answers) {
   return (await httpClient.post(`${mock(id)}/attempt/submit`, { ...reference, answers })).data;
 }
+// Leaves the attempt in progress without submitting; it is removed (D82).
+export async function discardMockAttempt(id, reference) {
+  return (await httpClient.post(`${mock(id)}/attempt/discard`, reference)).data;
+}
 // The answers of one finished attempt; the latest when attemptNumber is omitted.
 export async function getMockReview(id, reference, attemptNumber) {
   return (

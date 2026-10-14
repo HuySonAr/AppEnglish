@@ -1,7 +1,7 @@
 # Workflow: từ vựng, bài tập và review
 ## Trong lesson
 1. Student học danh sách từ vựng: phải mở hết từng từ.
-2. Làm bài trắc nghiệm từ vựng: mỗi từ một câu, chọn nghĩa đúng trong 4 lựa chọn A–D, thứ tự câu ngẫu nhiên, không lặp từ; phải đúng hết (D59).
+2. Làm bài trắc nghiệm từ vựng: mỗi từ một câu, chọn nghĩa đúng trong 4 lựa chọn A–D, thứ tự câu ngẫu nhiên, không lặp từ; phải đúng hết (D59). Sau mỗi lần kiểm tra, đèn của từng từ (và dải đèn tổng ở đầu bài) báo đúng/sai, không hiện đáp án (D83).
 3. Làm bài tập điền từ: phải đúng hết.
 4. Hoàn tất các phần này để mở lesson test cuối.
 

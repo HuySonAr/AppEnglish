@@ -118,6 +118,9 @@ export class LessonGatewayController extends LearningRelay {
   submitLessonTest(id, body, request) {
     return this.forward('SubmitLessonTest', request, { id, body });
   }
+  discardLessonTest(id, request) {
+    return this.forward('DiscardLessonTest', request, { id });
+  }
   getLessonTestReview(id, request) {
     return this.forward('GetLessonTestReview', request, { id });
   }
@@ -143,6 +146,7 @@ const lessonRoutes = [
   [Post, 'lessons/:id/test/start', 'startLessonTest', [Param('id'), Req()]],
   [Put, 'lessons/:id/test/answers', 'saveLessonTestAnswers', [Param('id'), Body(), Req()]],
   [Post, 'lessons/:id/test/submit', 'submitLessonTest', [Param('id'), Body(), Req()]],
+  [Post, 'lessons/:id/test/discard', 'discardLessonTest', [Param('id'), Req()]],
   [Get, 'lessons/:id/test/review', 'getLessonTestReview', [Param('id'), Req()]],
   [Get, 'lessons/:id/test/review/:attemptNumber', 'getLessonTestAttemptReview', [Param('id'), Param('attemptNumber'), Req()]],
   [Get, 'lessons/:id/ranking', 'getLessonRanking', [Param('id'), Req()]],
@@ -189,6 +193,9 @@ export class MockGatewayController extends LearningRelay {
   submitMockAttempt(id, body, request) {
     return this.forward('SubmitMockAttempt', request, { id, body });
   }
+  discardMockAttempt(id, body, request) {
+    return this.forward('DiscardMockAttempt', request, { id, body });
+  }
   getMockReview(id, query, request) {
     return this.forward('GetMockReview', request, { id, body: this.reference(query) });
   }
@@ -207,6 +214,7 @@ const mockRoutes = [
   [Post, ':id/attempt/start', 'startMockAttempt', [Param('id'), Body(), Req()]],
   [Put, ':id/attempt/answers', 'saveMockAnswers', [Param('id'), Body(), Req()]],
   [Post, ':id/attempt/submit', 'submitMockAttempt', [Param('id'), Body(), Req()]],
+  [Post, ':id/attempt/discard', 'discardMockAttempt', [Param('id'), Body(), Req()]],
   [Get, ':id/review', 'getMockReview', [Param('id'), Query(), Req()]],
 ];
 for (const [verb, path, method, params] of mockRoutes) {

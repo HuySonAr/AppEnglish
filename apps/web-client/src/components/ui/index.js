@@ -80,6 +80,14 @@ export {
   TabsTrigger,
   TabsContent,
 } from './tabs.jsx';
+export {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  ChartStyle,
+} from './chart.jsx';
 export { Checkbox } from './checkbox.jsx';
 export { Switch } from './switch.jsx';
 export { Toaster } from './sonner.jsx';

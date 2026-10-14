@@ -329,6 +329,19 @@ export class LessonService {
     return { saved: true };
   }
 
+  // Throws away the attempt in progress: it is not scored and leaves no trace
+  // in the history or the ranking (D82). An attempt whose time already ran
+  // out is finished instead, as it would be on the next visit.
+  async discardLessonTest(actor, lessonId) {
+    const attempt = await this.openAttempt(actor, lessonId);
+    if (this.isExpired(attempt)) {
+      await this.complete(attempt, attempt.answers);
+      throw lessonErrors.testNotInProgress();
+    }
+    await this.repository.deleteOpenAttempt(attempt.id);
+    return { discarded: true };
+  }
+
   // Scores the attempt and returns the result with the full review: correct
   // answers, explanations and transcripts (D59).
   async submitLessonTest(actor, lessonId, { answers }) {

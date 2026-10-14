@@ -179,3 +179,25 @@ test('an attempt finishes on the version it started, and the estimate is stored'
   await service.startMockAttempt(student, first.id, FULL);
   assert.equal((await service.submitMockAttempt(student, first.id, { ...FULL, answers: answers(first.id, 13) })).attempt.estimated.totalScore, 10);
 });
+
+test('an attempt left without submitting is removed, and the next one starts afresh (D82)', async () => {
+  const { service, tests, answers, advance, repository } = await harness();
+  const [first] = tests;
+  await assert.rejects(() => service.discardMockAttempt(student, first.id, FULL), { code: 58, status: 409 });
+
+  await service.startMockAttempt(student, first.id, mini('part5'));
+  await service.startMockAttempt(student, first.id, FULL);
+  await service.saveMockAnswers(student, first.id, { ...FULL, answers: answers(first.id, 5) });
+  assert.deepEqual(await service.discardMockAttempt(student, first.id, FULL), { discarded: true });
+  // Only the full attempt goes; the mini test of Part 5 stays in progress.
+  assert.deepEqual(repository.tables.attempts.map((row) => [row.kind, row.status]), [['MINI', 'IN_PROGRESS']]);
+  const detail = await service.getMockTest(student, first.id);
+  assert.deepEqual([detail.full.attempts, detail.full.inProgress], [[], false]);
+  const again = await service.startMockAttempt(student, first.id, FULL);
+  assert.deepEqual([again.attemptNumber, again.answers], [1, {}]);
+
+  // An attempt whose time ran out is scored instead.
+  advance(200);
+  await assert.rejects(() => service.discardMockAttempt(student, first.id, FULL), { code: 58 });
+  assert.equal((await service.getMockTest(student, first.id)).full.attempts.length, 1);
+});

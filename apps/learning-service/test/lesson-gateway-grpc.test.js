@@ -119,6 +119,10 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       assert.deepEqual((await call('POST', `${lesson}/fill-in`, { body: { answers: paper.content.fillIn.answers } })).json.data, { passed: true, total: 2, wrongBlanks: [] });
 
       assert.equal((await call('GET', `${lesson}/test`)).json.data.status, 'READY');
+      // Leaving without submitting removes the attempt (D82).
+      await call('POST', `${lesson}/test/start`);
+      assert.deepEqual((await call('POST', `${lesson}/test/discard`)).json.data, { discarded: true });
+      assert.equal((await call('POST', `${lesson}/test/discard`)).status, 409);
       const started = await call('POST', `${lesson}/test/start`);
       assert.equal(started.status, 201);
       assert.equal(started.json.data.status, 'IN_PROGRESS');

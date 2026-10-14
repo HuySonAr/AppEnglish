@@ -33,6 +33,10 @@ export async function saveLessonTestAnswers(id, answers) {
 export async function submitLessonTest(id, answers) {
   return (await httpClient.post(`${lesson(id)}/test/submit`, { answers })).data;
 }
+// Leaves the test in progress without submitting; it is removed (D82).
+export async function discardLessonTest(id) {
+  return (await httpClient.post(`${lesson(id)}/test/discard`)).data;
+}
 // The answers of one finished attempt; the latest when attemptNumber is omitted.
 export async function getLessonTestReview(id, attemptNumber) {
   const suffix = attemptNumber ? `/${attemptNumber}` : '';

@@ -38,6 +38,11 @@ const rpcs = {
     payload: attemptAnswersSchema,
     run: (service, { actor, id, payload }) => service.submitMockAttempt(actor, id, payload),
   },
+  DiscardMockAttempt: {
+    id: true,
+    payload: attemptReferenceSchema,
+    run: (service, { actor, id, payload }) => service.discardMockAttempt(actor, id, payload),
+  },
   GetMockReview: {
     id: true,
     payload: attemptReviewSchema,
