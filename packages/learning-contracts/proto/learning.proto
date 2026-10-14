@@ -30,6 +30,17 @@ service LearningService {
   rpc DiscardLessonTest(LearningRequest) returns (LearningReply);
   rpc GetLessonTestReview(LearningRequest) returns (LearningReply);
   rpc GetLessonRanking(LearningRequest) returns (LearningReply);
+  // Practice (F05B). Student: 20 words of the completed lessons (D84).
+  rpc GetVocabularyPractice(LearningRequest) returns (LearningReply);
+  // Listening practice (F05B-3, D86; songs D88): the published dictation
+  // exercises with the learner's best accuracy per mode, one exercise without
+  // its transcript (or a song with its blanks hidden), and the check of what
+  // the learner wrote.
+  rpc ListListeningPractice(LearningRequest) returns (LearningReply);
+  rpc GetListeningPractice(LearningRequest) returns (LearningReply);
+  rpc CheckListeningPractice(LearningRequest) returns (LearningReply);
+  // One line checked as the learner goes (D93); nothing is kept.
+  rpc CheckListeningLine(LearningRequest) returns (LearningReply);
   // Mock tests (F05A). Student: full tests and mini tests; id is the mock
   // test id. Admin: the estimated-score conversion table.
   rpc ListMockTests(LearningRequest) returns (LearningReply);

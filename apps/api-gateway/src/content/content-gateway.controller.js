@@ -88,6 +88,33 @@ export class ContentGatewayController {
   publishMockTest(id, request) {
     return this.forward('PublishMockTest', request, { id });
   }
+  listListeningTopics(request) {
+    return this.forward('ListListeningTopics', request);
+  }
+  createListeningTopic(body, request) {
+    return this.forward('CreateListeningTopic', request, { body });
+  }
+  updateListeningTopic(id, body, request) {
+    return this.forward('UpdateListeningTopic', request, { id, body });
+  }
+  listListeningExercises(request) {
+    return this.forward('ListListeningExercises', request);
+  }
+  createListeningExercise(body, request) {
+    return this.forward('CreateListeningExercise', request, { body });
+  }
+  updateListeningExercise(id, body, request) {
+    return this.forward('UpdateListeningExercise', request, { id, body });
+  }
+  getListeningExercise(id, request) {
+    return this.forward('GetListeningExercise', request, { id });
+  }
+  saveListeningExerciseDraft(id, body, request) {
+    return this.forward('SaveListeningExerciseDraft', request, { id, body });
+  }
+  publishListeningExercise(id, request) {
+    return this.forward('PublishListeningExercise', request, { id });
+  }
   deleteMedia(id, request) {
     return this.forward('DeleteMedia', request, { id });
   }
@@ -162,6 +189,15 @@ const routes = [
   [Get, 'mock-tests/:id', 'getMockTest', [Param('id'), Req()]],
   [Put, 'mock-tests/:id/draft', 'saveMockTestDraft', [Param('id'), Body(), Req()]],
   [Post, 'mock-tests/:id/publish', 'publishMockTest', [Param('id'), Req()]],
+  [Get, 'listening-topics', 'listListeningTopics', [Req()]],
+  [Post, 'listening-topics', 'createListeningTopic', [Body(), Req()]],
+  [Patch, 'listening-topics/:id', 'updateListeningTopic', [Param('id'), Body(), Req()]],
+  [Get, 'listening-exercises', 'listListeningExercises', [Req()]],
+  [Post, 'listening-exercises', 'createListeningExercise', [Body(), Req()]],
+  [Patch, 'listening-exercises/:id', 'updateListeningExercise', [Param('id'), Body(), Req()]],
+  [Get, 'listening-exercises/:id', 'getListeningExercise', [Param('id'), Req()]],
+  [Put, 'listening-exercises/:id/draft', 'saveListeningExerciseDraft', [Param('id'), Body(), Req()]],
+  [Post, 'listening-exercises/:id/publish', 'publishListeningExercise', [Param('id'), Req()]],
   [Get, 'placement', 'getPlacement', [Req()]],
   [Put, 'placement/draft', 'savePlacementDraft', [Body(), Req()]],
   [Post, 'placement/publish', 'publishPlacement', [Req()]],

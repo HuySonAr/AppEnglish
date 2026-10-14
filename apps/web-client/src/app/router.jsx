@@ -29,6 +29,15 @@ import { MockTestEditorPage } from '../features/content-manager/pages/MockTestEd
 import { MockTestsPage } from '../features/student/pages/MockTestsPage.jsx';
 import { MockTestPage } from '../features/student/pages/MockTestPage.jsx';
 import { MockMiniHistoryPage } from '../features/student/pages/MockMiniHistoryPage.jsx';
+import { PracticePage } from '../features/student/pages/PracticePage.jsx';
+import { ListeningExercisePage } from '../features/student/pages/ListeningExercisePage.jsx';
+import { ListeningPracticePage } from '../features/student/pages/ListeningPracticePage.jsx';
+import { ListeningExerciseListPage } from '../features/student/pages/ListeningExerciseListPage.jsx';
+import { ListeningTopicPage } from '../features/student/pages/ListeningTopicPage.jsx';
+import { ListeningExerciseEditorPage } from '../features/content-manager/pages/ListeningExerciseEditorPage.jsx';
+import { ListeningExercisesPage } from '../features/content-manager/pages/ListeningExercisesPage.jsx';
+import { ListeningTopicsPage } from '../features/content-manager/pages/ListeningTopicsPage.jsx';
+import { VocabularyPracticePage } from '../features/student/pages/VocabularyPracticePage.jsx';
 import { ScoreConversionPage } from '../features/admin/pages/ScoreConversionPage.jsx';
 import { ExamTypesPage } from '../features/admin/pages/ExamTypesPage.jsx';
 import { Roles } from '../constants/auth.js';
@@ -70,6 +79,12 @@ export function AppRouter() {
             <Route path="mock-tests" element={<MockTestsPage />} />
             <Route path="mock-tests/:mockTestId" element={<MockTestPage />} />
             <Route path="mock-tests/:mockTestId/mini/:partKey" element={<MockMiniHistoryPage />} />
+            <Route path="practice" element={<PracticePage />} />
+            <Route path="practice/vocabulary" element={<VocabularyPracticePage />} />
+            <Route path="practice/listening" element={<ListeningPracticePage />} />
+            <Route path="practice/listening/topics/:topicId" element={<ListeningTopicPage />} />
+            <Route path="practice/listening/topics/:topicId/:mode" element={<ListeningExerciseListPage />} />
+            <Route path="practice/listening/:exerciseId" element={<ListeningExercisePage />} />
           </Route>
         </Route>
         <Route path="/admin" element={<RoleRoute allowedRole={Roles.ADMIN} />}>
@@ -79,6 +94,7 @@ export function AppRouter() {
             <Route path="placement" element={<PlacementSettingsPage />} />
             <Route path="score-conversion" element={<ScoreConversionPage />} />
             <Route path="exam-types" element={<ExamTypesPage />} />
+            <Route path="listening-topics" element={<ListeningTopicsPage eyebrow="Admin" />} />
           </Route>
         </Route>
         <Route
@@ -91,6 +107,9 @@ export function AppRouter() {
             <Route path="placement" element={<PlacementEditorPage />} />
             <Route path="mock-tests" element={<MockTestsManagePage />} />
             <Route path="mock-tests/:mockTestId" element={<MockTestEditorPage />} />
+            <Route path="listening" element={<ListeningExercisesPage />} />
+            <Route path="listening/:exerciseId" element={<ListeningExerciseEditorPage />} />
+            <Route path="listening-topics" element={<ListeningTopicsPage eyebrow="Content Manager" />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
           </Route>
         </Route>

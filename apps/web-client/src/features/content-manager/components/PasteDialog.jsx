@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ClipboardPaste } from 'lucide-react';
+import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import {
   Button,
@@ -9,6 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  Input,
   Label,
 } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
@@ -18,7 +20,9 @@ import { Textarea } from '../../../components/ui/textarea.jsx';
 // … }: lines ({ title, note, text, errors, warnings }) are listed to check and
 // nothing changes until the confirm button, which hands the plan to onApply.
 // A line with errors blocks it. noun names what is counted ("question").
-export function PasteDialog({ id, button, title, description, label, placeholder, notFound, noun, done, planFor, onApply }) {
+// With fileAccept (e.g. ".srt,.lrc") a text file can be opened instead of
+// pasting; its text lands in the box. icon replaces the paste icon.
+export function PasteDialog({ id, button, title, description, label, placeholder, notFound, noun, done, planFor, onApply, fileAccept, icon: Icon = ClipboardPaste }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
   const plan = planFor(text);
@@ -35,7 +39,7 @@ export function PasteDialog({ id, button, title, description, label, placeholder
   return (
     <>
       <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setOpen(true)}>
-        <ClipboardPaste className="h-4 w-4" />
+        <Icon className="h-4 w-4" />
         {button}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -44,6 +48,26 @@ export function PasteDialog({ id, button, title, description, label, placeholder
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
+          {fileAccept ? (
+            <div className="space-y-2">
+              <Label htmlFor={`${id}-file`}>Open a file</Label>
+              <Input
+                id={`${id}-file`}
+                type="file"
+                accept={fileAccept}
+                onChange={async (event) => {
+                  const file = event.target.files?.[0];
+                  event.target.value = '';
+                  if (!file) return;
+                  try {
+                    setText(await file.text());
+                  } catch (error) {
+                    notify({ title: 'Could not read the file', description: getApiErrorMessage(error), variant: 'destructive' });
+                  }
+                }}
+              />
+            </div>
+          ) : null}
           <div className="space-y-2">
             <Label htmlFor={id}>{label}</Label>
             <Textarea id={id} className="font-mono text-sm" rows={9} placeholder={placeholder} value={text} onChange={(event) => setText(event.target.value)} />

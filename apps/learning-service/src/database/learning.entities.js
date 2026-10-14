@@ -152,3 +152,24 @@ export const ScoreConversionEntity = new EntitySchema({
   },
 });
 
+
+// Listening practice (F05B-3, D86): one row per learner, dictation exercise
+// and mode (full, or the blanks of a song, D88) with the best and the latest
+// accuracy (percent) of their checks.
+export const ListeningResultEntity = new EntitySchema({
+  name: 'ListeningResult',
+  tableName: 'listening_results',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    accountId: { type: 'uuid' },
+    exerciseId: { type: 'uuid' },
+    mode: { type: 'varchar', length: 10, default: 'full' },
+    bestAccuracy: { type: 'int' },
+    lastAccuracy: { type: 'int' },
+    checkCount: { type: 'int' },
+    lastCheckedAt: { type: 'timestamptz' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'UQ_listening_results_account_exercise_mode', columns: ['accountId', 'exerciseId', 'mode'], unique: true }],
+});

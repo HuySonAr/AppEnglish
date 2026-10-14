@@ -1,4 +1,4 @@
-import { BookOpen, ClipboardCheck, Timer, Trophy } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Dumbbell, Timer, Trophy } from 'lucide-react';
 import { FeatureCard } from '../../../components/shared/FeatureCard.jsx';
 import { useAuth } from '../../auth/context/AuthContext.jsx';
 
@@ -35,6 +35,12 @@ export function StudentDashboardPage() {
           description="Full tests against the clock, or one part at a time"
           to="/student/mock-tests"
           tone="info"
+        />
+        <FeatureCard
+          icon={Dumbbell}
+          title="Practice"
+          description="Remember the words of the lessons you completed"
+          to="/student/practice"
         />
         <FeatureCard icon={Trophy} title="Progress" description="Track your learning journey" tone="warning" />
       </div>

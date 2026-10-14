@@ -43,6 +43,17 @@ export class ContentClient {
     return this.call('listPublishedMockTests', {});
   }
 
+  // The listening topics and the published dictation exercises (F05B-3).
+  listPublishedListeningExercises() {
+    return this.call('listPublishedListeningExercises', {});
+  }
+
+  // A dictation exercise's published version with its transcript; null when
+  // it is not published.
+  getListeningPaper(exerciseId) {
+    return this.call('getListeningPaper', { id: exerciseId, payloadJson: '{}' });
+  }
+
   // A mock test's published version (the current one, or the given one) with
   // its answers; null when the mock test is not published.
   getMockPaper(mockTestId, versionId) {

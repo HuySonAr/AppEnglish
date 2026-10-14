@@ -5,6 +5,8 @@ import { randomUUID } from 'node:crypto';
 export function createMemoryRepository() {
   const tables = {
     units: [], lessons: [], versions: [], media: [], placement: [], mockTests: [], mockVersions: [],
+    listeningExercises: [], listeningVersions: [],
+    listeningTopics: [{ id: toeicTopicId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
     // The migration creates TOEIC.
     examTypes: [{ id: toeicExamTypeId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
   };
@@ -18,8 +20,33 @@ export function createMemoryRepository() {
     Object.assign(row, { id: stored.id });
     return copy(stored);
   }
+  // In-memory stand-in for ListeningRepository, on the same tables.
+  const listening = {
+    async listTopics() { return tables.listeningTopics.map(copy); },
+    async findTopic(id) { return copy(tables.listeningTopics.find((item) => item.id === id)); },
+    async saveTopic(topic) { return save('listeningTopics', topic); },
+    async listExercises() { return tables.listeningExercises.map(copy); },
+    async findExercise(id) { return copy(tables.listeningExercises.find((item) => item.id === id)); },
+    async saveExercise(exercise) { return save('listeningExercises', exercise); },
+    async listVersionSummaries() {
+      return tables.listeningVersions.map(({ id, exerciseId, versionNumber, status }) => ({ id, exerciseId, versionNumber, status }));
+    },
+    async findDraft(exerciseId) {
+      return copy(tables.listeningVersions.find((version) => version.exerciseId === exerciseId && version.status === 'DRAFT'));
+    },
+    async findVersion(id) { return copy(tables.listeningVersions.find((version) => version.id === id)); },
+    async maxVersionNumber(exerciseId) {
+      return Math.max(0, ...tables.listeningVersions.filter((version) => version.exerciseId === exerciseId).map((version) => version.versionNumber));
+    },
+    async saveVersion(version) { return save('listeningVersions', version); },
+    async publishVersion(exercise, version) {
+      save('listeningVersions', version);
+      save('listeningExercises', exercise);
+    },
+  };
   return {
     tables,
+    listening,
     async listUnits() { return tables.units.map(copy).sort(byPosition); },
     async findUnit(id) { return copy(tables.units.find((unit) => unit.id === id)); },
     async saveUnit(unit) { return save('units', unit); },
@@ -54,7 +81,7 @@ export function createMemoryRepository() {
     async saveMedia(asset) { return save('media', asset); },
     async deleteMedia(id) { tables.media = tables.media.filter((asset) => asset.id !== id); },
     async isMediaReferenced(id) {
-      return [...tables.versions, ...tables.placement, ...tables.mockVersions].some((version) => JSON.stringify(version.content).includes(id));
+      return [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions].some((version) => JSON.stringify(version.content).includes(id));
     },
     async listExamTypes() { return tables.examTypes.map(copy); },
     async findExamType(id) { return copy(tables.examTypes.find((item) => item.id === id)); },
@@ -89,6 +116,7 @@ export function createMemoryRepository() {
 }
 
 export const toeicExamTypeId = '66666666-6666-4666-8666-666666666666';
+export const toeicTopicId = '77777777-7777-4777-8777-777777777777';
 export const manager = { id: '11111111-1111-4111-8111-111111111111', role: 'CONTENT_MANAGER' };
 export const student = { id: '22222222-2222-4222-8222-222222222222', role: 'STUDENT' };
 export const admin = { id: '33333333-3333-4333-8333-333333333333', role: 'ADMIN' };

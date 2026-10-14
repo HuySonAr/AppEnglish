@@ -4,6 +4,9 @@ import { ContentGrpcController } from './content/content.grpc.controller.js';
 import { ContentRepository } from './content/content.repository.js';
 import { ContentService } from './content/content.service.js';
 import { createContentDataSource } from './database/database.config.js';
+import { ListeningGrpcController } from './listening/listening.grpc.controller.js';
+import { ListeningRepository } from './listening/listening.repository.js';
+import { ListeningService } from './listening/listening.service.js';
 import {
   CONTENT_DATA_SOURCE,
   CONTENT_REPOSITORY,
@@ -17,7 +20,7 @@ import {
 
 export class AppModule {}
 Module({
-  controllers: [HealthController, ContentGrpcController],
+  controllers: [HealthController, ContentGrpcController, ListeningGrpcController],
   providers: [
     { provide: MEDIA_STORAGE, useFactory: () => createMediaStorage() },
     { provide: PRONUNCIATION_SOURCE, useFactory: () => createPronunciationSource() },
@@ -32,6 +35,11 @@ Module({
       useFactory: (repository, mediaStorage, pronunciationSource) =>
         new ContentService(repository, mediaStorage, pronunciationSource),
       inject: [CONTENT_REPOSITORY, MEDIA_STORAGE, PRONUNCIATION_SOURCE],
+    },
+    {
+      provide: ListeningService,
+      useFactory: (dataSource, contentService) => new ListeningService(new ListeningRepository(dataSource), contentService),
+      inject: [CONTENT_DATA_SOURCE, ContentService],
     },
   ],
   exports: [MEDIA_STORAGE],

@@ -46,6 +46,25 @@ export async function saveMockTestDraft(id, content) {
 export async function publishMockTest(id) {
   return (await httpClient.post(`/content/mock-tests/${id}/publish`, undefined, { timeout: 30000 })).data;
 }
+// Listening exercises (F05B-2, D85).
+export async function listListeningExercises() {
+  return (await httpClient.get('/content/listening-exercises')).data;
+}
+export async function createListeningExercise(payload) {
+  return (await httpClient.post('/content/listening-exercises', payload)).data;
+}
+export async function updateListeningExercise(id, payload) {
+  return (await httpClient.patch(`/content/listening-exercises/${id}`, payload)).data;
+}
+export async function getListeningExercise(id) {
+  return (await httpClient.get(`/content/listening-exercises/${id}`)).data;
+}
+export async function saveListeningExerciseDraft(id, content) {
+  return (await httpClient.put(`/content/listening-exercises/${id}/draft`, content)).data;
+}
+export async function publishListeningExercise(id) {
+  return (await httpClient.post(`/content/listening-exercises/${id}/publish`)).data;
+}
 export async function getPlacementTest() {
   return (await httpClient.get('/content/placement')).data;
 }

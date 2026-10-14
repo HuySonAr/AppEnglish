@@ -9,6 +9,7 @@ import {
   PlacementStatus,
   QuizKind,
   StepStatus,
+  VOCABULARY_PRACTICE_SIZE,
   lessonTestPassed,
 } from '@appenglish/learning-contracts';
 import { placementErrors } from '../placement/placement.errors.js';
@@ -17,10 +18,12 @@ import {
   SKILL_TOTALS,
   lessonAccess,
   lessonSteps,
+  practiceWords,
   scoreTest,
   shuffledOptionOrder,
   testParts,
   testProgression,
+  vocabularyPractice,
   vocabularyQuiz,
   wrongBlanks,
   wrongQuizAnswers,
@@ -208,6 +211,44 @@ export class LessonService {
         await this.repository.saveProgress({ ...opened.progress, [field]: this.now() });
     }
     return { kind, passed: !wrongIds.length, total: vocabulary.length, wrongIds };
+  }
+
+  // ----- Vocabulary practice (F05B-1, D84)
+
+  // 20 random words of the completed lessons, with their answers; locked
+  // (no questions) while those lessons hold fewer than 20 different words.
+  async getVocabularyPractice(actor) {
+    this.assertStudent(actor);
+    const standing = await this.standing(actor);
+    const completed = [...standing.access.entries()]
+      .filter(([, entry]) => entry.state === LessonState.COMPLETED)
+      .map(([lessonId]) => lessonId);
+    const papers = (await Promise.all(completed.map((lessonId) => this.contentClient.getLessonPaper(lessonId)))).filter(Boolean);
+    const words = practiceWords(
+      papers.flatMap((paper) => {
+        const url = (mediaId) => (mediaId && paper.media[mediaId]?.url) || null;
+        return paper.content.vocabulary.map((item) => ({
+          id: item.id,
+          word: item.word,
+          partOfSpeech: item.partOfSpeech,
+          phonetic: item.phonetic,
+          meaning: item.meaning,
+          example: item.example,
+          exampleMeaning: item.exampleMeaning,
+          audioUkUrl: url(item.audioUkMediaId),
+          audioUsUrl: url(item.audioUsMediaId),
+          lessonTitle: paper.lesson.title,
+        }));
+      }),
+    );
+    const available = words.length >= VOCABULARY_PRACTICE_SIZE;
+    return {
+      size: VOCABULARY_PRACTICE_SIZE,
+      wordCount: words.length,
+      completedLessonCount: papers.length,
+      available,
+      questions: available ? vocabularyPractice(words, this.random) : [],
+    };
   }
 
   async submitFillIn(actor, lessonId, { answers }) {

@@ -8,12 +8,16 @@ import {
   CONTENT_GRPC_CLIENT,
   LEARNING_DATA_SOURCE,
   LESSON_REPOSITORY,
+  LISTENING_REPOSITORY,
   MOCK_REPOSITORY,
   PLACEMENT_REPOSITORY,
 } from './database/database.tokens.js';
 import { LessonGrpcController } from './lesson/lesson.grpc.controller.js';
 import { LessonRepository } from './lesson/lesson.repository.js';
 import { LessonService } from './lesson/lesson.service.js';
+import { ListeningGrpcController } from './listening/listening.grpc.controller.js';
+import { ListeningRepository } from './listening/listening.repository.js';
+import { ListeningPracticeService } from './listening/listening.service.js';
 import { MockGrpcController } from './mock/mock.grpc.controller.js';
 import { MockRepository } from './mock/mock.repository.js';
 import { MockService } from './mock/mock.service.js';
@@ -29,7 +33,7 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController],
+  controllers: [HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController],
   providers: [
     { provide: LEARNING_DATA_SOURCE, useFactory: createLearningDataSource },
     {
@@ -62,6 +66,16 @@ Module({
       useFactory: (repository, placementRepository, contentClient) =>
         new LessonService(repository, placementRepository, contentClient),
       inject: [LESSON_REPOSITORY, PLACEMENT_REPOSITORY, CONTENT_CLIENT],
+    },
+    {
+      provide: LISTENING_REPOSITORY,
+      useFactory: (dataSource) => new ListeningRepository(dataSource),
+      inject: [LEARNING_DATA_SOURCE],
+    },
+    {
+      provide: ListeningPracticeService,
+      useFactory: (repository, contentClient) => new ListeningPracticeService(repository, contentClient),
+      inject: [LISTENING_REPOSITORY, CONTENT_CLIENT],
     },
     {
       provide: MockService,

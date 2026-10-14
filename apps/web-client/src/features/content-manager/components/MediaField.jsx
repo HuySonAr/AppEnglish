@@ -8,7 +8,8 @@ const imageAccept = '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp';
 // clear(path, mediaId), fileNames, pending, stored } from the page. A chosen
 // file is only previewed; it is uploaded when the lesson is saved. Stored
 // files can be played or viewed again when they have a delivery URL.
-export function MediaField({ id, label, kind, path, mediaId, media }) {
+// audioRef, when given, is attached to the audio player (e.g. to read its time).
+export function MediaField({ id, label, kind, path, mediaId, media, audioRef }) {
   const chosen = media.pending[mediaId];
   const url = chosen?.url || media.stored[mediaId]?.url;
   return (
@@ -22,7 +23,7 @@ export function MediaField({ id, label, kind, path, mediaId, media }) {
             </span>
             <Button variant="ghost" size="sm" onClick={() => media.clear(path, mediaId)}>Remove</Button>
           </div>
-          {url && kind === MediaKind.AUDIO ? <audio controls src={url} className="w-full" /> : null}
+          {url && kind === MediaKind.AUDIO ? <audio ref={audioRef} controls src={url} className="w-full" /> : null}
           {url && kind === MediaKind.IMAGE ? <img src={url} alt="" className="max-h-48 rounded-md" /> : null}
           {chosen ? <p className="text-muted-foreground">Preview only — uploaded when you save.</p> : null}
         </div>

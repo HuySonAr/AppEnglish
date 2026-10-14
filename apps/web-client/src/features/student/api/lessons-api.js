@@ -37,6 +37,11 @@ export async function submitLessonTest(id, answers) {
 export async function discardLessonTest(id) {
   return (await httpClient.post(`${lesson(id)}/test/discard`)).data;
 }
+// 20 words of the completed lessons with their answers, or the locked state
+// (D84).
+export async function getVocabularyPractice() {
+  return (await httpClient.get('/learning/practice/vocabulary')).data;
+}
 // The answers of one finished attempt; the latest when attemptNumber is omitted.
 export async function getLessonTestReview(id, attemptNumber) {
   const suffix = attemptNumber ? `/${attemptNumber}` : '';

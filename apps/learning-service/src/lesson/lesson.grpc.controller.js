@@ -55,6 +55,7 @@ const rpcs = {
     payload: reviewRequestSchema,
     run: (service, { actor, id, payload }) => service.getLessonTestReview(actor, id, payload),
   },
+  GetVocabularyPractice: { run: (service, { actor }) => service.getVocabularyPractice(actor) },
   GetLessonRanking: {
     id: true,
     run: (service, { actor, id }) => service.getLessonRanking(actor, id),

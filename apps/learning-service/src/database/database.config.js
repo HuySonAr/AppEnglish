@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import {
   LessonProgressEntity,
   LessonTestAttemptEntity,
+  ListeningResultEntity,
   MockAttemptEntity,
   PlacementAttemptEntity,
   PlacementSettingsEntity,
@@ -23,6 +24,7 @@ export function createLearningDataSource() {
       LessonTestAttemptEntity,
       MockAttemptEntity,
       ScoreConversionEntity,
+      ListeningResultEntity,
     ],
     migrations: ['src/database/migrations/*.js'],
   });

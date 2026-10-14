@@ -15,7 +15,7 @@
 14. Speaking/Writing/teacher/class/assignment nằm ngoài phạm vi.
 15. Điểm lần làm đầu tiên của lesson test dùng để xếp hạng học viên trong chính lesson đó; không xếp hạng chung và không cộng XP (D30).
 16. Mỗi lần làm mock test và lesson test, thứ tự lựa chọn A/B/C/D được xáo ngẫu nhiên; không xáo câu hỏi (D31). Part 1 và 2 của đề 7 part không xáo vì cả part dùng một audio đọc lựa chọn theo thứ tự cố định (D48).
-17. Practice gồm luyện từ vựng (20 câu) và luyện nghe, lấy từ các lesson đã hoàn thành, làm lại không giới hạn; không có practice Reading (D65).
+17. Practice gồm luyện nhớ từ (20 từ của các lesson đã hoàn thành, D84) và luyện nghe chép theo chủ đề và cấp độ (chi tiết chưa chốt); làm lại không giới hạn; không có practice Reading (D65, D84).
 18. Mỗi câu hỏi có nhãn kỹ năng Reading/Listening và giải thích đáp án (D34).
 19. Lesson đầu tiên của unit bắt đầu được miễn bài ôn từ vựng lesson trước (D35).
 20. Bảng xếp hạng theo lesson: điểm lần đầu, rồi thời gian làm bài ngắn hơn, rồi nộp sớm hơn (D36).

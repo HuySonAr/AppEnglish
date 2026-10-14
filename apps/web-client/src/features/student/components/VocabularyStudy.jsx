@@ -3,7 +3,8 @@ import { Eye } from 'lucide-react';
 import { Badge, Button } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 
-function Pronunciation({ label, url }) {
+// A pronunciation recording with its label (UK or US); nothing without one.
+export function Pronunciation({ label, url }) {
   if (!url) return null;
   return (
     <div className="flex items-center gap-2 text-xs text-muted-foreground">

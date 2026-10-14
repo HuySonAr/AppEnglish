@@ -145,3 +145,56 @@ export const MockTestVersionEntity = new EntitySchema({
   ],
 });
 
+
+// Listening practice (F05B-2, D85): topics, exercises and their versions,
+// with the same life cycle as mock tests (a PUBLISHED version never changes).
+export const ListeningTopicEntity = new EntitySchema({
+  name: 'ListeningTopic',
+  tableName: 'listening_topics',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    code: { type: 'varchar', length: 40 },
+    name: { type: 'varchar', length: 100 },
+    format: { type: 'varchar', length: 20, nullable: true },
+    createdBy: { type: 'uuid', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'UQ_listening_topics_code', columns: ['code'], unique: true }],
+});
+
+export const ListeningExerciseEntity = new EntitySchema({
+  name: 'ListeningExercise',
+  tableName: 'listening_exercises',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    topicId: { type: 'uuid' },
+    title: { type: 'varchar', length: 200 },
+    level: { type: 'varchar', length: 2 },
+    kind: { type: 'varchar', length: 20 },
+    publishedVersionId: { type: 'uuid', nullable: true },
+    createdBy: { type: 'uuid' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+});
+
+export const ListeningExerciseVersionEntity = new EntitySchema({
+  name: 'ListeningExerciseVersion',
+  tableName: 'listening_exercise_versions',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    exerciseId: { type: 'uuid' },
+    versionNumber: { type: 'int' },
+    status: { type: 'varchar', length: 16, default: 'DRAFT' },
+    content: { type: 'jsonb' },
+    createdBy: { type: 'uuid' },
+    publishedBy: { type: 'uuid', nullable: true },
+    publishedAt: { type: 'timestamptz', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [
+    { name: 'UQ_listening_exercise_versions_number', columns: ['exerciseId', 'versionNumber'], unique: true },
+  ],
+});

@@ -3,6 +3,7 @@ import {
   ExamTypeEntity,
   LessonEntity,
   LessonVersionEntity,
+  ListeningExerciseVersionEntity,
   MediaAssetEntity,
   MockTestEntity,
   MockTestVersionEntity,
@@ -124,10 +125,10 @@ export class ContentRepository {
     await (await this.repo(MediaAssetEntity)).delete({ id });
   }
 
-  // True when any saved lesson, placement or mock-test version, draft or
-  // published, refers to the media.
+  // True when any saved lesson, placement, mock-test or listening-exercise
+  // version, draft or published, refers to the media.
   async isMediaReferenced(id) {
-    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity]) {
+    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity, ListeningExerciseVersionEntity]) {
       const count = await (await this.repo(entity))
         .createQueryBuilder('version')
         .where('CAST(version.content AS text) LIKE :pattern', { pattern: `%${id}%` })

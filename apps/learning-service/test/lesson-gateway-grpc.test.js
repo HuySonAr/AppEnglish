@@ -11,6 +11,9 @@ import { AUTH_GRPC_CLIENT } from '../../api-gateway/src/auth/auth-gateway.contro
 import { LEARNING_GRPC_CLIENT, LessonGatewayController } from '../../api-gateway/src/learning/learning-gateway.controller.js';
 import { LessonGrpcController } from '../src/lesson/lesson.grpc.controller.js';
 import { LessonService } from '../src/lesson/lesson.service.js';
+import { ListeningGrpcController } from '../src/listening/listening.grpc.controller.js';
+import { ListeningPracticeService } from '../src/listening/listening.service.js';
+import { listeningHarness } from './listening-helpers.js';
 import { admin, manager, student } from './helpers.js';
 import { createCurriculum, createLessonRepository, placementWith, quizAnswers, testAnswers } from './lesson-helpers.js';
 
@@ -50,7 +53,14 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
   class TestAuthModule {}
   Module({ controllers: [FakeAuthController] })(TestAuthModule);
   class TestLearningModule {}
-  Module({ controllers: [LessonGrpcController], providers: [{ provide: LessonService, useValue: service }] })(TestLearningModule);
+  const listening = listeningHarness();
+  Module({
+    controllers: [LessonGrpcController, ListeningGrpcController],
+    providers: [
+      { provide: LessonService, useValue: service },
+      { provide: ListeningPracticeService, useValue: listening.service },
+    ],
+  })(TestLearningModule);
   class TestGatewayModule {}
   Module({
     imports: [ClientsModule.register([
@@ -128,8 +138,29 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       assert.equal(started.json.data.status, 'IN_PROGRESS');
       assert.equal(JSON.stringify(started.json).includes('isCorrect'), false);
       assert.deepEqual((await call('PUT', `${lesson}/test/answers`, { body: { answers: testAnswers(paper, 2) } })).json.data, { saved: true });
-      assert.equal((await call('PUT', `${lesson}/test/answers`, { body: { answers: { x: 'y' } } })).status, 400);
+      assert.equal((await call('PUT', `${lesson}/test/answers`, { body: { mode: 'all', answers: {} } })).status, 400);
 
+      // Listening practice (D86).
+      const listeningList = await call('GET', '/learning/practice/listening');
+      assert.deepEqual([listeningList.status, listeningList.json.data.exercises.length], [200, 3]);
+      const song = listening.papers[2].exercise.id;
+      const blanks = await call('GET', `/learning/practice/listening/${song}?mode=blanks`);
+      assert.deepEqual([blanks.status, blanks.json.data.mode, blanks.json.data.segments[0].pieces[1]], [200, 'blanks', { blank: 0 }]);
+      assert.equal((await call('GET', `/learning/practice/listening/${song}?mode=all`)).status, 400);
+      const filled = await call('POST', `/learning/practice/listening/${song}/check`, { body: { mode: 'blanks', answers: { 0: 'walked', 1: 'empty', 2: 'hand' } } });
+      assert.equal(filled.json.data.accuracy, 100);
+      const firstLine = listening.papers[2].content.segments[0].id;
+      const oneLine = await call('POST', `/learning/practice/listening/${song}/check-line`, { body: { mode: 'blanks', segmentId: firstLine, answers: { 0: 'walked' } } });
+      assert.deepEqual([oneLine.status, oneLine.json.data.segment.accuracy], [201, 50]);
+      const photo = listening.papers[0];
+      assert.equal((await call('GET', `/learning/practice/listening/${photo.exercise.id}`)).json.data.segments.length, 4);
+      const checked = await call('POST', `/learning/practice/listening/${photo.exercise.id}/check`, {
+        body: { answers: Object.fromEntries(photo.content.segments.map((segment) => [segment.id, segment.text])) },
+      });
+      assert.deepEqual([checked.status, checked.json.data.accuracy], [201, 100]);
+      assert.equal((await call('POST', `/learning/practice/listening/${photo.exercise.id}/check`, { body: { mode: 'all', answers: {} } })).status, 400);
+      const practice = await call('GET', '/learning/practice/vocabulary');
+      assert.deepEqual([practice.status, practice.json.data.available, practice.json.data.size], [200, false, 20]);
       const result = await call('POST', `${lesson}/test/submit`, { body: { answers: testAnswers(paper, 21) } });
       assert.equal(result.status, 201);
       assert.equal(result.json.data.attempt.scorePercent, 91);

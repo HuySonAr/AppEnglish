@@ -127,6 +127,21 @@ export class LessonGatewayController extends LearningRelay {
   getLessonTestAttemptReview(id, attemptNumber, request) {
     return this.forward('GetLessonTestReview', request, { id, body: { attemptNumber: Number(attemptNumber) } });
   }
+  getVocabularyPractice(request) {
+    return this.forward('GetVocabularyPractice', request);
+  }
+  listListeningPractice(request) {
+    return this.forward('ListListeningPractice', request);
+  }
+  getListeningPractice(id, query, request) {
+    return this.forward('GetListeningPractice', request, { id, body: query?.mode ? { mode: query.mode } : {} });
+  }
+  checkListeningLine(id, body, request) {
+    return this.forward('CheckListeningLine', request, { id, body });
+  }
+  checkListeningPractice(id, body, request) {
+    return this.forward('CheckListeningPractice', request, { id, body });
+  }
   getLessonRanking(id, request) {
     return this.forward('GetLessonRanking', request, { id });
   }
@@ -150,6 +165,11 @@ const lessonRoutes = [
   [Get, 'lessons/:id/test/review', 'getLessonTestReview', [Param('id'), Req()]],
   [Get, 'lessons/:id/test/review/:attemptNumber', 'getLessonTestAttemptReview', [Param('id'), Param('attemptNumber'), Req()]],
   [Get, 'lessons/:id/ranking', 'getLessonRanking', [Param('id'), Req()]],
+  [Get, 'practice/vocabulary', 'getVocabularyPractice', [Req()]],
+  [Get, 'practice/listening', 'listListeningPractice', [Req()]],
+  [Get, 'practice/listening/:id', 'getListeningPractice', [Param('id'), Query(), Req()]],
+  [Post, 'practice/listening/:id/check', 'checkListeningPractice', [Param('id'), Body(), Req()]],
+  [Post, 'practice/listening/:id/check-line', 'checkListeningLine', [Param('id'), Body(), Req()]],
 ];
 for (const [verb, path, method, params] of lessonRoutes) {
   const descriptor = Object.getOwnPropertyDescriptor(LessonGatewayController.prototype, method);

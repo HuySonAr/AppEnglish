@@ -67,6 +67,15 @@ export const TestTrend = Object.freeze({
 // part at a time as a mini test (untimed, no XP) (D63).
 export const MockAttemptKind = Object.freeze({ FULL: 'FULL', MINI: 'MINI' });
 
+// Vocabulary practice (F05B-1, D84): words drawn from the completed lessons,
+// asked word → meaning or meaning → word. It opens once the completed lessons
+// hold this many different words.
+export const VOCABULARY_PRACTICE_SIZE = 20;
+// How a listening exercise is practised (D88): every sentence written down,
+// or only the blanks of a song filled in. The best score is kept per mode.
+export const ListeningMode = Object.freeze({ FULL: 'full', BLANKS: 'blanks' });
+export const PracticeDirection = Object.freeze({ MEANING: 'MEANING', WORD: 'WORD' });
+
 export const LESSON_TEST_DURATION_MINUTES = 25;
 // Minimum lesson-test score (percent) that completes the lesson.
 export const LESSON_PASS_PERCENT = 80;
@@ -93,5 +102,6 @@ export const LearningResponseCode = Object.freeze({
   LESSON_STEP_REQUIRED: 55,
   LESSON_TEST_NOT_IN_PROGRESS: 56,
   MOCK_TEST_NOT_FOUND: 57,
-  MOCK_TEST_NOT_IN_PROGRESS: 58
+  MOCK_TEST_NOT_IN_PROGRESS: 58,
+  LISTENING_EXERCISE_NOT_FOUND: 59
 });

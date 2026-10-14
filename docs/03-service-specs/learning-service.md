@@ -3,7 +3,8 @@
 ## Trạng thái xác minh
 
 VERIFIED 2026-10-10 for placement (F03) and 2026-10-11 for the lesson flow
-(F04) and mock tests (F05A). Practice (F05B) is not implemented.
+(F04) and mock tests (F05A). Vocabulary practice (F05B-1) and listening practice (F05B-3) are implemented and
+covered by tests, songs (F05B-4) included.
 
 ## Trách nhiệm và nghiệp vụ liên quan
 
@@ -141,6 +142,44 @@ earlier step is not finished (`data.step`), 56 no lesson test in progress.
   lesson is republished.
 - No XP, no progress event yet: Reading/Listening mastery (D33) is F06 and
   will read the per-skill counts stored on each attempt.
+
+## Vocabulary practice (F05B-1, D84)
+
+Code in `apps/learning-service/src/lesson/` (`getVocabularyPractice`,
+`practiceWords` and `vocabularyPractice` in `lesson.rules.js`). Nothing is
+stored: no table, no attempt.
+
+| Method | Path | RPC | Result |
+|---|---|---|---|
+| GET | `/learning/practice/vocabulary` | `GetVocabularyPractice` | `{ size: 20, wordCount, completedLessonCount, available, questions }`. Each question: `id` (vocabulary id), `direction` (`MEANING` word → meaning, `WORD` meaning → word), `prompt`, `partOfSpeech`, four `options`, `answer`, and `word` (word, part of speech, phonetic, meaning, example, translation, UK/US audio URLs, `lessonTitle`). `questions` is empty while `available` is false |
+
+- Words come from the latest published version of every lesson whose state is
+  `COMPLETED` for the learner; the same word and part of speech counts once.
+- Unlike the tests, the answers are sent with the questions: practice is
+  checked in the browser and earns nothing.
+- Student only (26 otherwise).
+
+## Listening practice (F05B-3, D85, D86)
+
+Code in `apps/learning-service/src/listening/` (`dictation.rules.js` scores,
+`listening.service.js`, repository, gRPC controller). Exercises are read from
+content-service (`ListPublishedListeningExercises`, `GetListeningPaper`).
+
+Data (`app_learning`, migration `1730000003000-create-listening-results`):
+`listening_results`, one row per learner, exercise and mode (`accountId`,
+`exerciseId`, `mode` `full`/`blanks` added by `1730000004000-listening-result-modes`,
+`bestAccuracy`, `lastAccuracy`, `checkCount`, `lastCheckedAt`; unique triple). A check is recorded with one `INSERT … ON CONFLICT DO UPDATE`,
+so the best never goes down and concurrent checks all count.
+
+| Method | Path | RPC | Result |
+|---|---|---|---|
+| GET | `/learning/practice/listening` | `ListListeningPractice` | `{ topics (with published exercises, each with its `format`), exercises }`; each exercise with `segmentCount`, `blankCount`, the full-mode `bestAccuracy`, `lastAccuracy`, `checkCount`, and `blanks` with the same for the blanks mode |
+| GET | `/learning/practice/listening/:id?mode=full\|blanks` | `GetListeningPractice` | `{ exercise, mode, audioUrl, blankCount, segments: [{ id, speaker, start, end }] }` and the learner's results; no transcript. In `blanks` mode (songs with blanks only, 30 otherwise) each segment has `pieces`: `{ text }` or `{ blank: n }` |
+| POST | `/learning/practice/listening/:id/check-line` | `CheckListeningLine` | Body `{ mode, segmentId, answers }` keyed as in a whole check. Scores that one line by the same rules and returns `{ mode, segment }` (as a segment of a whole check); nothing is kept (D93). 30 for a line not in the exercise |
+| POST | `/learning/practice/listening/:id/check` | `CheckListeningPractice` | Body `{ mode, answers }`: by sentence id (`full`) or by blank number (`blanks`; the result's segments then have `pieces` with `answer`, `typed`, `correct`, and `accuracy` is the share of right blanks). `{ accuracy, bestAccuracy, lastAccuracy, checkCount, segments: [{ id, speaker, text, typed, accuracy, words: [{ text, status: correct/wrong/missing/extra, typed? }] }] }` |
+
+Student only (26). 59 `LISTENING_EXERCISE_NOT_FOUND` for an exercise that is
+not published. Scoring rules: D86.
 
 ## Mock tests (F05A, D63, D64)
 

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterMockTests, filterUnits, isReorderable } from './content-list.js';
+import { filterListeningExercises, filterMockTests, filterUnits, isReorderable } from './content-list.js';
 
 const lesson = (title, publishedVersionNumber = null, hasDraft = false) => ({ id: title, title, publishedVersionNumber, hasDraft });
 const units = [
@@ -72,4 +72,20 @@ test('mock tests are searched, filtered and sorted', () => {
   assert.equal(titles({ examType: 'all' }).length, 4);
   // The stored list is not changed.
   assert.equal(mockTests[0].title, 'Test 10');
+});
+
+test('listening exercises are searched, filtered by topic, level, part and status, and sorted', () => {
+  const exercises = [
+    { title: 'Airport', topic: { id: 't1' }, level: 'B1', kind: 'part3', publishedVersionNumber: 1, hasDraft: false, createdAt: '2026-10-01' },
+    { title: 'Office talk', topic: { id: 't1' }, level: 'A2', kind: 'part4', publishedVersionNumber: null, hasDraft: true, createdAt: '2026-10-03' },
+    { title: 'Photo', topic: { id: 't2' }, level: 'A2', kind: 'part1', publishedVersionNumber: 2, hasDraft: true, createdAt: '2026-10-02' },
+  ];
+  const base = { search: '', topic: 'all', level: 'all', kind: 'all', status: 'all', sort: 'newest' };
+  const titles = (options) => filterListeningExercises(exercises, { ...base, ...options }).map((item) => item.title);
+  assert.deepEqual(titles({}), ['Office talk', 'Photo', 'Airport']);
+  assert.deepEqual(titles({ sort: 'level' }), ['Office talk', 'Photo', 'Airport']);
+  assert.deepEqual(titles({ search: 'office', topic: 't1' }), ['Office talk']);
+  assert.deepEqual(titles({ level: 'A2', status: 'published' }), ['Photo']);
+  assert.deepEqual(titles({ kind: 'part3' }), ['Airport']);
+  assert.deepEqual(titles({ status: 'draft', sort: 'title-desc' }), ['Photo', 'Office talk']);
 });

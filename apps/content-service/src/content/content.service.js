@@ -296,6 +296,7 @@ export class ContentService {
     let folder;
     if (input.section === MediaSection.PLACEMENT) folder = `${input.kind}/placement`;
     else if (input.section === MediaSection.MOCK) folder = `${input.kind}/mock`;
+    else if (input.section === MediaSection.LISTENING) folder = `${input.kind}/listening`;
     else if (input.lessonId) {
       const lesson = await this.repository.findLesson(input.lessonId);
       if (!lesson) throw contentErrors.lessonNotFound();

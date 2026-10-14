@@ -28,6 +28,13 @@ export const contentErrors = Object.freeze({
   // reason: NAME_TAKEN, or NO_EDITOR when tests cannot be written for the type yet.
   examTypeInvalid: (reason, message) =>
     new ContentError(ContentResponseCode.EXAM_TYPE_INVALID, message, 409, { reason }),
+  listeningTopicNotFound: () =>
+    new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Listening topic was not found', 404),
+  // reason: NAME_TAKEN, or NO_EDITOR when exercises cannot be written for the topic yet.
+  listeningTopicInvalid: (reason, message) =>
+    new ContentError(ContentResponseCode.LISTENING_TOPIC_INVALID, message, 409, { reason }),
+  listeningExerciseNotFound: () =>
+    new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Listening exercise was not found', 404),
   mockNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Mock test was not found', 404),
   placementNotFound: () =>

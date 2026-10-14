@@ -1,5 +1,12 @@
 import { LESSON_TEST_PARTS, Skill } from '@appenglish/content-contracts';
-import { LessonState, LessonStep, StepStatus, TestTrend } from '@appenglish/learning-contracts';
+import {
+  LessonState,
+  LessonStep,
+  PracticeDirection,
+  StepStatus,
+  TestTrend,
+  VOCABULARY_PRACTICE_SIZE,
+} from '@appenglish/learning-contracts';
 
 // Pure rules of the lesson flow and of the seven-part test. No I/O here.
 
@@ -95,6 +102,55 @@ export function vocabularyQuiz(vocabulary, random = Math.random) {
       options: shuffled([item.meaning, ...shuffled(others, random).slice(0, 3)], random),
     };
   });
+}
+
+// The words a learner can practise (D84): the vocabulary of the completed
+// lessons, each word once (the same word and part of speech in two lessons
+// counts once, the first one kept).
+export function practiceWords(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = `${item.word.trim().toLowerCase()}|${item.partOfSpeech}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+const sameText = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+// A vocabulary practice (D84): `size` random words, half asked word → meaning
+// (MEANING) and half meaning → word (WORD), in random order. Each question has
+// four options from the other words, the same part of speech first, and
+// carries its answer and the word itself: practice is checked right away in
+// the browser and earns nothing.
+export function vocabularyPractice(words, random = Math.random, size = VOCABULARY_PRACTICE_SIZE) {
+  const chosen = shuffled(words, random).slice(0, size);
+  const half = Math.ceil(chosen.length / 2);
+  return shuffled(
+    chosen.map((item, index) => {
+      const direction = index < half ? PracticeDirection.MEANING : PracticeDirection.WORD;
+      const field = direction === PracticeDirection.MEANING ? 'meaning' : 'word';
+      const answer = item[field];
+      // A word with the same meaning would be a second right answer.
+      const candidates = shuffled(words, random)
+        .filter((other) => !sameText(other[field], answer) && !sameText(other.meaning, item.meaning))
+        .sort((a, b) => Number(b.partOfSpeech === item.partOfSpeech) - Number(a.partOfSpeech === item.partOfSpeech));
+      const others = [];
+      for (const other of candidates)
+        if (others.length < 3 && !others.some((text) => sameText(text, other[field]))) others.push(other[field]);
+      return {
+        id: item.id,
+        direction,
+        prompt: direction === PracticeDirection.MEANING ? item.word : item.meaning,
+        partOfSpeech: item.partOfSpeech,
+        options: shuffled([answer, ...others], random),
+        answer,
+        word: item,
+      };
+    }),
+    random,
+  );
 }
 
 // Ids of the vocabulary items whose chosen meaning is wrong or missing.

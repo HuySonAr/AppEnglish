@@ -1,4 +1,4 @@
-import { ClipboardCheck, FileText, Library } from 'lucide-react';
+import { ClipboardCheck, FileText, Headphones, Library } from 'lucide-react';
 import { FeatureCard } from '../../../components/shared/FeatureCard.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 
@@ -30,6 +30,13 @@ export function ContentManagerDashboardPage() {
           description="Write and publish full TOEIC-style tests"
           to="/content-manager/mock-tests"
           tone="info"
+        />
+        <FeatureCard
+          icon={Headphones}
+          title="Listening exercises"
+          description="Write dictation exercises for the listening practice"
+          to="/content-manager/listening"
+          tone="warning"
         />
       </div>
     </section>

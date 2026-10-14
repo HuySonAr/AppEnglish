@@ -10,7 +10,7 @@
 - Làm một feature mỗi lượt, theo docs/04-implementation/implementation-order.md.
 - Nghiệp vụ trong docs/01-business là nguồn yêu cầu sản phẩm đã chốt.
 - Không tự thêm nghiệp vụ, service, API, database, event hay công nghệ.
-- Không đưa Speaking, Writing, giáo viên, lớp học, assignment, CEFR, streak hoặc XP lesson vào phạm vi.
+- Không đưa Speaking, Writing, giáo viên, lớp học, assignment, CEFR, streak hoặc XP lesson vào phạm vi. Ngoại lệ duy nhất (D85): A1–C2 là nhãn cấp độ của bài luyện nghe, không dùng cho placement, lesson, progress hay đánh giá học viên.
 - Không tự quyết định mục TBD. Nếu cần để triển khai, giải thích lựa chọn và hỏi người dùng.
 - Giữ pnpm workspaces/Turborepo, NestJS services, React + Vite client và quy ước code thật của repository. Không chuyển package manager/framework/language.
 - Trong NestJS, route thường nằm trong Controller; không tạo Express Router riêng nếu kiến trúc hiện tại không yêu cầu. Tách controller/DTO-validation/service/repository/model theo conventions hiện có.

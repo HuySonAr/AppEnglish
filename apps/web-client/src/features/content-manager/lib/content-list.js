@@ -97,3 +97,42 @@ export function filterMockTests(mockTests, { search, level, status, sort, examTy
     )
     .sort(compare);
 }
+
+export const ListeningSort = Object.freeze({
+  TITLE_ASC: 'title-asc',
+  TITLE_DESC: 'title-desc',
+  LEVEL: 'level',
+  NEWEST: 'newest',
+  OLDEST: 'oldest',
+});
+export const listeningSortOptions = [
+  { value: ListeningSort.NEWEST, label: 'Newest first' },
+  { value: ListeningSort.OLDEST, label: 'Oldest first' },
+  { value: ListeningSort.LEVEL, label: 'Level, then title' },
+  { value: ListeningSort.TITLE_ASC, label: 'Title A–Z' },
+  { value: ListeningSort.TITLE_DESC, label: 'Title Z–A' },
+];
+
+// Listening exercises (D85). topic is 'all' or a topic id; level is 'all' or
+// A1-C2; kind is 'all' or a part key.
+export function filterListeningExercises(exercises, { search, topic, level, kind, status, sort }) {
+  const byTitle = (a, b) => compareText(a.title, b.title);
+  const byDate = (a, b) => new Date(a.createdAt) - new Date(b.createdAt);
+  const compare = {
+    [ListeningSort.LEVEL]: (a, b) => compareText(a.level, b.level) || byTitle(a, b),
+    [ListeningSort.TITLE_ASC]: byTitle,
+    [ListeningSort.TITLE_DESC]: (a, b) => byTitle(b, a),
+    [ListeningSort.NEWEST]: (a, b) => byDate(b, a),
+    [ListeningSort.OLDEST]: byDate,
+  }[sort];
+  return exercises
+    .filter(
+      (exercise) =>
+        matchesSearch(exercise.title, search) &&
+        (topic === 'all' || exercise.topic?.id === topic) &&
+        (level === 'all' || exercise.level === level) &&
+        (kind === 'all' || exercise.kind === kind) &&
+        hasStatus(exercise, status),
+    )
+    .sort(compare);
+}

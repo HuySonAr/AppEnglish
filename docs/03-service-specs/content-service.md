@@ -304,3 +304,38 @@ often fail, not as the way to satisfy the audio requirement.
 
 `test/pronunciation.test.js` covers parsing, retries, real misses, the download
 host/size guard and the service behaviour with a stand-in source.
+
+## Listening practice content (F05B-2, D85)
+
+Code in `apps/content-service/src/listening/` (own gRPC controller, service,
+repository and schemas; files go through `ContentService` upload and clean-up,
+folder `audio/listening`). Migration `1720000005000-create-listening` creates
+`listening_topics` (TOEIC seeded with format `toeic`), `listening_exercises`
+(`topicId`, `title`, `level` A1–C2, `kind` part1–part4, `publishedVersionId`)
+and `listening_exercise_versions` (DRAFT/PUBLISHED, one draft per exercise,
+`content` jsonb). `isMediaReferenced` also searches the listening versions.
+
+Content: `{ audioMediaId, segments: [{ id, speaker, text, start, end }] }`,
+times in seconds, at most 80 sentences of 500 characters.
+
+| Method | Path | RPC | Who |
+|---|---|---|---|
+| GET | `/content/listening-topics` | `ListListeningTopics` | Any role |
+| POST, PATCH | `/content/listening-topics`, `/content/listening-topics/:id` | `CreateListeningTopic`, `UpdateListeningTopic` | Admin, Content Manager; `{ name, format }` (`toeic`, `song` or null; PATCH takes either); 46 `LISTENING_TOPIC_INVALID` (`NAME_TAKEN`, `HAS_EXERCISES` when the format of a topic with exercises changes) |
+| GET, POST | `/content/listening-exercises` | `ListListeningExercises`, `CreateListeningExercise` | Content Manager; create `{ topicId, title, level, kind }` (kind `part1`–`part4` for a TOEIC topic, `song` for a song topic); 46 (`NO_EDITOR` for a topic without format, `KIND_MISMATCH`) |
+| PATCH, GET | `/content/listening-exercises/:id` | `UpdateListeningExercise` (`title`, `level`), `GetListeningExercise` | Content Manager |
+| PUT | `/content/listening-exercises/:id/draft` | `SaveListeningExerciseDraft` | Content Manager |
+| POST | `/content/listening-exercises/:id/publish` | `PublishListeningExercise` | Content Manager; 42 with `issues` |
+
+Publishing rules: an audio file; Parts 1–2 exactly 4 sentences, Parts 3–4 at
+least one; every sentence has text; Parts 3–4 every sentence has start and
+end; given times need both, end after start, starts in recording order.
+Songs (D88): at least one line, every line timed; a blank is `[word]` (an
+empty `[ ]` or an unclosed bracket refuses publishing). `ListPublishedListeningExercises`
+also gives `blankCount` for songs. The bracket helpers (`lyricPieces`,
+`lyricText`, `lyricBlankCount`) are in `@appenglish/content-contracts`.
+Service-to-service reads (no actor, not exposed by the gateway, F05B-3):
+`ListPublishedListeningExercises` (every topic, and the published exercises
+with `segmentCount`) and `GetListeningPaper` (one exercise's published
+version with its transcript and recording URL; 404 when not published).
+

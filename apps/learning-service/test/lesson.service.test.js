@@ -6,7 +6,9 @@ import {
   lessonSteps,
   shuffledOptionOrder,
   testParts,
+  practiceWords,
   testProgression,
+  vocabularyPractice,
   vocabularyQuiz,
   wrongBlanks,
 } from '../src/lesson/lesson.rules.js';
@@ -405,3 +407,49 @@ test('progression compares the latest attempt with the previous and the first', 
   assert.deepEqual(testProgression([attempt(10, 4), attempt(20, 8), attempt(15, 9)]), { trend: 'DECLINED', changeFromPrevious: -5, changeFromFirst: 5, listeningChange: 1, readingChange: -6, bestCorrectCount: 20 });
 });
 
+
+test('a vocabulary practice asks 20 words both ways with four distinct options (D84)', () => {
+  const pool = Array.from({ length: 30 }, (_, index) => ({
+    id: `w${index}`, word: `word${index}`, partOfSpeech: index % 2 ? 'verb' : 'noun', meaning: `meaning${index}`,
+  }));
+  // The same word and part of speech in two lessons counts once.
+  assert.equal(practiceWords([...pool, { ...pool[0], id: 'again', word: ' WORD0 ' }]).length, 30);
+  // A synonym (same meaning) is never offered as a wrong option.
+  pool.push({ id: 'syn', word: 'synonym', partOfSpeech: 'noun', meaning: 'meaning0' });
+  const questions = vocabularyPractice(pool);
+  assert.equal(questions.length, 20);
+  assert.equal(new Set(questions.map((question) => question.id)).size, 20);
+  assert.deepEqual(['MEANING', 'WORD'].map((direction) => questions.filter((question) => question.direction === direction).length), [10, 10]);
+  for (const question of questions) {
+    const field = question.direction === 'MEANING' ? 'meaning' : 'word';
+    assert.equal(question.prompt, question.direction === 'MEANING' ? question.word.word : question.word.meaning);
+    assert.equal(question.answer, question.word[field]);
+    assert.equal(new Set(question.options).size, 4);
+    assert.ok(question.options.includes(question.answer));
+    const wrong = question.options.filter((option) => option !== question.answer);
+    // Wrong options share the part of speech, there being enough such words.
+    assert.ok(wrong.every((option) => pool.find((item) => item[field] === option).partOfSpeech === question.partOfSpeech));
+    if (question.id === 'w0' || question.id === 'syn') assert.ok(!wrong.some((option) => ['w0', 'syn'].includes(pool.find((item) => item[field] === option).id)));
+  }
+});
+
+test('vocabulary practice opens with 20 words of completed lessons', async () => {
+  const { service, repository, lessons, content } = await harness({ shape: [2, 2, 1] });
+  await assert.rejects(() => service.getVocabularyPractice(manager), { code: 26 });
+  const complete = (lesson) => repository.saveProgress({ accountId: learner.id, lessonId: lesson.id, completedAt: new Date() });
+  // Three completed lessons of five words: 15 words, still locked.
+  for (const lesson of lessons.slice(0, 3)) await complete(lesson);
+  const locked = await service.getVocabularyPractice(learner);
+  assert.deepEqual([locked.available, locked.wordCount, locked.completedLessonCount, locked.questions], [false, 15, 3, []]);
+  await complete(lessons[3]);
+  const open = await service.getVocabularyPractice(learner);
+  assert.deepEqual([open.available, open.wordCount, open.size, open.questions.length], [true, 20, 20, 20]);
+  const first = content.paperOf(lessons[0].id).content.vocabulary[0];
+  const question = open.questions.find((item) => item.id === first.id);
+  assert.deepEqual([question.word.word, question.word.lessonTitle, question.word.audioUkUrl], [first.word, 'U1L1', null]);
+  // Words of a lesson not completed are never asked.
+  const notDone = new Set(content.paperOf(lessons[4].id).content.vocabulary.map((item) => item.id));
+  assert.ok(open.questions.every((item) => !notDone.has(item.id)));
+  // Another learner has completed nothing.
+  assert.equal((await service.getVocabularyPractice(rival)).wordCount, 0);
+});
