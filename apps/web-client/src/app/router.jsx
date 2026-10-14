@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthLayout } from '../layouts/AuthLayout.jsx';
-import { ManagementLayout } from '../layouts/ManagementLayout.jsx';
-import { StudentLayout } from '../layouts/StudentLayout.jsx';
+import { SidebarLayout } from '../layouts/SidebarLayout.jsx';
 import { PublicOnlyRoute } from '../routes/PublicOnlyRoute.jsx';
 import { ProtectedRoute } from '../routes/ProtectedRoute.jsx';
 import { RoleRoute } from '../routes/RoleRoute.jsx';
@@ -70,7 +69,7 @@ export function AppRouter() {
           path="/student"
           element={<RoleRoute allowedRole={Roles.STUDENT} />}
         >
-          <Route element={<StudentLayout />}>
+          <Route element={<SidebarLayout role={Roles.STUDENT} drawerSide="right" />}>
             <Route index element={<StudentDashboardPage />} />
             <Route path="placement" element={<PlacementPage />} />
             <Route path="lessons" element={<LessonsPage />} />
@@ -88,7 +87,7 @@ export function AppRouter() {
           </Route>
         </Route>
         <Route path="/admin" element={<RoleRoute allowedRole={Roles.ADMIN} />}>
-          <Route element={<ManagementLayout role={Roles.ADMIN} />}>
+          <Route element={<SidebarLayout role={Roles.ADMIN} />}>
             <Route index element={<AdminDashboardPage />} />
             <Route path="accounts" element={<AdminAccountsPage />} />
             <Route path="placement" element={<PlacementSettingsPage />} />
@@ -101,7 +100,7 @@ export function AppRouter() {
           path="/content-manager"
           element={<RoleRoute allowedRole={Roles.CONTENT_MANAGER} />}
         >
-          <Route element={<ManagementLayout role={Roles.CONTENT_MANAGER} />}>
+          <Route element={<SidebarLayout role={Roles.CONTENT_MANAGER} />}>
             <Route index element={<ContentManagerDashboardPage />} />
             <Route path="units" element={<ContentUnitsPage />} />
             <Route path="placement" element={<PlacementEditorPage />} />

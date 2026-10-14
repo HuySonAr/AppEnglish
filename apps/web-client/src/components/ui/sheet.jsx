@@ -3,20 +3,24 @@ import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { cn } from '../../lib/utils.js';
 
-// A panel that slides in from the left edge; used for navigation on phones.
+// A panel that slides in from the left or right edge (side); used for
+// navigation on phones.
 export const Sheet = SheetPrimitive.Root;
 export const SheetTrigger = SheetPrimitive.Trigger;
 export const SheetClose = SheetPrimitive.Close;
 export const SheetTitle = SheetPrimitive.Title;
 export const SheetDescription = SheetPrimitive.Description;
 
-export function SheetContent({ className, children, ...props }) {
+export function SheetContent({ className, children, side = 'left', ...props }) {
   return (
     <SheetPrimitive.Portal>
       <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
       <SheetPrimitive.Content
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col border-r bg-card shadow-xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+          'fixed inset-y-0 z-50 flex w-72 max-w-[85vw] flex-col bg-card shadow-xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
+          side === 'right'
+            ? 'right-0 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right'
+            : 'left-0 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
           className,
         )}
         {...props}

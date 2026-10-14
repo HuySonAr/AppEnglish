@@ -3,6 +3,7 @@ import { Menu } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 import { navigation } from '../app/navigation.js';
 import { RoleLabels } from '../constants/auth.js';
+import { cn } from '../lib/utils.js';
 import { Button } from '../components/ui/button.jsx';
 import {
   Sheet,
@@ -16,11 +17,16 @@ import { SidebarNav } from './components/SidebarNav.jsx';
 import { ThemeToggle } from './components/ThemeToggle.jsx';
 import { UserMenu } from './components/UserMenu.jsx';
 
-// Workspace for the roles that manage things (Admin, Content Manager): a fixed
-// sidebar on wide screens, a slide-in drawer on phones, and a top bar.
-export function ManagementLayout({ role }) {
+// The workspace of every role: a fixed sidebar with the role's menu on wide
+// screens, a slide-in drawer on phones, and a top bar. side puts the sidebar
+// on the left or the right; drawerSide (side by default) does the same for
+// the phone drawer and its menu button: the student has the sidebar on the
+// left like the other roles and the drawer on the right (D96).
+export function SidebarLayout({ role, side = 'left', drawerSide = side }) {
   const { home, items } = navigation[role];
   const label = RoleLabels[role];
+  const right = side === 'right';
+  const drawerRight = drawerSide === 'right';
   const [drawerOpen, setDrawerOpen] = useState(false);
   const menu = (onNavigate) => (
     <>
@@ -35,30 +41,39 @@ export function ManagementLayout({ role }) {
       </div>
     </>
   );
+  const drawer = (
+    <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+          <Menu className="h-5 w-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side={drawerSide}>
+        <SheetTitle className="sr-only">{label} menu</SheetTitle>
+        <SheetDescription className="sr-only">Navigation</SheetDescription>
+        {menu(() => setDrawerOpen(false))}
+      </SheetContent>
+    </Sheet>
+  );
   return (
     <div className="min-h-screen bg-background">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r bg-card lg:flex">
+      <aside
+        className={cn(
+          'fixed inset-y-0 z-30 hidden w-64 flex-col bg-card lg:flex',
+          right ? 'right-0 border-l' : 'left-0 border-r',
+        )}
+      >
         {menu()}
       </aside>
 
-      <div className="lg:pl-64">
+      <div className={right ? 'lg:pr-64' : 'lg:pl-64'}>
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur sm:px-6">
-          <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <SheetTitle className="sr-only">{label} menu</SheetTitle>
-              <SheetDescription className="sr-only">Navigation</SheetDescription>
-              {menu(() => setDrawerOpen(false))}
-            </SheetContent>
-          </Sheet>
+          {drawerRight ? null : drawer}
           <Brand to={home} compact className="lg:hidden" />
           <div className="ml-auto flex items-center gap-1 sm:gap-2">
             <ThemeToggle />
             <UserMenu />
+            {drawerRight ? drawer : null}
           </div>
         </header>
         <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">

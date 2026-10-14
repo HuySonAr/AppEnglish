@@ -17,8 +17,7 @@ apps/web-client/src/
     navigation.js        # menu của từng role (thêm trang: 1 route + 1 mục ở đây)
   layouts/
     AuthLayout.jsx       # đăng nhập/đăng ký: form + panel thương hiệu
-    StudentLayout.jsx    # học viên: thanh trên, thanh dưới trên điện thoại
-    ManagementLayout.jsx # Admin, Content Manager: sidebar, drawer trên điện thoại
+    SidebarLayout.jsx    # mọi role: sidebar bên trái; drawer trên điện thoại (học viên mở từ bên phải, D96)
     components/          # Brand, SidebarNav, UserMenu, ThemeToggle
   routes/                # ProtectedRoute, PublicOnlyRoute, RoleRoute
   features/              # mỗi role/nghiệp vụ một thư mục
