@@ -33,7 +33,18 @@ import { ListeningExercisePage } from '../features/student/pages/ListeningExerci
 import { ListeningPracticePage } from '../features/student/pages/ListeningPracticePage.jsx';
 import { ListeningExerciseListPage } from '../features/student/pages/ListeningExerciseListPage.jsx';
 import { ListeningTopicPage } from '../features/student/pages/ListeningTopicPage.jsx';
+import { ListeningCoursePage } from '../features/student/pages/ListeningCoursePage.jsx';
+import { CourseLessonPage } from '../features/student/pages/CourseLessonPage.jsx';
+import { CourseTestPage } from '../features/student/pages/CourseTestPage.jsx';
+import { CoursePlacementPage } from '../features/student/pages/CoursePlacementPage.jsx';
+import { CourseProgressPage } from '../features/student/pages/CourseProgressPage.jsx';
+import { CourseMistakesPage } from '../features/student/pages/CourseMistakesPage.jsx';
+import { ProgressPage } from '../features/student/pages/ProgressPage.jsx';
+import { LeaderboardPage } from '../features/student/pages/LeaderboardPage.jsx';
 import { ListeningExerciseEditorPage } from '../features/content-manager/pages/ListeningExerciseEditorPage.jsx';
+import { CourseItemEditorPage } from '../features/content-manager/pages/CourseItemEditorPage.jsx';
+import { CourseManagePage } from '../features/content-manager/pages/CourseManagePage.jsx';
+import { CoursePlacementManagePage } from '../features/content-manager/pages/CoursePlacementManagePage.jsx';
 import { ListeningExercisesPage } from '../features/content-manager/pages/ListeningExercisesPage.jsx';
 import { ListeningTopicsPage } from '../features/content-manager/pages/ListeningTopicsPage.jsx';
 import { VocabularyPracticePage } from '../features/student/pages/VocabularyPracticePage.jsx';
@@ -78,6 +89,14 @@ export function AppRouter() {
             <Route path="mock-tests" element={<MockTestsPage />} />
             <Route path="mock-tests/:mockTestId" element={<MockTestPage />} />
             <Route path="mock-tests/:mockTestId/mini/:partKey" element={<MockMiniHistoryPage />} />
+            <Route path="listening-course" element={<ListeningCoursePage />} />
+            <Route path="listening-course/units/:unitId/lessons/:lessonId" element={<CourseLessonPage />} />
+            <Route path="listening-course/tests/:itemId" element={<CourseTestPage />} />
+            <Route path="listening-course/placement" element={<CoursePlacementPage />} />
+            <Route path="listening-course/progress" element={<CourseProgressPage />} />
+            <Route path="listening-course/mistakes" element={<CourseMistakesPage />} />
+            <Route path="progress" element={<ProgressPage />} />
+            <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="practice" element={<PracticePage />} />
             <Route path="practice/vocabulary" element={<VocabularyPracticePage />} />
             <Route path="practice/listening" element={<ListeningPracticePage />} />
@@ -109,6 +128,9 @@ export function AppRouter() {
             <Route path="listening" element={<ListeningExercisesPage />} />
             <Route path="listening/:exerciseId" element={<ListeningExerciseEditorPage />} />
             <Route path="listening-topics" element={<ListeningTopicsPage eyebrow="Content Manager" />} />
+            <Route path="listening-course" element={<CourseManagePage />} />
+            <Route path="listening-placement" element={<CoursePlacementManagePage />} />
+            <Route path="listening-course/:itemId" element={<CourseItemEditorPage />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
           </Route>
         </Route>

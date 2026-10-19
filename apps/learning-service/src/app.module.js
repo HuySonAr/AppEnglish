@@ -6,12 +6,19 @@ import { createLearningDataSource } from './database/database.config.js';
 import {
   CONTENT_CLIENT,
   CONTENT_GRPC_CLIENT,
+  COURSE_REPOSITORY,
+  EVENT_REPOSITORY,
   LEARNING_DATA_SOURCE,
   LESSON_REPOSITORY,
   LISTENING_REPOSITORY,
   MOCK_REPOSITORY,
   PLACEMENT_REPOSITORY,
 } from './database/database.tokens.js';
+import { CourseGrpcController } from './course/course.grpc.controller.js';
+import { CourseRepository } from './course/course.repository.js';
+import { CourseLessonService } from './course/course.service.js';
+import { EventRepository } from './events/events.repository.js';
+import { LearningEvents } from './events/learning-events.js';
 import { LessonGrpcController } from './lesson/lesson.grpc.controller.js';
 import { LessonRepository } from './lesson/lesson.repository.js';
 import { LessonService } from './lesson/lesson.service.js';
@@ -33,7 +40,7 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController],
+  controllers: [HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, CourseGrpcController],
   providers: [
     { provide: LEARNING_DATA_SOURCE, useFactory: createLearningDataSource },
     {
@@ -57,15 +64,30 @@ Module({
       inject: [CONTENT_GRPC_CLIENT],
     },
     {
+      provide: EVENT_REPOSITORY,
+      useFactory: (dataSource) => new EventRepository(dataSource),
+      inject: [LEARNING_DATA_SOURCE],
+    },
+    {
+      // Results for progress-service go through the outbox and RabbitMQ (F06, D110).
+      provide: LearningEvents,
+      useFactory: (repository) => {
+        const events = new LearningEvents(repository, { url: process.env.RABBITMQ_URL || 'amqp://localhost:5672' });
+        events.start();
+        return events;
+      },
+      inject: [EVENT_REPOSITORY],
+    },
+    {
       provide: PlacementService,
       useFactory: (repository, contentClient) => new PlacementService(repository, contentClient),
       inject: [PLACEMENT_REPOSITORY, CONTENT_CLIENT],
     },
     {
       provide: LessonService,
-      useFactory: (repository, placementRepository, contentClient) =>
-        new LessonService(repository, placementRepository, contentClient),
-      inject: [LESSON_REPOSITORY, PLACEMENT_REPOSITORY, CONTENT_CLIENT],
+      useFactory: (repository, placementRepository, contentClient, events) =>
+        new LessonService(repository, placementRepository, contentClient, { events }),
+      inject: [LESSON_REPOSITORY, PLACEMENT_REPOSITORY, CONTENT_CLIENT, LearningEvents],
     },
     {
       provide: LISTENING_REPOSITORY,
@@ -78,10 +100,20 @@ Module({
       inject: [LISTENING_REPOSITORY, CONTENT_CLIENT],
     },
     {
+      provide: COURSE_REPOSITORY,
+      useFactory: (dataSource) => new CourseRepository(dataSource),
+      inject: [LEARNING_DATA_SOURCE],
+    },
+    {
+      provide: CourseLessonService,
+      useFactory: (repository, contentClient) => new CourseLessonService(repository, contentClient),
+      inject: [COURSE_REPOSITORY, CONTENT_CLIENT],
+    },
+    {
       provide: MockService,
-      useFactory: (repository, placementRepository, contentClient) =>
-        new MockService(repository, placementRepository, contentClient),
-      inject: [MOCK_REPOSITORY, PLACEMENT_REPOSITORY, CONTENT_CLIENT],
+      useFactory: (repository, placementRepository, contentClient, events) =>
+        new MockService(repository, placementRepository, contentClient, { events }),
+      inject: [MOCK_REPOSITORY, PLACEMENT_REPOSITORY, CONTENT_CLIENT, LearningEvents],
     },
   ],
 })(AppModule);

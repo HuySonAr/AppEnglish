@@ -18,5 +18,5 @@ Không XP/streak cho học từ, điền từ hoặc ôn tập. Không tự tạ
 
 ## Định dạng nội dung (D43, D44)
 - Từ vựng: từ, loại từ (bắt buộc), phiên âm IPA, audio phát âm Anh-Anh và Anh-Mỹ, nghĩa theo loại từ, câu ví dụ và bản dịch câu ví dụ. Cùng một từ được lặp lại nếu khác loại từ. Hiện tại phiên âm, audio phát âm và bản dịch câu ví dụ chưa bắt buộc khi xuất bản (D51).
-- Bài điền từ: một đoạn văn có một hoặc nhiều chỗ trống `___`; Student chọn từ trong danh sách từ vựng của lesson cho từng chỗ trống; mỗi đáp án phải là một từ vựng của lesson.
+- Bài điền từ: một đoạn văn có một hoặc nhiều chỗ trống `___`; mỗi đáp án phải là một từ vựng của lesson. Học viên được cho sẵn các từ đáp án (xáo thứ tự, từ dùng ở hai chỗ trống xuất hiện hai lần) và xếp từng từ vào chỗ trống hợp nhất bằng cách chạm từ rồi chạm chỗ trống (hoặc ngược lại); từ đã đặt rời khỏi danh sách, chạm chỗ trống đã điền thì từ quay lại (D111). Không dùng kéo thả.
 - Bài ôn từ vựng lesson trước do hệ thống tự sinh từ từ vựng của lesson đó; Content Manager không soạn riêng.

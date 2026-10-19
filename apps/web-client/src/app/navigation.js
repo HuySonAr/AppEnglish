@@ -2,7 +2,9 @@ import {
   BookOpen,
   Calculator,
   ClipboardCheck,
+  Compass,
   Dumbbell,
+  GraduationCap,
   FileText,
   Headphones,
   Home,
@@ -11,6 +13,8 @@ import {
   Library,
   Tags,
   Timer,
+  TrendingUp,
+  Trophy,
   Users,
 } from 'lucide-react';
 import { Roles } from '../constants/auth.js';
@@ -24,9 +28,12 @@ export const navigation = Object.freeze({
     items: [
       { to: '/student', label: 'Home', icon: Home, end: true },
       { to: '/student/lessons', label: 'Lessons', icon: BookOpen },
+      { to: '/student/listening-course', label: 'Listening course', icon: GraduationCap },
       { to: '/student/mock-tests', label: 'Mock tests', icon: Timer },
       { to: '/student/practice', label: 'Practice', icon: Dumbbell },
       { to: '/student/placement', label: 'Placement', icon: ClipboardCheck },
+      { to: '/student/progress', label: 'Progress', icon: TrendingUp },
+      { to: '/student/leaderboard', label: 'Leaderboard', icon: Trophy },
     ],
   },
   [Roles.CONTENT_MANAGER]: {
@@ -41,7 +48,9 @@ export const navigation = Object.freeze({
       },
       { to: '/content-manager/placement', label: 'Placement test', icon: ClipboardCheck },
       { to: '/content-manager/mock-tests', label: 'Mock tests', icon: FileText },
-      { to: '/content-manager/listening', label: 'Listening', icon: Headphones },
+      { to: '/content-manager/listening-course', label: 'Listening course', icon: GraduationCap },
+      { to: '/content-manager/listening-placement', label: 'Listening placement', icon: Compass },
+      { to: '/content-manager/listening', label: 'Listening library', icon: Headphones },
       { to: '/content-manager/listening-topics', label: 'Listening topics', icon: Tags },
     ],
   },

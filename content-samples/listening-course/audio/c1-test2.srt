@@ -1,0 +1,24 @@
+1
+00:00:00,400 --> 00:00:05,840
+Traditional economics assumed that people make rational choices based on all available information.
+
+2
+00:00:06,440 --> 00:00:13,550
+Behavioural economists have shown that, in practice, our decisions are heavily shaped by how options are presented.
+
+3
+00:00:14,150 --> 00:00:22,820
+For example, when employees are automatically enrolled in a pension plan, with the option to leave, participation rises dramatically.
+
+4
+00:00:23,420 --> 00:00:27,590
+Nothing about the plan itself has changed; only the default has.
+
+5
+00:00:28,190 --> 00:00:32,760
+Governments have embraced such 'nudges' because they are cheap and preserve freedom of choice.
+
+6
+00:00:33,360 --> 00:00:39,080
+Critics, though, warn that the same techniques can easily be used to manipulate rather than to help.
+

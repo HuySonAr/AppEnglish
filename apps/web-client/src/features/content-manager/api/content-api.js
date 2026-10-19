@@ -65,6 +65,38 @@ export async function saveListeningExerciseDraft(id, content) {
 export async function publishListeningExercise(id) {
   return (await httpClient.post(`/content/listening-exercises/${id}/publish`)).data;
 }
+// Auto-time (D97): ask speech-service for the times of the saved lines, then
+// read the latest job until it is done.
+export async function requestListeningAutoTime(id) {
+  return (await httpClient.post(`/content/listening-exercises/${id}/auto-time`)).data;
+}
+// Transcribe (D98): the lines and their times from the recording alone; read
+// with getListeningAutoTime like an auto-time job.
+export async function requestListeningTranscribe(id) {
+  return (await httpClient.post(`/content/listening-exercises/${id}/transcribe`)).data;
+}
+export async function getListeningAutoTime(id) {
+  return (await httpClient.get(`/content/listening-exercises/${id}/auto-time`)).data;
+}
+// Listening course (F05C, D100): units and level tests of each CEFR level.
+export async function listListeningCourse() {
+  return (await httpClient.get('/content/listening-course')).data;
+}
+export async function createCourseItem(payload) {
+  return (await httpClient.post('/content/listening-course/items', payload)).data;
+}
+export async function updateCourseItem(id, payload) {
+  return (await httpClient.patch(`/content/listening-course/items/${id}`, payload)).data;
+}
+export async function getCourseItem(id) {
+  return (await httpClient.get(`/content/listening-course/items/${id}`)).data;
+}
+export async function saveCourseItemDraft(id, content) {
+  return (await httpClient.put(`/content/listening-course/items/${id}/draft`, content, { timeout: 30000 })).data;
+}
+export async function publishCourseItem(id) {
+  return (await httpClient.post(`/content/listening-course/items/${id}/publish`, undefined, { timeout: 30000 })).data;
+}
 export async function getPlacementTest() {
   return (await httpClient.get('/content/placement')).data;
 }

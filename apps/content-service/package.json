@@ -10,6 +10,7 @@
     "lint": "node ../../scripts/check-syntax.mjs src test",
     "test": "node --test test/*.test.js",
     "migration:run": "node --env-file=../../.env src/database/run-migrations.js",
+    "seed:listening-course": "node --env-file=../../.env scripts/seed-listening-course.mjs",
     "media:migrate-to-r2": "node --env-file=../../.env src/media/migrate-media-to-r2.js"
   },
   "dependencies": {

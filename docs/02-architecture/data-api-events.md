@@ -12,8 +12,8 @@
 |---|---|---|---|---|---|
 | User/Auth | auth-service | app_identity (PostgreSQL) | `packages/auth-contracts/proto/auth.proto` | TBD | `apps/auth-service/src/database/database.config.js` |
 | Content/lesson | content-service | app_content (PostgreSQL) | `packages/content-contracts/proto/content.proto` | TBD | `apps/content-service/src/database/database.config.js` |
-| Placement/test attempt | learning-service | app_learning (PostgreSQL) | `packages/learning-contracts/proto/learning.proto` (placement only) | TBD | `apps/learning-service/src/database/database.config.js` |
-| Progress/XP | progress-service | app_progress (PostgreSQL) | TBD | TBD | `apps/progress-service/src/database/database.config.js` |
+| Placement/test attempt | learning-service | app_learning (PostgreSQL) | `packages/learning-contracts/proto/learning.proto` | Producer of `learning.results` (F06) | `apps/learning-service/src/database/database.config.js`, `src/events/learning-events.js` |
+| Progress/XP | progress-service | app_progress (PostgreSQL) | `packages/progress-contracts/proto/progress.proto` | Consumer of `learning.results` (F06 progress, F07 XP) | `apps/progress-service/src/database/database.config.js`, `src/events/results.consumer.js` |
 
 Chỉ sửa/định nghĩa contract theo patterns và versions đang có. Không tự giả định tên RPC/event hoặc schema.
 
@@ -89,15 +89,45 @@ RabbitMQ event is defined: placement updates neither progress nor XP.
 `appenglish.learning.v1.LearningService`; the actor now carries the account
 email for the lesson ranking (D60). learning-service reads the curriculum and
 lesson papers from content-service through `GetCurriculum` and
-`GetLessonPaper`. No RabbitMQ event is defined yet; F06 decides how lesson
-results reach progress.
+`GetLessonPaper`. Lesson results reach progress-service over RabbitMQ (see F06
+below).
 
 ## F05A mock-test contract
 
 **VERIFIED (2026-10-11):** the gateway exposes nine `/mock-tests/*` routes
 relayed to `appenglish.learning.v1.LearningService` and six
 `/content/mock-tests*` routes for the Content Manager. learning-service reads
-published mock tests through `ListPublishedMockTests` and `GetMockPaper`. No
-RabbitMQ event is defined; F06/F07 decide how mock results reach progress and
-XP (each attempt already carries per-skill counts and `countsForXp`).
+published mock tests through `ListPublishedMockTests` and `GetMockPaper`. Full
+mock results reach progress-service over RabbitMQ (see F06 below); F07 decides
+XP from the same messages (each carries `attemptNumber` and the counts).
 
+## F06 progress contract
+
+**VERIFIED (2026-10-17, XP 2026-10-18):** the gateway exposes `GET /progress`,
+`GET /progress/xp` and `GET /progress/leaderboard` relayed to
+`appenglish.progress.v1.ProgressService` (`GetProgress`, `GetXp`, `GetLeaderboard`)
+(`packages/progress-contracts/proto/progress.proto`; request and reply have
+the shape of the learning contract). progress-service reads the published
+curriculum from content-service (`GetCurriculum`) for the number of lessons.
+
+## RabbitMQ: learning results (F06, D110)
+
+learning-service publishes every finished lesson-test attempt, every first
+pass of a lesson and every finished full mock attempt to the durable queue
+`learning.results` through an outbox (`learning_events`); progress-service
+consumes the queue, stores the per-skill counts in `app_progress` by attempt
+id (so a redelivery counts once) and computes completion and mastery when
+asked. Contract: `LearningQueue`/`LearningEventType` in
+`@appenglish/learning-contracts` and `docs/03-service-specs/learning-service.md`.
+Persistent JSON `{ id, type, occurredAt, payload }` on the default exchange.
+
+## RabbitMQ: Auto-time (D97)
+
+The first asynchronous messages of the system. content-service publishes an
+auto-time request for a listening exercise to `speech.autotime.requests`;
+speech-service answers on `speech.autotime.results` (RUNNING, then DONE or
+FAILED). Both queues are durable, on the default exchange; messages are
+persistent JSON. Contract: `SpeechQueue`/`AutoTimeStatus` in
+`@appenglish/content-contracts` and `docs/03-service-specs/speech-service.md`.
+content-service keeps the job state in `app_content.listening_timing_jobs`;
+speech-service has no database.

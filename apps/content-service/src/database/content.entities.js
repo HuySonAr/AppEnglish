@@ -198,3 +198,65 @@ export const ListeningExerciseVersionEntity = new EntitySchema({
     { name: 'UQ_listening_exercise_versions_number', columns: ['exerciseId', 'versionNumber'], unique: true },
   ],
 });
+
+// Auto-time jobs (D97): one row per request for the times of an exercise's
+// lines, answered by speech-service. lines are the lines asked about
+// ({ id, text }), result the answer ({ id, start, end, matched }).
+export const ListeningTimingJobEntity = new EntitySchema({
+  name: 'ListeningTimingJob',
+  tableName: 'listening_timing_jobs',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    exerciseId: { type: 'uuid' },
+    // align (Auto-time, D97) or transcribe (D98).
+    task: { type: 'varchar', length: 16, default: 'align' },
+    status: { type: 'varchar', length: 16 },
+    lines: { type: 'jsonb' },
+    result: { type: 'jsonb', nullable: true },
+    error: { type: 'text', nullable: true },
+    requestedBy: { type: 'uuid' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'IDX_listening_timing_jobs_exercise', columns: ['exerciseId', 'createdAt'] }],
+});
+
+// Listening course (F05C, D100): units and level tests of the CEFR levels,
+// versioned like mock tests (a PUBLISHED version never changes).
+export const ListeningCourseItemEntity = new EntitySchema({
+  name: 'ListeningCourseItem',
+  tableName: 'listening_course_items',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    level: { type: 'varchar', length: 2, nullable: true },
+    type: { type: 'varchar', length: 16 },
+    // The section of a unit (D107); null for a level test and the placement.
+    section: { type: 'varchar', length: 24, nullable: true },
+    title: { type: 'varchar', length: 200 },
+    description: { type: 'text', default: '' },
+    position: { type: 'int' },
+    publishedVersionId: { type: 'uuid', nullable: true },
+    createdBy: { type: 'uuid' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+});
+
+export const ListeningCourseVersionEntity = new EntitySchema({
+  name: 'ListeningCourseVersion',
+  tableName: 'listening_course_versions',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    itemId: { type: 'uuid' },
+    versionNumber: { type: 'int' },
+    status: { type: 'varchar', length: 16, default: 'DRAFT' },
+    content: { type: 'jsonb' },
+    createdBy: { type: 'uuid' },
+    publishedBy: { type: 'uuid', nullable: true },
+    publishedAt: { type: 'timestamptz', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'UQ_listening_course_versions_number', columns: ['itemId', 'versionNumber'], unique: true }],
+});
+

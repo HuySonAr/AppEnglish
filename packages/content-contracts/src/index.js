@@ -1,21 +1,21 @@
 export const UnitStatus = Object.freeze({
   DRAFT: 'DRAFT',
-  PUBLISHED: 'PUBLISHED'
+  PUBLISHED: 'PUBLISHED',
 });
 
 export const LessonVersionStatus = Object.freeze({
   DRAFT: 'DRAFT',
-  PUBLISHED: 'PUBLISHED'
+  PUBLISHED: 'PUBLISHED',
 });
 
 export const Skill = Object.freeze({
   READING: 'READING',
-  LISTENING: 'LISTENING'
+  LISTENING: 'LISTENING',
 });
 
 export const MediaKind = Object.freeze({
   AUDIO: 'audio',
-  IMAGE: 'image'
+  IMAGE: 'image',
 });
 
 // Which part of a lesson a file belongs to; decides its storage folder.
@@ -24,7 +24,7 @@ export const MediaSection = Object.freeze({
   TEST: 'test',
   PLACEMENT: 'placement',
   MOCK: 'mock',
-  LISTENING: 'listening'
+  LISTENING: 'listening',
 });
 
 export const Accent = Object.freeze({ UK: 'uk', US: 'us' });
@@ -39,7 +39,7 @@ export const PartOfSpeech = Object.freeze({
   PRONOUN: 'pronoun',
   DETERMINER: 'determiner',
   INTERJECTION: 'interjection',
-  PHRASE: 'phrase'
+  PHRASE: 'phrase',
 });
 
 // Marks a blank in the fill-in passage and in the Part 6 passage.
@@ -56,19 +56,91 @@ export function countBlanks(text) {
 // the lettered options, so their options are letters only. Questions are
 // numbered 1-23 across the parts: firstQuestionNumber is a part's first one.
 let nextQuestionNumber = 1;
-export const LESSON_TEST_PARTS = Object.freeze([
-  { key: 'part1', number: 1, skill: Skill.LISTENING, title: 'Photographs', questionCount: 1, optionCount: 4, group: { audio: true }, question: { image: true }, option: {} },
-  { key: 'part2', number: 2, skill: Skill.LISTENING, title: 'Question-Response', questionCount: 2, optionCount: 3, group: { audio: true }, question: {}, option: {} },
-  { key: 'part3', number: 3, skill: Skill.LISTENING, title: 'Conversation', questionCount: 3, optionCount: 4, group: { audio: true }, question: { prompt: true }, option: { text: true } },
-  { key: 'part4', number: 4, skill: Skill.LISTENING, title: 'Talk', questionCount: 3, optionCount: 4, group: { audio: true }, question: { prompt: true }, option: { text: true } },
-  { key: 'part5', number: 5, skill: Skill.READING, title: 'Incomplete Sentences', questionCount: 6, optionCount: 4, group: {}, question: { prompt: true }, option: { text: true } },
-  { key: 'part6', number: 6, skill: Skill.READING, title: 'Text Completion', questionCount: 3, optionCount: 4, group: { passage: true, blanks: true }, question: {}, option: { text: true } },
-  { key: 'part7', number: 7, skill: Skill.READING, title: 'Reading Comprehension', questionCount: 5, optionCount: 4, group: { passage: true, optionalImage: true }, question: { prompt: true }, option: { text: true } }
-].map((part) => {
-  const firstQuestionNumber = nextQuestionNumber;
-  nextQuestionNumber += part.questionCount;
-  return Object.freeze({ ...part, firstQuestionNumber });
-}));
+export const LESSON_TEST_PARTS = Object.freeze(
+  [
+    {
+      key: 'part1',
+      number: 1,
+      skill: Skill.LISTENING,
+      title: 'Photographs',
+      questionCount: 1,
+      optionCount: 4,
+      group: { audio: true },
+      question: { image: true },
+      option: {},
+    },
+    {
+      key: 'part2',
+      number: 2,
+      skill: Skill.LISTENING,
+      title: 'Question-Response',
+      questionCount: 2,
+      optionCount: 3,
+      group: { audio: true },
+      question: {},
+      option: {},
+    },
+    {
+      key: 'part3',
+      number: 3,
+      skill: Skill.LISTENING,
+      title: 'Conversation',
+      questionCount: 3,
+      optionCount: 4,
+      group: { audio: true },
+      question: { prompt: true },
+      option: { text: true },
+    },
+    {
+      key: 'part4',
+      number: 4,
+      skill: Skill.LISTENING,
+      title: 'Talk',
+      questionCount: 3,
+      optionCount: 4,
+      group: { audio: true },
+      question: { prompt: true },
+      option: { text: true },
+    },
+    {
+      key: 'part5',
+      number: 5,
+      skill: Skill.READING,
+      title: 'Incomplete Sentences',
+      questionCount: 6,
+      optionCount: 4,
+      group: {},
+      question: { prompt: true },
+      option: { text: true },
+    },
+    {
+      key: 'part6',
+      number: 6,
+      skill: Skill.READING,
+      title: 'Text Completion',
+      questionCount: 3,
+      optionCount: 4,
+      group: { passage: true, blanks: true },
+      question: {},
+      option: { text: true },
+    },
+    {
+      key: 'part7',
+      number: 7,
+      skill: Skill.READING,
+      title: 'Reading Comprehension',
+      questionCount: 5,
+      optionCount: 4,
+      group: { passage: true, optionalImage: true },
+      question: { prompt: true },
+      option: { text: true },
+    },
+  ].map((part) => {
+    const firstQuestionNumber = nextQuestionNumber;
+    nextQuestionNumber += part.questionCount;
+    return Object.freeze({ ...part, firstQuestionNumber });
+  }),
+);
 
 // Mock tests (F05A) use the same seven parts with the question counts of a
 // full TOEIC test (200 questions, 120 minutes). A mock test may hold fewer
@@ -84,7 +156,7 @@ export const MOCK_TEST_PART_COUNTS = Object.freeze({
   part4: 30,
   part5: 30,
   part6: 16,
-  part7: 54
+  part7: 54,
 });
 export const MOCK_TEST_DURATION_MINUTES = 120;
 
@@ -104,7 +176,7 @@ export const MOCK_SET_QUESTION_COUNT = 3;
 // the middle one, is the "Look at the graphic" question and holds the image.
 export const MOCK_GRAPHIC_SET_INDEXES = Object.freeze({
   part3: Object.freeze([10, 11, 12]),
-  part4: Object.freeze([8, 9])
+  part4: Object.freeze([8, 9]),
 });
 // Parts where each question has its own recording in a mock test.
 export const MOCK_QUESTION_AUDIO_PARTS = Object.freeze(['part1', 'part2']);
@@ -120,21 +192,26 @@ export const ListeningFormat = Object.freeze({ TOEIC: 'toeic', SONG: 'song' });
 // The kinds of TOEIC dictation. segmentCount is fixed for Parts 1 and 2
 // (four statements; a question and three responses); timed: every segment of
 // Parts 3 and 4 needs its start and end in the recording.
-export const LISTENING_TOEIC_KINDS = Object.freeze([
-  { key: 'part1', number: 1, title: 'Photographs', segmentCount: 4, timed: false, labels: ['(A)', '(B)', '(C)', '(D)'] },
-  { key: 'part2', number: 2, title: 'Question-Response', segmentCount: 4, timed: false, labels: ['Question', '(A)', '(B)', '(C)'] },
-  { key: 'part3', number: 3, title: 'Conversation', segmentCount: null, timed: true, labels: null },
-  { key: 'part4', number: 4, title: 'Talk', segmentCount: null, timed: true, labels: null }
-].map((kind) => Object.freeze(kind)));
+export const LISTENING_TOEIC_KINDS = Object.freeze(
+  [
+    { key: 'part1', number: 1, title: 'Photographs', segmentCount: 4, timed: false, labels: ['(A)', '(B)', '(C)', '(D)'] },
+    { key: 'part2', number: 2, title: 'Question-Response', segmentCount: 4, timed: false, labels: ['Question', '(A)', '(B)', '(C)'] },
+    { key: 'part3', number: 3, title: 'Conversation', segmentCount: null, timed: true, labels: null },
+    { key: 'part4', number: 4, title: 'Talk', segmentCount: null, timed: true, labels: null },
+  ].map((kind) => Object.freeze(kind)),
+);
 // A song (F05B-4, D88): the lyrics line by line, every line timed. Words in
 // square brackets are the blanks of the fill-in mode.
 export const LISTENING_SONG_KIND = Object.freeze({ key: 'song', number: null, title: 'Song', segmentCount: null, timed: true, labels: null });
 // The kinds of exercise each format has.
 export const LISTENING_KINDS = Object.freeze({
   [ListeningFormat.TOEIC]: LISTENING_TOEIC_KINDS,
-  [ListeningFormat.SONG]: Object.freeze([LISTENING_SONG_KIND])
+  [ListeningFormat.SONG]: Object.freeze([LISTENING_SONG_KIND]),
 });
-export const listeningKind = (key) => Object.values(LISTENING_KINDS).flat().find((kind) => kind.key === key) || null;
+export const listeningKind = (key) =>
+  Object.values(LISTENING_KINDS)
+    .flat()
+    .find((kind) => kind.key === key) || null;
 
 // A line of lyrics as pieces: { text } as sung, and { blank } for a word in
 // square brackets, blank being the word ("I [walked] home" → text "I ",
@@ -155,13 +232,70 @@ export function lyricPieces(line) {
 export const lyricText = (line) => line.replace(BLANK, (_, word) => word.trim());
 export const lyricBlankCount = (line) => lyricPieces(line).filter((piece) => 'blank' in piece).length;
 
+// Speech jobs over RabbitMQ between content-service and speech-service. A
+// request is { jobId, task, audioUrl, language, kind, lines }:
+//   task "align" (Auto-time, D97): lines [{ id, text }] to find in the
+//     recording; the answer's lines are [{ id, start, end, matched }],
+//     matched being the share (0-1) of the line's words heard;
+//   task "transcribe" (D98): no lines; the answer's lines are the text heard
+//     [{ text, start, end }], cut as song lines when kind is "song".
+// An answer is { jobId, status: RUNNING | DONE | FAILED, lines?, error? }.
+export const SpeechQueue = Object.freeze({
+  AUTOTIME_REQUESTS: 'speech.autotime.requests',
+  AUTOTIME_RESULTS: 'speech.autotime.results',
+});
+export const SpeechTask = Object.freeze({ ALIGN: 'align', TRANSCRIBE: 'transcribe' });
+export const AutoTimeStatus = Object.freeze({
+  QUEUED: 'QUEUED',
+  RUNNING: 'RUNNING',
+  DONE: 'DONE',
+  FAILED: 'FAILED',
+});
+
 export const LISTENING_MAX_SEGMENTS = 80;
 export const LISTENING_SEGMENT_MAX_LENGTH = 500;
 
-export const LESSON_TEST_QUESTION_COUNT = LESSON_TEST_PARTS.reduce(
-  (total, part) => total + part.questionCount,
-  0
-);
+// Listening course (F05C, D100): a CEFR path of listening, A1 to C1. Each
+// level has units in order and one level test; a unit has lessons and a unit
+// check. A lesson uses a listening exercise of the library and goes through
+// five steps (keywords, gist, detail, close listening, review). One listening
+// placement, with recordings of every level, sets where a learner starts (D103).
+export const COURSE_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1']);
+export const CourseItemType = Object.freeze({ UNIT: 'unit', LEVEL_TEST: 'level_test', PLACEMENT: 'placement' });
+// The two sections of every level (D107), in learning order: a unit belongs
+// to one; the units of a level are taken section by section.
+export const COURSE_SECTIONS = Object.freeze(['social_and_travel', 'work_and_study']);
+export const COURSE_SECTION_TITLES = Object.freeze({ social_and_travel: 'Social and Travel', work_and_study: 'Work and Study' });
+// What a course question checks: the main idea, a detail, or what is meant.
+export const CourseSkill = Object.freeze({ GIST: 'gist', DETAIL: 'detail', INFERENCE: 'inference' });
+// How a detail question is answered (D109): an option chosen, or the words
+// heard written into the blanks (FILL_IN_BLANK) of the sentence.
+export const CourseQuestionKind = Object.freeze({ CHOICE: 'choice', COMPLETE: 'complete' });
+// Pass marks (percent) of a lesson, a unit check and a level test, and the
+// share of a level's placement questions that counts the level as known.
+export const COURSE_PASS_PERCENT = Object.freeze({ lesson: 70, unitCheck: 75, levelTest: 70, placementLevel: 60 });
+export const COURSE_LIMITS = Object.freeze({
+  lessonsPerUnit: 8,
+  keywords: 10,
+  detailQuestions: Object.freeze({ min: 2, max: 5 }),
+  closeSentences: Object.freeze({ min: 1, max: 6 }),
+  options: Object.freeze({ min: 2, max: 4 }),
+  sections: 12,
+  questionsPerSection: 10,
+  unitCheckQuestions: 5,
+  levelTestQuestions: 8,
+  placementQuestionsPerLevel: 2,
+  // A "complete the sentence" question's blanks; a lesson's Focus on
+  // passage's blanks and words to choose from (D109).
+  completeBlanks: 4,
+  focusBlanks: 8,
+  focusWords: 12,
+});
+
+// Whether a lesson has a Focus on step: a passage with blanks (D109).
+export const hasCourseFocus = (focus) => Boolean(focus && focus.passage && focus.passage.trim());
+
+export const LESSON_TEST_QUESTION_COUNT = LESSON_TEST_PARTS.reduce((total, part) => total + part.questionCount, 0);
 
 // A unit needs this many published lessons before it can be published (D55).
 export const MIN_PUBLISHED_LESSONS_PER_UNIT = 1;
@@ -180,5 +314,6 @@ export const ContentResponseCode = Object.freeze({
   MEDIA_INVALID: 43,
   PRONUNCIATION_UNAVAILABLE: 44,
   EXAM_TYPE_INVALID: 45,
-  LISTENING_TOPIC_INVALID: 46
+  LISTENING_TOPIC_INVALID: 46,
+  SPEECH_UNAVAILABLE: 47,
 });

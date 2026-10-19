@@ -43,6 +43,9 @@ const rpcs = {
     run: (service, { actor, id, payload }) => service.saveDraft(actor, id, payload),
   },
   PublishListeningExercise: { id: true, run: (service, { actor, id }) => service.publish(actor, id) },
+  RequestListeningAutoTime: { id: true, run: (service, { actor, id }) => service.requestAutoTime(actor, id) },
+  GetListeningAutoTime: { id: true, run: (service, { actor, id }) => service.getAutoTime(actor, id) },
+  RequestListeningTranscribe: { id: true, run: (service, { actor, id }) => service.requestTranscribe(actor, id) },
   // Called by learning-service, not by the gateway: there is no actor.
   ListPublishedListeningExercises: { internal: true, run: (service) => service.listPublished() },
   GetListeningPaper: {

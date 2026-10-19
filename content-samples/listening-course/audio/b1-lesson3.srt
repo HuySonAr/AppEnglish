@@ -1,0 +1,28 @@
+1
+00:00:00,400 --> 00:00:03,870
+Many students study for hours but still forget what they learned.
+
+2
+00:00:04,470 --> 00:00:06,820
+Here are three simple tips that can help.
+
+3
+00:00:07,420 --> 00:00:13,390
+First, study in short sessions of about thirty minutes, then take a five-minute break.
+
+4
+00:00:13,990 --> 00:00:18,210
+Second, test yourself instead of just reading your notes again.
+
+5
+00:00:18,810 --> 00:00:22,610
+Trying to remember information makes it stay in your memory longer.
+
+6
+00:00:23,210 --> 00:00:29,330
+Finally, get enough sleep, because your brain organises new information while you sleep.
+
+7
+00:00:29,930 --> 00:00:32,770
+Try these tips for one week and see the difference.
+

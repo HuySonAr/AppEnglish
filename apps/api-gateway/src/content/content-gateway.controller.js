@@ -115,6 +115,33 @@ export class ContentGatewayController {
   publishListeningExercise(id, request) {
     return this.forward('PublishListeningExercise', request, { id });
   }
+  requestListeningAutoTime(id, request) {
+    return this.forward('RequestListeningAutoTime', request, { id });
+  }
+  getListeningAutoTime(id, request) {
+    return this.forward('GetListeningAutoTime', request, { id });
+  }
+  requestListeningTranscribe(id, request) {
+    return this.forward('RequestListeningTranscribe', request, { id });
+  }
+  listListeningCourse(request) {
+    return this.forward('ListListeningCourse', request);
+  }
+  createCourseItem(body, request) {
+    return this.forward('CreateCourseItem', request, { body });
+  }
+  updateCourseItem(id, body, request) {
+    return this.forward('UpdateCourseItem', request, { id, body });
+  }
+  getCourseItem(id, request) {
+    return this.forward('GetCourseItem', request, { id });
+  }
+  saveCourseItemDraft(id, body, request) {
+    return this.forward('SaveCourseItemDraft', request, { id, body });
+  }
+  publishCourseItem(id, request) {
+    return this.forward('PublishCourseItem', request, { id });
+  }
   deleteMedia(id, request) {
     return this.forward('DeleteMedia', request, { id });
   }
@@ -198,6 +225,15 @@ const routes = [
   [Get, 'listening-exercises/:id', 'getListeningExercise', [Param('id'), Req()]],
   [Put, 'listening-exercises/:id/draft', 'saveListeningExerciseDraft', [Param('id'), Body(), Req()]],
   [Post, 'listening-exercises/:id/publish', 'publishListeningExercise', [Param('id'), Req()]],
+  [Post, 'listening-exercises/:id/auto-time', 'requestListeningAutoTime', [Param('id'), Req()]],
+  [Get, 'listening-exercises/:id/auto-time', 'getListeningAutoTime', [Param('id'), Req()]],
+  [Post, 'listening-exercises/:id/transcribe', 'requestListeningTranscribe', [Param('id'), Req()]],
+  [Get, 'listening-course', 'listListeningCourse', [Req()]],
+  [Post, 'listening-course/items', 'createCourseItem', [Body(), Req()]],
+  [Patch, 'listening-course/items/:id', 'updateCourseItem', [Param('id'), Body(), Req()]],
+  [Get, 'listening-course/items/:id', 'getCourseItem', [Param('id'), Req()]],
+  [Put, 'listening-course/items/:id/draft', 'saveCourseItemDraft', [Param('id'), Body(), Req()]],
+  [Post, 'listening-course/items/:id/publish', 'publishCourseItem', [Param('id'), Req()]],
   [Get, 'placement', 'getPlacement', [Req()]],
   [Put, 'placement/draft', 'savePlacementDraft', [Body(), Req()]],
   [Post, 'placement/publish', 'publishPlacement', [Req()]],

@@ -54,6 +54,18 @@ export class ContentClient {
     return this.call('getListeningPaper', { id: exerciseId, payloadJson: '{}' });
   }
 
+  // The published Listening course (F05C): by level, the units in order with
+  // their lessons, and the level test.
+  listPublishedCourse() {
+    return this.call('listPublishedCourse', {});
+  }
+
+  // A published unit or level test (the current version, or the given one)
+  // with its answers and recordings; null when it is not published.
+  getCoursePaper(itemId, versionId) {
+    return this.call('getCoursePaper', { id: itemId, payloadJson: JSON.stringify(versionId ? { versionId } : {}) });
+  }
+
   // A mock test's published version (the current one, or the given one) with
   // its answers; null when the mock test is not published.
   getMockPaper(mockTestId, versionId) {

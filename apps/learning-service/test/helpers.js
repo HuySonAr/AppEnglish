@@ -106,3 +106,42 @@ export function answersFor(paper, correct, { skip = 0 } = {}) {
       .map((question, index) => [question.id, question.options[index < correct ? 0 : 1].id]),
   );
 }
+
+// In-memory stand-in for EventRepository (the outbox of results, F06).
+export function createEventRepository() {
+  const tables = { events: [] };
+  const copy = (row) => (row ? structuredClone(row) : null);
+  return {
+    tables,
+    async addEvent(event) {
+      const stored = { id: randomUUID(), ...structuredClone(event) };
+      tables.events.push(stored);
+      return copy(stored);
+    },
+    async listPendingEvents(limit = 100) {
+      return tables.events.filter((row) => !row.publishedAt).slice(0, limit).map(copy);
+    },
+    async markPublished(id, at) {
+      tables.events.find((row) => row.id === id).publishedAt = at;
+    },
+  };
+}
+
+// Stand-in for the RabbitMQ transport of LearningEvents: keeps what was sent;
+// ready and failing are switchable.
+export function fakeTransport() {
+  const transport = {
+    sent: [],
+    ready: true,
+    failing: false,
+    start(onReady) {
+      transport.onReady = onReady;
+    },
+    async send(message) {
+      if (transport.failing) throw new Error('broker refused');
+      transport.sent.push(structuredClone(message));
+    },
+    async stop() {},
+  };
+  return transport;
+}

@@ -137,7 +137,7 @@ matching RPC of `appenglish.content.v1.ContentService`
 | POST | `/content/mock-tests/:id/publish` | `PublishMockTest` | Content Manager | Validate and freeze the draft as the next version |
 | — | not exposed | `ListPublishedMockTests` | learning-service | Published mock tests with `questionCount` and `partCounts` |
 | — | not exposed | `GetMockPaper` | learning-service | Mock test id + `{ versionId? }` → a published version with answers and media URLs |
-| — | not exposed | `GetCurriculum` | learning-service | Published units in order with their published lessons; takes no actor |
+| — | not exposed | `GetCurriculum` | learning-service, progress-service | Published units in order with their published lessons; takes no actor |
 | — | not exposed | `GetLessonPaper` | learning-service | Lesson id + `{ versionId? }` → a published lesson version with answers and media URLs; 404 when the lesson or its unit is not published |
 | POST | `/content/pronunciation` | `AutofillPronunciation` | Content Manager | `{ word, accents? }`; looks the word up in the free dictionary and returns `{ found, phonetic, audio: { uk, us } }` with stored media or `null` |
 
@@ -234,7 +234,7 @@ messages up to 64 MB.
   next version; learners keep the current published version until it is
   published.
 - The learner view contains vocabulary, the fill-in passage with its blank
-  count but no answers, the word bank and the number of test questions (23).
+  count but no answers (learning-service builds the learner's word bank from the answers, D111) and the number of test questions (23).
   Test questions, correct options, transcripts and explanations are not
   returned; the lesson-flow feature (F04) must add its
   own internal contract to read them.
@@ -339,3 +339,81 @@ Service-to-service reads (no actor, not exposed by the gateway, F05B-3):
 with `segmentCount`) and `GetListeningPaper` (one exercise's published
 version with its transcript and recording URL; 404 when not published).
 
+## Auto-time (D97)
+
+| Method | Path | RPC | Who |
+|---|---|---|---|
+| POST | `/content/listening-exercises/:id/auto-time` | `RequestListeningAutoTime` | Content Manager. Reads the saved draft (or the published version), needs a recording with a public address (409 `NO_AUDIO`) and lines (409 `NO_LINES`), records a job in `listening_timing_jobs` and publishes it to `speech.autotime.requests`; 47 `SPEECH_UNAVAILABLE` (503) without the broker. A job still waiting or running is returned instead of a new one |
+| GET | `/content/listening-exercises/:id/auto-time` | `GetListeningAutoTime` | Content Manager. `{ job: { id, status, error, lineCount, lines: [{ id, start, end, matched }], createdAt, updatedAt } \| null }`; a job without an answer for 30 minutes shows as FAILED |
+
+`SpeechBroker` (`src/speech/speech.broker.js`, amqplib) connects at start and
+keeps retrying every 10 s; answers from `speech.autotime.results` go to
+`ListeningService.onAutoTimeResult` (validated with `autoTimeResultSchema`,
+unknown or finished jobs ignored). Migration
+`1720000006000-create-listening-timing-jobs`. The times are applied to the
+draft by the editor ("Apply times"), never by the service.
+
+### Transcribe (D98)
+
+| Method | Path | RPC | Who |
+|---|---|---|---|
+| POST | `/content/listening-exercises/:id/transcribe` | `RequestListeningTranscribe` | Content Manager. Needs only the saved recording; sends a `transcribe` job. Read with `GET …/auto-time`; the job has `task` (`align`/`transcribe`) and, for transcribe, `lines: [{ text, start, end }]` (trimmed to 500 characters and 80 lines) |
+
+Migration `1720000007000-listening-timing-job-task` adds `task` (default `align`).
+One job at a time per exercise, whatever its task.
+
+## Listening course (F05C, D100)
+
+Code in `apps/content-service/src/course/` (schemas with the publishing rules,
+repository, service, gRPC controller). Migration
+`1720000008000-create-listening-course`: `listening_course_items` (`level`
+A1–C1, `type` `unit`/`level_test`, `title`, `description`, `position`,
+`publishedVersionId`; one level test per level) and
+`listening_course_versions` (DRAFT/PUBLISHED, one draft per item).
+Migration `1720000010000-listening-course-section` (D107): `section`
+(`social_and_travel`/`work_and_study`, required on a unit, null otherwise;
+`COURSE_SECTIONS` in content-contracts). The units of a level are listed
+section by section, then by `position` within the section.
+
+Content of a unit: `{ lessons: [{ id, title, exerciseId, keywords: [{ id, word, meaning }],
+gist: question, detail: [question], focus, closeSegmentIds }], check: { sections } }`;
+of a level test: `{ sections }`; a section is `{ id, exerciseId, questions }` and
+a question `{ id, kind: choice|complete, skill: gist|detail|inference, prompt, options: [{ id, text, isCorrect }], answers, explanation }`
+(D109: `complete` only for detail questions of a lesson: `prompt` with `___`
+blanks, `answers` the words heard, one per blank, up to 4). `focus` (D109) is
+null or `{ title, passage, words, answers }`: a dialogue with `___` blanks (up
+to 8), 2–12 different words and the right word of each blank, taken from
+`words`; a focus without a passage counts as none.
+Recordings are exercises of the listening library, by id.
+
+| Method | Path | RPC | Who |
+|---|---|---|---|
+| GET | `/content/listening-course` | `ListListeningCourse` | Content Manager: `{ levels: [{ level, units, levelTest }] }` with status and counts |
+| POST | `/content/listening-course/items` | `CreateCourseItem` | `{ level, type, section, title, description }` (section on units only; a unit is added last in its section); 409 `LEVEL_TEST_EXISTS` |
+| PATCH | `/content/listening-course/items/:id` | `UpdateCourseItem` | `{ title?, description?, section?, position? }` (a unit moves within its section; a new section puts it last there) |
+| GET | `/content/listening-course/items/:id` | `GetCourseItem` | Item, draft, published, and the used library exercises with sentences and recording |
+| PUT | `/content/listening-course/items/:id/draft` | `SaveCourseItemDraft` | Content by the item's type; ids given to new lessons, keywords, questions, options, sections |
+| POST | `/content/listening-course/items/:id/publish` | `PublishCourseItem` | 42 with `issues` |
+
+Publishing rules (limits in `COURSE_LIMITS`): a unit has 1–8 lessons, each
+with a title, a published recording, keywords with word and meaning (up to
+10), one gist question, 2–5 detail questions, 1–6 sentences of its recording
+to write down; and a unit check of at least 5 questions. A level test has at
+least 8 questions. A choice question has a prompt, 2–4 different options and
+exactly one correct; a completed sentence has as many answers as blanks, none
+empty.
+
+Listening placement (D103): one item of type `placement` without a level
+(migration `1720000009000-listening-course-placement`: `level` nullable, checks
+rebuilt, unique index on the placement). Content `{ sections: [{ id,
+exerciseId, level, questions }] }`; publishing needs a level on every
+recording and at least 2 questions for each level A1–C1. `ListListeningCourse`
+and `ListPublishedCourse` return it as `placement` (or null).
+
+Reads for learning-service (step 2, no actor; not routed by the gateway):
+`ListPublishedCourse` → `{ levels: [{ level, units: [{ id, section, title, description,
+position, versionId, lessons: [{ id, title }], questionCount }], levelTest }] }`
+(published items only); `GetCoursePaper` (id, payload `{ versionId? }`) → the
+published version with answers and the library exercises it uses (recording
+URL and timed sentences with text); 404 when not published or the version is
+not one of the item's published versions.

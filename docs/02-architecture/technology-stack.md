@@ -11,7 +11,8 @@
 | UI styling/components/icons/charts | Tailwind CSS, shadcn/ui, lucide-react; biểu đồ dùng shadcn chart (Recharts `2.15.4`, D78) | Dùng cho web client; giữ component source trong repo và theo cấu hình Vite hiện có |
 | Public entrypoint/BFF | Gateway/BFF | Web client gọi public entrypoint; không gọi trực tiếp private service |
 | Synchronous service communication | gRPC | Tôn trọng proto/contracts hiện hữu; không tự chuyển sang REST giữa services |
-| Asynchronous messaging | RabbitMQ | Dùng event/message cho luồng async theo patterns hiện có |
+| Asynchronous messaging | RabbitMQ | Dùng event/message cho luồng async theo patterns hiện có. Đang dùng cho Auto-time (D97): hàng đợi `speech.autotime.requests`/`speech.autotime.results`, content-service dùng `amqplib`, speech-service dùng `pika` |
+| Speech (D97) | Python 3.12, faster-whisper 1.1.1 (+ av 13.1.0), pika 1.3.2, requests | Chỉ trong `apps/speech-service` (worker, không HTTP/gRPC/DB); `.venv` riêng, chạy qua `run.mjs` |
 | Cache/short-lived infrastructure | Redis | Dùng theo cấu hình/purpose đang có; không coi Redis là source of truth nghiệp vụ |
 | Data ownership | PostgreSQL database-per-service | Mapping xem database-allocation.md; không query DB service khác trực tiếp |
 | ORM | TypeORM `0.3.31` + PostgreSQL `pg` | DataSource/EntitySchema và F01 account migration đã tạo |

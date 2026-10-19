@@ -1,0 +1,15 @@
+{
+  "name": "@appenglish/speech-service",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Auto-time worker for listening exercises (Python, faster-whisper, RabbitMQ; D97)",
+  "scripts": {
+    "python:setup": "node -e \"require('node:child_process').execSync(process.platform === 'win32' ? 'python -m venv .venv' : 'python3 -m venv .venv', { stdio: 'inherit' })\" && node run.mjs -m pip install -r requirements.txt",
+    "build": "node run.mjs -m compileall -q speech_service",
+    "dev": "node run.mjs -m speech_service",
+    "start": "node run.mjs -m speech_service",
+    "lint": "node run.mjs -m compileall -q speech_service tests",
+    "test": "node run.mjs -m unittest discover -s tests -t ."
+  }
+}

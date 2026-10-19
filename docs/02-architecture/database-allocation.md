@@ -84,3 +84,32 @@ foreign key; `accountEmail` is a copy taken when the attempt starts.
 `mock_attempts` and `score_conversion` to `app_learning` (migration
 `1730000002000-create-mock-attempts.js`).
 
+## F05C Listening course schema
+
+`content-service` adds `listening_course_items` and `listening_course_versions`
+to `app_content` (migration `1720000008000-create-listening-course.js`).
+Migration `1720000009000-listening-course-placement.js` lets an item of type
+`placement` have no level (D103). `learning-service` adds
+`course_lesson_results`, `course_test_results`, `course_placements` and
+`course_mistakes` to `app_learning` (migrations
+`1730000005000-create-course-lesson-results.js`,
+`1730000006000-create-course-test-results.js`,
+`1730000007000-create-course-placements.js`,
+`1730000008000-create-course-mistakes.js`); `unitId`, `lessonId`, `itemId`,
+`segmentId` and `versionId` are content-service ids without a foreign key.
+
+## F06 progress schema
+
+`progress-service` adds `skill_results` and `lesson_completions` to
+`app_progress` (migration
+`apps/progress-service/src/database/migrations/1740000000000-create-progress.js`):
+one row per finished lesson-test or full mock-test attempt with its per-skill
+counts (the row id is the attempt id in learning-service), and one row per
+completed lesson. F07 adds `xp_ledger` (migration `1740000001000-create-xp-ledger.js`):
+one row per learner and mock test with the XP of the first full attempt and
+snapshots of the email and the test title. `learning-service` adds the outbox `learning_events` to
+`app_learning` (migration `1730000009000-create-learning-events.js`): each
+result is written there with the attempt and relayed to RabbitMQ afterwards
+(D110). `accountId`, `lessonId` and `sourceId` are other services' ids without
+a foreign key; progress-service reads the published curriculum from
+content-service over gRPC and never another database.

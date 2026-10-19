@@ -114,3 +114,41 @@ export function listeningIssueLabel(path, kind) {
   if (!match) return path;
   return `${segmentLabel(kind, Number(match[1]))} · ${match[2]}`;
 }
+
+// A line whose words were found less than this much (0-1) is marked to check,
+// and so is a line timed longer than AUTO_TIME_CHECK_LONGER seconds: in songs
+// Whisper may stretch the last word over the music that follows.
+export const AUTO_TIME_CHECK_BELOW = 0.8;
+export const AUTO_TIME_CHECK_LONGER = 12;
+
+// The times found by auto-time (D97) written into the lines, by line id.
+// Lines the answer did not time keep theirs. Returns the lines, how many got
+// times, and the ids of the lines to check (not found, found poorly, or
+// unusually long).
+export function applyAutoTime(segments, answer) {
+  const byId = new Map(answer.map((line) => [line.id, line]));
+  let timed = 0;
+  const check = [];
+  const next = segments.map((segment) => {
+    const found = byId.get(segment.id);
+    if (!found) return segment;
+    if (found.start === null || found.end === null) {
+      check.push(segment.id);
+      return segment;
+    }
+    timed += 1;
+    if (found.matched < AUTO_TIME_CHECK_BELOW || found.end - found.start > AUTO_TIME_CHECK_LONGER) check.push(segment.id);
+    return { ...segment, start: found.start, end: found.end };
+  });
+  return { segments: next, timed, check };
+}
+
+// The lines heard by Transcribe (D98) as the exercise's lines, with their
+// times. Parts 1 and 2 keep their four places: fewer lines are padded with
+// empty ones, more stay for the editor to merge or remove.
+export function transcribedSegments(lines, kind) {
+  const segments = lines.map((line) => newSegment({ text: line.text, start: line.start, end: line.end }));
+  if (kind.segmentCount) while (segments.length < kind.segmentCount) segments.push(newSegment());
+  return segments;
+}
+

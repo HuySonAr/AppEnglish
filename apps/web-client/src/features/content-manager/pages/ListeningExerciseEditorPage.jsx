@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, FileClock, MoveHorizontal, Play, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, AudioLines, FileClock, Loader2, MoveHorizontal, Play, Plus, Trash2, Wand2 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { ContentResponseCode, LISTENING_LEVELS, LISTENING_MAX_SEGMENTS, MediaKind, MediaSection, lyricBlankCount } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
@@ -21,8 +21,11 @@ import {
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import {
+  getListeningAutoTime,
   getListeningExercise,
   publishListeningExercise,
+  requestListeningAutoTime,
+  requestListeningTranscribe,
   saveListeningExerciseDraft,
   updateListeningExercise,
 } from '../api/content-api.js';
@@ -31,6 +34,7 @@ import { PasteDialog } from '../components/PasteDialog.jsx';
 import { useDraftMedia } from '../hooks/use-draft-media.js';
 import { lessonState, setIn } from '../lib/lesson-draft.js';
 import {
+  applyAutoTime,
   formatSeconds,
   listeningIssueLabel,
   listeningKindOf,
@@ -38,6 +42,7 @@ import {
   newSegment,
   parseSeconds,
   segmentLabel,
+  transcribedSegments,
   withEnd,
   workingListening,
 } from '../lib/listening-draft.js';
@@ -103,6 +108,10 @@ export function ListeningExerciseEditorPage() {
   const [now, setNow] = useState(0);
   // Seconds typed in "Shift all times", e.g. "1.2" or "-0.5".
   const [shift, setShift] = useState('');
+  // The latest auto-time job (D97) and the lines its answer asks to check.
+  const [autoTime, setAutoTime] = useState(null);
+  const [autoTimeBusy, setAutoTimeBusy] = useState(false);
+  const [checkIds, setCheckIds] = useState(() => new Set());
   const audioRef = useRef(null);
   // The time the player stops at while one sentence is played.
   const stopAt = useRef(null);
@@ -138,7 +147,25 @@ export function ListeningExerciseEditorPage() {
 
   useEffect(() => {
     load();
+    // A job asked for earlier is picked up again.
+    getListeningAutoTime(exerciseId)
+      .then((reply) => setAutoTime(reply.data.job))
+      .catch(() => {});
   }, [exerciseId]);
+
+  // While a job waits or runs, its state is read every few seconds.
+  const autoTimeActive = autoTime?.status === 'QUEUED' || autoTime?.status === 'RUNNING';
+  useEffect(() => {
+    if (!autoTimeActive) return undefined;
+    const timer = setTimeout(async () => {
+      try {
+        setAutoTime((await getListeningAutoTime(exerciseId)).data.job);
+      } catch {
+        setAutoTime((current) => ({ ...current }));
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [autoTime, autoTimeActive, exerciseId]);
 
   // Leaving with unsaved edits asks the browser to confirm.
   useEffect(() => {
@@ -231,6 +258,45 @@ export function ListeningExerciseEditorPage() {
     } finally {
       setBusy(false);
     }
+  }
+
+  // Saves the draft (the recording, and the lines speech-service times), then
+  // sends the job: Auto-time (D97) or Transcribe (D98).
+  async function startSpeechJob(request, title) {
+    setAutoTimeBusy(true);
+    try {
+      if (dirty) await saveDraft({ quiet: true });
+      setAutoTime((await request(exerciseId)).data.job);
+    } catch (error) {
+      notify({ title, description: saveErrorMessage(error), variant: 'destructive' });
+    } finally {
+      setAutoTimeBusy(false);
+    }
+  }
+  const onAutoTime = () => startSpeechJob(requestListeningAutoTime, 'Could not start auto-time');
+  const onTranscribe = () => startSpeechJob(requestListeningTranscribe, 'Could not start transcribe');
+
+  // The lines heard replace the ones there (D98).
+  function applyTranscript() {
+    const heard = transcribedSegments(autoTime.lines, kind);
+    setSegments(() => heard);
+    setCheckIds(new Set());
+    setAutoTime(null);
+    notify({
+      title: `${autoTime.lines.length} ${song ? 'lines' : 'sentences'} written from the recording`,
+      description: `Correct the words${song ? ' and mark the [blanks]' : ''}, listen to a few with Play, then save the draft.`,
+    });
+  }
+
+  function applyAutoTimeAnswer() {
+    const { segments: timed, timed: count, check } = applyAutoTime(content.segments, autoTime.lines);
+    setSegments(() => timed);
+    setCheckIds(new Set(check));
+    setAutoTime(null);
+    notify({
+      title: `Times set for ${count} of ${autoTime.lineCount} ${song ? 'lines' : 'sentences'}`,
+      description: check.length ? `${check.length} marked “Check timing”: listen to them with Play.` : 'Listen to a few with Play, then save the draft.',
+    });
   }
 
   async function onSaveDetails(event) {
@@ -383,6 +449,27 @@ export function ListeningExerciseEditorPage() {
               planFor={(text) => listeningPastePlan(segments, text, kind)}
               onApply={(plan) => setSegments(() => plan.segments)}
             />
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              disabled={autoTimeBusy || autoTimeActive || !content.audioMediaId}
+              onClick={onTranscribe}
+            >
+              <AudioLines className="h-4 w-4" />
+              Transcribe
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              loading={autoTimeBusy}
+              disabled={autoTimeBusy || autoTimeActive || !content.audioMediaId || !segments.some((segment) => segment.text.trim())}
+              onClick={onAutoTime}
+            >
+              <Wand2 className="h-4 w-4" />
+              Auto-time
+            </Button>
             <PasteDialog
               id="import-timed"
               icon={FileClock}
@@ -414,6 +501,69 @@ export function ListeningExerciseEditorPage() {
             )}
           </div>
         </div>
+
+        {autoTime && autoTime.status !== 'DONE' ? (
+          <div
+            role="status"
+            className={cn(
+              'flex flex-wrap items-center gap-2 rounded-xl border p-3 text-sm',
+              autoTime.status === 'FAILED' ? 'border-destructive/40 bg-destructive/10' : 'bg-muted/40',
+            )}
+          >
+            {autoTimeActive ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            <span>
+              {autoTime.status === 'QUEUED' ? `${autoTime.task === 'transcribe' ? 'Transcribe' : 'Auto-time'} is waiting for the speech service…` : null}
+              {autoTime.status === 'RUNNING' ? 'The speech service is listening to the recording; this can take a few minutes. You can keep working.' : null}
+              {autoTime.status === 'FAILED' ? `${autoTime.task === 'transcribe' ? 'Transcribe' : 'Auto-time'} failed: ${autoTime.error}` : null}
+            </span>
+            {autoTime.status === 'FAILED' ? (
+              <Button variant="ghost" size="sm" className="ml-auto" onClick={() => setAutoTime(null)}>
+                Dismiss
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
+        {autoTime?.status === 'DONE' && autoTime.task === 'transcribe' ? (
+          <div role="status" className="space-y-2 rounded-xl border border-success/40 bg-success/10 p-3 text-sm">
+            <div className="flex flex-wrap items-center gap-2">
+              <span>
+                Transcribe heard {autoTime.lines.length} {song ? 'lines' : 'sentences'} ({new Date(autoTime.updatedAt).toLocaleTimeString()}).
+                {segments.some((segment) => segment.text.trim()) ? ' They replace the lines below.' : ''}
+              </span>
+              <div className="ml-auto flex gap-2">
+                <Button size="sm" disabled={!autoTime.lines.length} onClick={applyTranscript}>
+                  Use these lines
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setAutoTime(null)}>
+                  Dismiss
+                </Button>
+              </div>
+            </div>
+            <ol className="max-h-40 list-decimal space-y-0.5 overflow-y-auto pl-6 text-muted-foreground">
+              {autoTime.lines.map((line, index) => (
+                <li key={index}>
+                  <span className="tabular-nums">{formatSeconds(line.start)}</span> {line.text}
+                </li>
+              ))}
+            </ol>
+          </div>
+        ) : null}
+        {autoTime?.status === 'DONE' && autoTime.task !== 'transcribe' ? (
+          <div role="status" className="flex flex-wrap items-center gap-2 rounded-xl border border-success/40 bg-success/10 p-3 text-sm">
+            <span>
+              Auto-time found the times of {autoTime.lines.filter((line) => line.start !== null).length} of {autoTime.lineCount}{' '}
+              {song ? 'lines' : 'sentences'} ({new Date(autoTime.updatedAt).toLocaleTimeString()}).
+            </span>
+            <div className="ml-auto flex gap-2">
+              <Button size="sm" onClick={applyAutoTimeAnswer}>
+                Apply times
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setAutoTime(null)}>
+                Dismiss
+              </Button>
+            </div>
+          </div>
+        ) : null}
 
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <Label htmlFor="shift-times" className="text-muted-foreground">
@@ -462,6 +612,7 @@ export function ListeningExerciseEditorPage() {
                   <CardContent className="space-y-3 pt-6">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium">{segmentLabel(kind, index)}</span>
+                      {checkIds.has(segment.id) ? <Badge variant="warning">Check timing</Badge> : null}
                       {kind.key === 'part3' ? (
                         <Input
                           aria-label={`${segmentLabel(kind, index)} speaker`}

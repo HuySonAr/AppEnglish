@@ -4,6 +4,7 @@ import { ListeningMode } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { cn } from '../../../lib/utils.js';
+import { useHeldPlayer } from '../../../hooks/use-held-player.js';
 import { Button, Input } from '../../../components/ui';
 import { checkListeningLine, checkListeningPractice } from '../api/practice-api.js';
 import { lineAnswers, lineBlanks, runningScore, sentenceLabel } from '../lib/listening-practice.js';
@@ -21,7 +22,6 @@ export function SongLinePractice({ exerciseId, data, onScored }) {
   const { segments, mode } = data;
   const blanksMode = mode === ListeningMode.BLANKS;
   const [index, setIndex] = useState(0);
-  const [started, setStarted] = useState(false);
   const [speed, setSpeed] = useState(1);
   // Line id (full mode) or blank number (blanks mode) → what was written.
   const [answers, setAnswers] = useState({});
@@ -31,13 +31,16 @@ export function SongLinePractice({ exerciseId, data, onScored }) {
   const [final, setFinal] = useState(null);
   const [busy, setBusy] = useState(false);
   const audioRef = useRef(null);
-  const stopAt = useRef(null);
-  const frame = useRef(null);
   const inputRef = useRef(null);
-  // The line the player is held to; set before a new line plays.
-  const lineRef = useRef(null);
 
   const segment = segments[index];
+  // The player stops at the end of the line; then its box is ready to type in.
+  const { started, playLine: playHeld, reset } = useHeldPlayer(audioRef, {
+    line: segment,
+    speed,
+    active: !final,
+    onStop: () => (inputRef.current || document.querySelector('input[aria-label*=", blank"]'))?.focus(),
+  });
   const label = sentenceLabel('song', index);
   const blanks = blanksMode ? lineBlanks(segment || {}) : [];
   // In blanks mode a line without blanks is only listened to.
@@ -45,68 +48,10 @@ export function SongLinePractice({ exerciseId, data, onScored }) {
   const result = segment ? results[segment.id] : null;
   const done = segment && (result || (nothingToWrite && started));
   const last = index === segments.length - 1;
-  if (!lineRef.current || lineRef.current.id !== segment?.id) lineRef.current = segment;
-
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.playbackRate = speed;
-  }, [speed]);
-
-  useEffect(() => () => cancelAnimationFrame(frame.current), []);
-
-  // Stops the player at the end of the line, checked on every frame so it
-  // never runs into the next line; then the line's box is ready to type in.
-  function watch() {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (stopAt.current !== null && audio.currentTime >= stopAt.current) {
-      stopAt.current = null;
-      audio.pause();
-      (inputRef.current || document.querySelector('input[aria-label*=", blank"]'))?.focus();
-      return;
-    }
-    frame.current = requestAnimationFrame(watch);
-  }
-
-  // The browser's own player, held to the current line (D95): play starts
-  // at the line's start when it is outside the line or at its end, it stops
-  // at the line's end, and moving outside the line goes back to its start.
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return undefined;
-    const outside = (line) => audio.currentTime < line.start - 0.05 || audio.currentTime >= line.end - 0.05;
-    const onPlay = () => {
-      const line = lineRef.current;
-      if (!line) return;
-      if (outside(line)) audio.currentTime = line.start;
-      audio.playbackRate = speed;
-      stopAt.current = line.end;
-      setStarted(true);
-      cancelAnimationFrame(frame.current);
-      frame.current = requestAnimationFrame(watch);
-    };
-    const onPause = () => cancelAnimationFrame(frame.current);
-    const onSeeking = () => {
-      const line = lineRef.current;
-      if (line && outside(line) && Math.abs(audio.currentTime - line.end) > 0.05) audio.currentTime = line.start;
-    };
-    audio.addEventListener('play', onPlay);
-    audio.addEventListener('pause', onPause);
-    audio.addEventListener('seeking', onSeeking);
-    return () => {
-      audio.removeEventListener('play', onPlay);
-      audio.removeEventListener('pause', onPause);
-      audio.removeEventListener('seeking', onSeeking);
-    };
-  }, [final, speed]);
 
   // Plays the line `at` from its start.
   function playLine(at = index) {
-    const audio = audioRef.current;
-    const line = segments[at];
-    if (!audio || !line) return;
-    lineRef.current = line;
-    audio.currentTime = line.start;
-    audio.play().catch(() => {
+    playHeld(segments[at]).catch(() => {
       notify({ title: 'The song cannot be played', description: 'Try again, or check your sound settings.', variant: 'destructive' });
     });
   }
@@ -149,11 +94,8 @@ export function SongLinePractice({ exerciseId, data, onScored }) {
   }
 
   function restart() {
-    cancelAnimationFrame(frame.current);
-    audioRef.current?.pause();
+    reset(segments[0]);
     setIndex(0);
-    setStarted(false);
-    lineRef.current = segments[0];
     setAnswers({});
     setResults({});
     setFinal(null);

@@ -1,0 +1,24 @@
+1
+00:00:00,400 --> 00:00:03,910
+Man: Hello. Do you have apples today?
+
+2
+00:00:04,510 --> 00:00:08,340
+Woman: Yes, we have red apples and green apples.
+
+3
+00:00:08,940 --> 00:00:11,000
+Man: How much are the red apples?
+
+4
+00:00:11,600 --> 00:00:13,700
+Woman: They are two dollars a kilo.
+
+5
+00:00:14,300 --> 00:00:21,420
+Man: OK, one kilo of red apples, please. And three bananas.
+
+6
+00:00:22,020 --> 00:00:26,620
+Woman: Sure. That's three dollars and fifty cents.
+

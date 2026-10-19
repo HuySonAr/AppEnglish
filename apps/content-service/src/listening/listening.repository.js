@@ -1,6 +1,7 @@
 import {
   ListeningExerciseEntity,
   ListeningExerciseVersionEntity,
+  ListeningTimingJobEntity,
   ListeningTopicEntity,
 } from '../database/content.entities.js';
 
@@ -67,5 +68,17 @@ export class ListeningRepository {
       await manager.getRepository(ListeningExerciseVersionEntity).save(version);
       await manager.getRepository(ListeningExerciseEntity).save(exercise);
     });
+  }
+
+  async saveTimingJob(job) {
+    return (await this.repo(ListeningTimingJobEntity)).save(job);
+  }
+
+  async findTimingJob(id) {
+    return (await this.repo(ListeningTimingJobEntity)).findOne({ where: { id } });
+  }
+
+  async findLatestTimingJob(exerciseId) {
+    return (await this.repo(ListeningTimingJobEntity)).findOne({ where: { exerciseId }, order: { createdAt: 'DESC' } });
   }
 }

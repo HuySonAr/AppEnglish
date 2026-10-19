@@ -41,6 +41,28 @@ service LearningService {
   rpc CheckListeningPractice(LearningRequest) returns (LearningReply);
   // One line checked as the learner goes (D93); nothing is kept.
   rpc CheckListeningLine(LearningRequest) returns (LearningReply);
+  // Listening course (F05C, D100). Student: the course with the learner's
+  // results, one lesson without its answers (id is the unit id), the check of
+  // one step as the learner goes (nothing kept), and the whole lesson scored
+  // and kept.
+  rpc GetListeningCourse(LearningRequest) returns (LearningReply);
+  rpc GetCourseLesson(LearningRequest) returns (LearningReply);
+  rpc CheckCourseLessonStep(LearningRequest) returns (LearningReply);
+  rpc CompleteCourseLesson(LearningRequest) returns (LearningReply);
+  // A unit check (id = the unit id) or a level test (id = its id) without
+  // its answers, and the answers scored and kept (D102).
+  rpc GetCourseTest(LearningRequest) returns (LearningReply);
+  rpc SubmitCourseTest(LearningRequest) returns (LearningReply);
+  // The listening placement (D103): taken or skipped once; it sets the level
+  // the learner starts the course at.
+  rpc GetCoursePlacement(LearningRequest) returns (LearningReply);
+  rpc SubmitCoursePlacement(LearningRequest) returns (LearningReply);
+  rpc SkipCoursePlacement(LearningRequest) returns (LearningReply);
+  // The learner's progress in the course, and the sentences they wrote down
+  // wrong with the check of one written again (id = the mistake id) (D104).
+  rpc GetCourseProgress(LearningRequest) returns (LearningReply);
+  rpc ListCourseMistakes(LearningRequest) returns (LearningReply);
+  rpc CheckCourseMistake(LearningRequest) returns (LearningReply);
   // Mock tests (F05A). Student: full tests and mini tests; id is the mock
   // test id. Admin: the estimated-score conversion table.
   rpc ListMockTests(LearningRequest) returns (LearningReply);

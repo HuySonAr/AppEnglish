@@ -1,12 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  applyAutoTime,
   formatSeconds,
   listeningPastePlan,
   listeningIssueLabel,
   listeningKindOf,
   parseSeconds,
   segmentsFromText,
+  transcribedSegments,
   withEnd,
   workingListening,
 } from './listening-draft.js';
@@ -60,5 +62,32 @@ test('song lines are kept whole and named as lines', () => {
   const lines = segmentsFromText('Chorus: I [walked] home\nAnd [stayed]', song);
   assert.deepEqual(lines.map((item) => [item.speaker, item.text]), [['', 'Chorus: I [walked] home'], ['', 'And [stayed]']]);
   assert.equal(listeningIssueLabel('segments[1].text', song), 'Line 2 · text');
+});
+
+test('auto-time writes the times it found and names the lines to check (D97)', () => {
+  const segments = [
+    { id: 'a', text: 'One.', start: null, end: null },
+    { id: 'b', text: 'Two.', start: 9, end: 10 },
+    { id: 'c', text: 'Three.', start: null, end: null },
+    { id: 'd', text: 'Not asked.', start: 20, end: 21 },
+  ];
+  const answer = [
+    { id: 'a', start: 0.4, end: 1.9, matched: 1 },
+    { id: 'b', start: 2, end: 3.1, matched: 0.5 },
+    { id: 'c', start: null, end: null, matched: 0 },
+    { id: 'd', start: 57.5, end: 75.1, matched: 1 },
+  ];
+  const { segments: next, timed, check } = applyAutoTime(segments, answer);
+  assert.deepEqual(next.map((item) => [item.id, item.start, item.end]), [['a', 0.4, 1.9], ['b', 2, 3.1], ['c', null, null], ['d', 57.5, 75.1]]);
+  // 'd' was found whole but lasts 17.6 s: worth a listen.
+  assert.deepEqual([timed, check], [3, ['b', 'c', 'd']]);
+});
+
+test('the lines heard by transcribe become the lines, Parts 1 and 2 keeping four places (D98)', () => {
+  const heard = [{ text: 'A man is reading.', start: 0.4, end: 2.1 }, { text: 'A woman is typing.', start: 2.3, end: 4 }];
+  const song = transcribedSegments(heard, listeningKindOf('song'));
+  assert.deepEqual(song.map((item) => [item.text, item.start, item.end, item.speaker]), [['A man is reading.', 0.4, 2.1, ''], ['A woman is typing.', 2.3, 4, '']]);
+  assert.ok(song[0].id);
+  assert.equal(transcribedSegments(heard, listeningKindOf('part1')).length, 4);
 });
 

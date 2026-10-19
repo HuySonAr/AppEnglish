@@ -1,0 +1,24 @@
+1
+00:00:00,400 --> 00:00:02,750
+Hello, my name is Mai.
+
+2
+00:00:03,350 --> 00:00:05,790
+There are four people in my family.
+
+3
+00:00:06,390 --> 00:00:09,860
+My father is a teacher and my mother is a nurse.
+
+4
+00:00:10,460 --> 00:00:14,490
+I have one brother. His name is Nam.
+
+5
+00:00:15,090 --> 00:00:18,260
+He is ten years old and he likes football.
+
+6
+00:00:18,860 --> 00:00:23,420
+On Sundays, we have dinner at my grandmother's house.
+

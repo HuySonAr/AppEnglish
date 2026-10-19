@@ -1,0 +1,28 @@
+1
+00:00:00,400 --> 00:00:03,720
+Man: Our company is letting us work from home three days a week now.
+
+2
+00:00:04,320 --> 00:00:07,750
+Woman: Lucky you! Do you think you will be more productive?
+
+3
+00:00:08,350 --> 00:00:15,070
+Man: Honestly, I'm not sure. I save an hour of travelling, but I get distracted easily at home.
+
+4
+00:00:15,670 --> 00:00:19,470
+Woman: Maybe you need a separate space to work in, not the kitchen table.
+
+5
+00:00:20,070 --> 00:00:24,780
+Man: That's a good point. I also worry about losing touch with my colleagues.
+
+6
+00:00:25,380 --> 00:00:30,950
+Woman: You could use the office days for meetings and teamwork, and keep the home days for focused tasks.
+
+7
+00:00:31,550 --> 00:00:35,560
+Man: That makes sense. I'll try organising my week like that.
+

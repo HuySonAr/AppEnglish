@@ -168,3 +168,78 @@ test('publishing rules of a song', () => {
   assert.deepEqual(issues([sentence('An empty [ ] blank', 0, 2)]), ['segments[0].text: A blank [ ] needs the word inside']);
   assert.deepEqual(issues([sentence('An [open blank', 0, 2)]), ['segments[0].text: A bracket is not closed: write a blank as [word]']);
 });
+
+test('auto-time sends the saved lines to speech-service and keeps its answer (D97)', async () => {
+  const { repository, upload } = await harness();
+  const content = new ContentService(repository, { async upload(input) { return { id: 's', kind: input.kind, fileName: input.fileName, mimeType: input.mimeType, sizeBytes: 1, url: `https://media.test/${input.fileName}`, storage: 'r2' }; }, async delete() {} });
+  const sent = [];
+  const broker = { ready: false, publish: (message) => sent.push(message) > 0 };
+  let clock = new Date();
+  const service = new ListeningService(repository.listening, content, { broker, now: () => clock });
+  const { exercise } = await service.createExercise(manager, { topicId: toeicTopicId, title: 'Talk', level: 'B1', kind: 'part4' });
+  await assert.rejects(() => service.requestAutoTime(manager, exercise.id), { code: 41, data: { reason: 'NO_AUDIO' } });
+  const audioId = (await content.uploadMedia(manager, { kind: 'audio', fileName: 't.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1]), section: 'listening' })).media.id;
+  await service.saveDraft(manager, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [] }));
+  await assert.rejects(() => service.requestAutoTime(manager, exercise.id), { code: 41, data: { reason: 'NO_LINES' } });
+  const saved = await service.saveDraft(manager, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [sentence('Attention, passengers.'), sentence('The train is late.')] }));
+  const [first, second] = saved.draft.content.segments;
+  // Without the broker no job is made.
+  await assert.rejects(() => service.requestAutoTime(manager, exercise.id), { code: 47, status: 503 });
+  await assert.rejects(() => service.requestAutoTime(student, exercise.id), { code: 26 });
+
+  broker.ready = true;
+  const { job } = await service.requestAutoTime(manager, exercise.id);
+  assert.deepEqual([job.task, job.status, job.lineCount, job.lines], ['align', 'QUEUED', 2, []]);
+  assert.deepEqual(sent, [{ jobId: job.id, task: 'align', audioUrl: 'https://media.test/t.mp3', language: 'en', kind: 'part4', lines: [{ id: first.id, text: 'Attention, passengers.' }, { id: second.id, text: 'The train is late.' }] }]);
+  // Asking again while it runs gives the same job.
+  assert.equal((await service.requestAutoTime(manager, exercise.id)).job.id, job.id);
+  assert.equal(sent.length, 1);
+
+  // Answers: running, then done; times of unknown lines are dropped, bad answers ignored.
+  await service.onAutoTimeResult({ jobId: job.id, status: 'RUNNING' });
+  assert.equal((await service.getAutoTime(manager, exercise.id)).job.status, 'RUNNING');
+  await service.onAutoTimeResult({ jobId: job.id, status: 'DONE', lines: 'nope' });
+  await service.onAutoTimeResult({
+    jobId: job.id,
+    status: 'DONE',
+    lines: [{ id: first.id, start: 0.4, end: 1.9, matched: 1 }, { id: second.id, start: 2.1, end: 3.5, matched: 0.75 }, { id: '99999999-9999-4999-8999-999999999999', start: 0, end: 1, matched: 1 }],
+  });
+  const done = (await service.getAutoTime(manager, exercise.id)).job;
+  assert.deepEqual([done.status, done.lines.map((line) => [line.start, line.end, line.matched])], ['DONE', [[0.4, 1.9, 1], [2.1, 3.5, 0.75]]]);
+  // A finished job is not changed by a late answer.
+  await service.onAutoTimeResult({ jobId: job.id, status: 'FAILED', error: 'late' });
+  assert.equal((await service.getAutoTime(manager, exercise.id)).job.status, 'DONE');
+
+  // A job left without an answer for 30 minutes shows as failed, and a new one can be asked.
+  const second2 = (await service.requestAutoTime(manager, exercise.id)).job;
+  clock = new Date(Date.now() + 31 * 60 * 1000);
+  const late = (await service.getAutoTime(manager, exercise.id)).job;
+  assert.deepEqual([late.id, late.status], [second2.id, 'FAILED']);
+  assert.notEqual((await service.requestAutoTime(manager, exercise.id)).job.id, second2.id);
+});
+
+test('transcribe asks for the lines of the recording alone and keeps the lines heard (D98)', async () => {
+  const { repository } = await harness();
+  const content = new ContentService(repository, { async upload(input) { return { id: 's', kind: input.kind, fileName: input.fileName, mimeType: input.mimeType, sizeBytes: 1, url: `https://media.test/${input.fileName}`, storage: 'r2' }; }, async delete() {} });
+  const sent = [];
+  const service = new ListeningService(repository.listening, content, { broker: { ready: true, publish: (message) => sent.push(message) > 0 } });
+  const songs = (await service.createTopic(admin, { name: 'Songs', format: 'song' })).topic;
+  const { exercise } = await service.createExercise(manager, { topicId: songs.id, title: 'Home', level: 'A2', kind: 'song' });
+  const audioId = (await content.uploadMedia(manager, { kind: 'audio', fileName: 's.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1]), section: 'listening' })).media.id;
+  // No lines are needed, only the recording.
+  await service.saveDraft(manager, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [] }));
+  const { job } = await service.requestTranscribe(manager, exercise.id);
+  assert.deepEqual([job.task, job.status, job.lineCount], ['transcribe', 'QUEUED', 0]);
+  assert.deepEqual(sent, [{ jobId: job.id, task: 'transcribe', audioUrl: 'https://media.test/s.mp3', language: 'en', kind: 'song', lines: [] }]);
+  // While it runs, auto-time gives the same job back.
+  assert.equal((await service.requestAutoTime(manager, exercise.id).catch((error) => error)).code, 41);
+
+  await service.onAutoTimeResult({
+    jobId: job.id,
+    status: 'DONE',
+    lines: [{ text: ' Love in your eyes ', start: 10.8, end: 13.2 }, { text: '   ', start: 14, end: 15 }, { text: 'Sitting silent by my side', start: 13.8, end: 16.6 }],
+  });
+  const done = (await service.getAutoTime(manager, exercise.id)).job;
+  assert.deepEqual([done.task, done.status, done.lineCount, done.lines], ['transcribe', 'DONE', 2, [{ text: 'Love in your eyes', start: 10.8, end: 13.2 }, { text: 'Sitting silent by my side', start: 13.8, end: 16.6 }]]);
+});
+

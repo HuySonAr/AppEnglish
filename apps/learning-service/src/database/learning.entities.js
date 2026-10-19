@@ -156,6 +156,84 @@ export const ScoreConversionEntity = new EntitySchema({
 // Listening practice (F05B-3, D86): one row per learner, dictation exercise
 // and mode (full, or the blanks of a song, D88) with the best and the latest
 // accuracy (percent) of their checks.
+export const CourseLessonResultEntity = new EntitySchema({
+  name: 'CourseLessonResult',
+  tableName: 'course_lesson_results',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    accountId: { type: 'uuid' },
+    unitId: { type: 'uuid' },
+    lessonId: { type: 'uuid' },
+    bestScore: { type: 'int' },
+    lastScore: { type: 'int' },
+    attemptCount: { type: 'int' },
+    passedAt: { type: 'timestamptz', nullable: true },
+    lastAttemptAt: { type: 'timestamptz' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'UQ_course_lesson_results_account_lesson', columns: ['accountId', 'lessonId'], unique: true }],
+});
+
+export const CourseTestResultEntity = new EntitySchema({
+  name: 'CourseTestResult',
+  tableName: 'course_test_results',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    accountId: { type: 'uuid' },
+    itemId: { type: 'uuid' },
+    kind: { type: 'varchar', length: 12 },
+    level: { type: 'varchar', length: 2 },
+    bestScore: { type: 'int' },
+    lastScore: { type: 'int' },
+    attemptCount: { type: 'int' },
+    passedAt: { type: 'timestamptz', nullable: true },
+    lastAttemptAt: { type: 'timestamptz' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'UQ_course_test_results_account_item', columns: ['accountId', 'itemId'], unique: true }],
+});
+
+export const CoursePlacementEntity = new EntitySchema({
+  name: 'CoursePlacement',
+  tableName: 'course_placements',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    accountId: { type: 'uuid', unique: true },
+    status: { type: 'varchar', length: 12 },
+    versionId: { type: 'uuid', nullable: true },
+    startLevel: { type: 'varchar', length: 2 },
+    levelScores: { type: 'jsonb', default: () => "'[]'" },
+    answers: { type: 'jsonb', default: () => "'{}'" },
+    completedAt: { type: 'timestamptz' },
+    createdAt: { type: 'timestamptz', createDate: true },
+  },
+});
+
+export const CourseMistakeEntity = new EntitySchema({
+  name: 'CourseMistake',
+  tableName: 'course_mistakes',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    accountId: { type: 'uuid' },
+    unitId: { type: 'uuid' },
+    lessonId: { type: 'uuid' },
+    segmentId: { type: 'uuid' },
+    level: { type: 'varchar', length: 2 },
+    unitTitle: { type: 'varchar', length: 200 },
+    lessonTitle: { type: 'varchar', length: 200 },
+    text: { type: 'text' },
+    speaker: { type: 'varchar', length: 100, default: '' },
+    missedWords: { type: 'jsonb', default: () => "'[]'" },
+    timesMissed: { type: 'int', default: 1 },
+    lastMissedAt: { type: 'timestamptz' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'UQ_course_mistakes_account_lesson_segment', columns: ['accountId', 'lessonId', 'segmentId'], unique: true }],
+});
+
 export const ListeningResultEntity = new EntitySchema({
   name: 'ListeningResult',
   tableName: 'listening_results',
@@ -172,4 +250,20 @@ export const ListeningResultEntity = new EntitySchema({
     updatedAt: { type: 'timestamptz', updateDate: true },
   },
   indices: [{ name: 'UQ_listening_results_account_exercise_mode', columns: ['accountId', 'exerciseId', 'mode'], unique: true }],
+});
+
+// Outbox of the results sent to progress-service (F06, D110): each row is one
+// event written together with the result it reports and relayed to RabbitMQ
+// afterwards; publishedAt is set once the broker confirmed it.
+export const LearningEventEntity = new EntitySchema({
+  name: 'LearningEvent',
+  tableName: 'learning_events',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    type: { type: 'varchar', length: 40 },
+    payload: { type: 'jsonb' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    publishedAt: { type: 'timestamptz', nullable: true },
+  },
+  indices: [{ name: 'IDX_learning_events_pending', columns: ['publishedAt', 'createdAt'] }],
 });

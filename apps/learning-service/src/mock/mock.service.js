@@ -1,6 +1,6 @@
 import { AccountRole } from '@appenglish/auth-contracts';
 import { LESSON_TEST_PARTS } from '@appenglish/content-contracts';
-import { MockAttemptKind, PlacementStatus } from '@appenglish/learning-contracts';
+import { LearningEventType, MockAttemptKind, PlacementStatus } from '@appenglish/learning-contracts';
 import {
   scoreTest,
   shuffledOptionOrder,
@@ -8,6 +8,7 @@ import {
   testParts,
   testProgression,
 } from '../lesson/lesson.rules.js';
+import { noEvents } from '../events/learning-events.js';
 import { placementErrors } from '../placement/placement.errors.js';
 import { mockErrors } from './mock.errors.js';
 import { defaultScoreConversion, estimatedScores, recommendedLevel } from './mock.rules.js';
@@ -26,11 +27,13 @@ const sameAttemptSeries = (attempt, kind, partKey) =>
 export class MockService {
   // contentClient reads published mock tests from content-service;
   // placementRepository gives the starting unit for the first suggestion;
-  // now() and random() are replaceable in tests.
-  constructor(repository, placementRepository, contentClient, { now = () => new Date(), random = Math.random } = {}) {
+  // events reports finished full tests to progress-service (F06); now() and
+  // random() are replaceable in tests.
+  constructor(repository, placementRepository, contentClient, { now = () => new Date(), random = Math.random, events = noEvents } = {}) {
     this.repository = repository;
     this.placementRepository = placementRepository;
     this.contentClient = contentClient;
+    this.events = events;
     this.now = now;
     this.random = random;
   }
@@ -87,7 +90,7 @@ export class MockService {
     const attempts = await this.repository.listTestAttempts(actor.id, mockTestId);
     for (const [index, attempt] of attempts.entries())
       if (attempt.status === IN_PROGRESS && this.isExpired(attempt))
-        attempts[index] = await this.complete(attempt, attempt.answers);
+        attempts[index] = await this.complete(attempt, attempt.answers, actor);
     return attempts;
   }
 
@@ -234,7 +237,7 @@ export class MockService {
   async saveMockAnswers(actor, mockTestId, { answers, ...reference }) {
     const attempt = await this.openAttempt(actor, mockTestId, reference);
     if (this.isExpired(attempt)) {
-      await this.complete(attempt, attempt.answers);
+      await this.complete(attempt, attempt.answers, actor);
       throw mockErrors.notInProgress();
     }
     attempt.answers = answers;
@@ -248,7 +251,7 @@ export class MockService {
   async discardMockAttempt(actor, mockTestId, reference) {
     const attempt = await this.openAttempt(actor, mockTestId, reference);
     if (this.isExpired(attempt)) {
-      await this.complete(attempt, attempt.answers);
+      await this.complete(attempt, attempt.answers, actor);
       throw mockErrors.notInProgress();
     }
     await this.repository.deleteOpenAttempt(attempt.id);
@@ -259,11 +262,12 @@ export class MockService {
   async submitMockAttempt(actor, mockTestId, { answers, ...reference }) {
     const attempt = await this.openAttempt(actor, mockTestId, reference);
     // A submit after the grace period is scored with the answers saved in time.
-    const finished = await this.complete(attempt, this.isExpired(attempt) ? attempt.answers : answers);
+    const finished = await this.complete(attempt, this.isExpired(attempt) ? attempt.answers : answers, actor);
     return this.reviewView(finished);
   }
 
-  async complete(attempt, answers) {
+  // actor is the learner, for the email the XP leaderboard shows (D112).
+  async complete(attempt, answers, actor) {
     const paper = await this.paper(attempt.mockTestId, attempt.mockVersionId);
     const partKeys = attempt.partKey ? [attempt.partKey] : undefined;
     const score = scoreTest(paper.test, answers, partKeys);
@@ -286,7 +290,24 @@ export class MockService {
       const { listeningScore, readingScore } = estimatedScores(score, totals, await this.conversion());
       Object.assign(attempt, { listeningScore, readingScore });
     }
-    return this.repository.saveAttempt(attempt);
+    const saved = await this.repository.saveAttempt(attempt);
+    // Only full tests reach progress and XP; mini tests are practice (D63).
+    if (saved.kind === MockAttemptKind.FULL) {
+      const { estimated, countsForXp, durationSeconds, scorePercent, ...counts } = this.summary(saved);
+      await this.events.record(LearningEventType.MOCK_SUBMITTED, {
+        attemptId: saved.id,
+        accountId: saved.accountId,
+        accountEmail: actor?.email || '',
+        mockTestId: saved.mockTestId,
+        mockTestTitle: paper.mockTest?.title || '',
+        mockVersionId: saved.mockVersionId,
+        kind: saved.kind,
+        ...counts,
+        listeningScore: estimated.listeningScore,
+        readingScore: estimated.readingScore,
+      });
+    }
+    return saved;
   }
 
   // One finished attempt of a series (the latest, or the given number).

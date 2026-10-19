@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package appenglish.progress.v1;
+
+// Internal contract between api-gateway and progress-service (F06). The
+// gateway authenticates the caller through auth-service and passes the actor;
+// progress-service enforces the role and owns the rules. Results arrive from
+// learning-service over RabbitMQ (queue learning.results), not over gRPC.
+service ProgressService {
+  // Student: lessons completed over the published lessons, and the Reading
+  // and Listening mastery from the lesson tests and full mock tests (D33).
+  rpc GetProgress(ProgressRequest) returns (ProgressReply);
+  // Student: XP from mock tests (F07, D63) and the XP leaderboard (D39).
+  rpc GetXp(ProgressRequest) returns (ProgressReply);
+  rpc GetLeaderboard(ProgressRequest) returns (ProgressReply);
+}
+
+// The authenticated account as verified by auth-service.
+message Actor {
+  string id = 1;
+  string role = 2;
+  string email = 3;
+}
+
+message ProgressRequest {
+  Actor actor = 1;
+  // Target id; empty when the call has none.
+  string id = 2;
+  // JSON request body validated by progress-service; empty when there is none.
+  string payload_json = 3;
+}
+
+message ProgressReply {
+  // HTTP status the gateway answers with when it is an error (>= 400).
+  int32 http_status = 1;
+  // Envelope code and msg; codes are in @appenglish/progress-contracts.
+  int32 code = 2;
+  string msg = 3;
+  // JSON object for the envelope's data; its shape depends on the call.
+  string data_json = 4;
+  // Unused by progress calls; keeps the reply shape shared with AuthReply.
+  repeated string set_cookies = 5;
+}

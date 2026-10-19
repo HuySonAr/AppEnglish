@@ -1,0 +1,24 @@
+1
+00:00:00,400 --> 00:00:02,250
+Welcome to the Science Museum.
+
+2
+00:00:02,850 --> 00:00:05,810
+This guide will take you through our three main galleries.
+
+3
+00:00:06,410 --> 00:00:12,200
+On the ground floor, you'll find the space gallery, where you can see a real rocket engine.
+
+4
+00:00:12,800 --> 00:00:17,890
+The first floor is about the human body and has many hands-on activities for children.
+
+5
+00:00:18,490 --> 00:00:22,430
+Please note that photography with a flash is not allowed in the galleries.
+
+6
+00:00:23,030 --> 00:00:28,270
+The café on the second floor closes an hour before the museum, at four o'clock.
+

@@ -1,4 +1,4 @@
-import { ClipboardCheck, FileText, Headphones, Library } from 'lucide-react';
+import { ClipboardCheck, Compass, FileText, GraduationCap, Headphones, Library } from 'lucide-react';
 import { FeatureCard } from '../../../components/shared/FeatureCard.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 
@@ -30,6 +30,20 @@ export function ContentManagerDashboardPage() {
           description="Write and publish full TOEIC-style tests"
           to="/content-manager/mock-tests"
           tone="info"
+        />
+        <FeatureCard
+          icon={GraduationCap}
+          title="Listening course"
+          description="Units, lessons and level tests from A1 to C1"
+          to="/content-manager/listening-course"
+          tone="success"
+        />
+        <FeatureCard
+          icon={Compass}
+          title="Listening placement"
+          description="The test that finds the level a learner starts the course at"
+          to="/content-manager/listening-placement"
+          tone="primary"
         />
         <FeatureCard
           icon={Headphones}

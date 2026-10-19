@@ -1,0 +1,32 @@
+1
+00:00:00,400 --> 00:00:05,480
+Man: Your town has seen visitor numbers triple in five years. Is that good news?
+
+2
+00:00:06,080 --> 00:00:13,720
+Woman: Economically, yes. Hotels and restaurants are thriving, and young people no longer need to leave to find work.
+
+3
+00:00:14,320 --> 00:00:16,370
+Man: But I gather not everyone is pleased.
+
+4
+00:00:16,970 --> 00:00:24,830
+Woman: That's right. Rents have soared because so many flats are now let to tourists, and some families have been priced out entirely.
+
+5
+00:00:25,430 --> 00:00:27,120
+Man: What is the council doing about it?
+
+6
+00:00:27,720 --> 00:00:34,320
+Woman: We've introduced a cap on short-term rentals in the old town, and a small tourist tax that funds affordable housing.
+
+7
+00:00:34,920 --> 00:00:36,200
+Man: Has it made a difference?
+
+8
+00:00:36,800 --> 00:00:40,100
+Woman: It's early days, but rents have at least stopped rising.
+

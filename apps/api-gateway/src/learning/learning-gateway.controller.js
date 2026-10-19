@@ -142,6 +142,42 @@ export class LessonGatewayController extends LearningRelay {
   checkListeningPractice(id, body, request) {
     return this.forward('CheckListeningPractice', request, { id, body });
   }
+  getListeningCourse(request) {
+    return this.forward('GetListeningCourse', request);
+  }
+  getCourseLesson(unitId, lessonId, request) {
+    return this.forward('GetCourseLesson', request, { id: unitId, body: { lessonId } });
+  }
+  checkCourseLessonStep(unitId, lessonId, body, request) {
+    return this.forward('CheckCourseLessonStep', request, { id: unitId, body: { ...body, lessonId } });
+  }
+  completeCourseLesson(unitId, lessonId, body, request) {
+    return this.forward('CompleteCourseLesson', request, { id: unitId, body: { ...body, lessonId } });
+  }
+  getCourseProgress(request) {
+    return this.forward('GetCourseProgress', request);
+  }
+  listCourseMistakes(request) {
+    return this.forward('ListCourseMistakes', request);
+  }
+  checkCourseMistake(id, body, request) {
+    return this.forward('CheckCourseMistake', request, { id, body });
+  }
+  getCoursePlacement(request) {
+    return this.forward('GetCoursePlacement', request);
+  }
+  submitCoursePlacement(body, request) {
+    return this.forward('SubmitCoursePlacement', request, { body });
+  }
+  skipCoursePlacement(request) {
+    return this.forward('SkipCoursePlacement', request);
+  }
+  getCourseTest(itemId, request) {
+    return this.forward('GetCourseTest', request, { id: itemId });
+  }
+  submitCourseTest(itemId, body, request) {
+    return this.forward('SubmitCourseTest', request, { id: itemId, body });
+  }
   getLessonRanking(id, request) {
     return this.forward('GetLessonRanking', request, { id });
   }
@@ -170,6 +206,18 @@ const lessonRoutes = [
   [Get, 'practice/listening/:id', 'getListeningPractice', [Param('id'), Query(), Req()]],
   [Post, 'practice/listening/:id/check', 'checkListeningPractice', [Param('id'), Body(), Req()]],
   [Post, 'practice/listening/:id/check-line', 'checkListeningLine', [Param('id'), Body(), Req()]],
+  [Get, 'listening-course', 'getListeningCourse', [Req()]],
+  [Get, 'listening-course/units/:unitId/lessons/:lessonId', 'getCourseLesson', [Param('unitId'), Param('lessonId'), Req()]],
+  [Post, 'listening-course/units/:unitId/lessons/:lessonId/check', 'checkCourseLessonStep', [Param('unitId'), Param('lessonId'), Body(), Req()]],
+  [Post, 'listening-course/units/:unitId/lessons/:lessonId/complete', 'completeCourseLesson', [Param('unitId'), Param('lessonId'), Body(), Req()]],
+  [Get, 'listening-course/progress', 'getCourseProgress', [Req()]],
+  [Get, 'listening-course/mistakes', 'listCourseMistakes', [Req()]],
+  [Post, 'listening-course/mistakes/:id/check', 'checkCourseMistake', [Param('id'), Body(), Req()]],
+  [Get, 'listening-course/placement', 'getCoursePlacement', [Req()]],
+  [Post, 'listening-course/placement/submit', 'submitCoursePlacement', [Body(), Req()]],
+  [Post, 'listening-course/placement/skip', 'skipCoursePlacement', [Req()]],
+  [Get, 'listening-course/tests/:itemId', 'getCourseTest', [Param('itemId'), Req()]],
+  [Post, 'listening-course/tests/:itemId/submit', 'submitCourseTest', [Param('itemId'), Body(), Req()]],
 ];
 for (const [verb, path, method, params] of lessonRoutes) {
   const descriptor = Object.getOwnPropertyDescriptor(LessonGatewayController.prototype, method);

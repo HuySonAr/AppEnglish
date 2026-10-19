@@ -26,6 +26,9 @@ importers:
       '@appenglish/learning-contracts':
         specifier: workspace:*
         version: link:../../packages/learning-contracts
+      '@appenglish/progress-contracts':
+        specifier: workspace:*
+        version: link:../../packages/progress-contracts
       '@grpc/grpc-js':
         specifier: ^1.14.0
         version: 1.14.6
@@ -197,9 +200,24 @@ importers:
 
   apps/progress-service:
     dependencies:
+      '@appenglish/auth-contracts':
+        specifier: workspace:*
+        version: link:../../packages/auth-contracts
+      '@appenglish/content-contracts':
+        specifier: workspace:*
+        version: link:../../packages/content-contracts
+      '@appenglish/learning-contracts':
+        specifier: workspace:*
+        version: link:../../packages/learning-contracts
+      '@appenglish/progress-contracts':
+        specifier: workspace:*
+        version: link:../../packages/progress-contracts
       '@grpc/grpc-js':
         specifier: ^1.14.0
         version: 1.14.6
+      '@grpc/proto-loader':
+        specifier: ^0.8.0
+        version: 0.8.1
       '@nestjs/common':
         specifier: ^11.1.6
         version: 11.2.7(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -230,6 +248,8 @@ importers:
       zod:
         specifier: ^3.25.76
         version: 3.25.76
+
+  apps/speech-service: {}
 
   apps/web-client:
     dependencies:
@@ -354,6 +374,8 @@ importers:
   packages/content-contracts: {}
 
   packages/learning-contracts: {}
+
+  packages/progress-contracts: {}
 
 packages:
 

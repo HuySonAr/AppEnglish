@@ -173,7 +173,8 @@ test('a lesson is studied step by step', async () => {
   assert.deepEqual(view.steps.map((step) => step.status), ['CURRENT', 'LOCKED', 'LOCKED', 'LOCKED']);
   assert.equal(view.review, null);
   assert.equal(view.vocabulary.length, 5);
-  assert.deepEqual(view.fillIn, { passage: 'The ___ left from the ___.', blankCount: 2, wordBank: paper.content.vocabulary.map((item) => item.word) });
+  // The word bank holds exactly the answers, shuffled (D111).
+  assert.deepEqual({ ...view.fillIn, wordBank: [...view.fillIn.wordBank].sort() }, { passage: 'The ___ left from the ___.', blankCount: 2, wordBank: [...paper.content.fillIn.answers].sort() });
   assert.deepEqual(view.test, { durationMinutes: 25, passPercent: 80, attemptCount: 0, bestPercent: null });
   assert.equal(JSON.stringify(view).includes('isCorrect'), false);
   assert.equal('answers' in view.fillIn, false);

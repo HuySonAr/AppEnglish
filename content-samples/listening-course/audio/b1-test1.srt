@@ -1,0 +1,32 @@
+1
+00:00:00,400 --> 00:00:02,600
+Man: So, how's the new apartment?
+
+2
+00:00:03,200 --> 00:00:08,810
+Woman: I love it. It's much bigger than my old place, and it's close to the station.
+
+3
+00:00:09,410 --> 00:00:10,550
+Man: What about the rent?
+
+4
+00:00:11,150 --> 00:00:15,830
+Woman: It's a bit higher, but I'm saving money because I don't need the bus anymore.
+
+5
+00:00:16,430 --> 00:00:18,150
+Man: Do you get on with your neighbours?
+
+6
+00:00:18,750 --> 00:00:23,800
+Woman: I've only met one. She's lived there for ten years and she's very friendly.
+
+7
+00:00:24,400 --> 00:00:26,560
+Man: You should have a party to meet the others.
+
+8
+00:00:27,160 --> 00:00:29,580
+Woman: Maybe once I've unpacked all the boxes!
+

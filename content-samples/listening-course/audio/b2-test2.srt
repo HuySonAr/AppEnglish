@@ -1,0 +1,24 @@
+1
+00:00:00,400 --> 00:00:04,460
+Scientists used to think that sleep was simply a time for the body to rest.
+
+2
+00:00:05,060 --> 00:00:08,440
+We now know that the brain is surprisingly active during the night.
+
+3
+00:00:09,040 --> 00:00:13,610
+During deep sleep, it removes waste products that build up while we are awake.
+
+4
+00:00:14,210 --> 00:00:19,400
+Lack of sleep has been linked to poor concentration, weaker memory and a higher risk of illness.
+
+5
+00:00:20,000 --> 00:00:23,110
+Adults generally need between seven and nine hours a night.
+
+6
+00:00:23,710 --> 00:00:27,600
+Yet surveys suggest that a third of adults regularly sleep less than that.
+

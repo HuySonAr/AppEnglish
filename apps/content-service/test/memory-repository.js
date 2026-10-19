@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto';
 export function createMemoryRepository() {
   const tables = {
     units: [], lessons: [], versions: [], media: [], placement: [], mockTests: [], mockVersions: [],
-    listeningExercises: [], listeningVersions: [],
+    listeningExercises: [], listeningVersions: [], timingJobs: [], courseItems: [], courseVersions: [],
     listeningTopics: [{ id: toeicTopicId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
     // The migration creates TOEIC.
     examTypes: [{ id: toeicExamTypeId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
@@ -43,10 +43,46 @@ export function createMemoryRepository() {
       save('listeningVersions', version);
       save('listeningExercises', exercise);
     },
+    async saveTimingJob(job) {
+      return save('timingJobs', { createdAt: new Date(), ...job, updatedAt: new Date() });
+    },
+    async findTimingJob(id) { return copy(tables.timingJobs.find((job) => job.id === id)); },
+    async findLatestTimingJob(exerciseId) {
+      return copy(tables.timingJobs.filter((job) => job.exerciseId === exerciseId).at(-1));
+    },
+  };
+  // In-memory stand-in for CourseRepository.
+  const course = {
+    async listItems() {
+      return tables.courseItems.map(copy).sort((a, b) => (a.level || '').localeCompare(b.level || '') || a.position - b.position);
+    },
+    async findItem(id) { return copy(tables.courseItems.find((item) => item.id === id)); },
+    async saveItem(item) { return save('courseItems', item); },
+    async saveItems(items) { return items.map((item) => save('courseItems', item)); },
+    async createItemWithDraft(item, draft) {
+      if (item.type === 'level_test' && tables.courseItems.some((other) => other.type === 'level_test' && other.level === item.level)) return null;
+      if (item.type === 'placement' && tables.courseItems.some((other) => other.type === 'placement')) return null;
+      const saved = save('courseItems', item);
+      return { item: saved, draft: save('courseVersions', { ...draft, itemId: saved.id }) };
+    },
+    async listVersionSummaries() {
+      return tables.courseVersions.map(({ id, itemId, versionNumber, status }) => ({ id, itemId, versionNumber, status }));
+    },
+    async findDraft(itemId) { return copy(tables.courseVersions.find((version) => version.itemId === itemId && version.status === 'DRAFT')); },
+    async findVersion(id) { return copy(tables.courseVersions.find((version) => version.id === id)); },
+    async maxVersionNumber(itemId) {
+      return Math.max(0, ...tables.courseVersions.filter((version) => version.itemId === itemId).map((version) => version.versionNumber));
+    },
+    async saveVersion(version) { return save('courseVersions', version); },
+    async publishVersion(item, version) {
+      save('courseVersions', version);
+      save('courseItems', item);
+    },
   };
   return {
     tables,
     listening,
+    course,
     async listUnits() { return tables.units.map(copy).sort(byPosition); },
     async findUnit(id) { return copy(tables.units.find((unit) => unit.id === id)); },
     async saveUnit(unit) { return save('units', unit); },

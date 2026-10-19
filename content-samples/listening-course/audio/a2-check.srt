@@ -1,0 +1,32 @@
+1
+00:00:00,400 --> 00:00:03,860
+Woman: Excuse me, when is the next train to Brighton?
+
+2
+00:00:04,460 --> 00:00:08,080
+Man: The next one leaves at ten fifteen from platform four.
+
+3
+00:00:08,680 --> 00:00:14,030
+Woman: Oh, I have to wait forty minutes. Is there an earlier bus?
+
+4
+00:00:14,630 --> 00:00:19,340
+Man: Yes, there's a bus at nine fifty, but it takes longer.
+
+5
+00:00:19,940 --> 00:00:21,170
+Woman: How much longer?
+
+6
+00:00:21,770 --> 00:00:24,150
+Man: About half an hour more than the train.
+
+7
+00:00:24,750 --> 00:00:29,790
+Woman: Then I'll take the train. One single ticket, please.
+
+8
+00:00:30,390 --> 00:00:31,860
+Man: That's twelve pounds.
+

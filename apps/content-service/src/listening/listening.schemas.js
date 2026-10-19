@@ -61,6 +61,28 @@ export const listeningContentSchema = z
   })
   .strict();
 
+// An answer of speech-service (D97, D98), read from speech.autotime.results:
+// lines are timed lines of the exercise (align: id and matched) or new lines
+// heard in the recording (transcribe: text). Extra fields are ignored so
+// speech-service can add some.
+export const autoTimeResultSchema = z.object({
+  jobId: z.string().uuid(),
+  status: z.enum(['RUNNING', 'DONE', 'FAILED']),
+  lines: z
+    .array(
+      z.object({
+        id: z.string().uuid().optional(),
+        text: z.string().optional(),
+        start: z.number().min(0).nullable(),
+        end: z.number().min(0).nullable(),
+        matched: z.number().min(0).max(1).optional(),
+      }),
+    )
+    .max(1000)
+    .optional(),
+  error: z.string().max(2000).optional(),
+});
+
 export function listeningMediaIds(content) {
   return [content.audioMediaId].filter(Boolean);
 }

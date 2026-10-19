@@ -1,8 +1,25 @@
 import { randomUUID } from 'node:crypto';
 import { AccountRole } from '@appenglish/auth-contracts';
-import { LISTENING_KINDS, LessonVersionStatus, listeningKind, lyricBlankCount } from '@appenglish/content-contracts';
+import { Logger } from '@nestjs/common';
+import {
+  AutoTimeStatus,
+  LISTENING_KINDS,
+  LISTENING_MAX_SEGMENTS,
+  LISTENING_SEGMENT_MAX_LENGTH,
+  SpeechTask,
+  LessonVersionStatus,
+  listeningKind,
+  lyricBlankCount,
+  lyricText,
+} from '@appenglish/content-contracts';
 import { contentErrors } from '../content/content.errors.js';
-import { listeningContentSchema, listeningIssues, listeningMediaIds } from './listening.schemas.js';
+import { autoTimeResultSchema, listeningContentSchema, listeningIssues, listeningMediaIds } from './listening.schemas.js';
+
+const logger = new Logger('ListeningService');
+// A job with no answer after this long is shown as failed (speech-service
+// down or the request lost); a new request can then be made.
+const AUTOTIME_TIMEOUT_MS = 30 * 60 * 1000;
+const active = (job) => job.status === AutoTimeStatus.QUEUED || job.status === AutoTimeStatus.RUNNING;
 
 const iso = (date) => (date ? new Date(date).toISOString() : null);
 
@@ -14,11 +31,14 @@ const withIds = (content) => ({
 
 // Listening practice content (F05B-2, D85): topics, and exercises written and
 // published by a Content Manager like mock tests. Files go through the
-// content module (upload, clean-up).
+// content module (upload, clean-up). broker (SpeechBroker) sends auto-time
+// requests to speech-service (D97); now() is replaceable in tests.
 export class ListeningService {
-  constructor(repository, contentService) {
+  constructor(repository, contentService, { broker = null, now = () => new Date() } = {}) {
     this.repository = repository;
     this.contentService = contentService;
+    this.broker = broker;
+    this.now = now;
   }
 
   assertManager(actor) {
@@ -204,6 +224,103 @@ export class ListeningService {
     exercise.publishedVersionId = draft.id;
     await this.repository.publishVersion(exercise, draft);
     return this.managedView(exercise, null, draft);
+  }
+
+  // ----- Speech jobs: Auto-time (D97) finds the times of the lines,
+  // Transcribe (D98) writes the lines from the recording.
+
+  timingJobView(job) {
+    const late = active(job) && this.now().getTime() - new Date(job.createdAt).getTime() > AUTOTIME_TIMEOUT_MS;
+    const task = job.task || SpeechTask.ALIGN;
+    return {
+      id: job.id,
+      task,
+      status: late ? AutoTimeStatus.FAILED : job.status,
+      error: late ? 'The speech service did not answer in time; try again.' : job.error || null,
+      lineCount: task === SpeechTask.ALIGN ? job.lines.length : (job.result || []).length,
+      lines: job.result || [],
+      createdAt: new Date(job.createdAt).toISOString(),
+      updatedAt: new Date(job.updatedAt || job.createdAt).toISOString(),
+    };
+  }
+
+  // Sends a speech job for the saved draft (the published version when there
+  // is no draft). One job at a time per exercise: a job still waiting or
+  // running is returned instead of a new one.
+  async startSpeechJob(actor, exerciseId, task) {
+    this.assertManager(actor);
+    const exercise = await this.findExerciseOrThrow(exerciseId);
+    const version = (await this.repository.findDraft(exerciseId)) || (await this.publishedVersion(exercise));
+    const content = version ? listeningContentSchema.parse(version.content) : null;
+    if (!content?.audioMediaId) throw contentErrors.autoTimeInvalid('NO_AUDIO', 'Add the recording and save the draft first');
+    const [asset] = await this.contentService.repository.findMediaByIds([content.audioMediaId]);
+    if (!asset?.url || asset.storage === 'local')
+      throw contentErrors.autoTimeInvalid('NO_AUDIO', 'The recording is not stored where the speech service can download it');
+    const lines =
+      task === SpeechTask.ALIGN
+        ? content.segments
+            .filter((segment) => segment.text.trim())
+            .map((segment) => ({ id: segment.id, text: exercise.kind === 'song' ? lyricText(segment.text) : segment.text }))
+        : [];
+    if (task === SpeechTask.ALIGN && !lines.length)
+      throw contentErrors.autoTimeInvalid('NO_LINES', 'Write or paste the lines and save the draft first');
+    const latest = await this.repository.findLatestTimingJob(exerciseId);
+    if (latest && active(latest) && this.timingJobView(latest).status !== AutoTimeStatus.FAILED)
+      return { job: this.timingJobView(latest) };
+    if (!this.broker?.ready) throw contentErrors.speechUnavailable();
+    const job = await this.repository.saveTimingJob({ exerciseId, task, status: AutoTimeStatus.QUEUED, lines, requestedBy: actor.id });
+    if (!this.broker.publish({ jobId: job.id, task, audioUrl: asset.url, language: 'en', kind: exercise.kind, lines })) {
+      await this.repository.saveTimingJob({ ...job, status: AutoTimeStatus.FAILED, error: 'The message broker could not be reached.' });
+      throw contentErrors.speechUnavailable();
+    }
+    return { job: this.timingJobView(job) };
+  }
+
+  // Auto-time (D97): the times of the saved lines.
+  requestAutoTime(actor, exerciseId) {
+    return this.startSpeechJob(actor, exerciseId, SpeechTask.ALIGN);
+  }
+
+  // Transcribe (D98): the lines and their times from the recording alone.
+  requestTranscribe(actor, exerciseId) {
+    return this.startSpeechJob(actor, exerciseId, SpeechTask.TRANSCRIBE);
+  }
+
+  // The latest auto-time job of the exercise, or null.
+  async getAutoTime(actor, exerciseId) {
+    this.assertManager(actor);
+    await this.findExerciseOrThrow(exerciseId);
+    const job = await this.repository.findLatestTimingJob(exerciseId);
+    return { job: job ? this.timingJobView(job) : null };
+  }
+
+  // An answer of speech-service: RUNNING, then DONE with the times or FAILED.
+  // Answers to unknown or finished jobs are ignored.
+  async onAutoTimeResult(message) {
+    const parsed = autoTimeResultSchema.safeParse(message);
+    if (!parsed.success) {
+      logger.warn('Ignored an auto-time answer that does not match the contract');
+      return;
+    }
+    const answer = parsed.data;
+    const job = await this.repository.findTimingJob(answer.jobId);
+    if (!job || !active(job)) return;
+    job.status = answer.status;
+    if (answer.status === AutoTimeStatus.DONE && (job.task || SpeechTask.ALIGN) === SpeechTask.ALIGN) {
+      const asked = new Set(job.lines.map((line) => line.id));
+      job.result = (answer.lines || [])
+        .filter((line) => asked.has(line.id))
+        .map(({ id, start, end, matched }) => ({ id, start, end, matched: matched ?? 0 }));
+    }
+    if (answer.status === AutoTimeStatus.DONE && job.task === SpeechTask.TRANSCRIBE) {
+      // New lines, as many as an exercise can hold and as long as a line can be.
+      job.result = (answer.lines || [])
+        .map(({ text, start, end }) => ({ text: (text || '').trim().slice(0, LISTENING_SEGMENT_MAX_LENGTH), start, end }))
+        .filter((line) => line.text)
+        .slice(0, LISTENING_MAX_SEGMENTS);
+    }
+    if (answer.status === AutoTimeStatus.FAILED) job.error = answer.error || 'The speech service could not time the lines.';
+    await this.repository.saveTimingJob(job);
   }
 
   // ----- Reads for learning-service (F05B-3). No actor: not exposed by the gateway.

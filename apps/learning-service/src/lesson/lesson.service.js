@@ -3,6 +3,7 @@ import { countBlanks } from '@appenglish/content-contracts';
 import {
   LESSON_PASS_PERCENT,
   LESSON_TEST_DURATION_MINUTES,
+  LearningEventType,
   LessonState,
   LessonStep,
   LessonTestStatus,
@@ -12,6 +13,7 @@ import {
   VOCABULARY_PRACTICE_SIZE,
   lessonTestPassed,
 } from '@appenglish/learning-contracts';
+import { noEvents } from '../events/learning-events.js';
 import { placementErrors } from '../placement/placement.errors.js';
 import { lessonErrors } from './lesson.errors.js';
 import {
@@ -20,6 +22,7 @@ import {
   lessonSteps,
   practiceWords,
   scoreTest,
+  shuffled,
   shuffledOptionOrder,
   testParts,
   testProgression,
@@ -40,12 +43,14 @@ const percent = (correctCount, totalCount) =>
 
 export class LessonService {
   // contentClient reads the curriculum and lesson papers from content-service;
-  // placementRepository gives the learner's starting unit; now() and random()
-  // are replaceable in tests.
-  constructor(repository, placementRepository, contentClient, { now = () => new Date(), random = Math.random } = {}) {
+  // placementRepository gives the learner's starting unit; events reports
+  // finished tests and completed lessons to progress-service (F06); now() and
+  // random() are replaceable in tests.
+  constructor(repository, placementRepository, contentClient, { now = () => new Date(), random = Math.random, events = noEvents } = {}) {
     this.repository = repository;
     this.placementRepository = placementRepository;
     this.contentClient = contentClient;
+    this.events = events;
     this.now = now;
     this.random = random;
   }
@@ -158,7 +163,10 @@ export class LessonService {
       fillIn: {
         passage: fillIn.passage,
         blankCount: countBlanks(fillIn.passage),
-        wordBank: [...new Set(vocabulary.map((item) => item.word))],
+        // The words to place, shuffled (D111): exactly the answers, so a word
+        // used in two blanks appears twice. Which blank each one goes to is
+        // what the learner works out.
+        wordBank: shuffled(fillIn.answers, this.random),
       },
       test: {
         durationMinutes: LESSON_TEST_DURATION_MINUTES,
@@ -407,14 +415,27 @@ export class LessonService {
       passed: lessonTestPassed(score.correctCount, score.totalCount),
     });
     const saved = await this.repository.saveAttempt(attempt);
+    await this.events.record(LearningEventType.LESSON_TEST_SUBMITTED, {
+      attemptId: saved.id,
+      accountId: saved.accountId,
+      lessonId: saved.lessonId,
+      lessonVersionId: saved.lessonVersionId,
+      ...this.attemptSummary(saved),
+    });
     if (saved.passed) {
       // Passing completes the lesson and opens the next one.
       const progress = (await this.repository.findProgress(attempt.accountId, attempt.lessonId)) || {
         accountId: attempt.accountId,
         lessonId: attempt.lessonId,
       };
-      if (!progress.completedAt)
+      if (!progress.completedAt) {
         await this.repository.saveProgress({ ...progress, completedAt: submittedAt });
+        await this.events.record(LearningEventType.LESSON_COMPLETED, {
+          accountId: attempt.accountId,
+          lessonId: attempt.lessonId,
+          completedAt: submittedAt.toISOString(),
+        });
+      }
     }
     return saved;
   }

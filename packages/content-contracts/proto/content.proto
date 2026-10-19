@@ -61,6 +61,24 @@ service ContentService {
   // transcript.
   rpc ListPublishedListeningExercises(ContentRequest) returns (ContentReply);
   rpc GetListeningPaper(ContentRequest) returns (ContentReply);
+  // Auto-time (D97): a Content Manager asks speech-service, through
+  // RabbitMQ, for the times of the draft's lines, then reads the latest job.
+  rpc RequestListeningAutoTime(ContentRequest) returns (ContentReply);
+  rpc GetListeningAutoTime(ContentRequest) returns (ContentReply);
+  // Transcribe (D98): the lines and their times from the recording alone.
+  rpc RequestListeningTranscribe(ContentRequest) returns (ContentReply);
+  // Listening course (F05C, D100): units and level tests of each CEFR level,
+  // written and published by a Content Manager.
+  rpc ListListeningCourse(ContentRequest) returns (ContentReply);
+  rpc CreateCourseItem(ContentRequest) returns (ContentReply);
+  rpc UpdateCourseItem(ContentRequest) returns (ContentReply);
+  rpc GetCourseItem(ContentRequest) returns (ContentReply);
+  rpc SaveCourseItemDraft(ContentRequest) returns (ContentReply);
+  rpc PublishCourseItem(ContentRequest) returns (ContentReply);
+  // Service-to-service only (learning-service): the published course, and one
+  // published unit or level test with its answers and recordings.
+  rpc ListPublishedCourse(ContentRequest) returns (ContentReply);
+  rpc GetCoursePaper(ContentRequest) returns (ContentReply);
 }
 
 // The authenticated account as verified by auth-service.

@@ -35,6 +35,7 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 pnpm --filter @appenglish/auth-service migration:run
 pnpm --filter @appenglish/content-service migration:run
 pnpm --filter @appenglish/learning-service migration:run
+pnpm --filter @appenglish/progress-service migration:run
 docker compose up -d redis rabbitmq
 pnpm dev
 ```
@@ -129,4 +130,37 @@ learning-service serves gRPC at `LEARNING_GRPC_HOST`:`LEARNING_GRPC_PORT`
 Add the two `LEARNING_GRPC_*` variables to `.env` only to change the default.
 Restart `pnpm dev` after pulling F03 so the gateway and learning-service start
 with the new contract. The Vite dev server proxies `/placement` to the gateway.
+
+## speech-service (Auto-time, D97)
+
+1. Python 3.12 on the PATH; ffmpeg is not needed (faster-whisper reads audio
+   with PyAV).
+2. `pnpm --filter @appenglish/speech-service python:setup` creates
+   `apps/speech-service/.venv` and installs `requirements.txt`.
+3. RabbitMQ must run (`pnpm compose:up`); content-service reconnects to it by
+   itself.
+4. `pnpm --filter @appenglish/speech-service dev` (or `pnpm dev`) starts the
+   worker. The first request downloads the Whisper model (`WHISPER_MODEL`,
+   default `small.en`, about 480 MB).
+5. Optional `.env`: `WHISPER_MODEL`, `WHISPER_DEVICE`, `WHISPER_COMPUTE_TYPE`,
+   `WHISPER_VAD_FILTER` (see `docs/03-service-specs/speech-service.md`).
+
+On Windows, Hugging Face warns that it cannot use symlinks for its cache
+without Developer Mode; the model still downloads and works.
+speech-service keeps the words it heard in `apps/speech-service/.cache/words`
+(ignored by git, D99). After a change to its code, restart the worker: Python
+does not reload by itself, and an old worker still running takes jobs in turn
+with the new one.
+
+## Nội dung demo của Listening course (D105)
+
+`content-samples/listening-course/` có 30 bản ghi A1–C1 và 125 câu hỏi (xem
+README trong thư mục). Khi content-service đang chạy, nhập bằng:
+
+```
+pnpm --filter @appenglish/content-service seed:listening-course -- --manager-id <id tài khoản Content Manager>
+```
+
+Script tải 30 file MP3 lên kho media trong `.env` và xuất bản thư viện nghe,
+các unit, Level test và Listening placement; chạy lại không tạo trùng.
 

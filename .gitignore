@@ -10,3 +10,9 @@ coverage/
 pnpm-debug.log*
 storage/media/*
 !storage/media/.gitkeep
+
+# speech-service (Python)
+apps/speech-service/.venv/
+__pycache__/
+*.pyc
+apps/speech-service/.cache/

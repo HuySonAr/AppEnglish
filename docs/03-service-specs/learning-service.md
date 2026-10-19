@@ -97,7 +97,7 @@ for Students; `:id` is a lesson id.
 | Method | Gateway route | RPC | Purpose |
 |---|---|---|---|
 | GET | `/learning/curriculum` | `GetCurriculum` | Published units and lessons with `state` (`LOCKED`/`OPEN`/`COMPLETED`), best test score, `startUnit`, `placementRequired` |
-| GET | `/learning/lessons/:id` | `GetLesson` | Lesson, its steps with status, vocabulary, fill-in passage and word bank, review target, test summary. No answers |
+| GET | `/learning/lessons/:id` | `GetLesson` | Lesson, its steps with status, vocabulary, fill-in passage and word bank (`fillIn.wordBank`: exactly the answers, shuffled, D111), review target, test summary. No answers in the test |
 | POST | `/learning/lessons/:id/vocabulary/studied` | `MarkVocabularyStudied` | The learner opened every word |
 | GET | `/learning/lessons/:id/quiz/:kind` | `GetVocabularyQuiz` | `kind` `vocabulary` or `review`: one question per word, up to four meanings, random order |
 | POST | `/learning/lessons/:id/quiz/:kind` | `SubmitVocabularyQuiz` | `{ answers: { vocabularyId: meaning } }` → `{ passed, total, wrongIds }` |
@@ -181,6 +181,78 @@ so the best never goes down and concurrent checks all count.
 Student only (26). 59 `LISTENING_EXERCISE_NOT_FOUND` for an exercise that is
 not published. Scoring rules: D86.
 
+## Listening course (F05C, D100, D101)
+
+Code in `apps/learning-service/src/course/`. Units and lessons are read from
+content-service (`ListPublishedCourse`, `GetCoursePaper`).
+
+Data (`app_learning`, migration `1730000005000-create-course-lesson-results`):
+`course_lesson_results`, one row per learner and lesson (`accountId`,
+`unitId`, `lessonId`, `bestScore`, `lastScore`, `attemptCount`, `passedAt`
+(first pass, kept), `lastAttemptAt`; unique pair). Recorded with one
+`INSERT … ON CONFLICT DO UPDATE`.
+
+| Method | Path | RPC | Result |
+|---|---|---|---|
+| GET | `/learning/listening-course` | `GetListeningCourse` | `{ passPercent, levels: [{ level, units: [{ id, section, title, description, lessons: [{ id, title, bestScore, lastScore, attemptCount, passed }], checkQuestionCount }], levelTest }] }` |
+| GET | `/learning/listening-course/units/:unitId/lessons/:lessonId` | `GetCourseLesson` | `{ unit, versionId, lesson: { id, title, number, count, nextLessonId }, passPercent, keywords, audioUrl, gist, detail, focus, closeSegments: [{ id, speaker, start, end }] }` and the learner's result; no answers, no text of the sentences to write down. A detail question of kind `complete` comes as `{ id, kind, skill, prompt, blankCount }`; `focus` (D109) is null or `{ title, passage, blankCount, words }` with the words in alphabetical order |
+| POST | `…/check` | `CheckCourseLessonStep` | Body `{ versionId?, step: gist\|detail\|focus\|close, segmentId? (close), answers }`. Answers: option id by question id, the words of a blank by `courseBlankKey(questionId, index)` (`<id>:<index>`) and of the Focus on by `focus:<index>`, text by sentence id. Choice questions come back with `chosenOptionId`, `correctOptionId`, `correct`, `accuracy` (100/0), `explanation`; a completed sentence with `blanks: [{ index, expected, typed, correct }]`, `correct`, `accuracy`; `focus` with the same blanks; a sentence with `text`, `typed`, `words`, `accuracy`. Nothing is kept; 30 for a sentence not chosen or a focus step of a lesson without one |
+| POST | `…/complete` | `CompleteCourseLesson` | Body `{ versionId?, answers }` (option id by question id, text by sentence id). `{ score, passed (this attempt), lessonPassed, passPercent, bestScore, lastScore, attemptCount, nextLessonId, questions, focus (or null), sentences, transcript: [{ …, writtenDown }] }`. Score (D101, D109): every question one point (a choice right or not, a completed sentence the share of its blanks right), the Focus on one point by its blanks, every sentence its accuracy; the share of points, passed at `passPercent` |
+
+| GET | `/learning/listening-course/tests/:itemId` | `GetCourseTest` | A unit check (itemId = the unit id) or level test: `{ test: { id, kind: unit_check\|level_test, title, level, nextLevel }, versionId, passPercent, sections: [{ id, audioUrl, questions }] }` without answers, and the learner's result |
+| POST | `/learning/listening-course/tests/:itemId/submit` | `SubmitCourseTest` | Body `{ versionId?, answers }`. `{ score, passed, testPassed, passPercent, rightCount, questionCount, bestScore, lastScore, attemptCount, levelUp: { from, to } \| null, next, sections: [{ id, audioUrl, questions (marked), transcript }] }` |
+
+Student only (26). 60 `COURSE_LESSON_NOT_FOUND` for a unit, lesson, test,
+version or recording that is not published; 61 `COURSE_ITEM_LOCKED` (409) for
+a lesson or test locked for the learner. Lesson score: each question 1 point,
+each sentence its accuracy (0–1); passed at 70% (D101). Unit check and level
+test score: share of right questions; passed at 75% and 70%.
+
+What is open (`course.rules.js`, D102): the current level is the first level
+from the starting level (A1 until the listening placement) whose level test is
+not passed; earlier levels are open for review, later ones locked. In the
+current level a lesson opens when the lesson or unit check before it is
+passed, a unit check when every lesson of its unit is passed, and the level
+test at any time. `GET /learning/listening-course` adds `currentLevel`,
+`next` (`{ type: lesson|unit_check|level_test, … }`), `state` on each level
+(DONE/CURRENT/LOCKED) and on each lesson, `check` and level test
+(LOCKED/OPEN/PASSED) with their results.
+
+Listening placement (D103):
+
+| Method | Path | RPC | Result |
+|---|---|---|---|
+| GET | `/learning/listening-course/placement` | `GetCoursePlacement` | Not taken: `{ status: NOT_STARTED, versionId, title, levelPassPercent, sections: [{ id, audioUrl, questions }] }` without answers or levels (404 code 60 when not published); taken or skipped: `{ status, startLevel, levelScores }` |
+| POST | `/learning/listening-course/placement/submit` | `SubmitCoursePlacement` | Body `{ versionId?, answers }`. `{ status, startLevel, currentLevel, levelScores: [{ level, right, total }], levelPassPercent, next, sections (with level, marked questions, transcript) }`; 409 code 62 once taken or skipped |
+| POST | `/learning/listening-course/placement/skip` | `SkipCoursePlacement` | `{ status: SKIPPED, startLevel: A1 }`; 409 code 62 once taken or skipped |
+
+A level is known at 60% of its questions; the start is the first level not
+known (C1 when all are). `GET /learning/listening-course` adds `placement:
+{ status, available, startLevel }`. Data: `course_placements` (migration
+`1730000007000-create-course-placements`), one row per learner (`accountId`
+unique, `status` COMPLETED/SKIPPED, `versionId`, `startLevel`, `levelScores`,
+`answers`, `completedAt`), inserted with `ON CONFLICT DO NOTHING`.
+
+Progress and mistakes notebook (D104):
+
+| Method | Path | RPC | Result |
+|---|---|---|---|
+| GET | `/learning/listening-course/progress` | `GetCourseProgress` | `{ currentLevel, placement, lessons: { passed, total }, averageBestScore, attemptCount, mistakeCount, mostMissedWords: [{ word, count }], levels: [{ level, state, lessons, unitChecks, levelTest: { bestScore, passed } \| null }] }` |
+| GET | `/learning/listening-course/mistakes` | `ListCourseMistakes` | `{ mistakes: [{ id, level, unitId, unitTitle, lessonId, lessonTitle, speaker, missedWords: [{ text, typed }], timesMissed, lastMissedAt, audioUrl, start, end }], mostMissedWords }`; no sentence text |
+| POST | `/learning/listening-course/mistakes/:id/check` | `CheckCourseMistake` | Body `{ text }`. `{ sentence (checked word by word, with its text), fixed }`; right removes it, wrong keeps it with the words missed this time; 404 code 60 for an unknown id |
+
+Finishing a lesson keeps each written sentence below 100% in the notebook
+(once more if already there) and removes those written right. Data:
+`course_mistakes` (migration `1730000008000-create-course-mistakes`), one row
+per learner, lesson and sentence (`unitId`, `segmentId`, `level`, `unitTitle`,
+`lessonTitle`, `text`, `speaker` kept as they were, `missedWords`,
+`timesMissed`, `lastMissedAt`).
+
+Data: `course_test_results` (migration `1730000006000-create-course-test-results`),
+one row per learner and unit check or level test (`accountId`, `itemId`,
+`kind`, `level`, `bestScore`, `lastScore`, `attemptCount`, `passedAt`,
+`lastAttemptAt`; unique pair), recorded like the lesson results.
+
 ## Mock tests (F05A, D63, D64)
 
 Workflow `06-practice-mock.md`. Code in `apps/learning-service/src/mock/`.
@@ -235,6 +307,52 @@ Codes: 57 mock test not found, 58 no mock attempt in progress.
   a Part 3–4 set is the `imageUrl` of its "Look at the graphic" question (D71).
 - An attempt keeps the mock version it started on.
 
+## Results for progress-service (F06, D110)
+
+learning-service reports what progress needs over RabbitMQ, never over gRPC
+and never by sharing a database. Three events, constants `LearningQueue` and
+`LearningEventType` in `packages/learning-contracts/src/index.js`:
+
+| Event | When | Payload |
+|---|---|---|
+| `lesson-test.submitted` | Every finished lesson-test attempt (`LessonService.complete`) | `attemptId`, `accountId`, `lessonId`, `lessonVersionId` and the attempt summary (`attemptNumber`, counts per skill, `passed`, `submittedAt`) |
+| `lesson.completed` | The lesson test passed for the first time | `accountId`, `lessonId`, `completedAt` |
+| `mock.submitted` | Every finished **full** mock attempt (`MockService.complete`); mini tests are never sent | `attemptId`, `accountId`, `accountEmail` (for the XP leaderboard, D112), `mockTestId`, `mockTestTitle`, `mockVersionId`, `kind`, `attemptNumber`, counts per skill, `listeningScore`, `readingScore`, `submittedAt` |
+
+Delivery is an outbox (`src/events/learning-events.js`, repository
+`src/events/events.repository.js`, table `learning_events`, migration
+`1730000009000-create-learning-events.js`): the event row is written right
+after the attempt is saved, then relayed to the durable queue
+`learning.results` on a confirm channel and marked `publishedAt`; pending rows
+are retried every 5 s and whenever the broker reconnects, so a result written
+while RabbitMQ is down goes out when it is back, in order. Messages are
+persistent JSON `{ id, type, occurredAt, payload }` with `messageId = id`;
+progress-service stores by attempt id, so a redelivery counts once. A failure
+to write the outbox is logged and never fails the learner's submit.
+
+## Results for progress-service (F06, D110)
+
+learning-service reports what progress needs over RabbitMQ, never over gRPC
+and never by sharing a database. Three events, constants `LearningQueue` and
+`LearningEventType` in `packages/learning-contracts/src/index.js`:
+
+| Event | When | Payload |
+|---|---|---|
+| `lesson-test.submitted` | Every finished lesson-test attempt (`LessonService.complete`) | `attemptId`, `accountId`, `lessonId`, `lessonVersionId` and the attempt summary (`attemptNumber`, counts per skill, `passed`, `submittedAt`) |
+| `lesson.completed` | The lesson test passed for the first time | `accountId`, `lessonId`, `completedAt` |
+| `mock.submitted` | Every finished **full** mock attempt (`MockService.complete`); mini tests are never sent | `attemptId`, `accountId`, `mockTestId`, `mockVersionId`, `kind`, `attemptNumber`, counts per skill, `listeningScore`, `readingScore`, `submittedAt` |
+
+Delivery is an outbox (`src/events/learning-events.js`, repository
+`src/events/events.repository.js`, table `learning_events`, migration
+`1730000009000-create-learning-events.js`): the event row is written right
+after the attempt is saved, then relayed to the durable queue
+`learning.results` on a confirm channel and marked `publishedAt`; pending rows
+are retried every 5 s and whenever the broker reconnects, so a result written
+while RabbitMQ is down goes out when it is back, in order. Messages are
+persistent JSON `{ id, type, occurredAt, payload }` with `messageId = id`;
+progress-service stores by attempt id, so a redelivery counts once. A failure
+to write the outbox is logged and never fails the learner's submit.
+
 ## Dependencies/config
 
 - gRPC server at `LEARNING_GRPC_HOST`:`LEARNING_GRPC_PORT` (default
@@ -247,6 +365,12 @@ Codes: 57 mock test not found, 58 no mock attempt in progress.
   `ListPublishedMockTests` and `GetMockPaper`.
 - PostgreSQL `LEARNING_DATABASE_NAME` (`app_learning`). The service loads the
   repository `.env`; run `pnpm --filter @appenglish/learning-service migration:run`.
+- RabbitMQ `RABBITMQ_URL` (default `amqp://localhost:5672`), queue
+  `learning.results` (F06). The service starts and serves without the broker;
+  results wait in `learning_events` until it is reachable.
+- RabbitMQ `RABBITMQ_URL` (default `amqp://localhost:5672`), queue
+  `learning.results` (F06). The service starts and serves without the broker;
+  results wait in `learning_events` until it is reachable.
 
 ## Kiểm thử
 

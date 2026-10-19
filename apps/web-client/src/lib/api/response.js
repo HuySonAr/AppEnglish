@@ -32,7 +32,10 @@ const messages = Object.freeze({
   [LearningResponseCode.LESSON_STEP_REQUIRED]: 'Finish the earlier step of the lesson first.',
   [LearningResponseCode.LESSON_TEST_NOT_IN_PROGRESS]: 'There is no lesson test in progress.',
   [LearningResponseCode.MOCK_TEST_NOT_FOUND]: 'This mock test is not available.',
-  [LearningResponseCode.MOCK_TEST_NOT_IN_PROGRESS]: 'There is no mock test in progress.'
+  [LearningResponseCode.MOCK_TEST_NOT_IN_PROGRESS]: 'There is no mock test in progress.',
+  [LearningResponseCode.COURSE_LESSON_NOT_FOUND]: 'This part of the listening course is not available.',
+  [LearningResponseCode.COURSE_ITEM_LOCKED]: 'This part of the listening course is still locked. Pass the one before it first.',
+  [LearningResponseCode.COURSE_PLACEMENT_DONE]: 'You have already taken or skipped the listening placement.'
 });
 
 // data.reason of a MEDIA_INVALID error says which upload rule failed.

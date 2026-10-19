@@ -1,0 +1,24 @@
+1
+00:00:00,400 --> 00:00:03,570
+Around a third of all food produced in the world is never eaten.
+
+2
+00:00:04,170 --> 00:00:09,600
+In wealthy countries, much of this waste happens at home rather than on farms or in factories.
+
+3
+00:00:10,200 --> 00:00:16,760
+People often buy more than they need, especially when supermarkets offer deals like 'buy one, get one free'.
+
+4
+00:00:17,360 --> 00:00:19,910
+Another cause is confusion over date labels.
+
+5
+00:00:20,510 --> 00:00:25,990
+'Best before' only refers to quality, so food is usually still safe to eat after that date.
+
+6
+00:00:26,590 --> 00:00:30,870
+Planning meals for the week and checking the fridge before shopping can make a real difference.
+

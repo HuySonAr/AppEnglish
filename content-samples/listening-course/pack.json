@@ -1,0 +1,4446 @@
+{
+ "topic": "Listening course (demo)",
+ "recordings": {
+  "a1-lesson1": {
+   "title": "A1 · Meeting a new classmate",
+   "level": "A1",
+   "kind": "part3",
+   "file": "audio/a1-lesson1.mp3",
+   "segments": [
+    {
+     "speaker": "Woman",
+     "text": "Hi, I'm Lan. Are you new here?",
+     "start": 0.4,
+     "end": 4.63
+    },
+    {
+     "speaker": "Man",
+     "text": "Yes, I am. My name is Tom.",
+     "start": 5.23,
+     "end": 9.5
+    },
+    {
+     "speaker": "Woman",
+     "text": "Nice to meet you, Tom. Where are you from?",
+     "start": 10.1,
+     "end": 15.05
+    },
+    {
+     "speaker": "Man",
+     "text": "I'm from Canada. I live near the school now.",
+     "start": 15.65,
+     "end": 19.89
+    },
+    {
+     "speaker": "Woman",
+     "text": "Oh, I live near the school too.",
+     "start": 20.49,
+     "end": 23.18
+    },
+    {
+     "speaker": "Man",
+     "text": "Great! We can walk to class together.",
+     "start": 23.78,
+     "end": 27.62
+    }
+   ]
+  },
+  "a1-lesson2": {
+   "title": "A1 · At the café",
+   "level": "A1",
+   "kind": "part3",
+   "file": "audio/a1-lesson2.mp3",
+   "segments": [
+    {
+     "speaker": "Man",
+     "text": "Good morning. What would you like?",
+     "start": 0.4,
+     "end": 3.69
+    },
+    {
+     "speaker": "Woman",
+     "text": "Can I have a tea, please?",
+     "start": 4.29,
+     "end": 6.81
+    },
+    {
+     "speaker": "Man",
+     "text": "Hot or iced?",
+     "start": 7.41,
+     "end": 8.57
+    },
+    {
+     "speaker": "Woman",
+     "text": "Hot, please. And a small cake.",
+     "start": 9.17,
+     "end": 13.5
+    },
+    {
+     "speaker": "Man",
+     "text": "That's four dollars.",
+     "start": 14.1,
+     "end": 15.61
+    },
+    {
+     "speaker": "Woman",
+     "text": "Here you are. Thank you.",
+     "start": 16.21,
+     "end": 19.19
+    }
+   ]
+  },
+  "a1-lesson3": {
+   "title": "A1 · My family",
+   "level": "A1",
+   "kind": "part4",
+   "file": "audio/a1-lesson3.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "Hello, my name is Mai.",
+     "start": 0.4,
+     "end": 2.75
+    },
+    {
+     "speaker": "",
+     "text": "There are four people in my family.",
+     "start": 3.35,
+     "end": 5.79
+    },
+    {
+     "speaker": "",
+     "text": "My father is a teacher and my mother is a nurse.",
+     "start": 6.39,
+     "end": 9.86
+    },
+    {
+     "speaker": "",
+     "text": "I have one brother. His name is Nam.",
+     "start": 10.46,
+     "end": 14.49
+    },
+    {
+     "speaker": "",
+     "text": "He is ten years old and he likes football.",
+     "start": 15.09,
+     "end": 18.26
+    },
+    {
+     "speaker": "",
+     "text": "On Sundays, we have dinner at my grandmother's house.",
+     "start": 18.86,
+     "end": 23.42
+    }
+   ]
+  },
+  "a1-check": {
+   "title": "A1 · Buying fruit",
+   "level": "A1",
+   "kind": "part3",
+   "file": "audio/a1-check.mp3",
+   "segments": [
+    {
+     "speaker": "Man",
+     "text": "Hello. Do you have apples today?",
+     "start": 0.4,
+     "end": 3.91
+    },
+    {
+     "speaker": "Woman",
+     "text": "Yes, we have red apples and green apples.",
+     "start": 4.51,
+     "end": 8.34
+    },
+    {
+     "speaker": "Man",
+     "text": "How much are the red apples?",
+     "start": 8.94,
+     "end": 11.0
+    },
+    {
+     "speaker": "Woman",
+     "text": "They are two dollars a kilo.",
+     "start": 11.6,
+     "end": 13.7
+    },
+    {
+     "speaker": "Man",
+     "text": "OK, one kilo of red apples, please. And three bananas.",
+     "start": 14.3,
+     "end": 21.42
+    },
+    {
+     "speaker": "Woman",
+     "text": "Sure. That's three dollars and fifty cents.",
+     "start": 22.02,
+     "end": 26.62
+    }
+   ]
+  },
+  "a1-test1": {
+   "title": "A1 · Asking for directions",
+   "level": "A1",
+   "kind": "part3",
+   "file": "audio/a1-test1.mp3",
+   "segments": [
+    {
+     "speaker": "Man",
+     "text": "Excuse me. Where is the post office?",
+     "start": 0.4,
+     "end": 4.65
+    },
+    {
+     "speaker": "Woman",
+     "text": "It's on Green Street, next to the bank.",
+     "start": 5.25,
+     "end": 8.68
+    },
+    {
+     "speaker": "Man",
+     "text": "Is it far from here?",
+     "start": 9.28,
+     "end": 10.86
+    },
+    {
+     "speaker": "Woman",
+     "text": "No, it's about five minutes on foot.",
+     "start": 11.46,
+     "end": 14.73
+    },
+    {
+     "speaker": "Man",
+     "text": "Do I turn left or right at the corner?",
+     "start": 15.33,
+     "end": 18.02
+    },
+    {
+     "speaker": "Woman",
+     "text": "Turn right, then go straight.",
+     "start": 18.62,
+     "end": 21.35
+    },
+    {
+     "speaker": "Man",
+     "text": "Thank you very much.",
+     "start": 21.95,
+     "end": 23.54
+    }
+   ]
+  },
+  "a1-test2": {
+   "title": "A1 · A message from a friend",
+   "level": "A1",
+   "kind": "part4",
+   "file": "audio/a1-test2.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "Hi Anna, it's Ben.",
+     "start": 0.4,
+     "end": 2.52
+    },
+    {
+     "speaker": "",
+     "text": "I'm at the cinema, but the film starts at seven, not six.",
+     "start": 3.12,
+     "end": 8.69
+    },
+    {
+     "speaker": "",
+     "text": "Can you come at a quarter to seven?",
+     "start": 9.29,
+     "end": 11.83
+    },
+    {
+     "speaker": "",
+     "text": "I have the tickets.",
+     "start": 12.43,
+     "end": 13.85
+    },
+    {
+     "speaker": "",
+     "text": "After the film, let's eat pizza.",
+     "start": 14.45,
+     "end": 17.47
+    },
+    {
+     "speaker": "",
+     "text": "Call me back, OK? Bye!",
+     "start": 18.07,
+     "end": 21.96
+    }
+   ]
+  },
+  "a2-lesson1": {
+   "title": "A2 · Booking a table",
+   "level": "A2",
+   "kind": "part3",
+   "file": "audio/a2-lesson1.mp3",
+   "segments": [
+    {
+     "speaker": "Woman",
+     "text": "Good afternoon, Rosa's Restaurant.",
+     "start": 0.4,
+     "end": 3.23
+    },
+    {
+     "speaker": "Man",
+     "text": "Hi, I'd like to book a table for Saturday evening.",
+     "start": 3.83,
+     "end": 7.59
+    },
+    {
+     "speaker": "Woman",
+     "text": "Of course. For how many people?",
+     "start": 8.19,
+     "end": 11.49
+    },
+    {
+     "speaker": "Man",
+     "text": "For six, please. It's my mother's birthday.",
+     "start": 12.09,
+     "end": 16.68
+    },
+    {
+     "speaker": "Woman",
+     "text": "We have a table at eight o'clock. Is that OK?",
+     "start": 17.28,
+     "end": 21.25
+    },
+    {
+     "speaker": "Man",
+     "text": "Perfect. Could we sit near the window?",
+     "start": 21.85,
+     "end": 25.29
+    },
+    {
+     "speaker": "Woman",
+     "text": "Sure. Can I have your name, please?",
+     "start": 25.89,
+     "end": 30.11
+    },
+    {
+     "speaker": "Man",
+     "text": "It's David Clark.",
+     "start": 30.71,
+     "end": 32.01
+    }
+   ]
+  },
+  "a2-lesson2": {
+   "title": "A2 · Weekend plans",
+   "level": "A2",
+   "kind": "part3",
+   "file": "audio/a2-lesson2.mp3",
+   "segments": [
+    {
+     "speaker": "Man",
+     "text": "Are you doing anything this weekend, Sara?",
+     "start": 0.4,
+     "end": 3.59
+    },
+    {
+     "speaker": "Woman",
+     "text": "I'm going to visit my aunt in the countryside on Saturday.",
+     "start": 4.19,
+     "end": 7.95
+    },
+    {
+     "speaker": "Man",
+     "text": "That sounds nice. How are you getting there?",
+     "start": 8.55,
+     "end": 12.37
+    },
+    {
+     "speaker": "Woman",
+     "text": "By train. It takes about two hours.",
+     "start": 12.97,
+     "end": 16.6
+    },
+    {
+     "speaker": "Man",
+     "text": "Will you be back on Sunday?",
+     "start": 17.2,
+     "end": 19.04
+    },
+    {
+     "speaker": "Woman",
+     "text": "Yes, in the afternoon. Why?",
+     "start": 19.64,
+     "end": 23.26
+    },
+    {
+     "speaker": "Man",
+     "text": "There's a concert in the park on Sunday evening. Do you want to come?",
+     "start": 23.86,
+     "end": 29.18
+    },
+    {
+     "speaker": "Woman",
+     "text": "I'd love to!",
+     "start": 29.78,
+     "end": 30.74
+    }
+   ]
+  },
+  "a2-lesson3": {
+   "title": "A2 · A city bus tour",
+   "level": "A2",
+   "kind": "part4",
+   "file": "audio/a2-lesson3.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "Welcome aboard the City Explorer bus tour.",
+     "start": 0.4,
+     "end": 3.29
+    },
+    {
+     "speaker": "",
+     "text": "The tour takes ninety minutes and makes six stops.",
+     "start": 3.89,
+     "end": 7.33
+    },
+    {
+     "speaker": "",
+     "text": "Our first stop is the old market, where you can try local food.",
+     "start": 7.93,
+     "end": 12.47
+    },
+    {
+     "speaker": "",
+     "text": "You can get off at any stop and catch the next bus thirty minutes later.",
+     "start": 13.07,
+     "end": 17.54
+    },
+    {
+     "speaker": "",
+     "text": "Please keep your ticket with you, because the driver will check it.",
+     "start": 18.14,
+     "end": 22.57
+    },
+    {
+     "speaker": "",
+     "text": "Free water is available at the front of the bus.",
+     "start": 23.17,
+     "end": 26.17
+    },
+    {
+     "speaker": "",
+     "text": "Enjoy the tour!",
+     "start": 26.77,
+     "end": 27.91
+    }
+   ]
+  },
+  "a2-check": {
+   "title": "A2 · At the train station",
+   "level": "A2",
+   "kind": "part3",
+   "file": "audio/a2-check.mp3",
+   "segments": [
+    {
+     "speaker": "Woman",
+     "text": "Excuse me, when is the next train to Brighton?",
+     "start": 0.4,
+     "end": 3.86
+    },
+    {
+     "speaker": "Man",
+     "text": "The next one leaves at ten fifteen from platform four.",
+     "start": 4.46,
+     "end": 8.08
+    },
+    {
+     "speaker": "Woman",
+     "text": "Oh, I have to wait forty minutes. Is there an earlier bus?",
+     "start": 8.68,
+     "end": 14.03
+    },
+    {
+     "speaker": "Man",
+     "text": "Yes, there's a bus at nine fifty, but it takes longer.",
+     "start": 14.63,
+     "end": 19.34
+    },
+    {
+     "speaker": "Woman",
+     "text": "How much longer?",
+     "start": 19.94,
+     "end": 21.17
+    },
+    {
+     "speaker": "Man",
+     "text": "About half an hour more than the train.",
+     "start": 21.77,
+     "end": 24.15
+    },
+    {
+     "speaker": "Woman",
+     "text": "Then I'll take the train. One single ticket, please.",
+     "start": 24.75,
+     "end": 29.79
+    },
+    {
+     "speaker": "Man",
+     "text": "That's twelve pounds.",
+     "start": 30.39,
+     "end": 31.86
+    }
+   ]
+  },
+  "a2-test1": {
+   "title": "A2 · At the doctor's",
+   "level": "A2",
+   "kind": "part3",
+   "file": "audio/a2-test1.mp3",
+   "segments": [
+    {
+     "speaker": "Man",
+     "text": "Good morning. What seems to be the problem?",
+     "start": 0.4,
+     "end": 4.07
+    },
+    {
+     "speaker": "Woman",
+     "text": "I've had a bad headache for three days, and I feel tired all the time.",
+     "start": 4.67,
+     "end": 9.65
+    },
+    {
+     "speaker": "Man",
+     "text": "Are you sleeping well?",
+     "start": 10.25,
+     "end": 11.68
+    },
+    {
+     "speaker": "Woman",
+     "text": "Not really. I've been working late every night this week.",
+     "start": 12.28,
+     "end": 16.71
+    },
+    {
+     "speaker": "Man",
+     "text": "I think you need more rest. Try to go to bed before eleven.",
+     "start": 17.31,
+     "end": 22.4
+    },
+    {
+     "speaker": "Woman",
+     "text": "Should I take any medicine?",
+     "start": 23.0,
+     "end": 24.78
+    },
+    {
+     "speaker": "Man",
+     "text": "You can take this for the headache, twice a day after meals.",
+     "start": 25.38,
+     "end": 29.8
+    },
+    {
+     "speaker": "Woman",
+     "text": "Thank you, doctor.",
+     "start": 30.4,
+     "end": 32.2
+    }
+   ]
+  },
+  "a2-test2": {
+   "title": "A2 · Weekend weather",
+   "level": "A2",
+   "kind": "part4",
+   "file": "audio/a2-test2.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "Here is the weather for the weekend.",
+     "start": 0.4,
+     "end": 2.28
+    },
+    {
+     "speaker": "",
+     "text": "On Saturday morning it will be cloudy, with some rain in the afternoon.",
+     "start": 2.88,
+     "end": 7.74
+    },
+    {
+     "speaker": "",
+     "text": "Temperatures will reach about fifteen degrees.",
+     "start": 8.34,
+     "end": 11.36
+    },
+    {
+     "speaker": "",
+     "text": "Sunday will be much better, with sunshine all day.",
+     "start": 11.96,
+     "end": 15.73
+    },
+    {
+     "speaker": "",
+     "text": "It will also be warmer, around twenty degrees.",
+     "start": 16.33,
+     "end": 20.18
+    },
+    {
+     "speaker": "",
+     "text": "So if you are planning a picnic, Sunday is the day to do it.",
+     "start": 20.78,
+     "end": 25.01
+    }
+   ]
+  },
+  "b1-lesson1": {
+   "title": "B1 · A job interview",
+   "level": "B1",
+   "kind": "part3",
+   "file": "audio/b1-lesson1.mp3",
+   "segments": [
+    {
+     "speaker": "Woman",
+     "text": "Thanks for coming in, James. Can you tell me why you applied for this job?",
+     "start": 0.4,
+     "end": 6.01
+    },
+    {
+     "speaker": "Man",
+     "text": "Sure. I've worked in a shop for two years, and I want to move into marketing.",
+     "start": 6.61,
+     "end": 12.33
+    },
+    {
+     "speaker": "Woman",
+     "text": "What do you think you are good at?",
+     "start": 12.93,
+     "end": 14.79
+    },
+    {
+     "speaker": "Man",
+     "text": "I'm good at talking to customers, and I enjoy working in a team.",
+     "start": 15.39,
+     "end": 19.63
+    },
+    {
+     "speaker": "Woman",
+     "text": "This job sometimes means working at weekends. Would that be a problem?",
+     "start": 20.23,
+     "end": 25.3
+    },
+    {
+     "speaker": "Man",
+     "text": "Not at all. My weekends are usually free.",
+     "start": 25.9,
+     "end": 29.51
+    },
+    {
+     "speaker": "Woman",
+     "text": "Great. We'll let you know our decision by Friday.",
+     "start": 30.11,
+     "end": 33.87
+    }
+   ]
+  },
+  "b1-lesson2": {
+   "title": "B1 · Returning a product",
+   "level": "B1",
+   "kind": "part3",
+   "file": "audio/b1-lesson2.mp3",
+   "segments": [
+    {
+     "speaker": "Man",
+     "text": "Hi, I bought these headphones here last week, but the left side has stopped working.",
+     "start": 0.4,
+     "end": 5.79
+    },
+    {
+     "speaker": "Woman",
+     "text": "I'm sorry to hear that. Do you have the receipt?",
+     "start": 6.39,
+     "end": 10.12
+    },
+    {
+     "speaker": "Man",
+     "text": "Yes, here it is.",
+     "start": 10.72,
+     "end": 12.42
+    },
+    {
+     "speaker": "Woman",
+     "text": "Thank you. Would you like a replacement or your money back?",
+     "start": 13.02,
+     "end": 17.14
+    },
+    {
+     "speaker": "Man",
+     "text": "I'd prefer a replacement, if you have the same model.",
+     "start": 17.74,
+     "end": 21.05
+    },
+    {
+     "speaker": "Woman",
+     "text": "Let me check. Yes, we have one in black, but not in white.",
+     "start": 21.65,
+     "end": 27.1
+    },
+    {
+     "speaker": "Man",
+     "text": "Black is fine.",
+     "start": 27.7,
+     "end": 28.73
+    },
+    {
+     "speaker": "Woman",
+     "text": "Here you are. If there's another problem, you can bring them back within a year.",
+     "start": 29.33,
+     "end": 34.82
+    }
+   ]
+  },
+  "b1-lesson3": {
+   "title": "B1 · Tips for studying",
+   "level": "B1",
+   "kind": "part4",
+   "file": "audio/b1-lesson3.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "Many students study for hours but still forget what they learned.",
+     "start": 0.4,
+     "end": 3.87
+    },
+    {
+     "speaker": "",
+     "text": "Here are three simple tips that can help.",
+     "start": 4.47,
+     "end": 6.82
+    },
+    {
+     "speaker": "",
+     "text": "First, study in short sessions of about thirty minutes, then take a five-minute break.",
+     "start": 7.42,
+     "end": 13.39
+    },
+    {
+     "speaker": "",
+     "text": "Second, test yourself instead of just reading your notes again.",
+     "start": 13.99,
+     "end": 18.21
+    },
+    {
+     "speaker": "",
+     "text": "Trying to remember information makes it stay in your memory longer.",
+     "start": 18.81,
+     "end": 22.61
+    },
+    {
+     "speaker": "",
+     "text": "Finally, get enough sleep, because your brain organises new information while you sleep.",
+     "start": 23.21,
+     "end": 29.33
+    },
+    {
+     "speaker": "",
+     "text": "Try these tips for one week and see the difference.",
+     "start": 29.93,
+     "end": 32.77
+    }
+   ]
+  },
+  "b1-check": {
+   "title": "B1 · Planning a team event",
+   "level": "B1",
+   "kind": "part3",
+   "file": "audio/b1-check.mp3",
+   "segments": [
+    {
+     "speaker": "Woman",
+     "text": "We need to choose something for the team event next month. Any ideas?",
+     "start": 0.4,
+     "end": 5.28
+    },
+    {
+     "speaker": "Man",
+     "text": "How about a cooking class? Everyone works together, and we eat at the end.",
+     "start": 5.88,
+     "end": 11.54
+    },
+    {
+     "speaker": "Woman",
+     "text": "That's a good idea, but it might be expensive for twenty people.",
+     "start": 12.14,
+     "end": 16.03
+    },
+    {
+     "speaker": "Man",
+     "text": "True. What about a picnic by the lake? It's free, apart from the food.",
+     "start": 16.63,
+     "end": 23.02
+    },
+    {
+     "speaker": "Woman",
+     "text": "The weather could be a problem in April, though.",
+     "start": 23.62,
+     "end": 26.47
+    },
+    {
+     "speaker": "Man",
+     "text": "Then let's book the cooking class and ask the company to pay half.",
+     "start": 27.07,
+     "end": 30.78
+    },
+    {
+     "speaker": "Woman",
+     "text": "OK, I'll write to the manager today.",
+     "start": 31.38,
+     "end": 34.0
+    }
+   ]
+  },
+  "b1-test1": {
+   "title": "B1 · A new apartment",
+   "level": "B1",
+   "kind": "part3",
+   "file": "audio/b1-test1.mp3",
+   "segments": [
+    {
+     "speaker": "Man",
+     "text": "So, how's the new apartment?",
+     "start": 0.4,
+     "end": 2.6
+    },
+    {
+     "speaker": "Woman",
+     "text": "I love it. It's much bigger than my old place, and it's close to the station.",
+     "start": 3.2,
+     "end": 8.81
+    },
+    {
+     "speaker": "Man",
+     "text": "What about the rent?",
+     "start": 9.41,
+     "end": 10.55
+    },
+    {
+     "speaker": "Woman",
+     "text": "It's a bit higher, but I'm saving money because I don't need the bus anymore.",
+     "start": 11.15,
+     "end": 15.83
+    },
+    {
+     "speaker": "Man",
+     "text": "Do you get on with your neighbours?",
+     "start": 16.43,
+     "end": 18.15
+    },
+    {
+     "speaker": "Woman",
+     "text": "I've only met one. She's lived there for ten years and she's very friendly.",
+     "start": 18.75,
+     "end": 23.8
+    },
+    {
+     "speaker": "Man",
+     "text": "You should have a party to meet the others.",
+     "start": 24.4,
+     "end": 26.56
+    },
+    {
+     "speaker": "Woman",
+     "text": "Maybe once I've unpacked all the boxes!",
+     "start": 27.16,
+     "end": 29.58
+    }
+   ]
+  },
+  "b1-test2": {
+   "title": "B1 · Museum audio guide",
+   "level": "B1",
+   "kind": "part4",
+   "file": "audio/b1-test2.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "Welcome to the Science Museum.",
+     "start": 0.4,
+     "end": 2.25
+    },
+    {
+     "speaker": "",
+     "text": "This guide will take you through our three main galleries.",
+     "start": 2.85,
+     "end": 5.81
+    },
+    {
+     "speaker": "",
+     "text": "On the ground floor, you'll find the space gallery, where you can see a real rocket engine.",
+     "start": 6.41,
+     "end": 12.2
+    },
+    {
+     "speaker": "",
+     "text": "The first floor is about the human body and has many hands-on activities for children.",
+     "start": 12.8,
+     "end": 17.89
+    },
+    {
+     "speaker": "",
+     "text": "Please note that photography with a flash is not allowed in the galleries.",
+     "start": 18.49,
+     "end": 22.43
+    },
+    {
+     "speaker": "",
+     "text": "The café on the second floor closes an hour before the museum, at four o'clock.",
+     "start": 23.03,
+     "end": 28.27
+    }
+   ]
+  },
+  "b2-lesson1": {
+   "title": "B2 · Working from home",
+   "level": "B2",
+   "kind": "part3",
+   "file": "audio/b2-lesson1.mp3",
+   "segments": [
+    {
+     "speaker": "Man",
+     "text": "Our company is letting us work from home three days a week now.",
+     "start": 0.4,
+     "end": 3.72
+    },
+    {
+     "speaker": "Woman",
+     "text": "Lucky you! Do you think you will be more productive?",
+     "start": 4.32,
+     "end": 7.75
+    },
+    {
+     "speaker": "Man",
+     "text": "Honestly, I'm not sure. I save an hour of travelling, but I get distracted easily at home.",
+     "start": 8.35,
+     "end": 15.07
+    },
+    {
+     "speaker": "Woman",
+     "text": "Maybe you need a separate space to work in, not the kitchen table.",
+     "start": 15.67,
+     "end": 19.47
+    },
+    {
+     "speaker": "Man",
+     "text": "That's a good point. I also worry about losing touch with my colleagues.",
+     "start": 20.07,
+     "end": 24.78
+    },
+    {
+     "speaker": "Woman",
+     "text": "You could use the office days for meetings and teamwork, and keep the home days for focused tasks.",
+     "start": 25.38,
+     "end": 30.95
+    },
+    {
+     "speaker": "Man",
+     "text": "That makes sense. I'll try organising my week like that.",
+     "start": 31.55,
+     "end": 35.56
+    }
+   ]
+  },
+  "b2-lesson2": {
+   "title": "B2 · Reducing food waste",
+   "level": "B2",
+   "kind": "part4",
+   "file": "audio/b2-lesson2.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "Around a third of all food produced in the world is never eaten.",
+     "start": 0.4,
+     "end": 3.57
+    },
+    {
+     "speaker": "",
+     "text": "In wealthy countries, much of this waste happens at home rather than on farms or in factories.",
+     "start": 4.17,
+     "end": 9.6
+    },
+    {
+     "speaker": "",
+     "text": "People often buy more than they need, especially when supermarkets offer deals like 'buy one, get one free'.",
+     "start": 10.2,
+     "end": 16.76
+    },
+    {
+     "speaker": "",
+     "text": "Another cause is confusion over date labels.",
+     "start": 17.36,
+     "end": 19.91
+    },
+    {
+     "speaker": "",
+     "text": "'Best before' only refers to quality, so food is usually still safe to eat after that date.",
+     "start": 20.51,
+     "end": 25.99
+    },
+    {
+     "speaker": "",
+     "text": "Planning meals for the week and checking the fridge before shopping can make a real difference.",
+     "start": 26.59,
+     "end": 30.87
+    }
+   ]
+  },
+  "b2-lesson3": {
+   "title": "B2 · A customer complaint",
+   "level": "B2",
+   "kind": "part3",
+   "file": "audio/b2-lesson3.mp3",
+   "segments": [
+    {
+     "speaker": "Woman",
+     "text": "Hello, I'm calling about an order I placed two weeks ago. It still hasn't arrived.",
+     "start": 0.4,
+     "end": 6.08
+    },
+    {
+     "speaker": "Man",
+     "text": "I'm sorry about that. Could you give me your order number?",
+     "start": 6.68,
+     "end": 10.34
+    },
+    {
+     "speaker": "Woman",
+     "text": "It's four, seven, two, nine, one.",
+     "start": 10.94,
+     "end": 14.81
+    },
+    {
+     "speaker": "Man",
+     "text": "Thank you. I can see the parcel was sent to your old address.",
+     "start": 15.41,
+     "end": 19.47
+    },
+    {
+     "speaker": "Woman",
+     "text": "But I updated my address in my account last month!",
+     "start": 20.07,
+     "end": 22.94
+    },
+    {
+     "speaker": "Man",
+     "text": "You're right, and I apologise. I'll send a new parcel today by express delivery, free of charge.",
+     "start": 23.54,
+     "end": 30.6
+    },
+    {
+     "speaker": "Woman",
+     "text": "Thank you. Will I get a tracking number?",
+     "start": 31.2,
+     "end": 34.12
+    },
+    {
+     "speaker": "Man",
+     "text": "Yes, you'll receive it by email within an hour.",
+     "start": 34.72,
+     "end": 37.72
+    }
+   ]
+  },
+  "b2-check": {
+   "title": "B2 · City bike scheme",
+   "level": "B2",
+   "kind": "part4",
+   "file": "audio/b2-check.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "The city council has announced that its bike-sharing scheme will double in size next spring.",
+     "start": 0.4,
+     "end": 5.03
+    },
+    {
+     "speaker": "",
+     "text": "Since it started two years ago, the scheme has recorded more than a million journeys.",
+     "start": 5.63,
+     "end": 10.32
+    },
+    {
+     "speaker": "",
+     "text": "However, some residents complain that bikes are often left blocking pavements.",
+     "start": 10.92,
+     "end": 15.52
+    },
+    {
+     "speaker": "",
+     "text": "To deal with this, riders will soon have to end their journeys at official parking points, or pay a fine.",
+     "start": 16.12,
+     "end": 22.45
+    },
+    {
+     "speaker": "",
+     "text": "The council also plans to add electric bikes, which will cost slightly more to rent.",
+     "start": 23.05,
+     "end": 28.26
+    },
+    {
+     "speaker": "",
+     "text": "Supporters say the changes will encourage more people to leave their cars at home.",
+     "start": 28.86,
+     "end": 33.0
+    }
+   ]
+  },
+  "b2-test1": {
+   "title": "B2 · Choosing a candidate",
+   "level": "B2",
+   "kind": "part3",
+   "file": "audio/b2-test1.mp3",
+   "segments": [
+    {
+     "speaker": "Woman",
+     "text": "So, we've interviewed both candidates. Who do you think we should hire?",
+     "start": 0.4,
+     "end": 5.41
+    },
+    {
+     "speaker": "Man",
+     "text": "Clara has more experience, but Daniel seemed more enthusiastic about the role.",
+     "start": 6.01,
+     "end": 10.97
+    },
+    {
+     "speaker": "Woman",
+     "text": "Experience matters, though. The project starts in three weeks and there's no time for long training.",
+     "start": 11.57,
+     "end": 17.89
+    },
+    {
+     "speaker": "Man",
+     "text": "True, but Clara asked for a salary well above our budget.",
+     "start": 18.49,
+     "end": 22.15
+    },
+    {
+     "speaker": "Woman",
+     "text": "Could we offer her a smaller salary with a bonus at the end of the project?",
+     "start": 22.75,
+     "end": 26.49
+    },
+    {
+     "speaker": "Man",
+     "text": "It's worth trying. If she says no, we'll offer the job to Daniel.",
+     "start": 27.09,
+     "end": 31.96
+    }
+   ]
+  },
+  "b2-test2": {
+   "title": "B2 · Why we need sleep",
+   "level": "B2",
+   "kind": "part4",
+   "file": "audio/b2-test2.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "Scientists used to think that sleep was simply a time for the body to rest.",
+     "start": 0.4,
+     "end": 4.46
+    },
+    {
+     "speaker": "",
+     "text": "We now know that the brain is surprisingly active during the night.",
+     "start": 5.06,
+     "end": 8.44
+    },
+    {
+     "speaker": "",
+     "text": "During deep sleep, it removes waste products that build up while we are awake.",
+     "start": 9.04,
+     "end": 13.61
+    },
+    {
+     "speaker": "",
+     "text": "Lack of sleep has been linked to poor concentration, weaker memory and a higher risk of illness.",
+     "start": 14.21,
+     "end": 19.4
+    },
+    {
+     "speaker": "",
+     "text": "Adults generally need between seven and nine hours a night.",
+     "start": 20.0,
+     "end": 23.11
+    },
+    {
+     "speaker": "",
+     "text": "Yet surveys suggest that a third of adults regularly sleep less than that.",
+     "start": 23.71,
+     "end": 27.6
+    }
+   ]
+  },
+  "c1-lesson1": {
+   "title": "C1 · Green spaces in cities",
+   "level": "C1",
+   "kind": "part4",
+   "file": "audio/c1-lesson1.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "Urban planners have long treated parks as a pleasant extra, something to add once the essential infrastructure is in place.",
+     "start": 0.4,
+     "end": 7.35
+    },
+    {
+     "speaker": "",
+     "text": "That view is increasingly hard to defend.",
+     "start": 7.95,
+     "end": 10.23
+    },
+    {
+     "speaker": "",
+     "text": "A growing body of research links access to green space with lower stress levels, better mental health and even reduced crime.",
+     "start": 10.83,
+     "end": 17.94
+    },
+    {
+     "speaker": "",
+     "text": "Trees also lower street temperatures by several degrees during heatwaves, which could save lives as summers become hotter.",
+     "start": 18.54,
+     "end": 25.55
+    },
+    {
+     "speaker": "",
+     "text": "The challenge is that land in city centres is extremely valuable, so councils face constant pressure to sell it to developers.",
+     "start": 26.15,
+     "end": 33.54
+    },
+    {
+     "speaker": "",
+     "text": "Some cities have responded creatively, turning disused railway lines and rooftops into public gardens.",
+     "start": 34.14,
+     "end": 40.38
+    }
+   ]
+  },
+  "c1-lesson2": {
+   "title": "C1 · Negotiating a contract",
+   "level": "C1",
+   "kind": "part3",
+   "file": "audio/c1-lesson2.mp3",
+   "segments": [
+    {
+     "speaker": "Woman",
+     "text": "We've reviewed your proposal, and while we like the design, the price is higher than we'd anticipated.",
+     "start": 0.4,
+     "end": 6.24
+    },
+    {
+     "speaker": "Man",
+     "text": "I understand. The figure reflects the custom software we'd be building specifically for your stores.",
+     "start": 6.84,
+     "end": 13.13
+    },
+    {
+     "speaker": "Woman",
+     "text": "Would there be any flexibility if we committed to a three-year contract instead of one?",
+     "start": 13.73,
+     "end": 18.1
+    },
+    {
+     "speaker": "Man",
+     "text": "There could be. A longer commitment would let us spread the development costs, so we might reduce the annual fee by around ten percent.",
+     "start": 18.7,
+     "end": 26.93
+    },
+    {
+     "speaker": "Woman",
+     "text": "That's encouraging. We'd also need the system running before the holiday season.",
+     "start": 27.53,
+     "end": 32.42
+    },
+    {
+     "speaker": "Man",
+     "text": "That's ambitious, but feasible if we can sign by the end of this month.",
+     "start": 33.02,
+     "end": 37.08
+    },
+    {
+     "speaker": "Woman",
+     "text": "Then let's aim for that. I'll take the revised figures to our board on Thursday.",
+     "start": 37.68,
+     "end": 42.62
+    }
+   ]
+  },
+  "c1-lesson3": {
+   "title": "C1 · Algorithms in hiring",
+   "level": "C1",
+   "kind": "part4",
+   "file": "audio/c1-lesson3.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "More and more companies now use algorithms to screen job applications before a human ever reads them.",
+     "start": 0.4,
+     "end": 6.04
+    },
+    {
+     "speaker": "",
+     "text": "Supporters argue that software is faster and, in theory, less prone to personal prejudice than a tired recruiter.",
+     "start": 6.64,
+     "end": 13.66
+    },
+    {
+     "speaker": "",
+     "text": "Critics point out, however, that an algorithm trained on past hiring decisions may simply learn to repeat past biases.",
+     "start": 14.26,
+     "end": 21.78
+    },
+    {
+     "speaker": "",
+     "text": "In one widely reported case, a system downgraded applications that mentioned women's sports clubs.",
+     "start": 22.38,
+     "end": 28.4
+    },
+    {
+     "speaker": "",
+     "text": "The question, then, is not whether to use these tools, but how to audit them.",
+     "start": 29.0,
+     "end": 34.13
+    },
+    {
+     "speaker": "",
+     "text": "Several governments are now considering rules that would require companies to explain how automated decisions are made.",
+     "start": 34.73,
+     "end": 40.65
+    }
+   ]
+  },
+  "c1-check": {
+   "title": "C1 · Tourism: a mixed blessing",
+   "level": "C1",
+   "kind": "part3",
+   "file": "audio/c1-check.mp3",
+   "segments": [
+    {
+     "speaker": "Man",
+     "text": "Your town has seen visitor numbers triple in five years. Is that good news?",
+     "start": 0.4,
+     "end": 5.48
+    },
+    {
+     "speaker": "Woman",
+     "text": "Economically, yes. Hotels and restaurants are thriving, and young people no longer need to leave to find work.",
+     "start": 6.08,
+     "end": 13.72
+    },
+    {
+     "speaker": "Man",
+     "text": "But I gather not everyone is pleased.",
+     "start": 14.32,
+     "end": 16.37
+    },
+    {
+     "speaker": "Woman",
+     "text": "That's right. Rents have soared because so many flats are now let to tourists, and some families have been priced out entirely.",
+     "start": 16.97,
+     "end": 24.83
+    },
+    {
+     "speaker": "Man",
+     "text": "What is the council doing about it?",
+     "start": 25.43,
+     "end": 27.12
+    },
+    {
+     "speaker": "Woman",
+     "text": "We've introduced a cap on short-term rentals in the old town, and a small tourist tax that funds affordable housing.",
+     "start": 27.72,
+     "end": 34.32
+    },
+    {
+     "speaker": "Man",
+     "text": "Has it made a difference?",
+     "start": 34.92,
+     "end": 36.2
+    },
+    {
+     "speaker": "Woman",
+     "text": "It's early days, but rents have at least stopped rising.",
+     "start": 36.8,
+     "end": 40.1
+    }
+   ]
+  },
+  "c1-test1": {
+   "title": "C1 · Puzzling survey results",
+   "level": "C1",
+   "kind": "part3",
+   "file": "audio/c1-test1.mp3",
+   "segments": [
+    {
+     "speaker": "Woman",
+     "text": "I've been going through the survey results, and something doesn't add up.",
+     "start": 0.4,
+     "end": 4.2
+    },
+    {
+     "speaker": "Man",
+     "text": "In what way?",
+     "start": 4.8,
+     "end": 5.49
+    },
+    {
+     "speaker": "Woman",
+     "text": "Customers say price is their main concern, yet our cheapest product is the one selling worst.",
+     "start": 6.09,
+     "end": 11.59
+    },
+    {
+     "speaker": "Man",
+     "text": "Perhaps people say one thing and do another. Price might be what they think they ought to care about.",
+     "start": 12.19,
+     "end": 17.84
+    },
+    {
+     "speaker": "Woman",
+     "text": "Or the packaging makes it look low quality, so they assume it won't last.",
+     "start": 18.44,
+     "end": 22.66
+    },
+    {
+     "speaker": "Man",
+     "text": "That's plausible. We could test it by selling it in different packaging in a few stores for a month.",
+     "start": 23.26,
+     "end": 28.98
+    },
+    {
+     "speaker": "Woman",
+     "text": "Good idea. If sales rise, we'll know packaging is the issue rather than the price.",
+     "start": 29.58,
+     "end": 35.17
+    }
+   ]
+  },
+  "c1-test2": {
+   "title": "C1 · Nudging behaviour",
+   "level": "C1",
+   "kind": "part4",
+   "file": "audio/c1-test2.mp3",
+   "segments": [
+    {
+     "speaker": "",
+     "text": "Traditional economics assumed that people make rational choices based on all available information.",
+     "start": 0.4,
+     "end": 5.84
+    },
+    {
+     "speaker": "",
+     "text": "Behavioural economists have shown that, in practice, our decisions are heavily shaped by how options are presented.",
+     "start": 6.44,
+     "end": 13.55
+    },
+    {
+     "speaker": "",
+     "text": "For example, when employees are automatically enrolled in a pension plan, with the option to leave, participation rises dramatically.",
+     "start": 14.15,
+     "end": 22.82
+    },
+    {
+     "speaker": "",
+     "text": "Nothing about the plan itself has changed; only the default has.",
+     "start": 23.42,
+     "end": 27.59
+    },
+    {
+     "speaker": "",
+     "text": "Governments have embraced such 'nudges' because they are cheap and preserve freedom of choice.",
+     "start": 28.19,
+     "end": 32.76
+    },
+    {
+     "speaker": "",
+     "text": "Critics, though, warn that the same techniques can easily be used to manipulate rather than to help.",
+     "start": 33.36,
+     "end": 39.08
+    }
+   ]
+  }
+ },
+ "levels": [
+  {
+   "level": "A1",
+   "unit": {
+    "title": "Everyday life",
+    "description": "Meeting people, ordering a drink and talking about family.",
+    "lessons": [
+     {
+      "title": "Meeting a new classmate",
+      "recording": "a1-lesson1",
+      "keywords": [
+       {
+        "word": "new",
+        "meaning": "mới"
+       },
+       {
+        "word": "classmate",
+        "meaning": "bạn cùng lớp"
+       },
+       {
+        "word": "near",
+        "meaning": "gần"
+       },
+       {
+        "word": "together",
+        "meaning": "cùng nhau"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "What are the speakers doing?",
+       "options": [
+        {
+         "text": "Talking about a film",
+         "isCorrect": false
+        },
+        {
+         "text": "Buying a book",
+         "isCorrect": false
+        },
+        {
+         "text": "Meeting for the first time",
+         "isCorrect": true
+        }
+       ],
+       "explanation": "Lan asks \"Are you new here?\" and they say their names."
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "Where is Tom from?",
+        "options": [
+         {
+          "text": "Canada",
+          "isCorrect": true
+         },
+         {
+          "text": "England",
+          "isCorrect": false
+         },
+         {
+          "text": "Australia",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "Tom says: \"I'm from Canada.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What can they do together?",
+        "options": [
+         {
+          "text": "Walk to class",
+          "isCorrect": true
+         },
+         {
+          "text": "Eat lunch",
+          "isCorrect": false
+         },
+         {
+          "text": "Play football",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "Tom says: \"We can walk to class together.\""
+       }
+      ],
+      "close": [
+       1,
+       3
+      ]
+     },
+     {
+      "title": "At the café",
+      "recording": "a1-lesson2",
+      "keywords": [
+       {
+        "word": "would like",
+        "meaning": "muốn"
+       },
+       {
+        "word": "hot",
+        "meaning": "nóng"
+       },
+       {
+        "word": "small",
+        "meaning": "nhỏ"
+       },
+       {
+        "word": "dollar",
+        "meaning": "đô la"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "Where are the speakers?",
+       "options": [
+        {
+         "text": "In a bank",
+         "isCorrect": false
+        },
+        {
+         "text": "At a bus stop",
+         "isCorrect": false
+        },
+        {
+         "text": "In a café",
+         "isCorrect": true
+        }
+       ],
+       "explanation": "The man asks what she would like, and she orders tea and cake."
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "What does the woman order to drink?",
+        "options": [
+         {
+          "text": "An iced coffee",
+          "isCorrect": false
+         },
+         {
+          "text": "A hot tea",
+          "isCorrect": true
+         },
+         {
+          "text": "A glass of milk",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "She asks for a tea and says \"Hot, please.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How much does she pay?",
+        "options": [
+         {
+          "text": "Two dollars",
+          "isCorrect": false
+         },
+         {
+          "text": "Four dollars",
+          "isCorrect": true
+         },
+         {
+          "text": "Ten dollars",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The man says: \"That's four dollars.\""
+       }
+      ],
+      "close": [
+       1,
+       4
+      ]
+     },
+     {
+      "title": "My family",
+      "recording": "a1-lesson3",
+      "keywords": [
+       {
+        "word": "family",
+        "meaning": "gia đình"
+       },
+       {
+        "word": "teacher",
+        "meaning": "giáo viên"
+       },
+       {
+        "word": "nurse",
+        "meaning": "y tá"
+       },
+       {
+        "word": "brother",
+        "meaning": "anh/em trai"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "What is the talk about?",
+       "options": [
+        {
+         "text": "Mai's school",
+         "isCorrect": false
+        },
+        {
+         "text": "Mai's family",
+         "isCorrect": true
+        },
+        {
+         "text": "Mai's house",
+         "isCorrect": false
+        }
+       ],
+       "explanation": "Mai talks about her father, mother and brother."
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "What does Mai's mother do?",
+        "options": [
+         {
+          "text": "She is a nurse",
+          "isCorrect": true
+         },
+         {
+          "text": "She is a cook",
+          "isCorrect": false
+         },
+         {
+          "text": "She is a teacher",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "Mai says: \"my mother is a nurse.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How old is Nam?",
+        "options": [
+         {
+          "text": "Ten",
+          "isCorrect": true
+         },
+         {
+          "text": "Eight",
+          "isCorrect": false
+         },
+         {
+          "text": "Twelve",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "Mai says: \"He is ten years old.\""
+       }
+      ],
+      "close": [
+       2,
+       4
+      ]
+     }
+    ],
+    "check": [
+     {
+      "recording": "a1-check",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "Where are the speakers?",
+        "options": [
+         {
+          "text": "At a school",
+          "isCorrect": false
+         },
+         {
+          "text": "At a hospital",
+          "isCorrect": false
+         },
+         {
+          "text": "At a fruit shop",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "They talk about apples and bananas and their prices."
+       },
+       {
+        "skill": "detail",
+        "prompt": "What colours are the apples?",
+        "options": [
+         {
+          "text": "Only green",
+          "isCorrect": false
+         },
+         {
+          "text": "Red and green",
+          "isCorrect": true
+         },
+         {
+          "text": "Red and yellow",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The woman says: \"we have red apples and green apples.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How much is a kilo of red apples?",
+        "options": [
+         {
+          "text": "Two dollars",
+          "isCorrect": true
+         },
+         {
+          "text": "Three dollars",
+          "isCorrect": false
+         },
+         {
+          "text": "Fifty cents",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The woman says: \"They are two dollars a kilo.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How many bananas does the man buy?",
+        "options": [
+         {
+          "text": "Three",
+          "isCorrect": true
+         },
+         {
+          "text": "Five",
+          "isCorrect": false
+         },
+         {
+          "text": "Two",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The man asks for \"three bananas.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How much does the man pay?",
+        "options": [
+         {
+          "text": "Two dollars",
+          "isCorrect": false
+         },
+         {
+          "text": "Four dollars fifty",
+          "isCorrect": false
+         },
+         {
+          "text": "Three dollars fifty",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "The woman says: \"That's three dollars and fifty cents.\""
+       }
+      ]
+     }
+    ]
+   },
+   "levelTest": {
+    "title": "A1 listening test",
+    "sections": [
+     {
+      "recording": "a1-test1",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "What is the man looking for?",
+        "options": [
+         {
+          "text": "The post office",
+          "isCorrect": true
+         },
+         {
+          "text": "The bank",
+          "isCorrect": false
+         },
+         {
+          "text": "A hotel",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "He asks: \"Where is the post office?\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "Where is it?",
+        "options": [
+         {
+          "text": "Next to the bank",
+          "isCorrect": true
+         },
+         {
+          "text": "Near the park",
+          "isCorrect": false
+         },
+         {
+          "text": "Behind the school",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The woman says it is \"next to the bank.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How long is the walk?",
+        "options": [
+         {
+          "text": "About an hour",
+          "isCorrect": false
+         },
+         {
+          "text": "About five minutes",
+          "isCorrect": true
+         },
+         {
+          "text": "About fifteen minutes",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "She says: \"about five minutes on foot.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What should he do at the corner?",
+        "options": [
+         {
+          "text": "Turn left",
+          "isCorrect": false
+         },
+         {
+          "text": "Turn right",
+          "isCorrect": true
+         },
+         {
+          "text": "Stop and wait",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "She says: \"Turn right, then go straight.\""
+       }
+      ]
+     },
+     {
+      "recording": "a1-test2",
+      "questions": [
+       {
+        "skill": "detail",
+        "prompt": "Where is Ben?",
+        "options": [
+         {
+          "text": "At home",
+          "isCorrect": false
+         },
+         {
+          "text": "At a restaurant",
+          "isCorrect": false
+         },
+         {
+          "text": "At the cinema",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "Ben says: \"I'm at the cinema.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What time does the film start?",
+        "options": [
+         {
+          "text": "At a quarter to seven",
+          "isCorrect": false
+         },
+         {
+          "text": "At seven",
+          "isCorrect": true
+         },
+         {
+          "text": "At six",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "Ben says the film \"starts at seven, not six.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What does Ben have?",
+        "options": [
+         {
+          "text": "The tickets",
+          "isCorrect": true
+         },
+         {
+          "text": "Anna's phone",
+          "isCorrect": false
+         },
+         {
+          "text": "The pizza",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "Ben says: \"I have the tickets.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What do they plan to do after the film?",
+        "options": [
+         {
+          "text": "Go shopping",
+          "isCorrect": false
+         },
+         {
+          "text": "Go home",
+          "isCorrect": false
+         },
+         {
+          "text": "Eat pizza",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "Ben says: \"After the film, let's eat pizza.\""
+       }
+      ]
+     }
+    ]
+   },
+   "placement": {
+    "recording": "a1-check",
+    "questions": [
+     {
+      "skill": "detail",
+      "prompt": "What does the man ask first?",
+      "options": [
+       {
+        "text": "If they have apples",
+        "isCorrect": true
+       },
+       {
+        "text": "Where the bank is",
+        "isCorrect": false
+       },
+       {
+        "text": "What time it is",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "He asks: \"Do you have apples today?\""
+     },
+     {
+      "skill": "detail",
+      "prompt": "What does the man buy with the apples?",
+      "options": [
+       {
+        "text": "Oranges",
+        "isCorrect": false
+       },
+       {
+        "text": "Bread",
+        "isCorrect": false
+       },
+       {
+        "text": "Bananas",
+        "isCorrect": true
+       }
+      ],
+      "explanation": "He also asks for three bananas."
+     },
+     {
+      "skill": "inference",
+      "prompt": "Who is selling the fruit?",
+      "options": [
+       {
+        "text": "The woman",
+        "isCorrect": true
+       },
+       {
+        "text": "The man",
+        "isCorrect": false
+       },
+       {
+        "text": "A child",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "The woman says \"we have\" apples and tells him the price."
+     }
+    ]
+   }
+  },
+  {
+   "level": "A2",
+   "unit": {
+    "title": "Plans and places",
+    "description": "Booking, weekend plans and a city tour.",
+    "lessons": [
+     {
+      "title": "Booking a table",
+      "recording": "a2-lesson1",
+      "keywords": [
+       {
+        "word": "book",
+        "meaning": "đặt chỗ"
+       },
+       {
+        "word": "evening",
+        "meaning": "buổi tối"
+       },
+       {
+        "word": "birthday",
+        "meaning": "sinh nhật"
+       },
+       {
+        "word": "window",
+        "meaning": "cửa sổ"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "Why is the man calling?",
+       "options": [
+        {
+         "text": "To complain about a meal",
+         "isCorrect": false
+        },
+        {
+         "text": "To book a table",
+         "isCorrect": true
+        },
+        {
+         "text": "To order food for delivery",
+         "isCorrect": false
+        }
+       ],
+       "explanation": "He says: \"I'd like to book a table for Saturday evening.\""
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "How many people will come?",
+        "options": [
+         {
+          "text": "Six",
+          "isCorrect": true
+         },
+         {
+          "text": "Four",
+          "isCorrect": false
+         },
+         {
+          "text": "Eight",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "He says: \"For six, please.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "Where does he want to sit?",
+        "options": [
+         {
+          "text": "Near the window",
+          "isCorrect": true
+         },
+         {
+          "text": "Near the kitchen",
+          "isCorrect": false
+         },
+         {
+          "text": "Outside",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "He asks: \"Could we sit near the window?\""
+       }
+      ],
+      "close": [
+       3,
+       5
+      ]
+     },
+     {
+      "title": "Weekend plans",
+      "recording": "a2-lesson2",
+      "keywords": [
+       {
+        "word": "countryside",
+        "meaning": "nông thôn"
+       },
+       {
+        "word": "aunt",
+        "meaning": "cô, dì"
+       },
+       {
+        "word": "concert",
+        "meaning": "buổi hòa nhạc"
+       },
+       {
+        "word": "be back",
+        "meaning": "trở về"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "What are they talking about?",
+       "options": [
+        {
+         "text": "A trip they took last year",
+         "isCorrect": false
+        },
+        {
+         "text": "Plans for the weekend",
+         "isCorrect": true
+        },
+        {
+         "text": "A problem at work",
+         "isCorrect": false
+        }
+       ],
+       "explanation": "He asks: \"Are you doing anything this weekend?\""
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "How is Sara travelling?",
+        "options": [
+         {
+          "text": "By bus",
+          "isCorrect": false
+         },
+         {
+          "text": "By car",
+          "isCorrect": false
+         },
+         {
+          "text": "By train",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "She says: \"By train. It takes about two hours.\""
+       },
+       {
+        "skill": "inference",
+        "prompt": "Will Sara go to the concert?",
+        "options": [
+         {
+          "text": "She doesn't know yet",
+          "isCorrect": false
+         },
+         {
+          "text": "No, she is busy",
+          "isCorrect": false
+         },
+         {
+          "text": "Yes, she will",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "She says \"I'd love to!\" and she is back on Sunday afternoon."
+       }
+      ],
+      "close": [
+       1,
+       6
+      ]
+     },
+     {
+      "title": "A city bus tour",
+      "recording": "a2-lesson3",
+      "keywords": [
+       {
+        "word": "aboard",
+        "meaning": "trên xe, trên tàu"
+       },
+       {
+        "word": "stop",
+        "meaning": "điểm dừng"
+       },
+       {
+        "word": "local",
+        "meaning": "địa phương"
+       },
+       {
+        "word": "available",
+        "meaning": "có sẵn"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "Who is speaking?",
+       "options": [
+        {
+         "text": "A teacher in a classroom",
+         "isCorrect": false
+        },
+        {
+         "text": "A tour guide on a bus",
+         "isCorrect": true
+        },
+        {
+         "text": "A pilot on a plane",
+         "isCorrect": false
+        }
+       ],
+       "explanation": "The speaker welcomes people \"aboard the City Explorer bus tour.\""
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "How long is the tour?",
+        "options": [
+         {
+          "text": "Ninety minutes",
+          "isCorrect": true
+         },
+         {
+          "text": "Thirty minutes",
+          "isCorrect": false
+         },
+         {
+          "text": "Six hours",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The guide says: \"The tour takes ninety minutes.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What should passengers keep with them?",
+        "options": [
+         {
+          "text": "Their ticket",
+          "isCorrect": true
+         },
+         {
+          "text": "Their water bottle",
+          "isCorrect": false
+         },
+         {
+          "text": "A map",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The guide says: \"Please keep your ticket with you.\""
+       }
+      ],
+      "close": [
+       1,
+       3
+      ]
+     }
+    ],
+    "check": [
+     {
+      "recording": "a2-check",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "What does the woman want to do?",
+        "options": [
+         {
+          "text": "Buy a bus pass",
+          "isCorrect": false
+         },
+         {
+          "text": "Meet a friend",
+          "isCorrect": false
+         },
+         {
+          "text": "Travel to Brighton",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "She asks about \"the next train to Brighton.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "When does the next train leave?",
+        "options": [
+         {
+          "text": "At ten forty",
+          "isCorrect": false
+         },
+         {
+          "text": "At ten fifteen",
+          "isCorrect": true
+         },
+         {
+          "text": "At nine fifty",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The man says: \"The next one leaves at ten fifteen.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "Which platform does the train leave from?",
+        "options": [
+         {
+          "text": "Platform four",
+          "isCorrect": true
+         },
+         {
+          "text": "Platform fourteen",
+          "isCorrect": false
+         },
+         {
+          "text": "Platform two",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "He says: \"from platform four.\""
+       },
+       {
+        "skill": "inference",
+        "prompt": "Why doesn't she take the bus?",
+        "options": [
+         {
+          "text": "It is full",
+          "isCorrect": false
+         },
+         {
+          "text": "It takes longer",
+          "isCorrect": true
+         },
+         {
+          "text": "It is more expensive",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The bus takes \"about half an hour more than the train.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How much is her ticket?",
+        "options": [
+         {
+          "text": "Twenty pounds",
+          "isCorrect": false
+         },
+         {
+          "text": "Twelve pounds",
+          "isCorrect": true
+         },
+         {
+          "text": "Forty pounds",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The man says: \"That's twelve pounds.\""
+       }
+      ]
+     }
+    ]
+   },
+   "levelTest": {
+    "title": "A2 listening test",
+    "sections": [
+     {
+      "recording": "a2-test1",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "What is wrong with the woman?",
+        "options": [
+         {
+          "text": "She has a broken arm",
+          "isCorrect": false
+         },
+         {
+          "text": "She has a stomach ache",
+          "isCorrect": false
+         },
+         {
+          "text": "She has a headache",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "She says: \"I've had a bad headache.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How long has she had the problem?",
+        "options": [
+         {
+          "text": "Three days",
+          "isCorrect": true
+         },
+         {
+          "text": "A week",
+          "isCorrect": false
+         },
+         {
+          "text": "Two days",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "She says: \"for three days.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "Why isn't she sleeping well?",
+        "options": [
+         {
+          "text": "She drinks too much coffee",
+          "isCorrect": false
+         },
+         {
+          "text": "Her neighbours are noisy",
+          "isCorrect": false
+         },
+         {
+          "text": "She has been working late",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "She says: \"I've been working late every night this week.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How often should she take the medicine?",
+        "options": [
+         {
+          "text": "Three times a day",
+          "isCorrect": false
+         },
+         {
+          "text": "Twice a day",
+          "isCorrect": true
+         },
+         {
+          "text": "Once a day",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The doctor says: \"twice a day after meals.\""
+       }
+      ]
+     },
+     {
+      "recording": "a2-test2",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "What is this?",
+        "options": [
+         {
+          "text": "An advertisement",
+          "isCorrect": false
+         },
+         {
+          "text": "A weather report",
+          "isCorrect": true
+         },
+         {
+          "text": "A sports report",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "It begins: \"Here is the weather for the weekend.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "When will it rain?",
+        "options": [
+         {
+          "text": "All weekend",
+          "isCorrect": false
+         },
+         {
+          "text": "On Saturday afternoon",
+          "isCorrect": true
+         },
+         {
+          "text": "On Sunday morning",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"Saturday … with some rain in the afternoon.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How warm will it be on Sunday?",
+        "options": [
+         {
+          "text": "Around twenty degrees",
+          "isCorrect": true
+         },
+         {
+          "text": "Below ten degrees",
+          "isCorrect": false
+         },
+         {
+          "text": "About fifteen degrees",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"It will also be warmer, around twenty degrees.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "Which day is better for a picnic?",
+        "options": [
+         {
+          "text": "Neither day",
+          "isCorrect": false
+         },
+         {
+          "text": "Saturday",
+          "isCorrect": false
+         },
+         {
+          "text": "Sunday",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"Sunday is the day to do it.\""
+       }
+      ]
+     }
+    ]
+   },
+   "placement": {
+    "recording": "a2-check",
+    "questions": [
+     {
+      "skill": "detail",
+      "prompt": "How long must she wait for the train?",
+      "options": [
+       {
+        "text": "Half an hour",
+        "isCorrect": false
+       },
+       {
+        "text": "Forty minutes",
+        "isCorrect": true
+       },
+       {
+        "text": "Fifteen minutes",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "She says: \"I have to wait forty minutes.\""
+     },
+     {
+      "skill": "detail",
+      "prompt": "What kind of ticket does she buy?",
+      "options": [
+       {
+        "text": "A single ticket",
+        "isCorrect": true
+       },
+       {
+        "text": "A weekly ticket",
+        "isCorrect": false
+       },
+       {
+        "text": "A return ticket",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "She asks for \"One single ticket.\""
+     },
+     {
+      "skill": "inference",
+      "prompt": "Who is the man?",
+      "options": [
+       {
+        "text": "A bus driver",
+        "isCorrect": false
+       },
+       {
+        "text": "Another passenger",
+        "isCorrect": false
+       },
+       {
+        "text": "A station worker",
+        "isCorrect": true
+       }
+      ],
+      "explanation": "He knows the train times and sells her the ticket."
+     }
+    ]
+   }
+  },
+  {
+   "level": "B1",
+   "unit": {
+    "title": "Work and study",
+    "description": "An interview, a return at a shop and tips for studying.",
+    "lessons": [
+     {
+      "title": "A job interview",
+      "recording": "b1-lesson1",
+      "keywords": [
+       {
+        "word": "apply for",
+        "meaning": "ứng tuyển"
+       },
+       {
+        "word": "marketing",
+        "meaning": "tiếp thị"
+       },
+       {
+        "word": "customer",
+        "meaning": "khách hàng"
+       },
+       {
+        "word": "decision",
+        "meaning": "quyết định"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "What is happening?",
+       "options": [
+        {
+         "text": "A job interview",
+         "isCorrect": true
+        },
+        {
+         "text": "A team meeting",
+         "isCorrect": false
+        },
+        {
+         "text": "A shopping trip",
+         "isCorrect": false
+        }
+       ],
+       "explanation": "The woman asks James why he applied for the job."
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "How long has James worked in a shop?",
+        "options": [
+         {
+          "text": "Two years",
+          "isCorrect": true
+         },
+         {
+          "text": "Five years",
+          "isCorrect": false
+         },
+         {
+          "text": "Six months",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "He says: \"I've worked in a shop for two years.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "When will he hear the decision?",
+        "options": [
+         {
+          "text": "By Friday",
+          "isCorrect": true
+         },
+         {
+          "text": "At the weekend",
+          "isCorrect": false
+         },
+         {
+          "text": "Next month",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "She says: \"We'll let you know our decision by Friday.\""
+       }
+      ],
+      "close": [
+       1,
+       3
+      ]
+     },
+     {
+      "title": "Returning a product",
+      "recording": "b1-lesson2",
+      "keywords": [
+       {
+        "word": "receipt",
+        "meaning": "hóa đơn"
+       },
+       {
+        "word": "replacement",
+        "meaning": "đồ thay thế"
+       },
+       {
+        "word": "model",
+        "meaning": "mẫu, đời"
+       },
+       {
+        "word": "within",
+        "meaning": "trong vòng"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "Why is the man in the shop?",
+       "options": [
+        {
+         "text": "His headphones are broken",
+         "isCorrect": true
+        },
+        {
+         "text": "He wants to buy a phone",
+         "isCorrect": false
+        },
+        {
+         "text": "He lost his receipt",
+         "isCorrect": false
+        }
+       ],
+       "explanation": "\"the left side has stopped working.\""
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "What does the man choose?",
+        "options": [
+         {
+          "text": "A different product",
+          "isCorrect": false
+         },
+         {
+          "text": "His money back",
+          "isCorrect": false
+         },
+         {
+          "text": "A replacement",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "He says: \"I'd prefer a replacement.\""
+       },
+       {
+        "skill": "inference",
+        "prompt": "What colour were his first headphones probably?",
+        "options": [
+         {
+          "text": "Black",
+          "isCorrect": false
+         },
+         {
+          "text": "White",
+          "isCorrect": true
+         },
+         {
+          "text": "Red",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The shop has the model in black \"but not in white\", and he accepts black instead."
+       }
+      ],
+      "close": [
+       0,
+       4
+      ]
+     },
+     {
+      "title": "Tips for studying",
+      "recording": "b1-lesson3",
+      "keywords": [
+       {
+        "word": "session",
+        "meaning": "buổi, phiên"
+       },
+       {
+        "word": "break",
+        "meaning": "giờ nghỉ"
+       },
+       {
+        "word": "memory",
+        "meaning": "trí nhớ"
+       },
+       {
+        "word": "organise",
+        "meaning": "sắp xếp"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "What is the main purpose of the talk?",
+       "options": [
+        {
+         "text": "To explain how sleep works",
+         "isCorrect": false
+        },
+        {
+         "text": "To advertise a school",
+         "isCorrect": false
+        },
+        {
+         "text": "To give advice on studying",
+         "isCorrect": true
+        }
+       ],
+       "explanation": "The speaker gives \"three simple tips\" for studying."
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "How long should one study session be?",
+        "options": [
+         {
+          "text": "About thirty minutes",
+          "isCorrect": true
+         },
+         {
+          "text": "About two hours",
+          "isCorrect": false
+         },
+         {
+          "text": "About five minutes",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"study in short sessions of about thirty minutes.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "Why is sleep important, according to the talk?",
+        "options": [
+         {
+          "text": "The brain organises new information",
+          "isCorrect": true
+         },
+         {
+          "text": "Teachers recommend it",
+          "isCorrect": false
+         },
+         {
+          "text": "It makes students less hungry",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"your brain organises new information while you sleep.\""
+       }
+      ],
+      "close": [
+       2,
+       4
+      ]
+     }
+    ],
+    "check": [
+     {
+      "recording": "b1-check",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "What are they planning?",
+        "options": [
+         {
+          "text": "A team event",
+          "isCorrect": true
+         },
+         {
+          "text": "A business trip",
+          "isCorrect": false
+         },
+         {
+          "text": "A birthday party",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"We need to choose something for the team event.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What is the man's first idea?",
+        "options": [
+         {
+          "text": "A picnic",
+          "isCorrect": false
+         },
+         {
+          "text": "A cooking class",
+          "isCorrect": true
+         },
+         {
+          "text": "A football match",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "He says: \"How about a cooking class?\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What is the problem with the cooking class?",
+        "options": [
+         {
+          "text": "It is too far",
+          "isCorrect": false
+         },
+         {
+          "text": "It might be expensive",
+          "isCorrect": true
+         },
+         {
+          "text": "It is too short",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"it might be expensive for twenty people.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What is the problem with the picnic?",
+        "options": [
+         {
+          "text": "The cost",
+          "isCorrect": false
+         },
+         {
+          "text": "The lake is closed",
+          "isCorrect": false
+         },
+         {
+          "text": "The weather",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"The weather could be a problem in April.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What will the woman do today?",
+        "options": [
+         {
+          "text": "Call the cooking school",
+          "isCorrect": false
+         },
+         {
+          "text": "Write to the manager",
+          "isCorrect": true
+         },
+         {
+          "text": "Book the picnic",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "She says: \"I'll write to the manager today.\""
+       }
+      ]
+     }
+    ]
+   },
+   "levelTest": {
+    "title": "B1 listening test",
+    "sections": [
+     {
+      "recording": "b1-test1",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "What does the woman like about the apartment?",
+        "options": [
+         {
+          "text": "It's cheaper and quiet",
+          "isCorrect": false
+         },
+         {
+          "text": "It has a garden",
+          "isCorrect": false
+         },
+         {
+          "text": "It's bigger and near the station",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"It's much bigger … and it's close to the station.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "Why is she saving money?",
+        "options": [
+         {
+          "text": "She cooks at home",
+          "isCorrect": false
+         },
+         {
+          "text": "She doesn't need the bus",
+          "isCorrect": true
+         },
+         {
+          "text": "Her rent is lower",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"I don't need the bus anymore.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What do we learn about her neighbour?",
+        "options": [
+         {
+          "text": "She is a student",
+          "isCorrect": false
+         },
+         {
+          "text": "She is moving out",
+          "isCorrect": false
+         },
+         {
+          "text": "She has lived there for ten years",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"She's lived there for ten years.\""
+       },
+       {
+        "skill": "inference",
+        "prompt": "Why hasn't she had a party yet?",
+        "options": [
+         {
+          "text": "She hasn't finished unpacking",
+          "isCorrect": true
+         },
+         {
+          "text": "She doesn't like parties",
+          "isCorrect": false
+         },
+         {
+          "text": "Her neighbours are unfriendly",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"Maybe once I've unpacked all the boxes!\""
+       }
+      ]
+     },
+     {
+      "recording": "b1-test2",
+      "questions": [
+       {
+        "skill": "detail",
+        "prompt": "What can visitors see on the ground floor?",
+        "options": [
+         {
+          "text": "A dinosaur",
+          "isCorrect": false
+         },
+         {
+          "text": "A rocket engine",
+          "isCorrect": true
+         },
+         {
+          "text": "A human heart",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"you can see a real rocket engine.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What is the first floor about?",
+        "options": [
+         {
+          "text": "Space",
+          "isCorrect": false
+         },
+         {
+          "text": "Machines",
+          "isCorrect": false
+         },
+         {
+          "text": "The human body",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"The first floor is about the human body.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What is not allowed in the galleries?",
+        "options": [
+         {
+          "text": "Food",
+          "isCorrect": false
+         },
+         {
+          "text": "Children",
+          "isCorrect": false
+         },
+         {
+          "text": "Flash photography",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"photography with a flash is not allowed.\""
+       },
+       {
+        "skill": "inference",
+        "prompt": "When does the museum close?",
+        "options": [
+         {
+          "text": "At four o'clock",
+          "isCorrect": false
+         },
+         {
+          "text": "At five o'clock",
+          "isCorrect": true
+         },
+         {
+          "text": "At six o'clock",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "The café closes at four, \"an hour before the museum.\""
+       }
+      ]
+     }
+    ]
+   },
+   "placement": {
+    "recording": "b1-check",
+    "questions": [
+     {
+      "skill": "detail",
+      "prompt": "How many people are in the team?",
+      "options": [
+       {
+        "text": "Twenty",
+        "isCorrect": true
+       },
+       {
+        "text": "Thirty",
+        "isCorrect": false
+       },
+       {
+        "text": "Ten",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "\"it might be expensive for twenty people.\""
+     },
+     {
+      "skill": "inference",
+      "prompt": "When is the event?",
+      "options": [
+       {
+        "text": "In April",
+        "isCorrect": true
+       },
+       {
+        "text": "In May",
+        "isCorrect": false
+       },
+       {
+        "text": "Next week",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "The event is \"next month\" and she talks about the weather \"in April.\""
+     },
+     {
+      "skill": "detail",
+      "prompt": "How much will the company be asked to pay?",
+      "options": [
+       {
+        "text": "All of it",
+        "isCorrect": false
+       },
+       {
+        "text": "Half",
+        "isCorrect": true
+       },
+       {
+        "text": "Nothing",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "\"ask the company to pay half.\""
+     }
+    ]
+   }
+  },
+  {
+   "level": "B2",
+   "unit": {
+    "title": "Society and change",
+    "description": "Working from home, food waste and customer service.",
+    "lessons": [
+     {
+      "title": "Working from home",
+      "recording": "b2-lesson1",
+      "keywords": [
+       {
+        "word": "productive",
+        "meaning": "năng suất"
+       },
+       {
+        "word": "distracted",
+        "meaning": "mất tập trung"
+       },
+       {
+        "word": "colleague",
+        "meaning": "đồng nghiệp"
+       },
+       {
+        "word": "focused",
+        "meaning": "tập trung"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "What is the conversation mainly about?",
+       "options": [
+        {
+         "text": "The pros and cons of working from home",
+         "isCorrect": true
+        },
+        {
+         "text": "Moving to a new office",
+         "isCorrect": false
+        },
+        {
+         "text": "Finding a new job",
+         "isCorrect": false
+        }
+       ],
+       "explanation": "They talk about the benefits and problems of working at home."
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "What problem does the man mention?",
+        "options": [
+         {
+          "text": "His internet is slow",
+          "isCorrect": false
+         },
+         {
+          "text": "His boss calls too often",
+          "isCorrect": false
+         },
+         {
+          "text": "He gets distracted easily",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"I get distracted easily at home.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What does the woman suggest using office days for?",
+        "options": [
+         {
+          "text": "Meetings and teamwork",
+          "isCorrect": true
+         },
+         {
+          "text": "Training courses",
+          "isCorrect": false
+         },
+         {
+          "text": "Focused tasks",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"use the office days for meetings and teamwork.\""
+       }
+      ],
+      "close": [
+       2,
+       5
+      ]
+     },
+     {
+      "title": "Reducing food waste",
+      "recording": "b2-lesson2",
+      "keywords": [
+       {
+        "word": "produce",
+        "meaning": "sản xuất"
+       },
+       {
+        "word": "wealthy",
+        "meaning": "giàu có"
+       },
+       {
+        "word": "label",
+        "meaning": "nhãn"
+       },
+       {
+        "word": "quality",
+        "meaning": "chất lượng"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "What is the talk mainly about?",
+       "options": [
+        {
+         "text": "How to eat a healthy diet",
+         "isCorrect": false
+        },
+        {
+         "text": "How supermarkets set prices",
+         "isCorrect": false
+        },
+        {
+         "text": "Why food is wasted and how to reduce it",
+         "isCorrect": true
+        }
+       ],
+       "explanation": "It gives causes of food waste and ways to waste less."
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "Where does much food waste happen in wealthy countries?",
+        "options": [
+         {
+          "text": "In restaurants",
+          "isCorrect": false
+         },
+         {
+          "text": "On farms",
+          "isCorrect": false
+         },
+         {
+          "text": "At home",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"much of this waste happens at home.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What does 'best before' refer to?",
+        "options": [
+         {
+          "text": "Price",
+          "isCorrect": false
+         },
+         {
+          "text": "Quality",
+          "isCorrect": true
+         },
+         {
+          "text": "Safety",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"'Best before' only refers to quality.\""
+       }
+      ],
+      "close": [
+       1,
+       4
+      ]
+     },
+     {
+      "title": "A customer complaint",
+      "recording": "b2-lesson3",
+      "keywords": [
+       {
+        "word": "order",
+        "meaning": "đơn hàng"
+       },
+       {
+        "word": "parcel",
+        "meaning": "bưu kiện"
+       },
+       {
+        "word": "apologise",
+        "meaning": "xin lỗi"
+       },
+       {
+        "word": "tracking number",
+        "meaning": "mã theo dõi"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "Why is the woman calling?",
+       "options": [
+        {
+         "text": "Her order hasn't arrived",
+         "isCorrect": true
+        },
+        {
+         "text": "She wants to cancel an order",
+         "isCorrect": false
+        },
+        {
+         "text": "She was charged twice",
+         "isCorrect": false
+        }
+       ],
+       "explanation": "\"I'm calling about an order … It still hasn't arrived.\""
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "What went wrong?",
+        "options": [
+         {
+          "text": "The order number was wrong",
+          "isCorrect": false
+         },
+         {
+          "text": "The parcel went to her old address",
+          "isCorrect": true
+         },
+         {
+          "text": "The parcel was damaged",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"the parcel was sent to your old address.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How will the new parcel be sent?",
+        "options": [
+         {
+          "text": "By normal post",
+          "isCorrect": false
+         },
+         {
+          "text": "She must collect it",
+          "isCorrect": false
+         },
+         {
+          "text": "By express delivery at no cost",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"by express delivery, free of charge.\""
+       }
+      ],
+      "close": [
+       4,
+       5
+      ]
+     }
+    ],
+    "check": [
+     {
+      "recording": "b2-check",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "What is the news about?",
+        "options": [
+         {
+          "text": "A new bus service",
+          "isCorrect": false
+         },
+         {
+          "text": "A cycling race",
+          "isCorrect": false
+         },
+         {
+          "text": "Changes to a bike-sharing scheme",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"its bike-sharing scheme will double in size.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How long has the scheme existed?",
+        "options": [
+         {
+          "text": "Two years",
+          "isCorrect": true
+         },
+         {
+          "text": "Five years",
+          "isCorrect": false
+         },
+         {
+          "text": "One year",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"Since it started two years ago.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What do some residents complain about?",
+        "options": [
+         {
+          "text": "There are not enough bikes",
+          "isCorrect": false
+         },
+         {
+          "text": "Bikes block pavements",
+          "isCorrect": true
+         },
+         {
+          "text": "Bikes are too expensive",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"bikes are often left blocking pavements.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What will riders have to do?",
+        "options": [
+         {
+          "text": "Register online",
+          "isCorrect": false
+         },
+         {
+          "text": "End journeys at official parking points",
+          "isCorrect": true
+         },
+         {
+          "text": "Wear helmets",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"end their journeys at official parking points, or pay a fine.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What is said about the electric bikes?",
+        "options": [
+         {
+          "text": "They will cost slightly more",
+          "isCorrect": true
+         },
+         {
+          "text": "They will only run at weekends",
+          "isCorrect": false
+         },
+         {
+          "text": "They will be free for students",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"which will cost slightly more to rent.\""
+       }
+      ]
+     }
+    ]
+   },
+   "levelTest": {
+    "title": "B2 listening test",
+    "sections": [
+     {
+      "recording": "b2-test1",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "What are they discussing?",
+        "options": [
+         {
+          "text": "A project budget report",
+          "isCorrect": false
+         },
+         {
+          "text": "Which candidate to hire",
+          "isCorrect": true
+         },
+         {
+          "text": "A new training course",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"Who do you think we should hire?\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What is Daniel's strength?",
+        "options": [
+         {
+          "text": "He seemed more enthusiastic",
+          "isCorrect": true
+         },
+         {
+          "text": "He has more experience",
+          "isCorrect": false
+         },
+         {
+          "text": "He already knows the project",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"Daniel seemed more enthusiastic about the role.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What is the problem with Clara?",
+        "options": [
+         {
+          "text": "Her salary request is too high",
+          "isCorrect": true
+         },
+         {
+          "text": "She can't start in three weeks",
+          "isCorrect": false
+         },
+         {
+          "text": "She has no experience",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"Clara asked for a salary well above our budget.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What will happen if Clara refuses the offer?",
+        "options": [
+         {
+          "text": "The job will go to Daniel",
+          "isCorrect": true
+         },
+         {
+          "text": "They will raise the budget",
+          "isCorrect": false
+         },
+         {
+          "text": "They will interview again",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"If she says no, we'll offer the job to Daniel.\""
+       }
+      ]
+     },
+     {
+      "recording": "b2-test2",
+      "questions": [
+       {
+        "skill": "detail",
+        "prompt": "What did scientists use to believe?",
+        "options": [
+         {
+          "text": "Sleep improved eyesight",
+          "isCorrect": false
+         },
+         {
+          "text": "Sleep was not necessary",
+          "isCorrect": false
+         },
+         {
+          "text": "Sleep was just a time for the body to rest",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"sleep was simply a time for the body to rest.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What happens during deep sleep?",
+        "options": [
+         {
+          "text": "The heart stops for a while",
+          "isCorrect": false
+         },
+         {
+          "text": "The brain removes waste products",
+          "isCorrect": true
+         },
+         {
+          "text": "The body grows taller",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"During deep sleep, it removes waste products.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "How much sleep do adults need?",
+        "options": [
+         {
+          "text": "Seven to nine hours",
+          "isCorrect": true
+         },
+         {
+          "text": "Five to six hours",
+          "isCorrect": false
+         },
+         {
+          "text": "Ten to twelve hours",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"between seven and nine hours a night.\""
+       },
+       {
+        "skill": "inference",
+        "prompt": "What can we conclude about many adults?",
+        "options": [
+         {
+          "text": "They sleep only during the day",
+          "isCorrect": false
+         },
+         {
+          "text": "They don't get enough sleep",
+          "isCorrect": true
+         },
+         {
+          "text": "They sleep too much",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"a third of adults regularly sleep less than that.\""
+       }
+      ]
+     }
+    ]
+   },
+   "placement": {
+    "recording": "b2-check",
+    "questions": [
+     {
+      "skill": "detail",
+      "prompt": "When will the scheme double in size?",
+      "options": [
+       {
+        "text": "Next spring",
+        "isCorrect": true
+       },
+       {
+        "text": "Next month",
+        "isCorrect": false
+       },
+       {
+        "text": "In two years",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "\"will double in size next spring.\""
+     },
+     {
+      "skill": "detail",
+      "prompt": "How many journeys has the scheme recorded?",
+      "options": [
+       {
+        "text": "More than a million",
+        "isCorrect": true
+       },
+       {
+        "text": "About a thousand",
+        "isCorrect": false
+       },
+       {
+        "text": "Exactly two million",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "\"more than a million journeys.\""
+     },
+     {
+      "skill": "inference",
+      "prompt": "What do supporters believe?",
+      "options": [
+       {
+        "text": "The fines are unfair",
+        "isCorrect": false
+       },
+       {
+        "text": "Bikes will become cheaper",
+        "isCorrect": false
+       },
+       {
+        "text": "Fewer people will drive",
+        "isCorrect": true
+       }
+      ],
+      "explanation": "\"encourage more people to leave their cars at home.\""
+     }
+    ]
+   }
+  },
+  {
+   "level": "C1",
+   "unit": {
+    "title": "Ideas and arguments",
+    "description": "Green cities, a negotiation and algorithms in hiring.",
+    "lessons": [
+     {
+      "title": "Green spaces in cities",
+      "recording": "c1-lesson1",
+      "keywords": [
+       {
+        "word": "infrastructure",
+        "meaning": "cơ sở hạ tầng"
+       },
+       {
+        "word": "defend",
+        "meaning": "bảo vệ (quan điểm)"
+       },
+       {
+        "word": "heatwave",
+        "meaning": "đợt nắng nóng"
+       },
+       {
+        "word": "disused",
+        "meaning": "bỏ hoang, không dùng nữa"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "What is the speaker's main argument?",
+       "options": [
+        {
+         "text": "Green spaces are essential, not optional",
+         "isCorrect": true
+        },
+        {
+         "text": "Parks are too expensive to maintain",
+         "isCorrect": false
+        },
+        {
+         "text": "Cities should stop building railways",
+         "isCorrect": false
+        }
+       ],
+       "explanation": "Treating parks as \"a pleasant extra\" is \"increasingly hard to defend.\""
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "What benefit of trees is mentioned?",
+        "options": [
+         {
+          "text": "They increase land prices",
+          "isCorrect": false
+         },
+         {
+          "text": "They attract tourists",
+          "isCorrect": false
+         },
+         {
+          "text": "They lower street temperatures",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"Trees also lower street temperatures by several degrees.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "Why is it hard to create green spaces in city centres?",
+        "options": [
+         {
+          "text": "The land is very valuable",
+          "isCorrect": true
+         },
+         {
+          "text": "Trees grow badly in cities",
+          "isCorrect": false
+         },
+         {
+          "text": "People don't use parks",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"land in city centres is extremely valuable.\""
+       }
+      ],
+      "close": [
+       2,
+       4
+      ]
+     },
+     {
+      "title": "Negotiating a contract",
+      "recording": "c1-lesson2",
+      "keywords": [
+       {
+        "word": "anticipate",
+        "meaning": "dự tính"
+       },
+       {
+        "word": "flexibility",
+        "meaning": "sự linh hoạt"
+       },
+       {
+        "word": "commit to",
+        "meaning": "cam kết"
+       },
+       {
+        "word": "feasible",
+        "meaning": "khả thi"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "What is the conversation?",
+       "options": [
+        {
+         "text": "A negotiation over price and timing",
+         "isCorrect": true
+        },
+        {
+         "text": "A complaint about faulty software",
+         "isCorrect": false
+        },
+        {
+         "text": "A job interview",
+         "isCorrect": false
+        }
+       ],
+       "explanation": "They discuss the price, a longer contract and a deadline."
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "What could reduce the annual fee?",
+        "options": [
+         {
+          "text": "Using standard software",
+          "isCorrect": false
+         },
+         {
+          "text": "Paying in advance",
+          "isCorrect": false
+         },
+         {
+          "text": "A three-year contract",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"A longer commitment … we might reduce the annual fee.\""
+       },
+       {
+        "skill": "inference",
+        "prompt": "What does the man think of the deadline?",
+        "options": [
+         {
+          "text": "Impossible",
+          "isCorrect": false
+         },
+         {
+          "text": "Difficult but possible",
+          "isCorrect": true
+         },
+         {
+          "text": "Very easy",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"That's ambitious, but feasible.\""
+       }
+      ],
+      "close": [
+       3,
+       5
+      ]
+     },
+     {
+      "title": "Algorithms in hiring",
+      "recording": "c1-lesson3",
+      "keywords": [
+       {
+        "word": "algorithm",
+        "meaning": "thuật toán"
+       },
+       {
+        "word": "prejudice",
+        "meaning": "định kiến"
+       },
+       {
+        "word": "bias",
+        "meaning": "sự thiên lệch"
+       },
+       {
+        "word": "audit",
+        "meaning": "kiểm tra, đánh giá"
+       }
+      ],
+      "gist": {
+       "skill": "gist",
+       "prompt": "What is the talk mainly about?",
+       "options": [
+        {
+         "text": "Why companies should hire more athletes",
+         "isCorrect": false
+        },
+        {
+         "text": "How to write a good job application",
+         "isCorrect": false
+        },
+        {
+         "text": "The risks of hiring algorithms and how to control them",
+         "isCorrect": true
+        }
+       ],
+       "explanation": "It weighs supporters and critics, then asks \"how to audit them.\""
+      },
+      "detail": [
+       {
+        "skill": "detail",
+        "prompt": "What do critics say?",
+        "options": [
+         {
+          "text": "Algorithms are too expensive",
+          "isCorrect": false
+         },
+         {
+          "text": "Algorithms are too slow",
+          "isCorrect": false
+         },
+         {
+          "text": "Algorithms may repeat past biases",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"may simply learn to repeat past biases.\""
+       },
+       {
+        "skill": "inference",
+        "prompt": "What is the speaker's view?",
+        "options": [
+         {
+          "text": "The tools can be used but must be checked",
+          "isCorrect": true
+         },
+         {
+          "text": "The tools should be banned",
+          "isCorrect": false
+         },
+         {
+          "text": "The tools need no rules",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"not whether to use these tools, but how to audit them.\""
+       }
+      ],
+      "close": [
+       2,
+       4
+      ]
+     }
+    ],
+    "check": [
+     {
+      "recording": "c1-check",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "What is the interview about?",
+        "options": [
+         {
+          "text": "The history of an old town",
+          "isCorrect": false
+         },
+         {
+          "text": "The effects of tourism on a town",
+          "isCorrect": true
+         },
+         {
+          "text": "Planning a holiday",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "They discuss the good and bad sides of more visitors."
+       },
+       {
+        "skill": "detail",
+        "prompt": "How have visitor numbers changed?",
+        "options": [
+         {
+          "text": "They have doubled",
+          "isCorrect": false
+         },
+         {
+          "text": "They have fallen",
+          "isCorrect": false
+         },
+         {
+          "text": "They have tripled",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"visitor numbers triple in five years.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What economic benefit is mentioned?",
+        "options": [
+         {
+          "text": "Rents have fallen",
+          "isCorrect": false
+         },
+         {
+          "text": "There are fewer cars",
+          "isCorrect": false
+         },
+         {
+          "text": "Young people can find work locally",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"young people no longer need to leave to find work.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What has caused problems?",
+        "options": [
+         {
+          "text": "Hotels are closing",
+          "isCorrect": false
+         },
+         {
+          "text": "Many flats are rented to tourists",
+          "isCorrect": true
+         },
+         {
+          "text": "The old town is full of cars",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"so many flats are now let to tourists.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What has happened so far?",
+        "options": [
+         {
+          "text": "Nothing has changed",
+          "isCorrect": false
+         },
+         {
+          "text": "Rents have stopped rising",
+          "isCorrect": true
+         },
+         {
+          "text": "Rents have fallen sharply",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"rents have at least stopped rising.\""
+       }
+      ]
+     }
+    ]
+   },
+   "levelTest": {
+    "title": "C1 listening test",
+    "sections": [
+     {
+      "recording": "c1-test1",
+      "questions": [
+       {
+        "skill": "gist",
+        "prompt": "What are they discussing?",
+        "options": [
+         {
+          "text": "Changing a supplier",
+          "isCorrect": false
+         },
+         {
+          "text": "Puzzling survey results about a product",
+          "isCorrect": true
+         },
+         {
+          "text": "Hiring a researcher",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"something doesn't add up\" in the survey results."
+       },
+       {
+        "skill": "detail",
+        "prompt": "What seems contradictory?",
+        "options": [
+         {
+          "text": "Price matters to customers, but the cheapest product sells worst",
+          "isCorrect": true
+         },
+         {
+          "text": "The survey was too short",
+          "isCorrect": false
+         },
+         {
+          "text": "Customers complain about the staff",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"price is their main concern, yet our cheapest product is the one selling worst.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What is the woman's explanation?",
+        "options": [
+         {
+          "text": "It is too expensive",
+          "isCorrect": false
+         },
+         {
+          "text": "The packaging makes it look low quality",
+          "isCorrect": true
+         },
+         {
+          "text": "It is hard to find in stores",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"the packaging makes it look low quality.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What will they do?",
+        "options": [
+         {
+          "text": "Stop selling the product",
+          "isCorrect": false
+         },
+         {
+          "text": "Lower the price",
+          "isCorrect": false
+         },
+         {
+          "text": "Test new packaging in some stores",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"selling it in different packaging in a few stores for a month.\""
+       }
+      ]
+     },
+     {
+      "recording": "c1-test2",
+      "questions": [
+       {
+        "skill": "detail",
+        "prompt": "What did traditional economics assume?",
+        "options": [
+         {
+          "text": "People ignore prices",
+          "isCorrect": false
+         },
+         {
+          "text": "People make rational choices",
+          "isCorrect": true
+         },
+         {
+          "text": "People simply copy others",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"people make rational choices based on all available information.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What does the pension example show?",
+        "options": [
+         {
+          "text": "Higher pay increases saving",
+          "isCorrect": false
+         },
+         {
+          "text": "People dislike pensions",
+          "isCorrect": false
+         },
+         {
+          "text": "Defaults change behaviour",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"Nothing about the plan itself has changed; only the default has.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "Why do governments like nudges?",
+        "options": [
+         {
+          "text": "They force people to act",
+          "isCorrect": false
+         },
+         {
+          "text": "They raise taxes",
+          "isCorrect": false
+         },
+         {
+          "text": "They are cheap and keep freedom of choice",
+          "isCorrect": true
+         }
+        ],
+        "explanation": "\"because they are cheap and preserve freedom of choice.\""
+       },
+       {
+        "skill": "detail",
+        "prompt": "What do critics warn?",
+        "options": [
+         {
+          "text": "Nudges are too expensive",
+          "isCorrect": false
+         },
+         {
+          "text": "Nudges can be used to manipulate",
+          "isCorrect": true
+         },
+         {
+          "text": "Nudges never work",
+          "isCorrect": false
+         }
+        ],
+        "explanation": "\"can easily be used to manipulate rather than to help.\""
+       }
+      ]
+     }
+    ]
+   },
+   "placement": {
+    "recording": "c1-check",
+    "questions": [
+     {
+      "skill": "detail",
+      "prompt": "What does the tourist tax pay for?",
+      "options": [
+       {
+        "text": "New hotels",
+        "isCorrect": false
+       },
+       {
+        "text": "Street cleaning",
+        "isCorrect": false
+       },
+       {
+        "text": "Affordable housing",
+        "isCorrect": true
+       }
+      ],
+      "explanation": "\"a small tourist tax that funds affordable housing.\""
+     },
+     {
+      "skill": "detail",
+      "prompt": "Where is the cap on short-term rentals?",
+      "options": [
+       {
+        "text": "Near the airport",
+        "isCorrect": false
+       },
+       {
+        "text": "In the old town",
+        "isCorrect": true
+       },
+       {
+        "text": "Across the whole country",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "\"a cap on short-term rentals in the old town.\""
+     },
+     {
+      "skill": "inference",
+      "prompt": "What is the woman's attitude to the measures?",
+      "options": [
+       {
+        "text": "Strongly opposed",
+        "isCorrect": false
+       },
+       {
+        "text": "Cautiously positive",
+        "isCorrect": true
+       },
+       {
+        "text": "Completely satisfied",
+        "isCorrect": false
+       }
+      ],
+      "explanation": "\"It's early days, but rents have at least stopped rising.\""
+     }
+    ]
+   }
+  }
+ ]
+}
