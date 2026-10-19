@@ -9,6 +9,12 @@ import {
   adminAccountQuerySchema,
   adminAccountIdSchema,
   adminAccountUpdateSchema,
+  adminAccountActionSchema,
+  updateProfileSchema,
+  changePasswordSchema,
+  verifyPasswordSchema,
+  avatarUploadSchema,
+  profileIdsSchema,
 } from './auth.schemas.js';
 import { RegisterAccountDto, LoginDto } from './auth.dto.js';
 import { AuthError } from './auth.errors.js';
@@ -149,6 +155,82 @@ export class AuthController {
         throw this.normalizeError(error);
       }
     }
+  async adminAction(accountId, body, accessToken) {
+    try {
+      return this.envelope(await this.authService.adminAction(
+        accessToken,
+        adminAccountIdSchema.parse(accountId),
+        adminAccountActionSchema.parse(body),
+      ));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
+  async adminStats(accessToken) {
+    try {
+      return this.envelope(await this.authService.adminStats(accessToken));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
+  // Profile of the signed-in account (F09, D113).
+  async updateProfile(body, accessToken) {
+    try {
+      return this.envelope(await this.authService.updateProfile(
+        accessToken,
+        updateProfileSchema.parse(body),
+      ));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
+  async verifyPassword(body, accessToken) {
+    try {
+      return this.envelope(await this.authService.verifyPassword(
+        accessToken,
+        verifyPasswordSchema.parse(body),
+      ));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
+  async changePassword(body, accessToken, response) {
+    try {
+      return this.withCookies(
+        this.envelope(await this.authService.changePassword(
+          accessToken,
+          changePasswordSchema.parse(body),
+        )),
+        response,
+      );
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
+  async uploadAvatar(file, accessToken) {
+    try {
+      return this.envelope(await this.authService.uploadAvatar(accessToken, {
+        ...avatarUploadSchema.parse({ fileName: file?.fileName, mimeType: file?.mimeType }),
+        data: file?.data,
+      }));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
+  async removeAvatar(accessToken) {
+    try {
+      return this.envelope(await this.authService.removeAvatar(accessToken));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
+  async getProfiles(accountIds) {
+    try {
+      return this.envelope(await this.authService.getProfiles(profileIdsSchema.parse(accountIds)));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
   envelope(data) {
     return { code: 0, msg: 'success', data: data || {} };
   }
@@ -168,7 +250,11 @@ export class AuthController {
         {
           code: error.code,
           msg: 'fail',
-          data: error.nextAction ? { nextAction: error.nextAction } : {},
+          data: error.nextAction
+            ? { nextAction: error.nextAction }
+            : error.reason
+              ? { reason: error.reason }
+              : {},
         },
         error.status,
       );

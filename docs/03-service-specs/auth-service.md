@@ -27,6 +27,9 @@ No teacher/instructor or excluded product role is defined.
 - Refresh migration: `apps/auth-service/src/database/migrations/1710000001000-create-refresh-tokens.js`.
 - OTP migration: `apps/auth-service/src/database/migrations/1710000002000-add-auth-verification-otp.js`.
 - Account audit migration: `apps/auth-service/src/database/migrations/1710000003000-create-account-audits.js`.
+- Profile migration (F09, D113): `1710000004000-add-account-profile.js` adds `displayName`, `avatarUrl`, `avatarStorage`, `avatarStorageId` to `accounts`. `accountResponseSchema` (and so `Me`, login, verify) now carries `displayName` and `avatarUrl` (both nullable).
+- Admin management migration (D114): `1710000005000-add-account-admin-fields.js` adds `accounts.lastLoginAt`, `accounts.statusReason`, `account_audits.reason` and indexes on `createdAt`/`lastLoginAt`. `Login` and `VerifyEmail` record `lastLoginAt`; a DISABLED/SUSPENDED sign-in error carries `data.reason`.
+- Avatar files are not rows: `src/profile/avatar-storage.js` stores them locally (`AVATAR_LOCAL_ROOT`, served by `AvatarFilesController` at `GET /avatars/:name`) or on ImageKit (`/appenglish/avatar`).
 - Passwords are stored as scrypt-derived hashes; plaintext passwords are never persisted.
 
 ## API/events
@@ -46,9 +49,17 @@ D27); auth-service itself serves no HTTP `/auth/*` route.
 | GET | `/auth/me` | `Me` | Validate access cookie and return current account |
 | POST | `/auth/forgot-password` | `ForgotPassword` | Start password reset without email enumeration |
 | POST | `/auth/reset-password` | `ResetPassword` | Verify reset OTP and revoke sessions |
-| GET | `/auth/admin/accounts` | `AdminListAccounts` | ADMIN-only account list with email/role/status filters and pagination |
-| GET | `/auth/admin/accounts/:id` | `AdminGetAccount` | ADMIN-only safe account detail |
-| PATCH | `/auth/admin/accounts/:id` | `AdminUpdateAccount` | ADMIN-only role/status update; invalidates sessions and writes audit |
+| GET | `/auth/admin/accounts` | `AdminListAccounts` | ADMIN-only account list: `email` or `search` (email or display name), `role`, `status`, `stale=true` (pending for over 7 days), `sort` (newest, oldest, lastLogin, email), pagination |
+| GET | `/auth/admin/accounts/:id` | `AdminGetAccount` | ADMIN-only account page (D114): `account` (with `displayName`, `avatarUrl`, `emailVerifiedAt`, `lastLoginAt`, `statusReason`), `activeSessions` (live refresh-token families) and `audits[]` (newest 50, with `actor` and `reason`) |
+| PATCH | `/auth/admin/accounts/:id` | `AdminUpdateAccount` | ADMIN-only role/status update; `reason` (max 300) is required when the status becomes DISABLED or SUSPENDED (400 code 29 otherwise), stored as `statusReason` and in the audit; invalidates sessions |
+| GET | `/auth/admin/accounts/stats` | `AdminAccountStats` | ADMIN-only numbers (D114): `total`, `byStatus`, `byRole`, `activeLast7Days`, `stalePending`, `newPerDay[]` (last 30 days), `days` |
+| POST | `/auth/admin/accounts/:id/actions` | `AdminAccountAction` | ADMIN-only `{ action, reason? }` with action in `AdminAccountAction` (REVOKE_SESSIONS, SEND_PASSWORD_RESET, REMOVE_AVATAR, RESET_DISPLAY_NAME); each writes an audit row; returns `{ account, changed }` |
+| PATCH | `/auth/profile` | `UpdateProfile` | Signed-in account's display name (`{ displayName }`, trimmed, max 50, empty clears; D113) |
+| POST | `/auth/profile/password/verify` | `VerifyPassword` | `{ currentPassword }`; step 1 of the password change (D113): 200 `{ verified: true }` or 400 code 27; changes nothing |
+| POST | `/auth/profile/password` | `ChangePassword` | `{ currentPassword, newPassword }`; wrong current password is 400 code 27; success bumps `sessionVersion`, revokes every refresh session and sets fresh cookies for this device |
+| POST | `/auth/profile/avatar` | `UploadAvatar` | Multipart `file` (JPEG/PNG/WebP, max `AVATAR_MAX_FILE_SIZE_BYTES`); stores it (local or ImageKit, D68), replaces and deletes the previous file; errors are 400 code 28 with `data.reason` |
+| DELETE | `/auth/profile/avatar` | `RemoveAvatar` | Clears the avatar and deletes its file |
+| — | (gateway-internal) | `GetProfiles` | `{ accountIds[] }` → `{ profiles: [{ id, displayName, avatarUrl }] }`; `displayName` falls back to the email local part; never returns the email. Used by the gateway to decorate `/learning/lessons/:id/ranking` and `/progress/leaderboard` |
 
 Registration accepts `{ email, password }`, creates `PENDING_VERIFICATION`, and
 sends a six-digit OTP. A public request cannot select `CONTENT_MANAGER` or
@@ -136,6 +147,7 @@ cannot create an administrator.
   `AUTH_COOKIE_SECURE`, `AUTH_COOKIE_SAMESITE`, `AUTH_COOKIE_PATH`.
 - `AUTH_OTP_SECRET` and backend-only `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`,
   `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`.
+- Avatars (F09): `AVATAR_STORAGE_ADAPTER` (`local` default, or `imagekit` with the `IMAGEKIT_*` keys), `AVATAR_LOCAL_ROOT`, `AVATAR_LOCAL_PUBLIC_URL`, `AVATAR_MAX_FILE_SIZE_BYTES`. `@imagekit/nodejs` is loaded only when the ImageKit adapter is enabled.
 - No direct database access is added to the gateway or web client.
 
 ## Kiểm thử
@@ -159,7 +171,9 @@ cannot create an administrator.
 - Web client `src/lib/api/session-refresh.test.js`: single refresh + replay on
   401, shared refresh for concurrent 401s, no loop when refresh fails, no refresh
   for session-creating routes.
-- The twelve routes in the table above are registered in
+- `apps/auth-service/test/profile.test.js` (F09): display name save/clear and validation, password change (wrong current password, session version, refresh revocation, fresh cookies), avatar validation/store/replace/remove with a temporary local storage, public profiles without email, gateway `attachProfiles` with and without auth-service, storage factory.
+- `apps/auth-service/test/admin-management.test.js` (D114): reason required to lock, stored and shown at sign-in, cleared on unlock; account page with sessions and audit trail; the four one-off actions and their audit rows; statistics are admin-only.
+- The nineteen routes in the table above are registered in
   `apps/api-gateway/src/auth/auth-gateway.controller.js`; their RPC handlers are
   in `apps/auth-service/src/auth/auth.grpc.controller.js`, which delegates to the
   transport-agnostic handlers in `auth.controller.js`.

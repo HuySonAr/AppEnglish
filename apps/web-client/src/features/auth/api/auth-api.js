@@ -46,3 +46,29 @@ export async function getAdminAccount(id) {
 export async function updateAdminAccount(id, payload) {
   return (await httpClient.patch(`/auth/admin/accounts/${id}`, payload)).data;
 }
+// Admin account management (D114).
+export async function getAdminAccountStats() {
+  return (await httpClient.get('/auth/admin/accounts/stats')).data;
+}
+export async function adminAccountAction(id, payload) {
+  return (await httpClient.post(`/auth/admin/accounts/${id}/actions`, payload)).data;
+}
+
+// Profile of the signed-in account (F09, D113).
+export async function updateProfile(payload) {
+  return (await httpClient.patch('/auth/profile', payload)).data;
+}
+export async function verifyPassword(payload) {
+  return (await httpClient.post('/auth/profile/password/verify', payload)).data;
+}
+export async function changePassword(payload) {
+  return (await httpClient.post('/auth/profile/password', payload)).data;
+}
+export async function uploadAvatar(file) {
+  const form = new FormData();
+  form.set('file', file);
+  return (await httpClient.post('/auth/profile/avatar', form, { timeout: 60000 })).data;
+}
+export async function removeAvatar() {
+  return (await httpClient.delete('/auth/profile/avatar')).data;
+}

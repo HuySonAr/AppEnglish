@@ -2,6 +2,7 @@ import { accountResponseSchema, authResponseSchema } from './auth.schemas.js';
 import { authErrors } from './auth.errors.js';
 import { AccountResponseDto } from './auth.dto.js';
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
+import { ADMIN_AUDIT_LIMIT, ADMIN_STATS_DAYS, AccountAuditAction, AdminAccountAction, displayNameOf } from '@appenglish/auth-contracts';
 import { AccountRole, AccountStatus } from './auth.constants.js';
 import {
   NextAction,
@@ -17,12 +18,14 @@ export class AuthService {
     tokenService,
     emailService,
     authorizationService,
+    avatarStorage,
   ) {
     this.accountRepository = accountRepository;
     this.passwordService = passwordService;
     this.tokenService = tokenService;
     this.emailService = emailService;
     this.authorizationService = authorizationService;
+    this.avatarStorage = avatarStorage;
   }
 
   async register(input) {
@@ -73,7 +76,18 @@ export class AuthService {
     this.assertLoginStatus(account);
     if (account.status !== AccountStatus.ACTIVE)
       throw authErrors.emailNotVerified();
+    await this.recordLogin(account);
     return this.createSessionResponse(account);
+  }
+
+  // The last sign-in (D114); a failure to note it never blocks the sign-in.
+  async recordLogin(account) {
+    account.lastLoginAt = new Date();
+    try {
+      await this.accountRepository.updateLastLogin?.(account.id, account.lastLoginAt);
+    } catch {
+      // Statistics only.
+    }
   }
 
   async verifyEmail(input) {
@@ -97,6 +111,7 @@ export class AuthService {
     await this.verifyOtp(account, OtpPurpose.VERIFY_EMAIL, input.otp);
     account.status = AccountStatus.ACTIVE;
     account.emailVerifiedAt = new Date();
+    account.lastLoginAt = new Date();
     await this.accountRepository.createAccount(account);
     return this.createSessionResponse(account);
   }
@@ -238,11 +253,12 @@ export class AuthService {
       .digest('hex');
   }
 
+  // A locked account is told why (the reason the admin gave, D114).
   assertLoginStatus(account) {
     if (account.status === AccountStatus.DISABLED)
-      throw authErrors.accountDisabled();
+      throw authErrors.accountDisabled(account.statusReason);
     if (account.status === AccountStatus.SUSPENDED)
-      throw authErrors.accountSuspended();
+      throw authErrors.accountSuspended(account.statusReason);
   }
 
   async me(accessToken) {
@@ -274,11 +290,87 @@ export class AuthService {
     };
   }
 
+  // The account page of the admin (D114): the account, its live sessions
+  // and its audit trail.
   async adminGet(accessToken, accountId) {
     await this.requireAdmin(accessToken);
     const account = await this.accountRepository.findAccountById(accountId);
     if (!account) throw authErrors.accountNotFound();
-    return { account: this.toAdminResponse(account) };
+    const [activeSessions, audits] = await Promise.all([
+      this.accountRepository.countActiveSessions?.(account.id) ?? 0,
+      this.accountRepository.listAudits?.(account.id, ADMIN_AUDIT_LIMIT) ?? [],
+    ]);
+    return {
+      account: this.toAdminResponse(account),
+      activeSessions,
+      audits: audits.map((audit) => ({
+        id: audit.id,
+        action: audit.action,
+        actorId: audit.actorId,
+        actor: audit.actorId === account.id ? 'self' : audit.actorDisplayName || audit.actorEmail || null,
+        previousRole: audit.previousRole || null,
+        nextRole: audit.nextRole || null,
+        previousStatus: audit.previousStatus || null,
+        nextStatus: audit.nextStatus || null,
+        reason: audit.reason || null,
+        createdAt: new Date(audit.createdAt).toISOString(),
+      })),
+    };
+  }
+
+  // One-off admin actions on an account (D114), each written to the audit.
+  async adminAction(accessToken, accountId, { action, reason }) {
+    const actor = await this.requireAdmin(accessToken);
+    const target = await this.accountRepository.findAccountById(accountId);
+    if (!target) throw authErrors.accountNotFound();
+    const audit = (auditAction) => ({
+      actorId: actor.id,
+      targetAccountId: target.id,
+      action: auditAction,
+      previousRole: target.role,
+      nextRole: target.role,
+      previousStatus: target.status,
+      nextStatus: target.status,
+      reason: reason || null,
+    });
+    if (action === AdminAccountAction.REVOKE_SESSIONS) {
+      target.sessionVersion = (target.sessionVersion || 0) + 1;
+      await this.accountRepository.updateAccountAndAudit(target, audit(AccountAuditAction.SESSIONS_REVOKED));
+      return { account: this.toAdminResponse(target), changed: true };
+    }
+    if (action === AdminAccountAction.SEND_PASSWORD_RESET) {
+      if (target.status !== AccountStatus.ACTIVE) throw authErrors.emailVerificationRequired();
+      await this.issueOtp(target, OtpPurpose.RESET_PASSWORD);
+      await this.accountRepository.saveAudit(audit(AccountAuditAction.PASSWORD_RESET_SENT));
+      return { account: this.toAdminResponse(target), changed: true, expiresInSeconds: 300 };
+    }
+    if (action === AdminAccountAction.REMOVE_AVATAR) {
+      const previous = this.avatarAsset(target);
+      if (!previous && !target.avatarUrl) return { account: this.toAdminResponse(target), changed: false };
+      target.avatarUrl = null;
+      target.avatarStorage = null;
+      target.avatarStorageId = null;
+      await this.accountRepository.saveAccount(target);
+      await this.accountRepository.saveAudit(audit(AccountAuditAction.AVATAR_REMOVED));
+      if (previous) await this.avatarStorage?.delete(previous).catch(() => {});
+      return { account: this.toAdminResponse(target), changed: true };
+    }
+    if (action === AdminAccountAction.RESET_DISPLAY_NAME) {
+      if (!target.displayName) return { account: this.toAdminResponse(target), changed: false };
+      target.displayName = null;
+      await this.accountRepository.saveAccount(target);
+      await this.accountRepository.saveAudit(audit(AccountAuditAction.DISPLAY_NAME_RESET));
+      return { account: this.toAdminResponse(target), changed: true };
+    }
+    throw authErrors.unauthorized();
+  }
+
+  // The numbers of the accounts page (D114): totals by status and role, who
+  // signed in this week, stale pending accounts, and sign-ups per day.
+  async adminStats(accessToken) {
+    await this.requireAdmin(accessToken);
+    const stats = await this.accountRepository.accountStats();
+    return { ...stats, days: ADMIN_STATS_DAYS };
   }
 
   async adminUpdate(accessToken, accountId, changes) {
@@ -302,9 +394,13 @@ export class AuthService {
     }
     if (nextRole === target.role && nextStatus === target.status)
       return { account: this.toAdminResponse(target), changed: false };
+    // Locking an account needs a reason the person will be shown (D114).
+    const locking = nextStatus !== target.status && nextStatus !== AccountStatus.ACTIVE;
+    if (locking && !changes.reason) throw authErrors.reasonRequired();
     const previous = { role: target.role, status: target.status };
     target.role = nextRole;
     target.status = nextStatus;
+    if (nextStatus !== previous.status) target.statusReason = locking ? changes.reason : null;
     target.sessionVersion = (target.sessionVersion || 0) + 1;
     await this.accountRepository.updateAccountAndAudit(target, {
       actorId: actor.id,
@@ -319,8 +415,89 @@ export class AuthService {
       nextRole: target.role,
       previousStatus: previous.status,
       nextStatus: target.status,
+      reason: changes.reason || null,
     });
     return { account: this.toAdminResponse(target), changed: true };
+  }
+
+  // The account behind a session, as stored (for profile changes).
+  async requireAccount(accessToken) {
+    const { account } = await this.me(accessToken);
+    return this.accountRepository.findAccountById(account.id);
+  }
+
+  // Profile (F09, D113): a free display name; empty clears it.
+  async updateProfile(accessToken, changes) {
+    const account = await this.requireAccount(accessToken);
+    account.displayName = changes.displayName || null;
+    await this.accountRepository.saveAccount(account);
+    return { account: this.toResponse(account) };
+  }
+
+  // Step 1 of the password change (D113): is this the current password?
+  async verifyPassword(accessToken, { currentPassword }) {
+    const account = await this.requireAccount(accessToken);
+    if (!this.passwordService.verify(currentPassword, account.passwordHash))
+      throw authErrors.currentPasswordInvalid();
+    return { verified: true };
+  }
+
+  // Changing the password needs the current one, signs every other device
+  // out (session version and refresh families) and keeps this one signed in
+  // with fresh cookies.
+  async changePassword(accessToken, { currentPassword, newPassword }) {
+    const account = await this.requireAccount(accessToken);
+    if (!this.passwordService.verify(currentPassword, account.passwordHash))
+      throw authErrors.currentPasswordInvalid();
+    account.passwordHash = this.passwordService.hash(newPassword);
+    account.sessionVersion = (account.sessionVersion || 0) + 1;
+    await this.accountRepository.saveAccount(account);
+    await this.accountRepository.revokeAccountSessions(account.id);
+    const session = await this.createSessionResponse(account);
+    return { ...session, passwordChanged: true };
+  }
+
+  // A new avatar replaces the previous file (D68: ImageKit when enabled).
+  async uploadAvatar(accessToken, file) {
+    const account = await this.requireAccount(accessToken);
+    const stored = await this.avatarStorage.upload(file);
+    const previous = this.avatarAsset(account);
+    account.avatarUrl = stored.url;
+    account.avatarStorage = stored.storage;
+    account.avatarStorageId = stored.storageId;
+    await this.accountRepository.saveAccount(account);
+    if (previous) await this.avatarStorage.delete(previous).catch(() => {});
+    return { account: this.toResponse(account) };
+  }
+
+  async removeAvatar(accessToken) {
+    const account = await this.requireAccount(accessToken);
+    const previous = this.avatarAsset(account);
+    account.avatarUrl = null;
+    account.avatarStorage = null;
+    account.avatarStorageId = null;
+    await this.accountRepository.saveAccount(account);
+    if (previous) await this.avatarStorage.delete(previous).catch(() => {});
+    return { account: this.toResponse(account) };
+  }
+
+  avatarAsset(account) {
+    return account.avatarStorage && account.avatarStorageId
+      ? { storage: account.avatarStorage, storageId: account.avatarStorageId }
+      : null;
+  }
+
+  // Public profiles for rankings: name and avatar only, never the email.
+  async getProfiles(accountIds) {
+    const ids = [...new Set(accountIds)];
+    const accounts = ids.length ? await this.accountRepository.findAccountsByIds(ids) : [];
+    return {
+      profiles: accounts.map((account) => ({
+        id: account.id,
+        displayName: displayNameOf(account),
+        avatarUrl: account.avatarUrl || null,
+      })),
+    };
   }
 
   async requireAdmin(accessToken) {
@@ -403,6 +580,8 @@ export class AuthService {
         role: account.role,
         status: account.status,
         createdAt: new Date(account.createdAt).toISOString(),
+        displayName: account.displayName || null,
+        avatarUrl: account.avatarUrl || null,
       }),
     );
   }
@@ -413,6 +592,8 @@ export class AuthService {
       emailVerifiedAt: account.emailVerifiedAt
         ? new Date(account.emailVerifiedAt).toISOString()
         : null,
+      lastLoginAt: account.lastLoginAt ? new Date(account.lastLoginAt).toISOString() : null,
+      statusReason: account.statusReason || null,
     };
   }
 }

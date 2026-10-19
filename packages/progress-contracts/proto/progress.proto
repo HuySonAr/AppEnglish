@@ -13,6 +13,8 @@ service ProgressService {
   // Student: XP from mock tests (F07, D63) and the XP leaderboard (D39).
   rpc GetXp(ProgressRequest) returns (ProgressReply);
   rpc GetLeaderboard(ProgressRequest) returns (ProgressReply);
+  // Admin (D114): one learner's progress and XP, read-only; id = the learner.
+  rpc GetLearnerSummary(ProgressRequest) returns (ProgressReply);
 }
 
 // The authenticated account as verified by auth-service.

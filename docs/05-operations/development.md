@@ -87,6 +87,31 @@ The current official Node SDK/upload documentation was checked for the
 server-side integration. Protected audio delivery is intentionally not claimed
 until ImageKit's current private-file/signed-URL documentation is verified.
 
+## Health endpoints
+
+`GET /health` (gateway alive), `GET /health/ready` (gateway + auth-service +
+its database) and `GET /health/services` (every backend service, for the
+admin dashboard, D115) are served by the gateway on `GATEWAY_PORT`. The
+services probe reaches content-, learning- and progress-service on their
+`*_SERVICE_PORT` HTTP ports, so those ports must match `.env` on the machine
+that runs the gateway.
+
+## Avatars (F09, D113)
+
+Profile pictures are handled by auth-service, apart from the content media.
+Development defaults to `AVATAR_STORAGE_ADAPTER=local`: files go under
+`AVATAR_LOCAL_ROOT` (`storage/avatars`, ignored by git) and auth-service serves
+them at `AVATAR_LOCAL_PUBLIC_URL` (`http://localhost:3001/avatars`). Set
+`AVATAR_STORAGE_ADAPTER=imagekit` with the `IMAGEKIT_*` keys to store them on
+ImageKit under `/appenglish/avatar` (D68). `AVATAR_MAX_FILE_SIZE_BYTES`
+(default 2 MB) is the backend limit; the web client crops and shrinks the
+picture to 256px before uploading. Run the auth migrations once after pulling
+this feature:
+
+```powershell
+pnpm --filter @appenglish/auth-service migration:run
+```
+
 ## Docker Compose
 Dùng file Compose và service names có sẵn trong repository. Chỉ khởi chạy Redis và RabbitMQ; không dùng lệnh compose khởi chạy PostgreSQL. Trước khi chạy, kiểm tra compose config để chắc chắn service/volume/port mappings không kéo theo database container.
 

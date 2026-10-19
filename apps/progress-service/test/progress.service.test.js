@@ -109,3 +109,18 @@ test('a mini test or an unknown type is ignored; a malformed message is refused'
   await assert.rejects(() => service.applyResult(message(LESSON_COMPLETED, { accountId: student.id })), { name: 'ZodError' });
   await assert.rejects(() => service.applyResult(message(LESSON_TEST_SUBMITTED, { ...lessonTest(student.id, randomUUID(), { listening: 1, reading: 1 }), listeningCorrect: -1 })), { name: 'ZodError' });
 });
+
+test('an admin reads the progress and XP of one learner; others cannot; the id must be a UUID (D114)', async () => {
+  const { service, content } = progressHarness([2]);
+  const admin = { id: '33333333-3333-4333-8333-333333333333', role: 'ADMIN' };
+  await service.applyResult(message(LESSON_COMPLETED, { accountId: student.id, lessonId: content.lessons[0].id, completedAt: '2026-10-17T08:00:00.000Z' }));
+  const summary = await service.getLearnerSummary(admin, student.id);
+  assert.equal(summary.learnerId, student.id);
+  assert.equal(summary.progress.completion.completedLessons, 1);
+  assert.deepEqual([summary.xp.totalXp, summary.xp.rank], [0, null]);
+  // A learner without anything yet still answers.
+  assert.equal((await service.getLearnerSummary(admin, otherStudent.id)).progress.completion.completedLessons, 0);
+  await assert.rejects(() => service.getLearnerSummary(student, otherStudent.id), { code: 26 });
+  await assert.rejects(() => service.getLearnerSummary(manager, otherStudent.id), { code: 26 });
+  await assert.rejects(() => service.getLearnerSummary(admin, 'not-a-uuid'), { name: 'ZodError' });
+});

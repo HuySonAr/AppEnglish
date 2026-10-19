@@ -18,6 +18,19 @@ service AuthService {
   rpc AdminListAccounts(AdminListAccountsRequest) returns (AuthReply);
   rpc AdminGetAccount(AdminGetAccountRequest) returns (AuthReply);
   rpc AdminUpdateAccount(AdminUpdateAccountRequest) returns (AuthReply);
+  // Admin account management (D114): one-off actions on an account, and the
+  // numbers behind the accounts page.
+  rpc AdminAccountAction(AdminAccountActionRequest) returns (AuthReply);
+  rpc AdminAccountStats(AccessRequest) returns (AuthReply);
+  // Profile of the signed-in account (F09, D113).
+  rpc UpdateProfile(UpdateProfileRequest) returns (AuthReply);
+  rpc VerifyPassword(ChangePasswordRequest) returns (AuthReply);
+  rpc ChangePassword(ChangePasswordRequest) returns (AuthReply);
+  rpc UploadAvatar(UploadAvatarRequest) returns (AuthReply);
+  rpc RemoveAvatar(AccessRequest) returns (AuthReply);
+  // Gateway-internal: the public profile (name, avatar) of several accounts,
+  // for rankings. Takes no session and is not exposed as a route.
+  rpc GetProfiles(GetProfilesRequest) returns (AuthReply);
   rpc Ready(ReadyRequest) returns (AuthReply);
 }
 
@@ -73,6 +86,41 @@ message AdminUpdateAccountRequest {
   string account_id = 2;
   string role = 3;
   string status = 4;
+  // Why the status changes; required when an account is disabled or suspended (D114).
+  string reason = 5;
+}
+
+message AdminAccountActionRequest {
+  string access_token = 1;
+  string account_id = 2;
+  // One of AdminAccountAction in @appenglish/auth-contracts.
+  string action = 3;
+  string reason = 4;
+}
+
+message UpdateProfileRequest {
+  string access_token = 1;
+  // The payload as JSON ({ displayName }), so an empty name (clear it) stays
+  // distinct from a name not sent.
+  string payload_json = 2;
+}
+
+// VerifyPassword sends only current_password.
+message ChangePasswordRequest {
+  string access_token = 1;
+  string current_password = 2;
+  string new_password = 3;
+}
+
+message UploadAvatarRequest {
+  string access_token = 1;
+  string file_name = 2;
+  string mime_type = 3;
+  bytes data = 4;
+}
+
+message GetProfilesRequest {
+  repeated string account_ids = 1;
 }
 
 message ReadyRequest {}

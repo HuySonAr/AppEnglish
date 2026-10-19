@@ -11,6 +11,7 @@ const rpcs = {
   GetProgress: { run: (service, { actor }) => service.getProgress(actor) },
   GetXp: { run: (service, { actor }) => service.getXp(actor) },
   GetLeaderboard: { run: (service, { actor }) => service.getLeaderboard(actor) },
+  GetLearnerSummary: { run: (service, { actor, id }) => service.getLearnerSummary(actor, id) },
 };
 
 export class ProgressGrpcController {
@@ -22,7 +23,7 @@ export class ProgressGrpcController {
   // gRPC error and the gateway answers 500.
   async handle(spec, request) {
     try {
-      const data = await spec.run(this.progressService, { actor: actorSchema.parse(request.actor) });
+      const data = await spec.run(this.progressService, { actor: actorSchema.parse(request.actor), id: request.id || '' });
       return this.toReply(200, ProgressResponseCode.SUCCESS, 'success', data);
     } catch (error) {
       if (error instanceof ProgressError) return this.toReply(error.status, error.code, 'fail', error.data);

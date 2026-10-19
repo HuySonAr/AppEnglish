@@ -33,11 +33,16 @@ nhận bằng pgAdmin/DBeaver.
 
 `auth-service` owns `accounts`, `refresh_tokens`, `otp_challenges` and
 `account_audits` in `app_identity` (entities under
-`apps/auth-service/src/database/*.entity.js`, four migrations under
+`apps/auth-service/src/database/*.entity.js`, six migrations under
 `src/database/migrations/`). The append-only TypeORM migrations create
 refresh-token family/revocation, OTP challenge and account audit data without
 dropping existing tables. F01 does not access any other service
-database.
+database. F09 (D113) adds the nullable profile columns `displayName`,
+`avatarUrl`, `avatarStorage` and `avatarStorageId` to `accounts`
+(`1710000004000-add-account-profile.js`); avatar files are stored outside the
+database (ImageKit or `storage/avatars`). F01B's extension (D114) adds
+`accounts.lastLoginAt`, `accounts.statusReason` and `account_audits.reason`
+(`1710000005000-add-account-admin-fields.js`), six migrations in all.
 
 ## Service ngoài phạm vi
 Payment service không thuộc nghiệp vụ Reading/Listening hiện tại. Nếu repository có service này, không gán nó vào content/learning và không xóa service/schema hiện hữu tự động. Kiểm tra code, migrations và dependencies; ghi lại trạng thái hiện tại, sau đó chỉ loại bỏ khi có quyết định riêng. Nếu còn một service khác không có trong mapping, không tự tạo database cho nó: trước tiên xác minh trách nhiệm và quyết định owner.

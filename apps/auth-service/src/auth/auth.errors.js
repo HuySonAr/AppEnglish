@@ -15,7 +15,9 @@ export const authErrors = Object.freeze({
   accountNotFound: () => new AuthError(12, 'Account was not found', 404),
   emailNotVerified: () =>
     new AuthError(13, 'Email verification is required', 403, 'VERIFY_EMAIL'),
-  accountDisabled: () => new AuthError(14, 'Account is disabled', 403),
+  // reason: why an admin locked the account, shown to the person (D114).
+  accountDisabled: (reason) =>
+    Object.assign(new AuthError(14, 'Account is disabled', 403), { reason: reason || undefined }),
   otpInvalid: () => new AuthError(15, 'OTP is invalid', 400),
   otpExpired: () => new AuthError(16, 'OTP has expired', 400),
   otpAttemptsExceeded: () => new AuthError(17, 'OTP attempts exceeded', 429),
@@ -24,7 +26,8 @@ export const authErrors = Object.freeze({
   refreshTokenReuse: () =>
     new AuthError(20, 'Refresh token reuse detected', 401),
   sessionExpired: () => new AuthError(21, 'Session is expired or invalid', 401),
-  accountSuspended: () => new AuthError(22, 'Account is suspended', 403),
+  accountSuspended: (reason) =>
+    Object.assign(new AuthError(22, 'Account is suspended', 403), { reason: reason || undefined }),
   lastAdmin: () =>
     new AuthError(23, 'The last active administrator cannot be demoted or disabled', 409),
   emailVerificationRequired: () =>
@@ -34,4 +37,10 @@ export const authErrors = Object.freeze({
   invalidRole: () =>
     new AuthError(30, 'Role is not allowed for public registration', 403),
   emailSend: () => new AuthError(31, 'Unable to send verification email', 503),
+  reasonRequired: () =>
+    new AuthError(29, 'A reason is required to disable or suspend an account', 400),
+  currentPasswordInvalid: () =>
+    new AuthError(27, 'The current password is incorrect', 400),
+  avatarInvalid: (reason) =>
+    Object.assign(new AuthError(28, 'The avatar file is not allowed', 400), { reason }),
 });

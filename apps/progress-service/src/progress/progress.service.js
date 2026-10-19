@@ -4,7 +4,7 @@ import { LearningEventType, MockAttemptKind } from '@appenglish/learning-contrac
 import { LEADERBOARD_SIZE, ProgressSkill, ProgressSource } from '@appenglish/progress-contracts';
 import { progressErrors } from './progress.errors.js';
 import { completion, skillMastery } from './progress.rules.js';
-import { payloadSchemas, resultMessageSchema } from './progress.schemas.js';
+import { learnerIdSchema, payloadSchemas, resultMessageSchema } from './progress.schemas.js';
 import { earnsXp, rankTotals, xpOf } from './xp.rules.js';
 
 const logger = new Logger('ProgressService');
@@ -36,9 +36,22 @@ export class ProgressService {
 
   async getProgress(actor) {
     this.assertStudent(actor);
+    return this.progressOf(actor.id);
+  }
+
+  // Admin (D114): the progress and XP of one learner, read-only. The id must
+  // be a UUID; a learner without results simply has empty numbers.
+  async getLearnerSummary(actor, learnerId) {
+    if (actor.role !== AccountRole.ADMIN) throw progressErrors.forbiddenRole();
+    const id = learnerIdSchema.parse(learnerId);
+    const [progress, xp] = await Promise.all([this.progressOf(id), this.xpOf(id)]);
+    return { learnerId: id, progress, xp };
+  }
+
+  async progressOf(accountId) {
     const [results, completions, curriculum] = await Promise.all([
-      this.repository.listResults(actor.id),
-      this.repository.listCompletions(actor.id),
+      this.repository.listResults(accountId),
+      this.repository.listCompletions(accountId),
       this.contentClient.getCurriculum(),
     ]);
     return {
@@ -108,8 +121,12 @@ export class ProgressService {
   // came from, latest first.
   async getXp(actor) {
     this.assertStudent(actor);
-    const [entries, totals] = await Promise.all([this.repository.listXp(actor.id), this.repository.listXpTotals()]);
-    const own = rankTotals(totals).find((entry) => entry.accountId === actor.id) || null;
+    return this.xpOf(actor.id);
+  }
+
+  async xpOf(accountId) {
+    const [entries, totals] = await Promise.all([this.repository.listXp(accountId), this.repository.listXpTotals()]);
+    const own = rankTotals(totals).find((entry) => entry.accountId === accountId) || null;
     return {
       totalXp: own?.totalXp ?? 0,
       rank: own?.rank ?? null,

@@ -6,6 +6,7 @@ import { paginate } from '../../../lib/list.js';
 import { notify } from '../../../lib/notify.js';
 import { cn } from '../../../lib/utils.js';
 import { Badge, Button } from '../../../components/ui';
+import { Avatar } from '../../../components/shared/Avatar.jsx';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
 import { SearchField } from '../../../components/shared/ListFilter.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
@@ -100,7 +101,7 @@ export function LeaderboardPage() {
 
       <SearchField
         label="Search learners"
-        placeholder="Search by email…"
+        placeholder="Search by name…"
         value={search}
         onChange={(value) => {
           setSearch(value);
@@ -109,7 +110,7 @@ export function LeaderboardPage() {
       />
 
       {filtered.length === 0 ? (
-        <EmptyState icon={Trophy} title="No learner matches" description="Try another email." />
+        <EmptyState icon={Trophy} title="No learner matches" description="Try another name." />
       ) : (
         <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
           <div className="grid grid-cols-[3rem_1fr_6rem] gap-3 border-b bg-muted/40 px-4 py-2 text-sm font-medium text-muted-foreground sm:grid-cols-[3rem_1fr_7rem_6rem]">
@@ -130,7 +131,8 @@ export function LeaderboardPage() {
                   {entry.rank}
                 </span>
                 <span className="flex min-w-0 items-center gap-2">
-                  <span className="truncate">{entry.email || 'Learner'}</span>
+                  <Avatar account={entry} size="sm" />
+                  <span className="truncate">{entry.displayName || 'Learner'}</span>
                   {entry.isYou ? <Badge variant="info">You</Badge> : null}
                 </span>
                 <span className="hidden text-right text-sm text-muted-foreground tabular-nums sm:block">{entry.mockCount}</span>

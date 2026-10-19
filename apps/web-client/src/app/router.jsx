@@ -14,6 +14,7 @@ import { NotFoundPage } from '../features/auth/pages/NotFoundPage.jsx';
 import { StudentDashboardPage } from '../features/student/pages/StudentDashboardPage.jsx';
 import { AdminDashboardPage } from '../features/admin/pages/AdminDashboardPage.jsx';
 import { AdminAccountsPage } from '../features/admin/pages/AdminAccountsPage.jsx';
+import { AdminAccountDetailPage } from '../features/admin/pages/AdminAccountDetailPage.jsx';
 import { ContentManagerDashboardPage } from '../features/content-manager/pages/ContentManagerDashboardPage.jsx';
 import { ContentUnitsPage } from '../features/content-manager/pages/ContentUnitsPage.jsx';
 import { LessonEditorPage } from '../features/content-manager/pages/LessonEditorPage.jsx';
@@ -50,6 +51,7 @@ import { ListeningTopicsPage } from '../features/content-manager/pages/Listening
 import { VocabularyPracticePage } from '../features/student/pages/VocabularyPracticePage.jsx';
 import { ScoreConversionPage } from '../features/admin/pages/ScoreConversionPage.jsx';
 import { ExamTypesPage } from '../features/admin/pages/ExamTypesPage.jsx';
+import { ProfilePage } from '../features/profile/pages/ProfilePage.jsx';
 import { Roles } from '../constants/auth.js';
 import { dashboardPathForRole } from '../features/auth/flow/auth-flow.js';
 import { useAuth } from '../features/auth/context/AuthContext.jsx';
@@ -103,16 +105,19 @@ export function AppRouter() {
             <Route path="practice/listening/topics/:topicId" element={<ListeningTopicPage />} />
             <Route path="practice/listening/topics/:topicId/:mode" element={<ListeningExerciseListPage />} />
             <Route path="practice/listening/:exerciseId" element={<ListeningExercisePage />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
         </Route>
         <Route path="/admin" element={<RoleRoute allowedRole={Roles.ADMIN} />}>
           <Route element={<SidebarLayout role={Roles.ADMIN} />}>
             <Route index element={<AdminDashboardPage />} />
             <Route path="accounts" element={<AdminAccountsPage />} />
+            <Route path="accounts/:accountId" element={<AdminAccountDetailPage />} />
             <Route path="placement" element={<PlacementSettingsPage />} />
             <Route path="score-conversion" element={<ScoreConversionPage />} />
             <Route path="exam-types" element={<ExamTypesPage />} />
             <Route path="listening-topics" element={<ListeningTopicsPage eyebrow="Admin" />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
         </Route>
         <Route
@@ -132,6 +137,7 @@ export function AppRouter() {
             <Route path="listening-placement" element={<CoursePlacementManagePage />} />
             <Route path="listening-course/:itemId" element={<CourseItemEditorPage />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
         </Route>
       </Route>

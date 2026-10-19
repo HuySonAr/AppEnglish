@@ -108,7 +108,7 @@ for Students; `:id` is a lesson id.
 | POST | `/learning/lessons/:id/test/submit` | `SubmitLessonTest` | Scores and returns the result with the review |
 | POST | `/learning/lessons/:id/test/discard` | `DiscardLessonTest` | Removes the attempt in progress without scoring it (D82): `{ discarded: true }`; an attempt whose time ran out is scored instead and 56 is returned |
 | GET | `/learning/lessons/:id/test/review` and `/review/:attemptNumber` | `GetLessonTestReview` | One finished attempt (the latest, or the numbered one): correct answers, the learner's answers, explanations, transcripts |
-| GET | `/learning/lessons/:id/ranking` | `GetLessonRanking` | First attempts ranked: `{ total, entries (top 50), me }` |
+| GET | `/learning/lessons/:id/ranking` | `GetLessonRanking` | First attempts ranked: `{ total, entries (top 50), me }`; rows carry `accountId`, and the gateway replaces the service's `email` with `displayName` and `avatarUrl` from auth-service (D113) |
 
 Codes: 53 lesson not found, 54 lesson locked (`data.placementRequired`), 55 an
 earlier step is not finished (`data.step`), 56 no lesson test in progress.

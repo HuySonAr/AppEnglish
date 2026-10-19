@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { authFormSchema } from '../schemas/auth-schemas.js';
 import { AuthCard, AuthLink } from '../components/AuthCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { getApiErrorMessage } from '../../../lib/api/response.js';
+import { errorReason, getApiErrorMessage } from '../../../lib/api/response.js';
 import {
   dashboardPathForRole,
   isVerificationRequiredError,
@@ -12,6 +12,7 @@ import {
 import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui/button.jsx';
 import { Input } from '../../../components/ui/input.jsx';
+import { PasswordInput } from '../../../components/shared/PasswordInput.jsx';
 import { Label } from '../../../components/ui/label.jsx';
 
 export function LoginPage() {
@@ -35,9 +36,10 @@ export function LoginPage() {
         navigate('/verify-email', { state: { email: values.email } });
         return;
       }
+      const reason = errorReason(error);
       notify({
         title: 'Sign in failed',
-        description: getApiErrorMessage(error),
+        description: reason ? `${getApiErrorMessage(error)} Reason: ${reason}` : getApiErrorMessage(error),
         variant: 'destructive',
       });
     }
@@ -63,9 +65,9 @@ export function LoginPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
+            autoComplete="current-password"
             {...form.register('password')}
             disabled={form.formState.isSubmitting}
           />

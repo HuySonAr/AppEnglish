@@ -34,9 +34,15 @@ class FakeAuthController {
       ? { httpStatus: 200, code: 0, msg: 'success', dataJson: JSON.stringify({ account }), setCookies: [] }
       : { httpStatus: 401, code: 21, msg: 'fail', dataJson: '{}', setCookies: [] };
   }
+  // Public profiles for the board (D113): the learner has a display name.
+  getProfiles({ accountIds }) {
+    const profiles = accountIds.filter((id) => id === student.id).map((id) => ({ id, displayName: 'Learner One', avatarUrl: null }));
+    return { httpStatus: 200, code: 0, msg: 'success', dataJson: JSON.stringify({ profiles }), setCookies: [] };
+  }
 }
 Controller()(FakeAuthController);
 GrpcMethod(AUTH_GRPC_SERVICE, 'Me')(FakeAuthController.prototype, 'me', Object.getOwnPropertyDescriptor(FakeAuthController.prototype, 'me'));
+GrpcMethod(AUTH_GRPC_SERVICE, 'GetProfiles')(FakeAuthController.prototype, 'getProfiles', Object.getOwnPropertyDescriptor(FakeAuthController.prototype, 'getProfiles'));
 
 test('Gateway HTTP to progress-service gRPC contract', async (t) => {
   const { service, content } = progressHarness([2]);
@@ -88,8 +94,9 @@ test('Gateway HTTP to progress-service gRPC contract', async (t) => {
     assert.equal(xp.status, 200);
     assert.deepEqual([xp.body.data.totalXp, xp.body.data.rank, xp.body.data.entries.map((entry) => [entry.mockTestTitle, entry.xp])], [60, 1, [['Level 2 test', 60]]]);
     const board = await call('student', '/leaderboard');
-    assert.deepEqual(board.body.data.entries.map((entry) => [entry.rank, entry.email, entry.totalXp, entry.isYou]), [[1, 'learner@appenglish.test', 60, true]]);
-    assert.deepEqual([board.body.data.learnerCount, board.body.data.you.rank], [1, 1]);
+    // The gateway swaps the email for the learner's profile (D113).
+    assert.deepEqual(board.body.data.entries.map((entry) => [entry.rank, entry.displayName, entry.avatarUrl, entry.email, entry.totalXp, entry.isYou]), [[1, 'Learner One', null, undefined, 60, true]]);
+    assert.deepEqual([board.body.data.learnerCount, board.body.data.you.rank, board.body.data.you.displayName], [1, 1, 'Learner One']);
     assert.deepEqual([(await call('manager', '/xp')).status, (await call('manager', '/leaderboard')).status], [403, 403]);
 
     const forbidden = await call('manager');

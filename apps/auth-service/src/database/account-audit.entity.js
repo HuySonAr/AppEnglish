@@ -12,6 +12,7 @@ export const AccountAuditEntity = new EntitySchema({
     nextRole: { type: 'varchar', length: 32, nullable: true },
     previousStatus: { type: 'varchar', length: 32, nullable: true },
     nextStatus: { type: 'varchar', length: 32, nullable: true },
+    reason: { type: 'text', nullable: true },
     createdAt: { type: 'timestamptz', createDate: true },
   },
 });

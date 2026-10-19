@@ -1,5 +1,6 @@
 import { Trophy } from 'lucide-react';
 import { cn } from '../../../lib/utils.js';
+import { Avatar } from '../../../components/shared/Avatar.jsx';
 import { formatRemaining } from '../lib/placement.js';
 
 // Gold, silver, bronze for the first three places.
@@ -9,8 +10,8 @@ const medals = {
   3: 'bg-orange-400 text-orange-950',
 };
 
-// Learners of one lesson ranked by their first attempt at its test.
-// ranking is { total, entries, me } from the API.
+// Learners of one lesson ranked by their first attempt at its test, shown by
+// display name and avatar (D113). ranking is { total, entries, me } from the API.
 export function LessonRanking({ ranking }) {
   const rows = ranking.me && !ranking.entries.some((entry) => entry.isMe)
     ? [...ranking.entries, ranking.me]
@@ -55,9 +56,10 @@ export function LessonRanking({ ranking }) {
               >
                 {entry.rank}
               </span>
+              <Avatar account={entry} size="sm" />
               <span className="min-w-0 flex-1">
                 <span className={cn('block truncate text-sm', entry.isMe && 'font-semibold')}>
-                  {entry.email}
+                  {entry.displayName || 'Learner'}
                   {entry.isMe ? ' (you)' : ''}
                 </span>
                 <span className="block text-xs text-muted-foreground tabular-nums">

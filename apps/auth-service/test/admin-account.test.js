@@ -30,11 +30,12 @@ test('ADMIN can list and update safe account fields, audit changes, and revoke s
   const h = harness([admin, student]);
   const listed = await h.service.adminList(h.token(admin), { page: 1, pageSize: 20 });
   assert.equal(listed.items[0].passwordHash, undefined);
-  const updated = await h.service.adminUpdate(h.token(admin), student.id, { role: 'CONTENT_MANAGER', status: 'SUSPENDED' });
+  const updated = await h.service.adminUpdate(h.token(admin), student.id, { role: 'CONTENT_MANAGER', status: 'SUSPENDED', reason: 'Policy check' });
   assert.equal(updated.account.role, 'CONTENT_MANAGER');
   assert.deepEqual(h.revoked, [student.id]);
   assert.equal(h.audits[0].actorId, admin.id);
   assert.equal(h.audits[0].previousRole, 'STUDENT');
+  assert.equal(h.audits[0].reason, 'Policy check');
 });
 
 test('STUDENT and CONTENT_MANAGER cannot use admin APIs', async () => {
@@ -48,6 +49,6 @@ test('STUDENT and CONTENT_MANAGER cannot use admin APIs', async () => {
 test('the last active administrator cannot be demoted or disabled', async () => {
   const admin = account('ADMIN');
   const h = harness([admin]);
-  await assert.rejects(() => h.service.adminUpdate(h.token(admin), admin.id, { status: 'DISABLED' }), { code: 23 });
+  await assert.rejects(() => h.service.adminUpdate(h.token(admin), admin.id, { status: 'DISABLED', reason: 'Test' }), { code: 23 });
   await assert.rejects(() => h.service.adminUpdate(h.token(admin), admin.id, { role: 'STUDENT' }), { code: 23 });
 });

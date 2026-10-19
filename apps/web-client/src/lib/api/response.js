@@ -16,6 +16,9 @@ const messages = Object.freeze({
   [ResponseCode.AUTH_ADMIN_LAST_ACCOUNT]: 'The last active administrator cannot be demoted or disabled.',
   [ResponseCode.AUTH_EMAIL_VERIFICATION_REQUIRED]: 'This account must verify its email before it can be activated.',
   [ResponseCode.AUTH_FORBIDDEN_ROLE]: 'You do not have permission to do this.',
+  [ResponseCode.AUTH_CURRENT_PASSWORD_INVALID]: 'The current password is incorrect.',
+  [ResponseCode.AVATAR_INVALID]: 'This picture cannot be used.',
+  [ResponseCode.AUTH_REASON_REQUIRED]: 'Give a reason before locking the account.',
   [ResponseCode.EMAIL_SEND_ERROR]: 'We could not send the email. Check the server email configuration.',
   [ResponseCode.VALIDATION_ERROR]: 'Please check the highlighted fields.',
   [ContentResponseCode.CONTENT_NOT_FOUND]: 'This content no longer exists.',
@@ -43,6 +46,10 @@ const mediaReasons = Object.freeze({
   MEDIA_MIME_TYPE_NOT_ALLOWED: 'This file format is not allowed. Use MP3, MP4 or M4A for audio and JPEG, PNG or WebP for images.',
   MEDIA_EXTENSION_NOT_ALLOWED: 'This file extension is not allowed. Use .mp3, .mp4 or .m4a for audio and .jpg, .jpeg, .png or .webp for images.',
   MEDIA_FILE_TOO_LARGE: 'This file is larger than the upload limit.',
+  AVATAR_MIME_TYPE_NOT_ALLOWED: 'Use a JPEG, PNG or WebP picture.',
+  AVATAR_EXTENSION_NOT_ALLOWED: 'Use a .jpg, .png or .webp picture.',
+  AVATAR_EMPTY: 'The picture is empty.',
+  AVATAR_FILE_TOO_LARGE: 'This picture is larger than the upload limit.',
 });
 
 export function responseData(response) {
@@ -57,6 +64,16 @@ export function errorCode(error) {
   return error?.response?.data?.code;
 }
 
+// The free-text reason of an error envelope (why an account is locked, D114);
+// avatar errors use data.reason for a rule code instead, which the caller
+// maps itself.
+export function errorReason(error) {
+  const code = errorCode(error);
+  if (code !== ResponseCode.AUTH_ACCOUNT_DISABLED && code !== ResponseCode.AUTH_ACCOUNT_SUSPENDED) return null;
+  const reason = error?.response?.data?.data?.reason;
+  return typeof reason === 'string' && reason.trim() ? reason.trim() : null;
+}
+
 // Reads data.nextAction from an error envelope, e.g.
 // { code: 13, msg: 'fail', data: { nextAction: 'VERIFY_EMAIL' } }.
 export function errorNextAction(error) {
@@ -68,7 +85,7 @@ export function getApiErrorMessage(error) {
   // The gateway refuses files above its own limit before content-service sees them.
   if (error?.response?.status === 413) return mediaReasons.MEDIA_FILE_TOO_LARGE;
   const reason = mediaReasons[error?.response?.data?.data?.reason];
-  if (code === ContentResponseCode.MEDIA_INVALID && reason) return reason;
+  if ((code === ContentResponseCode.MEDIA_INVALID || code === ResponseCode.AVATAR_INVALID) && reason) return reason;
   return messages[code] || error?.response?.data?.data?.message || 'Something went wrong. Please try again.';
 }
 

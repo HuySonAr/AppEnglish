@@ -8,7 +8,7 @@
     "dev": "vite",
     "start": "vite",
     "lint": "vite build",
-    "test": "node --test src/lib/*.test.js src/lib/api/*.test.js src/features/auth/flow/*.test.js src/features/admin/api/*.test.js src/features/content-manager/lib/*.test.js src/features/student/lib/*.test.js"
+    "test": "node --test src/lib/*.test.js src/lib/api/*.test.js src/features/auth/flow/*.test.js src/features/admin/api/*.test.js src/features/admin/lib/*.test.js src/features/content-manager/lib/*.test.js src/features/student/lib/*.test.js src/features/profile/lib/*.test.js"
   },
   "dependencies": {
     "@appenglish/auth-contracts": "workspace:*",

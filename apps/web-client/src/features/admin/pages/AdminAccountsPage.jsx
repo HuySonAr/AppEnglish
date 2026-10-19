@@ -1,379 +1,202 @@
 import { useEffect, useState } from 'react';
-import { AccountRole, AccountStatus } from '@appenglish/auth-contracts';
+import { ChevronRight, Users } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { AccountRole, AccountStatus, AdminAccountSort } from '@appenglish/auth-contracts';
+import { RoleLabels } from '../../../constants/auth.js';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
-import {
-  listAdminAccounts,
-  updateAdminAccount,
-} from '../../auth/api/auth-api.js';
 import { notify } from '../../../lib/notify.js';
-import {
-  Button,
-  Input,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  Badge,
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Label,
-  Skeleton,
-} from '../../../components/ui';
+import { cn } from '../../../lib/utils.js';
+import { Button, Skeleton, Switch } from '../../../components/ui';
+import { Avatar } from '../../../components/shared/Avatar.jsx';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
+import { FilterSelect, SearchField } from '../../../components/shared/ListFilter.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
-import { Users } from 'lucide-react';
+import { Pagination } from '../../../components/shared/Pagination.jsx';
+import { getAdminAccountStats, listAdminAccounts } from '../../auth/api/auth-api.js';
+import { AccountStats, AccountStatsSkeleton } from '../components/AccountStats.jsx';
+import { RoleBadge, StatusBadge } from '../components/AccountBadges.jsx';
+import { sortOptions, statusLabels, timeAgo } from '../lib/accounts.js';
 
-const editableStatuses = [
-  AccountStatus.ACTIVE,
-  AccountStatus.DISABLED,
-  AccountStatus.SUSPENDED,
-];
+const PAGE_SIZE = 20;
+const initialFilters = { search: '', role: '', status: '', stale: false, sort: AdminAccountSort.NEWEST, page: 1 };
 
-const statusLabels = {
-  PENDING_VERIFICATION: 'Pending verification',
-  ACTIVE: 'Active',
-  DISABLED: 'Disabled',
-  SUSPENDED: 'Suspended',
-};
-
-const roleLabels = {
-  STUDENT: 'Student',
-  CONTENT_MANAGER: 'Content Manager',
-  ADMIN: 'Admin',
-};
-
-function StatusBadge({ status }) {
-  const variant =
-    status === AccountStatus.ACTIVE
-      ? 'success'
-      : status === AccountStatus.DISABLED
-        ? 'destructive'
-        : status === AccountStatus.SUSPENDED
-          ? 'warning'
-          : 'info';
-  return <Badge variant={variant}>{statusLabels[status] || status}</Badge>;
+function RowsSkeleton() {
+  return (
+    <ul className="divide-y">
+      {[...Array(6)].map((_, index) => (
+        <li key={index} className="flex items-center gap-3 px-4 py-3">
+          <Skeleton className="h-10 w-10 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-48" />
+            <Skeleton className="h-3 w-64" />
+          </div>
+          <Skeleton className="hidden h-5 w-20 md:block" />
+          <Skeleton className="hidden h-5 w-24 md:block" />
+        </li>
+      ))}
+    </ul>
+  );
 }
 
-function RoleBadge({ role }) {
-  return <Badge variant="secondary">{roleLabels[role] || role}</Badge>;
+// Admin account management (F01B, D114): the numbers, then the list with
+// search, filters, sort and server paging; each row opens the account page.
+// Filters the dashboard links to: ?status=SUSPENDED, ?stale=true, ?role=…
+function filtersFromUrl(params) {
+  return {
+    ...initialFilters,
+    role: Object.values(AccountRole).includes(params.get('role')) ? params.get('role') : '',
+    status: Object.values(AccountStatus).includes(params.get('status')) ? params.get('status') : '',
+    stale: params.get('stale') === 'true',
+  };
 }
 
 export function AdminAccountsPage() {
-  const [filters, setFilters] = useState({
-    email: '',
-    role: '',
-    status: '',
-    page: 1,
-  });
-  const [result, setResult] = useState(null);
-  const [state, setState] = useState('loading');
-  const [pending, setPending] = useState(null);
+  const [searchParams] = useSearchParams();
+  const [filters, setFilters] = useState(() => filtersFromUrl(searchParams));
+  const [list, setList] = useState({ state: 'loading', items: [], pagination: null });
+  const [stats, setStats] = useState({ state: 'loading', data: null });
 
-  async function load() {
-    setState('loading');
+  async function loadStats() {
+    setStats({ state: 'loading', data: null });
     try {
-      setResult(await listAdminAccounts({ ...filters, pageSize: 20 }));
-      setState('ready');
-    } catch (error) {
-      setState('error');
-      notify({
-        title: 'Could not load accounts',
-        description: getApiErrorMessage(error),
-        variant: 'destructive',
+      setStats({ state: 'ready', data: (await getAdminAccountStats()).data });
+    } catch {
+      setStats({ state: 'error', data: null });
+    }
+  }
+
+  async function loadList() {
+    setList((current) => ({ ...current, state: 'loading' }));
+    try {
+      const result = await listAdminAccounts({
+        search: filters.search,
+        role: filters.role,
+        status: filters.status,
+        sort: filters.sort,
+        stale: filters.stale ? 'true' : '',
+        page: filters.page,
+        pageSize: PAGE_SIZE,
       });
+      setList({ state: 'ready', items: result.data.items, pagination: result.data.pagination });
+    } catch (error) {
+      setList((current) => ({ ...current, state: 'error' }));
+      notify({ title: 'Could not load accounts', description: getApiErrorMessage(error), variant: 'destructive' });
     }
   }
 
   useEffect(() => {
-    load();
-  }, [filters.email, filters.role, filters.status, filters.page]);
+    loadStats();
+  }, []);
+  useEffect(() => {
+    loadList();
+  }, [filters.search, filters.role, filters.status, filters.stale, filters.sort, filters.page]);
 
-  async function save() {
-    if (!pending) return;
-    const loadingToast = notify({
-      title: 'Updating account…',
-      variant: 'loading',
-    });
-    try {
-      const changes = { role: pending.role };
-      if (editableStatuses.includes(pending.status))
-        changes.status = pending.status;
-      await updateAdminAccount(pending.id, changes);
-      notify({ title: 'Account updated' });
-      setPending(null);
-      await load();
-    } catch (error) {
-      notify({
-        title: 'Account update failed',
-        description: getApiErrorMessage(error),
-        variant: 'destructive',
-      });
-    } finally {
-      loadingToast.dismiss();
-    }
-  }
-
-  const items = result?.data?.items || [];
-  const pagination = result?.data?.pagination;
+  const setFilter = (key) => (value) => setFilters({ ...filters, [key]: value, page: 1 });
+  const filtered = filters.search || filters.role || filters.status || filters.stale;
 
   return (
     <section className="space-y-6">
-      <PageHeader
-        eyebrow="Admin"
-        title="Account management"
-        description="Search accounts, change roles, lock and unlock access."
-      />
-      <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center">
-        <Input
-          placeholder="Search email"
-          value={filters.email}
-          onChange={(event) =>
-            setFilters({ ...filters, email: event.target.value, page: 1 })
-          }
-          className="w-full sm:w-[300px]"
-        />
-        <Select
-          value={filters.role}
-          onValueChange={(value) =>
-            setFilters({ ...filters, role: value, page: 1 })
-          }
-        >
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="All roles" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">All roles</SelectItem>
-            {Object.values(AccountRole).map((role) => (
-              <SelectItem key={role} value={role}>
-                {roleLabels[role] || role}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={filters.status}
-          onValueChange={(value) =>
-            setFilters({ ...filters, status: value, page: 1 })
-          }
-        >
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="All statuses" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">All statuses</SelectItem>
-            {Object.values(AccountStatus).map((status) => (
-              <SelectItem key={status} value={status}>
-                {statusLabels[status] || status}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      {state === 'loading' ? (
-        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Verified</TableHead>
-                <TableHead>Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {[...Array(5)].map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell>
-                    <Skeleton className="h-4 w-[200px]" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-[100px]" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-[120px]" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-[100px]" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-[100px]" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-[40px]" />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      <PageHeader eyebrow="Admin" title="Accounts" description="Who uses AppEnglish: numbers, the full list, and each account's page with its history and actions." />
+
+      {stats.state === 'loading' ? (
+        <AccountStatsSkeleton />
+      ) : stats.state === 'error' ? (
+        <div className="flex items-center justify-between gap-3 rounded-xl border bg-card p-4 text-sm shadow-sm">
+          <span className="text-muted-foreground">The statistics could not be loaded.</span>
+          <Button variant="outline" size="sm" onClick={loadStats}>
+            Try again
+          </Button>
         </div>
-      ) : state === 'error' ? (
-        <Button variant="outline" onClick={load}>
-          Try again
-        </Button>
-      ) : items.length === 0 ? (
-        <EmptyState
-          icon={Users}
-          title="No accounts found"
-          description="Try a different search or filter."
-        />
       ) : (
-        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="hidden md:table-cell">Created</TableHead>
-                <TableHead className="hidden md:table-cell">Verified</TableHead>
-                <TableHead className="w-[80px]">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.map((account) => (
-                <TableRow key={account.id}>
-                  <TableCell className="font-medium">{account.email}</TableCell>
-                  <TableCell>
-                    <RoleBadge role={account.role} />
-                  </TableCell>
-                  <TableCell>
-                    <StatusBadge status={account.status} />
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {new Date(account.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {account.emailVerifiedAt
-                      ? new Date(account.emailVerifiedAt).toLocaleDateString()
-                      : '—'}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        setPending({
-                          id: account.id,
-                          email: account.email,
-                          role: account.role,
-                          status: account.status,
-                        })
-                      }
-                    >
-                      Edit
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <AccountStats stats={stats.data} />
       )}
-      {pagination && pagination.totalPages > 1 ? (
-        <div className="flex items-center justify-center gap-3 text-sm">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={filters.page <= 1}
-            onClick={() => setFilters({ ...filters, page: filters.page - 1 })}
-          >
-            Previous
-          </Button>
-          <span>
-            Page {pagination.page} of {pagination.totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={filters.page >= pagination.totalPages}
-            onClick={() => setFilters({ ...filters, page: filters.page + 1 })}
-          >
-            Next
-          </Button>
+
+      <div className="space-y-3">
+        <div className="flex flex-col gap-3 rounded-xl border bg-card p-3 shadow-sm lg:flex-row lg:items-center">
+          <SearchField label="Search accounts" placeholder="Search by email or name…" value={filters.search} onChange={setFilter('search')} />
+          <FilterSelect
+            label="Role"
+            value={filters.role || 'all'}
+            onChange={(value) => setFilter('role')(value === 'all' ? '' : value)}
+            options={[{ value: 'all', label: 'All roles' }, ...Object.values(AccountRole).map((role) => ({ value: role, label: RoleLabels[role] }))]}
+            className="w-full lg:w-44"
+          />
+          <FilterSelect
+            label="Status"
+            value={filters.status || 'all'}
+            onChange={(value) => setFilter('status')(value === 'all' ? '' : value)}
+            options={[{ value: 'all', label: 'All statuses' }, ...Object.values(AccountStatus).map((status) => ({ value: status, label: statusLabels[status] }))]}
+            className="w-full lg:w-48"
+          />
+          <FilterSelect label="Sort" value={filters.sort} onChange={setFilter('sort')} options={sortOptions} className="w-full lg:w-40" />
+          <label className="flex h-10 items-center gap-2 rounded-md border px-3 text-sm lg:ml-auto">
+            <Switch checked={filters.stale} onCheckedChange={setFilter('stale')} aria-label="Only stale sign-ups" />
+            <span className="whitespace-nowrap">Stale sign-ups only</span>
+          </label>
         </div>
-      ) : null}
-      <Dialog
-        open={!!pending}
-        onOpenChange={(open) => !open && setPending(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Update {pending?.email}</DialogTitle>
-            <DialogDescription>
-              This changes authorization and invalidates active sessions. Email
-              verification remains an OTP-only operation.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <Select
-                value={pending?.role}
-                onValueChange={(value) =>
-                  setPending({ ...pending, role: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(AccountRole).map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {roleLabels[role] || role}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={pending?.status}
-                onValueChange={(value) =>
-                  setPending({ ...pending, status: value })
-                }
-                disabled={!editableStatuses.includes(pending?.status)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {pending?.status === AccountStatus.PENDING_VERIFICATION ? (
-                    <SelectItem value={AccountStatus.PENDING_VERIFICATION}>
-                      {statusLabels[AccountStatus.PENDING_VERIFICATION]}
-                    </SelectItem>
-                  ) : null}
-                  {editableStatuses.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {statusLabels[status]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+
+        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="hidden grid-cols-[1fr_9rem_9rem_8rem_2rem] gap-3 border-b bg-muted/40 px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground md:grid">
+            <span>Account</span>
+            <span>Role</span>
+            <span>Status</span>
+            <span>Last sign-in</span>
+            <span />
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setPending(null)}>
-              Cancel
-            </Button>
-            <Button onClick={save}>Confirm</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          {list.state === 'loading' ? (
+            <RowsSkeleton />
+          ) : list.state === 'error' ? (
+            <div className="p-6 text-center">
+              <Button variant="outline" onClick={loadList}>
+                Try again
+              </Button>
+            </div>
+          ) : list.items.length === 0 ? (
+            <div className="p-4">
+              <EmptyState
+                icon={Users}
+                title={filtered ? 'No account matches' : 'No accounts yet'}
+                description={filtered ? 'Try another search or filter.' : 'Accounts appear here as people register.'}
+                action={filtered ? <Button variant="outline" onClick={() => setFilters(initialFilters)}>Clear filters</Button> : null}
+              />
+            </div>
+          ) : (
+            <ul className="divide-y">
+              {list.items.map((account) => (
+                <li key={account.id}>
+                  <Link
+                    to={`/admin/accounts/${account.id}`}
+                    className={cn(
+                      'grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+                      'md:grid-cols-[1fr_9rem_9rem_8rem_2rem]',
+                    )}
+                  >
+                    <span className="flex min-w-0 items-center gap-3 md:col-span-1">
+                      <Avatar account={account} size="md" />
+                      <span className="min-w-0">
+                        <span className="block truncate font-medium">{account.displayName || account.email.split('@')[0]}</span>
+                        <span className="block truncate text-xs text-muted-foreground">{account.email}</span>
+                      </span>
+                    </span>
+                    <span className="flex flex-wrap items-center gap-1.5 md:contents">
+                      <RoleBadge role={account.role} />
+                      <StatusBadge status={account.status} />
+                      <span className="hidden text-sm text-muted-foreground md:block" title={account.lastLoginAt ? new Date(account.lastLoginAt).toLocaleString() : undefined}>
+                        {account.lastLoginAt ? timeAgo(account.lastLoginAt) : 'Never'}
+                      </span>
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {list.pagination ? (
+          <Pagination page={list.pagination.page} pageCount={list.pagination.totalPages} total={list.pagination.total} noun="account" onChange={(page) => setFilters({ ...filters, page })} />
+        ) : null}
+      </div>
     </section>
   );
 }

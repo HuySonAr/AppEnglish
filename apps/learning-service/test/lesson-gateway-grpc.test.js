@@ -40,9 +40,17 @@ class FakeAuthController {
       ? { httpStatus: 200, code: 0, msg: 'success', dataJson: JSON.stringify({ account }), setCookies: [] }
       : { httpStatus: 401, code: 21, msg: 'fail', dataJson: '{}', setCookies: [] };
   }
+  // Public profiles for the ranking (D113): the learner has a display name.
+  getProfiles({ accountIds }) {
+    const profiles = accountIds
+      .filter((id) => id === student.id)
+      .map((id) => ({ id, displayName: 'Learner One', avatarUrl: 'https://cdn.test/learner.webp' }));
+    return { httpStatus: 200, code: 0, msg: 'success', dataJson: JSON.stringify({ profiles }), setCookies: [] };
+  }
 }
 Controller()(FakeAuthController);
 GrpcMethod(AUTH_GRPC_SERVICE, 'Me')(FakeAuthController.prototype, 'me', Object.getOwnPropertyDescriptor(FakeAuthController.prototype, 'me'));
+GrpcMethod(AUTH_GRPC_SERVICE, 'GetProfiles')(FakeAuthController.prototype, 'getProfiles', Object.getOwnPropertyDescriptor(FakeAuthController.prototype, 'getProfiles'));
 
 test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async (t) => {
   const content = createCurriculum([2]);
@@ -211,9 +219,10 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       assert.equal((await call('GET', `${lesson}/test/review/abc`)).status, 400);
       assert.equal((await call('GET', `${lesson}/test`)).json.data.progression, null);
 
-      // The email passed by the gateway shows in the ranking.
+      // The gateway swaps the email for the learner's profile (D113).
       const ranking = await call('GET', `${lesson}/ranking`);
-      assert.deepEqual(ranking.json.data.entries.map((entry) => [entry.rank, entry.email, entry.isMe]), [[1, 'learner@appenglish.test', true]]);
+      assert.deepEqual(ranking.json.data.entries.map((entry) => [entry.rank, entry.displayName, entry.avatarUrl, entry.email, entry.isMe]), [[1, 'Learner One', 'https://cdn.test/learner.webp', undefined, true]]);
+      assert.equal(ranking.json.data.me.displayName, 'Learner One');
       assert.deepEqual((await call('GET', '/learning/curriculum')).json.data.units[0].lessons.map((item) => [item.state, item.bestPercent]), [['COMPLETED', 91], ['OPEN', null]]);
       // The next lesson now asks for the review of this one.
       const next = await call('GET', `/learning/lessons/${second.id}`);

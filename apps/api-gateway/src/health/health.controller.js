@@ -23,9 +23,16 @@ export class HealthController {
     if (status >= 400) throw new HttpException(payload, status);
     return payload.data;
   }
+
+  // Every backend service's state for the admin dashboard (D115). Always 200:
+  // a service that is down is reported in the list, not as a failure.
+  services() {
+    return this.healthService.probeServices({ authReady: () => callAuth(this.auth, 'Ready') });
+  }
 }
 
 Controller('health')(HealthController);
 Inject(AUTH_GRPC_CLIENT)(HealthController, undefined, 0);
 Get()(HealthController.prototype, 'check', Object.getOwnPropertyDescriptor(HealthController.prototype, 'check'));
 Get('ready')(HealthController.prototype, 'ready', Object.getOwnPropertyDescriptor(HealthController.prototype, 'ready'));
+Get('services')(HealthController.prototype, 'services', Object.getOwnPropertyDescriptor(HealthController.prototype, 'services'));

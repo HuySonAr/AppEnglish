@@ -10,6 +10,16 @@ function optional(value) {
   return value === '' ? undefined : value;
 }
 
+// A JSON payload; an empty string is an empty object.
+function parseJson(text) {
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
 function withoutEmpty(fields) {
   return Object.fromEntries(
     Object.entries(fields).filter(([, value]) => value !== ''),
@@ -71,14 +81,52 @@ export class AuthGrpcController {
       this.handlers.adminGet(accountId, optional(accessToken)),
     );
   }
-  adminUpdateAccount({ accessToken, accountId, role, status }) {
+  adminUpdateAccount({ accessToken, accountId, role, status, reason }) {
     return this.reply(() =>
       this.handlers.adminUpdate(
         accountId,
-        withoutEmpty({ role, status }),
+        withoutEmpty({ role, status, reason }),
         optional(accessToken),
       ),
     );
+  }
+  adminAccountAction({ accessToken, accountId, action, reason }) {
+    return this.reply(() =>
+      this.handlers.adminAction(accountId, withoutEmpty({ action, reason }), optional(accessToken)),
+    );
+  }
+  adminAccountStats({ accessToken }) {
+    return this.reply(() => this.handlers.adminStats(optional(accessToken)));
+  }
+  updateProfile({ accessToken, payloadJson }) {
+    return this.reply(() =>
+      this.handlers.updateProfile(parseJson(payloadJson), optional(accessToken)),
+    );
+  }
+  verifyPassword({ accessToken, currentPassword }) {
+    return this.reply(() =>
+      this.handlers.verifyPassword({ currentPassword }, optional(accessToken)),
+    );
+  }
+  changePassword({ accessToken, currentPassword, newPassword }) {
+    return this.reply((response) =>
+      this.handlers.changePassword(
+        { currentPassword, newPassword },
+        optional(accessToken),
+        response,
+      ),
+    );
+  }
+  uploadAvatar({ accessToken, fileName, mimeType, data }) {
+    return this.reply(() =>
+      this.handlers.uploadAvatar({ fileName, mimeType, data }, optional(accessToken)),
+    );
+  }
+  removeAvatar({ accessToken }) {
+    return this.reply(() => this.handlers.removeAvatar(optional(accessToken)));
+  }
+  getProfiles({ accountIds }) {
+    return this.reply(() => this.handlers.getProfiles(accountIds || []));
   }
   async ready() {
     try {
@@ -141,6 +189,14 @@ for (const rpc of [
   'AdminListAccounts',
   'AdminGetAccount',
   'AdminUpdateAccount',
+  'AdminAccountAction',
+  'AdminAccountStats',
+  'UpdateProfile',
+  'VerifyPassword',
+  'ChangePassword',
+  'UploadAvatar',
+  'RemoveAvatar',
+  'GetProfiles',
   'Ready',
 ]) {
   const method = rpc[0].toLowerCase() + rpc.slice(1);

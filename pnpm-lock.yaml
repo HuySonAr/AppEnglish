@@ -65,6 +65,9 @@ importers:
       '@grpc/proto-loader':
         specifier: ^0.8.0
         version: 0.8.1
+      '@imagekit/nodejs':
+        specifier: ^7.12.1
+        version: 7.12.1
       '@nestjs/common':
         specifier: ^11.1.6
         version: 11.2.7(reflect-metadata@0.2.2)(rxjs@7.8.2)

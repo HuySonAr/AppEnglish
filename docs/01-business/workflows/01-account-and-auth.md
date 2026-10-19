@@ -56,3 +56,53 @@ backend.
   400 with the existing validation envelope, rather than an unhandled 500.
 - Empty filters do not change an account's status. Account status must pass
   `accountResponseSchema` before a successful list response is returned.
+
+## F09 Hồ sơ cá nhân (D113)
+
+1. Người dùng (mọi vai trò) mở menu tài khoản ở thanh trên và chọn "Your profile"
+   (`/student/profile`, `/content-manager/profile`, `/admin/profile`).
+2. Trang hiện ảnh đại diện (hoặc chữ cái đầu khi chưa có ảnh), tên hiển thị,
+   thông tin tài khoản chỉ đọc (email, vai trò, ngày tạo) và mục đổi mật khẩu.
+   Học viên thấy thêm thẻ thành tích (lesson đã xong, Listening, Reading, XP)
+   lấy từ `/progress` và `/progress/xp`.
+3. Tên hiển thị tự do, tùy chọn, cho trùng, tối đa 50 ký tự; để trống thì hệ
+   thống dùng phần email trước dấu @. `PATCH /auth/profile` `{ displayName }`.
+4. Ảnh đại diện: chọn JPEG/PNG/WebP; trình duyệt cắt vuông và thu về 256px rồi
+   gửi `POST /auth/profile/avatar` (multipart `file`, tối đa 2 MB); ảnh mới thay
+   ảnh cũ. `DELETE /auth/profile/avatar` quay về chữ cái đầu. Backend lưu lên
+   ImageKit (D68) khi `AVATAR_STORAGE_ADAPTER=imagekit`, còn local thì
+   `storage/avatars` do auth-service phục vụ tại `/avatars/:name`.
+5. Đổi mật khẩu đi hai bước trong hộp thoại: bước 1 nhập mật khẩu hiện tại,
+   `POST /auth/profile/password/verify` kiểm tra ngay (sai thì báo tại chỗ, mã 27,
+   không đổi gì); bước 2 nhập mật khẩu mới hai lần rồi
+   `POST /auth/profile/password` `{ currentPassword, newPassword }`. Ô mật khẩu có
+   nút con mắt hiện/ẩn (dùng chung cho đăng nhập, đăng ký, đặt lại mật khẩu).
+   Sai mật khẩu hiện tại trả `AUTH_CURRENT_PASSWORD_INVALID` (27). Thành công
+   thì mọi thiết bị khác bị đăng xuất (session version + thu hồi refresh),
+   thiết bị đang dùng nhận cookie mới và vẫn đăng nhập.
+6. Email không đổi được. Không có tùy chọn ẩn khỏi bảng xếp hạng.
+7. Bảng xếp hạng lesson và bảng XP hiện tên hiển thị và avatar thay email:
+   gateway ghép từ RPC nội bộ `GetProfiles` của auth-service (xem workflow 07).
+
+## F01B mở rộng: quản lý tài khoản của Admin (D114)
+
+1. `/admin/accounts` mở với bảng thống kê: tổng tài khoản (theo vai trò), số Active,
+   số đăng nhập trong 7 ngày, số đăng ký chờ xác minh quá 7 ngày; biểu đồ đăng ký
+   mới theo ngày (30 ngày) và phân bố theo trạng thái.
+2. Danh sách tìm theo email hoặc tên hiển thị, lọc vai trò và trạng thái, công tắc
+   "chỉ đăng ký cũ chưa xác minh", sắp xếp (mới nhất, cũ nhất, đăng nhập cuối,
+   email), phân trang server. Mỗi hàng hiện avatar, tên, email, vai trò, trạng
+   thái, lần đăng nhập cuối và mở trang chi tiết.
+3. `/admin/accounts/:id` hiện hồ sơ và các mốc (đăng ký, xác minh, đăng nhập
+   cuối), vai trò, trạng thái và lý do khóa, số thiết bị đang đăng nhập, với học
+   viên thêm tóm tắt học tập chỉ đọc (lesson xong, XP và hạng, Listening,
+   Reading), và lịch sử audit kèm người thực hiện.
+4. Đổi vai trò/trạng thái trong hộp thoại. Chuyển sang DISABLED hoặc SUSPENDED
+   bắt buộc nhập lý do; lý do được lưu, ghi audit và hiện cho người dùng khi họ
+   đăng nhập thất bại ("Reason: …"). Mở lại ACTIVE xóa lý do. Mọi thay đổi vẫn
+   đăng xuất tài khoản khỏi mọi thiết bị như F01B.
+5. Hành động một lần, mỗi hành động có ghi chú tùy chọn vào audit: đăng xuất mọi
+   thiết bị; gửi email đặt lại mật khẩu (tài khoản ACTIVE, admin không biết mật
+   khẩu); xóa ảnh đại diện; đặt lại tên hiển thị.
+6. Không có: đăng nhập thay học viên, xóa cứng tài khoản, khóa hàng loạt, đổi
+   email, đặt mật khẩu thay người dùng.

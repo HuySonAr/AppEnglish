@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { filterLeaderboard, pageOfRank } from './leaderboard.js';
 
-test('the leaderboard is narrowed by email without changing ranks', () => {
+test('the leaderboard is narrowed by display name without changing ranks', () => {
   const entries = [
-    { rank: 1, email: 'anna@appenglish.test', totalXp: 95 },
-    { rank: 2, email: 'binh.nguyen@appenglish.test', totalXp: 90 },
-    { rank: 3, email: 'Chí@appenglish.test', totalXp: 90 },
+    { rank: 1, displayName: 'anna', totalXp: 95 },
+    { rank: 2, displayName: 'Binh Nguyen', totalXp: 90 },
+    { rank: 3, displayName: 'Chí', totalXp: 90 },
   ];
   assert.deepEqual(filterLeaderboard(entries).map((entry) => entry.rank), [1, 2, 3]);
   assert.deepEqual(filterLeaderboard(entries, { search: 'binh' }).map((entry) => entry.rank), [2]);

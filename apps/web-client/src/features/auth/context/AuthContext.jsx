@@ -52,6 +52,11 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  // A profile change (name, avatar) replaces the account without a reload.
+  const updateAccount = useCallback((account) => {
+    if (account) setState({ status: 'authenticated', account });
+  }, []);
+
   const value = useMemo(
     () => ({
       ...state,
@@ -59,8 +64,9 @@ export function AuthProvider({ children }) {
       restoreSession,
       signIn,
       signOut,
+      updateAccount,
     }),
-    [restoreSession, signIn, signOut, state],
+    [restoreSession, signIn, signOut, state, updateAccount],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -30,7 +30,7 @@ backward-compatible definitions khi nghiệp vụ được triển khai.
 ## F01 auth contract
 
 **VERIFIED (2026-10-10):** auth-service owns account data in `app_identity`; the
-gateway exposes the twelve `/auth/*` HTTP routes listed in
+gateway exposes the seventeen `/auth/*` HTTP routes (twelve from F01/F01B, five profile routes from F09) listed in
 `docs/03-service-specs/auth-service.md` and calls auth-service over gRPC (D27). The web client calls only the
 gateway. The auth-service migrations and Zod contracts are under
 `apps/auth-service/src/database/migrations/` and `apps/auth-service/src/auth/`;
@@ -91,6 +91,44 @@ email for the lesson ranking (D60). learning-service reads the curriculum and
 lesson papers from content-service through `GetCurriculum` and
 `GetLessonPaper`. Lesson results reach progress-service over RabbitMQ (see F06
 below).
+
+## F09 profile contract
+
+**VERIFIED (2026-10-19, D113):** auth-service owns the profile columns on
+`accounts` (`displayName`, `avatarUrl`, `avatarStorage`, `avatarStorageId`,
+migration `1710000004000`). The gateway exposes `PATCH /auth/profile`,
+`POST /auth/profile/password/verify`, `POST /auth/profile/password`,
+`POST /auth/profile/avatar` (multipart) and `DELETE /auth/profile/avatar`,
+relayed to the `UpdateProfile`, `VerifyPassword`, `ChangePassword`,
+`UploadAvatar` and `RemoveAvatar` RPCs. Rankings keep their data in
+learning-service and progress-service by `accountId`; the gateway calls the
+internal `GetProfiles` RPC and attaches `displayName` and `avatarUrl` to the
+rows of `/learning/lessons/:id/ranking` and `/progress/leaderboard`, removing
+`email` (`attachProfiles` in `apps/api-gateway/src/auth/auth-gateway.controller.js`).
+Avatar files live on ImageKit (D68) or under `storage/avatars` locally; no
+service reads another service's database and no RabbitMQ event is added.
+
+## F01B admin management contract (D114)
+
+**VERIFIED (2026-10-19):** the gateway adds `GET /auth/admin/accounts/stats` and
+`POST /auth/admin/accounts/:id/actions` (auth-service `AdminAccountStats`,
+`AdminAccountAction`) and `GET /progress/admin/learners/:id` (progress-service
+`GetLearnerSummary`, ADMIN only). Locking an account needs a `reason`
+(`PATCH /auth/admin/accounts/:id`), kept on `accounts.statusReason` and in
+`account_audits.reason`, and returned as `data.reason` of the 403 sign-in
+error. `accounts.lastLoginAt` is written by auth-service on sign-in. No service
+reads another service's database; the learner summary is served by
+progress-service from its own tables.
+
+## Admin dashboard health probe (D115)
+
+**VERIFIED (2026-10-19):** the gateway exposes `GET /health/services`
+(`apps/api-gateway/src/health/health.service.js`, `probeServices`): auth-service
+through gRPC `Ready` (with its database state), content-, learning- and
+progress-service through their HTTP `/health` on `*_SERVICE_PORT`, 2 s timeout
+each. It always answers 200 with `{ status: ok|degraded, checkedAt, services[] }`;
+a service that does not answer is listed as `down` with `detail` timeout or
+unreachable. It is public like `/health/ready` and adds no business data.
 
 ## F05A mock-test contract
 

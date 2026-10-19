@@ -11,6 +11,7 @@ import { registerOutcome } from '../flow/auth-flow.js';
 import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui/button.jsx';
 import { Input } from '../../../components/ui/input.jsx';
+import { PasswordInput } from '../../../components/shared/PasswordInput.jsx';
 import { Label } from '../../../components/ui/label.jsx';
 
 export function RegisterPage() {
@@ -96,9 +97,9 @@ export function RegisterPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
+            autoComplete="new-password"
             {...form.register('password')}
             disabled={form.formState.isSubmitting}
           />

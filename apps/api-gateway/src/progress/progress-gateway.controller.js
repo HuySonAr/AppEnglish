@@ -1,7 +1,7 @@
-import { Controller, Get, HttpException, Inject, Req } from '@nestjs/common';
+import { Controller, Get, HttpException, Inject, Param, Req } from '@nestjs/common';
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { PROGRESS_GRPC_SERVICE } from '@appenglish/progress-contracts/grpc';
-import { AUTH_GRPC_CLIENT, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
+import { AUTH_GRPC_CLIENT, attachProfiles, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
 import { callService } from '../grpc/grpc-call.js';
 
 export const PROGRESS_GRPC_CLIENT = 'PROGRESS_GRPC_CLIENT';
@@ -45,8 +45,15 @@ export class ProgressGatewayController {
   getXp(request) {
     return this.forward('GetXp', request);
   }
-  getLeaderboard(request) {
-    return this.forward('GetLeaderboard', request);
+  // Admin: a learner's progress and XP, read-only (D114).
+  getLearnerSummary(id, request) {
+    return this.forward('GetLearnerSummary', request, { id });
+  }
+  // Ranked learners are shown by display name and avatar (D113).
+  async getLeaderboard(request) {
+    const payload = await this.forward('GetLeaderboard', request);
+    await attachProfiles(this.auth, [...(payload.data.entries || []), payload.data.you]);
+    return payload;
   }
 }
 
@@ -57,6 +64,7 @@ const routes = [
   [Get, '', 'getProgress', [Req()]],
   [Get, 'xp', 'getXp', [Req()]],
   [Get, 'leaderboard', 'getLeaderboard', [Req()]],
+  [Get, 'admin/learners/:id', 'getLearnerSummary', [Param('id'), Req()]],
 ];
 for (const [verb, path, method, params] of routes) {
   const descriptor = Object.getOwnPropertyDescriptor(ProgressGatewayController.prototype, method);

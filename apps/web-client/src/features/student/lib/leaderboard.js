@@ -1,10 +1,10 @@
 import { matchesSearch } from '../../../lib/list.js';
 
 // Pure rules of the leaderboard page (D39): the board arrives ranked; the
-// learner only narrows it by email. Ranks stay as given, so a filtered list
-// still shows each learner's real place.
+// learner only narrows it by display name (D113). Ranks stay as given, so a
+// filtered list still shows each learner's real place.
 export function filterLeaderboard(entries, { search = '' } = {}) {
-  return entries.filter((entry) => matchesSearch(entry.email, search));
+  return entries.filter((entry) => matchesSearch(entry.displayName, search));
 }
 
 // The page of the board the learner's own row is on, for a jump to it.

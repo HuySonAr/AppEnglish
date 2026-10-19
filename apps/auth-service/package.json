@@ -19,6 +19,7 @@
     "@nestjs/platform-express": "^11.1.6",
     "pg": "^8.16.3",
     "@grpc/grpc-js": "^1.14.0",
+    "@imagekit/nodejs": "^7.12.1",
     "@grpc/proto-loader": "^0.8.0",
     "amqplib": "^0.10.9",
     "ioredis": "^5.8.1",

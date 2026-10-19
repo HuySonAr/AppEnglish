@@ -2,6 +2,9 @@ import { z } from 'zod';
 import { AccountRole } from '@appenglish/auth-contracts';
 import { LearningEventType } from '@appenglish/learning-contracts';
 
+// The learner an admin asks about (D114).
+export const learnerIdSchema = z.string().uuid();
+
 export const actorSchema = z.object({
   id: z.string().uuid(),
   role: z.enum(Object.values(AccountRole)),

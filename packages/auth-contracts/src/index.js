@@ -42,6 +42,9 @@ export const ResponseCode = Object.freeze({
   AUTH_ADMIN_AUDIT_ERROR: 24,
   AUTH_EMAIL_VERIFICATION_REQUIRED: 25,
   AUTH_FORBIDDEN_ROLE: 26,
+  AUTH_CURRENT_PASSWORD_INVALID: 27,
+  AVATAR_INVALID: 28,
+  AUTH_REASON_REQUIRED: 29,
   VALIDATION_ERROR: 30,
   EMAIL_SEND_ERROR: 31,
   SYSTEM_ERROR: 32
@@ -49,3 +52,59 @@ export const ResponseCode = Object.freeze({
 
 export const ResponseMsg = Object.freeze({ SUCCESS: 'success', ADDITIONAL: 'additional', FAIL: 'fail' });
 export const NextAction = Object.freeze({ VERIFY_EMAIL: 'VERIFY_EMAIL', LOGIN: 'LOGIN', RESET_PASSWORD: 'RESET_PASSWORD' });
+
+// Profile (F09, D113): a free display name that may repeat, and an optional
+// avatar; the email cannot be changed.
+export const PROFILE_LIMITS = Object.freeze({
+  displayNameMax: 50,
+  // The web client crops and shrinks the picture before upload (D113).
+  avatarMaxBytes: 2 * 1024 * 1024,
+  avatarMimeTypes: Object.freeze(['image/jpeg', 'image/png', 'image/webp']),
+  avatarExtensions: Object.freeze(['.jpg', '.jpeg', '.png', '.webp']),
+  avatarSize: 256
+});
+
+// The name shown for an account: its display name, or the part of the email
+// before @ while it has none (D113). Leaderboards never show the full email.
+export function displayNameOf({ displayName, email } = {}) {
+  const name = typeof displayName === 'string' ? displayName.trim() : '';
+  if (name) return name;
+  const local = String(email || '').split('@')[0];
+  return local || 'Learner';
+}
+
+// The letter an avatar placeholder shows.
+export function avatarInitialOf(account) {
+  return displayNameOf(account).slice(0, 1).toUpperCase();
+}
+
+// Admin account management (F01B, D114).
+export const AdminAccountAction = Object.freeze({
+  REVOKE_SESSIONS: 'REVOKE_SESSIONS',
+  SEND_PASSWORD_RESET: 'SEND_PASSWORD_RESET',
+  REMOVE_AVATAR: 'REMOVE_AVATAR',
+  RESET_DISPLAY_NAME: 'RESET_DISPLAY_NAME'
+});
+
+// What the audit trail records; role/status changes keep their F01B names.
+export const AccountAuditAction = Object.freeze({
+  ROLE_UPDATED: 'ROLE_UPDATED',
+  STATUS_UPDATED: 'STATUS_UPDATED',
+  ROLE_STATUS_UPDATED: 'ROLE_STATUS_UPDATED',
+  SESSIONS_REVOKED: 'SESSIONS_REVOKED',
+  PASSWORD_RESET_SENT: 'PASSWORD_RESET_SENT',
+  AVATAR_REMOVED: 'AVATAR_REMOVED',
+  DISPLAY_NAME_RESET: 'DISPLAY_NAME_RESET'
+});
+
+export const AdminAccountSort = Object.freeze({
+  NEWEST: 'newest',
+  OLDEST: 'oldest',
+  LAST_LOGIN: 'lastLogin',
+  EMAIL: 'email'
+});
+
+// A pending account older than this counts as stale (never verified).
+export const STALE_PENDING_DAYS = 7;
+export const ADMIN_STATS_DAYS = 30;
+export const ADMIN_AUDIT_LIMIT = 50;

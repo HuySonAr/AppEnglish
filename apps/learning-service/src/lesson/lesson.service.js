@@ -465,13 +465,15 @@ export class LessonService {
   }
 
   // Learners of the lesson ranked by their first attempt. Every student can
-  // see it; learners are shown by email for now (D60).
+  // see it. The gateway replaces the email with the learner's display name
+  // and avatar (D60, D113).
   async getLessonRanking(actor, lessonId) {
     this.assertStudent(actor);
     const standing = await this.standing(actor);
     if (!standing.access.has(lessonId)) throw lessonErrors.notFound();
     const rows = (await this.repository.listRanking(lessonId)).map((attempt, index) => ({
       rank: index + 1,
+      accountId: attempt.accountId,
       email: attempt.accountEmail,
       correctCount: attempt.correctCount,
       totalCount: attempt.totalCount,

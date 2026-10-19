@@ -127,6 +127,11 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
   định, `destructive` cho lỗi, `info`, `warning`, `loading`.
 - Tiêu đề trang dùng `PageHeader`; danh sách rỗng dùng `EmptyState`; ô dashboard
   dùng `FeatureCard`.
+- Ô mật khẩu dùng `PasswordInput` (`components/shared/PasswordInput.jsx`): có nút
+  con mắt hiện/ẩn, nhận mọi prop của `Input` và `register` của react-hook-form.
+- Người dùng hiện bằng `Avatar` (`components/shared/Avatar.jsx`): ảnh đại diện,
+  hoặc chữ cái đầu của tên khi chưa có ảnh; tên lấy từ `displayNameOf()` của
+  `@appenglish/auth-contracts` (D113). Không hiện email đầy đủ của người khác.
 - Biểu đồ dùng `ChartContainer` của shadcn chart (`components/ui/chart.jsx`, Recharts) với màu `--chart-1`…`--chart-5`; không tự vẽ biểu đồ bằng `div` hay thêm thư viện biểu đồ khác (D78).
 - Màu chỉ lấy từ token trong `styles/index.css`; mọi trang phải dùng được ở
   chế độ sáng, tối và trên màn hình điện thoại.

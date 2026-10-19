@@ -1,4 +1,6 @@
-import { Body, Controller, Get, HttpException, Inject, Param, Patch, Post, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Inject, Param, Patch, Post, Query, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { PROFILE_LIMITS, displayNameOf } from '@appenglish/auth-contracts';
 import { AuthCookie } from '@appenglish/auth-contracts';
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { callService, gatewayFailure } from '../grpc/grpc-call.js';
@@ -16,6 +18,33 @@ export function callAuth(auth, rpc, message = {}) {
 export function sessionTokens(request) {
   return cookies(request);
 }
+
+// Gives ranking rows the learner's public profile (F09, D113): displayName
+// and avatarUrl by accountId, and drops the email the services still carry.
+// When auth-service cannot answer, the rows fall back to the email's local
+// part so the board still renders.
+export async function attachProfiles(auth, rows) {
+  const list = rows.filter(Boolean);
+  const ids = [...new Set(list.map((row) => row.accountId).filter(Boolean))];
+  let byId = new Map();
+  if (ids.length) {
+    try {
+      const { status, payload } = await callAuth(auth, 'GetProfiles', { accountIds: ids });
+      if (status < 400) byId = new Map(payload.data.profiles.map((profile) => [profile.id, profile]));
+    } catch {
+      // Fallback below.
+    }
+  }
+  for (const row of list) {
+    const profile = byId.get(row.accountId);
+    row.displayName = profile?.displayName ?? displayNameOf({ email: row.email });
+    row.avatarUrl = profile?.avatarUrl ?? null;
+    delete row.email;
+  }
+}
+
+// Upper bound for one avatar held in memory; auth-service applies the exact rules.
+const MAX_AVATAR_UPLOAD_BYTES = PROFILE_LIMITS.avatarMaxBytes + 64 * 1024;
 
 // JSON body values become proto strings; auth-service validates them.
 function text(value) {
@@ -86,15 +115,65 @@ export class AuthGatewayController {
     const relayed = Object.fromEntries(new URLSearchParams(query));
     return this.forward('AdminListAccounts', { accessToken: cookies(request).accessToken, query: relayed }, response);
   }
+  // Declared before adminGet: Nest registers routes in method order, and
+  // "admin/accounts/stats" must be matched before "admin/accounts/:id".
+  async adminStats(request, response) {
+    return this.forward('AdminAccountStats', { accessToken: cookies(request).accessToken }, response);
+  }
   async adminGet(accountId, request, response) {
     return this.forward('AdminGetAccount', { accessToken: cookies(request).accessToken, accountId }, response);
   }
   async adminUpdate(accountId, body, request, response) {
     return this.forward(
       'AdminUpdateAccount',
-      { accessToken: cookies(request).accessToken, accountId, ...fields(body, ['role', 'status']) },
+      { accessToken: cookies(request).accessToken, accountId, ...fields(body, ['role', 'status', 'reason']) },
       response,
     );
+  }
+  async adminAction(accountId, body, request, response) {
+    return this.forward(
+      'AdminAccountAction',
+      { accessToken: cookies(request).accessToken, accountId, ...fields(body, ['action', 'reason']) },
+      response,
+    );
+  }
+
+  // Profile of the signed-in account (F09, D113).
+  async updateProfile(body, request, response) {
+    return this.forward(
+      'UpdateProfile',
+      { accessToken: cookies(request).accessToken, payloadJson: JSON.stringify(body && typeof body === 'object' ? body : {}) },
+      response,
+    );
+  }
+  async verifyPassword(body, request, response) {
+    return this.forward(
+      'VerifyPassword',
+      { accessToken: cookies(request).accessToken, ...fields(body, ['currentPassword']) },
+      response,
+    );
+  }
+  async changePassword(body, request, response) {
+    return this.forward(
+      'ChangePassword',
+      { accessToken: cookies(request).accessToken, ...fields(body, ['currentPassword', 'newPassword']) },
+      response,
+    );
+  }
+  async uploadAvatar(file, request, response) {
+    return this.forward(
+      'UploadAvatar',
+      {
+        accessToken: cookies(request).accessToken,
+        fileName: file?.originalname || '',
+        mimeType: file?.mimetype || '',
+        data: file?.buffer || Buffer.alloc(0),
+      },
+      response,
+    );
+  }
+  async removeAvatar(request, response) {
+    return this.forward('RemoveAvatar', { accessToken: cookies(request).accessToken }, response);
   }
 
   async forward(rpc, message, response) {
@@ -119,8 +198,16 @@ const routes = [
   [Post, 'logout', 'logout', [Req(), passthrough()]],
   [Get, 'me', 'me', [Req(), passthrough()]],
   [Get, 'admin/accounts', 'adminList', [Query(), Req(), passthrough()]],
+  // Before :id so "stats" is never read as an account id.
+  [Get, 'admin/accounts/stats', 'adminStats', [Req(), passthrough()]],
   [Get, 'admin/accounts/:id', 'adminGet', [Param('id'), Req(), passthrough()]],
   [Patch, 'admin/accounts/:id', 'adminUpdate', [Param('id'), Body(), Req(), passthrough()]],
+  [Post, 'admin/accounts/:id/actions', 'adminAction', [Param('id'), Body(), Req(), passthrough()]],
+  [Patch, 'profile', 'updateProfile', [Body(), Req(), passthrough()]],
+  [Post, 'profile/password/verify', 'verifyPassword', [Body(), Req(), passthrough()]],
+  [Post, 'profile/password', 'changePassword', [Body(), Req(), passthrough()]],
+  [Post, 'profile/avatar', 'uploadAvatar', [UploadedFile(), Req(), passthrough()]],
+  [Delete, 'profile/avatar', 'removeAvatar', [Req(), passthrough()]],
 ];
 for (const [verb, path, method, params] of routes) {
   verb(path)(
@@ -130,3 +217,8 @@ for (const [verb, path, method, params] of routes) {
   );
   params.forEach((decorator, index) => decorator(AuthGatewayController.prototype, method, index));
 }
+UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_AVATAR_UPLOAD_BYTES } }))(
+  AuthGatewayController.prototype,
+  'uploadAvatar',
+  Object.getOwnPropertyDescriptor(AuthGatewayController.prototype, 'uploadAvatar'),
+);

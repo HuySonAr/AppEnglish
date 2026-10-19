@@ -25,8 +25,9 @@ the leaderboard (F07, D63, D112).
   changes nothing; mini tests, placement, lessons and practice earn none.
 - **Leaderboard** (D39, D112): one overall board of total XP, ties broken by
   who reached the total first (the time of their last gain); learners are
-  shown by email like the lesson ranking (D60); the top 50, plus the learner's
-  own place.
+  shown by display name and avatar, attached by the gateway from auth-service
+  (D113; progress-service itself only knows `accountId`/`accountEmail`); the
+  top 50, plus the learner's own place.
 
 Exact counts are stored; whole percents are computed when read (D39).
 
@@ -57,7 +58,8 @@ like the learning contract).
 | Method | Gateway route | RPC | Who | Purpose |
 |---|---|---|---|---|
 | GET | `/progress/xp` | `GetXp` | Student | `totalXp`, `rank` (or `null` without XP), `learnerCount`, `entries[]` latest first (`mockTestId`, `mockTestTitle`, `xp`, `correctCount`, `totalCount`, `earnedAt`) |
-| GET | `/progress/leaderboard` | `GetLeaderboard` | Student | `entries[]` top 50 (`rank`, `accountId`, `email`, `totalXp`, `mockCount`, `reachedAt`, `isYou`), `learnerCount`, `you` (the learner's own row, or `null`) |
+| GET | `/progress/admin/learners/:id` | `GetLearnerSummary` | Admin | Read-only (D114): `{ learnerId, progress, xp }` with the same shapes as `GetProgress` and `GetXp` for that learner; `id` must be a UUID |
+| GET | `/progress/leaderboard` | `GetLeaderboard` | Student | `entries[]` top 50 (`rank`, `accountId`, `displayName`, `avatarUrl`, `totalXp`, `mockCount`, `reachedAt`, `isYou`; the service's `email` is replaced by the gateway, D113), `learnerCount`, `you` (the learner's own row, or `null`) |
 | GET | `/progress` | `GetProgress` | Student | `completion` (`completedLessons`, `totalLessons`, `percent` or `null` with no published lesson, `units[]` with `id`, `title`, `completed`, `total`), `skills.listening` and `skills.reading` (`percent` or `null`, `testCount`, `lessonTests`, `mockTests`: the tests it rests on), `attempts` (`lessonTests`, `mockTests`: finished attempts stored) |
 
 Codes (`packages/progress-contracts/src/index.js`): 0 success, 26 forbidden

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpException, Inject, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
-import { AUTH_GRPC_CLIENT, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
+import { AUTH_GRPC_CLIENT, attachProfiles, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
 import { callService } from '../grpc/grpc-call.js';
 
 export const LEARNING_GRPC_CLIENT = 'LEARNING_GRPC_CLIENT';
@@ -178,8 +178,11 @@ export class LessonGatewayController extends LearningRelay {
   submitCourseTest(itemId, body, request) {
     return this.forward('SubmitCourseTest', request, { id: itemId, body });
   }
-  getLessonRanking(id, request) {
-    return this.forward('GetLessonRanking', request, { id });
+  // Ranked learners are shown by display name and avatar (D113).
+  async getLessonRanking(id, request) {
+    const payload = await this.forward('GetLessonRanking', request, { id });
+    await attachProfiles(this.auth, [...(payload.data.entries || []), payload.data.me]);
+    return payload;
   }
 }
 

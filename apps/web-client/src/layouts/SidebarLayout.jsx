@@ -1,10 +1,17 @@
 import { useState } from 'react';
-import { Menu } from 'lucide-react';
-import { Outlet } from 'react-router-dom';
+import { LogOut, Menu, Moon, Sun } from 'lucide-react';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { displayNameOf } from '@appenglish/auth-contracts';
 import { navigation } from '../app/navigation.js';
 import { RoleLabels } from '../constants/auth.js';
 import { cn } from '../lib/utils.js';
 import { Button } from '../components/ui/button.jsx';
+import { Switch } from '../components/ui/switch.jsx';
+import { useTheme } from '../hooks/use-theme.js';
+import { Avatar } from '../components/shared/Avatar.jsx';
+import { useAuth } from '../features/auth/context/AuthContext.jsx';
+import { dashboardPathForRole } from '../features/auth/flow/auth-flow.js';
+import { canLeave } from '../lib/leave-guard.js';
 import {
   Sheet,
   SheetContent,
@@ -28,6 +35,16 @@ export function SidebarLayout({ role, side = 'left', drawerSide = side }) {
   const right = side === 'right';
   const drawerRight = drawerSide === 'right';
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { account, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const dark = theme === 'dark';
+  const navigate = useNavigate();
+  async function logOut() {
+    // A page such as a test in progress may refuse to be left.
+    if (!canLeave()) return;
+    await signOut();
+    navigate('/login', { replace: true });
+  }
   const menu = (onNavigate) => (
     <>
       <div className="flex h-16 shrink-0 items-center border-b px-5">
@@ -38,6 +55,33 @@ export function SidebarLayout({ role, side = 'left', drawerSide = side }) {
           {label}
         </p>
         <SidebarNav items={items} label={`${label} navigation`} onNavigate={onNavigate} />
+      </div>
+      {/* The signed-in person (D113): picture and name link to the profile; Log out below. */}
+      <div className="shrink-0 border-t p-3">
+        <Link
+          to={`${dashboardPathForRole(role)}/profile`}
+          onClick={onNavigate}
+          className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <Avatar account={account} size="md" />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-medium">{displayNameOf(account || {})}</span>
+            <span className="block truncate text-xs text-muted-foreground">{account?.email}</span>
+          </span>
+        </Link>
+        <div className="mt-2 flex items-center gap-2">
+          <Button variant="outline" className="flex-1 justify-start gap-2" onClick={logOut}>
+            <LogOut className="h-4 w-4" />
+            Log out
+          </Button>
+          <label
+            className="flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-md border bg-background px-2.5 text-muted-foreground transition hover:text-foreground"
+            title={dark ? 'Switch to light theme' : 'Switch to dark theme'}
+          >
+            {dark ? <Moon className="h-4 w-4" aria-hidden="true" /> : <Sun className="h-4 w-4" aria-hidden="true" />}
+            <Switch checked={dark} onCheckedChange={toggleTheme} aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'} />
+          </label>
+        </div>
       </div>
     </>
   );

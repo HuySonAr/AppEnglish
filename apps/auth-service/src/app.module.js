@@ -9,6 +9,8 @@ import { AccountRepository } from './auth/account.repository.js';
 import { createAuthDataSource } from './database/database.config.js';
 import { TokenService } from './auth/token.service.js';
 import { EmailService } from './auth/email.service.js';
+import { AVATAR_STORAGE, createAvatarStorage } from './profile/avatar-storage.js';
+import { AvatarFilesController } from './profile/avatar-files.controller.js';
 import {
   AUTH_DATA_SOURCE,
   AUTH_REPOSITORY,
@@ -18,13 +20,14 @@ export { AUTH_DATA_SOURCE, AUTH_REPOSITORY };
 
 export class AppModule {}
 Module({
-  controllers: [HealthController, AuthGrpcController],
+  controllers: [HealthController, AuthGrpcController, AvatarFilesController],
   providers: [
     PasswordService,
     TokenService,
     EmailService,
     AuthorizationService,
     { provide: AUTH_DATA_SOURCE, useFactory: createAuthDataSource },
+    { provide: AVATAR_STORAGE, useFactory: createAvatarStorage },
     {
       provide: AUTH_REPOSITORY,
       useFactory: (dataSource) => new AccountRepository(dataSource),
@@ -32,15 +35,16 @@ Module({
     },
     {
       provide: AuthService,
-      useFactory: (repository, passwordService, tokenService, emailService, authorizationService) =>
+      useFactory: (repository, passwordService, tokenService, emailService, authorizationService, avatarStorage) =>
         new AuthService(
           repository,
           passwordService,
           tokenService,
           emailService,
           authorizationService,
+          avatarStorage,
         ),
-      inject: [AUTH_REPOSITORY, PasswordService, TokenService, EmailService, AuthorizationService],
+      inject: [AUTH_REPOSITORY, PasswordService, TokenService, EmailService, AuthorizationService, AVATAR_STORAGE],
     },
     {
       provide: AuthController,
