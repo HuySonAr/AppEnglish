@@ -14,6 +14,13 @@ export const ProgressSkill = Object.freeze({ LISTENING: 'listening', READING: 'r
 export const XP_MAX_PER_MOCK = 100;
 export const LEADERBOARD_SIZE = 50;
 
+// Streak (D154): days of study in a row, counted in Vietnam time; each week
+// (Monday to Sunday) may have this many days off without breaking it.
+export const STREAK_TIME_ZONE = 'Asia/Ho_Chi_Minh';
+export const STREAK_REST_DAYS_PER_WEEK = 1;
+export const STREAK_CALENDAR_WEEKS = 8;
+export const StreakDayState = Object.freeze({ STUDIED: 'studied', REST: 'rest', MISSED: 'missed', TODAY: 'today', FUTURE: 'future' });
+
 // Exact values are stored; the client shows whole percents (D39).
 export function wholePercent(ratio) {
   return ratio === null || ratio === undefined ? null : Math.round(ratio * 100);

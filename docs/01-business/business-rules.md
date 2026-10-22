@@ -11,7 +11,7 @@
 10. XP mỗi mock = (best score / max score) x 100; tối đa 100 XP/đề.
 11. Chỉ lượt full đầu tiên của mỗi đề mock được tính XP; các lượt sau và mini test không tính XP (D63, thay quy tắc cộng chênh lệch).
 12. Progress gồm mức hoàn thành lesson và mức thành thạo Reading/Listening (trung bình điểm cao nhất của lesson test và mock test theo kỹ năng); placement và practice bị loại (D33).
-13. Lesson/ôn từ/practice không cộng XP hoặc streak.
+13. Lesson/ôn từ/practice không cộng XP. Streak (D154) đếm ngày học, không cộng XP.
 14. Speaking/Writing/teacher/class/assignment nằm ngoài phạm vi.
 15. Điểm lần làm đầu tiên của lesson test dùng để xếp hạng học viên trong chính lesson đó; không xếp hạng chung và không cộng XP (D30).
 16. Mỗi lần làm mock test và lesson test, thứ tự lựa chọn A/B/C/D được xáo ngẫu nhiên; không xáo câu hỏi (D31). Part 1 và 2 của đề 7 part không xáo vì cả part dùng một audio đọc lựa chọn theo thứ tự cố định (D48).

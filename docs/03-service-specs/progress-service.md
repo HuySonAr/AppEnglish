@@ -58,6 +58,7 @@ like the learning contract).
 | Method | Gateway route | RPC | Who | Purpose |
 |---|---|---|---|---|
 | GET | `/progress/xp` | `GetXp` | Student | `totalXp`, `rank` (or `null` without XP), `learnerCount`, `entries[]` latest first (`mockTestId`, `mockTestTitle`, `xp`, `correctCount`, `totalCount`, `earnedAt`) |
+| GET | `/progress/streak` | `GetStreak` | Student | D154: `{ timeZone, today, current, longest, studiedToday, restPerWeek, week[7], calendar[8][7] }`, each day `{ day, state }` with `state` in `StreakDayState` (`studied`, `rest`, `missed`, `today`, `future`); rules in `src/progress/streak.rules.js` (one day off per Monday–Sunday week, today never breaks the streak) |
 | GET | `/progress/admin/learners/:id` | `GetLearnerSummary` | Admin | Read-only (D114): `{ learnerId, progress, xp }` with the same shapes as `GetProgress` and `GetXp` for that learner; `id` must be a UUID |
 | GET | `/progress/leaderboard` | `GetLeaderboard` | Student | `entries[]` top 50 (`rank`, `accountId`, `displayName`, `avatarUrl`, `totalXp`, `mockCount`, `reachedAt`, `isYou`; the service's `email` is replaced by the gateway, D113), `learnerCount`, `you` (the learner's own row, or `null`) |
 | GET | `/progress` | `GetProgress` | Student | `completion` (`completedLessons`, `totalLessons`, `percent` or `null` with no published lesson, `units[]` with `id`, `title`, `completed`, `total`), `skills.listening` and `skills.reading` (`percent` or `null`, `testCount`, `lessonTests`, `mockTests`: the tests it rests on), `attempts` (`lessonTests`, `mockTests`: finished attempts stored) |
@@ -94,3 +95,7 @@ other learners, mini tests and malformed messages), the consumer's ack/drop/
 requeue decisions with a fake channel, and the gateway HTTP ↔ gRPC contract
 with a stand-in for auth-service. Results are in
 `docs/04-implementation/feature-status.md`.
+
+## Streak (D154)
+
+The consumer applies `activity.recorded` (`{ accountId, activity, occurredAt }`, `activity` in `StudyActivity`) by upserting `study_days` for the day of `occurredAt` in `Asia/Ho_Chi_Minh` and adding the activity to that day's list. `GetStreak` reads the learner's days and computes the streak; nothing is precomputed.

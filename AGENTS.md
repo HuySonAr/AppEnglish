@@ -10,7 +10,7 @@
 - Làm một feature mỗi lượt, theo docs/04-implementation/implementation-order.md.
 - Nghiệp vụ trong docs/01-business là nguồn yêu cầu sản phẩm đã chốt.
 - Không tự thêm nghiệp vụ, service, API, database, event hay công nghệ.
-- Không đưa Speaking, Writing, giáo viên, lớp học, assignment, CEFR, streak hoặc XP lesson vào phạm vi. Ngoại lệ (D85, D100): A1–C2 là nhãn cấp độ của bài luyện nghe, và A1–C1 là các cấp của Listening course (D141) (xếp cấp nghe, kiểm tra lên cấp nghe trong phần đó); không dùng cho placement chính, lesson hay progress chung.
+- Không đưa Speaking, Writing, giáo viên, lớp học, assignment, CEFR hoặc XP lesson vào phạm vi. Streak chỉ theo D154 (chuỗi ngày học, không gắn XP). Ngoại lệ (D85, D100): A1–C2 là nhãn cấp độ của bài luyện nghe, và A1–C1 là các cấp của Listening course (D141) (xếp cấp nghe, kiểm tra lên cấp nghe trong phần đó); không dùng cho placement chính, lesson hay progress chung.
 - Không tự quyết định mục TBD. Nếu cần để triển khai, giải thích lựa chọn và hỏi người dùng.
 - Giữ pnpm workspaces/Turborepo, NestJS services, React + Vite client và quy ước code thật của repository. Không chuyển package manager/framework/language.
 - Trong NestJS, route thường nằm trong Controller; không tạo Express Router riêng nếu kiến trúc hiện tại không yêu cầu. Tách controller/DTO-validation/service/repository/model theo conventions hiện có.
@@ -23,6 +23,7 @@
 - Trước khi viết hoặc sửa giao diện, đọc mục "Quy ước giao diện bắt buộc" trong docs/02-architecture/frontend-architecture.md và làm theo: skeleton theo hình dạng trang, `<Button loading>`, bốn trạng thái của trang, tìm kiếm/sắp xếp/phân trang cho danh sách, `notify()` cho thông báo.
 - Dùng lại component trong src/components/shared và hàm trong src/lib; không tạo biến thể riêng cho cùng một việc.
 - Chữ trên giao diện ngắn gọn: description, chú thích và hướng dẫn tối đa một câu ngắn, chỉ nói cần làm gì; không giải thích nghiệp vụ, không ghi mã quyết định (Dxx) (D149).
+- Không dùng nền chuyển màu (gradient) hay đốm màu mờ trang trí cho thẻ, banner, ảnh bìa; dùng nền phẳng (`bg-card`, `bg-muted`, màu nhạt một tông) và viền (D153).
 
 ## Sau mỗi feature
 - Cập nhật docs/04-implementation/feature-status.md.

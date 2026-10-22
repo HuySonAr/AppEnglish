@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, CheckCircle2, ChevronLeft, ChevronRight, Eye, GripVertical, Lightbulb, Play, RotateCcw, Trophy, Volume2, X } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, CheckCircle2, ChevronLeft, ChevronRight, Eye, GripVertical, Lightbulb, Play, RotateCcw, Trophy, X } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { CourseDictationMode, LearningResponseCode } from '@appenglish/learning-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
@@ -14,6 +14,8 @@ import { useReturnTo } from '../../../hooks/use-return-to.js';
 import { completeCourseTopic, getCourseTopic } from '../api/course-api.js';
 import { CourseQuestion } from '../components/CourseQuestion.jsx';
 import { RecordingPanel, useAudioState } from '../components/RecordingPanel.jsx';
+import { Pronunciation } from '../components/VocabularyStudy.jsx';
+import { WordFlipCard } from '../components/WordFlipCard.jsx';
 import { activeSentence, blankMark, courseTopicPath, moveItem, orderingResult, splitWords, typingMarks } from '../lib/listening-course.js';
 
 const Part = Object.freeze({ VOCABULARY: 'vocabulary', QUESTIONS: 'questions', ORDERING: 'ordering', DICTATION: 'dictation', TRANSCRIPT: 'transcript' });
@@ -39,41 +41,27 @@ function writeKnown(topicId, known) {
 }
 
 function WordCard({ word, known, onKnown }) {
-  const [flipped, setFlipped] = useState(false);
-  const face = 'absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-2xl border p-4 text-center [backface-visibility:hidden]';
   return (
     <div className="space-y-2">
-      <div className="h-40 [perspective:1000px]">
-        <button
-          type="button"
-          aria-label={flipped ? `${word.word}: ${word.meaning}` : `Show the meaning of ${word.word}`}
-          onClick={() => setFlipped(!flipped)}
-          className="relative h-full w-full rounded-2xl transition-transform duration-500 [transform-style:preserve-3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style={{ transform: flipped ? 'rotateY(180deg)' : 'none' }}
-        >
-          <span className={cn(face, 'bg-card shadow-sm', known && 'border-success/50')}>
+      <WordFlipCard
+        label={`${word.word}: show or hide the meaning`}
+        highlight={known}
+        front={
+          <>
             <span className="text-2xl font-bold">{word.word}</span>
             <span className="text-sm text-muted-foreground">{word.phonetic}</span>
             <span className="mt-2 text-xs text-muted-foreground">Tap to see the meaning</span>
-          </span>
-          <span className={cn(face, 'bg-primary/5 shadow-sm')} style={{ transform: 'rotateY(180deg)' }}>
+          </>
+        }
+        back={
+          <>
             <span className="text-lg font-semibold">{word.meaning}</span>
             <span className="text-sm text-muted-foreground">{word.word}</span>
-          </span>
-        </button>
-      </div>
+          </>
+        }
+      />
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-1.5"
-          aria-label={`Play ${word.word}`}
-          disabled={!word.audioUrl}
-          onClick={() => new Audio(word.audioUrl).play().catch(() => notify({ title: 'Could not play the word', variant: 'destructive' }))}
-        >
-          <Volume2 className="h-4 w-4" />
-          Listen
-        </Button>
+        <Pronunciation label="Listen" url={word.audioUrl} />
         <Button variant={known ? 'secondary' : 'ghost'} size="sm" className={cn('ml-auto gap-1.5', known && 'text-success')} aria-pressed={known} onClick={onKnown}>
           <Check className="h-4 w-4" />
           {known ? 'Known' : 'I know it'}

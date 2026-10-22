@@ -4,6 +4,7 @@ import {
   LESSON_PASS_PERCENT,
   LESSON_TEST_DURATION_MINUTES,
   LearningEventType,
+  StudyActivity,
   LessonState,
   LessonStep,
   LessonTestStatus,
@@ -14,7 +15,7 @@ import {
   VOCABULARY_PRACTICE_SIZE,
   lessonTestPassed,
 } from '@appenglish/learning-contracts';
-import { noEvents } from '../events/learning-events.js';
+import { noEvents, recordActivity } from '../events/learning-events.js';
 import { placementErrors } from '../placement/placement.errors.js';
 import { lessonErrors } from './lesson.errors.js';
 import {
@@ -195,6 +196,7 @@ export class LessonService {
     this.requireStep(steps, LessonStep.VOCABULARY);
     if (!progress.vocabularyStudiedAt)
       await this.repository.saveProgress({ ...progress, vocabularyStudiedAt: this.now() });
+    await recordActivity(this.events, actor.id, StudyActivity.LESSON_STEP, this.now());
     return { studied: true };
   }
 
@@ -227,6 +229,7 @@ export class LessonService {
       const field = kind === QuizKind.REVIEW ? 'reviewPassedAt' : 'vocabularyQuizPassedAt';
       if (!opened.progress[field])
         await this.repository.saveProgress({ ...opened.progress, [field]: this.now() });
+      await recordActivity(this.events, actor.id, StudyActivity.LESSON_STEP, this.now());
     }
     return { kind, passed: !wrongIds.length, total: vocabulary.length, wrongIds };
   }
@@ -269,12 +272,19 @@ export class LessonService {
     };
   }
 
+  async completeVocabularyPractice(actor) {
+    this.assertStudent(actor);
+    await recordActivity(this.events, actor.id, StudyActivity.WORD_MEMORY, this.now());
+    return { recorded: true };
+  }
+
   async submitFillIn(actor, lessonId, { answers }) {
     const { paper, progress, steps } = await this.open(actor, lessonId);
     this.requireStep(steps, LessonStep.FILL_IN);
     const blanks = wrongBlanks(paper.content.fillIn.answers, answers);
     if (!blanks.length && !progress.fillInPassedAt)
       await this.repository.saveProgress({ ...progress, fillInPassedAt: this.now() });
+    if (!blanks.length) await recordActivity(this.events, actor.id, StudyActivity.LESSON_STEP, this.now());
     return { passed: !blanks.length, total: paper.content.fillIn.answers.length, wrongBlanks: blanks };
   }
 
@@ -425,6 +435,7 @@ export class LessonService {
       passed: lessonTestPassed(score.correctCount, score.totalCount),
     });
     const saved = await this.repository.saveAttempt(attempt);
+    await recordActivity(this.events, saved.accountId, StudyActivity.LESSON_TEST, submittedAt);
     await this.events.record(LearningEventType.LESSON_TEST_SUBMITTED, {
       attemptId: saved.id,
       accountId: saved.accountId,
@@ -548,6 +559,7 @@ export class LessonService {
       passed: lessonTestPassed(score.correctCount, score.totalCount),
       submittedAt: this.now(),
     });
+    await recordActivity(this.events, actor.id, StudyActivity.UNIT_REVIEW, this.now());
     return {
       attempt: this.reviewAttemptSummary(saved),
       parts: testParts({ test: paper.test, media: {} }, { answers, partKeys: UNIT_REVIEW_PARTS }),

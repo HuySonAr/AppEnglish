@@ -11,7 +11,8 @@ import { EmptyState } from '../../../components/shared/EmptyState.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { useAuth } from '../../auth/context/AuthContext.jsx';
-import { getProgress, getXp } from '../../student/api/progress-api.js';
+import { getProgress, getStreak, getXp } from '../../student/api/progress-api.js';
+import { StreakCalendar } from '../../student/components/Streak.jsx';
 import { getCourseProgress } from '../../student/api/course-api.js';
 import { ChangePasswordDialog } from '../components/ChangePasswordDialog.jsx';
 import { EditProfileDialog } from '../components/EditProfileDialog.jsx';
@@ -55,7 +56,6 @@ function Panel({ title, description, action, children, className }) {
   );
 }
 
-// The levels of the listening course as steps: passed, current, locked.
 function LevelSteps({ steps, currentLevel }) {
   if (!steps.length) return <p className="text-sm text-muted-foreground">The listening course has no level yet.</p>;
   return (
@@ -90,7 +90,7 @@ function LevelSteps({ steps, currentLevel }) {
 function StandingSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2">
         {[0, 1, 2, 3].map((item) => <Skeleton key={item} className="h-20 rounded-xl" />)}
       </div>
       <div className="grid gap-6 lg:grid-cols-[1fr_16rem]">
@@ -102,9 +102,6 @@ function StandingSkeleton() {
   );
 }
 
-// The learner's standing (D113): stats, the two skills, the lessons ring, XP
-// per mock test and the listening levels. Loaded with the page; XP and the
-// course are optional and only say so when they fail.
 function Standing() {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
@@ -112,8 +109,8 @@ function Standing() {
   async function load() {
     setState('loading');
     try {
-      const [progress, xp, course] = await Promise.all([getProgress(), getXp().catch(() => null), getCourseProgress().catch(() => null)]);
-      setData({ progress: progress.data, xp: xp?.data ?? null, course: course?.data ?? null });
+      const [progress, xp, course, streak] = await Promise.all([getProgress(), getXp().catch(() => null), getCourseProgress().catch(() => null), getStreak().catch(() => null)]);
+      setData({ progress: progress.data, xp: xp?.data ?? null, course: course?.data ?? null, streak: streak?.data ?? null });
       setState('ready');
     } catch (error) {
       setData({ error: getApiErrorMessage(error) });
@@ -141,7 +138,7 @@ function Standing() {
       </Card>
     );
 
-  const { progress, xp, course } = data;
+  const { progress, xp, course, streak } = data;
   const ring = lessonRing(progress);
   const bars = skillBars(progress);
   const xpData = xpBars(xp);
@@ -152,18 +149,24 @@ function Standing() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Stat icon={BookOpen} label="Lessons completed" value={ring.total ? `${ring.completed}/${ring.total}` : '—'} detail={ring.percent === null ? 'No lesson published yet' : `${ring.percent}% of the course`} />
         <Stat icon={Trophy} label="XP" value={xp ? `${xp.totalXp} XP` : '—'} detail={xp ? (xp.rank ? `#${xp.rank} of ${xp.learnerCount} learners` : 'Finish a full mock test to earn XP') : 'XP not available'} tone="text-warning bg-warning/10" />
         <Stat icon={Headphones} label="Listening level" value={listeningLevel} detail={course ? `${course.topics?.done ?? 0}/${course.topics?.total ?? 0} course topics done` : 'Course not available'} tone="text-chart-2 bg-chart-2/10" />
         <Stat icon={Timer} label="Tests taken" value={tests} detail={`${plural(progress.attempts?.lessonTests || 0, 'lesson test')}, ${plural(progress.attempts?.mockTests || 0, 'full mock test')}`} />
       </div>
 
+      {streak ? (
+        <Panel title="Streak" description="Days of study in a row.">
+          <StreakCalendar streak={streak} />
+        </Panel>
+      ) : null}
+
       {nothingYet ? (
         <EmptyState
           icon={TrendingUp}
           title="Your story starts here"
-          description="Charts fill in as you pass lesson tests, take full mock tests and move through the listening course."
+          description="Pass a lesson test or take a full mock test."
           action={
             <div className="flex flex-wrap justify-center gap-2">
               <Button asChild>
@@ -183,7 +186,7 @@ function Standing() {
         />
       ) : (
         <>
-          <div className="grid gap-6 lg:grid-cols-[1fr_16rem]">
+          <div className="grid gap-6 xl:grid-cols-[1fr_16rem]">
             <Panel title="Mastery" description="Your best score on each skill.">
               <SkillsChart bars={bars} />
             </Panel>
@@ -194,7 +197,7 @@ function Standing() {
 
           <Panel
             title="XP from mock tests"
-            description="Only the first full attempt of each test earns XP: right answers out of 100."
+            description="First full attempt of each test."
             action={
               <Button asChild variant="ghost" size="sm">
                 <Link to="/student/leaderboard">
@@ -219,7 +222,6 @@ function Standing() {
 
           <Panel
             title="Listening course"
-            description="Each level opens when you pass the level test before it."
             action={
               <Button asChild variant="ghost" size="sm">
                 <Link to="/student/listening-course/progress">
@@ -237,9 +239,6 @@ function Standing() {
   );
 }
 
-// The signed-in person's profile (F09, D113): a hero card with the picture,
-// name and account facts; editing and the password change open on request;
-// students see their standing below with charts.
 export function ProfilePage() {
   const { status, account, updateAccount, restoreSession } = useAuth();
   const [editing, setEditing] = useState(false);
@@ -249,69 +248,63 @@ export function ProfilePage() {
   const name = displayNameOf(account);
   const since = new Date(account.createdAt);
 
+  const student = account.role === Roles.STUDENT;
+  const facts = [
+    { icon: Mail, label: 'Email', value: account.email },
+    { icon: CalendarDays, label: 'Member since', value: `${since.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })} · ${memberFor(account.createdAt)}` },
+    { icon: CheckCircle2, label: 'Account', value: account.status === 'ACTIVE' ? 'Active, email verified' : account.status, tone: 'text-success' },
+  ];
+  const card = (
+    <Card className={cn(student && 'lg:sticky lg:top-20')}>
+      <CardContent className="space-y-5 pt-6">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Avatar account={account} size="lg" className="shadow-sm" />
+          <div className="min-w-0 space-y-1.5">
+            <h2 className="truncate text-xl font-bold">{name}</h2>
+            <Badge variant="secondary" className="gap-1">
+              <Shield className="h-3 w-3" aria-hidden="true" />
+              {RoleLabels[account.role]}
+            </Badge>
+            {!account.displayName ? <p className="text-xs text-muted-foreground">No name set yet.</p> : null}
+          </div>
+        </div>
+        <div className="grid gap-2">
+          <Button onClick={() => setEditing(true)}>
+            <Pencil className="h-4 w-4" />
+            Edit profile
+          </Button>
+          <Button variant="outline" onClick={() => setChangingPassword(true)}>
+            <KeyRound className="h-4 w-4" />
+            Change password
+          </Button>
+        </div>
+        <dl className="divide-y rounded-xl border text-sm">
+          {facts.map((fact) => (
+            <div key={fact.label} className="flex items-center gap-3 px-3 py-2.5">
+              <fact.icon className={cn('h-4 w-4 shrink-0', fact.tone || 'text-muted-foreground')} aria-hidden="true" />
+              <div className="min-w-0">
+                <dt className="text-xs text-muted-foreground">{fact.label}</dt>
+                <dd className="truncate font-medium">{fact.value}</dd>
+              </div>
+            </div>
+          ))}
+        </dl>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <section className="space-y-6">
-      <PageHeader eyebrow={eyebrows[account.role]} title="Your profile" description="How you appear to others, and where you stand." />
+      <PageHeader eyebrow={eyebrows[account.role]} title="Your profile" />
+      {student ? (
+        <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start">
+          {card}
+          <Standing />
+        </div>
+      ) : (
+        <div className="max-w-md">{card}</div>
+      )}
 
-      <Card className="overflow-hidden">
-        <div className="h-24 bg-gradient-to-r from-primary/25 via-primary/10 to-chart-2/20 sm:h-28" aria-hidden="true" />
-        <CardContent className="relative pb-6 pt-0">
-          <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-              <Avatar account={account} size="lg" className="ring-4 ring-card shadow-md" />
-              <div className="min-w-0 space-y-1 sm:pb-1">
-                <h2 className="truncate text-2xl font-bold">{name}</h2>
-                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                  <Badge variant="secondary" className="gap-1">
-                    <Shield className="h-3 w-3" aria-hidden="true" />
-                    {RoleLabels[account.role]}
-                  </Badge>
-                  {!account.displayName ? <span>Shown by the first part of your email until you set a name.</span> : null}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2 sm:pb-1">
-              <Button onClick={() => setEditing(true)}>
-                <Pencil className="h-4 w-4" />
-                Edit profile
-              </Button>
-              <Button variant="outline" onClick={() => setChangingPassword(true)}>
-                <KeyRound className="h-4 w-4" />
-                Change password
-              </Button>
-            </div>
-          </div>
-
-          <dl className="mt-6 grid gap-3 text-sm sm:grid-cols-3">
-            <div className="flex items-center gap-3 rounded-lg border bg-muted/30 px-3 py-2">
-              <Mail className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-              <div className="min-w-0">
-                <dt className="text-xs text-muted-foreground">Email · cannot be changed</dt>
-                <dd className="truncate font-medium">{account.email}</dd>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 rounded-lg border bg-muted/30 px-3 py-2">
-              <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-              <div className="min-w-0">
-                <dt className="text-xs text-muted-foreground">Member since</dt>
-                <dd className="truncate font-medium">
-                  {since.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
-                  <span className="text-muted-foreground"> · {memberFor(account.createdAt)}</span>
-                </dd>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 rounded-lg border bg-muted/30 px-3 py-2">
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
-              <div className="min-w-0">
-                <dt className="text-xs text-muted-foreground">Account</dt>
-                <dd className="truncate font-medium">{account.status === 'ACTIVE' ? 'Active, email verified' : account.status}</dd>
-              </div>
-            </div>
-          </dl>
-        </CardContent>
-      </Card>
-
-      {account.role === Roles.STUDENT ? <Standing /> : null}
 
       <EditProfileDialog open={editing} onOpenChange={setEditing} account={account} onSaved={updateAccount} />
       <ChangePasswordDialog open={changingPassword} onOpenChange={setChangingPassword} onChanged={restoreSession} />

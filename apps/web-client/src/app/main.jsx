@@ -6,9 +6,11 @@ import App from './App.jsx';
 import { AuthProvider } from '../features/auth/context/AuthContext.jsx';
 import { Toaster } from '../components/ui/sonner.jsx';
 import { applyStoredTheme } from '../hooks/use-theme.js';
+import { installSingleAudio } from '../lib/audio.js';
 import '../styles/index.css';
 
 applyStoredTheme();
+installSingleAudio();
 
 const queryClient = new QueryClient();
 createRoot(document.getElementById('root')).render(

@@ -102,8 +102,8 @@ Module({
     },
     {
       provide: ListeningPracticeService,
-      useFactory: (repository, contentClient) => new ListeningPracticeService(repository, contentClient),
-      inject: [LISTENING_REPOSITORY, CONTENT_CLIENT],
+      useFactory: (repository, contentClient, events) => new ListeningPracticeService(repository, contentClient, { events }),
+      inject: [LISTENING_REPOSITORY, CONTENT_CLIENT, LearningEvents],
     },
     {
       provide: COURSE_REPOSITORY,
@@ -112,8 +112,8 @@ Module({
     },
     {
       provide: CourseLessonService,
-      useFactory: (repository, contentClient) => new CourseLessonService(repository, contentClient),
-      inject: [COURSE_REPOSITORY, CONTENT_CLIENT],
+      useFactory: (repository, contentClient, events) => new CourseLessonService(repository, contentClient, { events }),
+      inject: [COURSE_REPOSITORY, CONTENT_CLIENT, LearningEvents],
     },
     {
       provide: MockService,

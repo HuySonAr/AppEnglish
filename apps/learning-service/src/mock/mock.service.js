@@ -1,6 +1,6 @@
 import { AccountRole } from '@appenglish/auth-contracts';
 import { LESSON_TEST_PARTS } from '@appenglish/content-contracts';
-import { LearningEventType, MockAttemptKind, PlacementStatus } from '@appenglish/learning-contracts';
+import { LearningEventType, MockAttemptKind, PlacementStatus, StudyActivity } from '@appenglish/learning-contracts';
 import {
   scoreTest,
   shuffledOptionOrder,
@@ -8,7 +8,7 @@ import {
   testParts,
   testProgression,
 } from '../lesson/lesson.rules.js';
-import { noEvents } from '../events/learning-events.js';
+import { noEvents, recordActivity } from '../events/learning-events.js';
 import { placementErrors } from '../placement/placement.errors.js';
 import { mockErrors } from './mock.errors.js';
 import { defaultScoreConversion, estimatedScores, recommendedLevel } from './mock.rules.js';
@@ -291,6 +291,7 @@ export class MockService {
       Object.assign(attempt, { listeningScore, readingScore });
     }
     const saved = await this.repository.saveAttempt(attempt);
+    await recordActivity(this.events, saved.accountId, StudyActivity.MOCK_TEST, submittedAt);
     // Only full tests reach progress and XP; mini tests are practice (D63).
     if (saved.kind === MockAttemptKind.FULL) {
       const { estimated, countsForXp, durationSeconds, scorePercent, ...counts } = this.summary(saved);

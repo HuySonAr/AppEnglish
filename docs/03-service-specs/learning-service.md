@@ -318,6 +318,7 @@ and never by sharing a database. Three events, constants `LearningQueue` and
 | `lesson-test.submitted` | Every finished lesson-test attempt (`LessonService.complete`) | `attemptId`, `accountId`, `lessonId`, `lessonVersionId` and the attempt summary (`attemptNumber`, counts per skill, `passed`, `submittedAt`) |
 | `lesson.completed` | The lesson test passed for the first time | `accountId`, `lessonId`, `completedAt` |
 | `mock.submitted` | Every finished **full** mock attempt (`MockService.complete`); mini tests are never sent | `attemptId`, `accountId`, `accountEmail` (for the XP leaderboard, D112), `mockTestId`, `mockTestTitle`, `mockVersionId`, `kind`, `attemptNumber`, counts per skill, `listeningScore`, `readingScore`, `submittedAt` |
+| `activity.recorded` | D154, for the streak: a vocabulary studied, a word quiz or fill-in passed, a lesson test or unit review submitted, a course topic completed or level test submitted, a listening practice checked, a word memory round finished (`POST /learning/practice/vocabulary/complete`, RPC `CompleteVocabularyPractice`), any mock attempt submitted | `accountId`, `activity` (`StudyActivity`), `occurredAt` |
 
 Delivery is an outbox (`src/events/learning-events.js`, repository
 `src/events/events.repository.js`, table `learning_events`, migration

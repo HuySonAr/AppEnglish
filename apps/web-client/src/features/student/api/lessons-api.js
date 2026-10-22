@@ -42,6 +42,9 @@ export async function discardLessonTest(id) {
 export async function getVocabularyPractice() {
   return (await httpClient.get('/learning/practice/vocabulary')).data;
 }
+export async function completeVocabularyPractice() {
+  return (await httpClient.post('/learning/practice/vocabulary/complete')).data;
+}
 // The answers of one finished attempt; the latest when attemptNumber is omitted.
 export async function getLessonTestReview(id, attemptNumber) {
   const suffix = attemptNumber ? `/${attemptNumber}` : '';

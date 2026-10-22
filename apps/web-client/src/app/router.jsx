@@ -29,7 +29,7 @@ import { MockTestsManagePage } from '../features/content-manager/pages/MockTests
 import { MockTestEditorPage } from '../features/content-manager/pages/MockTestEditorPage.jsx';
 import { MockTestsPage } from '../features/student/pages/MockTestsPage.jsx';
 import { MockTestPage } from '../features/student/pages/MockTestPage.jsx';
-import { MockMiniHistoryPage } from '../features/student/pages/MockMiniHistoryPage.jsx';
+import { MockHistoryPage } from '../features/student/pages/MockHistoryPage.jsx';
 import { PracticePage } from '../features/student/pages/PracticePage.jsx';
 import { ListeningExercisePage } from '../features/student/pages/ListeningExercisePage.jsx';
 import { ListeningPracticePage } from '../features/student/pages/ListeningPracticePage.jsx';
@@ -92,7 +92,8 @@ export function AppRouter() {
             <Route path="units/:unitId/review" element={<UnitReviewPage />} />
             <Route path="mock-tests" element={<MockTestsPage />} />
             <Route path="mock-tests/:mockTestId" element={<MockTestPage />} />
-            <Route path="mock-tests/:mockTestId/mini/:partKey" element={<MockMiniHistoryPage />} />
+            <Route path="mock-tests/:mockTestId/history" element={<MockHistoryPage />} />
+            <Route path="mock-tests/:mockTestId/mini/:partKey" element={<MockHistoryPage />} />
             <Route path="listening-course" element={<ListeningCoursePage />} />
             <Route path="listening-course/topics/:topicId" element={<CourseTopicPage />} />
             <Route path="listening-course/tests/:itemId" element={<CourseTestPage />} />

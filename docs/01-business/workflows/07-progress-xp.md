@@ -10,6 +10,13 @@
 ## XP
 Chỉ lượt full đầu tiên của mỗi đề mock được tính XP (D63, D112): XP = số câu đúng / tổng số câu × 100, làm tròn thành số nguyên, tối đa 100 XP trên đề; làm lại đề không đổi XP. Không XP cho mini test, placement, lesson test, practice thường hoặc hoạt động học (D10, D14). XP được ghi khi progress-service nhận sự kiện `mock.submitted` của lượt đầu; học viên xem XP và các đề đã cộng ở trang Progress.
 
+## Streak (D154)
+- Streak là số ngày học liên tiếp. Một ngày học là ngày học viên làm xong ít nhất một việc: một bước lesson (vocabulary, word quiz, fill-in đạt), nộp lesson test hoặc unit review, đánh dấu xong một chủ đề Listening course hoặc nộp bài test cấp, bấm "Check my answers" một bài luyện nghe, làm xong một lượt Word memory, nộp một mock test (full hoặc mini). Chỉ mở app không tính.
+- Ngày tính theo giờ Việt Nam, cắt lúc 0 giờ.
+- Mỗi tuần (thứ 2 đến chủ nhật) được nghỉ một ngày mà chuỗi không đứt; nghỉ ngày thứ hai trong tuần thì chuỗi về 0. Hôm nay chưa học không làm đứt chuỗi. Lưu chuỗi dài nhất.
+- Không XP, không phần thưởng, không phạt, không bảng xếp hạng. Chỉ học viên tự xem: dashboard (số ngày, 7 chấm của tuần, nhắc nhẹ khi hôm nay chưa học), Profile (chuỗi hiện tại, dài nhất, lịch 8 tuần).
+- Chỉ đếm từ ngày triển khai (2026-10-22); không tính ngược dữ liệu cũ.
+
 ## Leaderboard
 Có hai loại bảng: bảng XP chung (tổng XP mock) và bảng riêng của từng lesson dùng điểm lần làm đầu tiên của lesson test (D30). Bảng theo lesson không cộng XP và không gộp thành bảng chung.
 

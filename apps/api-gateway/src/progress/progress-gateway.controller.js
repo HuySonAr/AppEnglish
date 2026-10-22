@@ -45,6 +45,9 @@ export class ProgressGatewayController {
   getXp(request) {
     return this.forward('GetXp', request);
   }
+  getStreak(request) {
+    return this.forward('GetStreak', request);
+  }
   // Admin: a learner's progress and XP, read-only (D114).
   getLearnerSummary(id, request) {
     return this.forward('GetLearnerSummary', request, { id });
@@ -63,6 +66,7 @@ Inject(PROGRESS_GRPC_CLIENT)(ProgressGatewayController, undefined, 1);
 const routes = [
   [Get, '', 'getProgress', [Req()]],
   [Get, 'xp', 'getXp', [Req()]],
+  [Get, 'streak', 'getStreak', [Req()]],
   [Get, 'leaderboard', 'getLeaderboard', [Req()]],
   [Get, 'admin/learners/:id', 'getLearnerSummary', [Param('id'), Req()]],
 ];

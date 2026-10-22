@@ -8,7 +8,7 @@ export const manager = { id: '11111111-1111-4111-8111-111111111111', role: 'CONT
 
 // In-memory stand-in for ProgressRepository.
 export function createProgressRepository() {
-  const tables = { results: [], completions: [], xp: [] };
+  const tables = { results: [], completions: [], xp: [], studyDays: [] };
   const copy = (row) => (row ? structuredClone(row) : null);
   return {
     tables,
@@ -42,6 +42,14 @@ export function createProgressRepository() {
     async listXpTotals() {
       return totalsOf(tables.xp);
     },
+    async saveStudyDay({ accountId, day, activity, at }) {
+      const row = tables.studyDays.find((item) => item.accountId === accountId && item.day === day);
+      if (!row) tables.studyDays.push({ accountId, day, activities: [activity], firstAt: at, lastAt: at });
+      else if (!row.activities.includes(activity)) row.activities.push(activity);
+    },
+    async listStudyDays(accountId) {
+      return tables.studyDays.filter((row) => row.accountId === accountId).map((row) => row.day).sort();
+    },
   };
 }
 
@@ -64,10 +72,10 @@ export function createCurriculum(shape = [2, 2]) {
   };
 }
 
-export function progressHarness(shape) {
+export function progressHarness(shape, { now } = {}) {
   const repository = createProgressRepository();
   const content = createCurriculum(shape);
-  const service = new ProgressService(repository, content);
+  const service = new ProgressService(repository, content, now ? { now } : {});
   return { repository, content, service };
 }
 

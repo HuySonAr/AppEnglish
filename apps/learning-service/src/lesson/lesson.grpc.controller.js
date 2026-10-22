@@ -56,6 +56,7 @@ const rpcs = {
     run: (service, { actor, id, payload }) => service.getLessonTestReview(actor, id, payload),
   },
   GetVocabularyPractice: { run: (service, { actor }) => service.getVocabularyPractice(actor) },
+  CompleteVocabularyPractice: { run: (service, { actor }) => service.completeVocabularyPractice(actor) },
   GetLessonRanking: {
     id: true,
     run: (service, { actor, id }) => service.getLessonRanking(actor, id),

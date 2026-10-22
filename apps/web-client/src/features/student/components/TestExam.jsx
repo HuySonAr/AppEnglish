@@ -24,26 +24,26 @@ function Question({ question, chosen, onChoose, blankNumber }) {
   return (
     <fieldset
       id={`question-${question.number}`}
-      className="scroll-mt-36 rounded-xl border bg-card p-4 shadow-sm sm:p-5"
+      className={cn('scroll-mt-36 rounded-2xl border-2 bg-card p-4 shadow-sm transition-colors sm:p-5', chosen ? 'border-primary/30' : 'border-transparent')}
     >
       <legend className="sr-only">Question {question.number}</legend>
-      <p className="font-medium">
-        <span className="mr-2 text-primary">{question.number}.</span>
-        {question.prompt || (blankNumber ? `Blank (${question.number})` : 'Choose the best answer.')}
+      <p className="flex items-start gap-3 font-medium">
+        <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums', chosen ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground')}>
+          {question.number}
+        </span>
+        <span className="pt-1">{question.prompt || (blankNumber ? `Blank (${question.number})` : 'Choose the best answer.')}</span>
       </p>
-      {question.audioUrl ? <audio controls src={question.audioUrl} className="mt-3 w-full" /> : null}
-      {question.imageUrl ? (
-        <img src={question.imageUrl} alt="" className="mt-3 max-h-80 rounded-lg" />
-      ) : null}
-      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+      {question.audioUrl ? <audio controls src={question.audioUrl} className="mt-4 w-full" /> : null}
+      {question.imageUrl ? <img src={question.imageUrl} alt="" className="mt-4 max-h-80 rounded-xl border" /> : null}
+      <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
         {question.options.map((option, index) => {
           const selected = chosen === option.id;
           return (
             <label
               key={option.id}
               className={cn(
-                'flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors focus-within:ring-2 focus-within:ring-ring',
-                selected ? 'border-primary bg-primary/10' : 'hover:bg-accent',
+                'flex cursor-pointer items-center gap-3 rounded-xl border-2 px-3.5 py-3 text-sm transition-colors focus-within:ring-2 focus-within:ring-ring',
+                selected ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/40 hover:bg-accent',
               )}
             >
               <input
@@ -55,7 +55,7 @@ function Question({ question, chosen, onChoose, blankNumber }) {
               />
               <span
                 className={cn(
-                  'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
+                  'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm font-semibold',
                   selected ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground',
                 )}
               >
@@ -70,17 +70,6 @@ function Question({ question, chosen, onChoose, blankNumber }) {
   );
 }
 
-// A seven-part test in progress (placement or lesson test): one part at a
-// time, the server's clock on top.
-//   attempt         the IN_PROGRESS state from the API
-//   saveAnswers     saves the answers chosen so far
-//   onSubmit        ends the test with the given answers
-//   name            what the test is called, e.g. "placement test"
-//   retakeAllowed   whether the test can be taken again after submitting
-//   onDiscard       throws the attempt away and leaves (D82); resolves to
-//                   true when it did. Without it there is no Exit button.
-//   onLeaveForLater leaves with the attempt kept, to resume it later (mini
-//                   tests, which have no clock)
 export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, retakeAllowed = false, onDiscard, onLeaveForLater }) {
   const [answers, setAnswers] = useState(attempt.answers || {});
   const [partIndex, setPartIndex] = useState(0);
@@ -229,9 +218,14 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
             No time limit
           </span>
         )}
-        <span className="rounded-full bg-muted px-3 py-1.5 text-sm font-medium tabular-nums">
-          <span className="font-bold text-primary">{answered}</span> / {total} answered
-        </span>
+        <div className="flex min-w-[10rem] flex-1 items-center gap-2 sm:max-w-xs">
+          <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+            <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${total ? (answered * 100) / total : 0}%` }} />
+          </div>
+          <span className="text-sm font-medium tabular-nums">
+            <span className="font-bold text-primary">{answered}</span>/{total}
+          </span>
+        </div>
         <div className="ml-auto flex items-center gap-2">
           {onDiscard ? (
             <Button variant="outline" disabled={submitting || discarding} onClick={() => setExiting(true)}>
@@ -245,18 +239,17 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
         </div>
       </div>
 
-      {/* Laptop: the question list stays on the right; phone: it comes first. */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
         <aside className="lg:order-2 lg:sticky lg:top-36 lg:self-start">
-          <div className="rounded-xl border bg-card p-4 shadow-sm">
+          <div className="rounded-2xl border bg-card p-4 shadow-sm">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm font-medium">Questions</p>
               <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-sm bg-primary" /> Answered
+                  <span className="h-3 w-3 rounded-full bg-primary" /> Answered
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 rounded-sm border border-input" /> Not answered
+                  <span className="h-3 w-3 rounded-full border border-input" /> Not answered
                 </span>
               </p>
             </div>
@@ -274,7 +267,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
                         aria-label={`Question ${question.number}, ${done ? 'answered' : 'not answered'}`}
                         onClick={() => showQuestion(index, question.number)}
                         className={cn(
-                          'flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+                          'flex h-9 w-9 items-center justify-center rounded-full border text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                           done
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-input text-muted-foreground hover:bg-accent',
@@ -294,7 +287,8 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
         <div className="min-w-0 space-y-6 lg:order-1">
           <nav aria-label="Parts" className="flex flex-wrap gap-2">
             {attempt.parts.map((item, index) => {
-              const done = item.questions.every((question) => answers[question.id]);
+              const count = item.questions.filter((question) => answers[question.id]).length;
+              const done = count === item.questions.length;
               return (
                 <button
                   key={item.key}
@@ -302,31 +296,33 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
                   aria-current={index === partIndex ? 'step' : undefined}
                   onClick={() => showPart(index)}
                   className={cn(
-                    'rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'flex flex-col items-start rounded-xl border-2 px-3 py-1.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     index === partIndex
                       ? 'border-primary bg-primary text-primary-foreground'
                       : done
                         ? 'border-success/40 bg-success/10 text-success'
-                        : 'text-muted-foreground hover:bg-accent',
+                        : 'border-border text-muted-foreground hover:bg-accent',
                   )}
                 >
-                  Part {item.number}
+                  <span className="text-sm font-semibold">Part {item.number}</span>
+                  <span className="text-[11px] tabular-nums opacity-80">
+                    {count}/{item.questions.length}
+                  </span>
                 </button>
               );
             })}
           </nav>
 
           <div className="space-y-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-                {skillLabels[part.skill]}
-              </p>
-              <h2 className="text-xl font-bold">
-                Part {part.number}: {part.title}
-              </h2>
+            <div className="flex items-center gap-3 rounded-2xl border bg-card p-4 shadow-sm">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">{part.number}</span>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-widest text-primary">{skillLabels[part.skill]}</p>
+                <h2 className="truncate text-xl font-bold">{part.title}</h2>
+              </div>
             </div>
             {part.audioUrl ? (
-              <div className="rounded-xl border bg-card p-4 shadow-sm">
+              <div className="rounded-2xl border bg-card p-4 shadow-sm">
                 <p className="mb-2 text-sm text-muted-foreground">
                   Listen, then answer the question{part.questions.length === 1 ? '' : 's'} of this part.
                 </p>
@@ -336,7 +332,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
             {partSections(part).map((section) => (
               <div key={section.id} className="space-y-4">
                 {section.audioUrl ? (
-                  <div className="rounded-xl border bg-card p-4 shadow-sm">
+                  <div className="rounded-2xl border bg-card p-4 shadow-sm">
                     <p className="mb-2 text-sm text-muted-foreground">
                       Listen, then answer question{section.questions.length === 1 ? '' : 's'}{' '}
                       {section.questions.map((question) => question.number).join(', ')}.
@@ -346,7 +342,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
                 ) : null}
                 {section.imageUrl ? <img src={section.imageUrl} alt="" className="max-h-96 rounded-lg border" /> : null}
                 {section.passage ? (
-                  <div className="whitespace-pre-wrap rounded-xl border bg-card p-4 leading-relaxed shadow-sm sm:p-5">
+                  <div className="whitespace-pre-wrap rounded-2xl border bg-card p-5 text-[15px] leading-relaxed shadow-sm sm:p-6">
                     {section.blanks ? numberBlanks(section.passage, section.questions[0].number) : <PassageText text={section.passage} />}
                   </div>
                 ) : null}

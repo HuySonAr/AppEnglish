@@ -26,8 +26,6 @@ export function AuthLayout() {
   return (
     <div className="grid min-h-screen bg-background lg:grid-cols-[1.1fr_1fr]">
       <aside className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-black/10 blur-3xl" />
         <p className="relative text-lg font-semibold tracking-tight">
           AppEnglish
         </p>

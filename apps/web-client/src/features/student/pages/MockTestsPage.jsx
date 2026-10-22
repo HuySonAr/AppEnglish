@@ -3,7 +3,7 @@ import { ChevronRight, Clock, FileText, ListChecks, Sparkles } from 'lucide-reac
 import { Link } from 'react-router-dom';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { Badge, Button, Skeleton } from '../../../components/ui';
+import { Badge, Button } from '../../../components/ui';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
 import { FilterSelect, SearchField } from '../../../components/shared/ListFilter.jsx';
 import { Pagination } from '../../../components/shared/Pagination.jsx';
@@ -22,8 +22,6 @@ const takenOptions = [
   { value: 'not-taken', label: 'Not taken yet' },
 ];
 
-// Mock tests with the level suggested to the learner. Every test is open; the
-// suggestion only says where to start.
 export function MockTestsPage() {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
@@ -63,23 +61,25 @@ export function MockTestsPage() {
       <PageHeader
         eyebrow="Practice for the test"
         title="Mock tests"
-        description="Take a full test against the clock, or practise one part at a time as a mini test."
+        description="Full tests against the clock, or one part at a time."
       />
       {data.mockTests.length === 0 ? (
         <EmptyState icon={FileText} title="No mock tests yet" description="Mock tests will appear here when they are published." />
       ) : (
         <>
-          <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Sparkles className="h-5 w-5" />
+          <div className="flex flex-wrap items-center gap-4 rounded-2xl border bg-card p-5 shadow-sm">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+              <Sparkles className="h-6 w-6" />
             </span>
-            <div>
-              <p className="font-semibold">Suggested for you: Level {data.recommendedLevel}</p>
-              <p className="text-sm text-muted-foreground">
-                Based on your latest full mock test, or on your placement test before that. You can
-                take any test.
-              </p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">Suggested for you</p>
+              <p className="text-lg font-semibold">Level {data.recommendedLevel}</p>
             </div>
+            {data.mockTests.some((item) => item.recommended) ? (
+              <Button variant="outline" onClick={() => setFilters({ ...filters, level: String(data.recommendedLevel) })}>
+                Show level {data.recommendedLevel}
+              </Button>
+            ) : null}
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search mock tests by title" />
@@ -104,44 +104,60 @@ export function MockTestsPage() {
           {shown.total === 0 ? (
             <EmptyState icon={FileText} title="No mock test matches" description="Try another search or filter." />
           ) : null}
-          <ul className="grid gap-4 sm:grid-cols-2">
+          <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {shown.items.map((mockTest) => (
               <li key={mockTest.id}>
                 <Link
                   to={`/student/mock-tests/${mockTest.id}`}
                   className={cn(
-                    'group flex h-full flex-col rounded-xl border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                    mockTest.recommended && 'border-primary/50',
+                    'group flex h-full flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    mockTest.recommended && 'border-primary/50 ring-1 ring-primary/30',
                   )}
                 >
-                  <div className="flex flex-wrap items-center gap-2">
-                    {mockTest.examType ? <Badge variant="outline">{mockTest.examType.name}</Badge> : null}
-                    <Badge variant="secondary">Level {mockTest.level}</Badge>
-                    {mockTest.recommended ? <Badge variant="info">Recommended for you</Badge> : null}
-                    <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                  <div className="flex items-center gap-3 border-b bg-card px-5 py-4">
+                    <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+                      <span className="text-[10px] font-medium uppercase leading-none opacity-80">Level</span>
+                      <span className="text-lg font-bold leading-none">{mockTest.level}</span>
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <h2 className="truncate font-semibold">{mockTest.title}</h2>
+                      <div className="mt-1 flex flex-wrap gap-1.5">
+                        {mockTest.examType ? <Badge variant="outline">{mockTest.examType.name}</Badge> : null}
+                        {mockTest.recommended ? <Badge variant="info">For you</Badge> : null}
+                      </div>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
                   </div>
-                  <h2 className="mt-3 text-lg font-semibold">{mockTest.title}</h2>
-                  <p className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1.5">
-                      <ListChecks className="h-4 w-4" />
-                      {mockTest.questionCount} questions
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Clock className="h-4 w-4" />
-                      {mockTest.durationMinutes} minutes
-                    </span>
-                  </p>
-                  <p className="mt-4 border-t pt-3 text-sm">
+                  <div className="flex flex-1 flex-col gap-4 p-5">
+                    <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1.5">
+                        <ListChecks className="h-4 w-4" />
+                        {mockTest.questionCount} questions
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="h-4 w-4" />
+                        {mockTest.durationMinutes} min
+                      </span>
+                    </p>
                     {mockTest.attemptCount ? (
-                      <>
-                        Taken {mockTest.attemptCount} time{mockTest.attemptCount === 1 ? '' : 's'} · best{' '}
-                        <span className="font-semibold">{mockTest.bestPercent}%</span> · latest estimated score{' '}
-                        <span className="font-semibold">{mockTest.latestTotalScore}</span>
-                      </>
+                      <div className="mt-auto grid grid-cols-3 gap-2 text-center">
+                        <div className="rounded-xl bg-muted/50 p-2">
+                          <p className="text-lg font-bold tabular-nums">{mockTest.bestPercent}%</p>
+                          <p className="text-[11px] text-muted-foreground">best</p>
+                        </div>
+                        <div className="rounded-xl bg-muted/50 p-2">
+                          <p className="text-lg font-bold tabular-nums">{mockTest.latestTotalScore ?? '—'}</p>
+                          <p className="text-[11px] text-muted-foreground">latest score</p>
+                        </div>
+                        <div className="rounded-xl bg-muted/50 p-2">
+                          <p className="text-lg font-bold tabular-nums">{mockTest.attemptCount}</p>
+                          <p className="text-[11px] text-muted-foreground">taken</p>
+                        </div>
+                      </div>
                     ) : (
-                      <span className="text-muted-foreground">Not taken in full yet</span>
+                      <p className="mt-auto rounded-xl border border-dashed p-3 text-center text-sm text-muted-foreground">Not taken in full yet</p>
                     )}
-                  </p>
+                  </div>
                 </Link>
               </li>
             ))}

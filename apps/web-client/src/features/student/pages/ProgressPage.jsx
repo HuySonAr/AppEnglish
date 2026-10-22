@@ -1,60 +1,34 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, Headphones, Timer, TrendingUp, Trophy } from 'lucide-react';
+import { ArrowRight, BookOpen, CheckCircle2, Headphones, Timer, TrendingUp, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
+import { cn } from '../../../lib/utils.js';
 import { Button } from '../../../components/ui';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { getProgress, getXp } from '../api/progress-api.js';
+import { ScoreRing } from '../components/ScoreRing.jsx';
 
 const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
 
-function Stat({ icon: Icon, label, value, detail }) {
+function RingCard({ icon: Icon, title, percent, tone, detail }) {
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Icon className="h-4 w-4" aria-hidden="true" />
-        {label}
-      </div>
-      <p className="mt-1 text-2xl font-bold tabular-nums">{value}</p>
-      {detail ? <p className="text-xs text-muted-foreground">{detail}</p> : null}
+    <div className="flex flex-col items-center gap-3 rounded-2xl border bg-card p-5 text-center shadow-sm">
+      <p className="flex items-center gap-1.5 text-sm font-medium">
+        <Icon className="h-4 w-4 text-primary" />
+        {title}
+      </p>
+      <ScoreRing percent={percent} tone={tone} size={112} />
+      <p className="text-xs text-muted-foreground">{detail}</p>
     </div>
   );
 }
 
-function Bar({ completed, total }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-        <div className="h-full rounded-full bg-primary" style={{ width: `${total ? (completed * 100) / total : 0}%` }} />
-      </div>
-      <span className="w-12 text-right text-sm tabular-nums text-muted-foreground">
-        {completed}/{total}
-      </span>
-    </div>
-  );
-}
-
-// A skill's mastery: the average of the best score on that skill's questions
-// of every lesson test and full mock test taken (D33). Before any such test
-// there is no value, not 0% (D39).
-function Skill({ icon, label, skill }) {
-  const rests = skill.testCount
-    ? `best of ${plural(skill.lessonTests, 'lesson test')} and ${plural(skill.mockTests, 'mock test')}`
-    : 'Take a lesson test or a full mock test';
-  return <Stat icon={icon} label={label} value={skill.percent === null ? 'No data yet' : `${skill.percent}%`} detail={rests} />;
-}
-
-// The learner's progress (F06, D33): lessons completed over the published
-// lessons, and the Reading and Listening mastery. Placement, practice and
-// mini tests do not count; retakes never lower it.
 export function ProgressPage() {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
-  // XP is shown beside the progress; without progress-service's XP answer
-  // the card says so instead of hiding the page.
   const [xp, setXp] = useState(null);
 
   async function load() {
@@ -74,7 +48,7 @@ export function ProgressPage() {
     load();
   }, []);
 
-  const header = <PageHeader eyebrow="Student" title="Progress" description="How much of the course you completed, and how well you do in Listening and Reading." />;
+  const header = <PageHeader eyebrow="Student" title="Progress" description="Your lessons and your Listening and Reading." />;
 
   if (state === 'loading') return <DetailPageSkeleton />;
   if (state === 'error')
@@ -89,33 +63,45 @@ export function ProgressPage() {
 
   const { completion, skills, attempts } = data;
   const nothingYet = completion.completedLessons === 0 && attempts.lessonTests === 0 && attempts.mockTests === 0;
+  const skillDetail = (skill) => (skill.testCount ? `${plural(skill.lessonTests, 'lesson test')} · ${plural(skill.mockTests, 'mock test')}` : 'No test yet');
 
   return (
     <section className="space-y-6">
       {header}
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <RingCard
           icon={BookOpen}
-          label="Lessons completed"
-          value={completion.percent === null ? 'No lessons yet' : `${completion.percent}%`}
-          detail={completion.totalLessons ? `${completion.completedLessons} of ${plural(completion.totalLessons, 'lesson')}` : 'No lesson is published yet'}
+          title="Lessons"
+          percent={completion.percent}
+          tone={completion.percent === 100 ? 'success' : 'primary'}
+          detail={completion.totalLessons ? `${completion.completedLessons} of ${plural(completion.totalLessons, 'lesson')}` : 'No lesson yet'}
         />
-        <Skill icon={Headphones} label="Listening" skill={skills.listening} />
-        <Skill icon={BookOpen} label="Reading" skill={skills.reading} />
-        <Stat
-          icon={Trophy}
-          label="XP"
-          value={xp ? `${xp.totalXp} XP` : '—'}
-          detail={xp ? (xp.rank ? `#${xp.rank} of ${xp.learnerCount} on the leaderboard` : 'Finish a full mock test to earn XP') : 'XP could not be loaded'}
-        />
+        <RingCard icon={Headphones} title="Listening" percent={skills.listening.percent} detail={skillDetail(skills.listening)} />
+        <RingCard icon={BookOpen} title="Reading" percent={skills.reading.percent} detail={skillDetail(skills.reading)} />
+        <div className="flex flex-col justify-between gap-3 rounded-2xl border bg-card p-5 shadow-sm">
+          <p className="flex items-center gap-1.5 text-sm font-medium">
+            <Trophy className="h-4 w-4 text-warning" />
+            XP
+          </p>
+          <div>
+            <p className="text-4xl font-bold tabular-nums">{xp ? xp.totalXp : '—'}</p>
+            <p className="text-xs text-muted-foreground">{xp ? (xp.rank ? `#${xp.rank} of ${xp.learnerCount} learners` : 'From your first full mock tests') : 'Could not be loaded'}</p>
+          </div>
+          <Button asChild variant="outline" size="sm" className="w-fit gap-1.5">
+            <Link to="/student/leaderboard">
+              Leaderboard
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {nothingYet ? (
         <EmptyState
           icon={TrendingUp}
           title="Nothing to show yet"
-          description="Your progress grows as you pass lesson tests and take full mock tests. Placement, practice and mini tests do not count."
+          description="Pass a lesson test or take a full mock test."
           action={
             <div className="flex flex-wrap justify-center gap-2">
               <Button asChild>
@@ -134,52 +120,68 @@ export function ProgressPage() {
           }
         />
       ) : (
-        <>
-          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-            <div className="border-b bg-muted/40 px-4 py-2 text-sm font-medium text-muted-foreground">Lessons completed by unit</div>
-            {completion.units.length ? (
-              <ul className="divide-y">
-                {completion.units.map((unit) => (
-                  <li key={unit.id} className="grid gap-2 px-4 py-3 sm:grid-cols-[14rem_1fr] sm:items-center sm:gap-4">
-                    <span className="font-medium">{unit.title}</span>
-                    <Bar completed={unit.completed} total={unit.total} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="px-4 py-6 text-sm text-muted-foreground">No lesson is published yet.</p>
-            )}
+        <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 font-semibold">
+              <BookOpen className="h-4 w-4 text-primary" />
+              Lessons by unit
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              {plural(attempts.lessonTests, 'lesson test')} · {plural(attempts.mockTests, 'full mock test')} taken
+            </span>
           </div>
-
-          <p className="text-sm text-muted-foreground">
-            Mastery is the average of your best score on each skill&apos;s questions over every lesson test and full mock test you took
-            ({plural(attempts.lessonTests, 'lesson test attempt')}, {plural(attempts.mockTests, 'full mock test attempt')}). Retaking a test never lowers it.
-          </p>
-        </>
+          {completion.units.length ? (
+            <ol className="grid gap-3 sm:grid-cols-2">
+              {completion.units.map((unit, index) => {
+                const finished = unit.total > 0 && unit.completed === unit.total;
+                return (
+                  <li key={unit.id} className="flex items-center gap-3 rounded-xl border p-3">
+                    <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold', finished ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground')}>
+                      {finished ? <CheckCircle2 className="h-5 w-5" /> : index + 1}
+                    </span>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <p className="truncate text-sm font-medium">{unit.title}</p>
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                          <div className={cn('h-full rounded-full transition-all', finished ? 'bg-success' : 'bg-primary')} style={{ width: `${unit.total ? (unit.completed * 100) / unit.total : 0}%` }} />
+                        </div>
+                        <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                          {unit.completed}/{unit.total}
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          ) : (
+            <p className="text-sm text-muted-foreground">No lesson is published yet.</p>
+          )}
+        </div>
       )}
 
       {xp?.entries?.length ? (
-        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-          <div className="flex items-center justify-between gap-3 border-b bg-muted/40 px-4 py-2 text-sm font-medium text-muted-foreground">
-            <span>XP from mock tests (first full attempt of each)</span>
-            <Link to="/student/leaderboard" className="inline-flex items-center gap-1.5 hover:text-foreground">
-              <Trophy className="h-4 w-4" />
-              Leaderboard
-            </Link>
-          </div>
-          <ul className="divide-y">
+        <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+          <h2 className="flex items-center gap-2 font-semibold">
+            <Trophy className="h-4 w-4 text-warning" />
+            XP from mock tests
+          </h2>
+          <ol className="space-y-2">
             {xp.entries.map((entry) => (
-              <li key={entry.mockTestId} className="grid grid-cols-[1fr_auto] items-center gap-3 px-4 py-3 text-sm">
-                <span className="min-w-0">
+              <li key={entry.mockTestId} className="flex items-center gap-3 rounded-xl border p-3 text-sm">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-warning/15 text-warning">
+                  <Timer className="h-4 w-4" />
+                </span>
+                <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium">{entry.mockTestTitle || 'Mock test'}</span>
                   <span className="text-xs text-muted-foreground">
                     {entry.correctCount}/{entry.totalCount} right · {new Date(entry.earnedAt).toLocaleDateString()}
                   </span>
                 </span>
-                <span className="font-semibold tabular-nums">+{entry.xp} XP</span>
+                <span className="rounded-full bg-warning/15 px-2.5 py-1 text-xs font-bold tabular-nums text-warning">+{entry.xp} XP</span>
               </li>
             ))}
-          </ul>
+          </ol>
         </div>
       ) : null}
     </section>

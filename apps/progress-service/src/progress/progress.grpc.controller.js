@@ -11,6 +11,7 @@ const rpcs = {
   GetProgress: { run: (service, { actor }) => service.getProgress(actor) },
   GetXp: { run: (service, { actor }) => service.getXp(actor) },
   GetLeaderboard: { run: (service, { actor }) => service.getLeaderboard(actor) },
+  GetStreak: { run: (service, { actor }) => service.getStreak(actor) },
   GetLearnerSummary: { run: (service, { actor, id }) => service.getLearnerSummary(actor, id) },
 };
 

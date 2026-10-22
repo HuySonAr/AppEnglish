@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowUp, ClipboardCheck, Clock, ListChecks, Target, Trophy } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { LESSON_TEST_QUESTION_COUNT } from '@appenglish/content-contracts';
 import { LessonTestStatus } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { Badge, Button, Skeleton } from '../../../components/ui';
+import { Badge, Button } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import {
   discardLessonTest,
@@ -20,9 +20,11 @@ import { LessonRanking } from '../components/LessonRanking.jsx';
 import { TestExam } from '../components/TestExam.jsx';
 import { TestProgression } from '../components/TestProgression.jsx';
 import { TestReview } from '../components/TestReview.jsx';
+import { ScoreRing } from '../components/ScoreRing.jsx';
+import { TestStartCard } from '../components/TestStartCard.jsx';
 import { formatRemaining } from '../lib/placement.js';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
-import { useFocusReturn, useListLinkState, useReturnTo } from '../../../hooks/use-return-to.js';
+import { useReturnTo } from '../../../hooks/use-return-to.js';
 
 // The lesson test: start, take it (same exam screen as the placement test),
 // then the score with every answer explained, the history of attempts with how
@@ -164,14 +166,9 @@ export function LessonTestPage() {
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 Attempt {review.attempt.attemptNumber}
               </p>
-              <p
-                className={cn(
-                  'mt-3 text-6xl font-bold tracking-tight',
-                  review.attempt.passed ? 'text-success' : 'text-destructive',
-                )}
-              >
-                {review.attempt.scorePercent}%
-              </p>
+              <div className="mt-4 flex justify-center">
+                <ScoreRing percent={review.attempt.scorePercent} tone={review.attempt.passed ? 'success' : 'destructive'} label="correct" />
+              </div>
               <p className="mt-2 text-muted-foreground">
                 {review.attempt.correctCount} of {review.attempt.totalCount} correct in{' '}
                 {formatRemaining(review.attempt.durationSeconds * 1000)}
@@ -195,25 +192,23 @@ export function LessonTestPage() {
               </div>
             </div>
           ) : (
-            <div className="rounded-xl border bg-card p-6 shadow-sm">
-              <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-bold">Lesson test</h1>
-                {passed ? <Badge variant="success">Passed</Badge> : null}
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {LESSON_TEST_QUESTION_COUNT} questions in {test.durationMinutes} minutes: Parts 1–4 are
-                Listening, Parts 5–7 are Reading. Score {test.passPercent}% or more to complete the
-                lesson. You can take the test again; only your first attempt counts for the ranking.
-              </p>
-              {locked ? (
-                <p className="mt-4 text-sm font-medium text-destructive">
-                  Finish the vocabulary, the word quiz and the fill-in exercise of this lesson first.
-                </p>
-              ) : null}
-              <Button className="mt-5" disabled={busy || locked} onClick={onStart}>
+            <TestStartCard
+              icon={Trophy}
+              eyebrow="Parts 1–4 Listening · Parts 5–7 Reading"
+              title="Lesson test"
+              badges={passed ? <Badge variant="success">Passed</Badge> : null}
+              stats={[
+                { icon: ListChecks, label: 'Questions', value: LESSON_TEST_QUESTION_COUNT },
+                { icon: Clock, label: 'Minutes', value: test.durationMinutes },
+                { icon: Target, label: 'To pass', value: `${test.passPercent}%` },
+                { icon: ClipboardCheck, label: 'Attempts', value: test.attempts.length },
+              ]}
+              note={locked ? 'Finish the vocabulary, the word quiz and the fill-in first.' : 'Your first attempt counts for the ranking.'}
+            >
+              <Button size="lg" disabled={busy || locked} onClick={onStart}>
                 {test.attempts.length ? 'Take the test again' : 'Start the test'}
               </Button>
-            </div>
+            </TestStartCard>
           )}
 
           <TestProgression

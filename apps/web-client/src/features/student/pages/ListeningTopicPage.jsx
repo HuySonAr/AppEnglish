@@ -6,20 +6,17 @@ import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
-import { FeatureCard } from '../../../components/shared/FeatureCard.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { CardGridPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { listListeningPractice } from '../api/practice-api.js';
+import { PracticeCard } from '../components/PracticeCard.jsx';
 import { exercisesFor, modeLabels, resultOf, topicModes } from '../lib/listening-practice.js';
 
 const modeCards = {
-  [ListeningMode.BLANKS]: { icon: TextCursorInput, tone: 'success', description: 'The lyrics are shown with words missing; type the words you hear.' },
-  [ListeningMode.FULL]: { icon: PenLine, tone: 'primary', description: 'Write down every line you hear, one line at a time.' },
+  [ListeningMode.BLANKS]: { icon: TextCursorInput, tone: 'success', description: 'Type the missing words.' },
+  [ListeningMode.FULL]: { icon: PenLine, tone: 'primary', description: 'Write every line.' },
 };
 
-// Listening practice (D92), second step for a topic with several ways of
-// practising (songs): a card per way. A topic with one way goes straight on
-// to its exercises.
 export function ListeningTopicPage() {
   const { topicId } = useParams();
   const [state, setState] = useState('loading');
@@ -79,11 +76,14 @@ export function ListeningTopicPage() {
           const tried = own.filter((exercise) => resultOf(exercise, mode).checkCount > 0).length;
           const card = modeCards[mode];
           return (
-            <FeatureCard
+            <PracticeCard
               key={mode}
               icon={card.icon}
               title={modeLabels[mode]}
-              description={`${card.description} ${own.length} song${own.length === 1 ? '' : 's'}${tried ? `, ${tried} tried` : ''}.`}
+              description={card.description}
+              total={own.length}
+              done={tried}
+              unit="song"
               to={`/student/practice/listening/topics/${topicId}/${mode}`}
               tone={card.tone}
             />

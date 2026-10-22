@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, CheckCircle2, ClipboardCheck, ListChecks, Target } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ClipboardCheck, ListChecks, Target, Trophy } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { UNIT_REVIEW_PART_COUNTS, UNIT_REVIEW_PASSAGE_COUNT, UNIT_REVIEW_PASSAGE_QUESTIONS } from '@appenglish/content-contracts';
 import { UnitReviewState } from '@appenglish/learning-contracts';
@@ -10,14 +10,10 @@ import { cn } from '../../../lib/utils.js';
 import { getUnitReview, submitUnitReview } from '../api/lessons-api.js';
 import { MockAttemptResult } from '../components/MockAttemptResult.jsx';
 import { TestExam } from '../components/TestExam.jsx';
+import { TestStartCard } from '../components/TestStartCard.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
-import { PageHeader } from '../../../components/shared/PageHeader.jsx';
-import { useFocusReturn, useListLinkState, useReturnTo } from '../../../hooks/use-return-to.js';
+import { useReturnTo } from '../../../hooks/use-return-to.js';
 
-// The review that closes a unit (D121, D129): 19 Reading questions on the words of
-// the unit, no time limit, 80% to open the next unit, retakes unlimited.
-// Three screens: the overview with the attempts, the exam, the result with
-// every answer explained.
 export function UnitReviewPage() {
   const { unitId } = useParams();
   const back = useReturnTo('/student/lessons');
@@ -128,36 +124,23 @@ export function UnitReviewPage() {
         </div>
       ) : (
         <>
-          <PageHeader
+          <TestStartCard
+            icon={Trophy}
             eyebrow={`Unit ${data.unit.number}`}
             title={`Unit review: ${data.unit.title}`}
-            description={`${data.questionCount} Reading questions on the words of this unit: ${UNIT_REVIEW_PART_COUNTS.part5} sentences to complete and ${UNIT_REVIEW_PASSAGE_COUNT} passages with ${UNIT_REVIEW_PASSAGE_QUESTIONS} blanks each. No time limit; every answer is explained afterwards.`}
-          />
-          <div className="rounded-2xl border bg-card p-6 shadow-sm">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant={passed ? 'success' : 'info'}>{passed ? 'Passed' : 'Open'}</Badge>
-              {data.bestPercent === null ? null : <Badge variant="secondary">Best {data.bestPercent}%</Badge>}
-            </div>
-            <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <ListChecks className="h-4 w-4" />
-                {data.questionCount} questions
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Target className="h-4 w-4" />
-                {data.passPercent}% to pass and open the next unit
-              </span>
-              <span className="flex items-center gap-1.5">
-                <ClipboardCheck className="h-4 w-4" />
-                {data.attemptCount} attempt{data.attemptCount === 1 ? '' : 's'}
-              </span>
-            </p>
-            <div className="mt-5">
-              <Button disabled={busy} onClick={() => setTaking(true)}>
-                {data.attemptCount ? 'Take the review again' : 'Start the review'}
-              </Button>
-            </div>
-          </div>
+            badges={<Badge variant={passed ? 'success' : 'info'}>{passed ? 'Passed' : 'Open'}</Badge>}
+            stats={[
+              { icon: ListChecks, label: 'Questions', value: data.questionCount },
+              { icon: Target, label: 'To pass', value: `${data.passPercent}%` },
+              { icon: ClipboardCheck, label: 'Attempts', value: data.attemptCount },
+              { icon: CheckCircle2, label: 'Best', value: data.bestPercent === null ? '—' : `${data.bestPercent}%`, tone: passed ? 'text-success' : undefined },
+            ]}
+            note={`Part 5: ${UNIT_REVIEW_PART_COUNTS.part5} sentences. Part 6: ${UNIT_REVIEW_PASSAGE_COUNT} passages of ${UNIT_REVIEW_PASSAGE_QUESTIONS} blanks. No time limit.`}
+          >
+            <Button size="lg" disabled={busy} onClick={() => setTaking(true)}>
+              {data.attemptCount ? 'Take the review again' : 'Start the review'}
+            </Button>
+          </TestStartCard>
 
           <div className="space-y-3">
             <h2 className="text-lg font-semibold">Your attempts ({data.attempts.length})</h2>

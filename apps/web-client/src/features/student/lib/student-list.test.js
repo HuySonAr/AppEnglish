@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterCurriculum, filterStudentMocks } from './student-list.js';
+import { filterCurriculum, filterStudentMocks, nextLesson, unitProgress } from './student-list.js';
 
 test('the learner searches, filters and sorts mock tests', () => {
   const mock = (title, level, extra = {}) => ({ id: title, title, level, recommended: false, attemptCount: 0, bestPercent: null, examType: { id: 'toeic' }, ...extra });
@@ -42,3 +42,17 @@ test('the learner searches and filters lessons, keeping the learning order', () 
   assert.deepEqual(shape({ search: 'business', state: 'LOCKED' }), [['u1', ['Warranties']], ['u2', ['Business letters']]]);
   assert.deepEqual(shape({ search: 'nothing like this' }), []);
 });
+
+test('the next lesson to continue and the progress of a unit', () => {
+  const unit = (id, states, review) => ({ id, lessons: states.map((state, index) => ({ id: `${id}-${index}`, state })), review });
+  const first = unit('u1', ['COMPLETED', 'COMPLETED'], { state: 'OPEN' });
+  const second = unit('u2', ['OPEN', 'LOCKED'], null);
+  assert.deepEqual(unitProgress(first), { done: 2, total: 2, complete: false });
+  assert.deepEqual(unitProgress({ ...first, review: { state: 'PASSED' } }), { done: 2, total: 2, complete: true });
+  assert.deepEqual(unitProgress(second), { done: 0, total: 2, complete: false });
+  assert.equal(nextLesson([first, second]).type, 'review');
+  const after = nextLesson([{ ...first, review: { state: 'PASSED' } }, second]);
+  assert.deepEqual([after.type, after.lesson.id], ['lesson', 'u2-0']);
+  assert.equal(nextLesson([unit('u3', ['COMPLETED'], null)]), null);
+});
+

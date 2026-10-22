@@ -1,6 +1,7 @@
 import { AccountRole } from '@appenglish/auth-contracts';
 import { COURSE_PASS_PERCENT, CourseItemType, lyricPieces } from '@appenglish/content-contracts';
-import { CourseDictationMode } from '@appenglish/learning-contracts';
+import { CourseDictationMode, StudyActivity } from '@appenglish/learning-contracts';
+import { noEvents, recordActivity } from '../events/learning-events.js';
 import { accuracyOf, checkSentence, sameWords } from '../listening/dictation.rules.js';
 import { placementErrors } from '../placement/placement.errors.js';
 import { courseErrors } from './course.errors.js';
@@ -49,10 +50,11 @@ export function transcriptLines(transcript) {
 
 export class CourseLessonService {
   // now() is replaceable in tests.
-  constructor(repository, contentClient, { now = () => new Date() } = {}) {
+  constructor(repository, contentClient, { now = () => new Date(), events = noEvents } = {}) {
     this.repository = repository;
     this.contentClient = contentClient;
     this.now = now;
+    this.events = events;
   }
 
   assertStudent(actor) {
@@ -192,6 +194,7 @@ export class CourseLessonService {
     this.assertStudent(actor);
     await this.topicOf(actor.id, topicId);
     const result = await this.repository.recordAttempt(actor.id, topicId, topicId, 100, true, this.now());
+    await recordActivity(this.events, actor.id, StudyActivity.COURSE_TOPIC, this.now());
     const { map } = await this.mapOf(actor.id);
     return { done: Boolean(result.passedAt), progress: courseProgress(map, await this.repository.listTestResults(actor.id)) };
   }
@@ -247,6 +250,7 @@ export class CourseLessonService {
     const score = questions.length ? Math.round((right * 100) / questions.length) : 0;
     const passed = questions.length > 0 && right * 100 >= passPercent * questions.length;
     const result = await this.repository.recordTestAttempt(actor.id, itemId, 'level_test', paper.item.level, score, passed, this.now());
+    await recordActivity(this.events, actor.id, StudyActivity.COURSE_TEST, this.now());
     const { map } = await this.mapOf(actor.id);
     return {
       ...this.resultView(result),

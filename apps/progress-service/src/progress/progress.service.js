@@ -5,6 +5,7 @@ import { LEADERBOARD_SIZE, ProgressSkill, ProgressSource } from '@appenglish/pro
 import { progressErrors } from './progress.errors.js';
 import { completion, skillMastery } from './progress.rules.js';
 import { learnerIdSchema, payloadSchemas, resultMessageSchema } from './progress.schemas.js';
+import { dayOf, streakView } from './streak.rules.js';
 import { earnsXp, rankTotals, xpOf } from './xp.rules.js';
 
 const logger = new Logger('ProgressService');
@@ -25,9 +26,10 @@ const counts = (payload) => ({
 // Results arrive as learning.results messages; the curriculum is read from
 // content-service.
 export class ProgressService {
-  constructor(repository, contentClient) {
+  constructor(repository, contentClient, { now = () => new Date() } = {}) {
     this.repository = repository;
     this.contentClient = contentClient;
+    this.now = now;
   }
 
   assertStudent(actor) {
@@ -87,6 +89,9 @@ export class ProgressService {
         sourceId: data.lessonId,
         ...counts(data),
       });
+    } else if (type === LearningEventType.ACTIVITY_RECORDED) {
+      const at = new Date(data.occurredAt);
+      await this.repository.saveStudyDay({ accountId: data.accountId, day: dayOf(at), activity: data.activity, at });
     } else if (type === LearningEventType.LESSON_COMPLETED) {
       await this.repository.saveCompletion({ accountId: data.accountId, lessonId: data.lessonId, completedAt: new Date(data.completedAt) });
     } else if (type === LearningEventType.MOCK_SUBMITTED) {
@@ -115,6 +120,11 @@ export class ProgressService {
       }
     }
     return true;
+  }
+
+  async getStreak(actor) {
+    this.assertStudent(actor);
+    return streakView(await this.repository.listStudyDays(actor.id), this.now());
   }
 
   // The learner's XP (F07): the total, their rank, and the mock tests it

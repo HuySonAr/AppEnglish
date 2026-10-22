@@ -271,6 +271,9 @@ importers:
       '@appenglish/learning-contracts':
         specifier: workspace:*
         version: link:../../packages/learning-contracts
+      '@appenglish/progress-contracts':
+        specifier: workspace:*
+        version: link:../../packages/progress-contracts
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.9.1(react-hook-form@7.89.0(react@19.3.0))(zod@3.25.76)

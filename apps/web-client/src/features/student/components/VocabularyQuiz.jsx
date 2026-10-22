@@ -1,45 +1,24 @@
-import { useEffect, useState } from 'react';
-import { Lightbulb } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Check, ChevronLeft, ChevronRight, RotateCcw, X } from 'lucide-react';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { Badge, Button } from '../../../components/ui';
+import { Badge, Button, Card, CardContent } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import { getVocabularyQuiz, submitVocabularyQuiz } from '../api/lessons-api.js';
 import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { QuizLight, checkedLights, lightOf, withAnswerChanged } from '../lib/quiz-lights.js';
 
 const optionLetters = ['A', 'B', 'C', 'D'];
-const lightStyles = {
-  [QuizLight.UNCHECKED]: { tone: 'bg-muted text-muted-foreground', label: 'not checked' },
-  [QuizLight.RIGHT]: { tone: 'bg-success/15 text-success', label: 'right' },
-  [QuizLight.WRONG]: { tone: 'bg-destructive/10 text-destructive', label: 'not right' },
-};
 
-// The light of one word: grey until checked, then green or red (D83).
-function WordLight({ light, className }) {
-  return (
-    <span className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-full', lightStyles[light].tone, className)}>
-      <Lightbulb className="h-4 w-4" aria-hidden="true" />
-    </span>
-  );
-}
-
-// Choose the meaning of every word (kind is QuizKind: this lesson's words or
-// the review of the previous lesson). Every word must be right; the wrong ones
-// are marked and the learner tries again. onPassed is called once all are right.
-//
-// Layout: the questions on the left; the lights and the Check button in a
-// column on the right that stays in view while scrolling. On a phone the
-// lights sit in a row above the questions and the Check button sticks to the
-// bottom of the screen, so the learner never scrolls to find it.
 export function VocabularyQuiz({ lessonId, kind, onPassed }) {
   const [state, setState] = useState('loading');
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
-  // Question id → QuizLight of the words checked and not changed since.
   const [lights, setLights] = useState({});
+  const [at, setAt] = useState(0);
   const [busy, setBusy] = useState(false);
   const [passed, setPassed] = useState(false);
+  const advance = useRef(null);
 
   async function load() {
     setState('loading');
@@ -47,6 +26,7 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
       setQuestions((await getVocabularyQuiz(lessonId, kind)).data.questions);
       setAnswers({});
       setLights({});
+      setAt(0);
       setPassed(false);
       setState('ready');
     } catch (error) {
@@ -59,6 +39,18 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
     load();
   }, [lessonId, kind]);
 
+  useEffect(() => () => clearTimeout(advance.current), []);
+
+  function choose(question, option) {
+    const next = { ...answers, [question.id]: option };
+    setAnswers(next);
+    setLights((current) => withAnswerChanged(current, question.id));
+    clearTimeout(advance.current);
+    const following = questions.findIndex((item, index) => index > at && !next[item.id]);
+    const anyLeft = following >= 0 ? following : questions.findIndex((item) => !next[item.id]);
+    if (anyLeft >= 0) advance.current = setTimeout(() => setAt(anyLeft), 350);
+  }
+
   async function check() {
     setBusy(true);
     try {
@@ -69,14 +61,9 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
         notify({ title: 'All correct' });
         onPassed();
       } else {
-        notify({
-          title: `${result.wrongIds.length} of ${result.total} to fix`,
-          description: 'Change the marked answers and check again.',
-          variant: 'destructive',
-        });
-        // Brings the first word to fix into view.
+        notify({ title: `${result.wrongIds.length} of ${result.total} to fix`, description: 'Change the red words and check again.', variant: 'destructive' });
         const firstWrong = questions.findIndex((question) => result.wrongIds.includes(question.id));
-        if (firstWrong >= 0) document.getElementById(wordId(firstWrong))?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        if (firstWrong >= 0) setAt(firstWrong);
       }
     } catch (error) {
       notify({ title: 'Could not check the answers', description: getApiErrorMessage(error), variant: 'destructive' });
@@ -85,8 +72,6 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
     }
   }
 
-  const wordId = (index) => `quiz-${kind}-word-${index + 1}`;
-
   if (state === 'loading') return <RowsSkeleton rows={3} tall />;
   if (state === 'error')
     return (
@@ -94,131 +79,105 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
         Try again
       </Button>
     );
+  if (!questions.length) return <p className="text-sm text-muted-foreground">This quiz has no words.</p>;
 
-  const answered = questions.filter((question) => answers[question.id]).length;
-  const checkButton = (
-    <Button className="w-full lg:w-auto" loading={busy} disabled={busy || passed || answered < questions.length} onClick={check}>
-      {busy ? 'Checking…' : 'Check answers'}
-    </Button>
-  );
-  const counter = (
-    <span className="text-sm text-muted-foreground tabular-nums">
-      {answered} of {questions.length} answered
-    </span>
-  );
-  const again = passed ? (
-    <Button variant="outline" className="w-full lg:w-auto" onClick={load}>
-      Practise again with a new order
-    </Button>
-  ) : null;
+  const question = questions[at];
+  const answered = questions.filter((item) => answers[item.id]).length;
+  const light = lightOf(lights, question.id);
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Choose the meaning of each word. All {questions.length} must be right; you can try as often as you need.
-      </p>
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Words">
+        {questions.map((item, index) => {
+          const itemLight = lightOf(lights, item.id);
+          return (
+            <button
+              key={item.id}
+              type="button"
+              aria-label={`Word ${index + 1}`}
+              aria-current={index === at ? 'step' : undefined}
+              onClick={() => setAt(index)}
+              className={cn(
+                'flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold tabular-nums transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                itemLight === QuizLight.RIGHT
+                  ? 'border-success bg-success text-white'
+                  : itemLight === QuizLight.WRONG
+                    ? 'border-destructive bg-destructive text-white'
+                    : answers[item.id]
+                      ? 'border-primary/50 bg-primary/10 text-primary'
+                      : 'text-muted-foreground',
+                index === at && 'ring-2 ring-primary ring-offset-2',
+              )}
+            >
+              {itemLight === QuizLight.RIGHT ? <Check className="h-3.5 w-3.5" /> : itemLight === QuizLight.WRONG ? <X className="h-3.5 w-3.5" /> : index + 1}
+            </button>
+          );
+        })}
+        <span className="ml-auto text-sm tabular-nums text-muted-foreground">
+          {answered} of {questions.length} answered
+        </span>
+      </div>
 
-      <div className="lg:grid lg:grid-cols-[1fr_15rem] lg:items-start lg:gap-5">
-        {/* One light per word: grey until checked, then green or red. A row on
-            a phone, a column that follows the scroll on a wide screen. */}
-        <aside className="mb-4 rounded-xl border bg-card p-3 shadow-sm lg:sticky lg:top-20 lg:order-2 lg:mb-0 lg:p-4">
-          <ol aria-label="Results" className="flex flex-wrap gap-2">
-            {questions.map((question, index) => {
-              const light = lightOf(lights, question.id);
-              return (
-                <li key={question.id}>
-                  <button
-                    type="button"
-                    aria-label={`Word ${index + 1}: ${lightStyles[light].label}`}
-                    title={`${question.word}: ${lightStyles[light].label}`}
-                    className="flex flex-col items-center gap-0.5 rounded-lg p-1 text-xs font-medium text-muted-foreground tabular-nums hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    onClick={() => document.getElementById(wordId(index))?.scrollIntoView({ block: 'center', behavior: 'smooth' })}
-                  >
-                    <WordLight light={light} />
-                    {index + 1}
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-          {/* The actions live here on a wide screen; on a phone they are in the bar below. */}
-          <div className="mt-4 hidden flex-col gap-2 border-t pt-4 lg:flex">
-            {counter}
-            {checkButton}
-            {again}
+      <Card className={cn('border-2 transition-colors', light === QuizLight.WRONG ? 'border-destructive/50' : light === QuizLight.RIGHT ? 'border-success/50' : 'border-transparent')}>
+        <CardContent className="space-y-6 pt-6">
+          <div className="space-y-2 text-center">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+              Word {at + 1} of {questions.length}
+            </p>
+            <p className="text-3xl font-bold">{question.word}</p>
+            <div className="flex items-center justify-center gap-2">
+              <Badge variant="secondary">{question.partOfSpeech}</Badge>
+              {light === QuizLight.WRONG ? <Badge variant="destructive">Not right</Badge> : null}
+            </div>
           </div>
-        </aside>
-
-        <ol className="space-y-3 lg:order-1">
-          {questions.map((question, index) => {
-            const light = lightOf(lights, question.id);
-            const wrong = light === QuizLight.WRONG;
-            return (
-              <li key={question.id} id={wordId(index)} className="scroll-mt-24">
-                <fieldset
+          <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label={`Meaning of ${question.word}`}>
+            {question.options.map((option, index) => {
+              const selected = answers[question.id] === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  disabled={passed}
+                  onClick={() => choose(question, option)}
                   className={cn(
-                    'rounded-xl border bg-card p-4 shadow-sm',
-                    wrong && 'border-destructive/60',
-                    light === QuizLight.RIGHT && 'border-success/40',
+                    'flex items-center gap-3 rounded-xl border-2 px-4 py-3.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default',
+                    selected ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/40 hover:bg-accent',
                   )}
                 >
-                  <legend className="sr-only">Word {index + 1}</legend>
-                  <p className="flex flex-wrap items-center gap-2 font-medium">
-                    <WordLight light={light} />
-                    <span className="sr-only">{lightStyles[light].label}</span>
-                    <span className="text-primary">{index + 1}.</span>
-                    {question.word}
-                    <Badge variant="secondary">{question.partOfSpeech}</Badge>
-                    {wrong ? <Badge variant="destructive">Not right</Badge> : null}
-                  </p>
-                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                    {question.options.map((option, optionIndex) => {
-                      const selected = answers[question.id] === option;
-                      return (
-                        <label
-                          key={option}
-                          className={cn(
-                            'flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors focus-within:ring-2 focus-within:ring-ring',
-                            selected ? 'border-primary bg-primary/10' : 'hover:bg-accent',
-                          )}
-                        >
-                          <input
-                            type="radio"
-                            name={`quiz-${kind}-${question.id}`}
-                            className="sr-only"
-                            checked={selected}
-                            disabled={passed}
-                            onChange={() => {
-                              setAnswers((current) => ({ ...current, [question.id]: option }));
-                              setLights((current) => withAnswerChanged(current, question.id));
-                            }}
-                          />
-                          <span
-                            className={cn(
-                              'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
-                              selected ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground',
-                            )}
-                          >
-                            {optionLetters[optionIndex]}
-                          </span>
-                          <span>{option}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </fieldset>
-              </li>
-            );
-          })}
-        </ol>
-      </div>
-
-      {/* Phone: the Check button stays at the bottom of the screen. */}
-      <div className="sticky bottom-0 -mx-4 flex flex-wrap items-center gap-3 border-t bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
-        <div className="flex-1 min-w-[10rem]">{checkButton}</div>
-        {counter}
-        {again ? <div className="w-full">{again}</div> : null}
-      </div>
+                  <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-sm font-semibold', selected ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground')}>
+                    {optionLetters[index]}
+                  </span>
+                  <span className="font-medium">{option}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 border-t pt-4">
+            <Button variant="outline" size="sm" className="gap-1" disabled={at === 0} onClick={() => setAt(at - 1)}>
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <Button variant="outline" size="sm" className="gap-1" disabled={at === questions.length - 1} onClick={() => setAt(at + 1)}>
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <div className="ml-auto flex gap-2">
+              {passed ? (
+                <Button variant="outline" className="gap-1.5" onClick={load}>
+                  <RotateCcw className="h-4 w-4" />
+                  Practise again
+                </Button>
+              ) : (
+                <Button loading={busy} disabled={busy || answered < questions.length} onClick={check}>
+                  {busy ? 'Checking…' : 'Check answers'}
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

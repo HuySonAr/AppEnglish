@@ -42,6 +42,8 @@ service LearningService {
   rpc GetContentUsage(LearningRequest) returns (LearningReply);
   // Practice (F05B). Student: 20 words of the completed lessons (D84).
   rpc GetVocabularyPractice(LearningRequest) returns (LearningReply);
+  // A round of word memory finished (D154): counts as a day of study.
+  rpc CompleteVocabularyPractice(LearningRequest) returns (LearningReply);
   // Listening practice (F05B-3, D86; songs D88): the published dictation
   // exercises with the learner's best accuracy per mode, one exercise without
   // its transcript (or a song with its blanks hidden), and the check of what

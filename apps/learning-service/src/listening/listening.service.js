@@ -1,6 +1,7 @@
 import { AccountRole } from '@appenglish/auth-contracts';
 import { lyricPieces, lyricText } from '@appenglish/content-contracts';
-import { ListeningMode } from '@appenglish/learning-contracts';
+import { ListeningMode, StudyActivity } from '@appenglish/learning-contracts';
+import { noEvents, recordActivity } from '../events/learning-events.js';
 import { placementErrors } from '../placement/placement.errors.js';
 import { accuracyOf, checkSentence, sameWords } from './dictation.rules.js';
 import { listeningErrors } from './listening.errors.js';
@@ -22,10 +23,11 @@ function numberedPieces(segments) {
 // kept.
 export class ListeningPracticeService {
   // now() is replaceable in tests.
-  constructor(repository, contentClient, { now = () => new Date() } = {}) {
+  constructor(repository, contentClient, { now = () => new Date(), events = noEvents } = {}) {
     this.repository = repository;
     this.contentClient = contentClient;
     this.now = now;
+    this.events = events;
   }
 
   assertStudent(actor) {
@@ -109,6 +111,7 @@ export class ListeningPracticeService {
     const paper = await this.paper(exerciseId);
     const scored = mode === ListeningMode.BLANKS ? this.checkBlanks(paper, answers) : this.checkLines(paper, answers);
     const result = await this.repository.recordCheck(actor.id, exerciseId, mode, scored.accuracy, this.now());
+    await recordActivity(this.events, actor.id, StudyActivity.LISTENING_PRACTICE, this.now());
     return { mode, accuracy: scored.accuracy, ...this.resultView(result), segments: scored.segments };
   }
 

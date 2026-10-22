@@ -1,22 +1,19 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCheck, Clock, ListChecks, Target, Trophy } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { StepNav, StepState } from '../../../components/shared/StepNav.jsx';
-import {
-  LessonState,
-  LessonStep,
-  QuizKind,
-  StepStatus,
-} from '@appenglish/learning-contracts';
+import { LESSON_TEST_QUESTION_COUNT } from '@appenglish/content-contracts';
+import { LessonState, LessonStep, QuizKind, StepStatus } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { Badge, Button, Skeleton } from '../../../components/ui';
+import { Badge, Button } from '../../../components/ui';
+import { StepNav, StepState } from '../../../components/shared/StepNav.jsx';
+import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { useReturnTo } from '../../../hooks/use-return-to.js';
 import { getLesson, markVocabularyStudied } from '../api/lessons-api.js';
 import { FillInExercise } from '../components/FillInExercise.jsx';
+import { TestStartCard } from '../components/TestStartCard.jsx';
 import { VocabularyQuiz } from '../components/VocabularyQuiz.jsx';
 import { VocabularyStudy } from '../components/VocabularyStudy.jsx';
-import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
-import { useFocusReturn, useListLinkState, useReturnTo } from '../../../hooks/use-return-to.js';
 
 const stepLabels = {
   [LessonStep.REVIEW]: 'Review',
@@ -26,8 +23,25 @@ const stepLabels = {
   [LessonStep.TEST]: 'Lesson test',
 };
 
-// One lesson: review of the previous words (when required), vocabulary, word
-// quiz, fill-in, then the lesson test. Steps open in order.
+const stepHints = {
+  [LessonStep.REVIEW]: 'Choose the meaning of each word from the last lesson.',
+  [LessonStep.VOCABULARY]: 'Learn the words of this lesson.',
+  [LessonStep.VOCABULARY_QUIZ]: 'Choose the meaning of each word.',
+  [LessonStep.FILL_IN]: 'Put each word in its blank.',
+};
+
+function StepCard({ title, hint, children }) {
+  return (
+    <div className="space-y-5 rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
+      <div>
+        <h2 className="text-lg font-semibold">{title}</h2>
+        {hint ? <p className="text-sm text-muted-foreground">{hint}</p> : null}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export function LessonPage() {
   const { lessonId } = useParams();
   const back = useReturnTo('/student/lessons');
@@ -36,7 +50,6 @@ export function LessonPage() {
   const [active, setActive] = useState(null);
   const [busy, setBusy] = useState(false);
 
-  // Loads the lesson; with follow=true the view moves to the current step.
   async function load({ follow = true, quiet = false } = {}) {
     if (!quiet) setState('loading');
     try {
@@ -49,11 +62,7 @@ export function LessonPage() {
       setState('ready');
     } catch (error) {
       setState('error');
-      notify({
-        title: 'Could not open the lesson',
-        description: getApiErrorMessage(error),
-        variant: 'destructive',
-      });
+      notify({ title: 'Could not open the lesson', description: getApiErrorMessage(error), variant: 'destructive' });
     }
   }
 
@@ -76,8 +85,9 @@ export function LessonPage() {
 
   const { lesson, steps } = data;
   const statusOf = (key) => steps.find((step) => step.key === key)?.status;
-  // A finished step keeps the learner on it; the next one is unlocked above.
   const stepDone = () => load({ follow: false, quiet: true });
+  const doneCount = steps.filter((step) => step.status === StepStatus.DONE).length;
+  const completed = lesson.state === LessonState.COMPLETED;
 
   async function onStudied() {
     setBusy(true);
@@ -92,24 +102,36 @@ export function LessonPage() {
   }
 
   const next = steps[steps.findIndex((step) => step.key === active) + 1];
+  const test = data.test;
   return (
     <section className="space-y-6">
-      <Link
-        to={back.to} state={back.state}
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-      >
+      <Link to={back.to} state={back.state} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" />
         Lessons
       </Link>
-      <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-          Unit {lesson.unitNumber}: {lesson.unitTitle}
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
+
+      <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
+        <div className="min-w-0 space-y-1.5">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+            Unit {lesson.unitNumber} · {lesson.unitTitle}
+          </p>
           <h1 className="text-2xl font-bold sm:text-3xl">
             Lesson {lesson.number}: {lesson.title}
           </h1>
-          {lesson.state === LessonState.COMPLETED ? <Badge variant="success">Completed</Badge> : null}
+        </div>
+        <div className="flex items-center gap-3">
+          {completed ? (
+            <Badge variant="success" className="gap-1">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Completed
+            </Badge>
+          ) : null}
+          <div className="text-right">
+            <p className="text-2xl font-bold tabular-nums">
+              {doneCount}/{steps.length}
+            </p>
+            <p className="text-xs text-muted-foreground">steps done</p>
+          </div>
         </div>
       </div>
 
@@ -124,58 +146,54 @@ export function LessonPage() {
         }))}
       />
 
-      <div className="space-y-4">
-        {active === LessonStep.REVIEW ? (
-          <>
-            <h2 className="text-lg font-semibold">
-              Review the words of “{data.review.lessonTitle}”
-            </h2>
-            <VocabularyQuiz lessonId={lessonId} kind={QuizKind.REVIEW} onPassed={stepDone} />
-          </>
-        ) : null}
-        {active === LessonStep.VOCABULARY ? (
-          <>
-            <h2 className="text-lg font-semibold">Vocabulary</h2>
-            <VocabularyStudy
-              vocabulary={data.vocabulary}
-              done={statusOf(LessonStep.VOCABULARY) === StepStatus.DONE}
-              busy={busy}
-              onAllOpened={onStudied}
-            />
-          </>
-        ) : null}
-        {active === LessonStep.VOCABULARY_QUIZ ? (
-          <>
-            <h2 className="text-lg font-semibold">Word quiz</h2>
-            <VocabularyQuiz lessonId={lessonId} kind={QuizKind.VOCABULARY} onPassed={stepDone} />
-          </>
-        ) : null}
-        {active === LessonStep.FILL_IN ? (
-          <>
-            <h2 className="text-lg font-semibold">Fill in the blanks</h2>
-            <FillInExercise lessonId={lessonId} fillIn={data.fillIn} onPassed={stepDone} />
-          </>
-        ) : null}
-        {active === LessonStep.TEST ? (
-          <div className="rounded-xl border bg-card p-6 shadow-sm">
-            <h2 className="text-lg font-semibold">Lesson test</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              23 questions in {data.test.durationMinutes} minutes. Score {data.test.passPercent}% or more
-              to complete the lesson and open the next one.
-              {data.test.attemptCount
-                ? ` You have taken it ${data.test.attemptCount} time${data.test.attemptCount === 1 ? '' : 's'}; your best score is ${data.test.bestPercent}%.`
-                : ''}
-            </p>
-            <Button asChild className="mt-4">
-              <Link to={`/student/lessons/${lessonId}/test`} state={back.passThrough}>Go to the lesson test</Link>
-            </Button>
-          </div>
-        ) : null}
-      </div>
+      {active === LessonStep.REVIEW ? (
+        <StepCard title={`Review: ${data.review.lessonTitle}`} hint={stepHints[LessonStep.REVIEW]}>
+          <VocabularyQuiz lessonId={lessonId} kind={QuizKind.REVIEW} onPassed={stepDone} />
+        </StepCard>
+      ) : null}
+      {active === LessonStep.VOCABULARY ? (
+        <StepCard title="Vocabulary" hint={stepHints[LessonStep.VOCABULARY]}>
+          <VocabularyStudy vocabulary={data.vocabulary} done={statusOf(LessonStep.VOCABULARY) === StepStatus.DONE} busy={busy} onAllOpened={onStudied} />
+        </StepCard>
+      ) : null}
+      {active === LessonStep.VOCABULARY_QUIZ ? (
+        <StepCard title="Word quiz" hint={stepHints[LessonStep.VOCABULARY_QUIZ]}>
+          <VocabularyQuiz lessonId={lessonId} kind={QuizKind.VOCABULARY} onPassed={stepDone} />
+        </StepCard>
+      ) : null}
+      {active === LessonStep.FILL_IN ? (
+        <StepCard title="Fill in the blanks" hint={stepHints[LessonStep.FILL_IN]}>
+          <FillInExercise lessonId={lessonId} fillIn={data.fillIn} onPassed={stepDone} />
+        </StepCard>
+      ) : null}
+      {active === LessonStep.TEST ? (
+        <TestStartCard
+          icon={Trophy}
+          eyebrow={`Lesson ${lesson.number}`}
+          title="Lesson test"
+          badges={statusOf(LessonStep.TEST) === StepStatus.DONE ? <Badge variant="success">Passed</Badge> : null}
+          stats={[
+            { icon: ListChecks, label: 'Questions', value: LESSON_TEST_QUESTION_COUNT },
+            { icon: Clock, label: 'Minutes', value: test.durationMinutes },
+            { icon: Target, label: 'To pass', value: `${test.passPercent}%` },
+            { icon: ClipboardCheck, label: 'Best', value: test.attemptCount ? `${test.bestPercent}%` : '—', tone: test.attemptCount && test.bestPercent >= test.passPercent ? 'text-success' : undefined },
+          ]}
+        >
+          <Button asChild size="lg" className="gap-1.5">
+            <Link to={`/student/lessons/${lessonId}/test`} state={back.passThrough}>
+              {test.attemptCount ? 'Open the lesson test' : 'Go to the lesson test'}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </TestStartCard>
+      ) : null}
 
       {next && next.status !== StepStatus.LOCKED && active !== LessonStep.TEST ? (
         <div className="flex justify-end">
-          <Button onClick={() => setActive(next.key)}>Next: {stepLabels[next.key]}</Button>
+          <Button className="gap-1.5" onClick={() => setActive(next.key)}>
+            Next: {stepLabels[next.key]}
+            <ArrowRight className="h-4 w-4" />
+          </Button>
         </div>
       ) : null}
     </section>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowDown, ArrowUp, Plus, Trash2, Volume2, Wand2 } from 'lucide-react';
 import { Accent, COURSE_LIMITS, COURSE_RECORDING_KIND } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
+import { playSound } from '../../../lib/audio.js';
 import { notify } from '../../../lib/notify.js';
 import { cn } from '../../../lib/utils.js';
 import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label, Switch } from '../../../components/ui';
@@ -128,7 +129,7 @@ function VocabularySection({ words, media, onChange, onMedia }) {
               className="h-9 w-9"
               aria-label={`Play ${word.word || 'word'}`}
               disabled={!media[word.audioMediaId]}
-              onClick={() => new Audio(media[word.audioMediaId]).play().catch(() => {})}
+              onClick={() => playSound(media[word.audioMediaId]).catch(() => {})}
             >
               <Volume2 className="h-4 w-4" />
             </Button>

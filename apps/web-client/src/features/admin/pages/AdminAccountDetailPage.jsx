@@ -217,7 +217,7 @@ export function AdminAccountDetailPage() {
       />
 
       <Card className="overflow-hidden">
-        <div className={cn('h-20 bg-gradient-to-r', locked ? 'from-destructive/20 via-destructive/10 to-transparent' : 'from-primary/20 via-primary/10 to-chart-2/15')} aria-hidden="true" />
+        <div className={cn('h-20 border-b', locked ? 'bg-destructive/10' : 'bg-muted')} aria-hidden="true" />
         <CardContent className="pb-6 pt-0">
           <div className="-mt-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end gap-4">

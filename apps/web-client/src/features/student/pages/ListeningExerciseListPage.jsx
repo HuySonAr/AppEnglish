@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Headphones } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Headphones } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { LISTENING_KINDS, LISTENING_LEVELS } from '@appenglish/content-contracts';
 import { ListeningMode } from '@appenglish/learning-contracts';
@@ -31,9 +31,6 @@ import { useListState } from '../../../hooks/use-list-state.js';
 const PAGE_SIZE = 10;
 const levelOptions = [{ value: 'all', label: 'All levels' }, ...LISTENING_LEVELS.map((level) => ({ value: level, label: level }))];
 
-// Listening practice (D92), last step before practising: the exercises of
-// one topic in one way of practising, searched, filtered, sorted and paged,
-// each with the learner's best score in that way.
 export function ListeningExerciseListPage() {
   const { topicId, mode } = useParams();
   const [state, setState] = useState('loading');
@@ -57,7 +54,6 @@ export function ListeningExerciseListPage() {
 
   const topic = data?.topics.find((item) => item.id === topicId);
   const modes = topicModes(topic);
-  // Back to the choice of a way of practising when the topic has several.
   const back = (
     <Link
       to={modes.length > 1 ? `/student/practice/listening/topics/${topicId}` : '/student/practice/listening'}
@@ -101,7 +97,7 @@ export function ListeningExerciseListPage() {
   return (
     <section className="space-y-6">
       {back}
-      <PageHeader eyebrow={topic.name} title={modes.length > 1 ? modeLabels[mode] : topic.name} description="Choose an exercise. Your best score is kept for each one." />
+      <PageHeader eyebrow={topic.name} title={modes.length > 1 ? modeLabels[mode] : topic.name} description="Choose an exercise." />
 
       {all.length === 0 ? (
         <EmptyState icon={Headphones} title="No exercises yet" description="Exercises will appear here when they are published." />
@@ -117,31 +113,42 @@ export function ListeningExerciseListPage() {
           {shown.total === 0 ? (
             <EmptyState icon={Headphones} title="No exercise matches" description="Try another search or filter." />
           ) : (
-            <ul className="divide-y overflow-hidden rounded-xl border bg-card shadow-sm">
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {shown.items.map((exercise) => {
                 const result = resultOf(exercise, mode);
                 return (
                   <li key={exercise.id}>
                     <Link
                       to={`/student/practice/listening/${exercise.id}?mode=${mode}`}
-                      className="flex flex-wrap items-center gap-3 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                      className="group flex h-full flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium">{exercise.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {kindLabel(exercise.kind)} ·{' '}
-                          {blanks
-                            ? `${exercise.blankCount} blank${exercise.blankCount === 1 ? '' : 's'}`
-                            : `${exercise.segmentCount} ${exercise.kind === 'song' ? 'line' : 'sentence'}${exercise.segmentCount === 1 ? '' : 's'}`}
-                        </p>
+                      <div className="flex items-start gap-3">
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-sm font-bold text-primary">{exercise.level}</span>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold leading-snug">{exercise.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {kindLabel(exercise.kind)} ·{' '}
+                            {blanks
+                              ? `${exercise.blankCount} blank${exercise.blankCount === 1 ? '' : 's'}`
+                              : `${exercise.segmentCount} ${exercise.kind === 'song' ? 'line' : 'sentence'}${exercise.segmentCount === 1 ? '' : 's'}`}
+                          </p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
                       </div>
-                      <Badge variant="secondary">{exercise.level}</Badge>
                       {result.checkCount ? (
-                        <span className={cn('text-sm font-semibold tabular-nums', result.bestAccuracy >= 80 ? 'text-success' : 'text-foreground')}>
-                          Best {result.bestAccuracy}%
-                        </span>
+                        <div className="mt-auto space-y-1">
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Best</span>
+                            <span className={cn('font-semibold tabular-nums', result.bestAccuracy >= 80 ? 'text-success' : 'text-foreground')}>{result.bestAccuracy}%</span>
+                          </div>
+                          <div className="h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                            <div className={cn('h-full rounded-full transition-all', result.bestAccuracy >= 80 ? 'bg-success' : 'bg-primary')} style={{ width: `${result.bestAccuracy}%` }} />
+                          </div>
+                        </div>
                       ) : (
-                        <Badge variant="outline">New</Badge>
+                        <Badge variant="outline" className="mt-auto self-start">
+                          New
+                        </Badge>
                       )}
                     </Link>
                   </li>

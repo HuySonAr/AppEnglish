@@ -145,6 +145,9 @@ export class LessonGatewayController extends LearningRelay {
   getVocabularyPractice(request) {
     return this.forward('GetVocabularyPractice', request);
   }
+  completeVocabularyPractice(request) {
+    return this.forward('CompleteVocabularyPractice', request);
+  }
   listListeningPractice(request) {
     return this.forward('ListListeningPractice', request);
   }
@@ -215,6 +218,7 @@ const lessonRoutes = [
   [Get, 'units/:id/review', 'getUnitReview', [Param('id'), Req()]],
   [Post, 'units/:id/review/submit', 'submitUnitReview', [Param('id'), Body(), Req()]],
   [Get, 'practice/vocabulary', 'getVocabularyPractice', [Req()]],
+  [Post, 'practice/vocabulary/complete', 'completeVocabularyPractice', [Req()]],
   [Get, 'practice/listening', 'listListeningPractice', [Req()]],
   [Get, 'practice/listening/:id', 'getListeningPractice', [Param('id'), Query(), Req()]],
   [Post, 'practice/listening/:id/check', 'checkListeningPractice', [Param('id'), Body(), Req()]],

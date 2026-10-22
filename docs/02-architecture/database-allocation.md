@@ -126,7 +126,10 @@ one row per finished lesson-test or full mock-test attempt with its per-skill
 counts (the row id is the attempt id in learning-service), and one row per
 completed lesson. F07 adds `xp_ledger` (migration `1740000001000-create-xp-ledger.js`):
 one row per learner and mock test with the XP of the first full attempt and
-snapshots of the email and the test title. `learning-service` adds the outbox `learning_events` to
+snapshots of the email and the test title. D154 adds `study_days` (migration
+`1740000002000-create-study-days.js`): one row per learner and day of study in
+Vietnam time (primary key `accountId`, `day`), the activities of that day
+(`activities` jsonb) and the first and last time. `learning-service` adds the outbox `learning_events` to
 `app_learning` (migration `1730000009000-create-learning-events.js`): each
 result is written there with the attempt and relayed to RabbitMQ afterwards
 (D110). `accountId`, `lessonId` and `sourceId` are other services' ids without

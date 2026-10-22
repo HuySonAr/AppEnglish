@@ -1,4 +1,4 @@
-import { LessonState } from '@appenglish/learning-contracts';
+import { LessonState, UnitReviewState } from '@appenglish/learning-contracts';
 import { compareText, matchesSearch } from '../../../lib/list.js';
 
 export const MockListSort = Object.freeze({
@@ -64,3 +64,19 @@ export function filterCurriculum(units, { search, state }) {
   }
   return result;
 }
+
+export function unitProgress(unit) {
+  const done = unit.lessons.filter((lesson) => lesson.state === LessonState.COMPLETED).length;
+  const reviewPassed = !unit.review || unit.review.state === UnitReviewState.PASSED;
+  return { done, total: unit.lessons.length, complete: unit.lessons.length > 0 && done === unit.lessons.length && reviewPassed };
+}
+
+export function nextLesson(units) {
+  for (const unit of units) {
+    const lesson = unit.lessons.find((item) => item.state === LessonState.OPEN);
+    if (lesson) return { type: 'lesson', unit, lesson };
+    if (unit.review?.state === UnitReviewState.OPEN) return { type: 'review', unit };
+  }
+  return null;
+}
+

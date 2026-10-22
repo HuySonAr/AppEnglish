@@ -1,6 +1,6 @@
 import amqp from 'amqplib';
 import { Logger } from '@nestjs/common';
-import { LearningQueue } from '@appenglish/learning-contracts';
+import { LearningEventType, LearningQueue } from '@appenglish/learning-contracts';
 
 const logger = new Logger('LearningEvents');
 const RETRY_MS = 10_000;
@@ -131,3 +131,7 @@ export class LearningEvents {
 
 // For services built without a publisher (tests): records nothing.
 export const noEvents = Object.freeze({ record: async () => null });
+
+export function recordActivity(events, accountId, activity, at = new Date()) {
+  return events.record(LearningEventType.ACTIVITY_RECORDED, { accountId, activity, occurredAt: at.toISOString() });
+}

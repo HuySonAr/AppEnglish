@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Check, RotateCcw } from 'lucide-react';
+import { ArrowRight, Check, Play, RotateCcw } from 'lucide-react';
 import { ListeningMode } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -9,32 +9,22 @@ import { Button, Input } from '../../../components/ui';
 import { checkListeningLine, checkListeningPractice } from '../api/practice-api.js';
 import { lineAnswers, lineBlanks, runningScore, sentenceLabel } from '../lib/listening-practice.js';
 import { BlankLine, CheckedWords } from './ListeningMarks.jsx';
+import { RecordingPanel } from './RecordingPanel.jsx';
+import { ScoreRing } from './ScoreRing.jsx';
 
-const SPEEDS = [0.75, 1, 1.25];
-
-// A song practised one line at a time (D93): the line plays and stops at its
-// end, only that line is shown to write down (or to fill in), it is checked at
-// once, and the next line plays on. After the last line the whole song is
-// checked, which keeps the best score, and every line can be looked at again.
-//   data      the exercise as opened (GET), its mode and timed lines
-//   onScored  receives the check of the whole song
 export function SongLinePractice({ exerciseId, data, onScored }) {
   const { segments, mode } = data;
   const blanksMode = mode === ListeningMode.BLANKS;
   const [index, setIndex] = useState(0);
   const [speed, setSpeed] = useState(1);
-  // Line id (full mode) or blank number (blanks mode) → what was written.
   const [answers, setAnswers] = useState({});
-  // Line id → its check.
   const [results, setResults] = useState({});
-  // The check of the whole song, once every line is done.
   const [final, setFinal] = useState(null);
   const [busy, setBusy] = useState(false);
   const audioRef = useRef(null);
   const inputRef = useRef(null);
 
   const segment = segments[index];
-  // The player stops at the end of the line; then its box is ready to type in.
   const { started, playLine: playHeld, reset } = useHeldPlayer(audioRef, {
     line: segment,
     speed,
@@ -43,13 +33,11 @@ export function SongLinePractice({ exerciseId, data, onScored }) {
   });
   const label = sentenceLabel('song', index);
   const blanks = blanksMode ? lineBlanks(segment || {}) : [];
-  // In blanks mode a line without blanks is only listened to.
   const nothingToWrite = blanksMode && !blanks.length;
   const result = segment ? results[segment.id] : null;
   const done = segment && (result || (nothingToWrite && started));
   const last = index === segments.length - 1;
 
-  // Plays the line `at` from its start.
   function playLine(at = index) {
     playHeld(segments[at]).catch(() => {
       notify({ title: 'The song cannot be played', description: 'Try again, or check your sound settings.', variant: 'destructive' });
@@ -101,13 +89,10 @@ export function SongLinePractice({ exerciseId, data, onScored }) {
     setFinal(null);
   }
 
-  // Enter checks the line, then goes on to the next one.
   const onEnter = () => (done ? next() : checkLine());
   useEffect(() => {
     if (!done || final) return undefined;
     const onKey = (event) => {
-      // An Enter already used by a box (to check the line) does not also go
-      // on: the check can come back while that key press is still on its way.
       if (event.key === 'Enter' && !event.isComposing && !event.defaultPrevented) {
         event.preventDefault();
         next();
@@ -124,21 +109,22 @@ export function SongLinePractice({ exerciseId, data, onScored }) {
   if (final)
     return (
       <div className="space-y-6">
-        <div className="rounded-2xl border bg-card p-6 text-center shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary">Your score</p>
-          <p className={cn('mt-2 text-5xl font-bold tracking-tight', final.accuracy >= 80 ? 'text-success' : 'text-foreground')}>{final.accuracy}%</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Best {final.bestAccuracy}% · {final.checkCount} time{final.checkCount === 1 ? '' : 's'}. Capital letters, punctuation and accents
-            do not count; “don't” and “do not”, “five” and “5” are the same.
-          </p>
-          <Button className="mt-4 gap-1.5" onClick={restart}>
-            <RotateCcw className="h-4 w-4" />
-            Practise again
-          </Button>
+        <div className="flex flex-col items-center gap-6 rounded-2xl border bg-card p-6 shadow-sm sm:flex-row">
+          <ScoreRing percent={final.accuracy} tone={final.accuracy >= 80 ? 'success' : 'primary'} label="this time" />
+          <div className="flex-1 space-y-3 text-center sm:text-left">
+            <p className="text-lg font-semibold">
+              Best {final.bestAccuracy}% · {final.checkCount} time{final.checkCount === 1 ? '' : 's'}
+            </p>
+            <p className="text-sm text-muted-foreground">Capitals, punctuation and accents do not count.</p>
+            <Button className="gap-1.5" onClick={restart}>
+              <RotateCcw className="h-4 w-4" />
+              Practise again
+            </Button>
+          </div>
         </div>
         <ol className="space-y-3">
           {final.segments.map((line, at) => (
-            <li key={line.id} className="space-y-1 rounded-xl border bg-card p-4 text-sm shadow-sm">
+            <li key={line.id} className={cn('space-y-1 rounded-2xl border-2 bg-card p-4 text-sm shadow-sm', line.accuracy === 100 ? 'border-success/40 bg-success/5' : line.accuracy !== null ? 'border-destructive/30' : 'border-transparent')}>
               <div className="flex items-center gap-2">
                 <span className="font-medium">{sentenceLabel('song', at)}</span>
                 {line.accuracy !== null ? (
@@ -153,8 +139,27 @@ export function SongLinePractice({ exerciseId, data, onScored }) {
       </div>
     );
 
+  const doneIds = new Set(Object.entries(results).filter(([, line]) => line.accuracy === 100).map(([id]) => id));
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 lg:grid lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start lg:gap-6 lg:space-y-0">
+      <RecordingPanel
+        className="lg:sticky lg:top-20"
+        audioRef={audioRef}
+        audioUrl={data.audioUrl}
+        held
+        sentences={segments}
+        current={index}
+        doneIds={doneIds}
+        showSentence={false}
+        onSelect={(at) => {
+          if (at < index) playHeld(segments[at]).catch(() => {});
+        }}
+        onPlayLine={() => playLine()}
+        speed={speed}
+        onSpeed={setSpeed}
+      />
+      <div className="min-w-0 space-y-4">
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm text-muted-foreground tabular-nums">
           <span>
@@ -167,28 +172,22 @@ export function SongLinePractice({ exerciseId, data, onScored }) {
         </div>
       </div>
 
-      <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
-        <p className="font-medium">{label}</p>
-
-        {/* The browser's player, held to this line: it stops at the line's end. */}
-        <div className="space-y-2">
-          <audio ref={audioRef} src={data.audioUrl} controls controlsList="nodownload" preload="auto" className="w-full" />
-          <div className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
-            <Button variant="ghost" size="sm" className="gap-1.5" disabled={!started} onClick={() => playLine()}>
+      <div className="space-y-5 rounded-2xl border-2 border-primary/20 bg-card p-5 shadow-sm sm:p-6">
+        <div className="flex items-center gap-2">
+          <p className="font-semibold">{label}</p>
+          {started ? (
+            <Button variant="ghost" size="sm" className="ml-auto gap-1.5" onClick={() => playLine()}>
               <RotateCcw className="h-4 w-4" />
-              From the start of the line
+              Again
             </Button>
-            <span className="ml-auto">Speed</span>
-            {SPEEDS.map((value) => (
-              <Button key={value} variant={speed === value ? 'secondary' : 'ghost'} size="sm" aria-pressed={speed === value} onClick={() => setSpeed(value)}>
-                {value}×
-              </Button>
-            ))}
-          </div>
+          ) : null}
         </div>
 
         {!started ? (
-          <p className="text-sm text-muted-foreground">Press play: the song plays this line and stops at its end.</p>
+          <Button size="lg" className="gap-1.5" onClick={() => playLine()}>
+            <Play className="h-4 w-4" />
+            Play the line
+          </Button>
         ) : nothingToWrite ? (
           <p className="text-lg">{segment.pieces.map((piece) => piece.text).join('')}</p>
         ) : blanksMode ? (
@@ -248,6 +247,7 @@ export function SongLinePractice({ exerciseId, data, onScored }) {
           ) : null}
           {started ? <span className="text-xs text-muted-foreground">Enter {done ? (last ? 'shows your score' : 'goes on') : 'checks the line'}</span> : null}
         </div>
+      </div>
       </div>
     </div>
   );

@@ -8,11 +8,6 @@ import { cn } from '../../../lib/utils.js';
 import { submitFillIn } from '../api/lessons-api.js';
 import { answersOf, availableChips, emptyPlacement, tapBlank, tapChip } from '../lib/fill-in.js';
 
-// One passage with blanks and the words to place (D111): the learner taps a
-// word, then the blank it belongs in (or the blank first, then the word). A
-// placed word leaves the bank; tapping a filled blank gives it back. Every
-// blank must be right; the wrong ones are marked and the learner tries again.
-// onPassed is called once all are right.
 export function FillInExercise({ lessonId, fillIn, onPassed }) {
   const [state, setState] = useState(() => ({ placed: emptyPlacement(fillIn.blankCount), selectedChip: null, selectedBlank: null }));
   const [wrongBlanks, setWrongBlanks] = useState([]);
@@ -70,12 +65,16 @@ export function FillInExercise({ lessonId, fillIn, onPassed }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Place every word in the right blank. All {fillIn.blankCount} must be right; you can try as often as you need.
-      </p>
-
-      {/* The words still to place. */}
-      <div className="rounded-xl border bg-card p-3 shadow-sm">
+      <div className="sticky top-16 z-10 rounded-2xl border bg-card/95 p-3 shadow-sm backdrop-blur">
+        <div className="mb-2 flex items-center gap-3 px-1">
+          <span className="text-xs font-semibold uppercase tracking-wide text-primary">Words</span>
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+            <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${(filled * 100) / fillIn.blankCount}%` }} />
+          </div>
+          <span className="text-xs tabular-nums text-muted-foreground">
+            {filled}/{fillIn.blankCount}
+          </span>
+        </div>
         <ul aria-label="Words to place" className="flex min-h-11 flex-wrap items-center gap-2">
           {bank.length ? (
             bank.map(({ chip, word }) => (
@@ -86,8 +85,8 @@ export function FillInExercise({ lessonId, fillIn, onPassed }) {
                   disabled={passed}
                   onClick={() => onChip(chip)}
                   className={cn(
-                    'rounded-full border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                    state.selectedChip === chip ? 'border-primary bg-primary text-primary-foreground' : 'bg-background hover:bg-accent',
+                    'rounded-full border-2 px-4 py-1.5 text-base font-medium shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    state.selectedChip === chip ? 'scale-105 border-primary bg-primary text-primary-foreground' : 'bg-background hover:border-primary/40 hover:bg-accent',
                     passed && 'opacity-60',
                   )}
                 >
@@ -101,7 +100,7 @@ export function FillInExercise({ lessonId, fillIn, onPassed }) {
         </ul>
       </div>
 
-      <div className="whitespace-pre-wrap rounded-xl border bg-card p-4 leading-[3] shadow-sm sm:p-5">
+      <div className="whitespace-pre-wrap rounded-2xl border bg-card p-5 text-lg leading-[3.2] shadow-sm sm:p-7">
         {pieces.map((piece, index) => {
           if (index === pieces.length - 1) return <span key={index}>{piece}</span>;
           const chip = state.placed[index];
@@ -117,7 +116,7 @@ export function FillInExercise({ lessonId, fillIn, onPassed }) {
                 disabled={passed}
                 onClick={() => onBlank(index)}
                 className={cn(
-                  'mx-1 inline-flex h-9 min-w-[7rem] items-center justify-center rounded-lg border px-3 align-middle text-sm font-medium leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  'mx-1 inline-flex h-10 min-w-[7rem] items-center justify-center rounded-lg border-2 px-3 align-middle text-base font-medium leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   chip === null ? 'border-dashed text-muted-foreground hover:bg-accent' : 'border-primary/50 bg-primary/5 hover:bg-primary/10',
                   selected && 'border-primary ring-2 ring-primary/40',
                   state.selectedChip !== null && 'border-primary/70 hover:bg-primary/10',
@@ -136,9 +135,6 @@ export function FillInExercise({ lessonId, fillIn, onPassed }) {
         <Button loading={busy} disabled={busy || passed || filled < fillIn.blankCount} onClick={check}>
           {busy ? 'Checking…' : 'Check answers'}
         </Button>
-        <span className="text-sm text-muted-foreground tabular-nums">
-          {filled} of {fillIn.blankCount} placed
-        </span>
         {!passed && filled > 0 ? (
           <Button variant="ghost" size="sm" className="gap-1.5" onClick={reset}>
             <RotateCcw className="h-4 w-4" />

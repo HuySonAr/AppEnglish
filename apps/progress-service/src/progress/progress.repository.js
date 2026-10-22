@@ -1,4 +1,4 @@
-import { LessonCompletionEntity, SkillResultEntity, XpLedgerEntity } from '../database/progress.entities.js';
+import { LessonCompletionEntity, SkillResultEntity, StudyDayEntity, XpLedgerEntity } from '../database/progress.entities.js';
 
 export class ProgressRepository {
   constructor(dataSource) {
@@ -32,6 +32,24 @@ export class ProgressRepository {
   // (or the same attempt) changes nothing.
   async saveXp(entry) {
     await (await this.repo(XpLedgerEntity)).createQueryBuilder().insert().values(entry).orIgnore().execute();
+  }
+
+  async saveStudyDay({ accountId, day, activity, at }) {
+    const repository = await this.repo(StudyDayEntity);
+    await repository.query(
+      `INSERT INTO "study_days" ("accountId", "day", "activities", "firstAt", "lastAt")
+       VALUES ($1, $2, jsonb_build_array($3::text), $4, $4)
+       ON CONFLICT ("accountId", "day") DO UPDATE SET
+         "activities" = CASE WHEN "study_days"."activities" ? $3 THEN "study_days"."activities" ELSE "study_days"."activities" || jsonb_build_array($3::text) END,
+         "firstAt" = LEAST("study_days"."firstAt", EXCLUDED."firstAt"),
+         "lastAt" = GREATEST("study_days"."lastAt", EXCLUDED."lastAt")`,
+      [accountId, day, activity, at],
+    );
+  }
+
+  async listStudyDays(accountId) {
+    const rows = await (await this.repo(StudyDayEntity)).query(`SELECT to_char("day", 'YYYY-MM-DD') AS "day" FROM "study_days" WHERE "accountId" = $1 ORDER BY "day"`, [accountId]);
+    return rows.map((row) => row.day);
   }
 
   async listXp(accountId) {

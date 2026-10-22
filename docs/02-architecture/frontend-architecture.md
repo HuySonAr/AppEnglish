@@ -87,6 +87,12 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
   điều kiện mở khóa) và không ghi mã quyết định (Dxx); nghiệp vụ nằm trong docs.
 - Thông báo và hộp thoại xác nhận vẫn nói rõ hậu quả của thao tác.
 
+### Âm thanh
+- Chỉ một âm thanh phát tại một thời điểm: `installSingleAudio` (trong `main.jsx`) dừng mọi trình phát khác khi một trình phát bắt đầu; phát âm thanh ngắn (phát âm từ vựng) dùng `playSound` trong `src/lib/audio.js`, không tạo `new Audio()` riêng.
+
+### Màu nền (D153)
+- Không dùng gradient hay đốm màu mờ (blur) trang trí. Thẻ giới thiệu, banner và ảnh bìa dùng nền phẳng: `bg-card` có viền, `bg-muted`, hoặc một màu nhạt một tông như `bg-primary/10` cho ô biểu tượng.
+
 ### Trạng thái đang tải
 - Trang đang tải dữ liệu lần đầu phải hiện skeleton có hình dạng giống trang
   thật, không hiện một khối xám hay chữ "Loading". Dùng các component trong
@@ -173,6 +179,7 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
 - Tiêu đề trang dùng `PageHeader`; danh sách rỗng dùng `EmptyState`; ô dashboard
   dùng `FeatureCard`.
 - Trang có nhiều bước (lesson, chủ đề Listening course) dùng `StepNav` cho dải bước.
+- Thẻ từ vựng lật dùng `features/student/components/WordFlipCard.jsx`; màn hình bắt đầu bài test (lesson test, unit review, mock test, mini test) dùng `TestStartCard.jsx`; vòng điểm kết quả dùng `ScoreRing.jsx`.
 - Ô mật khẩu dùng `PasswordInput` (`components/shared/PasswordInput.jsx`): nút
   con mắt hiện/ẩn chỉ xuất hiện khi ô đã có chữ; nút reveal mặc định của trình
   duyệt (Edge `::-ms-reveal`) bị ẩn trong `styles/index.css` để không có hai con

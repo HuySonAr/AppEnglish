@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { AccountRole } from '@appenglish/auth-contracts';
-import { LearningEventType } from '@appenglish/learning-contracts';
+import { LearningEventType, StudyActivity } from '@appenglish/learning-contracts';
 
 // The learner an admin asks about (D114).
 export const learnerIdSchema = z.string().uuid();
@@ -66,8 +66,17 @@ export const resultMessageSchema = z.object({
   payload: z.record(z.unknown()),
 });
 
+export const activityRecordedSchema = z
+  .object({
+    accountId: z.string().uuid(),
+    activity: z.enum(Object.values(StudyActivity)),
+    occurredAt: isoDate,
+  })
+  .passthrough();
+
 export const payloadSchemas = Object.freeze({
   [LearningEventType.LESSON_TEST_SUBMITTED]: lessonTestSubmittedSchema,
   [LearningEventType.LESSON_COMPLETED]: lessonCompletedSchema,
   [LearningEventType.MOCK_SUBMITTED]: mockSubmittedSchema,
+  [LearningEventType.ACTIVITY_RECORDED]: activityRecordedSchema,
 });

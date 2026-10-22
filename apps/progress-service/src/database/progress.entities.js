@@ -64,3 +64,15 @@ export const XpLedgerEntity = new EntitySchema({
     { name: 'IDX_xp_ledger_account', columns: ['accountId'] },
   ],
 });
+
+export const StudyDayEntity = new EntitySchema({
+  name: 'StudyDay',
+  tableName: 'study_days',
+  columns: {
+    accountId: { type: 'uuid', primary: true },
+    day: { type: 'date', primary: true },
+    activities: { type: 'jsonb', default: () => "'[]'::jsonb" },
+    firstAt: { type: 'timestamptz' },
+    lastAt: { type: 'timestamptz' },
+  },
+});

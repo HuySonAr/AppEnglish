@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Play, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Check, Play, RotateCcw } from 'lucide-react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ListeningMode } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
@@ -10,25 +10,20 @@ import { Textarea } from '../../../components/ui/textarea.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { checkListeningPractice, getListeningPractice } from '../api/practice-api.js';
 import { BlankLine, CheckedWords } from '../components/ListeningMarks.jsx';
+import { RecordingPanel } from '../components/RecordingPanel.jsx';
+import { ScoreRing } from '../components/ScoreRing.jsx';
 import { SongLinePractice } from '../components/SongLinePractice.jsx';
 import { isTimed, kindLabel, modeLabels, sentenceLabel } from '../lib/listening-practice.js';
 
-const SPEEDS = [0.75, 1, 1.25];
-
 const instructions = {
-  part1: 'Write down the four statements about the photograph, (A) to (D).',
-  part2: 'Write down the question, then the three responses.',
-  part3: 'Write down the conversation one sentence at a time. Each sentence can be replayed on its own.',
-  part4: 'Write down the talk one sentence at a time. Each sentence can be replayed on its own.',
-  song: 'Listen to one line at a time; it stops at the end of the line. Write the line down and check it, then go on to the next.',
+  part1: 'Write down the four statements, (A) to (D).',
+  part2: 'Write down the question and the three responses.',
+  part3: 'Write down each sentence of the conversation.',
+  part4: 'Write down each sentence of the talk.',
+  song: 'Write down each line, then check it.',
 };
-const blanksInstruction = 'Listen to one line at a time; it stops at the end of the line. Type the missing words and check them, then go on to the next.';
+const blanksInstruction = 'Type the missing words of each line.';
 
-// A dictation exercise (F05B-3, D86; songs D88): the recording with its speed,
-// a box per sentence (each timed sentence can be replayed alone) or, for a
-// song in blanks mode, the lyrics with boxes for the missing words; then the
-// check against the transcript and the best score so far for the mode. The
-// mode is chosen before (D92) and comes in the address: ?mode=blanks.
 export function ListeningExercisePage() {
   const { exerciseId } = useParams();
   const [searchParams] = useSearchParams();
@@ -40,8 +35,8 @@ export function ListeningExercisePage() {
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [current, setCurrent] = useState(0);
   const audioRef = useRef(null);
-  // The time the player stops at while one sentence is played.
   const stopAt = useRef(null);
 
   async function load() {
@@ -61,7 +56,6 @@ export function ListeningExercisePage() {
     load();
   }, [exerciseId, mode]);
 
-  // Keeps the chosen speed, and stops at the end of a sentence being played.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return undefined;
@@ -84,9 +78,12 @@ export function ListeningExercisePage() {
     audio.play().catch(() => {});
   }
 
-  function rewind() {
-    const audio = audioRef.current;
-    if (audio) audio.currentTime = Math.max(0, audio.currentTime - 3);
+  function select(index, { play = false } = {}) {
+    const segment = data.segments[index];
+    if (!segment) return;
+    setCurrent(index);
+    if (play && isTimed(segment)) playSentence(segment);
+    else if (audioRef.current && segment.start !== null) audioRef.current.currentTime = segment.start;
   }
 
   async function onCheck() {
@@ -104,7 +101,6 @@ export function ListeningExercisePage() {
     }
   }
 
-  // Back to the exercises of the topic in this way of practising.
   const topicId = data?.exercise.topic?.id;
   const back = (
     <Link
@@ -128,7 +124,6 @@ export function ListeningExercisePage() {
     );
 
   const { exercise, segments } = data;
-  // The mode of the data shown: the lines with their blanks come only with it.
   const blanksMode = data.mode === ListeningMode.BLANKS;
   const best = blanksMode ? data.blanks : data;
   const filled = blanksMode
@@ -137,25 +132,11 @@ export function ListeningExercisePage() {
   const toFill = blanksMode ? data.blankCount : segments.length;
   const checkedById = new Map((result?.segments || []).map((segment) => [segment.id, segment]));
 
-  // A song is practised line by line (D93).
   if (exercise.kind === 'song')
     return (
-      <section className="mx-auto max-w-3xl space-y-6">
+      <section className="space-y-6">
         {back}
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            {exercise.topic ? <Badge variant="info">{exercise.topic.name}</Badge> : null}
-            <Badge variant="secondary">{exercise.level}</Badge>
-            <Badge variant="outline">{modeLabels[data.mode]}</Badge>
-          </div>
-          <h1 className="text-2xl font-bold sm:text-3xl">{exercise.title}</h1>
-          <p className="text-muted-foreground">{blanksMode ? blanksInstruction : instructions.song}</p>
-          {best?.checkCount ? (
-            <p className="text-sm text-muted-foreground">
-              Your best score in “{modeLabels[data.mode]}”: <span className="font-semibold text-foreground">{best.bestAccuracy}%</span>
-            </p>
-          ) : null}
-        </div>
+        <ExerciseHeader exercise={exercise} badges={<Badge variant="outline">{modeLabels[data.mode]}</Badge>} instruction={blanksMode ? blanksInstruction : instructions.song} best={best} />
         <SongLinePractice
           key={`${exerciseId}-${data.mode}`}
           exerciseId={exerciseId}
@@ -172,130 +153,163 @@ export function ListeningExercisePage() {
       </section>
     );
 
+  const doneIds = new Set((result?.segments || []).filter((segment) => segment.accuracy === 100).map((segment) => segment.id));
+
   return (
-    <section className="mx-auto max-w-3xl space-y-6">
+    <section className="space-y-6">
       {back}
-      <div className="space-y-2">
+      <ExerciseHeader exercise={exercise} badges={<span className="text-sm text-muted-foreground">{kindLabel(exercise.kind)}</span>} instruction={blanksMode ? blanksInstruction : instructions[exercise.kind]} best={result ? null : best} />
+
+      {result ? (
+        <div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
+          <div className="flex flex-col items-center gap-6 bg-card p-6 sm:flex-row">
+            <ScoreRing percent={result.accuracy} tone={result.accuracy >= 80 ? 'success' : 'primary'} label="this time" />
+            <div className="flex-1 space-y-3 text-center sm:text-left">
+              <p className="text-lg font-semibold">
+                Best {result.bestAccuracy}% · checked {result.checkCount} time{result.checkCount === 1 ? '' : 's'}
+              </p>
+              <p className="text-sm text-muted-foreground">Capitals, punctuation and accents do not count.</p>
+              <div className="flex flex-wrap justify-center gap-3 sm:justify-start">
+                <Button variant="outline" onClick={() => setResult(null)}>
+                  Edit and check again
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="gap-1.5"
+                  onClick={() => {
+                    setAnswers({});
+                    setResult(null);
+                  }}
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Start over
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="space-y-6 lg:grid lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start lg:gap-6 lg:space-y-0">
+        {data.audioUrl ? (
+          <RecordingPanel
+            className="lg:sticky lg:top-20"
+            audioRef={audioRef}
+            audioUrl={data.audioUrl}
+            held={false}
+            follow
+            sentences={segments}
+            current={current}
+            doneIds={doneIds}
+            showSentence={false}
+            onSelect={select}
+            onPlayLine={playSentence}
+            speed={speed}
+            onSpeed={setSpeed}
+          />
+        ) : (
+          <p className="rounded-2xl border p-4 text-sm text-destructive">The recording cannot be played right now.</p>
+        )}
+
+        <div className="min-w-0 space-y-4">
+          <ol className="space-y-3">
+            {segments.map((segment, index) => {
+              const checked = checkedById.get(segment.id);
+              const label = sentenceLabel(exercise.kind, index, segment.speaker);
+              const perfect = checked && checked.accuracy === 100;
+              return (
+                <li
+                  key={segment.id}
+                  className={cn(
+                    'space-y-3 rounded-2xl border-2 bg-card p-4 shadow-sm transition-colors',
+                    index === current ? 'border-primary/30' : 'border-transparent',
+                    checked && (perfect ? 'border-success/40 bg-success/5' : 'border-destructive/30'),
+                  )}
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    {isTimed(segment) ? (
+                      <Button variant={index === current ? 'default' : 'outline'} size="icon" className="h-8 w-8 rounded-full" aria-label={`Play ${label}`} disabled={!data.audioUrl} onClick={() => select(index, { play: true })}>
+                        <Play className="h-4 w-4" />
+                      </Button>
+                    ) : null}
+                    <span className="font-medium">{label}</span>
+                    {checked && checked.accuracy !== null ? (
+                      <span className={cn('ml-auto flex items-center gap-1 text-sm font-semibold tabular-nums', perfect ? 'text-success' : 'text-destructive')}>
+                        {perfect ? <Check className="h-4 w-4" /> : null}
+                        {checked.accuracy}%
+                      </span>
+                    ) : null}
+                  </div>
+                  {blanksMode ? (
+                    <div className="text-lg">
+                      <BlankLine pieces={checked ? checked.pieces : segment.pieces} answers={answers} label={label} onAnswer={(blank, text) => setAnswers((state) => ({ ...state, [blank]: text }))} />
+                    </div>
+                  ) : checked ? (
+                    <div className="space-y-1">
+                      <div className="text-lg">
+                        <CheckedWords words={checked.words} />
+                      </div>
+                      <p className="text-sm text-muted-foreground">You wrote: {checked.typed || '(nothing)'}</p>
+                    </div>
+                  ) : (
+                    <Textarea
+                      aria-label={`${label}: what you hear`}
+                      rows={2}
+                      maxLength={2000}
+                      spellCheck={false}
+                      autoComplete="off"
+                      className="text-base"
+                      placeholder="Type what you hear"
+                      value={answers[segment.id] || ''}
+                      onFocus={() => setCurrent(index)}
+                      onChange={(event) => setAnswers((state) => ({ ...state, [segment.id]: event.target.value }))}
+                    />
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+
+          {result ? null : (
+            <div className="sticky bottom-0 -mx-4 flex flex-wrap items-center gap-3 border-t bg-background/95 px-4 py-3 backdrop-blur sm:mx-0 sm:rounded-2xl sm:border sm:px-4">
+              <Button loading={busy} disabled={busy} className="gap-1.5" onClick={onCheck}>
+                <Check className="h-4 w-4" />
+                {busy ? 'Checking…' : 'Check my answers'}
+              </Button>
+              <div className="flex min-w-[8rem] flex-1 items-center gap-2">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                  <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${toFill ? (filled * 100) / toFill : 0}%` }} />
+                </div>
+                <span className="text-sm tabular-nums text-muted-foreground">
+                  {filled}/{toFill}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ExerciseHeader({ exercise, badges, instruction, best }) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
+      <div className="min-w-0 space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           {exercise.topic ? <Badge variant="info">{exercise.topic.name}</Badge> : null}
           <Badge variant="secondary">{exercise.level}</Badge>
-          <span className="text-sm text-muted-foreground">{kindLabel(exercise.kind)}</span>
-          {exercise.kind === 'song' ? <Badge variant="outline">{modeLabels[data.mode]}</Badge> : null}
+          {badges}
         </div>
         <h1 className="text-2xl font-bold sm:text-3xl">{exercise.title}</h1>
-        <p className="text-muted-foreground">{blanksMode ? blanksInstruction : instructions[exercise.kind]}</p>
+        <p className="text-sm text-muted-foreground">{instruction}</p>
       </div>
-
-
-      {result ? (
-        <div className="rounded-2xl border bg-card p-6 text-center shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-widest text-primary">Your score</p>
-          <p className={cn('mt-2 text-5xl font-bold tracking-tight', result.accuracy >= 80 ? 'text-success' : 'text-foreground')}>{result.accuracy}%</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Best {result.bestAccuracy}% · checked {result.checkCount} time{result.checkCount === 1 ? '' : 's'}
-            {exercise.kind === 'song' ? ` in “${modeLabels[data.mode]}”` : ''}. Capital letters, punctuation and accents do not count; “don't” and “do not”, “five” and
-            “5” are the same.
-          </p>
-          <div className="mt-4 flex flex-wrap justify-center gap-3">
-            <Button variant="outline" onClick={() => setResult(null)}>
-              Edit and check again
-            </Button>
-            <Button
-              variant="outline"
-              className="gap-1.5"
-              onClick={() => {
-                setAnswers({});
-                setResult(null);
-              }}
-            >
-              <RotateCcw className="h-4 w-4" />
-              Start over
-            </Button>
-          </div>
+      {best?.checkCount ? (
+        <div className="text-right">
+          <p className="text-2xl font-bold tabular-nums text-success">{best.bestAccuracy}%</p>
+          <p className="text-xs text-muted-foreground">your best</p>
         </div>
-      ) : best?.checkCount ? (
-        <p className="text-sm text-muted-foreground">
-          Your best score{exercise.kind === 'song' ? ` in “${modeLabels[data.mode]}”` : ''}: <span className="font-semibold text-foreground">{best.bestAccuracy}%</span>
-        </p>
       ) : null}
-
-      <div className="sticky top-16 z-10 -mx-4 space-y-2 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-        {data.audioUrl ? (
-          <audio ref={audioRef} controls src={data.audioUrl} className="w-full" />
-        ) : (
-          <p className="text-sm text-destructive">The recording cannot be played right now.</p>
-        )}
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5" disabled={!data.audioUrl} onClick={rewind}>
-            <RotateCcw className="h-4 w-4" />3 s
-          </Button>
-          <span className="ml-2 text-sm text-muted-foreground">Speed</span>
-          {SPEEDS.map((value) => (
-            <Button key={value} variant={speed === value ? 'default' : 'outline'} size="sm" aria-pressed={speed === value} onClick={() => setSpeed(value)}>
-              {value}×
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      <ol className="space-y-3">
-        {segments.map((segment, index) => {
-          const checked = checkedById.get(segment.id);
-          const label = sentenceLabel(exercise.kind, index, segment.speaker);
-          return (
-            <li key={segment.id} className="space-y-2 rounded-xl border bg-card p-4 shadow-sm">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-medium">{label}</span>
-                {isTimed(segment) ? (
-                  <Button variant="ghost" size="sm" className="gap-1.5" disabled={!data.audioUrl} onClick={() => playSentence(segment)}>
-                    <Play className="h-4 w-4" />
-                    {exercise.kind === 'song' ? 'Play this line' : 'Play this sentence'}
-                  </Button>
-                ) : null}
-                {checked && checked.accuracy !== null ? (
-                  <span className={cn('ml-auto text-sm font-semibold tabular-nums', checked.accuracy === 100 ? 'text-success' : 'text-destructive')}>
-                    {checked.accuracy}%
-                  </span>
-                ) : null}
-              </div>
-              {blanksMode ? (
-                <BlankLine
-                  pieces={checked ? checked.pieces : segment.pieces}
-                  answers={answers}
-                  label={label}
-                  onAnswer={(blank, text) => setAnswers((current) => ({ ...current, [blank]: text }))}
-                />
-              ) : checked ? (
-                <div className="space-y-1 text-sm">
-                  <CheckedWords words={checked.words} />
-                  <p className="text-muted-foreground">You wrote: {checked.typed || '(nothing)'}</p>
-                </div>
-              ) : (
-                <Textarea
-                  aria-label={`${label}: what you hear`}
-                  rows={2}
-                  maxLength={2000}
-                  spellCheck={false}
-                  autoComplete="off"
-                  value={answers[segment.id] || ''}
-                  onChange={(event) => setAnswers((current) => ({ ...current, [segment.id]: event.target.value }))}
-                />
-              )}
-            </li>
-          );
-        })}
-      </ol>
-
-      {result ? null : (
-        <div className="flex flex-wrap items-center gap-3">
-          <Button loading={busy} disabled={busy} onClick={onCheck}>
-            {busy ? 'Checking…' : 'Check my answers'}
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            {filled} of {toFill} {blanksMode ? 'blanks filled' : 'written'}
-          </span>
-        </div>
-      )}
-    </section>
+    </div>
   );
 }

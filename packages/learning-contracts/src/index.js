@@ -146,8 +146,23 @@ export const LearningQueue = Object.freeze({ RESULTS: 'learning.results' });
 //   mockTestTitle, mockVersionId, kind, attemptNumber, correctCount,
 //   totalCount, listeningCorrect, listeningTotal, readingCorrect,
 //   readingTotal, listeningScore, readingScore, submittedAt }.
+// - ACTIVITY_RECORDED (D154): the learner did one thing that counts as a day
+//   of study for the streak. { accountId, activity (StudyActivity),
+//   occurredAt }.
 export const LearningEventType = Object.freeze({
   LESSON_TEST_SUBMITTED: 'lesson-test.submitted',
   LESSON_COMPLETED: 'lesson.completed',
   MOCK_SUBMITTED: 'mock.submitted',
+  ACTIVITY_RECORDED: 'activity.recorded',
+});
+
+export const StudyActivity = Object.freeze({
+  LESSON_STEP: 'lessonStep',
+  LESSON_TEST: 'lessonTest',
+  UNIT_REVIEW: 'unitReview',
+  COURSE_TOPIC: 'courseTopic',
+  COURSE_TEST: 'courseTest',
+  LISTENING_PRACTICE: 'listeningPractice',
+  WORD_MEMORY: 'wordMemory',
+  MOCK_TEST: 'mockTest',
 });
