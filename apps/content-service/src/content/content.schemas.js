@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { AccountRole } from '@appenglish/auth-contracts';
 import {
+  ContentVersionKind,
   FILL_IN_BLANK,
   LESSON_TEST_PARTS,
   MOCK_GROUPED_PARTS,
@@ -10,6 +11,10 @@ import {
   MOCK_TEST_PART_COUNTS,
   MOCK_QUESTION_AUDIO_PARTS,
   MOCK_TEST_LEVELS,
+  UNIT_REVIEW_PARTS,
+  UNIT_REVIEW_PART_COUNTS,
+  UNIT_REVIEW_PASSAGE_COUNT,
+  UNIT_REVIEW_PASSAGE_QUESTIONS,
   MediaKind,
   MediaSection,
   PartOfSpeech,
@@ -168,6 +173,17 @@ export const mockContentSchema = z
   })
   .strict();
 
+// A unit review (D121): Parts 5 and 6 in the mock-test shape (Part 6 passages
+// are sets); no other part. A draft may be incomplete.
+export const unitReviewContentSchema = z
+  .object({
+    test: z
+      .object(Object.fromEntries(UNIT_REVIEW_PARTS.map((key) => [key, mockPartSchema.default({})])))
+      .strict()
+      .default({}),
+  })
+  .strict();
+
 export const examTypeSchema = z.object({ name: requiredText(100) }).strict();
 
 const mockMeta = {
@@ -184,6 +200,11 @@ export const mockUpdateSchema = z
   });
 
 export const placementPaperSchema = z.object({ versionId: z.string().uuid().optional() }).strict();
+
+// Version history (D122): which kind of content, and which version.
+export const versionRequestSchema = z
+  .object({ kind: z.enum(Object.values(ContentVersionKind)), versionId: z.string().uuid().optional() })
+  .strict();
 
 export const pronunciationSchema = z
   .object({
@@ -265,16 +286,15 @@ export function publishIssues(content, mediaById) {
   // The same word may appear once per part of speech.
   if (duplicates(content.vocabulary.filter((item) => item.word).map((item) => `${lower(item.word)}|${item.partOfSpeech}`)))
     issue('vocabulary', 'A word can appear only once per part of speech');
-  const words = content.vocabulary.map((item) => lower(item.word)).filter(Boolean);
-
   const blanks = countBlanks(content.fillIn.passage);
   if (!content.fillIn.passage) issue('fillIn.passage', 'Required');
   else if (!blanks) issue('fillIn.passage', `The passage needs at least one blank (${FILL_IN_BLANK})`);
   if (blanks && content.fillIn.answers.length !== blanks)
     issue('fillIn.answers', `The passage has ${blanks} blanks but ${content.fillIn.answers.length} answers`);
+  // Answers are typed by the Content Manager (D119); they need not be lesson
+  // vocabulary, only present.
   content.fillIn.answers.forEach((answer, index) => {
-    if (!words.includes(lower(answer)))
-      issue(`fillIn.answers[${index}]`, 'Answer must be one of the lesson vocabulary words');
+    if (!answer.trim()) issue(`fillIn.answers[${index}]`, 'Required');
   });
 
   testIssues(content.test, issues, mediaById);
@@ -399,6 +419,56 @@ export function mockIssues(content, mediaById) {
     ...questions,
     ...questions.flatMap((question) => question.options),
   ].map((item) => item.id);
+  if (duplicates(ids)) issue('content', 'Item ids must be unique');
+  return issues;
+}
+
+// Returns the reasons a unit review draft cannot be published (D121, D129):
+// exactly UNIT_REVIEW_PART_COUNTS.part5 Part 5 questions and
+// UNIT_REVIEW_PASSAGE_COUNT Part 6 passages of UNIT_REVIEW_PASSAGE_QUESTIONS
+// blanks and questions each, every question with text (Part 5), four
+// different options, one correct and an explanation. A review has no media.
+export function unitReviewIssues(content) {
+  const issues = [];
+  const { issue, required } = issueChecks(issues, new Map());
+  const checkQuestion = (spec, question, path) => {
+    if (spec.question.prompt) required(`${path}.prompt`, question.prompt);
+    required(`${path}.explanation`, question.explanation);
+    if (question.options.length !== spec.optionCount)
+      issue(`${path}.options`, `Exactly ${spec.optionCount} options are required`);
+    if (question.options.filter((option) => option.isCorrect).length !== 1)
+      issue(`${path}.options`, 'Exactly one option must be correct');
+    const texts = question.options.map((option) => lower(option.text));
+    if (texts.some((value) => !value)) issue(`${path}.options`, 'Every option needs text');
+    else if (duplicates(texts)) issue(`${path}.options`, 'Options must be different');
+  };
+  const spec5 = LESSON_TEST_PARTS.find((part) => part.key === 'part5');
+  const part5 = content.test.part5;
+  if (part5.questions.length !== UNIT_REVIEW_PART_COUNTS.part5)
+    issue('test.part5.questions', `Part 5 needs exactly ${UNIT_REVIEW_PART_COUNTS.part5} questions`);
+  part5.questions.forEach((question, index) => checkQuestion(spec5, question, `test.part5.questions[${index}]`));
+
+  const spec6 = LESSON_TEST_PARTS.find((part) => part.key === 'part6');
+  const part6 = content.test.part6;
+  if (part6.groups.length !== UNIT_REVIEW_PASSAGE_COUNT)
+    issue('test.part6.groups', `Part 6 needs exactly ${UNIT_REVIEW_PASSAGE_COUNT} passages`);
+  part6.groups.forEach((group, index) => {
+    const path = `test.part6.groups[${index}]`;
+    const count = part6.questions.filter((question) => question.groupId === group.id).length;
+    required(`${path}.passage`, group.passage);
+    if (count !== UNIT_REVIEW_PASSAGE_QUESTIONS) issue(path, `The passage needs exactly ${UNIT_REVIEW_PASSAGE_QUESTIONS} questions`);
+    if (group.passage && countBlanks(group.passage) !== UNIT_REVIEW_PASSAGE_QUESTIONS)
+      issue(`${path}.passage`, `The passage needs exactly ${UNIT_REVIEW_PASSAGE_QUESTIONS} blanks (${FILL_IN_BLANK})`);
+  });
+  part6.questions.forEach((question, index) => {
+    const path = `test.part6.questions[${index}]`;
+    if (!part6.groups.some((group) => group.id === question.groupId)) issue(path, 'The question does not belong to a passage');
+    checkQuestion(spec6, question, path);
+  });
+
+  const parts = Object.values(content.test);
+  const questions = parts.flatMap((part) => part.questions);
+  const ids = [...parts.flatMap((part) => part.groups), ...questions, ...questions.flatMap((question) => question.options)].map((item) => item.id);
   if (duplicates(ids)) issue('content', 'Item ids must be unique');
   return issues;
 }

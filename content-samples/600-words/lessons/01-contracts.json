@@ -1,0 +1,260 @@
+{
+  "number": 1,
+  "title": "Contracts",
+  "vocabulary": [
+    {
+      "word": "abide by",
+      "partOfSpeech": "verb",
+      "meaning": "tuân theo, làm đúng theo (luật, điều khoản, quyết định)",
+      "example": "Both companies must abide by the delivery dates written in the contract.",
+      "exampleMeaning": "Cả hai công ty phải tuân theo các ngày giao hàng ghi trong hợp đồng."
+    },
+    {
+      "word": "agreement",
+      "partOfSpeech": "noun",
+      "meaning": "sự thỏa thuận; bản hợp đồng, bản thỏa thuận",
+      "example": "After two weeks of talks, the supplier and the store signed a three-year agreement.",
+      "exampleMeaning": "Sau hai tuần đàm phán, nhà cung cấp và cửa hàng đã ký một thỏa thuận ba năm."
+    },
+    {
+      "word": "assurance",
+      "partOfSpeech": "noun",
+      "meaning": "sự bảo đảm, lời cam đoan",
+      "example": "The landlord gave us written assurance that the repairs would be finished by May.",
+      "exampleMeaning": "Chủ nhà đã cam đoan bằng văn bản rằng việc sửa chữa sẽ xong trước tháng Năm."
+    },
+    {
+      "word": "cancellation",
+      "partOfSpeech": "noun",
+      "meaning": "sự hủy bỏ (hợp đồng, đơn hàng, đặt chỗ)",
+      "example": "The hotel charges a fee for any cancellation made less than 48 hours before arrival.",
+      "exampleMeaning": "Khách sạn thu phí cho mọi trường hợp hủy phòng dưới 48 giờ trước ngày đến."
+    },
+    {
+      "word": "determine",
+      "partOfSpeech": "verb",
+      "meaning": "xác định, quyết định (sau khi xem xét)",
+      "example": "The inspector will determine whether the damage is covered by the contract.",
+      "exampleMeaning": "Thanh tra viên sẽ xác định liệu thiệt hại có nằm trong phạm vi hợp đồng hay không."
+    },
+    {
+      "word": "engage",
+      "partOfSpeech": "verb",
+      "meaning": "thuê (dịch vụ, người); tham gia vào",
+      "example": "We engaged a local law firm to review the terms before we signed.",
+      "exampleMeaning": "Chúng tôi đã thuê một công ty luật địa phương xem lại các điều khoản trước khi ký."
+    },
+    {
+      "word": "establish",
+      "partOfSpeech": "verb",
+      "meaning": "thiết lập, lập ra; xác lập",
+      "example": "The first clause establishes the rights and duties of each side.",
+      "exampleMeaning": "Điều khoản đầu tiên xác lập quyền và nghĩa vụ của mỗi bên."
+    },
+    {
+      "word": "obligate",
+      "partOfSpeech": "verb",
+      "meaning": "bắt buộc, ràng buộc (về pháp lý hoặc đạo đức)",
+      "example": "The contract obligates the builder to fix any defects within one year.",
+      "exampleMeaning": "Hợp đồng buộc nhà thầu phải sửa mọi khiếm khuyết trong vòng một năm."
+    },
+    {
+      "word": "party",
+      "partOfSpeech": "noun",
+      "meaning": "bên (tham gia hợp đồng, tranh chấp)",
+      "example": "Each party received a signed copy of the lease.",
+      "exampleMeaning": "Mỗi bên nhận được một bản hợp đồng thuê đã ký."
+    },
+    {
+      "word": "provision",
+      "partOfSpeech": "noun",
+      "meaning": "điều khoản, quy định (trong hợp đồng, luật)",
+      "example": "A provision in the agreement allows either side to end it with 60 days' notice.",
+      "exampleMeaning": "Một điều khoản trong thỏa thuận cho phép bên nào cũng có thể chấm dứt với thông báo trước 60 ngày."
+    },
+    {
+      "word": "resolve",
+      "partOfSpeech": "verb",
+      "meaning": "giải quyết (tranh chấp, vấn đề); quyết tâm",
+      "example": "The two companies resolved their dispute without going to court.",
+      "exampleMeaning": "Hai công ty đã giải quyết tranh chấp mà không phải ra tòa."
+    },
+    {
+      "word": "specific",
+      "partOfSpeech": "adjective",
+      "meaning": "cụ thể, rõ ràng, riêng biệt",
+      "example": "The contract lists specific dates for each stage of the project.",
+      "exampleMeaning": "Hợp đồng liệt kê các ngày cụ thể cho từng giai đoạn của dự án."
+    }
+  ],
+  "fillIn": {
+    "passage": "When Lakeside Bakery decided to open a second shop, its owner, Mrs. Tran, needed a reliable flour supplier. She ___ a small consulting firm to help her compare offers. The consultant's first job was to ___ which suppliers could deliver every week without fail, and his report helped her ___ a short list of three companies.\n\nMrs. Tran chose Northfield Mills, and the two ___ met to write the ___. The document ___ Northfield to deliver 200 kilograms of flour every Monday and lists the ___ price of each delivery. One ___ allows either side to end the contract with 30 days' notice, so a sudden ___ cannot leave the bakery without flour. Northfield also gave Mrs. Tran a written ___ that prices would not change during the first year.\n\nBoth sides promised to ___ the terms. If a problem appears, they will try to ___ it by phone first and ask a lawyer only if that fails.",
+    "answers": ["engaged", "determine", "establish", "parties", "agreement", "obligates", "specific", "provision", "cancellation", "assurance", "abide by", "resolve"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Hai người phụ nữ ngồi ở bàn làm việc, một người đang ký vào một bản hợp đồng, người kia nhìn theo.",
+      "options": [
+        "The women are signing a document.",
+        "The women are filing papers in a cabinet.",
+        "The women are shaking hands across the table.",
+        "The women are reading a newspaper."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy hai người phụ nữ đang ký giấy tờ. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Who will determine the delivery schedule?",
+        "options": ["The supplier will, after the meeting.", "It was delivered on Tuesday.", "Yes, the schedule is on my desk."],
+        "answer": "A",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người. (B) nhầm với từ 'delivery', (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Did both parties agree to the new terms?",
+        "options": ["The party starts at eight.", "Yes, they signed this morning.", "I'll cancel the order."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về việc đồng ý; (B) trả lời Yes và thêm chi tiết đã ký. (A) nhầm nghĩa 'party' là bữa tiệc, (C) không liên quan."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Hi, Daniel. I've just read the draft agreement from the printing company. There's one provision I don't like.\nMan: Which one?\nWoman: The cancellation clause. If we cancel an order, even a month early, we still have to pay the full price.\nMan: That's not acceptable. Our orders change every season. We should ask them to change it so that any cancellation made more than two weeks before printing is free.\nWoman: I agree. Could you call their sales manager this afternoon? I'd like to resolve this before Friday, when we're supposed to sign.\nMan: Sure. I'll also ask for written assurance that the price per page stays the same for the whole year.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["A printing error", "A clause in a contract", "A late delivery", "A new sales manager"],
+          "answer": "B",
+          "explanation": "Người phụ nữ nói về một 'provision' (điều khoản) trong bản thỏa thuận nháp, cụ thể là điều khoản hủy đơn hàng."
+        },
+        {
+          "prompt": "What does the woman want to do before Friday?",
+          "options": ["Print a new catalog", "Pay the full price", "Settle the problem", "Hire a lawyer"],
+          "answer": "C",
+          "explanation": "Cô ấy nói 'I'd like to resolve this before Friday'; 'settle' đồng nghĩa với 'resolve'."
+        },
+        {
+          "prompt": "What will the man ask for?",
+          "options": ["A lower price per page", "A longer contract", "A written promise about prices", "A meeting on Friday"],
+          "answer": "C",
+          "explanation": "Người đàn ông sẽ xin 'written assurance that the price per page stays the same', tức một lời cam đoan bằng văn bản về giá."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good morning, everyone. Before we start today's meeting, I want to give you an update on our contract with Greenway Cleaning Services. As you know, our agreement with them expires at the end of June. Last week we engaged a lawyer to review the terms, and then we met with their manager to discuss the contract for next year. They have agreed to keep the same monthly fee, and they have added a provision that obligates them to replace any cleaner who receives two complaints. In return, we have agreed to a twelve-month contract instead of six months. Both parties will sign the new agreement next Monday. If you have any specific concerns about the cleaning service, please send them to me by Friday so that I can raise them before we sign.",
+      "questions": [
+        {
+          "prompt": "What is the talk mainly about?",
+          "options": ["A change in office hours", "The renewal of a service contract", "A complaint from a customer", "A new cleaning schedule"],
+          "answer": "B",
+          "explanation": "Người nói cập nhật về hợp đồng với công ty vệ sinh sắp hết hạn và các điều khoản cho năm tới."
+        },
+        {
+          "prompt": "What will the cleaning company do under the new agreement?",
+          "options": ["Lower its monthly fee", "Clean the office twice a day", "Replace cleaners who receive complaints", "Sign a six-month contract"],
+          "answer": "C",
+          "explanation": "Điều khoản mới 'obligates them to replace any cleaner who receives two complaints'. Phí giữ nguyên chứ không giảm, và hợp đồng là 12 tháng."
+        },
+        {
+          "prompt": "What are listeners asked to do by Friday?",
+          "options": ["Sign the agreement", "Send their concerns to the speaker", "Meet the cleaning manager", "Choose a new supplier"],
+          "answer": "B",
+          "explanation": "Cuối bài: 'please send them to me by Friday' nói về các mối lo ngại (concerns) về dịch vụ vệ sinh."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "All employees must _____ the safety rules listed in the handbook.",
+        "options": ["abide by", "abide", "abiding by", "abided"],
+        "answer": "A",
+        "explanation": "Sau 'must' cần động từ nguyên mẫu; 'abide by' là cụm động từ nghĩa là tuân theo, không bỏ 'by'."
+      },
+      {
+        "prompt": "The two companies reached an _____ on the price after a long negotiation.",
+        "options": ["agree", "agreement", "agreeable", "agreed"],
+        "answer": "B",
+        "explanation": "Sau mạo từ 'an' cần danh từ: 'agreement'."
+      },
+      {
+        "prompt": "The manager will _____ whether the project needs more staff.",
+        "options": ["determination", "determined", "determine", "determining"],
+        "answer": "C",
+        "explanation": "Sau trợ động từ 'will' cần động từ nguyên mẫu."
+      },
+      {
+        "prompt": "Each _____ to the contract must keep a signed copy for its records.",
+        "options": ["party", "partly", "parting", "partial"],
+        "answer": "A",
+        "explanation": "Cần danh từ chỉ bên tham gia hợp đồng; 'party to the contract' là cách nói cố định."
+      },
+      {
+        "prompt": "The customer asked for a _____ delivery date instead of a general estimate.",
+        "options": ["specify", "specific", "specifically", "specification"],
+        "answer": "B",
+        "explanation": "Trước cụm danh từ 'delivery date' cần tính từ: 'specific'."
+      },
+      {
+        "prompt": "The new policy _____ all suppliers to provide a written warranty.",
+        "options": ["obligation", "obligates", "obligatory", "obliging"],
+        "answer": "B",
+        "explanation": "Chủ ngữ 'The new policy' số ít và câu cần động từ chính; 'obligates ... to' là đúng."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Sales Staff\nFrom: Helen Park, Legal Department\nSubject: New customer contracts\n\nStarting on March 1, all sales staff must use the updated customer contract. The new form includes a ___ that explains how a customer can end the service. Under this clause, a customer who requests a ___ within fourteen days of signing will receive a full refund. After that period, the company is not ___ to return any payment. Please read the new form carefully and contact me if you have any questions.",
+      "questions": [
+        {
+          "options": ["provision", "provider", "provide", "provisional"],
+          "answer": "A",
+          "explanation": "Sau 'a' cần danh từ, và nghĩa phù hợp là 'điều khoản' giải thích cách chấm dứt dịch vụ."
+        },
+        {
+          "options": ["cancel", "cancellation", "canceled", "canceling"],
+          "answer": "B",
+          "explanation": "Sau 'a' cần danh từ: 'cancellation' (yêu cầu hủy)."
+        },
+        {
+          "options": ["obligate", "obligation", "obligated", "obligating"],
+          "answer": "C",
+          "explanation": "'is not obligated to' là dạng bị động, nghĩa là không bị buộc phải; cần quá khứ phân từ."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "RIVERSIDE APARTMENTS\nSummary of Service Agreement with Bright Lawn Care\n\nDear Residents,\n\nOn April 2, Riverside Apartments signed a new agreement with Bright Lawn Care for the maintenance of our gardens and parking areas. The main terms are listed below.\n\n| Service | Schedule |\n| Lawn mowing | Every Tuesday, April to October |\n| Tree and hedge trimming | First Monday of each month |\n| Snow removal | Within six hours of snowfall, November to March |\n\nThe agreement is valid for two years and establishes a fixed monthly fee, so the service charge in your rent will not change. A provision in the contract obligates Bright Lawn Care to repair, at its own cost, any damage its workers cause to cars or buildings. Either party may cancel the agreement with 60 days' written notice.\n\nResidents who notice a problem with the service should not contact Bright Lawn Care directly. Instead, please report it to the management office at extension 210, and we will resolve it with the company.\n\nThank you,\nMarcus Webb\nProperty Manager",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the notice?",
+          "options": ["To announce a new parking rule", "To inform residents about a service contract", "To ask residents to pay a fee", "To introduce a new property manager"],
+          "answer": "B",
+          "explanation": "Thông báo tóm tắt thỏa thuận dịch vụ mới ký với Bright Lawn Care cho cư dân."
+        },
+        {
+          "prompt": "When will hedges be trimmed?",
+          "options": ["Every Tuesday", "Once a month", "Within six hours", "Twice a year"],
+          "answer": "B",
+          "explanation": "Bảng ghi 'Tree and hedge trimming: First Monday of each month', tức mỗi tháng một lần."
+        },
+        {
+          "prompt": "How long will the agreement last?",
+          "options": ["Six months", "One year", "Two years", "Sixty days"],
+          "answer": "C",
+          "explanation": "'The agreement is valid for two years.' 60 ngày là thời hạn báo trước khi hủy."
+        },
+        {
+          "prompt": "What must Bright Lawn Care do if its workers damage a car?",
+          "options": ["Report it to the police", "Cancel the contract", "Pay for the repair", "Contact the resident"],
+          "answer": "C",
+          "explanation": "Điều khoản buộc công ty 'repair, at its own cost, any damage its workers cause to cars or buildings'."
+        },
+        {
+          "prompt": "What should residents do if they have a complaint?",
+          "options": ["Call the management office", "Write to Bright Lawn Care", "Send a letter to Marcus Webb", "Wait 60 days"],
+          "answer": "A",
+          "explanation": "Cư dân được yêu cầu báo cho văn phòng quản lý qua số máy lẻ 210, không liên hệ trực tiếp công ty."
+        }
+      ]
+    }
+  }
+}

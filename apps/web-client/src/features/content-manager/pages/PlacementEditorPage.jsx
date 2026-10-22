@@ -32,6 +32,7 @@ import {
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { PartEditor, questionRange } from '../components/PartEditor.jsx';
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { PublishButton, usePublishAction } from '../../../components/shared/PublishButton.jsx';
 
 const saveErrorMessage = (error) =>
   `${error?.fileName ? `${error.fileName}: ` : ''}${getApiErrorMessage(error)}`;
@@ -44,6 +45,7 @@ export function PlacementEditorPage() {
   const [content, setContent] = useState(null);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
+  const publish = usePublishAction();
   const [issues, setIssues] = useState([]);
   const [partTab, setPartTab] = useState(LESSON_TEST_PARTS[0].key);
 
@@ -124,6 +126,7 @@ export function PlacementEditorPage() {
       apply(data);
       setIssues([]);
       notify({ title: `Published version ${data.published.versionNumber}` });
+      return true;
     } catch (error) {
       const found = error?.response?.data?.data?.issues;
       if (errorCode(error) === ContentResponseCode.CONTENT_NOT_PUBLISHABLE && found?.length) {
@@ -160,7 +163,7 @@ export function PlacementEditorPage() {
       <PageHeader
         eyebrow="Content Manager"
         title="Placement test"
-        description={`One test for every new learner: seven parts, 23 questions, ${PLACEMENT_DURATION_MINUTES} minutes. Each learner takes it once; the score decides the unit they start at.`}
+        description={`Seven parts, 23 questions, ${PLACEMENT_DURATION_MINUTES} minutes.`}
       />
 
       <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-2 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
@@ -175,9 +178,7 @@ export function PlacementEditorPage() {
           <Button loading={busy} variant="outline" disabled={busy || !dirty} onClick={onSave}>
             {busy ? 'Working…' : 'Save draft'}
           </Button>
-          <Button disabled={busy || !(dirty || status.hasDraft)} onClick={onPublish}>
-            Publish
-          </Button>
+          <PublishButton state={publish.state} disabled={busy || !(dirty || status.hasDraft)} onClick={() => publish.run(onPublish)} />
         </div>
       </div>
 

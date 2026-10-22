@@ -27,10 +27,20 @@ test('xp bars are in the order earned with shortened titles', () => {
 });
 
 test('level steps and membership length', () => {
-  assert.deepEqual(levelSteps({ levels: [{ level: 'A1', state: 'DONE', lessons: { completed: 2, total: 2 } }, { level: 'A2', state: 'CURRENT' }] }), [
-    { level: 'A1', state: 'DONE', lessons: { completed: 2, total: 2 } },
-    { level: 'A2', state: 'CURRENT', lessons: null },
+  const course = {
+    currentLevel: 'A2',
+    levels: [
+      { level: 'A1', state: 'OPEN', topics: { done: 2, total: 2 }, levelTest: { passed: true } },
+      { level: 'A2', state: 'OPEN', topics: { done: 0, total: 3 }, levelTest: { passed: false } },
+      { level: 'B1', state: 'LOCKED', topics: { done: 0, total: 0 }, levelTest: null },
+    ],
+  };
+  assert.deepEqual(levelSteps(course), [
+    { level: 'A1', state: 'DONE', topics: { done: 2, total: 2 } },
+    { level: 'A2', state: 'CURRENT', topics: { done: 0, total: 3 } },
+    { level: 'B1', state: 'LOCKED', topics: { done: 0, total: 0 } },
   ]);
+  assert.deepEqual(levelSteps(null), []);
   const now = new Date('2026-10-19T12:00:00Z');
   assert.equal(memberFor('2026-10-19T08:00:00Z', now), 'today');
   assert.equal(memberFor('2026-10-18T08:00:00Z', now), '1 day');

@@ -1,0 +1,260 @@
+{
+  "number": 9,
+  "title": "Electronics",
+  "vocabulary": [
+    {
+      "word": "disk",
+      "partOfSpeech": "noun",
+      "meaning": "đĩa (lưu dữ liệu), ổ đĩa",
+      "example": "The old accounting records are kept on a backup disk in the office safe.",
+      "exampleMeaning": "Các sổ sách kế toán cũ được lưu trên một đĩa dự phòng trong tủ két của văn phòng."
+    },
+    {
+      "word": "facilitate",
+      "partOfSpeech": "verb",
+      "meaning": "tạo điều kiện thuận lợi, làm cho dễ dàng hơn",
+      "example": "The new scanner facilitates sharing documents with our overseas office.",
+      "exampleMeaning": "Máy quét mới giúp việc chia sẻ tài liệu với văn phòng ở nước ngoài dễ dàng hơn."
+    },
+    {
+      "word": "network",
+      "partOfSpeech": "noun",
+      "meaning": "mạng (máy tính); mạng lưới (quan hệ, chi nhánh)",
+      "example": "All the office printers are connected to the same network, so staff can print from any desk.",
+      "exampleMeaning": "Tất cả máy in trong văn phòng đều nối chung một mạng, nên nhân viên có thể in từ bất kỳ bàn nào."
+    },
+    {
+      "word": "popularity",
+      "partOfSpeech": "noun",
+      "meaning": "sự phổ biến, sự được ưa chuộng",
+      "example": "The popularity of tablets among sales staff has grown quickly over the past two years.",
+      "exampleMeaning": "Mức độ ưa chuộng máy tính bảng trong đội ngũ bán hàng đã tăng nhanh trong hai năm qua."
+    },
+    {
+      "word": "process",
+      "partOfSpeech": "verb",
+      "meaning": "xử lý (dữ liệu, đơn hàng); (n) quy trình",
+      "example": "The new system processes customer orders in a few seconds instead of overnight.",
+      "exampleMeaning": "Hệ thống mới xử lý đơn hàng của khách trong vài giây thay vì qua đêm."
+    },
+    {
+      "word": "replace",
+      "partOfSpeech": "verb",
+      "meaning": "thay thế, thay mới",
+      "example": "We plan to replace the oldest laptops before their warranty expires.",
+      "exampleMeaning": "Chúng tôi dự định thay các laptop cũ nhất trước khi hết hạn bảo hành."
+    },
+    {
+      "word": "revolution",
+      "partOfSpeech": "noun",
+      "meaning": "cuộc cách mạng, sự thay đổi lớn và căn bản",
+      "example": "Cloud storage has caused a revolution in the way small companies share files.",
+      "exampleMeaning": "Lưu trữ đám mây đã tạo ra một cuộc cách mạng trong cách các công ty nhỏ chia sẻ tập tin."
+    },
+    {
+      "word": "sharp",
+      "partOfSpeech": "adjective",
+      "meaning": "sắc nét, rõ; sắc bén; đột ngột (tăng, giảm)",
+      "example": "The new monitor shows a much sharper image than the one we used before.",
+      "exampleMeaning": "Màn hình mới cho hình ảnh sắc nét hơn nhiều so với chiếc chúng tôi dùng trước đây."
+    },
+    {
+      "word": "skill",
+      "partOfSpeech": "noun",
+      "meaning": "kỹ năng, tay nghề",
+      "example": "Basic spreadsheet skills are required for every position in the finance team.",
+      "exampleMeaning": "Kỹ năng bảng tính cơ bản là yêu cầu cho mọi vị trí trong nhóm tài chính."
+    },
+    {
+      "word": "software",
+      "partOfSpeech": "noun",
+      "meaning": "phần mềm",
+      "example": "The design team asked for new software that can open larger image files.",
+      "exampleMeaning": "Nhóm thiết kế yêu cầu phần mềm mới có thể mở các tập tin hình ảnh lớn hơn."
+    },
+    {
+      "word": "store",
+      "partOfSpeech": "verb",
+      "meaning": "lưu trữ, cất giữ; (n) cửa hàng",
+      "example": "The device can store up to ten thousand photos of product samples.",
+      "exampleMeaning": "Thiết bị có thể lưu trữ tới mười nghìn bức ảnh mẫu sản phẩm."
+    },
+    {
+      "word": "technically",
+      "partOfSpeech": "adverb",
+      "meaning": "về mặt kỹ thuật; nói một cách chặt chẽ thì",
+      "example": "The printer is technically still working, but it jams several times a day.",
+      "exampleMeaning": "Về mặt kỹ thuật thì máy in vẫn hoạt động, nhưng nó kẹt giấy nhiều lần mỗi ngày."
+    }
+  ],
+  "fillIn": {
+    "passage": "Fifteen years ago, Bluebird Photography kept every customer photo on a ___ in a drawer, and finding an old picture could take a whole morning. Since then, the studio has gone through a small ___ in the way it works. The owner, Mr. Haddad, decided to ___ the old desktop computers with two laptops and a tablet that the photographers can carry to weddings and events.\n\nThe new devices ___ images on a central server, and every camera in the studio connects to the same ___, so a photo taken in the morning can be printed by the afternoon. New editing ___ allows staff to ___ hundreds of pictures in an hour, and the large screens show a much ___ image than the old ones. Mr. Haddad says the change has ___ faster deliveries and happier customers.\n\nThe upgrade also required new ___: two assistants took an evening course on the editing program. ___, the old computers still turn on, but they are too slow to be useful. As the ___ of online photo albums grows, the studio expects to sell more digital packages than printed ones next year.",
+    "answers": ["disk", "revolution", "replace", "store", "network", "software", "process", "sharper", "facilitated", "skills", "Technically", "popularity"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một kỹ thuật viên nam ngồi xổm phía sau bàn làm việc, đang cắm dây cáp vào mặt sau của một máy tính để bàn.",
+      "options": [
+        "The man is connecting cables to a computer.",
+        "The man is cleaning the windows.",
+        "The man is carrying a box up the stairs.",
+        "The man is turning off the lights."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người đàn ông đang cắm dây cáp vào máy tính. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Where do you store the backup disks?",
+        "options": ["In the locked cabinet in Room 4.", "Yes, every evening.", "The store closes at nine."],
+        "answer": "A",
+        "explanation": "Câu hỏi Where cần câu trả lời chỉ nơi chốn. (B) trả lời Yes cho câu hỏi Wh, (C) nhầm nghĩa 'store' là cửa hàng."
+      },
+      {
+        "question": "Has the IT team replaced the router yet?",
+        "options": ["They finished it this morning.", "The route goes past the bank.", "It's a popular model."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc đã thay xong chưa; (A) cho biết đã xong sáng nay. (B) nhầm âm 'route', (C) không trả lời câu hỏi."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Kenji, have you tried the new inventory software yet?\nMan: Only once. Technically it works, but it took almost a minute to load the product list. Is that normal?\nWoman: It shouldn't be. The vendor said the program processes a thousand items in a few seconds. The problem may be our network rather than the software.\nMan: That makes sense. The connection in the warehouse has been slow all week.\nWoman: I'll ask the IT team to check the cables this afternoon. In the meantime, could you sign up for the training session on Thursday? The program has become quite popular with the sales team, and they'd like everyone to have the same skills.\nMan: Sure. Is it in the morning or the afternoon?\nWoman: Ten o'clock, in the second-floor meeting room. It lasts about two hours.\nMan: I'll put it in my calendar now.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["A delivery delay", "A new computer program", "A job interview", "A warehouse move"],
+          "answer": "B",
+          "explanation": "Cuộc nói chuyện bắt đầu bằng câu hỏi về 'the new inventory software' và xoay quanh chương trình này."
+        },
+        {
+          "prompt": "What does the woman think is causing the problem?",
+          "options": ["The software has an error.", "The product list is too long.", "The network connection is slow.", "The computer is too old."],
+          "answer": "C",
+          "explanation": "Cô ấy nói 'The problem may be our network rather than the software', và người đàn ông xác nhận kết nối ở kho chậm cả tuần."
+        },
+        {
+          "prompt": "What does the woman ask the man to do?",
+          "options": ["Replace the cables", "Call the vendor", "Attend a training session", "Move to the second floor"],
+          "answer": "C",
+          "explanation": "'Could you sign up for the training session on Thursday?'"
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Welcome to Harbor Electronics, and thank you for joining our Saturday demonstration. This afternoon we are showing the new Vista 12 monitor, which went on sale last week and has already become one of the most popular items in the store. The screen is 27 inches wide and gives a much sharper picture than most office monitors, which makes it ideal for designers and for anyone who reads documents all day. If you are thinking of replacing your old screen, bring it in today and receive a forty-dollar discount on the Vista 12. We will also demonstrate the Pocket Drive, a small disk that can store two terabytes of files and connects to any laptop without extra software. Our staff are at the counter to answer questions and to facilitate orders for home delivery. The demonstration begins in five minutes at the back of the store.",
+      "questions": [
+        {
+          "prompt": "Where is the talk most likely taking place?",
+          "options": ["At a trade fair", "In an electronics store", "In a design studio", "At a company meeting"],
+          "answer": "B",
+          "explanation": "Người nói chào 'Welcome to Harbor Electronics' và nhắc đến 'the store' và quầy phục vụ."
+        },
+        {
+          "prompt": "How can customers receive a discount?",
+          "options": ["By ordering online", "By bringing in an old monitor", "By buying two items", "By signing up for a newsletter"],
+          "answer": "B",
+          "explanation": "'If you are thinking of replacing your old screen, bring it in today and receive a forty-dollar discount.'"
+        },
+        {
+          "prompt": "What is mentioned about the Pocket Drive?",
+          "options": ["It needs special software.", "It is designed only for designers.", "It can hold two terabytes of data.", "It is sold out."],
+          "answer": "C",
+          "explanation": "Pocket Drive là 'a small disk that can store two terabytes of files' và không cần phần mềm thêm."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The new sorting machine can _____ about 500 letters per minute.",
+        "options": ["process", "processes", "processing", "processed"],
+        "answer": "A",
+        "explanation": "Sau 'can' cần động từ nguyên mẫu: 'process' (xử lý)."
+      },
+      {
+        "prompt": "The online booking tool _____ communication between the sales office and the warehouse.",
+        "options": ["facilitate", "facilitates", "facilitation", "facilitator"],
+        "answer": "B",
+        "explanation": "Chủ ngữ số ít 'The online booking tool' cần động từ hiện tại đơn có 's': 'facilitates'."
+      },
+      {
+        "prompt": "The _____ of wireless headsets has grown among call center staff.",
+        "options": ["popular", "popularly", "popularity", "popularize"],
+        "answer": "C",
+        "explanation": "Sau 'The' và trước 'of' cần danh từ làm chủ ngữ: 'popularity'."
+      },
+      {
+        "prompt": "All customer records are _____ on a secure server outside the building.",
+        "options": ["store", "stored", "storing", "storage"],
+        "answer": "B",
+        "explanation": "Câu bị động 'are + quá khứ phân từ': 'are stored' (được lưu trữ)."
+      },
+      {
+        "prompt": "Strong communication _____ are essential for anyone in the support department.",
+        "options": ["skill", "skilled", "skills", "skillful"],
+        "answer": "C",
+        "explanation": "Động từ 'are' cho biết chủ ngữ số nhiều: 'skills'."
+      },
+      {
+        "prompt": "_____, the warranty covers the screen, but the company refused to repair the crack.",
+        "options": ["Technical", "Technically", "Technique", "Technician"],
+        "answer": "B",
+        "explanation": "Trạng từ đứng đầu câu bổ nghĩa cho cả mệnh đề: 'Technically' (về mặt kỹ thuật, trên lý thuyết)."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Staff\nFrom: Olivia Brandt, IT Manager\nSubject: Weekend network upgrade\n\nThe office ___ will be unavailable from 6 p.m. on Friday until noon on Saturday while we install new equipment. During this time, you will not be able to open shared folders or print. Please copy any files you need for weekend work onto a portable ___ before you leave on Friday. The new equipment will ___ faster file transfers and more reliable video calls, especially with the branch offices. If you have trouble connecting on Monday morning, restart your computer first and then call extension 220.",
+      "questions": [
+        {
+          "options": ["network", "networking", "networked", "networks"],
+          "answer": "A",
+          "explanation": "Sau 'The office' cần danh từ số ít làm chủ ngữ của 'will be': 'network' (mạng)."
+        },
+        {
+          "options": ["disk", "skill", "revolution", "popularity"],
+          "answer": "A",
+          "explanation": "Cần danh từ chỉ thiết bị lưu tập tin: 'a portable disk' (đĩa di động). Các từ khác không hợp nghĩa."
+        },
+        {
+          "options": ["facilitate", "facilitates", "facilitating", "facilitated"],
+          "answer": "A",
+          "explanation": "Sau 'will' cần động từ nguyên mẫu: 'facilitate' (tạo điều kiện cho)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "TECHNOLOGY FOR SMALL BUSINESS\nLocal Shops Join the Tablet Revolution\nby Marisol Vega\n\nFive years ago, almost every shop on Willow Street had a cash register that only printed paper receipts. Today, more than half of them have replaced those registers with tablets. Owners call the change a quiet revolution in how they run their businesses.\n\n\"The software does the work of three machines,\" says Ravi Menon, who owns a bakery on the corner. His tablet takes payments, stores every sale, and prints a report each night so he knows which breads to bake the next morning. \"I'm technically not a computer person, but I learned the basics in one afternoon.\"\n\nThe growing popularity of tablets has also created work for local trainers. Linh Dao, who teaches a class at the community center, says most owners already have the skills they need. What surprises her students most is the screen: it is sharp enough to show product photos, so some shops use the tablet as a menu.\n\nNot everyone has switched. Owners of smaller shops say the monthly fee, between 30 and 60 dollars, is too high for a business with only a few sales a day. Ms. Dao's next class is on May 9 at 7 p.m.",
+      "questions": [
+        {
+          "prompt": "What is the article mainly about?",
+          "options": ["A new bakery on Willow Street", "Shops changing from cash registers to tablets", "A fundraiser at the community center", "Problems with paper receipts"],
+          "answer": "B",
+          "explanation": "Bài báo nói về việc hơn nửa số cửa hàng trên Willow Street đã thay máy tính tiền bằng máy tính bảng và ảnh hưởng của thay đổi này."
+        },
+        {
+          "prompt": "What does Mr. Menon use the nightly report for?",
+          "options": ["To pay his employees", "To decide what to bake", "To order new software", "To record customer names"],
+          "answer": "B",
+          "explanation": "Máy tính bảng 'prints a report each night so he knows which breads to bake the next morning'."
+        },
+        {
+          "prompt": "Who is Linh Dao?",
+          "options": ["A shop owner", "A software developer", "A trainer", "A journalist"],
+          "answer": "C",
+          "explanation": "Cô Dao 'teaches a two-hour class at the community center' và được nhắc đến trong phần về 'local trainers'."
+        },
+        {
+          "prompt": "According to the article, what surprises Ms. Dao's students most?",
+          "options": ["The monthly fee", "The quality of the screen", "The speed of payments", "The size of the tablet"],
+          "answer": "B",
+          "explanation": "'What surprises her students most is the screen: it is sharp enough to show product photos.'"
+        },
+        {
+          "prompt": "Why have some owners not switched to tablets?",
+          "options": ["They do not know how to use phones.", "The screens are too small.", "The monthly fee is too high for them.", "Their customers prefer paper receipts."],
+          "answer": "C",
+          "explanation": "Đoạn cuối: chủ các cửa hàng nhỏ hơn nói 'the monthly fee ... is too high for a business that makes only a few sales a day'."
+        }
+      ]
+    }
+  }
+}

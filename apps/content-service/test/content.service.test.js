@@ -134,7 +134,8 @@ test('vocabulary and fill-in publishing rules', async () => {
     value.vocabulary[0].audioUkMediaId = imageId;
     value.vocabulary[0].audioUsMediaId = '00000000-0000-4000-8000-000000000000';
     value.vocabulary.push({ ...value.vocabulary[1], word: 'PLATFORM' });
-    value.fillIn = { passage: 'One ___ and two ___ and three ___.', answers: ['ticket', 'station'] };
+    // Answers are free text (D119): the second one is blank, the third is missing.
+    value.fillIn = { passage: 'One ___ and two ___ and three ___.', answers: ['ticket', '  '] };
     return value;
   }));
   const paths = await issuePaths(service, lesson.id);

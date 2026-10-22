@@ -130,6 +130,17 @@ export class AuthGatewayController {
       response,
     );
   }
+  // Invitations (D131).
+  async adminInvite(body, request, response) {
+    return this.forward(
+      'AdminInviteAccount',
+      { accessToken: cookies(request).accessToken, ...fields(body, ['email', 'displayName', 'role']) },
+      response,
+    );
+  }
+  async acceptInvite(body, response) {
+    return this.forward('AcceptInvite', fields(body, ['email', 'otp', 'password']), response);
+  }
   async adminAction(accountId, body, request, response) {
     return this.forward(
       'AdminAccountAction',
@@ -194,10 +205,12 @@ const routes = [
   [Post, 'resend-verification', 'resendVerification', [Body(), passthrough()]],
   [Post, 'forgot-password', 'forgotPassword', [Body(), passthrough()]],
   [Post, 'reset-password', 'resetPassword', [Body(), passthrough()]],
+  [Post, 'accept-invite', 'acceptInvite', [Body(), passthrough()]],
   [Post, 'refresh', 'refresh', [Req(), passthrough()]],
   [Post, 'logout', 'logout', [Req(), passthrough()]],
   [Get, 'me', 'me', [Req(), passthrough()]],
   [Get, 'admin/accounts', 'adminList', [Query(), Req(), passthrough()]],
+  [Post, 'admin/accounts', 'adminInvite', [Body(), Req(), passthrough()]],
   // Before :id so "stats" is never read as an account id.
   [Get, 'admin/accounts/stats', 'adminStats', [Req(), passthrough()]],
   [Get, 'admin/accounts/:id', 'adminGet', [Param('id'), Req(), passthrough()]],

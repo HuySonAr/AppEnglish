@@ -1,0 +1,260 @@
+{
+  "number": 4,
+  "title": "Business Planning",
+  "vocabulary": [
+    {
+      "word": "address",
+      "partOfSpeech": "verb",
+      "meaning": "giải quyết, xử lý (vấn đề); phát biểu trước (ai đó)",
+      "example": "The new plan addresses the shortage of parking spaces for customers.",
+      "exampleMeaning": "Kế hoạch mới giải quyết tình trạng thiếu chỗ đậu xe cho khách hàng."
+    },
+    {
+      "word": "avoid",
+      "partOfSpeech": "verb",
+      "meaning": "tránh, né tránh",
+      "example": "To avoid delays, the team ordered materials two months before construction began.",
+      "exampleMeaning": "Để tránh chậm trễ, nhóm đã đặt vật liệu hai tháng trước khi khởi công."
+    },
+    {
+      "word": "demonstrate",
+      "partOfSpeech": "verb",
+      "meaning": "chứng minh, cho thấy; trình diễn, giới thiệu",
+      "example": "The sales figures demonstrate that the new store location was a good choice.",
+      "exampleMeaning": "Số liệu bán hàng chứng minh rằng vị trí cửa hàng mới là lựa chọn đúng."
+    },
+    {
+      "word": "develop",
+      "partOfSpeech": "verb",
+      "meaning": "phát triển, xây dựng (kế hoạch, sản phẩm)",
+      "example": "The owners spent six months developing a plan for the second restaurant.",
+      "exampleMeaning": "Các chủ sở hữu đã dành sáu tháng xây dựng kế hoạch cho nhà hàng thứ hai."
+    },
+    {
+      "word": "evaluate",
+      "partOfSpeech": "verb",
+      "meaning": "đánh giá, thẩm định",
+      "example": "The bank will evaluate the business plan before approving the loan.",
+      "exampleMeaning": "Ngân hàng sẽ đánh giá kế hoạch kinh doanh trước khi duyệt khoản vay."
+    },
+    {
+      "word": "gather",
+      "partOfSpeech": "verb",
+      "meaning": "thu thập; tụ họp, tập hợp",
+      "example": "Our assistant gathered information about rents in three neighborhoods near the station.",
+      "exampleMeaning": "Trợ lý của chúng tôi đã thu thập thông tin về giá thuê ở ba khu phố gần nhà ga."
+    },
+    {
+      "word": "offer",
+      "partOfSpeech": "verb",
+      "meaning": "đưa ra, cung cấp, đề nghị; (danh từ) lời đề nghị",
+      "example": "The consultant offered to review our budget for a small fee.",
+      "exampleMeaning": "Nhà tư vấn đề nghị xem lại ngân sách của chúng tôi với một khoản phí nhỏ."
+    },
+    {
+      "word": "primarily",
+      "partOfSpeech": "adverb",
+      "meaning": "chủ yếu, trước hết",
+      "example": "The shop's profits come primarily from repeat customers who live nearby.",
+      "exampleMeaning": "Lợi nhuận của cửa hàng chủ yếu đến từ khách hàng quen sống gần đó."
+    },
+    {
+      "word": "risk",
+      "partOfSpeech": "noun",
+      "meaning": "rủi ro, nguy cơ",
+      "example": "Opening a second branch in a new city carries a high financial risk.",
+      "exampleMeaning": "Mở chi nhánh thứ hai ở thành phố mới mang theo rủi ro tài chính cao."
+    },
+    {
+      "word": "strategy",
+      "partOfSpeech": "noun",
+      "meaning": "chiến lược, kế hoạch dài hạn",
+      "example": "Our strategy for next year is to sell more through the website and less through agents.",
+      "exampleMeaning": "Chiến lược năm tới của chúng tôi là bán nhiều hơn qua website và ít hơn qua đại lý."
+    },
+    {
+      "word": "strong",
+      "partOfSpeech": "adjective",
+      "meaning": "mạnh, vững chắc; thuyết phục (bằng chứng, lý lẽ)",
+      "example": "The company has a strong position in the local market thanks to its loyal customers.",
+      "exampleMeaning": "Công ty có vị thế vững chắc trên thị trường địa phương nhờ khách hàng trung thành."
+    },
+    {
+      "word": "substitution",
+      "partOfSpeech": "noun",
+      "meaning": "sự thay thế, vật thay thế",
+      "example": "The substitution of local wood for imported wood lowered our costs by ten percent.",
+      "exampleMeaning": "Việc thay gỗ nhập khẩu bằng gỗ trong nước đã giảm chi phí của chúng tôi mười phần trăm."
+    }
+  ],
+  "fillIn": {
+    "passage": "Amara and Felix wanted to open a bicycle repair shop, so they spent the winter writing a business plan. First they ___ information about the area: how many people ride to work and what services other shops ___. They learned that the nearest repair service was forty minutes away and served ___ racing cyclists, not everyday riders.\n\nNext they ___ a simple ___: fast, low-cost repairs for commuters, with a free loan bike while the customer waits. To ___ the high rent on the main street, they chose a small space near the train station. A friend at a bank helped them ___ the plan and pointed out one ___: a large sports store might open nearby. They ___ this concern by adding a home pick-up service that a big store would be unlikely to copy.\n\nIn March they presented the plan to a local lender. The ___ of a cheaper location for the one they first wanted had cut costs by a third, and three months of parking counts gave them ___ evidence of demand. The figures ___ that the shop could cover its costs within a year, and the loan was approved.",
+    "answers": ["gathered", "offer", "primarily", "developed", "strategy", "avoid", "evaluate", "risk", "addressed", "substitution", "strong", "demonstrated"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Bốn người ngồi quanh bàn họp, một người phụ nữ đứng chỉ vào biểu đồ trên bảng trắng.",
+      "options": [
+        "A woman is pointing at a chart.",
+        "The people are leaving the room.",
+        "A man is cleaning the whiteboard.",
+        "The chairs are stacked against the wall."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ đang chỉ vào biểu đồ trên bảng. (B), (C) và (D) mô tả hành động hoặc tình trạng không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Who is going to evaluate the proposals from the suppliers?",
+        "options": ["The purchasing manager, by Friday.", "The value is about ten thousand.", "Yes, they arrived yesterday."],
+        "answer": "A",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người. (B) nhầm âm 'evaluate' với 'value', (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Why did you avoid the highway this morning?",
+        "options": ["There was an accident near exit twelve.", "I usually leave at seven.", "It's about forty kilometers long."],
+        "answer": "A",
+        "explanation": "Câu hỏi Why cần lý do; (A) nêu lý do tránh đường cao tốc. (B) trả lời cho câu hỏi When, (C) trả lời về độ dài."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Tomas, the directors want a draft of next year's strategy by the end of the month. Have you started on it?\nMan: I've gathered the sales data from all four regions, but I haven't written anything yet. The numbers from the north are weaker than I expected.\nWoman: That's a risk we should mention in the plan. Do you think we should close the northern office?\nMan: Not yet. I'd rather develop a cheaper way to serve those customers first, maybe through online orders and a single delivery van.\nWoman: That sounds reasonable. Could you prepare two options with costs so the directors can compare them?\nMan: Of course. I can offer a first version on Thursday if you have time to review it.\nWoman: Thursday afternoon works for me. Book the small meeting room, please.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["A customer complaint", "A plan for next year", "A new delivery van", "A job opening in the north"],
+          "answer": "B",
+          "explanation": "Người phụ nữ mở đầu bằng 'a draft of next year's strategy', và cả cuộc nói chuyện xoay quanh bản kế hoạch đó."
+        },
+        {
+          "prompt": "What problem does the man mention?",
+          "options": ["The sales data is missing.", "The northern region's sales are weak.", "The directors canceled the meeting.", "The delivery van broke down."],
+          "answer": "B",
+          "explanation": "'The numbers from the north are weaker than I expected.' Dữ liệu đã được thu thập đủ, không bị thiếu."
+        },
+        {
+          "prompt": "What does the woman ask the man to do?",
+          "options": ["Close the northern office", "Prepare two options with costs", "Hire more delivery drivers", "Call the directors on Thursday"],
+          "answer": "B",
+          "explanation": "'Could you prepare two options with costs so the directors can compare them?'"
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good evening, and welcome to the Riverton Small Business Forum. Tonight's talk is about planning for a difficult year. Many of you have told me that your costs rose sharply in the spring, primarily because of higher prices for imported materials. I will show you how three local companies addressed this problem. The first, a furniture maker, found a substitution for imported oak and kept its prices stable. The second, a bakery, evaluated every product on its menu and dropped the ten items that sold the least. The third, a cleaning service, built a strong relationship with two large hotels instead of chasing dozens of small clients. Each case demonstrates that a clear plan matters more than a large budget. After my talk, our volunteers will hand out a one-page planning worksheet. Please fill it in during the break, and we will discuss your answers in small groups.",
+      "questions": [
+        {
+          "prompt": "What is the main topic of the talk?",
+          "options": ["How to hire more staff", "Planning during a difficult period", "Importing materials from abroad", "Opening a new hotel"],
+          "answer": "B",
+          "explanation": "Người nói giới thiệu 'Tonight's talk is about planning for a difficult year' rồi kể ba ví dụ về cách lập kế hoạch."
+        },
+        {
+          "prompt": "What did the bakery do?",
+          "options": ["It changed its supplier of oak.", "It removed its least popular products.", "It signed contracts with hotels.", "It raised its prices."],
+          "answer": "B",
+          "explanation": "Tiệm bánh 'dropped the ten items that sold the least'. Thay gỗ sồi là xưởng nội thất, hợp tác với khách sạn là dịch vụ vệ sinh."
+        },
+        {
+          "prompt": "What will listeners do during the break?",
+          "options": ["Visit a furniture shop", "Complete a worksheet", "Pay for the seminar", "Meet the three company owners"],
+          "answer": "B",
+          "explanation": "'Please fill it in during the break' nói về tờ kế hoạch một trang mà tình nguyện viên phát."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The report will _____ the problem of late deliveries in its final section.",
+        "options": ["address", "addressing", "addressed", "addresses"],
+        "answer": "A",
+        "explanation": "Sau trợ động từ 'will' cần động từ nguyên mẫu; 'address the problem' là giải quyết vấn đề."
+      },
+      {
+        "prompt": "The company _____ a bigger loss by selling its old warehouse early.",
+        "options": ["avoidance", "avoided", "avoiding", "avoidable"],
+        "answer": "B",
+        "explanation": "Câu cần động từ chính ở quá khứ cho chủ ngữ 'The company': 'avoided'."
+      },
+      {
+        "prompt": "Researchers were asked to _____ data from at least five hundred customers.",
+        "options": ["gathering", "gathered", "gather", "gathers"],
+        "answer": "C",
+        "explanation": "Cấu trúc 'be asked to + động từ nguyên mẫu': 'to gather'."
+      },
+      {
+        "prompt": "The new product line is aimed _____ at small restaurants rather than hotels.",
+        "options": ["primary", "primarily", "prime", "primaries"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho 'is aimed': 'primarily' (chủ yếu)."
+      },
+      {
+        "prompt": "Investors prefer companies with a _____ record of paying their debts on time.",
+        "options": ["strong", "strength", "strongly", "strengthen"],
+        "answer": "A",
+        "explanation": "Giữa 'a' và danh từ 'record' cần tính từ: 'strong'."
+      },
+      {
+        "prompt": "The committee's _____ for cutting costs was approved by the board.",
+        "options": ["strategize", "strategic", "strategy", "strategically"],
+        "answer": "C",
+        "explanation": "Sau sở hữu cách 'The committee's' cần danh từ làm chủ ngữ: 'strategy'."
+      }
+    ],
+    "part6": {
+      "passage": "To: Department Heads\nFrom: Elena Moreau, Chief Operating Officer\nSubject: Planning meeting on May 12\n\nThe yearly planning meeting will take place on May 12 in the main conference room. Each department head should bring a one-page summary of goals for the coming year. Before the meeting, the finance team will ___ the costs of every proposal received so far and send its comments to you by May 8. Please note that we expect imported paper to become more expensive, so any plan that depends on it should include a possible ___. Finally, I would like each of you to ___ one new idea in five minutes or less. Long presentations will not be possible this year.\n\nThank you,\nElena",
+      "questions": [
+        {
+          "options": ["evaluate", "evaluation", "evaluated", "evaluating"],
+          "answer": "A",
+          "explanation": "Sau 'will' cần động từ nguyên mẫu: 'will evaluate the costs'."
+        },
+        {
+          "options": ["substitute", "substitution", "substituted", "substituting"],
+          "answer": "B",
+          "explanation": "Sau 'a possible' cần danh từ: 'substitution' (phương án thay thế)."
+        },
+        {
+          "options": ["demonstrate", "avoid", "gather", "risk"],
+          "answer": "A",
+          "explanation": "Mỗi trưởng phòng được yêu cầu trình bày một ý tưởng mới trong năm phút; 'demonstrate' (trình bày, giới thiệu) hợp nghĩa nhất. 'avoid' và 'gather' không hợp ngữ cảnh."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "BLUE HARBOR BUSINESS JOURNAL\nLocal Bookstore Finds a New Path\n\nWhen the Corner Page bookstore opened twelve years ago, it sold books and nothing else. Last year, however, its owner, Daniel Kowalski, faced falling sales as more readers bought books online. Instead of closing, he spent three months developing a new plan.\n\n\"I started by gathering opinions from my regular customers,\" Mr. Kowalski said. \"Most of them told me they still wanted a place to meet, not just a place to buy.\" His new strategy has three parts: a small cafe at the back of the shop, a reading club that meets every Tuesday evening, and a service that delivers books to offices in the area within one day.\n\nThe owner admits that the plan carried some risk. The cafe required a loan of 30,000 dollars, and the bank evaluated his proposal twice before approving it. Six months later, however, sales are 22 percent higher than in the same period last year, and the reading club has 140 members.\n\nThe Corner Page will offer free coffee to new club members during the whole of September. The club meets at 7 p.m.; details are available at the shop counter.",
+      "questions": [
+        {
+          "prompt": "What is the article mainly about?",
+          "options": ["The opening of a new cafe chain", "How a bookstore changed its business", "A bank's loan policy", "Online book sales"],
+          "answer": "B",
+          "explanation": "Bài báo kể cách chủ hiệu sách lập kế hoạch mới và thay đổi cách kinh doanh khi doanh số giảm."
+        },
+        {
+          "prompt": "Why did Mr. Kowalski change his plan?",
+          "options": ["His rent was increased.", "Customers were buying books online.", "He wanted to retire.", "The shop was too small."],
+          "answer": "B",
+          "explanation": "'faced falling sales as more readers bought books online' là lý do ông phải thay đổi."
+        },
+        {
+          "prompt": "What did the owner do first?",
+          "options": ["Apply for a loan", "Hire a cafe manager", "Ask his regular customers for their opinions", "Close the shop for three months"],
+          "answer": "C",
+          "explanation": "'I started by gathering opinions from my regular customers.'"
+        },
+        {
+          "prompt": "What is NOT part of the new strategy?",
+          "options": ["A cafe", "A reading club", "Delivery to offices", "An online store"],
+          "answer": "D",
+          "explanation": "Chiến lược có ba phần: quán cà phê, câu lạc bộ đọc sách và dịch vụ giao sách đến văn phòng. Cửa hàng trực tuyến không được nhắc đến."
+        },
+        {
+          "prompt": "What is indicated about the reading club?",
+          "options": ["It meets on weekday mornings.", "It costs 30,000 dollars to join.", "It has more than one hundred members.", "It is held at a local office."],
+          "answer": "C",
+          "explanation": "'the reading club has 140 members'. Câu lạc bộ họp tối thứ Ba, và 30.000 đô la là khoản vay cho quán cà phê."
+        }
+      ]
+    }
+  }
+}

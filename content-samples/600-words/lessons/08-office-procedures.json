@@ -1,0 +1,260 @@
+{
+  "number": 8,
+  "title": "Office Procedures",
+  "vocabulary": [
+    {
+      "word": "appreciation",
+      "partOfSpeech": "noun",
+      "meaning": "sự cảm kích, lòng biết ơn; sự đánh giá cao",
+      "example": "The director sent a note of appreciation to everyone who worked late during the audit.",
+      "exampleMeaning": "Giám đốc gửi thư cảm ơn đến tất cả những người đã làm việc muộn trong đợt kiểm toán."
+    },
+    {
+      "word": "be made of",
+      "partOfSpeech": "phrase",
+      "meaning": "được làm bằng, được cấu tạo từ (chất liệu)",
+      "example": "From next month, visitor badges will be made of thick card instead of paper so they last longer.",
+      "exampleMeaning": "Từ tháng sau, thẻ khách sẽ được làm bằng bìa dày thay vì giấy để dùng được lâu hơn."
+    },
+    {
+      "word": "bring in",
+      "partOfSpeech": "verb",
+      "meaning": "mời (người ngoài) vào làm; mang vào, đưa vào",
+      "example": "Every two years the company brings in an outside consultant to review the filing system.",
+      "exampleMeaning": "Cứ hai năm một lần, công ty mời một chuyên gia tư vấn bên ngoài vào xem xét hệ thống lưu trữ hồ sơ."
+    },
+    {
+      "word": "casually",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách thoải mái, không trang trọng; tình cờ",
+      "example": "Staff may dress casually on Fridays, but not when clients are visiting the office.",
+      "exampleMeaning": "Nhân viên có thể ăn mặc thoải mái vào thứ Sáu, nhưng không được khi có khách hàng đến văn phòng."
+    },
+    {
+      "word": "code",
+      "partOfSpeech": "noun",
+      "meaning": "mã số, mật mã; bộ quy tắc (code of conduct)",
+      "example": "Every employee must enter a four-digit code to open the supply room door.",
+      "exampleMeaning": "Mỗi nhân viên phải nhập một mã bốn chữ số để mở cửa phòng văn phòng phẩm."
+    },
+    {
+      "word": "glimpse",
+      "partOfSpeech": "noun",
+      "meaning": "cái nhìn thoáng qua, cái liếc nhanh",
+      "example": "A quick glimpse at the sign-in sheet showed that two visitors had not signed out.",
+      "exampleMeaning": "Chỉ liếc nhanh qua sổ đăng ký đã thấy hai vị khách chưa ký ra về."
+    },
+    {
+      "word": "out of",
+      "partOfSpeech": "phrase",
+      "meaning": "hết (thứ gì); ra khỏi",
+      "example": "The copier on the second floor is out of paper again, so please use the one downstairs.",
+      "exampleMeaning": "Máy photocopy ở tầng hai lại hết giấy rồi, nên vui lòng dùng máy ở tầng dưới."
+    },
+    {
+      "word": "outdated",
+      "partOfSpeech": "adjective",
+      "meaning": "lỗi thời, không còn phù hợp, cũ",
+      "example": "The procedures manual is outdated and still describes forms we stopped using years ago.",
+      "exampleMeaning": "Sổ tay quy trình đã lỗi thời và vẫn mô tả những biểu mẫu chúng ta đã ngừng dùng từ nhiều năm trước."
+    },
+    {
+      "word": "practice",
+      "partOfSpeech": "noun",
+      "meaning": "thông lệ, cách làm thường lệ; sự thực hành",
+      "example": "It is standard practice here to confirm every meeting room booking by e-mail.",
+      "exampleMeaning": "Thông lệ ở đây là xác nhận mọi lượt đặt phòng họp qua e-mail."
+    },
+    {
+      "word": "reinforce",
+      "partOfSpeech": "verb",
+      "meaning": "củng cố, tăng cường, làm vững thêm",
+      "example": "The safety video reinforces the rules that new employees learn in their first week.",
+      "exampleMeaning": "Video an toàn củng cố những quy tắc mà nhân viên mới học trong tuần đầu tiên."
+    },
+    {
+      "word": "verbally",
+      "partOfSpeech": "adverb",
+      "meaning": "bằng lời nói, bằng miệng",
+      "example": "Mr. Ito approved the schedule verbally but asked us to send the final version in writing too.",
+      "exampleMeaning": "Ông Ito đã duyệt lịch bằng lời nhưng yêu cầu chúng tôi gửi thêm bản cuối cùng bằng văn bản."
+    },
+    {
+      "word": "verify",
+      "partOfSpeech": "verb",
+      "meaning": "xác minh, kiểm tra tính đúng đắn",
+      "example": "The receptionist verifies each visitor's identity before issuing a badge.",
+      "exampleMeaning": "Lễ tân xác minh danh tính của từng vị khách trước khi cấp thẻ."
+    }
+  ],
+  "fillIn": {
+    "passage": "When Sandra Whitfield became office manager at Meridian Insurance, she noticed that many of the office rules had never been written down. Staff learned them ___, from whoever happened to sit nearby, and a new assistant told her that the only handbook in the drawer was ___ and still listed a fax number that no longer worked.\n\nSandra decided to ___ a consultant for two days to review every procedure. He found that the standard ___ for handling visitors was unclear: the receptionist did not ___ anyone's identity, and the door ___ for the file room was written on a sticky note that anyone could catch a ___ of. He also noticed that staff dressed ___ even on days when clients visited, and that the supply cabinet was often ___ paper because nobody was responsible for ordering it.\n\nSandra wrote a new handbook and ordered covers for it that would ___ thick cardboard so they would last. She also held a short meeting every Friday to ___ the rules. At the end of the first month, she sent a note of ___ to the whole team for making the changes work.",
+    "answers": ["verbally", "outdated", "bring in", "practice", "verify", "code", "glimpse", "casually", "out of", "be made of", "reinforce", "appreciation"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Tại quầy lễ tân, một nữ nhân viên đang đưa thẻ khách cho một người đàn ông mặc vest đứng phía bên kia quầy.",
+      "options": [
+        "A woman is handing something to a man.",
+        "A man is putting on his coat.",
+        "A woman is answering the telephone.",
+        "They are moving a desk together."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ đang đưa thẻ cho người đàn ông ở quầy lễ tân. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Why is the handbook considered outdated?",
+        "options": ["It still lists the old office address.", "Yes, it's on the shelf.", "I'll hand it in tomorrow."],
+        "answer": "A",
+        "explanation": "Câu hỏi Why cần lý do; (A) nêu lý do sổ tay lỗi thời. (B) trả lời Yes cho câu hỏi Wh, (C) nhầm âm 'hand'."
+      },
+      {
+        "question": "Did Mr. Patel approve the new procedure verbally or in writing?",
+        "options": ["He signed the form yesterday.", "The procedure starts at nine.", "No, he is not a doctor."],
+        "answer": "A",
+        "explanation": "Câu hỏi lựa chọn giữa 'verbally' và 'in writing'; (A) cho biết ông ấy đã ký, tức bằng văn bản. (B) nhầm từ 'procedure', (C) không liên quan."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Victor, the supply cabinet is out of toner again, and I need to print the board report by three o'clock.\nMan: There should be two boxes in the file room. Did you check there?\nWoman: I tried, but the door code was changed last week, and nobody told me the new one.\nMan: Sorry about that. Facilities changed it after the audit. I'll call them to verify that you're on the list, and they'll text you the code within an hour.\nWoman: An hour is too late for my report. Could I use the printer in the marketing department?\nMan: Sure, I'll e-mail Alicia so she expects you. And I'll ask facilities to bring in a few extra cartridges for our floor.\nWoman: Thanks. Could you also put the new code in the shared procedures file so this doesn't happen to the next person?\nMan: Good point. I'll do that this afternoon.",
+      "questions": [
+        {
+          "prompt": "Why is the woman talking to the man?",
+          "options": ["She cannot find a report.", "She needs toner for a printer.", "She has lost her badge.", "She wants to change a meeting time."],
+          "answer": "B",
+          "explanation": "Cô ấy nói tủ văn phòng phẩm 'is out of toner again' và cô cần in báo cáo trước ba giờ."
+        },
+        {
+          "prompt": "Why can't the woman get into the file room?",
+          "options": ["The door is broken.", "She does not know the new code.", "The room is being cleaned.", "She left her key at home."],
+          "answer": "B",
+          "explanation": "'The door code was changed last week, and nobody told me the new one.'"
+        },
+        {
+          "prompt": "What will the man do this afternoon?",
+          "options": ["Print the board report", "Order new printers", "Update the shared procedures file", "Visit the marketing department"],
+          "answer": "C",
+          "explanation": "Khi cô ấy đề nghị ghi mã mới vào tập tin quy trình dùng chung, anh ấy đáp 'I'll do that this afternoon'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good morning, team. Before you go back to your desks, I want to say a few words about the visitor procedure that started last month. First, thank you. I have seen a real improvement at the front desk, and I want to express my appreciation to the reception staff in particular. Almost every visitor now signs in, and we verify their names against the appointment list before giving them a badge. There is still one weak point, however. Some employees let visitors walk through the security door with them after only a glimpse at their badge, or because the person seemed friendly and chatted casually in the lobby. Please remember that it is our practice to escort every visitor to the meeting room, no matter who they are. To reinforce this rule, we will post reminder cards at each door on Monday. Thank you again.",
+      "questions": [
+        {
+          "prompt": "Who is the speaker thanking in particular?",
+          "options": ["The cleaning staff", "The reception staff", "The security guards", "The sales team"],
+          "answer": "B",
+          "explanation": "Người nói 'want to express my appreciation to the reception staff in particular'."
+        },
+        {
+          "prompt": "What problem does the speaker mention?",
+          "options": ["Visitors forget their badges.", "Employees arrive late.", "Visitors go through doors without an escort.", "The appointment list is often wrong."],
+          "answer": "C",
+          "explanation": "Điểm yếu là 'Some employees let visitors walk through the security door with them' chỉ sau một cái liếc nhìn thẻ, thay vì đưa khách đến phòng họp."
+        },
+        {
+          "prompt": "What will happen on Monday?",
+          "options": ["A new receptionist will start.", "Reminder cards will be posted.", "The security door will be replaced.", "Visitors will need a new badge."],
+          "answer": "B",
+          "explanation": "'We will post reminder cards at each door on Monday.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The manager expressed her _____ for the team's hard work during the office move.",
+        "options": ["appreciate", "appreciative", "appreciation", "appreciated"],
+        "answer": "C",
+        "explanation": "Sau tính từ sở hữu 'her' cần danh từ: 'appreciation' (sự cảm kích)."
+      },
+      {
+        "prompt": "Visitors must enter the security _____ to reach the fifth floor.",
+        "options": ["code", "glimpse", "practice", "appreciation"],
+        "answer": "A",
+        "explanation": "Cần danh từ chỉ mã số để qua cửa an ninh: 'security code'. Các từ còn lại không hợp nghĩa với 'enter'."
+      },
+      {
+        "prompt": "The new filing _____ was explained to all staff at the Monday meeting.",
+        "options": ["practice", "practical", "practically", "practiced"],
+        "answer": "A",
+        "explanation": "Cần danh từ làm chủ ngữ sau 'The new filing': 'practice' (cách làm, thông lệ)."
+      },
+      {
+        "prompt": "Last week the team _____ the rules by posting them next to every printer.",
+        "options": ["reinforcement", "reinforced", "reinforcing", "reinforces"],
+        "answer": "B",
+        "explanation": "Có 'Last week' nên động từ chính ở quá khứ: 'reinforced'."
+      },
+      {
+        "prompt": "Please _____ the delivery address before you send the package.",
+        "options": ["verify", "verification", "verified", "verifiable"],
+        "answer": "A",
+        "explanation": "Câu mệnh lệnh sau 'Please' cần động từ nguyên mẫu: 'verify' (xác minh)."
+      },
+      {
+        "prompt": "The instructions in the old manual are _____ and should not be followed.",
+        "options": ["outdating", "outdated", "outdate", "outdates"],
+        "answer": "B",
+        "explanation": "Sau 'are' cần tính từ: 'outdated' (lỗi thời)."
+      }
+    ],
+    "part6": {
+      "passage": "NOTICE TO ALL EMPLOYEES\nOffice dress and identification\n\nFrom September 1, employees may dress ___ on Fridays, provided no client meetings are scheduled that day. Suits are still required from Monday to Thursday. In addition, all staff will receive new identification cards next week. The cards ___ hard plastic and must be worn where they can be seen at all times. Security staff may ask you to show your card and will ___ your name against the staff list. Old paper cards will not be accepted after September 15. Questions should be directed to Human Resources at extension 300.",
+      "questions": [
+        {
+          "options": ["casual", "casually", "casualness", "casualty"],
+          "answer": "B",
+          "explanation": "Bổ nghĩa cho động từ 'dress' cần trạng từ: 'casually' (thoải mái, không trang trọng)."
+        },
+        {
+          "options": ["are made of", "is made of", "be made of", "making of"],
+          "answer": "A",
+          "explanation": "Chủ ngữ 'The cards' số nhiều và câu ở hiện tại đơn bị động: 'are made of' (được làm bằng)."
+        },
+        {
+          "options": ["verify", "verifies", "verified", "verification"],
+          "answer": "A",
+          "explanation": "Sau 'will' cần động từ nguyên mẫu: 'verify' (đối chiếu, xác minh)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "To: All Staff, Lakewood Branch\nFrom: Henry Osei, Branch Operations Manager\nSubject: Three changes to office procedures\nDate: October 3\n\nDear Colleagues,\n\nAfter last month's review, we are making three changes. The old procedures manual on the shared drive is now outdated and will be removed on October 10.\n\n1. Supplies. Instead of each team ordering its own items, Ms. Nguyen at the front desk will keep a list. If a cabinet is out of anything, write the item on the list; orders go out every Tuesday. Please do not bring in supplies from home or buy them yourself, as the branch cannot repay you.\n\n2. Approvals. Requests for leave or overtime must be made on the new online form. A request made only verbally to a supervisor will not be recorded.\n\n3. Visitors. Reception will give each visitor a numbered badge. If you catch a glimpse of someone without a badge beyond the lobby, please walk them back to reception rather than questioning them yourself.\n\nMy appreciation goes to everyone who took part in the review. A short training session on the online form will be held on October 8 at 9 a.m. in Room 2.\n\nHenry Osei",
+      "questions": [
+        {
+          "prompt": "What is the main purpose of the memo?",
+          "options": ["To announce a new branch manager", "To explain changes to office procedures", "To invite staff to a celebration", "To report a security incident"],
+          "answer": "B",
+          "explanation": "Tiêu đề là 'Three changes to office procedures' và thư trình bày ba thay đổi về văn phòng phẩm, phê duyệt và khách đến thăm."
+        },
+        {
+          "prompt": "What will happen on October 10?",
+          "options": ["A training session will be held.", "New badges will be issued.", "The old manual will be removed.", "Supply orders will be placed."],
+          "answer": "C",
+          "explanation": "'The old procedures manual on the shared drive ... will be removed on October 10.' Buổi tập huấn diễn ra ngày 8 tháng Mười."
+        },
+        {
+          "prompt": "What should employees do when a cabinet runs out of an item?",
+          "options": ["Buy the item themselves", "Write it on the front desk list", "E-mail Mr. Osei", "Ask another team for it"],
+          "answer": "B",
+          "explanation": "'If a cabinet is out of anything, write the item on the list' do cô Nguyen ở quầy lễ tân giữ."
+        },
+        {
+          "prompt": "What is indicated about leave requests made only verbally?",
+          "options": ["They are processed faster.", "They must be confirmed by the manager.", "They will not be recorded.", "They are allowed on Fridays."],
+          "answer": "C",
+          "explanation": "'A request made only verbally to a supervisor will not be recorded.'"
+        },
+        {
+          "prompt": "What should staff do if they see a person without a badge?",
+          "options": ["Call the security office", "Ask the person for identification", "Report it on the online form", "Take the person back to reception"],
+          "answer": "D",
+          "explanation": "Mục 3 yêu cầu 'walk them back to reception rather than questioning them yourself'."
+        }
+      ]
+    }
+  }
+}

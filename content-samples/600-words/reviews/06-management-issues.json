@@ -1,0 +1,223 @@
+{
+  "unit": 6,
+  "title": "Management Issues",
+  "part5": [
+    {
+      "prompt": "The owner of the new company personally ___ every expense.",
+      "options": [
+        "scrutiny",
+        "scrutinize",
+        "scrutinized",
+        "scrutinizing"
+      ],
+      "answer": "C",
+      "explanation": "Động từ quá khứ “scrutinized” diễn tả chủ doanh nghiệp đã xem xét kỹ từng khoản chi."
+    },
+    {
+      "prompt": "Several employees will ___ on designing the office for efficiency.",
+      "options": [
+        "collaborate",
+        "collaborated",
+        "collaborating",
+        "collaboration"
+      ],
+      "answer": "A",
+      "explanation": "Sau “will” dùng động từ nguyên mẫu “collaborate”; “collaborate on” nghĩa là hợp tác thực hiện."
+    },
+    {
+      "prompt": "When there is a problem with company policy, it should be ___ before the board of directors.",
+      "options": [
+        "bring up",
+        "bring in",
+        "brought up",
+        "brought in"
+      ],
+      "answer": "C",
+      "explanation": "Cấu trúc bị động “should be brought up” nghĩa là vấn đề nên được đưa ra thảo luận."
+    },
+    {
+      "prompt": "The quality control department felt it was making good ___ when the number of defects declined.",
+      "options": [
+        "progress",
+        "progressed",
+        "progressing",
+        "progressive"
+      ],
+      "answer": "A",
+      "explanation": "Cụm “make good progress” nghĩa là đạt tiến triển tốt; cần danh từ “progress”."
+    },
+    {
+      "prompt": "___ goods can ruin the future of a new company.",
+      "options": [
+        "Defect",
+        "Defects",
+        "Defective",
+        "Defection"
+      ],
+      "answer": "C",
+      "explanation": "“Defective” là tính từ bổ nghĩa cho “goods”, nghĩa là hàng hóa bị lỗi."
+    },
+    {
+      "prompt": "The public’s ___ of a company depends on how solidly the company stands behind its products.",
+      "options": [
+        "perceive",
+        "perceptive",
+        "perceived",
+        "perception"
+      ],
+      "answer": "D",
+      "explanation": "Sau sở hữu cách “public’s” cần danh từ “perception” (nhận thức/đánh giá)."
+    },
+    {
+      "prompt": "The market research matched our ___.",
+      "options": [
+        "assumes",
+        "assuming",
+        "assumed",
+        "assumptions"
+      ],
+      "answer": "D",
+      "explanation": "“Our” đi với danh từ số nhiều “assumptions” để chỉ những giả định ban đầu."
+    },
+    {
+      "prompt": "Determining the safeness of a particular appliance requires a ___ investigation of the electrical components.",
+      "options": [
+        "system",
+        "systems",
+        "systematic",
+        "systematize"
+      ],
+      "answer": "C",
+      "explanation": "Tính từ “systematic” bổ nghĩa cho “investigation” (cuộc kiểm tra có hệ thống)."
+    },
+    {
+      "prompt": "When ___ office space, it is wise to insist upon an option to renew.",
+      "options": [
+        "lease",
+        "leasing",
+        "leased",
+        "lessor"
+      ],
+      "answer": "B",
+      "explanation": "Sau “when” có thể dùng V-ing “leasing” trong mệnh đề rút gọn, nghĩa là khi thuê mặt bằng."
+    },
+    {
+      "prompt": "___ a lease might be expensive.",
+      "options": [
+        "Getting in",
+        "Getting on",
+        "Getting off of",
+        "Getting out of"
+      ],
+      "answer": "D",
+      "explanation": "“Get out of a lease” nghĩa là chấm dứt/thoát khỏi hợp đồng thuê; cả cụm đóng vai trò chủ ngữ ở dạng V-ing."
+    }
+  ],
+  "part6": [
+    {
+      "passage": "To: m_schwartz@donner.com\nFrom: j_holmes@blitzen.com\nSubject: board meeting\n\nMary,\n\nWe all missed you at yesterday’s meeting, but you will be happy to know it went well. We were able to adhere ___ the agenda and cover all topics in the allotted time. Wilbur gave a ___ explanation of the budget, and now I feel we all understand it quite thoroughly. He plans to e-mail you a copy of his notes. The meeting ___ on time, at 5:00. The next meeting is scheduled for June 16.\n\nJohn",
+      "questions": [
+        {
+          "options": [
+            "to",
+            "at",
+            "of",
+            "in"
+          ],
+          "answer": "A",
+          "explanation": "“Adhere to” là cụm cố định, nghĩa là tuân thủ chương trình nghị sự."
+        },
+        {
+          "options": [
+            "length",
+            "lengthy",
+            "lengthen",
+            "lengthily"
+          ],
+          "answer": "B",
+          "explanation": "Cần tính từ “lengthy” bổ nghĩa cho “explanation”, nghĩa là lời giải thích dài, chi tiết."
+        },
+        {
+          "options": [
+            "had concluded",
+            "has concluded",
+            "concluded",
+            "concludes"
+          ],
+          "answer": "C",
+          "explanation": "Sự kiện cuộc họp đã kết thúc hôm qua nên dùng quá khứ đơn “concluded”."
+        }
+      ]
+    },
+    {
+      "passage": "Our job here in the Quality Control Department is to make sure that no garment leaves the factory in less than perfect condition. This means that each garment ___ carefully by a trained garment inspector. We throw out all ___ garments. It is important to protect our ___ and make sure that the name of our company is always associated with top-quality products.",
+      "questions": [
+        {
+          "options": [
+            "inspects",
+            "is inspected",
+            "is inspecting",
+            "has inspected"
+          ],
+          "answer": "B",
+          "explanation": "Mỗi sản phẩm là đối tượng được kiểm tra; cần bị động hiện tại đơn “is inspected”."
+        },
+        {
+          "options": [
+            "defect",
+            "defects",
+            "detective",
+            "defective"
+          ],
+          "answer": "D",
+          "explanation": "“Defective” là tính từ mô tả quần áo có lỗi."
+        },
+        {
+          "options": [
+            "lobby",
+            "research",
+            "brand",
+            "wrinkle"
+          ],
+          "answer": "C",
+          "explanation": "“Brand” là thương hiệu/danh tiếng cần được bảo vệ bằng chất lượng sản phẩm."
+        }
+      ]
+    },
+    {
+      "passage": "Dear Mr. Wilcox,\n\nYour lease for the office you ___ at 121 North Main Street will expire next month. I will be very happy to have you renew the lease if you desire. You have occupied that space for a ___, and during those ten years you have always been a reliable tenant. Unfortunately, ___ to rising costs everywhere, I will have to raise the rent on that space by 20 percent. I hope this won’t cause you any hardship. Please let me know if you are still interested in renewing the lease, and I will have my assistant send one over to you.\n\nSincerely,\nAmanda Brightwood",
+      "questions": [
+        {
+          "options": [
+            "occupy",
+            "occupied",
+            "occupant",
+            "occupancy"
+          ],
+          "answer": "A",
+          "explanation": "“The office you occupy” dùng động từ hiện tại đơn “occupy” để chỉ văn phòng đang thuê."
+        },
+        {
+          "options": [
+            "month",
+            "semester",
+            "decade",
+            "century"
+          ],
+          "answer": "C",
+          "explanation": "“A decade” bằng mười năm, phù hợp với “during those ten years”."
+        },
+        {
+          "options": [
+            "because",
+            "up",
+            "ought",
+            "due"
+          ],
+          "answer": "D",
+          "explanation": "Cụm “due to” nghĩa là do/bởi vì, đứng trước danh từ “rising costs”."
+        }
+      ]
+    }
+  ]
+}

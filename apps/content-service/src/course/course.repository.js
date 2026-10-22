@@ -46,6 +46,14 @@ export class CourseRepository {
   }
 
   // Version metadata without the content payload.
+  async deleteItemWithVersions(itemId) {
+    await this.repo(ListeningCourseItemEntity);
+    return this.dataSource.transaction(async (manager) => {
+      await manager.getRepository(ListeningCourseVersionEntity).delete({ itemId });
+      await manager.getRepository(ListeningCourseItemEntity).delete({ id: itemId });
+    });
+  }
+
   async listVersionSummaries() {
     return (await this.repo(ListeningCourseVersionEntity)).find({
       select: { id: true, itemId: true, versionNumber: true, status: true },

@@ -2,170 +2,138 @@ import { z } from 'zod';
 import {
   COURSE_LEVELS,
   COURSE_LIMITS,
-  COURSE_SECTIONS,
+  COURSE_TEST_LEVELS,
   CourseItemType,
-  CourseQuestionKind,
   CourseSkill,
-  FILL_IN_BLANK,
-  countBlanks,
-  hasCourseFocus,
+  LISTENING_MAX_SEGMENTS,
+  LISTENING_SEGMENT_MAX_LENGTH,
+  MediaKind,
+  courseGapCount,
+  courseGapText,
 } from '@appenglish/content-contracts';
 
 const text = (max) => z.string().trim().max(max);
 const requiredText = (max) => text(max).min(1);
 const id = z.string().uuid().optional();
 
-// The placement has no level of its own (D103); units and level tests need
-// one. A unit belongs to a section of its level (D107); nothing else does.
+// A topic or a level test of a level (D143–D145); level tests exist for
+// every level but the last.
 export const courseItemCreateSchema = z
   .object({
-    level: z.enum(COURSE_LEVELS).nullable().default(null),
+    level: z.enum(COURSE_LEVELS),
     type: z.enum(Object.values(CourseItemType)),
-    section: z.enum(COURSE_SECTIONS).nullable().default(null),
     title: requiredText(200),
     description: text(2000).default(''),
   })
   .strict()
-  .refine((value) => (value.type === CourseItemType.PLACEMENT ? value.level === null : value.level !== null), {
-    message: 'Choose the level (none for the placement)',
+  .refine((value) => value.type !== CourseItemType.LEVEL_TEST || COURSE_TEST_LEVELS.includes(value.level), {
+    message: 'The last level has no level test',
     path: ['level'],
-  })
-  .refine((value) => (value.type === CourseItemType.UNIT ? value.section !== null : value.section === null), {
-    message: 'Choose the section (units only)',
-    path: ['section'],
   });
 
 export const courseItemUpdateSchema = z
   .object({
     title: requiredText(200).optional(),
     description: text(2000).optional(),
-    section: z.enum(COURSE_SECTIONS).optional(),
     position: z.number().int().min(1).optional(),
   })
   .strict()
   .refine((value) => Object.values(value).some((field) => field !== undefined), { message: 'At least one field is required' });
 
-// A question about a recording (D100): multiple choice, or (detail
-// questions only, D109) a sentence with blanks completed with the words heard
-// (`answers`, one per blank).
+// A multiple-choice question about a recording.
 const questionSchema = z
   .object({
     id,
-    kind: z.enum(Object.values(CourseQuestionKind)).default(CourseQuestionKind.CHOICE),
     skill: z.enum(Object.values(CourseSkill)).default(CourseSkill.DETAIL),
     prompt: text(500).default(''),
-    answers: z.array(text(100)).max(COURSE_LIMITS.completeBlanks).default([]),
     options: z
-      .array(
-        z
-          .object({
-            id,
-            text: text(300).default(''),
-            isCorrect: z.boolean().default(false),
-          })
-          .strict(),
-      )
+      .array(z.object({ id, text: text(300).default(''), isCorrect: z.boolean().default(false) }).strict())
       .max(COURSE_LIMITS.options.max)
       .default([]),
     explanation: text(1000).default(''),
   })
   .strict();
 
-const keywordSchema = z.object({ id, word: text(100).default(''), meaning: text(300).default('') }).strict();
-
-// Focus on (D109): a short dialogue with blanks filled from the words given.
-const focusSchema = z
-  .object({
-    title: text(200).default(''),
-    passage: text(2000).default(''),
-    words: z.array(text(100)).max(COURSE_LIMITS.focusWords).default([]),
-    answers: z.array(text(100)).max(COURSE_LIMITS.focusBlanks).default([]),
-  })
-  .strict();
-
-// One lesson: a recording of the library and its five steps.
-const lessonSchema = z
+// A word to learn before listening (D143): IPA, meaning and a pronunciation
+// made by the speech service (D144).
+const vocabularySchema = z
   .object({
     id,
-    title: text(200).default(''),
-    exerciseId: z.string().uuid().nullable().default(null),
-    keywords: z.array(keywordSchema).max(COURSE_LIMITS.keywords).default([]),
-    gist: questionSchema.default({ skill: CourseSkill.GIST }),
-    detail: z.array(questionSchema).max(COURSE_LIMITS.detailQuestions.max).default([]),
-    focus: focusSchema.nullable().default(null),
-    // Sentences of the recording the learner writes down.
-    closeSegmentIds: z.array(z.string().uuid()).max(COURSE_LIMITS.closeSentences.max).default([]),
+    word: text(100).default(''),
+    phonetic: text(100).default(''),
+    meaning: text(300).default(''),
+    audioMediaId: z.string().uuid().nullable().default(null),
   })
   .strict();
 
-// A recording of the library with questions about it (unit check, level test).
+// The ideas in the order they are heard; the learner gets them shuffled.
+const orderingSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    prompt: text(300).default(''),
+    items: z.array(z.object({ id, text: text(300).default('') }).strict()).max(COURSE_LIMITS.ordering.max).default([]),
+  })
+  .strict();
+
+// A time in the recording, in seconds.
+const seconds = z.number().min(0).max(3 * 60 * 60).nullable().default(null);
+
+// A sentence of a topic's own recording (D147): its text and speaker, its
+// place in the recording (Auto-time), the Vietnamese translation, and the
+// sentence with the words to write in [brackets] for the blanks mode of the
+// dictation ('' = no blank).
+const segmentSchema = z
+  .object({
+    id,
+    speaker: text(40).default(''),
+    text: text(LISTENING_SEGMENT_MAX_LENGTH).default(''),
+    start: seconds,
+    end: seconds,
+    translation: text(1000).default(''),
+    gap: text(600).default(''),
+  })
+  .strict();
+
+const audioMediaId = z.string().uuid().nullable().default(null);
+
+// One topic: one lesson on its own recording (D144, D147).
+export const topicContentSchema = z
+  .object({
+    audioMediaId,
+    segments: z.array(segmentSchema).max(LISTENING_MAX_SEGMENTS).default([]),
+    vocabulary: z.array(vocabularySchema).max(COURSE_LIMITS.vocabulary.max).default([]),
+    questions: z.array(questionSchema).max(COURSE_LIMITS.questions.max).default([]),
+    ordering: orderingSchema.default({}),
+  })
+  .strict();
+
+// A recording of a level test with its transcript (shown after the test) and
+// the questions about it (D147).
 const sectionSchema = z
   .object({
     id,
-    exerciseId: z.string().uuid().nullable().default(null),
+    audioMediaId,
+    transcript: text(COURSE_LIMITS.transcript).default(''),
     questions: z.array(questionSchema).max(COURSE_LIMITS.questionsPerSection).default([]),
   })
   .strict();
 
-export const unitContentSchema = z
-  .object({
-    lessons: z.array(lessonSchema).max(COURSE_LIMITS.lessonsPerUnit).default([]),
-    check: z
-      .object({
-        sections: z.array(sectionSchema).max(COURSE_LIMITS.sections).default([]),
-      })
-      .strict()
-      .default({}),
-  })
-  .strict();
-
 export const levelTestContentSchema = z
-  .object({
-    sections: z.array(sectionSchema).max(COURSE_LIMITS.sections).default([]),
-  })
+  .object({ sections: z.array(sectionSchema).max(COURSE_LIMITS.sections).default([]) })
   .strict();
 
-// The listening placement (D103): recordings of every level, each with the
-// level it tests.
-export const placementContentSchema = z
-  .object({
-    sections: z
-      .array(
-        sectionSchema.extend({
-          level: z.enum(COURSE_LEVELS).nullable().default(null),
-        }),
-      )
-      .max(COURSE_LIMITS.sections)
-      .default([]),
-  })
-  .strict();
+export const contentSchemaOf = (type) => (type === CourseItemType.TOPIC ? topicContentSchema : levelTestContentSchema);
 
-export const contentSchemaOf = (type) =>
-  type === CourseItemType.UNIT ? unitContentSchema : type === CourseItemType.PLACEMENT ? placementContentSchema : levelTestContentSchema;
+// The recordings of a content: the topic's, or each level-test section's.
+export const courseAudioIds = (content) => [content.audioMediaId, ...(content.sections || []).map((section) => section.audioMediaId)].filter(Boolean);
 
-// The library exercises a content refers to.
-export function courseExerciseIds(content) {
-  const sections = content.sections || content.check?.sections || [];
-  return [...new Set([...(content.lessons || []).map((lesson) => lesson.exerciseId), ...sections.map((section) => section.exerciseId)].filter(Boolean))];
-}
+// Every media a content refers to: its recordings and the words' pronunciations.
+export const courseMediaIds = (content) => [...courseAudioIds(content), ...(content.vocabulary || []).map((item) => item.audioMediaId).filter(Boolean)];
 
-// complete: whether a "complete the sentence" question is allowed here
-// (detail questions of a lesson only).
-function questionIssues(issue, path, question, complete = false) {
+const normalize = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+
+function questionIssues(issue, path, question) {
   if (!question.prompt) issue(`${path}.prompt`, 'Write the question');
-  if (question.kind === CourseQuestionKind.COMPLETE) {
-    if (!complete) issue(`${path}.kind`, 'Only detail questions of a lesson can be completed with words heard');
-    const blanks = countBlanks(question.prompt);
-    if (question.prompt && !blanks) issue(`${path}.prompt`, `Mark each word to write with ${FILL_IN_BLANK}`);
-    else if (blanks > COURSE_LIMITS.completeBlanks) issue(`${path}.prompt`, `At most ${COURSE_LIMITS.completeBlanks} blanks`);
-    else if (question.answers.length !== blanks)
-      issue(
-        `${path}.answers`,
-        `The sentence has ${blanks} blank${blanks === 1 ? '' : 's'} but ${question.answers.length} answer${question.answers.length === 1 ? '' : 's'}`,
-      );
-    else if (question.answers.some((answer) => !answer)) issue(`${path}.answers`, 'Every blank needs the words heard');
-    return;
-  }
   const options = question.options;
   if (options.length < COURSE_LIMITS.options.min) issue(`${path}.options`, `At least ${COURSE_LIMITS.options.min} options are needed`);
   else if (options.some((option) => !option.text)) issue(`${path}.options`, 'Every option needs text');
@@ -173,90 +141,79 @@ function questionIssues(issue, path, question, complete = false) {
   if (options.filter((option) => option.isCorrect).length !== 1) issue(`${path}.options`, 'Exactly one option must be correct');
 }
 
-// The Focus on step is optional; once it has a passage it needs its blanks,
-// an answer for each taken from the words, and distinct words.
-function focusIssues(issue, path, focus) {
-  if (!hasCourseFocus(focus)) return;
-  const blanks = countBlanks(focus.passage);
-  if (!blanks) issue(`${path}.passage`, `Mark each blank with ${FILL_IN_BLANK}`);
-  else if (blanks > COURSE_LIMITS.focusBlanks) issue(`${path}.passage`, `At most ${COURSE_LIMITS.focusBlanks} blanks`);
-  const words = focus.words.map((word) => word.trim()).filter(Boolean);
-  if (words.length < 2) issue(`${path}.words`, 'Give at least two words to choose from');
-  else if (new Set(words.map((word) => word.toLowerCase())).size !== words.length) issue(`${path}.words`, 'Words must be different');
-  if (blanks && focus.answers.length !== blanks)
-    issue(
-      `${path}.answers`,
-      `The passage has ${blanks} blank${blanks === 1 ? '' : 's'} but ${focus.answers.length} answer${focus.answers.length === 1 ? '' : 's'}`,
-    );
-  else if (focus.answers.some((answer) => !words.includes(answer))) issue(`${path}.answers`, 'Every answer must be one of the words');
+function audioIssues(issue, path, mediaId, mediaById) {
+  if (!mediaId) issue(path, 'Add the recording');
+  else if (mediaById.get(mediaId)?.kind !== MediaKind.AUDIO) issue(path, 'The recording is missing or is not audio');
 }
 
-// exercises maps an exercise id to its published version's sentences
-// ({ segments: [{ id }] }); an exercise missing from it is not published.
-function sectionIssues(issue, path, sections) {
-  return (exercises) => {
-    let questions = 0;
-    sections.forEach((section, index) => {
-      const at = `${path}[${index}]`;
-      if (!section.exerciseId) issue(`${at}.exerciseId`, 'Choose a recording');
-      else if (!exercises.has(section.exerciseId)) issue(`${at}.exerciseId`, 'The recording is not published');
-      if (!section.questions.length) issue(`${at}.questions`, 'Add at least one question');
-      section.questions.forEach((question, at2) => questionIssues(issue, `${at}.questions[${at2}]`, question));
-      questions += section.questions.length;
-    });
-    return questions;
-  };
+// mediaById maps existing media ids to their rows.
+function topicIssues(issue, content, mediaById) {
+  audioIssues(issue, 'audioMediaId', content.audioMediaId, mediaById);
+
+  const { min, max } = COURSE_LIMITS.vocabulary;
+  if (content.vocabulary.length < min || content.vocabulary.length > max) issue('vocabulary', `${min} to ${max} words are needed`);
+  content.vocabulary.forEach((item, index) => {
+    if (!item.word || !item.meaning) issue(`vocabulary[${index}]`, 'A word needs the word and its meaning');
+    if (!item.phonetic) issue(`vocabulary[${index}].phonetic`, 'Add the IPA');
+    if (!item.audioMediaId) issue(`vocabulary[${index}].audioMediaId`, 'Add the pronunciation');
+  });
+
+  if (content.questions.length < COURSE_LIMITS.questions.min) issue('questions', 'Add at least one question');
+  content.questions.forEach((question, index) => questionIssues(issue, `questions[${index}]`, question));
+
+  if (content.ordering.enabled) {
+    const items = content.ordering.items.map((item) => item.text);
+    const { min: least, max: most } = COURSE_LIMITS.ordering;
+    if (items.length < least || items.length > most) issue('ordering.items', `${least} to ${most} ideas are needed`);
+    else if (items.some((item) => !item)) issue('ordering.items', 'Every idea needs text');
+    else if (new Set(items.map((item) => item.toLowerCase())).size !== items.length) issue('ordering.items', 'Ideas must be different');
+  }
+
+  // Every sentence is written down alone, so each needs its place in the
+  // recording, and its translation for the transcript.
+  if (!content.segments.length) issue('segments', 'Add the transcript of the recording');
+  let blanks = 0;
+  let previousStart = -1;
+  content.segments.forEach((segment, index) => {
+    const path = `segments[${index}]`;
+    const number = index + 1;
+    if (!segment.text) issue(`${path}.text`, `Write sentence ${number}`);
+    if (segment.start === null || segment.end === null) issue(`${path}.start`, `Sentence ${number} needs its start and end (Auto-time)`);
+    else if (segment.end <= segment.start) issue(`${path}.end`, `The end of sentence ${number} must come after its start`);
+    else if (segment.start < previousStart) issue(`${path}.start`, 'Sentences must follow the order of the recording');
+    if (segment.start !== null) previousStart = segment.start;
+    if (!segment.translation) issue(`${path}.translation`, `Translate sentence ${number}`);
+    if (segment.gap) {
+      const count = courseGapCount(segment.gap);
+      if (!count) issue(`${path}.gap`, `Mark the words to write in sentence ${number} with [brackets], or leave it empty`);
+      else if (normalize(courseGapText(segment.gap)) !== normalize(segment.text))
+        issue(`${path}.gap`, `Sentence ${number} with its blanks must keep the words of the sentence`);
+      blanks += count;
+    }
+  });
+  if (content.segments.length && !blanks) issue('segments', 'Mark at least one word to write for the blanks mode of the dictation');
+  const ids = content.segments.map((segment) => segment.id).filter(Boolean);
+  if (new Set(ids).size !== ids.length) issue('segments', 'Sentence ids must be unique');
 }
 
-// Returns the reasons a course item draft cannot be published; empty when it
-// can (D100). exercises: Map of published library exercises (see above).
-export function courseIssues(type, content, exercises) {
+// Returns the reasons a course item draft cannot be published; empty when it can.
+export function courseIssues(type, content, mediaById) {
   const issues = [];
   const issue = (path, message) => issues.push({ path, message });
-  if (type === CourseItemType.PLACEMENT) {
-    if (!content.sections.length) issue('sections', 'Add recordings with questions for every level');
-    sectionIssues(issue, 'sections', content.sections)(exercises);
-    content.sections.forEach((section, index) => {
-      if (!section.level) issue(`sections[${index}].level`, 'Choose the level this recording tests');
-    });
-    const min = COURSE_LIMITS.placementQuestionsPerLevel;
-    for (const level of COURSE_LEVELS) {
-      const count = content.sections.filter((section) => section.level === level).reduce((sum, section) => sum + section.questions.length, 0);
-      if (count < min) issue('sections', `${level} needs at least ${min} questions; it has ${count}`);
-    }
+  if (type === CourseItemType.TOPIC) {
+    topicIssues(issue, content, mediaById);
     return issues;
   }
-  if (type === CourseItemType.LEVEL_TEST) {
-    if (!content.sections.length) issue('sections', 'Add at least one recording with questions');
-    const count = sectionIssues(issue, 'sections', content.sections)(exercises);
-    if (count < COURSE_LIMITS.levelTestQuestions)
-      issue('sections', `A level test needs at least ${COURSE_LIMITS.levelTestQuestions} questions; it has ${count}`);
-    return issues;
-  }
-  if (!content.lessons.length) issue('lessons', 'Add at least one lesson');
-  content.lessons.forEach((lesson, index) => {
-    const at = `lessons[${index}]`;
-    if (!lesson.title) issue(`${at}.title`, 'Give the lesson a title');
-    const exercise = lesson.exerciseId ? exercises.get(lesson.exerciseId) : null;
-    if (!lesson.exerciseId) issue(`${at}.exerciseId`, 'Choose a recording');
-    else if (!exercise) issue(`${at}.exerciseId`, 'The recording is not published');
-    lesson.keywords.forEach((keyword, at2) => {
-      if (!keyword.word || !keyword.meaning) issue(`${at}.keywords[${at2}]`, 'A keyword needs the word and its meaning');
-    });
-    questionIssues(issue, `${at}.gist`, lesson.gist);
-    const { min, max } = COURSE_LIMITS.detailQuestions;
-    if (lesson.detail.length < min || lesson.detail.length > max) issue(`${at}.detail`, `${min} to ${max} detail questions are needed`);
-    lesson.detail.forEach((question, at2) => questionIssues(issue, `${at}.detail[${at2}]`, question, true));
-    focusIssues(issue, `${at}.focus`, lesson.focus);
-    const close = COURSE_LIMITS.closeSentences;
-    if (lesson.closeSegmentIds.length < close.min) issue(`${at}.closeSegmentIds`, `Choose ${close.min} to ${close.max} sentences to write down`);
-    if (exercise && lesson.closeSegmentIds.some((segmentId) => !exercise.segments.some((segment) => segment.id === segmentId)))
-      issue(`${at}.closeSegmentIds`, 'A chosen sentence is no longer in the recording');
+  if (!content.sections.length) issue('sections', 'Add at least one recording with questions');
+  let count = 0;
+  content.sections.forEach((section, index) => {
+    const at = `sections[${index}]`;
+    audioIssues(issue, `${at}.audioMediaId`, section.audioMediaId, mediaById);
+    if (!section.transcript) issue(`${at}.transcript`, 'Add the transcript (learners read it after the test)');
+    if (!section.questions.length) issue(`${at}.questions`, 'Add at least one question');
+    section.questions.forEach((question, at2) => questionIssues(issue, `${at}.questions[${at2}]`, question));
+    count += section.questions.length;
   });
-  const sections = content.check.sections;
-  if (!sections.length) issue('check.sections', 'Add the unit check: at least one recording with questions');
-  const count = sectionIssues(issue, 'check.sections', sections)(exercises);
-  if (sections.length && count < COURSE_LIMITS.unitCheckQuestions)
-    issue('check.sections', `A unit check needs at least ${COURSE_LIMITS.unitCheckQuestions} questions; it has ${count}`);
+  if (count < COURSE_LIMITS.levelTestQuestions) issue('sections', `A level test needs at least ${COURSE_LIMITS.levelTestQuestions} questions; it has ${count}`);
   return issues;
 }

@@ -1,0 +1,260 @@
+{
+  "number": 32,
+  "title": "Eating Out",
+  "vocabulary": [
+    {
+      "word": "basic",
+      "partOfSpeech": "adjective",
+      "meaning": "cơ bản, đơn giản",
+      "example": "The cafe's basic lunch set includes soup, a sandwich and a drink for nine dollars.",
+      "exampleMeaning": "Suất ăn trưa cơ bản của quán cà phê gồm súp, một chiếc bánh mì kẹp và một đồ uống với giá chín đô la."
+    },
+    {
+      "word": "complete",
+      "partOfSpeech": "verb",
+      "meaning": "hoàn thành, hoàn tất; (tính từ) đầy đủ, trọn vẹn",
+      "example": "Please complete the short survey on the back of your receipt before you leave.",
+      "exampleMeaning": "Vui lòng hoàn thành bản khảo sát ngắn ở mặt sau hóa đơn trước khi rời đi."
+    },
+    {
+      "word": "excite",
+      "partOfSpeech": "verb",
+      "meaning": "làm hứng thú, làm phấn khích",
+      "example": "The new tasting menu excited food writers across the city.",
+      "exampleMeaning": "Thực đơn nếm thử mới đã khiến các cây bút ẩm thực khắp thành phố phấn khích."
+    },
+    {
+      "word": "flavor",
+      "partOfSpeech": "noun",
+      "meaning": "hương vị, mùi vị",
+      "example": "The chef balanced the sweet flavor of the sauce with a little lime juice.",
+      "exampleMeaning": "Bếp trưởng cân bằng vị ngọt của nước sốt bằng một chút nước cốt chanh."
+    },
+    {
+      "word": "forget",
+      "partOfSpeech": "verb",
+      "meaning": "quên, không nhớ",
+      "example": "The waiter forgot to bring the extra plates we had asked for.",
+      "exampleMeaning": "Người phục vụ đã quên mang thêm đĩa mà chúng tôi yêu cầu."
+    },
+    {
+      "word": "ingredient",
+      "partOfSpeech": "noun",
+      "meaning": "nguyên liệu, thành phần (của món ăn)",
+      "example": "Our kitchen buys every ingredient from farms within fifty kilometers.",
+      "exampleMeaning": "Bếp của chúng tôi mua mọi nguyên liệu từ các nông trại trong bán kính năm mươi ki-lô-mét."
+    },
+    {
+      "word": "judge",
+      "partOfSpeech": "verb",
+      "meaning": "đánh giá, nhận xét, phán xét",
+      "example": "Diners often judge a restaurant by how quickly the first dish arrives.",
+      "exampleMeaning": "Thực khách thường đánh giá một nhà hàng qua tốc độ món đầu tiên được mang ra."
+    },
+    {
+      "word": "mix-up",
+      "partOfSpeech": "noun",
+      "meaning": "sự nhầm lẫn, sự lộn xộn",
+      "example": "A mix-up at the reception desk sent two parties to the same table.",
+      "exampleMeaning": "Một sự nhầm lẫn ở quầy tiếp tân đã đưa hai nhóm khách đến cùng một bàn."
+    },
+    {
+      "word": "patron",
+      "partOfSpeech": "noun",
+      "meaning": "khách quen, khách hàng (của nhà hàng, cửa hàng)",
+      "example": "Regular patrons receive a free dessert on their birthday.",
+      "exampleMeaning": "Khách quen được tặng một món tráng miệng miễn phí vào ngày sinh nhật."
+    },
+    {
+      "word": "predict",
+      "partOfSpeech": "verb",
+      "meaning": "dự đoán, tiên đoán",
+      "example": "The manager predicts that Friday evenings will be busier once the theater reopens.",
+      "exampleMeaning": "Người quản lý dự đoán các tối thứ Sáu sẽ đông hơn khi nhà hát mở cửa trở lại."
+    },
+    {
+      "word": "randomly",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách ngẫu nhiên",
+      "example": "Each month the restaurant randomly selects one customer review to post on its website.",
+      "exampleMeaning": "Mỗi tháng nhà hàng chọn ngẫu nhiên một đánh giá của khách để đăng lên trang web."
+    },
+    {
+      "word": "remind",
+      "partOfSpeech": "verb",
+      "meaning": "nhắc nhở, nhắc cho nhớ",
+      "example": "The host reminded the group that the kitchen closes at ten.",
+      "exampleMeaning": "Người tiếp đón nhắc cả nhóm rằng bếp đóng cửa lúc mười giờ."
+    }
+  ],
+  "fillIn": {
+    "passage": "Last Thursday, Marco Delgado took a new client, Ms. Adeyemi, to dinner at Olive Lane Bistro. He had chosen the place because its regular ___ speak highly of the service, and he did not want to ___ a restaurant by its website alone. Marco had booked a table by the window, but a ___ at the front desk gave their table to another party, so they waited twenty minutes at the bar.\n\nOnce seated, they ordered the tasting menu. The first course was a ___ tomato soup, nothing special, but the second course ___ them both: a grilled fish with a smoky ___ that neither of them could ___. The waiter listed every ___, from the olive oil to the wild herbs, and ___ them that the dish changes each season. Ms. Adeyemi laughed that she had ___ picked the bistro from a list of ten the week before and ended up at the same place.\n\nBefore they left, Marco ___ a short feedback card. He did not ___ to mention the seating problem, but he also praised the kitchen, and the manager offered them free coffee as an apology.",
+    "answers": ["patrons", "judge", "mix-up", "basic", "excited", "flavor", "predict", "ingredient", "reminded", "randomly", "completed", "forget"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người phục vụ đang đặt đĩa thức ăn xuống bàn trước một nhóm bốn người ngồi trong nhà hàng.",
+      "options": [
+        "A waiter is serving food to a group of diners.",
+        "The diners are leaving the restaurant.",
+        "A chef is chopping vegetables in the kitchen.",
+        "The customers are standing in line at the counter."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phục vụ đang mang đồ ăn ra cho nhóm khách. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Why did the kitchen send out the wrong dish?",
+        "options": ["There was a mix-up with the table numbers.", "Yes, it was delicious.", "The dish costs twelve dollars."],
+        "answer": "A",
+        "explanation": "Câu hỏi Why cần lý do; (A) giải thích có sự nhầm lẫn số bàn. (B) trả lời Yes cho câu hỏi Wh, (C) nói về giá."
+      },
+      {
+        "question": "Could you remind me what time the restaurant closes?",
+        "options": ["Ten o'clock on weekdays.", "Yes, I close the window every night.", "It opened in 2015."],
+        "answer": "A",
+        "explanation": "Người hỏi muốn biết giờ đóng cửa; (A) cho biết giờ. (B) lặp ý 'close' với nghĩa khác, (C) nói về năm khai trương."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Excuse me, I ordered the lemon chicken, but this looks like the fish special.\nMan: I'm very sorry, ma'am. There must have been a mix-up with the orders at table nine. I'll take it back right away.\nWoman: Thank you. Also, my colleague has a nut allergy. Could you check the ingredients in the chicken sauce?\nMan: Of course. The sauce has butter, lemon and herbs, but no nuts. I'll remind the kitchen to keep it away from the dessert station, where we use almonds.\nWoman: That would be great. One more thing: we have a meeting at two. How long will the chicken take?\nMan: About twelve minutes. As an apology, I'd like to offer you both a free dessert, or a coffee if you prefer.\nWoman: Coffee would be perfect. We'll need it for the meeting.",
+      "questions": [
+        {
+          "prompt": "What problem does the woman mention?",
+          "options": ["Her order was late", "She received the wrong dish", "The bill was incorrect", "Her table was too small"],
+          "answer": "B",
+          "explanation": "Cô ấy gọi gà chanh nhưng nhận được món cá; người phục vụ xác nhận có nhầm lẫn đơn hàng."
+        },
+        {
+          "prompt": "What does the woman ask the man to check?",
+          "options": ["The ingredients of a sauce", "The time of a meeting", "The price of the dessert", "The number of her table"],
+          "answer": "A",
+          "explanation": "Cô ấy hỏi 'Could you check the ingredients in the chicken sauce?' vì đồng nghiệp dị ứng với hạt."
+        },
+        {
+          "prompt": "What does the man offer the woman?",
+          "options": ["A discount on the bill", "A table by the window", "A free coffee or dessert", "A different sauce"],
+          "answer": "C",
+          "explanation": "Anh ấy nói 'I'd like to offer you both a free dessert, or a coffee if you prefer'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good afternoon, team. Before we open, a few notes about tonight. First, the weather report predicts heavy rain after seven, so we expect most patrons to arrive early rather than late; please have all stations ready by five thirty. Second, the new autumn menu starts tonight. Guests judge a dish within seconds, so describe each special clearly: the pumpkin soup has a smoky flavor from roasted peppers, and the lamb comes with a basic herb sauce that we can make without garlic on request. Third, our owner has asked us to excite returning guests with something new, so every table will receive a small tasting spoon of the new chestnut dessert. Finally, a reminder: a food inspector may visit randomly this month. Do not forget to wash your hands between tasks, and keep the allergy list beside the pass at all times. Thanks, everyone. Let's have a great evening.",
+      "questions": [
+        {
+          "prompt": "Who most likely is the speaker?",
+          "options": ["A food inspector", "A restaurant manager", "A weather reporter", "A food supplier"],
+          "answer": "B",
+          "explanation": "Người nói hướng dẫn nhân viên trước giờ mở cửa về thực đơn, quy định vệ sinh và khách, nên là quản lý nhà hàng."
+        },
+        {
+          "prompt": "Why does the speaker expect guests to arrive early?",
+          "options": ["A new menu starts tonight", "Rain is expected later in the evening", "The owner is visiting", "The kitchen closes early"],
+          "answer": "B",
+          "explanation": "'the weather report predicts heavy rain after seven, so we expect most patrons to arrive early'."
+        },
+        {
+          "prompt": "What will every table receive?",
+          "options": ["A free main course", "A printed allergy list", "A sample of a new dessert", "A discount voucher"],
+          "answer": "C",
+          "explanation": "'every table will receive a small tasting spoon of the new chestnut dessert'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The chef's new tasting menu has _____ food critics all over the region.",
+        "options": ["excite", "excitement", "excited", "excitedly"],
+        "answer": "C",
+        "explanation": "'has' + quá khứ phân từ tạo thì hiện tại hoàn thành: 'has excited'."
+      },
+      {
+        "prompt": "The soup has a rich _____ because it is cooked slowly for six hours.",
+        "options": ["flavor", "flavored", "flavorful", "flavorfully"],
+        "answer": "A",
+        "explanation": "Sau 'a rich' cần danh từ: 'flavor' (hương vị)."
+      },
+      {
+        "prompt": "It is hard to _____ how many guests will come on a rainy evening.",
+        "options": ["prediction", "predictable", "predict", "predictably"],
+        "answer": "C",
+        "explanation": "Sau 'to' cần động từ nguyên mẫu: 'predict'."
+      },
+      {
+        "prompt": "Staff should _____ a cleaning checklist at the end of every shift.",
+        "options": ["complete", "completion", "completely", "completed"],
+        "answer": "A",
+        "explanation": "Sau 'should' cần động từ nguyên mẫu: 'complete'."
+      },
+      {
+        "prompt": "The host _____ selects a table to receive a free appetizer each night.",
+        "options": ["random", "randomly", "randomness", "randomize"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'selects': 'randomly'."
+      },
+      {
+        "prompt": "Loyal _____ of the cafe receive a discount card after ten visits.",
+        "options": ["patron", "patrons", "patronize", "patronage"],
+        "answer": "B",
+        "explanation": "Động từ 'receive' ở số nhiều nên chủ ngữ phải là danh từ số nhiều: 'patrons'. 'patronage' là danh từ không đếm được, không hợp."
+      }
+    ],
+    "part6": {
+      "passage": "Dear Ms. Whitfield,\n\nThank you for your email about your dinner at Juniper Grill last Saturday. I am sorry that a ___ at our front desk meant your group waited for its table. We have spoken with the evening staff and have ___ them to confirm every reservation twice. Please also accept our apology for the salad: our kitchen should never ___ to ask about allergies, and we have added a written question to every order slip. I would like to invite you back for a free meal for four. Please call me at 555-0142 to arrange a date.\n\nSincerely,\nOwen Castellano\nGeneral Manager",
+      "questions": [
+        {
+          "options": ["mix-up", "mixed", "mixing", "mixture"],
+          "answer": "A",
+          "explanation": "Sau 'a' cần danh từ chỉ sự nhầm lẫn khiến khách phải chờ bàn: 'mix-up'."
+        },
+        {
+          "options": ["remind", "reminder", "reminded", "reminding"],
+          "answer": "C",
+          "explanation": "'have ___ them' là thì hiện tại hoàn thành, cần quá khứ phân từ: 'reminded'."
+        },
+        {
+          "options": ["forget", "forgot", "forgetting", "forgetful"],
+          "answer": "A",
+          "explanation": "Sau 'should never' cần động từ nguyên mẫu: 'forget'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "RIVERBEND KITCHEN\nA note to our patrons\n\nStarting on March 1, Riverbend Kitchen will make three changes based on the 412 feedback cards you completed last winter.\n\n1. A new seasonal menu. Many of you told us that the menu had not changed in two years. From March, the chef will replace one third of the dishes every season and list the main ingredients of each dish, so that guests with allergies no longer need to ask.\n\n2. Shorter waits at lunch. On weekdays, the basic lunch set (soup, main dish and coffee) will be served within fifteen minutes of ordering, or the coffee is free. We predict that this will cut the average lunch visit from 55 to 40 minutes.\n\n3. Fewer booking errors. Several cards mentioned a mix-up with reservations. From now on, our host will call every party on the morning of the booking to remind them of the time and confirm the number of guests.\n\nEach month we will randomly choose one completed card and give its writer a dinner for two. Thank you for helping us improve. We hope the new flavors excite you as much as they excite our kitchen team.\n\nGrace Oyelaran, Owner",
+      "questions": [
+        {
+          "prompt": "Why was the notice written?",
+          "options": ["To announce a new owner", "To explain changes made after customer feedback", "To apologize for a price increase", "To advertise a cooking class"],
+          "answer": "B",
+          "explanation": "Thông báo nêu ba thay đổi 'based on the 412 feedback cards you completed last winter'."
+        },
+        {
+          "prompt": "What will appear on the new menu?",
+          "options": ["The chef's name", "The price of each ingredient", "The main ingredients of each dish", "Photos of every dish"],
+          "answer": "C",
+          "explanation": "Mục 1: bếp trưởng sẽ 'list the main ingredients of each dish on the menu'."
+        },
+        {
+          "prompt": "What happens if a weekday lunch set takes more than fifteen minutes?",
+          "options": ["The meal is free", "The coffee is free", "The guest receives a dessert", "The guest can leave without paying"],
+          "answer": "B",
+          "explanation": "Mục 2: suất ăn trưa được phục vụ trong mười lăm phút, 'or the coffee is free'."
+        },
+        {
+          "prompt": "How will the restaurant reduce reservation errors?",
+          "options": ["By using a new booking website", "By hiring a second host", "By calling guests on the day of their booking", "By asking guests to pay a deposit"],
+          "answer": "C",
+          "explanation": "Mục 3: người tiếp đón sẽ gọi cho mỗi nhóm khách vào buổi sáng ngày đặt bàn để nhắc giờ và xác nhận số khách."
+        },
+        {
+          "prompt": "What can a patron win each month?",
+          "options": ["A dinner for two", "A cooking lesson", "A free lunch set for a month", "A gift card"],
+          "answer": "A",
+          "explanation": "'Each month we will randomly choose one completed card and give its writer a dinner for two.'"
+        }
+      ]
+    }
+  }
+}

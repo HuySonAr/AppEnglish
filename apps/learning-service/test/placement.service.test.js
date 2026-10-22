@@ -177,3 +177,17 @@ test('an admin changes the thresholds for later attempts', async () => {
   // The earlier result keeps its starting unit.
   assert.equal((await service.getPlacement(student)).startUnit, 2);
 });
+
+test('an admin resets a learner\'s placement so they take it again (D131)', async () => {
+  const { service, repository } = harness();
+  await service.skipPlacement(student);
+  assert.equal((await service.getPlacement(student)).status, 'SKIPPED');
+  for (const actor of [manager, student]) await assert.rejects(() => service.adminResetPlacement(actor, student.id), { code: 26, status: 403 });
+
+  assert.deepEqual(await service.adminResetPlacement(admin, student.id), { reset: true });
+  assert.equal(repository.tables.attempts.length, 0);
+  assert.equal((await service.getPlacement(student)).status, 'NOT_STARTED');
+  // Nothing to remove the second time; the learner may start again.
+  assert.deepEqual(await service.adminResetPlacement(admin, student.id), { reset: false });
+  assert.equal((await service.startPlacement(student)).status, 'IN_PROGRESS');
+});

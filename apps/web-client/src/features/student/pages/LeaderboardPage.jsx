@@ -14,6 +14,7 @@ import { ListPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { getLeaderboard } from '../api/progress-api.js';
 import { filterLeaderboard, pageOfRank } from '../lib/leaderboard.js';
+import { useListState } from '../../../hooks/use-list-state.js';
 
 const PAGE_SIZE = 10;
 const medal = { 1: 'text-warning', 2: 'text-muted-foreground', 3: 'text-warning/70' };
@@ -24,8 +25,9 @@ const medal = { 1: 'text-warning', 2: 'text-muted-foreground', 3: 'text-warning/
 export function LeaderboardPage() {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const { filters, setFilter, page, setPage } = useListState({ search: '' });
+  const search = filters.search;
+  const setSearch = setFilter('search');
 
   async function load() {
     setState('loading');

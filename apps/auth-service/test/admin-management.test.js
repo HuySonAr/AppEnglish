@@ -13,6 +13,7 @@ function harness(accounts) {
   const audits = [];
   const otps = [];
   const sent = [];
+  const codes = [];
   const refreshTokens = [];
   const deletedAvatars = [];
   const repo = {
@@ -20,7 +21,11 @@ function harness(accounts) {
     findByEmail: async (email) => accounts.find((account) => account.email === email) || null,
     listAccounts: async () => ({ items: accounts, total: accounts.length }),
     countActiveAdmins: async () => accounts.filter((account) => account.role === 'ADMIN' && account.status === 'ACTIVE').length,
-    createAccount: async (account) => account,
+    createAccount: async (account) => {
+      if (!account.id) Object.assign(account, { id: crypto.randomUUID(), createdAt: new Date(), sessionVersion: 0 });
+      if (!accounts.includes(account)) accounts.push(account);
+      return account;
+    },
     saveAccount: async (account) => account,
     saveAudit: async (audit) => { audits.push({ id: crypto.randomUUID(), createdAt: new Date(), ...audit }); },
     updateAccountAndAudit: async (account, audit) => {
@@ -35,11 +40,14 @@ function harness(accounts) {
     countRecentOtps: async () => 0,
     findLatestOtp: async () => null,
     invalidateOtps: async () => {},
-    saveOtp: async (otp) => { otps.push(otp); },
+    saveOtp: async (otp) => { otps.push({ id: crypto.randomUUID(), ...otp }); },
+    findLatestOtpChallenge: async (accountId, purpose) => [...otps].reverse().find((otp) => otp.accountId === accountId && otp.purpose === purpose) || null,
+    updateOtp: async (id, changes) => { Object.assign(otps.find((otp) => otp.id === id), changes); },
+    revokeAccountSessions: async () => {},
   };
   const avatarStorage = { delete: async (asset) => { deletedAvatars.push(asset); } };
-  const service = new AuthService(repo, new PasswordService(), new TokenService(), { sendOtp: async (email, code, purpose) => { sent.push({ email, purpose }); } }, new AuthorizationService(), avatarStorage);
-  return { service, controller: new AuthController(service), token: (account) => service.tokenService.createAccessToken(account), audits, otps, sent, refreshTokens, deletedAvatars };
+  const service = new AuthService(repo, new PasswordService(), new TokenService(), { sendOtp: async (email, code, purpose, context) => { sent.push({ email, purpose, ...(context && Object.keys(context).length ? { context } : {}) }); codes.push(code); } }, new AuthorizationService(), avatarStorage);
+  return { service, controller: new AuthController(service), token: (account) => service.tokenService.createAccessToken(account), audits, otps, sent, codes, refreshTokens, deletedAvatars };
 }
 function account(role, overrides = {}) {
   return { id: crypto.randomUUID(), email: `${role.toLowerCase()}-${crypto.randomUUID()}@example.com`, role, status: 'ACTIVE', createdAt: new Date(), sessionVersion: 0, passwordHash: new PasswordService().hash('correct horse battery staple'), ...overrides };
@@ -136,4 +144,84 @@ test('account statistics are admin-only and pass the repository numbers through'
   assert.deepEqual([stats.total, stats.activeLast7Days, stats.days, stats.newPerDay], [2, 1, 30, [{ day: '2026-10-19', count: 2 }]]);
   await assert.rejects(() => h.service.adminStats(h.token(student)), { code: 26 });
   await assert.rejects(() => h.controller.adminStats(undefined), (error) => error.getStatus() === 401);
+});
+
+// D131: invitations.
+test('an admin invites an account; the person accepts with the emailed code and a password', async () => {
+  const admin = account('ADMIN');
+  const someone = account('STUDENT');
+  const h = harness([admin, someone]);
+  const token = h.token(admin);
+
+  await assert.rejects(() => h.service.adminInvite(h.token(someone), { email: 'x@example.com', displayName: '', role: 'STUDENT' }), { code: 26 });
+  const invited = await h.service.adminInvite(token, { email: 'new.manager@example.com', displayName: 'Mai', role: 'CONTENT_MANAGER' });
+  assert.equal(invited.expiresInHours, 72);
+  assert.equal(invited.account.status, 'PENDING_VERIFICATION');
+  assert.equal(invited.account.role, 'CONTENT_MANAGER');
+  assert.equal(invited.account.displayName, 'Mai');
+  assert.ok(invited.account.invitedAt);
+  assert.deepEqual(h.sent, [{ email: 'new.manager@example.com', purpose: 'INVITE', context: { role: 'CONTENT_MANAGER', displayName: 'Mai', expiresInHours: 72 } }]);
+  // The code lasts 72 hours, not five minutes.
+  assert.ok(h.otps[0].expiresAt.getTime() - Date.now() > 71 * 3600000);
+  assert.deepEqual(h.audits.map((audit) => audit.action), ['ACCOUNT_INVITED']);
+  // The same email cannot be invited twice.
+  await assert.rejects(() => h.service.adminInvite(token, { email: 'new.manager@example.com', displayName: '', role: 'STUDENT' }), { code: 19 });
+
+  const stored = h.audits[0] && (await h.service.accountRepository.findByEmail('new.manager@example.com'));
+  // Nobody can sign in before accepting: the password is unknown, and the account is pending.
+  await assert.rejects(() => h.service.login({ email: stored.email, password: 'anything at all' }), { code: 10 });
+  // A wrong code is refused; the admin can send the invitation again; the right code sets the password and signs in.
+  await assert.rejects(() => h.service.acceptInvite({ email: stored.email, otp: '000000', password: 'chosen by the person' }), (error) => error.code === 15 || error.code === 16);
+  h.otps.forEach((otp) => { otp.resendAfter = new Date(0); });
+  const resent = await h.service.adminAction(token, stored.id, { action: 'RESEND_INVITE' });
+  assert.equal(resent.expiresInHours, 72);
+  assert.equal(h.sent.length, 2);
+  const session = await h.service.acceptInvite({ email: stored.email, otp: h.codes.at(-1), password: 'chosen by the person' });
+  assert.equal(session.account.status, 'ACTIVE');
+  assert.equal(session.account.role, 'CONTENT_MANAGER');
+  assert.ok(session.setCookies.length);
+  assert.ok(stored.emailVerifiedAt);
+  assert.equal((await h.service.login({ email: stored.email, password: 'chosen by the person' })).account.id, stored.id);
+  // Accepting again answers LOGIN guidance, no session.
+  assert.equal((await h.service.acceptInvite({ email: stored.email, otp: '123456', password: 'another password' })).data.nextAction, 'LOGIN');
+  // Unknown or not-invited emails look like a wrong code.
+  await assert.rejects(() => h.service.acceptInvite({ email: 'nobody@example.com', otp: '123456', password: 'another password' }), { code: 15 });
+  await assert.rejects(() => h.service.acceptInvite({ email: admin.email, otp: '123456', password: 'another password' }), { code: 15 });
+  assert.deepEqual(h.audits.map((audit) => audit.action), ['ACCOUNT_INVITED', 'INVITE_RESENT', 'INVITE_ACCEPTED']);
+  // Once active, the invitation cannot be resent.
+  await assert.rejects(() => h.service.adminAction(token, stored.id, { action: 'RESEND_INVITE' }), { code: 25 });
+});
+
+test('a self-registered pending account can get a new code or be activated with a reason; invited ones cannot', async () => {
+  const admin = account('ADMIN');
+  const pending = account('STUDENT', { status: 'PENDING_VERIFICATION' });
+  const invited = account('STUDENT', { status: 'PENDING_VERIFICATION', invitedAt: new Date() });
+  const active = account('STUDENT');
+  const h = harness([admin, pending, invited, active]);
+  const token = h.token(admin);
+
+  const code = await h.service.adminAction(token, pending.id, { action: 'RESEND_VERIFICATION' });
+  assert.equal(code.expiresInSeconds, 300);
+  assert.deepEqual(h.sent, [{ email: pending.email, purpose: 'VERIFY_EMAIL' }]);
+  await assert.rejects(() => h.service.adminAction(token, invited.id, { action: 'RESEND_VERIFICATION' }), { code: 25 });
+  await assert.rejects(() => h.service.adminAction(token, active.id, { action: 'RESEND_VERIFICATION' }), { code: 25 });
+  await assert.rejects(() => h.service.adminAction(token, pending.id, { action: 'RESEND_INVITE' }), { code: 25 });
+
+  await assert.rejects(() => h.service.adminAction(token, pending.id, { action: 'ACTIVATE' }), { code: 29 });
+  await assert.rejects(() => h.service.adminAction(token, invited.id, { action: 'ACTIVATE', reason: 'x' }), { code: 25 });
+  await assert.rejects(() => h.service.adminAction(token, active.id, { action: 'ACTIVATE', reason: 'x' }), { code: 25 });
+  const activated = await h.service.adminAction(token, pending.id, { action: 'ACTIVATE', reason: 'Code never arrived; identity checked by phone' });
+  assert.equal(activated.account.status, 'ACTIVE');
+  assert.equal(pending.emailVerifiedAt, undefined);
+  assert.equal((await h.service.login({ email: pending.email, password: 'correct horse battery staple' })).account.status, 'ACTIVE');
+  assert.deepEqual(h.audits.map((audit) => [audit.action, audit.previousStatus, audit.nextStatus, audit.reason]), [
+    ['VERIFICATION_RESENT', 'PENDING_VERIFICATION', 'PENDING_VERIFICATION', null],
+    ['ACCOUNT_ACTIVATED', 'PENDING_VERIFICATION', 'ACTIVE', 'Code never arrived; identity checked by phone'],
+  ]);
+
+  // The placement reset audit row: learners only.
+  const reset = await h.service.adminAction(token, active.id, { action: 'RESET_PLACEMENT', reason: 'Asked to retake' });
+  assert.equal(reset.changed, true);
+  await assert.rejects(() => h.service.adminAction(token, admin.id, { action: 'RESET_PLACEMENT' }), { code: 26 });
+  assert.deepEqual(h.audits.at(-1).action, 'PLACEMENT_RESET');
 });

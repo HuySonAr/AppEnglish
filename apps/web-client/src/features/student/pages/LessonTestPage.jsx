@@ -22,12 +22,14 @@ import { TestProgression } from '../components/TestProgression.jsx';
 import { TestReview } from '../components/TestReview.jsx';
 import { formatRemaining } from '../lib/placement.js';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { useFocusReturn, useListLinkState, useReturnTo } from '../../../hooks/use-return-to.js';
 
 // The lesson test: start, take it (same exam screen as the placement test),
 // then the score with every answer explained, the history of attempts with how
 // the results develop, and the lesson ranking.
 export function LessonTestPage() {
   const { lessonId } = useParams();
+  const back = useReturnTo('/student/lessons');
   const navigate = useNavigate();
   const [state, setState] = useState('loading');
   const [test, setTest] = useState(null);
@@ -122,7 +124,7 @@ export function LessonTestPage() {
         <Button variant="outline" onClick={load}>
           Try again
         </Button>
-        <Link className="block text-sm text-primary underline-offset-4 hover:underline" to="/student/lessons">
+        <Link className="block text-sm text-primary underline-offset-4 hover:underline" to={back.to} state={back.state}>
           Back to lessons
         </Link>
       </div>
@@ -147,6 +149,7 @@ export function LessonTestPage() {
     <section className="space-y-6">
       <Link
         to={`/student/lessons/${lessonId}`}
+        state={back.passThrough}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -184,7 +187,7 @@ export function LessonTestPage() {
               </p>
               <div className="mt-5 flex flex-wrap justify-center gap-3">
                 <Button asChild variant="outline">
-                  <Link to="/student/lessons">Back to lessons</Link>
+                  <Link to={back.to} state={back.state}>Back to lessons</Link>
                 </Button>
                 <Button disabled={busy} onClick={onStart}>
                   Take the test again

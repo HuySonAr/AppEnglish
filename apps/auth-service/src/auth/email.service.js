@@ -14,7 +14,8 @@ export class EmailService {
       });
   }
 
-  async sendOtp(email, code, purpose) {
+  // context (D131, invitations): { role, displayName, expiresInHours }.
+  async sendOtp(email, code, purpose, context = {}) {
     if (!process.env.SMTP_HOST) {
       if (process.env.NODE_ENV === 'test') return;
       throw new Error('SMTP_HOST is not configured');
@@ -22,11 +23,36 @@ export class EmailService {
     await this.transporter.sendMail({
       from: process.env.SMTP_FROM,
       to: email,
-      subject:
-        purpose === 'VERIFY_EMAIL'
-          ? 'Verify your AppEnglish email'
-          : 'Reset your AppEnglish password',
-      text: `Your AppEnglish code is ${code}. It expires in 5 minutes.`,
+      ...(purpose === 'INVITE' ? inviteMessage(email, code, context) : otpMessage(code, purpose)),
     });
   }
+}
+
+function otpMessage(code, purpose) {
+  return {
+    subject: purpose === 'VERIFY_EMAIL' ? 'Verify your AppEnglish email' : 'Reset your AppEnglish password',
+    text: `Your AppEnglish code is ${code}. It expires in 5 minutes.`,
+  };
+}
+
+// The invitation (D131): where to go, the code, how long it lasts. WEB_APP_URL
+// is the address of the web client; without it the email names the page.
+export function inviteMessage(email, code, { role = 'STUDENT', displayName = '', expiresInHours = 72 } = {}) {
+  const roleName = { STUDENT: 'a learner', CONTENT_MANAGER: 'a Content Manager', ADMIN: 'an administrator' }[role] || 'a member';
+  const base = (process.env.WEB_APP_URL || '').replace(/\/+$/, '');
+  const where = base ? `${base}/accept-invite?email=${encodeURIComponent(email)}` : 'the "Accept invitation" page of AppEnglish';
+  const greeting = displayName ? `Hello ${displayName},` : 'Hello,';
+  return {
+    subject: 'You are invited to AppEnglish',
+    text: [
+      greeting,
+      '',
+      `You have been invited to AppEnglish as ${roleName}.`,
+      `Open ${where} and enter this invitation code to choose your password:`,
+      '',
+      `    ${code}`,
+      '',
+      `The code is valid for ${expiresInHours} hours. If you did not expect this invitation, you can ignore this email.`,
+    ].join('\n'),
+  };
 }

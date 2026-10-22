@@ -181,6 +181,17 @@ export const MOCK_GRAPHIC_SET_INDEXES = Object.freeze({
 // Parts where each question has its own recording in a mock test.
 export const MOCK_QUESTION_AUDIO_PARTS = Object.freeze(['part1', 'part2']);
 
+// Unit review (D121, sizes corrected in D129): the test that closes a unit,
+// written by a Content Manager like the Word Review of the book. Reading
+// only, no media: 10 Part 5 sentences (questions 1-10) and 3 Part 6 passages
+// of 3 blanks each (questions 11-19). It uses the mock-test shape of those
+// two parts (passages are sets).
+export const UNIT_REVIEW_PARTS = Object.freeze(['part5', 'part6']);
+export const UNIT_REVIEW_PART_COUNTS = Object.freeze({ part5: 10, part6: 9 });
+export const UNIT_REVIEW_PASSAGE_COUNT = 3;
+export const UNIT_REVIEW_PASSAGE_QUESTIONS = 3;
+export const UNIT_REVIEW_QUESTION_COUNT = UNIT_REVIEW_PART_COUNTS.part5 + UNIT_REVIEW_PART_COUNTS.part6;
+
 // Listening practice (F05B-2, D85): exercises written by a Content Manager,
 // each with a topic, a level and one recording whose transcript is split into
 // segments the learner writes down. Levels are CEFR labels of the exercise
@@ -243,6 +254,9 @@ export const lyricBlankCount = (line) => lyricPieces(line).filter((piece) => 'bl
 export const SpeechQueue = Object.freeze({
   AUTOTIME_REQUESTS: 'speech.autotime.requests',
   AUTOTIME_RESULTS: 'speech.autotime.results',
+  // Pronunciation (D123): a request names its reply queue; the answer comes
+  // back there with the request's correlation id.
+  PRONOUNCE_REQUESTS: 'speech.pronounce.requests',
 });
 export const SpeechTask = Object.freeze({ ALIGN: 'align', TRANSCRIBE: 'transcribe' });
 export const AutoTimeStatus = Object.freeze({
@@ -255,47 +269,51 @@ export const AutoTimeStatus = Object.freeze({
 export const LISTENING_MAX_SEGMENTS = 80;
 export const LISTENING_SEGMENT_MAX_LENGTH = 500;
 
-// Listening course (F05C, D100): a CEFR path of listening, A1 to C1. Each
-// level has units in order and one level test; a unit has lessons and a unit
-// check. A lesson uses a listening exercise of the library and goes through
-// five steps (keywords, gist, detail, close listening, review). One listening
-// placement, with recordings of every level, sets where a learner starts (D103).
-export const COURSE_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1']);
-export const CourseItemType = Object.freeze({ UNIT: 'unit', LEVEL_TEST: 'level_test', PLACEMENT: 'placement' });
-// The two sections of every level (D107), in learning order: a unit belongs
-// to one; the units of a level are taken section by section.
-export const COURSE_SECTIONS = Object.freeze(['social_and_travel', 'work_and_study']);
-export const COURSE_SECTION_TITLES = Object.freeze({ social_and_travel: 'Social and Travel', work_and_study: 'Work and Study' });
-// What a course question checks: the main idea, a detail, or what is meant.
+// Listening course (F05C, D143–D145): levels A1 to C2, each with topics in
+// order; a topic is one listening lesson on its own recording (uploaded in the
+// topic with its transcript, timed by Auto-time; D147) with vocabulary, comprehension questions,
+// an optional ordering task, dictation (blanks or full sentences, checked but
+// not scored) and the transcript with its Vietnamese translation. Nothing in
+// a level is locked; the level test of a level, passed, opens the next level.
+export const COURSE_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+// The levels that have a level test: every level but the last (D145).
+export const COURSE_TEST_LEVELS = Object.freeze(COURSE_LEVELS.slice(0, -1));
+export const CourseItemType = Object.freeze({ TOPIC: 'topic', LEVEL_TEST: 'level_test' });
+// What a question checks: the main idea, a detail, or what is meant.
 export const CourseSkill = Object.freeze({ GIST: 'gist', DETAIL: 'detail', INFERENCE: 'inference' });
-// How a detail question is answered (D109): an option chosen, or the words
-// heard written into the blanks (FILL_IN_BLANK) of the sentence.
-export const CourseQuestionKind = Object.freeze({ CHOICE: 'choice', COMPLETE: 'complete' });
-// Pass marks (percent) of a lesson, a unit check and a level test, and the
-// share of a level's placement questions that counts the level as known.
-export const COURSE_PASS_PERCENT = Object.freeze({ lesson: 70, unitCheck: 75, levelTest: 70, placementLevel: 60 });
+// Pass mark (percent) of a level test.
+export const COURSE_PASS_PERCENT = Object.freeze({ levelTest: 70 });
 export const COURSE_LIMITS = Object.freeze({
-  lessonsPerUnit: 8,
-  keywords: 10,
-  detailQuestions: Object.freeze({ min: 2, max: 5 }),
-  closeSentences: Object.freeze({ min: 1, max: 6 }),
+  // A topic's words to learn first (D143): the ones the recording needs.
+  vocabulary: Object.freeze({ min: 4, max: 6 }),
+  questions: Object.freeze({ min: 1, max: 10 }),
   options: Object.freeze({ min: 2, max: 4 }),
+  // The ideas to put in the order they are heard (D143), when turned on.
+  ordering: Object.freeze({ min: 3, max: 8 }),
   sections: 12,
   questionsPerSection: 10,
-  unitCheckQuestions: 5,
   levelTestQuestions: 8,
-  placementQuestionsPerLevel: 2,
-  // A "complete the sentence" question's blanks; a lesson's Focus on
-  // passage's blanks and words to choose from (D109).
-  completeBlanks: 4,
-  focusBlanks: 8,
-  focusWords: 12,
+  // The transcript of a level-test recording (D147), shown after the test.
+  transcript: 10000,
+  // D141: in a level test a recording is heard at its own speed and at most
+  // this many times, as in an exam.
+  testPlays: 2,
 });
-
-// Whether a lesson has a Focus on step: a passage with blanks (D109).
-export const hasCourseFocus = (focus) => Boolean(focus && focus.passage && focus.passage.trim());
+// A sentence of a topic's dictation in the blanks mode (D143): its text with
+// the words to write in square brackets, as for songs ("I [walked] home").
+// The text without the brackets must be the sentence itself.
+export const courseGapText = (gap) => String(gap || '').replace(/\[([^\[\]]*)\]/g, '$1');
+export const courseGapCount = (gap) => (String(gap || '').match(/\[[^\[\]]*\]/g) || []).length;
+// A topic's recording is cut like a TOEIC conversation (D147): sentences with
+// an optional speaker, each timed. Auto-time is sent this kind.
+export const COURSE_RECORDING_KIND = 'part3';
 
 export const LESSON_TEST_QUESTION_COUNT = LESSON_TEST_PARTS.reduce((total, part) => total + part.questionCount, 0);
+
+// The upload limit of one media file as the editor states it (D125): the
+// default of content-service (a mock-test part can be one long recording);
+// MEDIA_MAX_FILE_SIZE_BYTES in .env may lower what the service accepts.
+export const MEDIA_MAX_FILE_SIZE_BYTES = 40 * 1024 * 1024;
 
 // A unit needs this many published lessons before it can be published (D55).
 export const MIN_PUBLISHED_LESSONS_PER_UNIT = 1;
@@ -316,4 +334,41 @@ export const ContentResponseCode = Object.freeze({
   EXAM_TYPE_INVALID: 45,
   LISTENING_TOPIC_INVALID: 46,
   SPEECH_UNAVAILABLE: 47,
+  // Learners already have results for it (D118): unpublish instead of deleting.
+  CONTENT_IN_USE: 48,
+});
+
+// What learner results can refer to (D118); learning-service counts them so
+// the gateway refuses to delete content that was used.
+export const ContentUsageKind = Object.freeze({
+  // A unit itself: the attempts at its review (D121).
+  UNIT: 'unit',
+  // One stored version (D128): the attempts that were taken on it and are
+  // reviewed against it. A listening exercise version is never referenced.
+  LESSON_VERSION: 'lessonVersion',
+  MOCK_VERSION: 'mockVersion',
+  UNIT_REVIEW_VERSION: 'unitReviewVersion',
+  COURSE_VERSION: 'courseVersion',
+  LISTENING_VERSION: 'listeningVersion',
+  LESSON: 'lesson',
+  MOCK_TEST: 'mockTest',
+  LISTENING_EXERCISE: 'listeningExercise',
+  // A topic of the Listening course (D145): the learners who completed it.
+  COURSE_TOPIC: 'courseTopic',
+  COURSE_TEST: 'courseTest'
+});
+
+// A media file uploaded but referenced by no version is left alone this long,
+// so an editor still saving is not swept.
+export const ORPHAN_MEDIA_GRACE_MS = 60 * 60 * 1000;
+
+// Versioned content whose history a Content Manager can browse and restore
+// (D122): the owner id is the lesson, mock test, exercise, course item or
+// unit; versions are listed newest first.
+export const ContentVersionKind = Object.freeze({
+  LESSON: 'lesson',
+  MOCK_TEST: 'mockTest',
+  LISTENING_EXERCISE: 'listeningExercise',
+  COURSE_ITEM: 'courseItem',
+  UNIT_REVIEW: 'unitReview',
 });

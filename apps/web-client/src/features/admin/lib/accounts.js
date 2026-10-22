@@ -1,4 +1,4 @@
-import { AccountAuditAction, AccountStatus, AdminAccountSort, ADMIN_STATS_DAYS } from '@appenglish/auth-contracts';
+import { AccountAuditAction, AccountRole, AccountStatus, AdminAccountAction, AdminAccountSort, ADMIN_STATS_DAYS } from '@appenglish/auth-contracts';
 
 // Pure rules of the admin account pages (F01B, D114).
 
@@ -47,6 +47,18 @@ export function auditDescription(audit, labels = { status: statusLabels, role: {
       return 'Profile picture removed';
     case AccountAuditAction.DISPLAY_NAME_RESET:
       return 'Display name reset';
+    case AccountAuditAction.ACCOUNT_INVITED:
+      return `Invited as ${role(audit.nextRole)}`;
+    case AccountAuditAction.INVITE_RESENT:
+      return 'Invitation sent again';
+    case AccountAuditAction.INVITE_ACCEPTED:
+      return 'Accepted the invitation and chose a password';
+    case AccountAuditAction.VERIFICATION_RESENT:
+      return 'Verification code sent again';
+    case AccountAuditAction.ACCOUNT_ACTIVATED:
+      return 'Activated without the verification code';
+    case AccountAuditAction.PLACEMENT_RESET:
+      return 'Placement test reset';
     default:
       return audit.action;
   }
@@ -88,4 +100,40 @@ export function timeAgo(iso, now = new Date()) {
   if (days < 30) return `${days} day${days === 1 ? '' : 's'} ago`;
   const months = Math.floor(days / 30);
   return `${months} month${months === 1 ? '' : 's'} ago`;
+}
+
+// A pending account created by an admin, waiting for the person to accept
+// the invitation (D131).
+export function isInvitedPending(account) {
+  return account?.status === AccountStatus.PENDING_VERIFICATION && Boolean(account.invitedAt);
+}
+
+// The one-off actions that make sense for an account right now (D131), in
+// menu order. Picture and name moderation stay on the account page.
+export function availableActions(account) {
+  if (!account) return [];
+  const pending = account.status === AccountStatus.PENDING_VERIFICATION;
+  const invited = isInvitedPending(account);
+  const actions = [];
+  if (pending && invited) actions.push(AdminAccountAction.RESEND_INVITE);
+  if (pending && !invited) actions.push(AdminAccountAction.RESEND_VERIFICATION, AdminAccountAction.ACTIVATE);
+  if (account.status === AccountStatus.ACTIVE) actions.push(AdminAccountAction.SEND_PASSWORD_RESET);
+  actions.push(AdminAccountAction.REVOKE_SESSIONS);
+  if (account.role === AccountRole.STUDENT) actions.push(AdminAccountAction.RESET_PLACEMENT);
+  return actions;
+}
+
+// The statuses the status menu of a row offers (D131): where the account can
+// go from here. A pending account is activated through the ACTIVATE action.
+export function statusChoices(account) {
+  switch (account?.status) {
+    case AccountStatus.ACTIVE:
+      return [AccountStatus.SUSPENDED, AccountStatus.DISABLED];
+    case AccountStatus.SUSPENDED:
+      return [AccountStatus.ACTIVE, AccountStatus.DISABLED];
+    case AccountStatus.DISABLED:
+      return [AccountStatus.ACTIVE, AccountStatus.SUSPENDED];
+    default:
+      return [];
+  }
 }

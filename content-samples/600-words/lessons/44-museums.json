@@ -1,0 +1,260 @@
+{
+  "number": 44,
+  "title": "Museums",
+  "vocabulary": [
+    {
+      "word": "acquire",
+      "partOfSpeech": "verb",
+      "meaning": "mua lại, có được, thu được",
+      "example": "The museum acquired two rare maps at an auction last month.",
+      "exampleMeaning": "Bảo tàng đã mua được hai tấm bản đồ hiếm tại một phiên đấu giá tháng trước."
+    },
+    {
+      "word": "admire",
+      "partOfSpeech": "verb",
+      "meaning": "ngưỡng mộ, chiêm ngưỡng, khen ngợi",
+      "example": "Visitors stood quietly to admire the glass ceiling of the main hall.",
+      "exampleMeaning": "Du khách đứng lặng để chiêm ngưỡng trần kính của sảnh chính."
+    },
+    {
+      "word": "collection",
+      "partOfSpeech": "noun",
+      "meaning": "bộ sưu tập; việc thu gom, thu tiền",
+      "example": "The museum's collection of old farm tools is the largest in the region.",
+      "exampleMeaning": "Bộ sưu tập nông cụ cũ của bảo tàng là bộ lớn nhất trong vùng."
+    },
+    {
+      "word": "criticism",
+      "partOfSpeech": "noun",
+      "meaning": "sự phê bình, sự chỉ trích; lời phê bình",
+      "example": "The new entrance fee drew criticism from local teachers who bring students every year.",
+      "exampleMeaning": "Mức phí vào cửa mới bị các giáo viên địa phương hay dẫn học sinh đến hằng năm chỉ trích."
+    },
+    {
+      "word": "express",
+      "partOfSpeech": "verb",
+      "meaning": "diễn đạt, bày tỏ; (tính từ) nhanh, hỏa tốc",
+      "example": "Many visitors expressed their thanks in the guest book near the exit.",
+      "exampleMeaning": "Nhiều du khách bày tỏ lời cảm ơn trong sổ lưu niệm đặt gần lối ra."
+    },
+    {
+      "word": "fashion",
+      "partOfSpeech": "noun",
+      "meaning": "thời trang; cách thức, kiểu cách",
+      "example": "The textile gallery traces three centuries of fashion through clothing worn by ordinary families.",
+      "exampleMeaning": "Phòng trưng bày dệt may kể lại ba thế kỷ thời trang qua quần áo của những gia đình bình thường."
+    },
+    {
+      "word": "leisure",
+      "partOfSpeech": "noun",
+      "meaning": "thời gian rảnh rỗi, sự nhàn rỗi",
+      "example": "The survey asked how residents spend their leisure time on weekends.",
+      "exampleMeaning": "Cuộc khảo sát hỏi cư dân dành thời gian rảnh cuối tuần như thế nào."
+    },
+    {
+      "word": "respond",
+      "partOfSpeech": "verb",
+      "meaning": "trả lời, phản hồi; phản ứng",
+      "example": "The curator responded to every question from the group of students.",
+      "exampleMeaning": "Người phụ trách bảo tàng đã trả lời mọi câu hỏi của nhóm học sinh."
+    },
+    {
+      "word": "schedule",
+      "partOfSpeech": "noun",
+      "meaning": "lịch trình, thời gian biểu; (động từ) lên lịch",
+      "example": "The schedule of guided tours is printed on the back of the ticket.",
+      "exampleMeaning": "Lịch các tour có hướng dẫn viên được in ở mặt sau vé."
+    },
+    {
+      "word": "significant",
+      "partOfSpeech": "adjective",
+      "meaning": "quan trọng, đáng kể",
+      "example": "The donation was significant enough to pay for a new gallery wing.",
+      "exampleMeaning": "Khoản quyên góp đủ lớn để chi trả cho một cánh trưng bày mới."
+    },
+    {
+      "word": "specialize",
+      "partOfSpeech": "verb",
+      "meaning": "chuyên về, chuyên môn hóa",
+      "example": "The small museum specializes in the history of printing and paper.",
+      "exampleMeaning": "Bảo tàng nhỏ này chuyên về lịch sử ngành in và giấy."
+    },
+    {
+      "word": "spectrum",
+      "partOfSpeech": "noun",
+      "meaning": "phổ, dải; phạm vi rộng (ý kiến, đối tượng)",
+      "example": "The exhibition attracted a wide spectrum of visitors, from schoolchildren to retired engineers.",
+      "exampleMeaning": "Triển lãm thu hút đủ mọi thành phần khách, từ học sinh đến các kỹ sư đã nghỉ hưu."
+    }
+  ],
+  "fillIn": {
+    "passage": "The Harrowgate Maritime Museum ___ in the history of fishing and shipbuilding along the northern coast. Two years ago its director, Mr. Lindqvist, decided that the museum needed a wider ___ of visitors, not only retired sailors. He began by studying how local families spend their ___ time and found that most of them had never visited.\n\nThe first change was the ___: the museum now opens late on Thursdays and offers free entry on the first Sunday of each month. Next, Mr. Lindqvist ___ a set of old photographs showing dock workers and their families, which gave the ___ a more human face. A new gallery displays the ___ of the port through the years, from heavy wool coats to the bright jackets of today's crews.\n\nNot everyone was pleased. Some long-time members ___ concern that the museum was losing its serious character, and a local newspaper published sharp ___. Mr. Lindqvist ___ by inviting the writers to a private tour, and most of them left ___ the care that had gone into the new displays. Visitor numbers rose by a ___ forty percent in the first year.",
+    "answers": ["specializes", "spectrum", "leisure", "schedule", "acquired", "collection", "fashions", "expressed", "criticism", "responded", "admiring", "significant"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nhóm du khách đứng trong phòng trưng bày của bảo tàng, nhìn một bức tranh lớn trên tường; một hướng dẫn viên nữ đang chỉ tay vào bức tranh.",
+      "options": [
+        "A guide is pointing at a painting.",
+        "Visitors are buying tickets at the entrance.",
+        "A woman is hanging a picture on the wall.",
+        "The gallery floor is being cleaned."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy hướng dẫn viên đang chỉ vào bức tranh trước nhóm khách. (C) nhầm hành động chỉ tay với treo tranh; (B) và (D) không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "What time does the guided tour start?",
+        "options": ["At eleven, in the main hall.", "It costs eight dollars per person.", "Yes, I'd like to join it."],
+        "answer": "A",
+        "explanation": "Câu hỏi What time cần câu trả lời về giờ. (B) nói về giá, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Who responded to the newspaper's criticism?",
+        "options": ["The director wrote a letter yesterday.", "The newspaper comes out on Fridays.", "No, it was quite positive."],
+        "answer": "A",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người. (B) nhắc lại 'newspaper' nhưng nói về ngày phát hành, (C) trả lời No cho câu hỏi Wh."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Lena, have you seen the schedule for the autumn exhibition? The opening has been moved from October 3 to October 17.\nWoman: I saw it this morning. Is it because of the paintings we acquired from the estate sale?\nMan: Partly. They need three more weeks of cleaning before they can join the collection. But the bigger problem is the lighting in the east gallery.\nWoman: What's wrong with it?\nMan: The new lamps show a much narrower spectrum of color than we expected. The reds look brown. The supplier is sending a different model next week.\nWoman: That's a significant delay, but better than opening with poor light. Should I tell the printer to change the date on the posters?\nMan: Yes, please, and ask them to hold the catalog until we confirm the final list of works.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["A change to the exhibition opening", "A job opening at the museum", "The price of new paintings", "A visit from a supplier"],
+          "answer": "A",
+          "explanation": "Hai người nói về việc ngày khai mạc triển lãm bị lùi từ 3 tháng Mười sang 17 tháng Mười và lý do của việc đó."
+        },
+        {
+          "prompt": "What problem does the man mention about the lamps?",
+          "options": ["They are too expensive.", "They arrived late.", "They show colors poorly.", "They use too much electricity."],
+          "answer": "C",
+          "explanation": "Anh ấy nói đèn mới 'show a much narrower spectrum of color' và màu đỏ trông thành nâu."
+        },
+        {
+          "prompt": "What will the woman most likely do next?",
+          "options": ["Clean the paintings", "Contact the printer", "Order new lamps", "Write the catalog"],
+          "answer": "B",
+          "explanation": "Cô ấy hỏi 'Should I tell the printer to change the date on the posters?' và người đàn ông đồng ý."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Welcome to the Oakhurst Museum of Everyday Life. My name is Daniel, and I'll be your guide for the next forty-five minutes. Unlike most museums in the city, we specialize in objects that ordinary families used at home and at work: kitchen tools, school desks, bicycles and radios. We'll begin in the Fashion Hall, where you can admire two hundred years of working clothes, from heavy linen aprons to the first factory uniforms. Then we'll move to the Leisure Gallery, which shows how people spent their free time before television: board games, gardening tools and musical instruments. When this gallery opened, it received some criticism for having too few labels, and we responded by adding audio guides, which you can borrow free of charge at the front desk. Please feel free to express any questions as we go. Photographs are allowed everywhere except in the textile rooms. Let's begin.",
+      "questions": [
+        {
+          "prompt": "What makes the museum different from others in the city?",
+          "options": ["It is the oldest.", "It focuses on everyday objects.", "It has no entrance fee.", "It is open at night."],
+          "answer": "B",
+          "explanation": "Người hướng dẫn nói 'Unlike most museums in the city, we specialize in objects that ordinary families used'."
+        },
+        {
+          "prompt": "What is shown in the Leisure Gallery?",
+          "options": ["Working clothes", "Kitchen tools", "Things people used in their free time", "Old factory machines"],
+          "answer": "C",
+          "explanation": "Phòng Leisure Gallery 'shows how people spent their free time before television'. Quần áo lao động nằm ở Fashion Hall."
+        },
+        {
+          "prompt": "How did the museum respond to the criticism?",
+          "options": ["It added audio guides.", "It lowered its prices.", "It closed the gallery.", "It hired more guides."],
+          "answer": "A",
+          "explanation": "'we responded by adding audio guides, which you can borrow free of charge'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The museum hopes to _____ a complete set of the artist's early sketches.",
+        "options": ["acquire", "acquisition", "acquired", "acquiring"],
+        "answer": "A",
+        "explanation": "Sau 'hopes to' cần động từ nguyên mẫu: 'acquire' (mua lại, có được)."
+      },
+      {
+        "prompt": "The exhibit's design received high praise, but the entrance fee drew sharp _____.",
+        "options": ["criticize", "critical", "criticism", "critically"],
+        "answer": "C",
+        "explanation": "Sau tính từ 'sharp' và động từ 'drew' cần danh từ làm tân ngữ: 'criticism' (sự chỉ trích)."
+      },
+      {
+        "prompt": "Last weekend, visitors _____ strongly to the new interactive displays.",
+        "options": ["respond", "responded", "response", "responsive"],
+        "answer": "B",
+        "explanation": "'Last weekend' cho biết thì quá khứ đơn: 'responded to' (phản ứng với)."
+      },
+      {
+        "prompt": "The gallery _____ in prints and drawings from the nineteenth century.",
+        "options": ["special", "specialist", "specializes", "specially"],
+        "answer": "C",
+        "explanation": "Câu cần động từ chính cho chủ ngữ số ít 'The gallery': 'specializes in' (chuyên về)."
+      },
+      {
+        "prompt": "A _____ number of visitors come from outside the city on weekends.",
+        "options": ["signify", "significance", "significant", "significantly"],
+        "answer": "C",
+        "explanation": "Trước danh từ 'number' cần tính từ: 'significant' (đáng kể)."
+      },
+      {
+        "prompt": "The guest book allows visitors to _____ their opinions about the exhibitions.",
+        "options": ["express", "expression", "expressive", "expressly"],
+        "answer": "A",
+        "explanation": "Cấu trúc 'allow someone to do' cần động từ nguyên mẫu: 'express' (bày tỏ)."
+      }
+    ],
+    "part6": {
+      "passage": "Dear Member,\n\nThe spring ___ of events is now on our website, and printed copies will be mailed next week. Highlights include evening openings every Friday, when members can visit at their ___ without the weekend crowds, and a new sculpture garden opening on April 12. Members are also invited to a preview on April 10 to ___ the garden before the public opening. Please bring your membership card. For questions about any event, reply to this email or call 555-0167.\n\nBest regards,\nIngrid Solberg\nMembership Office",
+      "questions": [
+        {
+          "options": ["schedule", "scheduled", "scheduling", "scheduler"],
+          "answer": "A",
+          "explanation": "Sau 'The spring' cần danh từ làm chủ ngữ: 'schedule' (lịch sự kiện)."
+        },
+        {
+          "options": ["leisure", "leisurely", "leisured", "leisureliness"],
+          "answer": "A",
+          "explanation": "'at their leisure' là cụm cố định nghĩa là khi rảnh, không vội; sau 'their' cần danh từ."
+        },
+        {
+          "options": ["admire", "admiration", "admirable", "admired"],
+          "answer": "A",
+          "explanation": "Sau 'to' chỉ mục đích cần động từ nguyên mẫu: 'admire' (chiêm ngưỡng)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "CITY NEWS - Arts\n\nRiverbend Design Museum to Reopen with Expanded Collection\n\nThe Riverbend Design Museum will reopen on June 6 after a nine-month renovation. The museum, which specializes in furniture and household design, has acquired more than three hundred new objects during the closure, including a significant group of chairs made by local workshops between 1920 and 1960.\n\n\"We wanted the collection to show the full spectrum of design in this region, not only the famous names,\" said director Paulo Ferreira. The new galleries will also include a small fashion section, with clothing designed by the same workshops.\n\nThe renovation was not without criticism. Some residents complained about the long closure and the higher ticket price, which rises from 9 to 12 dollars. Mr. Ferreira responded that the museum will now be free for anyone under eighteen and for everyone on the last Friday of every month.\n\nOpening weekend events include talks by three designers and a workshop for children. Visitors are asked to book a free time slot online, as the museum expects large crowds. Members may express interest in a private tour by calling 555-0199 before May 30.",
+      "questions": [
+        {
+          "prompt": "What is the main purpose of the article?",
+          "options": ["To review a new furniture shop", "To announce the reopening of a museum", "To report a change of director", "To describe a design competition"],
+          "answer": "B",
+          "explanation": "Bài báo đưa tin bảo tàng mở cửa trở lại ngày 6 tháng Sáu sau chín tháng cải tạo, cùng các thay đổi kèm theo."
+        },
+        {
+          "prompt": "What did the museum do during the closure?",
+          "options": ["It moved to a new building.", "It added many objects to its collection.", "It lowered its ticket price.", "It hired three designers."],
+          "answer": "B",
+          "explanation": "'has acquired more than three hundred new objects during the closure'."
+        },
+        {
+          "prompt": "What is stated about ticket prices?",
+          "options": ["They will stay at 9 dollars.", "They will rise to 12 dollars.", "They are free for everyone on Fridays.", "They are decided by members."],
+          "answer": "B",
+          "explanation": "'the higher ticket price, which rises from 9 to 12 dollars'. Miễn phí cho mọi người chỉ áp dụng vào thứ Sáu cuối tháng."
+        },
+        {
+          "prompt": "Who can enter the museum free of charge at any time?",
+          "options": ["Local residents", "Designers", "People under eighteen", "Members only"],
+          "answer": "C",
+          "explanation": "Giám đốc cho biết 'the museum will now be free for anyone under eighteen'."
+        },
+        {
+          "prompt": "What are visitors asked to do before coming on opening weekend?",
+          "options": ["Reserve a time slot online", "Call the director", "Buy a membership", "Attend a workshop"],
+          "answer": "A",
+          "explanation": "'Visitors are asked to book a free time slot online, as the museum expects large crowds.'"
+        }
+      ]
+    }
+  }
+}

@@ -32,6 +32,7 @@ import { ContentClient } from './placement/content.client.js';
 import { PlacementGrpcController } from './placement/placement.grpc.controller.js';
 import { PlacementRepository } from './placement/placement.repository.js';
 import { PlacementService } from './placement/placement.service.js';
+import { USAGE_REPOSITORY, UsageGrpcController, UsageRepository } from './usage/usage.grpc.controller.js';
 
 export class AppModule {}
 Module({
@@ -40,7 +41,7 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, CourseGrpcController],
+  controllers: [HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, CourseGrpcController, UsageGrpcController],
   providers: [
     { provide: LEARNING_DATA_SOURCE, useFactory: createLearningDataSource },
     {
@@ -56,6 +57,11 @@ Module({
     {
       provide: MOCK_REPOSITORY,
       useFactory: (dataSource) => new MockRepository(dataSource),
+      inject: [LEARNING_DATA_SOURCE],
+    },
+    {
+      provide: USAGE_REPOSITORY,
+      useFactory: (dataSource) => new UsageRepository(dataSource),
       inject: [LEARNING_DATA_SOURCE],
     },
     {

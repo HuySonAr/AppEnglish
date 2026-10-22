@@ -3,10 +3,21 @@ import { createMemoryRepository, placementPaper } from './helpers.js';
 
 // In-memory stand-in for LessonRepository.
 export function createLessonRepository() {
-  const tables = { progress: [], attempts: [] };
+  const tables = { progress: [], attempts: [], reviewAttempts: [] };
   const copy = (row) => (row ? structuredClone(row) : null);
   return {
     tables,
+    async listReviewAttempts(accountId, unitId) {
+      return tables.reviewAttempts
+        .filter((row) => row.accountId === accountId && (!unitId || row.unitId === unitId))
+        .sort((a, b) => a.unitId.localeCompare(b.unitId) || a.attemptNumber - b.attemptNumber)
+        .map(copy);
+    },
+    async createReviewAttempt(attempt) {
+      const stored = { id: randomUUID(), ...structuredClone(attempt) };
+      tables.reviewAttempts.push(stored);
+      return copy(stored);
+    },
     async listProgress(accountId) {
       return tables.progress.filter((row) => row.accountId === accountId).map(copy);
     },
@@ -100,13 +111,38 @@ export function lessonPaper(lesson, unit, { versionNumber = 1, wordCount = 5 } =
   };
 }
 
+// A published unit review as content-service returns it (D121, D129): 10
+// Part 5 questions and 3 Part 6 passages of 3; the first option is correct.
+export function reviewPaper(unit, { versionNumber = 1 } = {}) {
+  const options = () => Array.from({ length: 4 }, (_, index) => ({ id: randomUUID(), text: `Option ${index + 1}`, isCorrect: index === 0 }));
+  const question = (fields) => ({ id: randomUUID(), prompt: '', audioMediaId: null, transcript: '', imageMediaId: null, groupId: null, explanation: 'Secret explanation', options: options(), ...fields });
+  const groups = [1, 2, 3].map((number) => ({ id: randomUUID(), audioMediaId: null, transcript: '', passage: `Passage ${number}: ___ ___ ___.`, imageMediaId: null }));
+  return {
+    unit: { id: unit.id, title: unit.title },
+    versionId: randomUUID(),
+    versionNumber,
+    test: {
+      part5: { audioMediaId: null, transcript: '', passage: '', imageMediaId: null, groups: [], questions: Array.from({ length: 10 }, (_, index) => question({ prompt: `Sentence ${index + 1}?` })) },
+      part6: { audioMediaId: null, transcript: '', passage: '', imageMediaId: null, groups, questions: groups.flatMap((group) => Array.from({ length: 3 }, () => question({ groupId: group.id }))) },
+    },
+  };
+}
+
+// Answers of a unit review with the first `correct` questions right.
+export function reviewAnswers(paper, correct) {
+  const questions = [...paper.test.part5.questions, ...paper.test.part6.questions];
+  return Object.fromEntries(questions.map((question, index) => [question.id, question.options[index < correct ? 0 : 1].id]));
+}
+
 // Content-service stand-in with a curriculum of `shape` lessons per unit,
-// e.g. [2, 2] is two units of two lessons.
-export function createCurriculum(shape = [2, 2]) {
+// e.g. [2, 2] is two units of two lessons. reviews lists the (0-based) units
+// that have a published review (D121).
+export function createCurriculum(shape = [2, 2], { reviews = [] } = {}) {
   const units = shape.map((count, unitIndex) => ({
     id: randomUUID(),
     title: `Unit ${unitIndex + 1}`,
     description: '',
+    reviewVersionId: null,
     lessons: Array.from({ length: count }, (_, lessonIndex) => ({
       id: randomUUID(),
       title: `U${unitIndex + 1}L${lessonIndex + 1}`,
@@ -114,10 +150,27 @@ export function createCurriculum(shape = [2, 2]) {
   }));
   const papers = new Map();
   const versions = new Map();
+  const reviewPapers = new Map();
   const client = {
     units,
     lessons: units.flatMap((unit) => unit.lessons),
     paperOf: (lessonId) => papers.get(lessonId),
+    reviewOf: (unitId) => reviewPapers.get(unitId),
+    // Publishes (a new version of) the review of a unit.
+    publishReview(unitId) {
+      const unit = units.find((item) => item.id === unitId);
+      const paper = reviewPaper(unit, { versionNumber: (reviewPapers.get(unitId)?.versionNumber || 0) + 1 });
+      reviewPapers.set(unitId, paper);
+      unit.reviewVersionId = paper.versionId;
+      return paper;
+    },
+    unpublishReview(unitId) {
+      units.find((item) => item.id === unitId).reviewVersionId = null;
+    },
+    async getUnitReviewPaper(unitId) {
+      const unit = units.find((item) => item.id === unitId);
+      return unit?.reviewVersionId ? structuredClone(reviewPapers.get(unitId)) : null;
+    },
     // Publishes a new version of a lesson.
     republish(lessonId) {
       const unit = units.find((item) => item.lessons.some((lesson) => lesson.id === lessonId));
@@ -139,6 +192,7 @@ export function createCurriculum(shape = [2, 2]) {
     },
   };
   for (const lesson of client.lessons) client.republish(lesson.id);
+  for (const index of reviews) client.publishReview(units[index].id);
   return client;
 }
 

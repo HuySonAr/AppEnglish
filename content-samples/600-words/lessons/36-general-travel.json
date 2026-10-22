@@ -1,0 +1,260 @@
+{
+  "number": 36,
+  "title": "General Travel",
+  "vocabulary": [
+    {
+      "word": "agent",
+      "partOfSpeech": "noun",
+      "meaning": "đại lý; nhân viên đại lý (du lịch, hãng vận chuyển)",
+      "example": "Our travel agent found a cheaper flight that leaves two hours later.",
+      "exampleMeaning": "Nhân viên đại lý du lịch của chúng tôi tìm được một chuyến bay rẻ hơn khởi hành muộn hai giờ."
+    },
+    {
+      "word": "announcement",
+      "partOfSpeech": "noun",
+      "meaning": "thông báo, lời thông báo (qua loa, văn bản)",
+      "example": "Passengers should listen for an announcement about the new gate number.",
+      "exampleMeaning": "Hành khách nên lắng nghe thông báo về số cửa ra máy bay mới."
+    },
+    {
+      "word": "beverage",
+      "partOfSpeech": "noun",
+      "meaning": "đồ uống, thức uống",
+      "example": "Hot beverages are served free of charge on all morning flights.",
+      "exampleMeaning": "Đồ uống nóng được phục vụ miễn phí trên mọi chuyến bay buổi sáng."
+    },
+    {
+      "word": "blanket",
+      "partOfSpeech": "noun",
+      "meaning": "chăn, mền",
+      "example": "The flight attendant brought an extra blanket to the passenger in seat 14C.",
+      "exampleMeaning": "Tiếp viên mang thêm một chiếc chăn cho hành khách ở ghế 14C."
+    },
+    {
+      "word": "board",
+      "partOfSpeech": "verb",
+      "meaning": "lên (máy bay, tàu, xe)",
+      "example": "Business travelers with priority tickets may board the plane first.",
+      "exampleMeaning": "Khách doanh nhân có vé ưu tiên có thể lên máy bay trước."
+    },
+    {
+      "word": "claim",
+      "partOfSpeech": "verb",
+      "meaning": "nhận lại (hành lý); đòi, yêu cầu (bồi thường, quyền lợi)",
+      "example": "After landing, passengers can claim their suitcases at carousel number six.",
+      "exampleMeaning": "Sau khi hạ cánh, hành khách có thể nhận lại va li tại băng chuyền số sáu."
+    },
+    {
+      "word": "delay",
+      "partOfSpeech": "noun",
+      "meaning": "sự chậm trễ, sự trì hoãn; (v) làm chậm, trì hoãn",
+      "example": "A two-hour delay at the airport made Mr. Okafor miss his connecting train.",
+      "exampleMeaning": "Việc chậm trễ hai giờ ở sân bay khiến ông Okafor lỡ chuyến tàu nối chuyến."
+    },
+    {
+      "word": "depart",
+      "partOfSpeech": "verb",
+      "meaning": "khởi hành, rời đi",
+      "example": "The shuttle bus to the conference center departs every thirty minutes from the main entrance.",
+      "exampleMeaning": "Xe đưa đón đến trung tâm hội nghị khởi hành mỗi ba mươi phút từ cổng chính."
+    },
+    {
+      "word": "embarkation",
+      "partOfSpeech": "noun",
+      "meaning": "việc lên tàu, lên máy bay; thủ tục lên tàu",
+      "example": "Cruise guests must complete embarkation at least ninety minutes before the ship sails.",
+      "exampleMeaning": "Khách đi du thuyền phải hoàn tất thủ tục lên tàu ít nhất chín mươi phút trước khi tàu rời bến."
+    },
+    {
+      "word": "itinerary",
+      "partOfSpeech": "noun",
+      "meaning": "lịch trình chuyến đi, hành trình",
+      "example": "The assistant emailed a detailed itinerary that listed every meeting and hotel.",
+      "exampleMeaning": "Trợ lý đã gửi email một lịch trình chi tiết liệt kê mọi cuộc họp và khách sạn."
+    },
+    {
+      "word": "prohibit",
+      "partOfSpeech": "verb",
+      "meaning": "cấm, ngăn cấm",
+      "example": "Airport rules prohibit passengers from carrying large bottles of liquid through security.",
+      "exampleMeaning": "Quy định sân bay cấm hành khách mang các chai chất lỏng lớn qua khu kiểm tra an ninh."
+    },
+    {
+      "word": "valid",
+      "partOfSpeech": "adjective",
+      "meaning": "còn hiệu lực, hợp lệ",
+      "example": "Your passport must be valid for at least six months after the date of travel.",
+      "exampleMeaning": "Hộ chiếu của bạn phải còn hiệu lực ít nhất sáu tháng sau ngày đi."
+    }
+  ],
+  "fillIn": {
+    "passage": "Last month, Priya Nair, a sales manager at Westbrook Tools, flew to a trade show in another city. Her travel ___ at Sunrise Journeys booked the flights and sent her a printed ___ with every flight time and hotel address. At the airport, Priya checked that her passport was still ___ and that her ticket matched the name on it.\n\nWhile waiting at the gate, she heard an ___ that her flight would ___ forty minutes late because of fog. A short ___ was not a problem, so she bought a hot ___ and read her notes. Security rules ___ passengers from carrying large bottles, so she had left her water behind. When the ___ time arrived, passengers with small children were invited to ___ the plane first. Once seated, Priya asked for a ___ because the cabin was cold.\n\nAfter landing, she went to the baggage hall to ___ her suitcase. It arrived quickly, and she reached the hotel in time for dinner with her new clients.",
+    "answers": ["agent", "itinerary", "valid", "announcement", "depart", "delay", "beverage", "prohibit", "embarkation", "board", "blanket", "claim"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Hành khách đang xếp hàng lên máy bay qua cầu dẫn; một nhân viên mặt đất đứng cạnh cửa kiểm tra thẻ lên máy bay.",
+      "options": [
+        "Passengers are boarding an airplane.",
+        "Passengers are claiming their luggage.",
+        "A man is painting a wooden board.",
+        "People are drinking beverages at a cafe."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy hành khách đang lên máy bay. (B) và (D) là hành động không có trong ảnh; (C) dùng 'board' với nghĩa khác (tấm ván)."
+    },
+    "part2": [
+      {
+        "question": "When does the next shuttle depart for the airport?",
+        "options": ["In about fifteen minutes.", "It's a large department store.", "No, I haven't packed yet."],
+        "answer": "A",
+        "explanation": "Câu hỏi When cần câu trả lời về thời gian. (B) nhầm âm 'depart' với 'department', (C) trả lời No cho câu hỏi Wh."
+      },
+      {
+        "question": "Is my ticket still valid for tomorrow's flight?",
+        "options": ["Yes, as long as you check in on time.", "The valley is beautiful in spring.", "I'd like a window seat."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về hiệu lực của vé; (A) trả lời Yes kèm điều kiện. (B) nhầm âm 'valid' với 'valley', (C) không liên quan."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Excuse me, I just heard an announcement about flight 482 to Harbor City, but I couldn't understand it. Is there a delay?\nMan: Yes, I'm afraid so. The aircraft arrived late, so we'll begin boarding about fifty minutes later than planned.\nWoman: Oh no. I have a connecting train at six, and my itinerary doesn't leave much time.\nMan: I understand. If you miss the connection, the airline will rebook you on the next train at no charge. Just keep your boarding pass as proof.\nWoman: That's good to know. One more thing: may I bring this bottle of juice on board?\nMan: Beverages bought inside the terminal are fine. Only liquids from outside security are prohibited.\nWoman: Great. I'll wait near the gate, then.\nMan: Please do. We'll make another announcement when embarkation starts.",
+      "questions": [
+        {
+          "prompt": "Why is the flight delayed?",
+          "options": ["The weather is bad.", "The plane arrived late.", "A passenger is missing.", "The gate has changed."],
+          "answer": "B",
+          "explanation": "Người đàn ông giải thích 'The aircraft arrived late', nên việc lên máy bay bị lùi khoảng năm mươi phút."
+        },
+        {
+          "prompt": "What is the woman worried about?",
+          "options": ["Losing her boarding pass", "Paying for a new ticket", "Missing a train connection", "Finding her luggage"],
+          "answer": "C",
+          "explanation": "Cô ấy nói 'I have a connecting train at six, and my itinerary doesn't leave much time', tức lo lỡ chuyến tàu nối chuyến."
+        },
+        {
+          "prompt": "What does the man say about the juice?",
+          "options": ["It must be thrown away.", "It can be taken on the plane.", "It is free on the flight.", "It must be checked in."],
+          "answer": "B",
+          "explanation": "Anh ấy nói 'Beverages bought inside the terminal are fine', nghĩa là đồ uống mua trong nhà ga được mang lên máy bay."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good afternoon, and welcome aboard the Coral Wind ferry service to Mariner's Island. This is your captain speaking. We will depart from the pier in approximately ten minutes, and the crossing will take about two hours. There is a short delay this afternoon because of strong wind at the harbor entrance, so we expect to arrive at four fifteen rather than four o'clock. During the trip, hot and cold beverages are available at the snack bar on the upper deck, and blankets can be borrowed from the crew desk if you feel cold outside. Please note that smoking is prohibited everywhere on the ship. When we arrive, passengers who checked large bags at embarkation can claim them at the counter beside the exit ramp. Please have your ticket ready, as it must be shown again when you leave. Thank you for traveling with Coral Wind, and enjoy the crossing.",
+      "questions": [
+        {
+          "prompt": "Where is the announcement most likely being made?",
+          "options": ["On a train", "On a ship", "At a hotel", "In an airport lounge"],
+          "answer": "B",
+          "explanation": "Người nói là thuyền trưởng của 'the Coral Wind ferry service' và nhắc đến 'the pier', 'the crossing', 'the ship'."
+        },
+        {
+          "prompt": "Why will the ferry arrive later than scheduled?",
+          "options": ["The crew is short-staffed.", "Wind is strong at the harbor.", "The snack bar is not ready.", "Many bags were checked."],
+          "answer": "B",
+          "explanation": "Bài nói nêu 'a short delay this afternoon because of strong wind at the harbor entrance'."
+        },
+        {
+          "prompt": "What are passengers asked to do when they leave the ship?",
+          "options": ["Return their blankets to their seats", "Show their tickets", "Pay for their beverages", "Fill out a claim form"],
+          "answer": "B",
+          "explanation": "Cuối bài: 'Please have your ticket ready, as it must be shown again when you leave.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Our travel _____, Ms. Lopez, recommended a hotel close to the conference center.",
+        "options": ["agent", "agency", "agenda", "agents"],
+        "answer": "A",
+        "explanation": "Chủ ngữ là một người có tên 'Ms. Lopez' nên cần danh từ số ít chỉ người: 'agent'. 'agency' là tổ chức, 'agenda' là chương trình họp."
+      },
+      {
+        "prompt": "The airline made an _____ about the gate change over the loudspeaker.",
+        "options": ["announce", "announcement", "announced", "announcing"],
+        "answer": "B",
+        "explanation": "Sau mạo từ 'an' cần danh từ: 'announcement'. 'make an announcement' là cụm cố định."
+      },
+      {
+        "prompt": "Flights to the coast _____ from Terminal 2 every morning at six.",
+        "options": ["departure", "departs", "depart", "departing"],
+        "answer": "C",
+        "explanation": "Chủ ngữ 'Flights' số nhiều, thì hiện tại đơn diễn tả lịch cố định, nên động từ là 'depart' không thêm -s."
+      },
+      {
+        "prompt": "Passengers whose luggage is damaged should _____ compensation within seven days.",
+        "options": ["claim", "claims", "claiming", "claimed"],
+        "answer": "A",
+        "explanation": "Sau 'should' cần động từ nguyên mẫu: 'claim compensation' nghĩa là yêu cầu bồi thường."
+      },
+      {
+        "prompt": "This boarding pass is _____ only for the flight and date printed on it.",
+        "options": ["valid", "validity", "validate", "validly"],
+        "answer": "A",
+        "explanation": "Sau động từ 'is' cần tính từ làm vị ngữ: 'valid' (có hiệu lực)."
+      },
+      {
+        "prompt": "Because of a long _____ at the border, the bus reached the hotel after midnight.",
+        "options": ["delay", "delayed", "delaying", "delays"],
+        "answer": "A",
+        "explanation": "Sau 'a long' cần danh từ số ít: 'delay'. 'delays' số nhiều không đi với 'a'."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Staff Traveling to the Regional Sales Meeting\nFrom: Dana Whitfield, Travel Coordinator\nSubject: Final travel details\n\nAttached you will find your personal ___ for next week's trip, including flight numbers, hotel addresses and the schedule of meetings. Please check that your identity card is ___ for the whole period of travel; several airlines now refuse to let passengers board with documents that expire within a month. Our group flight will ___ at 7:20 a.m. on Monday, so plan to be at the airport by 5:30. Hot beverages and a light breakfast will be served on the plane. If you have any questions, call me at extension 318.",
+      "questions": [
+        {
+          "options": ["itinerary", "itineraries", "announcement", "blanket"],
+          "answer": "A",
+          "explanation": "Sau 'your personal' cần danh từ số ít chỉ tài liệu liệt kê chuyến bay, khách sạn và lịch họp: 'itinerary'."
+        },
+        {
+          "options": ["valid", "validity", "validate", "validation"],
+          "answer": "A",
+          "explanation": "Sau 'is' cần tính từ: 'valid' (còn hiệu lực). Câu sau nói về giấy tờ sắp hết hạn, khẳng định nghĩa này."
+        },
+        {
+          "options": ["depart", "departure", "departed", "departing"],
+          "answer": "A",
+          "explanation": "Sau 'will' cần động từ nguyên mẫu: 'depart'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "SUNRISE JOURNEYS TRAVEL\nBooking Confirmation - Reference SJ-20483\n\nDear Mr. Haruto Sato,\n\nThank you for booking your business trip to Port Allen with Sunrise Journeys. Your itinerary is summarized below. Contact your agent, Leila Marsh, within 48 hours if any detail is wrong.\n\n| Date | Service | Departs | Arrives |\n| June 3 | Flight BW 215 | 08:10, Northgate Airport | 10:45, Port Allen |\n| June 3 | Airport shuttle to Bayview Hotel | 11:15 | 11:50 |\n| June 6 | Flight BW 218 | 17:30, Port Allen | 20:05, Northgate Airport |\n\nImportant reminders:\n- Boarding closes 20 minutes before each flight departs. Arrive at the airport at least two hours early to allow for security checks and possible delays.\n- Your passport must be valid on both travel dates. The airline will refuse embarkation if it has expired.\n- One checked bag of up to 23 kg is included. Heavier bags are prohibited unless an extra fee is paid.\n- A hot meal and a choice of beverages are served on the outbound flight; only snacks are offered on the return flight.\n\nIf your bag is lost or damaged, keep your baggage tag and claim compensation at the airline desk before leaving the airport.\n\nLeila Marsh\nSenior Travel Agent, Sunrise Journeys",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the email?",
+          "options": ["To advertise a new flight route", "To confirm the details of a trip", "To request payment for a booking", "To announce a change of hotel"],
+          "answer": "B",
+          "explanation": "Tiêu đề là 'Booking Confirmation' và email tóm tắt lịch trình chuyến đi đã đặt của ông Sato."
+        },
+        {
+          "prompt": "By what time should Mr. Sato arrive at Northgate Airport on June 3?",
+          "options": ["6:10 a.m.", "7:50 a.m.", "8:10 a.m.", "10:45 a.m."],
+          "answer": "A",
+          "explanation": "Chuyến bay khởi hành lúc 08:10 và email yêu cầu đến sân bay 'at least two hours early', tức 6:10."
+        },
+        {
+          "prompt": "What is indicated about the return flight?",
+          "options": ["It includes a hot meal.", "It leaves in the morning.", "It serves only snacks.", "It departs from Bayview Hotel."],
+          "answer": "C",
+          "explanation": "Email ghi 'only snacks are offered on the return flight'; bữa nóng chỉ có trên chuyến đi, và chuyến về khởi hành lúc 17:30."
+        },
+        {
+          "prompt": "What should Mr. Sato do if a detail in the booking is incorrect?",
+          "options": ["Call the airline directly", "Contact Leila Marsh within two days", "Pay an extra fee at the counter", "Visit the Bayview Hotel"],
+          "answer": "B",
+          "explanation": "Đoạn đầu: 'contact your agent, Leila Marsh, within 48 hours if any detail is wrong'; 48 giờ là hai ngày."
+        },
+        {
+          "prompt": "According to the email, what must Mr. Sato do if his bag is damaged?",
+          "options": ["Buy a new bag at the airport", "Email Sunrise Journeys", "Report it at the airline desk before leaving", "Wait 48 hours for a reply"],
+          "answer": "C",
+          "explanation": "Email hướng dẫn 'claim compensation at the airline desk before leaving the airport' và giữ thẻ hành lý."
+        }
+      ]
+    }
+  }
+}

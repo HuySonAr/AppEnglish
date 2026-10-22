@@ -25,4 +25,4 @@ AppEnglish hỗ trợ học viên học và luyện Reading/Listening qua unit, 
 - Chỉ mock test cộng XP; lesson, placement, practice thường không cộng.
 
 ## Ngoài phạm vi
-Speaking, Writing (có thể mở rộng sau, D84), giáo viên, lớp học, assignment, AI grading, CEFR (trừ nhãn cấp độ A1–C2 của bài luyện nghe và các cấp của Listening course, D85, D100), streak, XP lesson/ôn tập.
+Speaking, Writing (có thể mở rộng sau, D84), giáo viên, lớp học, assignment, AI grading, CEFR (trừ nhãn cấp độ A1–C2 của bài luyện nghe và các cấp A1–C1 của Listening course, D85, D100, D141), streak, XP lesson/ôn tập.

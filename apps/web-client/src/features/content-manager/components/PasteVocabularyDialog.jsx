@@ -12,7 +12,7 @@ export function PasteVocabularyDialog({ vocabulary, onApply }) {
       id="paste-vocabulary"
       button="Paste words"
       title="Paste vocabulary"
-      description="One word per line: word | part of speech | meaning | example sentence | example translation | phonetic. The last two may be left out, and rows copied from a spreadsheet work as they are. A word already in the lesson with the same part of speech is updated and keeps its audio; pronunciation audio is still added in the editor."
+      description="One word per line: word | part of speech | meaning | example sentence | example translation | phonetic. The last two are optional; spreadsheet rows work as they are."
       label="Words"
       placeholder={example}
       notFound="No word found."

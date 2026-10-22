@@ -1,0 +1,260 @@
+{
+  "number": 11,
+  "title": "Job Advertising and Recruiting",
+  "vocabulary": [
+    {
+      "word": "abundant",
+      "partOfSpeech": "adjective",
+      "meaning": "dồi dào, phong phú, có rất nhiều",
+      "example": "Applications for the design position were abundant, so the team needed two full days to read them.",
+      "exampleMeaning": "Hồ sơ ứng tuyển vị trí thiết kế rất dồi dào, nên nhóm cần trọn hai ngày để đọc hết."
+    },
+    {
+      "word": "accomplishment",
+      "partOfSpeech": "noun",
+      "meaning": "thành tích, thành tựu đã đạt được",
+      "example": "Please list your three main accomplishments from your last job on the second page of the form.",
+      "exampleMeaning": "Vui lòng liệt kê ba thành tích chính ở công việc gần nhất của bạn vào trang hai của mẫu đơn."
+    },
+    {
+      "word": "bring together",
+      "partOfSpeech": "verb",
+      "meaning": "tập hợp, kết nối (người, nhóm) lại với nhau",
+      "example": "The job fair brings together local employers and recent graduates in one hall.",
+      "exampleMeaning": "Hội chợ việc làm tập hợp các nhà tuyển dụng địa phương và sinh viên mới tốt nghiệp trong cùng một hội trường."
+    },
+    {
+      "word": "candidate",
+      "partOfSpeech": "noun",
+      "meaning": "ứng viên, người dự tuyển",
+      "example": "Four candidates will be interviewed for the accounting position next Tuesday.",
+      "exampleMeaning": "Bốn ứng viên sẽ được phỏng vấn cho vị trí kế toán vào thứ Ba tới."
+    },
+    {
+      "word": "come up with",
+      "partOfSpeech": "verb",
+      "meaning": "nghĩ ra, đưa ra (ý tưởng, kế hoạch, giải pháp)",
+      "example": "The marketing team has come up with a short video to advertise the open positions.",
+      "exampleMeaning": "Nhóm tiếp thị đã nghĩ ra một đoạn video ngắn để quảng cáo các vị trí đang tuyển."
+    },
+    {
+      "word": "commensurate",
+      "partOfSpeech": "adjective",
+      "meaning": "tương xứng, tương ứng với",
+      "example": "The advertisement says that pay will be commensurate with experience and skills.",
+      "exampleMeaning": "Quảng cáo nói rằng mức lương sẽ tương xứng với kinh nghiệm và kỹ năng."
+    },
+    {
+      "word": "match",
+      "partOfSpeech": "verb",
+      "meaning": "phù hợp, khớp với; ghép (người) với (việc) phù hợp",
+      "example": "The agency tries to match each job seeker with a company that suits his or her skills.",
+      "exampleMeaning": "Công ty môi giới cố gắng ghép mỗi người tìm việc với một doanh nghiệp phù hợp với kỹ năng của họ."
+    },
+    {
+      "word": "profile",
+      "partOfSpeech": "noun",
+      "meaning": "bản mô tả tóm lược (về một người, vị trí hoặc công ty)",
+      "example": "Before posting the ad, the manager wrote a profile of the ideal employee for the role.",
+      "exampleMeaning": "Trước khi đăng quảng cáo, người quản lý đã viết bản mô tả về nhân viên lý tưởng cho vị trí này."
+    },
+    {
+      "word": "qualifications",
+      "partOfSpeech": "noun",
+      "meaning": "bằng cấp, trình độ chuyên môn; điều kiện đáp ứng công việc",
+      "example": "Her qualifications include a degree in logistics and five years of warehouse experience.",
+      "exampleMeaning": "Trình độ của cô ấy gồm một bằng về logistics và năm năm kinh nghiệm làm việc tại kho."
+    },
+    {
+      "word": "recruit",
+      "partOfSpeech": "verb",
+      "meaning": "tuyển dụng, tuyển mộ (nhân viên mới)",
+      "example": "The hospital plans to recruit twenty nurses before the new wing opens in June.",
+      "exampleMeaning": "Bệnh viện dự định tuyển hai mươi y tá trước khi khu nhà mới mở cửa vào tháng Sáu."
+    },
+    {
+      "word": "submit",
+      "partOfSpeech": "verb",
+      "meaning": "nộp, gửi (hồ sơ, đơn, báo cáo)",
+      "example": "Applicants should submit a resume and a cover letter before the end of the month.",
+      "exampleMeaning": "Người ứng tuyển nên nộp sơ yếu lý lịch và thư xin việc trước cuối tháng."
+    },
+    {
+      "word": "time-consuming",
+      "partOfSpeech": "adjective",
+      "meaning": "tốn nhiều thời gian",
+      "example": "Reading three hundred applications by hand was time-consuming, so we bought screening software.",
+      "exampleMeaning": "Đọc ba trăm hồ sơ bằng tay rất tốn thời gian, nên chúng tôi đã mua phần mềm sàng lọc."
+    }
+  ],
+  "fillIn": {
+    "passage": "Brightwater Furniture needs a new store manager for its branch in Elm City. The human resources director, Mr. Okafor, started by writing a ___ of the person he wanted: someone with retail experience, a calm manner and a record of real ___ in sales. He then had to ___ a job advertisement that would stand out from the dozens posted every week. The ad promised a salary ___ with experience and asked applicants to ___ a resume and a short letter by April 15.\n\nReplies were ___. More than ninety people applied in the first week, and reading every application proved ___. To save time, Mr. Okafor asked a local agency to help ___ for the position. The agency checked each applicant's ___ and sent him a list of eight people whose skills seemed to ___ the job best.\n\nNext Friday, Brightwater will ___ the eight finalists and the three regional managers for a half-day of interviews. Each ___ will present a plan for the store's first year, and the directors will make their choice by the end of the month.",
+    "answers": ["profile", "accomplishment", "come up with", "commensurate", "submit", "abundant", "time-consuming", "recruit", "qualifications", "match", "bring together", "candidate"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người đàn ông đứng trước bảng thông báo việc làm trong hành lang văn phòng, đang ghim một tờ quảng cáo tuyển dụng lên bảng.",
+      "options": [
+        "The man is posting a notice on a board.",
+        "The man is boarding a train.",
+        "The man is painting the wall.",
+        "The man is reading a newspaper at his desk."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người đàn ông đang ghim thông báo lên bảng. (B) dùng từ 'boarding' có âm gần với 'board' nhưng là hành động khác; (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How many candidates have submitted applications so far?",
+        "options": ["About forty, and more arrive every day.", "Yes, the deadline is on Friday.", "The candidate from Hillview."],
+        "answer": "A",
+        "explanation": "Câu hỏi 'How many' cần câu trả lời về số lượng. (B) trả lời Yes cho câu hỏi Wh; (C) lặp lại từ 'candidate' nhưng không nói số lượng."
+      },
+      {
+        "question": "Is the salary for this position commensurate with experience?",
+        "options": ["Yes, the pay rises with each year of experience.", "The position is on the third floor.", "I submitted it this morning."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về mức lương; (A) trả lời Yes và giải thích. (B) nhầm 'position' thành vị trí địa lý; (C) không liên quan."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Marcus, have you seen the replies to our ad for the warehouse supervisor? There are more than a hundred.\nMan: That many? Reading all of them is going to be very time-consuming. We only have until Friday to choose people for interviews.\nWoman: I know. That's why I'd like to ask Sterling Staffing to screen them. They would check qualifications and send us a shortlist of ten candidates whose skills match our needs.\nMan: How much do they charge?\nWoman: Twelve percent of the first-year salary if we hire someone they recommend. Nothing if we don't.\nMan: That's fair. Can you call them today and ask how quickly they can come up with the shortlist?\nWoman: Sure. I'll also send them the profile of the ideal candidate that we wrote last month.\nMan: Good. Let me know what they say by this afternoon.",
+      "questions": [
+        {
+          "prompt": "What problem does the man mention?",
+          "options": ["The advertisement contained an error", "There are too many applications to read quickly", "The agency is too expensive", "The deadline has already passed"],
+          "answer": "B",
+          "explanation": "Người đàn ông nói đọc hơn một trăm hồ sơ sẽ 'very time-consuming' trong khi chỉ còn đến thứ Sáu, tức quá nhiều hồ sơ để đọc kịp."
+        },
+        {
+          "prompt": "How does Sterling Staffing charge for its service?",
+          "options": ["A fixed monthly fee", "A percentage of the new employee's salary", "A fee for every application it reads", "A charge for each interview"],
+          "answer": "B",
+          "explanation": "Người phụ nữ nói công ty môi giới thu 'twelve percent of the first-year salary' nếu tuyển được người họ giới thiệu."
+        },
+        {
+          "prompt": "What will the woman send to the agency?",
+          "options": ["The job advertisement", "A list of ten candidates", "A description of the ideal candidate", "The signed contract"],
+          "answer": "C",
+          "explanation": "Cô ấy nói sẽ gửi 'the profile of the ideal candidate', tức bản mô tả ứng viên lý tưởng."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good afternoon, and welcome to the Riverbend Career Fair. This event brings together more than sixty employers and job seekers from across the region. Companies in the main hall are recruiting for positions in hospitality, logistics, health care and software, and opportunities are abundant this year: the organizers have counted over four hundred open positions. If you want to apply for a job today, please go to the registration desk near the east entrance, where our staff will print copies of your resume free of charge. Many employers will accept applications on the spot, so make sure your resume lists your qualifications and your main accomplishments clearly. At two o'clock, a career coach will give a short talk in Room B on how to write a strong application. Finally, please submit the feedback form in your welcome bag before you leave. Enjoy the fair.",
+      "questions": [
+        {
+          "prompt": "Where is the announcement most likely being made?",
+          "options": ["At a job fair", "At a company meeting", "At a university lecture", "At a hotel reception"],
+          "answer": "A",
+          "explanation": "Người nói chào mừng mọi người đến 'the Riverbend Career Fair', nơi tập hợp nhà tuyển dụng và người tìm việc."
+        },
+        {
+          "prompt": "What can visitors do at the registration desk?",
+          "options": ["Sign up for a talk", "Get copies of their resume printed", "Meet a career coach", "Collect a welcome bag"],
+          "answer": "B",
+          "explanation": "Tại bàn đăng ký, nhân viên 'will print copies of your resume free of charge'. Buổi nói chuyện diễn ra ở phòng B, không phải ở bàn đăng ký."
+        },
+        {
+          "prompt": "What are listeners asked to do before leaving?",
+          "options": ["Visit Room B", "Hand in a feedback form", "Submit a job application", "Speak to an employer"],
+          "answer": "B",
+          "explanation": "Cuối bài: 'please submit the feedback form in your welcome bag before you leave'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The agency was hired to _____ experienced engineers for the new plant.",
+        "options": ["recruitment", "recruit", "recruiter", "recruited"],
+        "answer": "B",
+        "explanation": "Sau 'to' trong cấu trúc 'was hired to' cần động từ nguyên mẫu: 'recruit'."
+      },
+      {
+        "prompt": "The successful _____ will begin work on the first of September.",
+        "options": ["candidly", "candidacy", "candidate", "candid"],
+        "answer": "C",
+        "explanation": "Cần danh từ chỉ người làm chủ ngữ cho 'will begin work'; 'the successful candidate' là cách nói quen thuộc trong tuyển dụng."
+      },
+      {
+        "prompt": "Her _____ for the role include a nursing degree and three years in a clinic.",
+        "options": ["qualifications", "qualify", "qualified", "qualifying"],
+        "answer": "A",
+        "explanation": "Sau 'Her' cần danh từ, và động từ 'include' ở dạng số nhiều nên chủ ngữ là 'qualifications'."
+      },
+      {
+        "prompt": "Interviewing every applicant in person is too _____ for a team of only two people.",
+        "options": ["timing", "timely", "time-consumer", "time-consuming"],
+        "answer": "D",
+        "explanation": "Sau 'too' cần tính từ mô tả việc phỏng vấn tốn thời gian: 'time-consuming'. 'Timely' nghĩa là đúng lúc, không hợp nghĩa."
+      },
+      {
+        "prompt": "Salaries at the firm are _____ with the responsibilities of each position.",
+        "options": ["commensuration", "commensurate", "commensurately", "commensurable"],
+        "answer": "B",
+        "explanation": "Sau 'are' cần tính từ; 'commensurate with' là cụm cố định nghĩa là tương xứng với."
+      },
+      {
+        "prompt": "Please _____ your application through the online portal before midnight on Friday.",
+        "options": ["submission", "submitted", "submit", "submitting"],
+        "answer": "C",
+        "explanation": "Câu mệnh lệnh bắt đầu bằng 'Please' cần động từ nguyên mẫu: 'submit'."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Department Heads\nFrom: Priya Nair, Human Resources\nSubject: Hiring for the autumn season\n\nHuman Resources will begin advertising next month for the positions you requested in your budget plans. To help us write effective advertisements, please send me a short ___ of each role by June 20: the main duties, the required experience and the kind of person who would fit your team. Last year, applications were ___ for sales roles but very few for technical positions, so this year we will also post technical openings on two engineering websites. Finally, remember that interviews are ___ for everyone involved; please block at least two half-days in July for them.",
+      "questions": [
+        {
+          "options": ["profile", "profiler", "profiled", "profiling"],
+          "answer": "A",
+          "explanation": "Sau 'a short' cần danh từ; 'profile' là bản mô tả tóm lược về vị trí cần tuyển."
+        },
+        {
+          "options": ["abundance", "abundant", "abundantly", "abound"],
+          "answer": "B",
+          "explanation": "Sau 'were' cần tính từ để mô tả 'applications': 'abundant' (rất nhiều), đối lập với 'very few' ở phần sau câu."
+        },
+        {
+          "options": ["time-consuming", "time-consume", "consuming time", "timed"],
+          "answer": "A",
+          "explanation": "Sau 'are' cần tính từ: 'time-consuming'. Ý câu là phỏng vấn tốn thời gian nên cần chặn lịch trước."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "CEDARWOOD HOME GOODS\nAssistant Buyer - Kitchen and Dining Department\n\nCedarwood Home Goods, a growing chain of twelve housewares stores, is recruiting an Assistant Buyer to join its head office in Port Ellis. The successful candidate will work with the senior buyer to select products, negotiate prices with suppliers and track the sales of each product line.\n\nQualifications:\n- A degree in business, marketing or a related field\n- At least two years of experience in retail purchasing\n- Strong spreadsheet skills and a good eye for home design trends\n- Willingness to travel to trade shows four to six times a year\n\nSalary is commensurate with experience; the range for this position is $42,000 to $51,000 per year, plus a staff discount and health insurance after three months.\n\nTo apply, submit a resume, a cover letter and a one-page summary of a purchasing accomplishment you are proud of. Send all three documents in a single email to the careers address on our website by Friday, May 9. Only candidates selected for an interview will be contacted; interviews will be held during the week of May 19.\n\nCedarwood Home Goods welcomes applications from all qualified people.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the advertisement?",
+          "options": ["To announce a new store opening", "To find a person for an open position", "To promote kitchen products", "To invite suppliers to a trade show"],
+          "answer": "B",
+          "explanation": "Công ty 'is recruiting an Assistant Buyer', tức đang tuyển người cho một vị trí."
+        },
+        {
+          "prompt": "What is one duty of the Assistant Buyer?",
+          "options": ["Designing kitchen products", "Managing a retail store", "Discussing prices with suppliers", "Training new sales staff"],
+          "answer": "C",
+          "explanation": "Người được tuyển sẽ 'negotiate prices with suppliers', tức thương lượng giá với nhà cung cấp."
+        },
+        {
+          "prompt": "What is a requirement for the position?",
+          "options": ["A degree in interior design", "Five years of management experience", "Experience in retail purchasing", "Fluency in a second language"],
+          "answer": "C",
+          "explanation": "Mục Qualifications ghi 'At least two years of experience in retail purchasing'. Bằng cấp yêu cầu là về kinh doanh hoặc tiếp thị, không phải thiết kế nội thất."
+        },
+        {
+          "prompt": "What does the salary depend on?",
+          "options": ["The applicant's experience", "The number of trade shows attended", "The store's monthly sales", "The applicant's age"],
+          "answer": "A",
+          "explanation": "'Salary is commensurate with experience' nghĩa là lương tương xứng với kinh nghiệm của ứng viên."
+        },
+        {
+          "prompt": "What must applicants include with their resume?",
+          "options": ["A photograph", "Two reference letters", "A description of a past achievement", "A copy of their degree"],
+          "answer": "C",
+          "explanation": "Ứng viên phải nộp 'a one-page summary of a purchasing accomplishment', tức bản tóm tắt một thành tích trong công việc mua hàng."
+        }
+      ]
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { AccountRole } from '@appenglish/auth-contracts';
-import { countBlanks } from '@appenglish/content-contracts';
+import { UNIT_REVIEW_PARTS, UNIT_REVIEW_QUESTION_COUNT, countBlanks } from '@appenglish/content-contracts';
 import {
   LESSON_PASS_PERCENT,
   LESSON_TEST_DURATION_MINUTES,
@@ -10,6 +10,7 @@ import {
   PlacementStatus,
   QuizKind,
   StepStatus,
+  UnitReviewState,
   VOCABULARY_PRACTICE_SIZE,
   lessonTestPassed,
 } from '@appenglish/learning-contracts';
@@ -26,6 +27,7 @@ import {
   shuffledOptionOrder,
   testParts,
   testProgression,
+  unitReviewAccess,
   vocabularyPractice,
   vocabularyQuiz,
   wrongBlanks,
@@ -61,19 +63,25 @@ export class LessonService {
 
   // The published curriculum and where the learner stands in it.
   async standing(actor) {
-    const [curriculum, placement, progress] = await Promise.all([
+    const [curriculum, placement, progress, reviewAttempts] = await Promise.all([
       this.contentClient.getCurriculum(),
       this.placementRepository.findAttempt(actor.id),
       this.repository.listProgress(actor.id),
+      this.repository.listReviewAttempts(actor.id),
     ]);
     // Lessons open once the placement test is taken or skipped (D35).
     const placed = Boolean(placement) && placement.status !== PlacementStatus.IN_PROGRESS;
+    const startUnit = placed ? placement.startUnit : null;
     const completed = new Set(progress.filter((row) => row.completedAt).map((row) => row.lessonId));
+    // Units whose review the learner passed (D121).
+    const passedReviews = new Set(reviewAttempts.filter((attempt) => attempt.passed).map((attempt) => attempt.unitId));
     return {
       curriculum,
       placementRequired: !placed,
-      startUnit: placed ? placement.startUnit : null,
-      access: lessonAccess(curriculum, placed ? placement.startUnit : null, completed),
+      startUnit,
+      access: lessonAccess(curriculum, startUnit, completed, passedReviews),
+      reviews: unitReviewAccess(curriculum, startUnit, completed, passedReviews),
+      reviewAttempts,
       progress: new Map(progress.map((row) => [row.lessonId, row])),
     };
   }
@@ -94,6 +102,8 @@ export class LessonService {
         number: index + 1,
         title: unit.title,
         description: unit.description,
+        // The review that closes the unit (D121), or null when it has none.
+        review: this.reviewSummary(standing, unit.id),
         lessons: unit.lessons.map((lesson) => {
           const entry = standing.access.get(lesson.id);
           return {
@@ -461,6 +471,86 @@ export class LessonService {
         { test: paper.content.test, media: paper.media },
         { optionOrder: attempt.optionOrder, answers: attempt.answers },
       ),
+    };
+  }
+
+  // ----- Unit review (D121): the untimed, 30-question Reading test that
+  // closes a unit. Scored on submit; every attempt is kept; no XP.
+
+  reviewAttemptSummary(attempt) {
+    return {
+      attemptNumber: attempt.attemptNumber,
+      correctCount: attempt.correctCount,
+      totalCount: attempt.totalCount,
+      scorePercent: percent(attempt.correctCount, attempt.totalCount),
+      passed: attempt.passed,
+      submittedAt: new Date(attempt.submittedAt).toISOString(),
+    };
+  }
+
+  // Where the learner stands with a unit's review, or null for a unit without one.
+  reviewSummary(standing, unitId) {
+    const entry = standing.reviews.get(unitId);
+    if (!entry || entry.state === UnitReviewState.NONE) return null;
+    const attempts = standing.reviewAttempts.filter((attempt) => attempt.unitId === unitId);
+    return {
+      state: entry.state,
+      questionCount: UNIT_REVIEW_QUESTION_COUNT,
+      passPercent: LESSON_PASS_PERCENT,
+      lessonsLeft: entry.lessonsLeft,
+      attemptCount: attempts.length,
+      bestPercent: attempts.length ? Math.max(...attempts.map((attempt) => percent(attempt.correctCount, attempt.totalCount))) : null,
+    };
+  }
+
+  // Loads what both review actions need and refuses a locked or missing review.
+  async openReview(actor, unitId) {
+    this.assertStudent(actor);
+    const standing = await this.standing(actor);
+    const entry = standing.reviews.get(unitId);
+    if (!entry || entry.state === UnitReviewState.NONE) throw lessonErrors.reviewNotFound();
+    if (entry.state === UnitReviewState.LOCKED) throw lessonErrors.reviewLocked(standing.placementRequired, entry.lessonsLeft);
+    const paper = await this.contentClient.getUnitReviewPaper(unitId);
+    if (!paper) throw lessonErrors.reviewNotFound();
+    return { standing, entry, paper };
+  }
+
+  // The review with the learner's attempts and the paper to work on: no
+  // answers or explanations; the options of every question are shuffled (D31).
+  async getUnitReview(actor, unitId) {
+    const { standing, entry, paper } = await this.openReview(actor, unitId);
+    const attempts = standing.reviewAttempts.filter((attempt) => attempt.unitId === unitId);
+    return {
+      unit: { id: unitId, number: entry.unitNumber, title: entry.unit.title },
+      ...this.reviewSummary(standing, unitId),
+      attempts: attempts.map((attempt) => this.reviewAttemptSummary(attempt)),
+      parts: testParts(
+        { test: paper.test, media: {} },
+        { optionOrder: shuffledOptionOrder(paper.test, this.random, UNIT_REVIEW_PARTS), partKeys: UNIT_REVIEW_PARTS },
+      ),
+    };
+  }
+
+  // Scores the answers against the current published review, keeps the
+  // attempt and returns the result with every answer explained.
+  async submitUnitReview(actor, unitId, { answers }) {
+    const { standing, paper } = await this.openReview(actor, unitId);
+    const score = scoreTest(paper.test, answers, UNIT_REVIEW_PARTS);
+    const own = standing.reviewAttempts.filter((attempt) => attempt.unitId === unitId);
+    const saved = await this.repository.createReviewAttempt({
+      accountId: actor.id,
+      unitId,
+      reviewVersionId: paper.versionId,
+      attemptNumber: own.length + 1,
+      answers,
+      totalCount: score.totalCount,
+      correctCount: score.correctCount,
+      passed: lessonTestPassed(score.correctCount, score.totalCount),
+      submittedAt: this.now(),
+    });
+    return {
+      attempt: this.reviewAttemptSummary(saved),
+      parts: testParts({ test: paper.test, media: {} }, { answers, partKeys: UNIT_REVIEW_PARTS }),
     };
   }
 

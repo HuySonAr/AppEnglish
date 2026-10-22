@@ -1,0 +1,260 @@
+{
+  "number": 35,
+  "title": "Events",
+  "vocabulary": [
+    {
+      "word": "assist",
+      "partOfSpeech": "verb",
+      "meaning": "giúp đỡ, hỗ trợ",
+      "example": "Two interns will assist the event team with registration on the morning of the conference.",
+      "exampleMeaning": "Hai thực tập sinh sẽ hỗ trợ nhóm sự kiện làm thủ tục đăng ký vào sáng ngày hội nghị."
+    },
+    {
+      "word": "coordinate",
+      "partOfSpeech": "verb",
+      "meaning": "phối hợp, điều phối",
+      "example": "Ms. Okonjo coordinates the catering, the sound system and the parking for every company event.",
+      "exampleMeaning": "Cô Okonjo điều phối dịch vụ ăn uống, hệ thống âm thanh và bãi đỗ xe cho mọi sự kiện của công ty."
+    },
+    {
+      "word": "dimension",
+      "partOfSpeech": "noun",
+      "meaning": "kích thước, chiều (dài, rộng, cao); khía cạnh",
+      "example": "Please send the dimensions of the hall so that we can arrange the seating.",
+      "exampleMeaning": "Vui lòng gửi kích thước của hội trường để chúng tôi sắp xếp chỗ ngồi."
+    },
+    {
+      "word": "exact",
+      "partOfSpeech": "adjective",
+      "meaning": "chính xác, đúng",
+      "example": "We need the exact number of guests by Friday to order the chairs.",
+      "exampleMeaning": "Chúng tôi cần số lượng khách chính xác trước thứ Sáu để đặt ghế."
+    },
+    {
+      "word": "general",
+      "partOfSpeech": "adjective",
+      "meaning": "chung, tổng quát",
+      "example": "The general idea is a morning of talks followed by lunch in the garden.",
+      "exampleMeaning": "Ý tưởng chung là một buổi sáng với các bài nói chuyện, sau đó là bữa trưa ngoài vườn."
+    },
+    {
+      "word": "ideally",
+      "partOfSpeech": "adverb",
+      "meaning": "lý tưởng nhất là, tốt nhất là",
+      "example": "Ideally, the keynote speaker would arrive the evening before the event.",
+      "exampleMeaning": "Lý tưởng nhất là diễn giả chính đến vào buổi tối trước sự kiện."
+    },
+    {
+      "word": "lead time",
+      "partOfSpeech": "noun",
+      "meaning": "thời gian chuẩn bị (từ lúc đặt hàng đến lúc giao)",
+      "example": "The printer needs a lead time of ten days for the conference banners.",
+      "exampleMeaning": "Xưởng in cần thời gian chuẩn bị mười ngày cho các băng rôn hội nghị."
+    },
+    {
+      "word": "plan",
+      "partOfSpeech": "verb",
+      "meaning": "lên kế hoạch, dự định; (danh từ) kế hoạch",
+      "example": "We are planning a product launch for two hundred guests in early May.",
+      "exampleMeaning": "Chúng tôi đang lên kế hoạch cho buổi ra mắt sản phẩm với hai trăm khách vào đầu tháng Năm."
+    },
+    {
+      "word": "proximity",
+      "partOfSpeech": "noun",
+      "meaning": "sự gần, vị trí gần (với nơi nào)",
+      "example": "The hotel's proximity to the airport makes it a popular venue for international meetings.",
+      "exampleMeaning": "Vị trí gần sân bay khiến khách sạn trở thành địa điểm được ưa chuộng cho các cuộc họp quốc tế."
+    },
+    {
+      "word": "regulate",
+      "partOfSpeech": "verb",
+      "meaning": "điều chỉnh, kiểm soát (theo quy định)",
+      "example": "City rules regulate how late outdoor concerts may play music.",
+      "exampleMeaning": "Quy định của thành phố kiểm soát việc các buổi hòa nhạc ngoài trời được chơi nhạc đến mấy giờ."
+    },
+    {
+      "word": "site",
+      "partOfSpeech": "noun",
+      "meaning": "địa điểm, khu đất (tổ chức, xây dựng)",
+      "example": "The team visited three possible sites before choosing the riverside park.",
+      "exampleMeaning": "Nhóm đã khảo sát ba địa điểm khả thi trước khi chọn công viên ven sông."
+    },
+    {
+      "word": "stage",
+      "partOfSpeech": "noun",
+      "meaning": "sân khấu; giai đoạn",
+      "example": "The crew will build the stage on Thursday and test the lights on Friday.",
+      "exampleMeaning": "Đội thi công sẽ dựng sân khấu vào thứ Năm và thử đèn vào thứ Sáu."
+    }
+  ],
+  "fillIn": {
+    "passage": "Amara Osei, the events manager at Brightline Software, has eight weeks to ___ the launch party for the company's new product. Her first task was to choose a ___. She visited four venues and picked the Lakeside Pavilion because of its ___ to the train station, which matters for the two hundred guests coming from out of town.\n\nThe venue sent her a drawing with the ___ of the main hall, and she used it to decide where the ___ for the presentation would stand. The hall seats 220 in theater style, so the ___ number of guests must be confirmed by the end of the month. Amara also learned that city rules ___ the use of outdoor speakers after 10 p.m., so the music will move indoors for the last hour.\n\nIn ___ terms, the schedule is simple: a welcome drink, a thirty-minute presentation and dinner. The product demo would ___ run twice so that late arrivals do not miss it. The printer needs a ___ of two weeks for the banners, so the artwork is due on Friday. Two interns will ___ Amara on the day, and a colleague from marketing will ___ the photographers and the press.",
+    "answers": ["plan", "site", "proximity", "dimensions", "stage", "exact", "regulate", "general", "ideally", "lead time", "assist", "coordinate"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Hai công nhân đang dựng một sân khấu ngoài trời trong công viên; một người đứng trên thang để chỉnh đèn.",
+      "options": [
+        "The workers are setting up a stage.",
+        "The audience is clapping for the band.",
+        "A man is mowing the grass in the park.",
+        "The workers are painting a fence."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy công nhân đang dựng sân khấu. (B), (C) và (D) mô tả người hoặc hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How much lead time does the florist need for the table arrangements?",
+        "options": ["At least five working days.", "She leads the design team.", "The tables seat eight people each."],
+        "answer": "A",
+        "explanation": "Câu hỏi về thời gian chuẩn bị cần câu trả lời là một khoảng thời gian. (B) lặp âm 'lead' với nghĩa khác, (C) nói về số chỗ ngồi."
+      },
+      {
+        "question": "Who's going to coordinate the volunteers on Saturday?",
+        "options": ["Marta has agreed to do it.", "Saturday works for me.", "Yes, the coordinates are on the map."],
+        "answer": "A",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người. (B) lặp từ 'Saturday' nhưng không trả lời, (C) nhầm 'coordinates' là tọa độ và trả lời Yes cho câu hỏi Wh."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Hello, this is Felix Bauer from the Greenwood Hotel. I'm calling about the awards dinner you've booked for November 3.\nWoman: Yes, thanks for calling. I was about to email you, actually. We need the exact dimensions of the Garden Room so our designer can plan the stage.\nMan: Of course. The room is 24 meters by 15, with a ceiling height of 4.5 meters. I'll send a drawing this afternoon.\nWoman: Perfect. One more question: our guests will mostly come by train. How far is the hotel from the station?\nMan: About a six-minute walk, and we can arrange a shuttle for anyone who needs it.\nWoman: Great, the proximity to the station was one reason we chose your site. Could you also confirm that the room can hold 180 seated guests?\nMan: Yes, 180 at round tables of ten is comfortable. If you go above 200, we'd need to use the adjoining room as well.\nWoman: 180 is our limit. Thank you, Felix. I'll look out for the drawing.",
+      "questions": [
+        {
+          "prompt": "Why is the man calling?",
+          "options": ["To cancel a booking", "To discuss an event booked at his hotel", "To sell a shuttle service", "To ask for a payment"],
+          "answer": "B",
+          "explanation": "Anh ấy nói 'I'm calling about the awards dinner you've booked for November 3'."
+        },
+        {
+          "prompt": "What does the woman need from the man?",
+          "options": ["The price of the dinner", "The measurements of a room", "The train timetable", "A list of hotel staff"],
+          "answer": "B",
+          "explanation": "Cô ấy cần 'the exact dimensions of the Garden Room'; 'measurements' đồng nghĩa với 'dimensions'."
+        },
+        {
+          "prompt": "What does the man say about groups larger than 200?",
+          "options": ["They receive a discount", "They must book a different hotel", "They would need an additional room", "They must arrive by shuttle"],
+          "answer": "C",
+          "explanation": "'If you go above 200, we'd need to use the adjoining room as well.'"
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Welcome, everyone, and thank you for volunteering at the Riverside Business Fair this weekend. I'm Carla Mendes, the event coordinator, and I'll give you the general plan for the two days. The fair opens at nine both mornings, but we need you on site by seven thirty to assist exhibitors with their stands. Each of you will be assigned to one hall, and a team leader in a green vest will coordinate your breaks and answer questions. A few rules: the fire department regulates the number of people in each hall, so if the counter at a door shows a red light, please stop visitors politely until it turns green. Ideally, no visitor should wait more than five minutes. If an exhibitor asks for extra furniture, tell them the rental company needs a lead time of two hours, and send the request to the service desk. Thank you again. Let's make this a great weekend.",
+      "questions": [
+        {
+          "prompt": "Who are the listeners?",
+          "options": ["Exhibitors", "Visitors to the fair", "Volunteers", "Fire inspectors"],
+          "answer": "C",
+          "explanation": "Người nói mở đầu bằng 'thank you for volunteering at the Riverside Business Fair'."
+        },
+        {
+          "prompt": "What should listeners do if a door counter shows a red light?",
+          "options": ["Call the fire department", "Stop visitors from entering until it turns green", "Open a second door", "Report to the service desk"],
+          "answer": "B",
+          "explanation": "'if the counter at a door shows a red light, please stop visitors politely until it turns green'."
+        },
+        {
+          "prompt": "What does the speaker say about extra furniture?",
+          "options": ["It is not available", "It costs extra for exhibitors", "It takes two hours to arrive", "Volunteers must carry it"],
+          "answer": "C",
+          "explanation": "'the rental company needs a lead time of two hours', tức mất hai tiếng mới có đồ."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Three volunteers will _____ the registration desk during the morning rush.",
+        "options": ["assist", "assistance", "assistant", "assisted"],
+        "answer": "A",
+        "explanation": "Sau 'will' cần động từ nguyên mẫu: 'assist'."
+      },
+      {
+        "prompt": "Ms. Ibarra _____ all the suppliers for the company picnic last year.",
+        "options": ["coordinate", "coordination", "coordinated", "coordinator"],
+        "answer": "C",
+        "explanation": "'last year' cho thấy thì quá khứ đơn: 'coordinated'."
+      },
+      {
+        "prompt": "The venue's _____ to the airport is its biggest advantage for international guests.",
+        "options": ["proximate", "proximity", "proximately", "approximate"],
+        "answer": "B",
+        "explanation": "Sau sở hữu cách 'The venue's' cần danh từ: 'proximity to' (sự gần với)."
+      },
+      {
+        "prompt": "_____, the stage should be ready two hours before the guests arrive.",
+        "options": ["Ideal", "Ideally", "Idealize", "Idealism"],
+        "answer": "B",
+        "explanation": "Đầu câu, bổ nghĩa cho cả mệnh đề, cần trạng từ: 'Ideally'."
+      },
+      {
+        "prompt": "Local laws _____ the sound level at outdoor concerts after 10 p.m.",
+        "options": ["regulation", "regulate", "regulatory", "regulator"],
+        "answer": "B",
+        "explanation": "Chủ ngữ số nhiều 'Local laws' cần động từ nguyên mẫu ở hiện tại đơn: 'regulate'."
+      },
+      {
+        "prompt": "The caterer needs the _____ number of guests at least five days before the event.",
+        "options": ["exact", "exactly", "exactness", "exacting"],
+        "answer": "A",
+        "explanation": "Trước danh từ 'number' cần tính từ: 'exact' (chính xác)."
+      }
+    ],
+    "part6": {
+      "passage": "To: Facilities Team\nFrom: Noor Rahman, Events\nSubject: Spring product launch, April 22\n\nHello team,\n\nWe have confirmed the Harbor Pavilion as the ___ for the spring launch. The venue has sent a drawing with the ___ of the main hall (30 meters by 18), and I have attached it to this email. Please use it to plan the layout of the demo tables and the stage. The lighting company needs a ___ of three weeks, so I have to send them the final layout by March 31. Could you send me your draft by March 24 so that we have a week for changes?\n\nMany thanks,\nNoor",
+      "questions": [
+        {
+          "options": ["site", "sight", "cite", "sited"],
+          "answer": "A",
+          "explanation": "Cần danh từ chỉ địa điểm tổ chức: 'site'. 'sight' (cảnh tượng) và 'cite' (trích dẫn) là từ đồng âm với nghĩa khác."
+        },
+        {
+          "options": ["dimensions", "proximity", "stages", "plans"],
+          "answer": "A",
+          "explanation": "Bản vẽ ghi '30 meters by 18', tức kích thước của hội trường: 'dimensions'."
+        },
+        {
+          "options": ["lead time", "lead", "leading", "led"],
+          "answer": "A",
+          "explanation": "Công ty ánh sáng cần 'a lead time of three weeks', tức thời gian chuẩn bị ba tuần."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "WESTFIELD CONVENTION CENTER\nInformation for Exhibitors: Spring Trade Show, May 14-16\n\nSet-up schedule\n| Date | Time | Activity |\n| May 13 | 8:00 a.m. - 6:00 p.m. | Exhibitor stand construction |\n| May 13 | 6:00 p.m. - 8:00 p.m. | Safety inspection of all stands |\n| May 14 | 7:30 a.m. | Halls open to exhibitors |\n| May 14 | 9:00 a.m. | Show opens to the public |\n\nGeneral rules\nStand dimensions must match the plan approved in March; stands taller than 4 meters need written approval from the center. City fire codes regulate the number of visitors in each hall, so do not place furniture in the aisles. The main stage in Hall B is reserved for scheduled talks; exhibitors who wish to present there must book a slot with the program office by April 30.\n\nDeliveries\nBecause of the center's proximity to the port, large shipments usually arrive within a day. Deliveries to the site before May 13 are stored in the loading area for a daily fee of $40 per pallet.\n\nAssistance\nStaff in yellow jackets will assist exhibitors on the set-up day. For electrical connections, give the exact power requirements of your equipment on the attached form by May 1.\n\nQuestions? Call the exhibitor desk at 555-0188.",
+      "questions": [
+        {
+          "prompt": "For whom is this notice intended?",
+          "options": ["Visitors to the trade show", "Companies exhibiting at the show", "Center employees", "Port workers"],
+          "answer": "B",
+          "explanation": "Tiêu đề là 'Information for Exhibitors' và nội dung hướng dẫn việc dựng gian hàng, giao hàng và kết nối điện."
+        },
+        {
+          "prompt": "When will the safety inspection take place?",
+          "options": ["On the morning of May 13", "On the evening of May 13", "At 7:30 a.m. on May 14", "After the show closes"],
+          "answer": "B",
+          "explanation": "Bảng ghi 'May 13, 6:00 p.m. - 8:00 p.m.: Safety inspection of all stands'."
+        },
+        {
+          "prompt": "What must exhibitors do if their stand is taller than 4 meters?",
+          "options": ["Pay a daily fee", "Place it in Hall B", "Get written approval from the center", "Book a slot with the program office"],
+          "answer": "C",
+          "explanation": "'stands taller than 4 meters need written approval from the center'. Đặt chỗ với văn phòng chương trình là dành cho việc thuyết trình trên sân khấu."
+        },
+        {
+          "prompt": "What is suggested about deliveries sent before May 13?",
+          "options": ["They are not accepted", "They are delivered to the stand for free", "They are stored for a fee", "They must arrive by ship"],
+          "answer": "C",
+          "explanation": "'Deliveries to the site before May 13 are stored in the loading area for a daily fee of $40 per pallet.'"
+        },
+        {
+          "prompt": "What should exhibitors send by May 1?",
+          "options": ["A booking for the stage", "Their power requirements", "A list of their staff", "Payment for the stand"],
+          "answer": "B",
+          "explanation": "Phần 'Assistance': 'please give the exact power requirements of your equipment on the attached form by May 1'."
+        }
+      ]
+    }
+  }
+}

@@ -22,6 +22,10 @@ service AuthService {
   // numbers behind the accounts page.
   rpc AdminAccountAction(AdminAccountActionRequest) returns (AuthReply);
   rpc AdminAccountStats(AccessRequest) returns (AuthReply);
+  // D131: an admin creates an account by invitation; the person sets the
+  // password with the emailed code.
+  rpc AdminInviteAccount(AdminInviteAccountRequest) returns (AuthReply);
+  rpc AcceptInvite(ResetPasswordRequest) returns (AuthReply);
   // Profile of the signed-in account (F09, D113).
   rpc UpdateProfile(UpdateProfileRequest) returns (AuthReply);
   rpc VerifyPassword(ChangePasswordRequest) returns (AuthReply);
@@ -96,6 +100,13 @@ message AdminAccountActionRequest {
   // One of AdminAccountAction in @appenglish/auth-contracts.
   string action = 3;
   string reason = 4;
+}
+
+message AdminInviteAccountRequest {
+  string access_token = 1;
+  string email = 2;
+  string display_name = 3;
+  string role = 4;
 }
 
 message UpdateProfileRequest {

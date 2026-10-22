@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { Camera, Trash2, Undo2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Trash2, Undo2 } from 'lucide-react';
 import { PROFILE_LIMITS, displayNameOf } from '@appenglish/auth-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -15,6 +15,7 @@ import {
   Label,
 } from '../../../components/ui';
 import { Avatar } from '../../../components/shared/Avatar.jsx';
+import { FileDropzone } from '../../../components/shared/FileDropzone.jsx';
 import { removeAvatar, updateProfile, uploadAvatar } from '../../auth/api/auth-api.js';
 import { avatarFileIssue, normalizeDisplayName, prepareAvatar } from '../lib/avatar.js';
 
@@ -25,7 +26,6 @@ export function EditProfileDialog({ open, onOpenChange, account, onSaved }) {
   const [picture, setPicture] = useState({ file: null, url: null, remove: false });
   const [preparing, setPreparing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const fileInput = useRef(null);
 
   // Start from the account each time the dialog opens; free the preview URL.
   useEffect(() => {
@@ -48,9 +48,7 @@ export function EditProfileDialog({ open, onOpenChange, account, onSaved }) {
     avatarUrl: picture.file ? picture.url : picture.remove ? null : account?.avatarUrl,
   };
 
-  async function choose(event) {
-    const file = event.target.files?.[0];
-    event.target.value = '';
+  async function choose(file) {
     const issue = avatarFileIssue(file);
     if (issue) {
       notify({ title: 'Could not use this picture', description: issue, variant: 'destructive' });
@@ -103,14 +101,19 @@ export function EditProfileDialog({ open, onOpenChange, account, onSaved }) {
         </DialogHeader>
 
         <div className="space-y-6 py-2">
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-4">
             <Avatar account={preview} size="lg" className="ring-4 ring-background shadow-md" />
             <div className="flex flex-1 flex-wrap gap-2">
-              <input ref={fileInput} type="file" accept={PROFILE_LIMITS.avatarMimeTypes.join(',')} className="hidden" onChange={choose} />
-              <Button type="button" variant="outline" size="sm" loading={preparing} disabled={saving} onClick={() => fileInput.current?.click()}>
-                {preparing ? null : <Camera className="h-4 w-4" />}
-                {preview.avatarUrl ? 'Choose another' : 'Choose a picture'}
-              </Button>
+              <FileDropzone
+                compact
+                className="basis-full"
+                accept={`${PROFILE_LIMITS.avatarMimeTypes.join(',')},.jpg,.jpeg,.png,.webp`}
+                kindLabel="JPEG, PNG or WebP"
+                maxBytes={PROFILE_LIMITS.avatarMaxBytes}
+                title={preparing ? 'Preparing the picture…' : preview.avatarUrl ? 'Drag another picture here' : 'Drag a picture here'}
+                disabled={saving || preparing}
+                onFile={choose}
+              />
               {pictureChanged ? (
                 <Button type="button" variant="ghost" size="sm" disabled={saving} onClick={undoPicture}>
                   <Undo2 className="h-4 w-4" />

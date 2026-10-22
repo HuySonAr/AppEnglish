@@ -14,6 +14,7 @@ import {
   MockTestVersionEntity,
   PlacementVersionEntity,
   UnitEntity,
+  UnitReviewVersionEntity,
 } from './content.entities.js';
 
 export function createContentDataSource() {
@@ -26,6 +27,7 @@ export function createContentDataSource() {
     database: process.env.CONTENT_DATABASE_NAME || 'app_content',
     entities: [
       UnitEntity,
+      UnitReviewVersionEntity,
       LessonEntity,
       LessonVersionEntity,
       MediaAssetEntity,

@@ -1,0 +1,260 @@
+{
+  "number": 23,
+  "title": "Investments",
+  "vocabulary": [
+    {
+      "word": "aggressively",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách mạnh mẽ, quyết liệt; táo bạo (khi đầu tư)",
+      "example": "The company expanded aggressively, opening eight new branches in a single year.",
+      "exampleMeaning": "Công ty đã mở rộng mạnh mẽ, khai trương tám chi nhánh mới chỉ trong một năm."
+    },
+    {
+      "word": "attitude",
+      "partOfSpeech": "noun",
+      "meaning": "thái độ, quan điểm, cách nhìn",
+      "example": "Her careful attitude toward risk makes her a good adviser for first-time investors.",
+      "exampleMeaning": "Thái độ thận trọng của cô ấy với rủi ro khiến cô trở thành cố vấn tốt cho những người lần đầu đầu tư."
+    },
+    {
+      "word": "commit",
+      "partOfSpeech": "verb",
+      "meaning": "cam kết; dành (tiền, thời gian) cho việc gì",
+      "example": "The board committed two million dollars to the new research center.",
+      "exampleMeaning": "Hội đồng quản trị đã cam kết dành hai triệu đô la cho trung tâm nghiên cứu mới."
+    },
+    {
+      "word": "conservative",
+      "partOfSpeech": "adjective",
+      "meaning": "thận trọng, dè dặt, ít rủi ro; bảo thủ",
+      "example": "A conservative investor usually prefers government bonds to shares in new companies.",
+      "exampleMeaning": "Nhà đầu tư thận trọng thường thích trái phiếu chính phủ hơn cổ phiếu của các công ty mới."
+    },
+    {
+      "word": "fund",
+      "partOfSpeech": "noun",
+      "meaning": "quỹ, khoản tiền dành cho mục đích nhất định",
+      "example": "The pension fund holds shares in more than two hundred companies.",
+      "exampleMeaning": "Quỹ hưu trí nắm giữ cổ phiếu của hơn hai trăm công ty."
+    },
+    {
+      "word": "invest",
+      "partOfSpeech": "verb",
+      "meaning": "đầu tư (tiền, thời gian, công sức)",
+      "example": "Many employees invest part of their salary in the company's savings plan.",
+      "exampleMeaning": "Nhiều nhân viên đầu tư một phần lương vào kế hoạch tiết kiệm của công ty."
+    },
+    {
+      "word": "long-term",
+      "partOfSpeech": "adjective",
+      "meaning": "dài hạn, lâu dài",
+      "example": "The firm's long-term goal is to own its own office building within ten years.",
+      "exampleMeaning": "Mục tiêu dài hạn của công ty là sở hữu tòa nhà văn phòng riêng trong vòng mười năm."
+    },
+    {
+      "word": "portfolio",
+      "partOfSpeech": "noun",
+      "meaning": "danh mục đầu tư; hồ sơ tác phẩm, hồ sơ năng lực",
+      "example": "Our adviser suggested adding some property shares to balance the portfolio.",
+      "exampleMeaning": "Cố vấn của chúng tôi gợi ý thêm một số cổ phiếu bất động sản để cân bằng danh mục đầu tư."
+    },
+    {
+      "word": "pull out",
+      "partOfSpeech": "verb",
+      "meaning": "rút lui, rút (vốn) khỏi",
+      "example": "Two partners pulled out of the project when the costs doubled.",
+      "exampleMeaning": "Hai đối tác đã rút khỏi dự án khi chi phí tăng gấp đôi."
+    },
+    {
+      "word": "resource",
+      "partOfSpeech": "noun",
+      "meaning": "nguồn lực, tài nguyên (tiền, người, vật tư)",
+      "example": "The start-up has limited resources, so it must choose its projects carefully.",
+      "exampleMeaning": "Công ty khởi nghiệp có nguồn lực hạn chế nên phải chọn dự án một cách cẩn thận."
+    },
+    {
+      "word": "return",
+      "partOfSpeech": "noun",
+      "meaning": "lợi nhuận, tiền lãi thu về (từ đầu tư); sự trở lại",
+      "example": "The bond offers a return of four percent a year, paid every six months.",
+      "exampleMeaning": "Trái phiếu mang lại lợi nhuận bốn phần trăm mỗi năm, trả sáu tháng một lần."
+    },
+    {
+      "word": "wisely",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách khôn ngoan, sáng suốt",
+      "example": "She wisely kept some savings in cash in case the shares lost value.",
+      "exampleMeaning": "Cô ấy đã khôn ngoan giữ một phần tiết kiệm bằng tiền mặt phòng khi cổ phiếu mất giá."
+    }
+  ],
+  "fillIn": {
+    "passage": "Linh Pham inherited a small sum from her aunt and decided to ___ it rather than leave it in a savings account. A colleague recommended Oliver Grant, an adviser known for his calm ___ toward the ups and downs of the market. At their first meeting, Oliver asked how much of the money she could ___ for at least ten years, since he believed that ___ planning produces the best results.\n\nLinh explained that she had limited ___ and could not afford to lose her savings. Oliver therefore suggested a ___ approach: most of the money would go into a bond ___ with a steady but modest ___, while a smaller part would be used more ___ to buy shares in growing companies. He warned her not to ___ at the first sign of trouble, because prices often recover within a year. Linh ___ followed his advice. Three years later, her ___ had grown by almost twenty percent, and she had never once been tempted to sell.",
+    "answers": ["invest", "attitude", "commit", "long-term", "resources", "conservative", "fund", "return", "aggressively", "pull out", "wisely", "portfolio"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Hai người đàn ông mặc vest ngồi trước màn hình lớn hiển thị biểu đồ giá cổ phiếu; một người đang chỉ tay lên biểu đồ.",
+      "options": [
+        "The men are looking at a chart.",
+        "The men are painting a wall.",
+        "One man is leaving the room.",
+        "The screen is being switched off."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy hai người đàn ông đang xem biểu đồ trên màn hình. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Why did the investors pull out of the deal?",
+        "options": ["They were worried about the costs.", "Yes, they pulled it out of the box.", "The deal was signed in March."],
+        "answer": "A",
+        "explanation": "Câu hỏi Why cần một lý do. (B) lặp 'pull out' với nghĩa khác và trả lời Yes cho câu hỏi Wh, (C) trả lời về thời gian."
+      },
+      {
+        "question": "Would you rather have a conservative plan or a riskier one?",
+        "options": ["The plane leaves at noon.", "I'd prefer the safer option.", "She has invested before."],
+        "answer": "B",
+        "explanation": "Câu hỏi lựa chọn giữa hai kế hoạch; (B) chọn phương án an toàn hơn, tức kế hoạch thận trọng. (A) nhầm âm 'plan' với 'plane', (C) lạc đề."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Thanks for coming in, Mr. Alvarez. I've reviewed your portfolio, and I'd like to suggest a few changes.\nMan: Go ahead. I was hoping to get a better return this year.\nWoman: Right now, almost all of your money is in short-term savings products. They're safe, but the return is below two percent. If you can commit part of it for at least seven years, a long-term bond fund would pay more.\nMan: How much more?\nWoman: Around four and a half percent a year, based on the last decade. And you'd still keep a cash reserve for emergencies.\nMan: That sounds sensible. Can you send me the details in writing? I'd like to read them carefully before I decide.\nWoman: Of course. I'll email you a summary this afternoon, and we can meet again next week.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the meeting?",
+          "options": ["To open a new bank account", "To review the man's investments", "To discuss a job offer", "To sign a rental contract"],
+          "answer": "B",
+          "explanation": "Người phụ nữ nói 'I've reviewed your portfolio, and I'd like to suggest a few changes', tức buổi gặp để xem lại danh mục đầu tư."
+        },
+        {
+          "prompt": "What does the woman recommend?",
+          "options": ["Keeping all the money in savings", "Buying shares in a new company", "Moving some money into a bond fund", "Taking out a loan"],
+          "answer": "C",
+          "explanation": "Cô ấy gợi ý 'a long-term bond fund would pay more' nếu ông ấy cam kết một phần tiền trong ít nhất bảy năm."
+        },
+        {
+          "prompt": "What does the man ask the woman to do?",
+          "options": ["Call him next week", "Lower her fee", "Send him information in writing", "Close his account"],
+          "answer": "C",
+          "explanation": "Người đàn ông hỏi 'Can you send me the details in writing?' và cô ấy sẽ gửi email tóm tắt."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good afternoon, everyone. As the human resources manager, I want to tell you about the new employee savings plan that starts in January. Under the plan, you can invest up to six percent of your monthly salary, and the company will add half of that amount from its own funds. You can choose between three options. The Steady option is for people with a careful attitude toward risk and puts your money in government bonds. The Balanced option mixes bonds and shares. The Growth option invests more aggressively in shares of young companies, which may rise quickly but can also fall. Please choose wisely, because you can change your option only once a year. A short guide to the plan is available on the intranet, and I will hold two information sessions next Tuesday, at ten in the morning and at three in the afternoon. Thank you.",
+      "questions": [
+        {
+          "prompt": "What is the speaker mainly talking about?",
+          "options": ["A new office building", "A savings plan for employees", "A change in working hours", "A training course"],
+          "answer": "B",
+          "explanation": "Người nói giới thiệu 'the new employee savings plan that starts in January' và ba lựa chọn của kế hoạch."
+        },
+        {
+          "prompt": "What is true about the Growth option?",
+          "options": ["It invests only in government bonds", "It can be changed every month", "It carries more risk", "It is open to managers only"],
+          "answer": "C",
+          "explanation": "Lựa chọn Growth 'invests more aggressively in shares of young companies, which may rise quickly but can also fall', tức rủi ro cao hơn."
+        },
+        {
+          "prompt": "What will happen next Tuesday?",
+          "options": ["The plan will start", "Salaries will be paid", "Information sessions will be held", "The intranet will be updated"],
+          "answer": "C",
+          "explanation": "Người nói sẽ 'hold two information sessions next Tuesday'; kế hoạch bắt đầu vào tháng Một."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The firm invested _____ in new technology and doubled its market share in two years.",
+        "options": ["aggressive", "aggression", "aggressively", "aggressor"],
+        "answer": "C",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'invested': 'aggressively' (một cách mạnh mẽ)."
+      },
+      {
+        "prompt": "Our _____ include a skilled team, a loyal customer base and a strong brand.",
+        "options": ["resource", "resources", "resourceful", "resourcefully"],
+        "answer": "B",
+        "explanation": "Chủ ngữ đi với động từ số nhiều 'include' và liệt kê nhiều thứ nên cần danh từ số nhiều: 'resources'."
+      },
+      {
+        "prompt": "The directors have agreed to _____ an additional three million dollars to the factory expansion.",
+        "options": ["commit", "commitment", "committed", "committing"],
+        "answer": "A",
+        "explanation": "Sau 'agreed to' cần động từ nguyên mẫu: 'commit ... to' (dành tiền cho)."
+      },
+      {
+        "prompt": "A _____ approach to spending helped the company survive the slow season.",
+        "options": ["conserve", "conservation", "conservatively", "conservative"],
+        "answer": "D",
+        "explanation": "Trước danh từ 'approach' cần tính từ: 'conservative' (thận trọng)."
+      },
+      {
+        "prompt": "The project's expected _____ on investment is about nine percent a year.",
+        "options": ["returnable", "returned", "return", "returning"],
+        "answer": "C",
+        "explanation": "Sau 'expected' và trước 'on investment' cần danh từ: 'return on investment' (lợi nhuận trên vốn đầu tư)."
+      },
+      {
+        "prompt": "The pension _____ reported stronger results than it had expected.",
+        "options": ["funding", "fund", "funded", "fundamental"],
+        "answer": "B",
+        "explanation": "'pension fund' (quỹ hưu trí) là danh từ ghép làm chủ ngữ của 'reported'."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Members\nFrom: Greenfield Employee Savings Club\nSubject: Annual review of the club's investments\n\nDear members,\n\nEach year our committee reviews how the club's money is invested. Our ___ strategy, agreed at the start, is to hold most of the money for at least ten years. During that period, we spread the money across bonds, property and shares so that the ___ does not depend on one type of investment. Last year the value grew by seven percent. We will present the full results at the meeting on March 12 and ask members to decide ___ before changing any part of the plan.",
+      "questions": [
+        {
+          "options": ["long", "length", "long-term", "longer"],
+          "answer": "C",
+          "explanation": "Trước danh từ 'strategy' cần tính từ, và việc giữ tiền ít nhất mười năm cho thấy chiến lược 'long-term' (dài hạn)."
+        },
+        {
+          "options": ["portfolio", "resource", "attitude", "return"],
+          "answer": "A",
+          "explanation": "Tập hợp tiền được chia vào trái phiếu, bất động sản và cổ phiếu chính là 'portfolio' (danh mục đầu tư)."
+        },
+        {
+          "options": ["wise", "wisdom", "wisely", "wiser"],
+          "answer": "C",
+          "explanation": "Cần trạng từ bổ nghĩa cho động từ 'decide': 'wisely' (một cách sáng suốt)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "Harborview Business Journal\nLocal Workshop Grows with Patient Investors\n\nSix years ago, Marta Kowalski needed money to turn her furniture repair workshop into a small factory. Banks were cautious, so she presented her plan to a group of local investors who meet once a month at the Harborview Library. Four of them agreed to invest a total of 150,000 dollars in return for a thirty percent share of the business.\n\n\"They were conservative investors,\" Ms. Kowalski says. \"They did not want to pull out quickly; they wanted a company that would still be here in twenty years.\" The group committed its money for a minimum of five years and asked only for a seat at the quarterly meetings.\n\nToday the factory employs twenty-two people. The investors received their first payment in June, a return of just over eleven percent on their original investment. One of them, Dr. Samuel Ortiz, says the key was Ms. Kowalski's attitude: \"She used every resource wisely and never spent money she did not have.\"\n\nThe investment group is now looking for two new projects to support. Business owners can submit a plan at the library's front desk before August 31.",
+      "questions": [
+        {
+          "prompt": "What is the article mainly about?",
+          "options": ["A new library program", "A business that grew with investors' help", "A furniture exhibition", "A bank's loan policy"],
+          "answer": "B",
+          "explanation": "Bài báo kể về xưởng sửa nội thất của bà Kowalski phát triển thành nhà máy nhờ nhóm nhà đầu tư địa phương."
+        },
+        {
+          "prompt": "How much did the investors contribute?",
+          "options": ["30,000 dollars", "150,000 dollars", "1.8 million dollars", "11,000 dollars"],
+          "answer": "B",
+          "explanation": "'Four of them agreed to invest a total of 150,000 dollars'; ba mươi là phần trăm cổ phần, mười một là phần trăm lợi nhuận."
+        },
+        {
+          "prompt": "What did the investors ask for?",
+          "options": ["A seat at quarterly meetings", "A monthly report", "Control of the factory", "A higher share of profits"],
+          "answer": "A",
+          "explanation": "Nhóm 'asked only for a seat at the quarterly meetings'."
+        },
+        {
+          "prompt": "According to Dr. Ortiz, why was the business successful?",
+          "options": ["It had many customers", "It received a bank loan", "Its owner managed resources carefully", "It sold furniture online"],
+          "answer": "C",
+          "explanation": "Dr. Ortiz nói 'She used every resource wisely and never spent money she did not have'."
+        },
+        {
+          "prompt": "What are business owners invited to do?",
+          "options": ["Visit the factory", "Join the investment group", "Submit a plan at the library", "Attend a meeting in June"],
+          "answer": "C",
+          "explanation": "Đoạn cuối: 'Business owners can submit a plan at the library's front desk before August 31'."
+        }
+      ]
+    }
+  }
+}

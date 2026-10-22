@@ -10,10 +10,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  Input,
   Label,
 } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
+import { FileDropzone } from '../../../components/shared/FileDropzone.jsx';
 
 // A button opening a dialog that fills part of a draft from pasted text. The
 // text is read as it is typed by planFor(text), which returns { count, lines,
@@ -49,24 +49,21 @@ export function PasteDialog({ id, button, title, description, label, placeholder
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           {fileAccept ? (
-            <div className="space-y-2">
-              <Label htmlFor={`${id}-file`}>Open a file</Label>
-              <Input
-                id={`${id}-file`}
-                type="file"
-                accept={fileAccept}
-                onChange={async (event) => {
-                  const file = event.target.files?.[0];
-                  event.target.value = '';
-                  if (!file) return;
-                  try {
-                    setText(await file.text());
-                  } catch (error) {
-                    notify({ title: 'Could not read the file', description: getApiErrorMessage(error), variant: 'destructive' });
-                  }
-                }}
-              />
-            </div>
+            <FileDropzone
+              id={`${id}-file`}
+              compact
+              accept={fileAccept}
+              kindLabel={fileAccept.split(',').map((part) => part.trim().replace(/^\./, '').toUpperCase()).join(', ')}
+              maxBytes={2 * 1024 * 1024}
+              title="Drag a file here, or paste its text below"
+              onFile={async (file) => {
+                try {
+                  setText(await file.text());
+                } catch (error) {
+                  notify({ title: 'Could not read the file', description: getApiErrorMessage(error), variant: 'destructive' });
+                }
+              }}
+            />
           ) : null}
           <div className="space-y-2">
             <Label htmlFor={id}>{label}</Label>

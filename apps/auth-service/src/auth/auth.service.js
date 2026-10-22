@@ -2,7 +2,8 @@ import { accountResponseSchema, authResponseSchema } from './auth.schemas.js';
 import { authErrors } from './auth.errors.js';
 import { AccountResponseDto } from './auth.dto.js';
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
-import { ADMIN_AUDIT_LIMIT, ADMIN_STATS_DAYS, AccountAuditAction, AdminAccountAction, displayNameOf } from '@appenglish/auth-contracts';
+import { ADMIN_AUDIT_LIMIT, ADMIN_STATS_DAYS, AccountAuditAction, AdminAccountAction, INVITE_TTL_HOURS, displayNameOf } from '@appenglish/auth-contracts';
+import { randomBytes } from 'node:crypto';
 import { AccountRole, AccountStatus } from './auth.constants.js';
 import {
   NextAction,
@@ -186,7 +187,9 @@ export class AuthService {
     return { code: 0, msg: 'success', data: {} };
   }
 
-  async issueOtp(account, purpose) {
+  // ttlMs: how long the code lasts (five minutes; INVITE_TTL_HOURS for an
+  // invitation). context goes into the email (D131).
+  async issueOtp(account, purpose, { ttlMs = 300000, context = {} } = {}) {
     const now = Date.now();
     const recent = await this.accountRepository.countRecentOtps(
       account.id,
@@ -207,12 +210,12 @@ export class AuthService {
       accountId: account.id,
       purpose,
       codeHash,
-      expiresAt: new Date(now + 300000),
+      expiresAt: new Date(now + ttlMs),
       resendAfter: new Date(now + 60000),
       attempts: 0,
     });
     try {
-      await this.emailService.sendOtp(account.email, code, purpose);
+      await this.emailService.sendOtp(account.email, code, purpose, context);
     } catch {
       throw authErrors.emailSend();
     }
@@ -362,7 +365,111 @@ export class AuthService {
       await this.accountRepository.saveAudit(audit(AccountAuditAction.DISPLAY_NAME_RESET));
       return { account: this.toAdminResponse(target), changed: true };
     }
+    // D131: activation without the code, for a self-registered account whose
+    // code never arrived; needs a reason. An invited account has no password
+    // yet, so it is activated by accepting the invitation instead.
+    if (action === AdminAccountAction.ACTIVATE) {
+      if (target.status !== AccountStatus.PENDING_VERIFICATION) throw authErrors.notPending();
+      if (target.invitedAt) throw authErrors.invitedPending();
+      if (!reason) throw authErrors.reasonRequired();
+      target.status = AccountStatus.ACTIVE;
+      target.statusReason = null;
+      await this.accountRepository.saveAccount(target);
+      await this.accountRepository.saveAudit({ ...audit(AccountAuditAction.ACCOUNT_ACTIVATED), previousStatus: AccountStatus.PENDING_VERIFICATION, nextStatus: AccountStatus.ACTIVE });
+      return { account: this.toAdminResponse(target), changed: true };
+    }
+    if (action === AdminAccountAction.RESEND_VERIFICATION) {
+      if (target.status !== AccountStatus.PENDING_VERIFICATION) throw authErrors.notPending();
+      if (target.invitedAt) throw authErrors.invitedPending();
+      await this.issueOtp(target, OtpPurpose.VERIFY_EMAIL);
+      await this.accountRepository.saveAudit(audit(AccountAuditAction.VERIFICATION_RESENT));
+      return { account: this.toAdminResponse(target), changed: true, expiresInSeconds: 300 };
+    }
+    if (action === AdminAccountAction.RESEND_INVITE) {
+      if (target.status !== AccountStatus.PENDING_VERIFICATION) throw authErrors.notPending();
+      if (!target.invitedAt) throw authErrors.notInvited();
+      await this.issueOtp(target, OtpPurpose.INVITE, this.inviteOptions(target));
+      await this.accountRepository.saveAudit(audit(AccountAuditAction.INVITE_RESENT));
+      return { account: this.toAdminResponse(target), changed: true, expiresInHours: INVITE_TTL_HOURS };
+    }
+    // The placement itself lives in learning-service; the gateway calls this
+    // after learning-service removed the attempt, so the account's history
+    // shows who reset it and why (D131).
+    if (action === AdminAccountAction.RESET_PLACEMENT) {
+      if (target.role !== AccountRole.STUDENT) throw authErrors.forbiddenRole();
+      await this.accountRepository.saveAudit(audit(AccountAuditAction.PLACEMENT_RESET));
+      return { account: this.toAdminResponse(target), changed: true };
+    }
     throw authErrors.unauthorized();
+  }
+
+  // Invitation (D131): the admin creates the account (PENDING_VERIFICATION,
+  // no usable password) and the person receives a code valid for
+  // INVITE_TTL_HOURS to choose a password on /accept-invite. The admin never
+  // sets or sees a password.
+  async adminInvite(accessToken, { email, displayName, role }) {
+    const actor = await this.requireAdmin(accessToken);
+    if (await this.accountRepository.findByEmail(email)) throw authErrors.emailTaken();
+    const account = await this.accountRepository.createAccount({
+      email,
+      // Unusable until the invitation is accepted: nobody knows this value.
+      passwordHash: this.passwordService.hash(randomBytes(32).toString('hex')),
+      role,
+      status: AccountStatus.PENDING_VERIFICATION,
+      displayName: displayName || null,
+      invitedAt: new Date(),
+    });
+    await this.issueOtp(account, OtpPurpose.INVITE, this.inviteOptions(account));
+    await this.accountRepository.saveAudit({
+      actorId: actor.id,
+      targetAccountId: account.id,
+      action: AccountAuditAction.ACCOUNT_INVITED,
+      previousRole: role,
+      nextRole: role,
+      previousStatus: AccountStatus.PENDING_VERIFICATION,
+      nextStatus: AccountStatus.PENDING_VERIFICATION,
+      reason: null,
+    });
+    return { account: this.toAdminResponse(account), expiresInHours: INVITE_TTL_HOURS };
+  }
+
+  inviteOptions(account) {
+    return {
+      ttlMs: INVITE_TTL_HOURS * 3600000,
+      context: { role: account.role, displayName: account.displayName || '', expiresInHours: INVITE_TTL_HOURS },
+    };
+  }
+
+  // The invited person chooses a password with the emailed code (D131): the
+  // account becomes ACTIVE, the email counts as verified, a session starts.
+  async acceptInvite(input) {
+    const account = await this.accountRepository.findByEmail(input.email.trim().toLowerCase());
+    // Unknown email == bad code, as on the other public OTP routes.
+    if (!account || !account.invitedAt) throw authErrors.otpInvalid();
+    this.assertLoginStatus(account);
+    if (account.status === AccountStatus.ACTIVE)
+      return {
+        code: ResponseCode.ADDITIONAL,
+        msg: ResponseMsg.ADDITIONAL,
+        data: { nextAction: NextAction.LOGIN, email: account.email },
+      };
+    await this.verifyOtp(account, OtpPurpose.INVITE, input.otp);
+    account.passwordHash = this.passwordService.hash(input.password);
+    account.status = AccountStatus.ACTIVE;
+    account.emailVerifiedAt = new Date();
+    account.lastLoginAt = new Date();
+    await this.accountRepository.createAccount(account);
+    await this.accountRepository.saveAudit({
+      actorId: account.id,
+      targetAccountId: account.id,
+      action: AccountAuditAction.INVITE_ACCEPTED,
+      previousRole: account.role,
+      nextRole: account.role,
+      previousStatus: AccountStatus.PENDING_VERIFICATION,
+      nextStatus: AccountStatus.ACTIVE,
+      reason: null,
+    });
+    return this.createSessionResponse(account);
   }
 
   // The numbers of the accounts page (D114): totals by status and role, who
@@ -594,6 +701,7 @@ export class AuthService {
         : null,
       lastLoginAt: account.lastLoginAt ? new Date(account.lastLoginAt).toISOString() : null,
       statusReason: account.statusReason || null,
+      invitedAt: account.invitedAt ? new Date(account.invitedAt).toISOString() : null,
     };
   }
 }

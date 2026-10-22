@@ -82,6 +82,14 @@ services' rows without a foreign key.
 `lessonId` and `lessonVersionId` hold ids of other services' rows without a
 foreign key; `accountEmail` is a copy taken when the attempt starts.
 
+## Unit review schema (D121)
+
+`content-service` adds `unit_review_versions` and `units.reviewVersionId` to
+`app_content` (migration `1720000011000-create-unit-reviews.js`).
+`learning-service` adds `unit_review_attempts` to `app_learning` (migration
+`1730000010000-create-unit-review-attempts.js`); `accountId`, `unitId` and
+`reviewVersionId` hold ids of other services' rows without a foreign key.
+
 ## F05A mock-test schema
 
 `content-service` adds `mock_tests` and `mock_test_versions` to `app_content`
@@ -95,13 +103,19 @@ foreign key; `accountEmail` is a copy taken when the attempt starts.
 to `app_content` (migration `1720000008000-create-listening-course.js`).
 Migration `1720000009000-listening-course-placement.js` lets an item of type
 `placement` have no level (D103). `learning-service` adds
-`course_lesson_results`, `course_test_results`, `course_placements` and
-`course_mistakes` to `app_learning` (migrations
-`1730000005000-create-course-lesson-results.js`,
-`1730000006000-create-course-test-results.js`,
-`1730000007000-create-course-placements.js`,
-`1730000008000-create-course-mistakes.js`); `unitId`, `lessonId`, `itemId`,
-`segmentId` and `versionId` are content-service ids without a foreign key.
+`course_lesson_results` and `course_test_results` to `app_learning`
+(migrations `1730000005000-create-course-lesson-results.js`,
+`1730000006000-create-course-test-results.js`); `unitId`, `lessonId`,
+`itemId` and `versionId` are content-service ids without a foreign key.
+`course_placements` and `course_mistakes` (migrations `1730000007000`,
+`1730000008000`) were dropped by `1730000011000-drop-course-placements-and-mistakes.js`
+(D146): the course has no placement and no mistakes notebook (D145).
+D147: course items hold their own recordings in their versions' content.
+`listening_timing_jobs` (content-service) gets `courseItemId` (foreign key to
+`listening_course_items`, deleted with it), `exerciseId` becomes nullable, and
+a CHECK keeps exactly one of the two (migration
+`1720000013000-course-own-recordings.js`, which also moves existing course
+contents to the new shape).
 
 ## F06 progress schema
 

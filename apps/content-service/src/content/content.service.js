@@ -7,6 +7,8 @@ import {
   LessonVersionStatus,
   MIN_PUBLISHED_LESSONS_PER_UNIT,
   MediaSection,
+  ORPHAN_MEDIA_GRACE_MS,
+  UNIT_REVIEW_QUESTION_COUNT,
   UnitStatus,
   countBlanks,
 } from '@appenglish/content-contracts';
@@ -19,6 +21,8 @@ import {
   placementContentSchema,
   placementIssues,
   publishIssues,
+  unitReviewContentSchema,
+  unitReviewIssues,
 } from './content.schemas.js';
 
 const emptyContent = () => lessonContentSchema.parse({});
@@ -82,10 +86,11 @@ export class ContentService {
   // other roles see published units and their published lessons only.
   async listUnits(actor) {
     const manager = this.isManager(actor);
-    const [units, lessons, versions] = await Promise.all([
+    const [units, lessons, versions, reviews] = await Promise.all([
       this.repository.listUnits(),
       this.repository.listLessons(),
       manager ? this.repository.listVersionSummaries() : [],
+      manager ? this.repository.listReviewVersionSummaries() : [],
     ]);
     const visibleUnits = manager
       ? units
@@ -93,6 +98,8 @@ export class ContentService {
     return {
       units: visibleUnits.map((unit) => ({
         ...this.unitView(unit),
+        // The publishing state of the unit's review (D121), for the editor.
+        ...(manager ? { review: this.reviewSummary(unit, reviews) } : {}),
         lessons: lessons
           .filter((lesson) => lesson.unitId === unit.id)
           .filter((lesson) => manager || lesson.publishedVersionId)
@@ -150,6 +157,160 @@ export class ContentService {
       await this.repository.saveUnit(unit);
     }
     return { unit: this.unitView(unit) };
+  }
+
+  // Hides a unit and its lessons from learners (D118); nothing is lost and
+  // the unit can be published again.
+  async unpublishUnit(actor, unitId) {
+    this.assertManager(actor);
+    const unit = await this.repository.findUnit(unitId);
+    if (!unit) throw contentErrors.unitNotFound();
+    if (unit.status === UnitStatus.PUBLISHED) {
+      unit.status = UnitStatus.DRAFT;
+      await this.repository.saveUnit(unit);
+    }
+    return { unit: this.unitView(unit) };
+  }
+
+  // ----- Unit review (D121): the Reading test that closes a unit, one per
+  // unit, versioned like a lesson. No media.
+
+  reviewSummary(unit, summaries) {
+    const own = summaries.filter((version) => version.unitId === unit.id);
+    return {
+      publishedVersionNumber: own.find((version) => version.id === unit.reviewVersionId)?.versionNumber ?? null,
+      hasDraft: own.some((version) => version.status === LessonVersionStatus.DRAFT),
+    };
+  }
+
+  async findUnitOrThrow(unitId) {
+    const unit = await this.repository.findUnit(unitId);
+    if (!unit) throw contentErrors.unitNotFound();
+    return unit;
+  }
+
+  async publishedReviewVersion(unit) {
+    return unit.reviewVersionId ? this.repository.findReviewVersion(unit.reviewVersionId) : null;
+  }
+
+  managedReviewView(unit, draft, published) {
+    return {
+      unit: this.unitView(unit),
+      questionCount: UNIT_REVIEW_QUESTION_COUNT,
+      draft: draft ? { versionNumber: draft.versionNumber, content: draft.content } : null,
+      published: published
+        ? {
+            versionId: published.id,
+            versionNumber: published.versionNumber,
+            publishedAt: new Date(published.publishedAt).toISOString(),
+            content: published.content,
+          }
+        : null,
+    };
+  }
+
+  async getUnitReview(actor, unitId) {
+    this.assertManager(actor);
+    const unit = await this.findUnitOrThrow(unitId);
+    return this.managedReviewView(unit, await this.repository.findReviewDraft(unitId), await this.publishedReviewVersion(unit));
+  }
+
+  async saveUnitReviewDraft(actor, unitId, content) {
+    this.assertManager(actor);
+    const unit = await this.findUnitOrThrow(unitId);
+    let draft = await this.repository.findReviewDraft(unitId);
+    if (draft) draft.content = withIds(content);
+    else
+      draft = {
+        unitId,
+        versionNumber: (await this.repository.maxReviewVersionNumber(unitId)) + 1,
+        status: LessonVersionStatus.DRAFT,
+        content: withIds(content),
+        createdBy: actor.id,
+      };
+    draft = await this.repository.saveReviewVersion(draft);
+    return this.managedReviewView(unit, draft, await this.publishedReviewVersion(unit));
+  }
+
+  async publishUnitReview(actor, unitId) {
+    this.assertManager(actor);
+    const unit = await this.findUnitOrThrow(unitId);
+    const draft = await this.repository.findReviewDraft(unitId);
+    if (!draft) throw contentErrors.noDraft();
+    draft.content = unitReviewContentSchema.parse(draft.content);
+    const issues = unitReviewIssues(draft.content);
+    if (issues.length) throw contentErrors.notPublishable(issues);
+    draft.status = LessonVersionStatus.PUBLISHED;
+    draft.publishedAt = new Date();
+    draft.publishedBy = actor.id;
+    unit.reviewVersionId = draft.id;
+    await this.repository.publishReviewVersion(unit, draft);
+    return this.managedReviewView(unit, null, draft);
+  }
+
+  // Learners stop getting the review; the unit then closes with its last
+  // lesson again. Versions are kept.
+  async unpublishUnitReview(actor, unitId) {
+    this.assertManager(actor);
+    const unit = await this.findUnitOrThrow(unitId);
+    const published = await this.publishedReviewVersion(unit);
+    if (unit.reviewVersionId) {
+      unit.reviewVersionId = null;
+      await this.repository.saveUnit(unit);
+    }
+    let draft = await this.repository.findReviewDraft(unitId);
+    // The version taken down becomes the draft when there is none (D122).
+    if (!draft && published)
+      draft = await this.repository.saveReviewVersion({
+        unitId,
+        versionNumber: (await this.repository.maxReviewVersionNumber(unitId)) + 1,
+        status: LessonVersionStatus.DRAFT,
+        content: structuredClone(published.content),
+        createdBy: actor.id,
+      });
+    return this.managedReviewView(unit, draft, null);
+  }
+
+  // For learning-service: a unit's published review (the current version, or
+  // the given earlier one) with its answers. 404 unless the unit is published.
+  async getUnitReviewPaper(unitId, { versionId } = {}) {
+    const unit = await this.repository.findUnit(unitId);
+    if (!unit?.reviewVersionId || unit.status !== UnitStatus.PUBLISHED) throw contentErrors.unitReviewNotFound();
+    const version = await this.repository.findReviewVersion(versionId || unit.reviewVersionId);
+    if (version?.unitId !== unit.id || version.status !== LessonVersionStatus.PUBLISHED)
+      throw contentErrors.unitReviewNotFound();
+    return {
+      unit: { id: unit.id, title: unit.title },
+      versionId: version.id,
+      versionNumber: version.versionNumber,
+      test: unitReviewContentSchema.parse(version.content).test,
+    };
+  }
+
+  // Removes a unit with its lessons, versions and the media only they used.
+  // The gateway only calls this when no learner has results for its lessons.
+  async deleteUnit(actor, unitId) {
+    this.assertManager(actor);
+    const unit = await this.repository.findUnit(unitId);
+    if (!unit) throw contentErrors.unitNotFound();
+    const lessons = await this.repository.listLessonsByUnit(unitId);
+    const mediaIds = await this.mediaIdsOfLessons(lessons.map((lesson) => lesson.id));
+    await this.repository.deleteUnitWithLessons(unitId, lessons.map((lesson) => lesson.id));
+    const units = (await this.repository.listUnits()).filter((item) => item.id !== unitId);
+    await this.repository.saveUnits(units.map((item, index) => ({ ...item, position: index + 1 })));
+    const removedMedia = await this.removeUnusedMedia(mediaIds);
+    return { deleted: true, lessons: lessons.length, removedMedia: removedMedia.length };
+  }
+
+  async mediaIdsOfLessons(lessonIds) {
+    const summaries = (await this.repository.listVersionSummaries()).filter((version) => lessonIds.includes(version.lessonId));
+    const ids = [];
+    for (const summary of summaries) {
+      const version = await this.repository.findVersion(summary.id);
+      const parsed = version ? lessonContentSchema.safeParse(version.content) : null;
+      if (parsed?.success) ids.push(...contentMediaIds(parsed.data));
+    }
+    return [...new Set(ids)];
   }
 
   async createLesson(actor, unitId, input) {
@@ -260,7 +421,47 @@ export class ContentService {
     return this.managedLessonView(lesson, null, draft);
   }
 
-  // Looks the word up in the dictionary source and stores the audio it has
+  // Hides a lesson from learners (D118): the published version stays stored
+  // but is no longer the live one; the next publish makes a new version live.
+  async unpublishLesson(actor, lessonId) {
+    this.assertManager(actor);
+    const lesson = await this.repository.findLesson(lessonId);
+    if (!lesson) throw contentErrors.lessonNotFound();
+    const published = lesson.publishedVersionId ? await this.repository.findVersion(lesson.publishedVersionId) : null;
+    if (lesson.publishedVersionId) {
+      lesson.publishedVersionId = null;
+      await this.repository.saveLesson(lesson);
+    }
+    let draft = await this.repository.findDraft(lessonId);
+    // Without a draft the editor would open empty: the version just taken
+    // down becomes the draft, so its content stays in hand (D122).
+    if (!draft && published)
+      draft = await this.repository.saveVersion({
+        lessonId,
+        versionNumber: (await this.repository.maxVersionNumber(lessonId)) + 1,
+        status: LessonVersionStatus.DRAFT,
+        content: structuredClone(published.content),
+        createdBy: actor.id,
+      });
+    return this.managedLessonView(lesson, draft, null);
+  }
+
+  // Removes a lesson, its versions and the media only it used; later lessons
+  // of the unit close the gap. The gateway only calls this when no learner has
+  // results for the lesson.
+  async deleteLesson(actor, lessonId) {
+    this.assertManager(actor);
+    const lesson = await this.repository.findLesson(lessonId);
+    if (!lesson) throw contentErrors.lessonNotFound();
+    const mediaIds = await this.mediaIdsOfLessons([lessonId]);
+    await this.repository.deleteLessonWithVersions(lessonId);
+    const rest = (await this.repository.listLessonsByUnit(lesson.unitId)).filter((item) => item.id !== lessonId);
+    await this.repository.saveLessons(rest.map((item, index) => ({ ...item, position: index + 1 })));
+    const removedMedia = await this.removeUnusedMedia(mediaIds);
+    return { deleted: true, unitId: lesson.unitId, removedMedia: removedMedia.length };
+  }
+
+  // Asks the pronunciation source (speech-service by default, D123) and stores the audio it has
   // for the requested accents. Whatever is missing comes back empty/null and
   // the Content Manager enters or uploads it (D47).
   async autofillPronunciation(actor, { word, accents, lessonId }) {
@@ -280,9 +481,11 @@ export class ContentService {
       try {
         const data = await this.pronunciationSource.download(entry.audio[accent]);
         const fileName = `${word.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${accent}.mp3`;
-        audio[accent] = (
-          await this.uploadMedia(actor, { kind: 'audio', fileName, mimeType: 'audio/mpeg', data, lessonId, section: MediaSection.VOCABULARY })
-        ).media;
+        const { media } = await this.uploadMedia(actor, { kind: 'audio', fileName, mimeType: 'audio/mpeg', data, lessonId, section: MediaSection.VOCABULARY });
+        // The address lets the editor play the pronunciation at once; none
+        // for a locally stored file.
+        const [asset] = await this.repository.findMediaByIds([media.id]);
+        audio[accent] = { ...media, url: asset && asset.storage !== 'local' ? asset.url : null };
       } catch {
         // A failed download is reported as missing audio for that accent.
       }
@@ -588,6 +791,43 @@ export class ContentService {
     return this.managedMockView(mockTest, null, draft);
   }
 
+  async unpublishMockTest(actor, mockTestId) {
+    this.assertManager(actor);
+    const mockTest = await this.findMockOrThrow(mockTestId);
+    const published = await this.publishedMockVersion(mockTest);
+    if (mockTest.publishedVersionId) {
+      mockTest.publishedVersionId = null;
+      await this.repository.saveMockTest(mockTest);
+    }
+    let draft = await this.repository.findMockDraft(mockTestId);
+    // The version taken down becomes the draft when there is none (D122).
+    if (!draft && published)
+      draft = await this.repository.saveMockVersion({
+        mockTestId,
+        versionNumber: (await this.repository.maxMockVersionNumber(mockTestId)) + 1,
+        status: LessonVersionStatus.DRAFT,
+        content: structuredClone(published.content),
+        createdBy: actor.id,
+      });
+    return this.managedMockView(mockTest, draft, null);
+  }
+
+  // The gateway only calls this when no learner has an attempt of the test.
+  async deleteMockTest(actor, mockTestId) {
+    this.assertManager(actor);
+    const mockTest = await this.findMockOrThrow(mockTestId);
+    const summaries = (await this.repository.listMockVersionSummaries()).filter((version) => version.mockTestId === mockTestId);
+    const mediaIds = [];
+    for (const summary of summaries) {
+      const version = await this.repository.findMockVersion(summary.id);
+      const parsed = version ? mockContentSchema.safeParse(version.content) : null;
+      if (parsed?.success) mediaIds.push(...contentMediaIds(parsed.data));
+    }
+    await this.repository.deleteMockTestWithVersions(mockTestId);
+    const removedMedia = await this.removeUnusedMedia([...new Set(mediaIds)]);
+    return { deleted: true, removedMedia: removedMedia.length };
+  }
+
   async managedMockView(mockTest, draft, published) {
     return {
       mockTest: await this.mockView(mockTest),
@@ -657,6 +897,8 @@ export class ContentService {
           id: unit.id,
           title: unit.title,
           description: unit.description,
+          // The published review that closes the unit (D121), or null.
+          reviewVersionId: unit.reviewVersionId || null,
           lessons: lessons
             .filter((lesson) => lesson.unitId === unit.id && lesson.publishedVersionId)
             .map((lesson) => ({ id: lesson.id, title: lesson.title })),
@@ -705,6 +947,39 @@ export class ContentService {
     this.assertManager(actor);
     if (!(await this.repository.findMediaByIds([mediaId])).length) throw contentErrors.mediaNotFound();
     return { deleted: (await this.removeUnusedMedia([mediaId])).includes(mediaId) };
+  }
+
+  // Files no saved version refers to (D118), uploaded longer ago than the
+  // grace period; the Content Manager reviews the list before deleting.
+  async listOrphanMedia(actor, { now = Date.now() } = {}) {
+    this.assertManager(actor);
+    const [candidates, referenced] = await Promise.all([
+      this.repository.listMediaBefore(new Date(now - ORPHAN_MEDIA_GRACE_MS)),
+      this.repository.listReferencedMediaIds(),
+    ]);
+    const orphans = [];
+    for (const asset of candidates) {
+      if (referenced.has(asset.id.toLowerCase())) continue;
+      orphans.push({
+        id: asset.id,
+        kind: asset.kind,
+        fileName: asset.fileName,
+        mimeType: asset.mimeType,
+        sizeBytes: asset.sizeBytes,
+        storage: asset.storage,
+        url: asset.storage === 'local' ? null : asset.url,
+        createdAt: asset.createdAt ? new Date(asset.createdAt).toISOString() : null,
+      });
+    }
+    return { media: orphans, totalBytes: orphans.reduce((sum, asset) => sum + (asset.sizeBytes || 0), 0) };
+  }
+
+  // Deletes the chosen files if they are still unreferenced; returns the ids
+  // that went (a referenced or already gone id is simply left out).
+  async deleteOrphanMedia(actor, { ids }) {
+    this.assertManager(actor);
+    const deleted = await this.removeUnusedMedia(ids);
+    return { deleted, skipped: ids.filter((id) => !deleted.includes(id)) };
   }
 
   // Deletes, from storage and the database, the given media that no saved

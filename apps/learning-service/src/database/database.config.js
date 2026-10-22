@@ -1,8 +1,6 @@
 import { DataSource } from 'typeorm';
 import {
   CourseLessonResultEntity,
-  CourseMistakeEntity,
-  CoursePlacementEntity,
   CourseTestResultEntity,
   LearningEventEntity,
   LessonProgressEntity,
@@ -12,6 +10,7 @@ import {
   PlacementAttemptEntity,
   PlacementSettingsEntity,
   ScoreConversionEntity,
+  UnitReviewAttemptEntity,
 } from './learning.entities.js';
 
 export function createLearningDataSource() {
@@ -27,13 +26,12 @@ export function createLearningDataSource() {
       PlacementSettingsEntity,
       LessonProgressEntity,
       LessonTestAttemptEntity,
+      UnitReviewAttemptEntity,
       MockAttemptEntity,
       ScoreConversionEntity,
       ListeningResultEntity,
       CourseLessonResultEntity,
       CourseTestResultEntity,
-      CoursePlacementEntity,
-      CourseMistakeEntity,
       LearningEventEntity,
     ],
     migrations: ['src/database/migrations/*.js'],

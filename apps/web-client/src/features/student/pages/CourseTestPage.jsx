@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, RotateCcw, Trophy } from 'lucide-react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { cn } from '../../../lib/utils.js';
@@ -8,26 +8,21 @@ import { Badge, Button } from '../../../components/ui';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { getCourseTest, submitCourseTest } from '../api/course-api.js';
 import { CourseTestSection, firstNumbers } from '../components/CourseTestSection.jsx';
-import { nextKind, nextPath, unanswered } from '../lib/listening-course.js';
+import { unanswered } from '../lib/listening-course.js';
 
-const SPEEDS = [0.75, 1, 1.25];
-const kindLabel = { unit_check: 'Unit check', level_test: 'Level test' };
-
-// A unit check or a level test of the Listening course (D102): recordings
-// with multiple-choice questions, untimed; every question answered, then the
-// answers are scored and the best score kept. Passing the level test moves
-// the learner up a level; the review shows the answers, the explanations and
-// the transcripts.
+// The level test of a level of the Listening course (D145): recordings with
+// multiple-choice questions, untimed, each recording heard at its own speed
+// at most twice; every question answered, then the answers are scored and the
+// best score kept. Passing opens the next level; the review shows the
+// answers, the explanations and the transcripts.
 export function CourseTestPage() {
   const { itemId } = useParams();
-  const navigate = useNavigate();
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
   // Option id by question id.
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
-  const [speed, setSpeed] = useState(1);
 
   async function load() {
     setState('loading');
@@ -46,12 +41,6 @@ export function CourseTestPage() {
     load();
   }, [itemId]);
 
-  // A new speed applies to the recording playing now too.
-  useEffect(() => {
-    document.querySelectorAll('audio').forEach((audio) => {
-      audio.playbackRate = speed;
-    });
-  }, [speed]);
 
   async function submit() {
     setBusy(true);
@@ -104,15 +93,15 @@ export function CourseTestPage() {
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{test.level}</Badge>
-          <Badge variant="outline">{kindLabel[test.kind]}</Badge>
+          <Badge variant="outline">Level test</Badge>
           {data.passed ? <Badge variant="success">Passed</Badge> : null}
           {data.bestScore !== null ? <span className="text-sm text-muted-foreground">Best {data.bestScore}%</span> : null}
         </div>
-        <h1 className="text-2xl font-bold sm:text-3xl">{test.kind === 'unit_check' ? `${test.title}: unit check` : test.title}</h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">{test.title}</h1>
         {!result ? (
           <p className="text-muted-foreground">
             {questions.length} questions on {data.sections.length} recording{data.sections.length === 1 ? '' : 's'}, no time limit. Pass with{' '}
-            {data.passPercent}%{test.kind === 'level_test' ? (test.nextLevel ? ` to move up to ${test.nextLevel}.` : ' to finish the course.') : ' to open the next unit.'}
+            {data.passPercent}% to open {test.nextLevel || 'the next level'}. Each recording plays at its own speed, at most twice.
           </p>
         ) : null}
       </div>
@@ -122,7 +111,7 @@ export function CourseTestPage() {
           {result.levelUp ? (
             <div className="mb-4 flex items-center justify-center gap-2 rounded-xl bg-success/10 px-4 py-3 font-semibold text-success">
               <Trophy className="h-5 w-5" />
-              {result.levelUp.to ? `You moved up to ${result.levelUp.to}!` : 'You passed the last level test!'}
+              {`${result.levelUp.to} is open!`}
             </div>
           ) : null}
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">Your score</p>
@@ -138,28 +127,15 @@ export function CourseTestPage() {
               <RotateCcw className="h-4 w-4" />
               Try again
             </Button>
-            {result.next && result.next.itemId !== test.id ? (
-              <Button variant={result.passed ? 'default' : 'outline'} className="gap-1.5" onClick={() => navigate(nextPath(result.next))}>
-                {nextKind[result.next.type]}: {result.next.title}
+            <Button asChild variant={result.passed ? 'default' : 'outline'} className="gap-1.5">
+              <Link to={result.levelUp ? `/student/listening-course?level=${result.levelUp.to}` : '/student/listening-course'}>
+                {result.levelUp ? `Go to ${result.levelUp.to}` : 'Back to the course'}
                 <ArrowRight className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button asChild variant={result.passed ? 'default' : 'outline'}>
-                <Link to="/student/listening-course">Back to the course</Link>
-              </Button>
-            )}
+              </Link>
+            </Button>
           </div>
         </div>
       ) : null}
-
-      <div className="flex flex-wrap items-center justify-end gap-1 text-sm text-muted-foreground">
-        <span>Speed</span>
-        {SPEEDS.map((value) => (
-          <Button key={value} variant={speed === value ? 'secondary' : 'ghost'} size="sm" aria-pressed={speed === value} onClick={() => setSpeed(value)}>
-            {value}×
-          </Button>
-        ))}
-      </div>
 
       {sections.map((section, index) => (
         <CourseTestSection
@@ -167,7 +143,7 @@ export function CourseTestPage() {
           index={index}
           section={section}
           first={firsts[index]}
-          speed={speed}
+          versionId={data.versionId}
           answers={result ? null : answers}
           onChoose={(questionId, optionId) => setAnswers((current) => ({ ...current, [questionId]: optionId }))}
         />

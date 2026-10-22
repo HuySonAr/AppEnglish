@@ -1,0 +1,260 @@
+{
+  "number": 39,
+  "title": "Hotels",
+  "vocabulary": [
+    {
+      "word": "advanced",
+      "partOfSpeech": "adjective",
+      "meaning": "tiên tiến, hiện đại; ở trình độ cao",
+      "example": "The hotel installed an advanced key system that opens rooms with a phone.",
+      "exampleMeaning": "Khách sạn đã lắp một hệ thống khóa hiện đại cho phép mở phòng bằng điện thoại."
+    },
+    {
+      "word": "chain",
+      "partOfSpeech": "noun",
+      "meaning": "chuỗi (khách sạn, cửa hàng cùng một chủ)",
+      "example": "The Maple Leaf chain has more than forty hotels in six countries.",
+      "exampleMeaning": "Chuỗi Maple Leaf có hơn bốn mươi khách sạn ở sáu quốc gia."
+    },
+    {
+      "word": "check in",
+      "partOfSpeech": "verb",
+      "meaning": "làm thủ tục nhận phòng; làm thủ tục lên máy bay",
+      "example": "Guests who check in after midnight should call the front desk in advance.",
+      "exampleMeaning": "Khách nhận phòng sau nửa đêm nên gọi trước cho quầy lễ tân."
+    },
+    {
+      "word": "confirm",
+      "partOfSpeech": "verb",
+      "meaning": "xác nhận",
+      "example": "Please confirm your booking by replying to this email within 24 hours.",
+      "exampleMeaning": "Vui lòng xác nhận đặt phòng bằng cách trả lời email này trong vòng 24 giờ."
+    },
+    {
+      "word": "expect",
+      "partOfSpeech": "verb",
+      "meaning": "mong đợi, dự kiến, trông chờ",
+      "example": "We expect about two hundred guests for the trade fair next week.",
+      "exampleMeaning": "Chúng tôi dự kiến khoảng hai trăm khách cho hội chợ thương mại tuần tới."
+    },
+    {
+      "word": "housekeeper",
+      "partOfSpeech": "noun",
+      "meaning": "nhân viên dọn phòng, nhân viên buồng phòng",
+      "example": "The housekeeper found a laptop under the bed and took it to the lost property desk.",
+      "exampleMeaning": "Nhân viên dọn phòng tìm thấy một máy tính xách tay dưới giường và mang đến quầy đồ thất lạc."
+    },
+    {
+      "word": "notify",
+      "partOfSpeech": "verb",
+      "meaning": "thông báo, báo cho biết",
+      "example": "The hotel will notify you by text message when your room is ready.",
+      "exampleMeaning": "Khách sạn sẽ thông báo cho bạn bằng tin nhắn khi phòng đã sẵn sàng."
+    },
+    {
+      "word": "preclude",
+      "partOfSpeech": "verb",
+      "meaning": "ngăn cản, loại trừ khả năng",
+      "example": "A late payment does not preclude the client from booking with us again.",
+      "exampleMeaning": "Việc thanh toán muộn không loại trừ khả năng khách hàng đặt phòng với chúng tôi lần nữa."
+    },
+    {
+      "word": "quote",
+      "partOfSpeech": "verb",
+      "meaning": "báo giá; trích dẫn",
+      "example": "The sales office quoted a group rate of $95 per night for the conference week.",
+      "exampleMeaning": "Phòng kinh doanh đã báo giá theo nhóm là 95 đô la mỗi đêm cho tuần hội nghị."
+    },
+    {
+      "word": "rate",
+      "partOfSpeech": "noun",
+      "meaning": "mức giá, giá phòng; tỷ lệ",
+      "example": "Room rates are lower from Sunday to Thursday than at the weekend.",
+      "exampleMeaning": "Giá phòng từ Chủ nhật đến thứ Năm thấp hơn so với cuối tuần."
+    },
+    {
+      "word": "reservation",
+      "partOfSpeech": "noun",
+      "meaning": "sự đặt chỗ, đặt phòng",
+      "example": "Ms. Farouk made a reservation for three single rooms on the hotel's website.",
+      "exampleMeaning": "Bà Farouk đã đặt ba phòng đơn trên trang web của khách sạn."
+    },
+    {
+      "word": "service",
+      "partOfSpeech": "noun",
+      "meaning": "dịch vụ, sự phục vụ",
+      "example": "Room service is available until eleven at night in every building of the resort.",
+      "exampleMeaning": "Dịch vụ phòng phục vụ đến mười một giờ đêm ở mọi tòa nhà của khu nghỉ dưỡng."
+    }
+  ],
+  "fillIn": {
+    "passage": "Kenji Watanabe, an office manager at a software company, had to find rooms for eight engineers attending a two-week training course. He called three hotels and asked each one to ___ a price for the whole stay. The Harborview, part of a large international ___, offered the best ___ because the training fell in the low season.\n\nKenji made the ___ online and received an email the next day asking him to ___ it. The email explained that the hotel's ___ booking system would send each guest a code to open the room door, so they would not have to wait in line to ___ at the front desk. It also said the hotel ___ to be full during the second week, so any change in the number of guests had to be reported early. Kenji was asked to ___ the hotel at least 48 hours before arrival if anyone could not come. A late cancellation would not ___ a refund, but a fee of one night would apply.\n\nDuring the stay, the engineers praised the friendly ___ at the restaurant and the ___ who left fresh towels in every room each morning.",
+    "answers": ["quote", "chain", "rate", "reservation", "confirm", "advanced", "check in", "expected", "notify", "preclude", "service", "housekeeper"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nhân viên dọn phòng đang trải ga giường trong phòng khách sạn; xe đẩy chứa khăn tắm đứng ở cửa.",
+      "options": [
+        "A woman is making a bed.",
+        "A woman is checking in at the front desk.",
+        "A guest is carrying a suitcase up the stairs.",
+        "A man is painting a hotel room."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy nhân viên dọn phòng đang dọn giường. (B), (C) và (D) mô tả người hoặc hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Has the hotel confirmed our reservation for Friday?",
+        "options": ["Yes, I got the email this morning.", "The firm is on the fifth floor.", "It's a long drive on Friday."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc xác nhận đặt phòng; (A) trả lời Yes và nói đã nhận email. (B) nhầm âm 'confirmed' với 'firm', (C) lặp từ 'Friday' nhưng không trả lời."
+      },
+      {
+        "question": "What time can guests check in?",
+        "options": ["The check is in the mail.", "From two o'clock in the afternoon.", "Yes, the room is ready."],
+        "answer": "B",
+        "explanation": "Câu hỏi What time cần câu trả lời về giờ. (A) nhầm 'check' với nghĩa tấm séc, (C) trả lời Yes cho câu hỏi Wh."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Good afternoon, Crestview Hotel reservations. How can I help you?\nWoman: Hello. I'm calling from Delmar Logistics. I'd like to reserve four single rooms for the nights of May 8 and 9 for our sales team.\nMan: Certainly. Our corporate rate for that week is $110 per night, including breakfast. Shall I book them?\nWoman: Yes, please. Could you also send me an email to confirm the reservation? Our accounts department needs it before they pay.\nMan: Of course. I'll send it within the hour. Will your team check in late? The front desk closes at midnight.\nWoman: Two of them are driving and expect to arrive around eleven, so that should be fine.\nMan: Good. If anything changes, please notify us by six in the evening so we can hold the rooms.\nWoman: I will. Thank you very much.",
+      "questions": [
+        {
+          "prompt": "Why is the woman calling?",
+          "options": ["To complain about a bill", "To book rooms for colleagues", "To cancel a reservation", "To ask about room service"],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'I'd like to reserve four single rooms ... for our sales team', tức đặt phòng cho đồng nghiệp."
+        },
+        {
+          "prompt": "What does the woman ask the man to send?",
+          "options": ["A breakfast menu", "A map of the hotel", "A written confirmation", "A corporate discount card"],
+          "answer": "C",
+          "explanation": "Cô ấy hỏi 'Could you also send me an email to confirm the reservation?', tức một xác nhận bằng văn bản."
+        },
+        {
+          "prompt": "What should the woman do if the plans change?",
+          "options": ["Call before 6 p.m.", "Pay a cancellation fee", "Arrive before midnight", "Email the accounts department"],
+          "answer": "A",
+          "explanation": "Người đàn ông yêu cầu 'If anything changes, please notify us by six in the evening'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hello, this is Beatrice Lang, the front office manager at the Silver Pines Hotel, calling for Mr. Dominic Hale. I'm calling about your reservation for March 3 to March 6. First, I'm happy to confirm that the room rate we quoted last week, $128 per night, still applies, even though we now expect the hotel to be full that weekend. Second, because our lobby is being renovated, guests will check in at a temporary desk next to the restaurant on the ground floor; a sign will show you the way. The renovation does not preclude the use of any hotel service, including the gym and room service. Finally, our housekeepers clean rooms between ten and two, so if you prefer a different time, please notify the front desk when you arrive. If you have any questions, call me at 555-0142. Thank you, and we look forward to welcoming you.",
+      "questions": [
+        {
+          "prompt": "Why is the speaker calling?",
+          "options": ["To cancel a booking", "To give information about an upcoming stay", "To offer a job at the hotel", "To ask for a payment"],
+          "answer": "B",
+          "explanation": "Người nói xác nhận giá phòng và giải thích nơi nhận phòng, dịch vụ và giờ dọn phòng cho kỳ lưu trú sắp tới của ông Hale."
+        },
+        {
+          "prompt": "Where will guests check in during the renovation?",
+          "options": ["In the gym", "At a desk near the restaurant", "In the parking area", "On the second floor"],
+          "answer": "B",
+          "explanation": "Bài nói nêu 'guests will check in at a temporary desk next to the restaurant on the ground floor'."
+        },
+        {
+          "prompt": "What should Mr. Hale do if he wants his room cleaned at another time?",
+          "options": ["Call Ms. Lang before March 3", "Leave a note for the housekeeper", "Tell the front desk when he arrives", "Use the restaurant instead"],
+          "answer": "C",
+          "explanation": "'If you prefer a different time, please notify the front desk when you arrive.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The resort uses _____ software to control the lighting and temperature in every room.",
+        "options": ["advance", "advanced", "advancement", "advances"],
+        "answer": "B",
+        "explanation": "Trước danh từ 'software' cần tính từ: 'advanced' (hiện đại, tiên tiến)."
+      },
+      {
+        "prompt": "Business travelers can _____ at the self-service kiosk in the lobby.",
+        "options": ["check in", "check into", "checking in", "checked in"],
+        "answer": "A",
+        "explanation": "Sau 'can' cần động từ nguyên mẫu; 'check in' không có tân ngữ, còn 'check into' phải đi kèm tên khách sạn hoặc phòng."
+      },
+      {
+        "prompt": "Please _____ your arrival time so that a driver can meet you at the station.",
+        "options": ["confirm", "confirmation", "confirmed", "confirming"],
+        "answer": "A",
+        "explanation": "Câu mệnh lệnh bắt đầu bằng 'Please' cần động từ nguyên mẫu: 'confirm'."
+      },
+      {
+        "prompt": "The _____ reported a broken lamp in room 412 to the maintenance team.",
+        "options": ["housekeeper", "housekeeping", "household", "house"],
+        "answer": "A",
+        "explanation": "Chủ ngữ cần danh từ chỉ người báo cáo: 'housekeeper' (nhân viên dọn phòng). 'housekeeping' là bộ phận, không đứng một mình với 'The' ở đây."
+      },
+      {
+        "prompt": "We were _____ the lowest rate for a conference room by the Grandview Hotel.",
+        "options": ["quote", "quoted", "quotation", "quoting"],
+        "answer": "B",
+        "explanation": "Cấu trúc bị động 'were quoted ... by' cần quá khứ phân từ: 'quoted' (được báo giá)."
+      },
+      {
+        "prompt": "The hotel's customer _____ team answers emails within two hours.",
+        "options": ["serve", "service", "served", "serving"],
+        "answer": "B",
+        "explanation": "'customer service team' là cụm danh từ ghép; cần danh từ 'service' đứng trước 'team'."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Front Desk Staff\nFrom: Rosa Almeida, General Manager\nSubject: Group arrival on Thursday\n\nOn Thursday, we ___ a group of thirty-five guests from Pinewood Engineering to arrive between 3 and 4 p.m. To avoid long lines, please prepare their key cards in advance and let them ___ at the conference desk in the lobby rather than at the main counter. The group has been given a special ___ of $99 per night, which already includes breakfast, so do not add breakfast charges to their bills. If any guest asks about late checkout, offer 1 p.m. at no cost. Thank you for your help.",
+      "questions": [
+        {
+          "options": ["expect", "expectation", "expected", "expecting"],
+          "answer": "A",
+          "explanation": "Chủ ngữ 'we' cần động từ chính ở hiện tại đơn: 'expect ... to arrive' (dự kiến sẽ đến)."
+        },
+        {
+          "options": ["check in", "check out", "checking in", "checked in"],
+          "answer": "A",
+          "explanation": "Sau 'let them' cần động từ nguyên mẫu không 'to'; khách mới đến nên là 'check in' (nhận phòng), không phải 'check out'."
+        },
+        {
+          "options": ["rate", "rating", "rated", "rates"],
+          "answer": "A",
+          "explanation": "Sau 'a special' cần danh từ số ít chỉ mức giá: 'rate'. 'rating' là xếp hạng, không phải giá."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "MAPLE COURT HOTELS\nReservation Confirmation\n\nConfirmation number: MC-77215\nGuest: Ms. Ingrid Solberg, Nordlys Design\nDates: Tuesday, August 11 to Friday, August 14 (3 nights)\nRoom: One Executive King, non-smoking\n\nDear Ms. Solberg,\n\nThank you for choosing Maple Court Hotels, the largest hotel chain in the Lake District. Your reservation is confirmed at the rate quoted by our sales office, $142 per night, plus local tax. Breakfast in the Garden Room is included.\n\n| Service | Hours | Cost |\n| Airport shuttle | Every 30 minutes, 6 a.m. to 11 p.m. | Free |\n| Room service | 6 a.m. to midnight | Menu prices |\n| Business center | 24 hours | Free for Executive guests |\n| Laundry | Collected by the housekeeper before 9 a.m. | $4 per item |\n\nCheck-in begins at 3 p.m. If you expect to arrive earlier, please notify us the day before and we will store your luggage. Checkout is at noon; a late checkout at 2 p.m. can be arranged for $30.\n\nCancellation: You may cancel free of charge until 6 p.m. on August 10. A later cancellation does not preclude a refund of the tax, but one night's rate will be charged.\n\nWe look forward to your stay.\n\nGuest Services, Maple Court Hotels - Lake District",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the email?",
+          "options": ["To confirm a hotel booking", "To advertise a new hotel", "To request a deposit", "To announce a change of rooms"],
+          "answer": "A",
+          "explanation": "Tiêu đề là 'Reservation Confirmation' và thư ghi 'Your reservation is confirmed at the rate quoted'."
+        },
+        {
+          "prompt": "What is included in the room rate?",
+          "options": ["Laundry", "Breakfast", "Local tax", "Late checkout"],
+          "answer": "B",
+          "explanation": "Thư ghi 'Breakfast in the Garden Room is included'; thuế địa phương tính thêm, giặt là và trả phòng muộn đều có phí."
+        },
+        {
+          "prompt": "How often does the airport shuttle run?",
+          "options": ["Every 15 minutes", "Every 30 minutes", "Once an hour", "Twice a day"],
+          "answer": "B",
+          "explanation": "Bảng ghi 'Airport shuttle: Every 30 minutes, 6 a.m. to 11 p.m.'"
+        },
+        {
+          "prompt": "What should Ms. Solberg do if she will arrive before 3 p.m.?",
+          "options": ["Pay $30 at the front desk", "Wait in the business center", "Inform the hotel in advance", "Use the room service menu"],
+          "answer": "C",
+          "explanation": "'If you expect to arrive earlier, please notify us the day before and we will store your luggage.'"
+        },
+        {
+          "prompt": "What happens if Ms. Solberg cancels on August 11?",
+          "options": ["She receives a full refund.", "She is charged for one night.", "She loses the whole payment.", "She must rebook within a week."],
+          "answer": "B",
+          "explanation": "Hủy miễn phí chỉ đến 6 giờ chiều ngày 10 tháng 8; hủy muộn hơn thì 'one night's rate will be charged'."
+        }
+      ]
+    }
+  }
+}

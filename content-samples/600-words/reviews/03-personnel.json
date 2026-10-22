@@ -1,0 +1,223 @@
+{
+  "unit": 3,
+  "title": "Personnel",
+  "part5": [
+    {
+      "prompt": "_____ with a good ad is time-consuming.",
+      "options": [
+        "Coming up",
+        "Coming to",
+        "Coming by",
+        "Coming on"
+      ],
+      "answer": "A",
+      "explanation": "'Come up with' nghĩa là nghĩ ra ý tưởng; 'coming up with a good ad' làm chủ ngữ."
+    },
+    {
+      "prompt": "To _____ the best and the brightest, companies have to be willing to pay well.",
+      "options": [
+        "recruit",
+        "recruits",
+        "recruiting",
+        "recruitment"
+      ],
+      "answer": "A",
+      "explanation": "Sau 'to' chỉ mục đích cần động từ nguyên mẫu 'recruit' (tuyển dụng)."
+    },
+    {
+      "prompt": "A qualified candidate usually exudes _____.",
+      "options": [
+        "confident",
+        "confidence",
+        "confidential",
+        "confidentially"
+      ],
+      "answer": "B",
+      "explanation": "'Exude confidence' nghĩa là toát lên sự tự tin; cần danh từ 'confidence'."
+    },
+    {
+      "prompt": "Any applicant is wise to _____ an interview with a note or a phone call.",
+      "options": [
+        "follow after",
+        "follow behind",
+        "follow up",
+        "follow with"
+      ],
+      "answer": "C",
+      "explanation": "'Follow up an interview' là tiếp tục liên hệ sau phỏng vấn; lựa chọn 'follow up' phù hợp."
+    },
+    {
+      "prompt": "Workers are promoted on their _____ and merits.",
+      "options": [
+        "achieve",
+        "achieved",
+        "achiever",
+        "achievements"
+      ],
+      "answer": "D",
+      "explanation": "'Achievements' là danh từ số nhiều, song song với 'merits'."
+    },
+    {
+      "prompt": "The benefits package is an important aspect of contract _____.",
+      "options": [
+        "negotiate",
+        "negotiable",
+        "negotiations",
+        "negotiated"
+      ],
+      "answer": "C",
+      "explanation": "'Contract negotiations' là các cuộc đàm phán hợp đồng; cần danh từ số nhiều."
+    },
+    {
+      "prompt": "Some employees have to wait years before they are fully _____ in the company pension plan.",
+      "options": [
+        "vest",
+        "vested",
+        "vesting",
+        "vests"
+      ],
+      "answer": "B",
+      "explanation": "'Be fully vested' nghĩa là đã có đầy đủ quyền lợi theo chương trình hưu trí."
+    },
+    {
+      "prompt": "Health _____ are very important for an employee who develops a serious medical problem.",
+      "options": [
+        "benefit",
+        "benefits",
+        "beneficial",
+        "beneficiary"
+      ],
+      "answer": "B",
+      "explanation": "Động từ 'are' và ngữ nghĩa cần danh từ số nhiều 'benefits' (phúc lợi)."
+    },
+    {
+      "prompt": "A _____ and hard-working employee can look forward to rapid promotions.",
+      "options": [
+        "dedicate",
+        "dedication",
+        "dedicating",
+        "dedicated"
+      ],
+      "answer": "D",
+      "explanation": "'Dedicated' là tính từ nghĩa là tận tâm, song song với 'hard-working'."
+    },
+    {
+      "prompt": "A company that recognizes _____ merit will receive employee loyalty in return.",
+      "options": [
+        "obvious",
+        "obviously",
+        "oblivious",
+        "obliviously"
+      ],
+      "answer": "A",
+      "explanation": "'Obvious' là tính từ bổ nghĩa cho danh từ 'merit'."
+    }
+  ],
+  "part6": [
+    {
+      "passage": "Thank you for your interest in working at Plytel Corporation. To apply for a position, please ___ a résumé and a letter explaining your background and interest. We will keep your information on file for a year. If your qualifications match available openings, we will call you ___ for an interview. Please do not call us; we will contact you if we have a position suited to your ___.",
+      "questions": [
+        {
+          "options": [
+            "submit",
+            "will submit",
+            "to submit",
+            "submitting"
+          ],
+          "answer": "A",
+          "explanation": "Sau 'please' trong câu yêu cầu dùng động từ nguyên mẫu 'submit'."
+        },
+        {
+          "options": [
+            "on",
+            "in",
+            "to",
+            "at"
+          ],
+          "answer": "B",
+          "explanation": "'Call someone in for an interview' nghĩa là mời ai đến phỏng vấn."
+        },
+        {
+          "options": [
+            "able",
+            "ably",
+            "enable",
+            "abilities"
+          ],
+          "answer": "D",
+          "explanation": "Sau 'your' cần danh từ, 'abilities' là khả năng/năng lực của ứng viên."
+        }
+      ]
+    },
+    {
+      "passage": "When your company has a job opening, it is important to hire the right person for the job. The job interview offers you, the employer, an opportunity to get to know each ___ and assess his or her ability to do the job. You will have many questions for the applicants, but you should also ___ ready for questions from them. In addition to understanding the job duties, they may want to know about ___ offered by your company such as vacations and health care.",
+      "questions": [
+        {
+          "options": [
+            "expert",
+            "mentor",
+            "supervisor",
+            "candidate"
+          ],
+          "answer": "D",
+          "explanation": "'Each candidate' chỉ mỗi ứng viên được người tuyển dụng tìm hiểu trong buổi phỏng vấn."
+        },
+        {
+          "options": [
+            "be",
+            "do",
+            "have",
+            "will be"
+          ],
+          "answer": "A",
+          "explanation": "Sau 'should' cần động từ nguyên mẫu 'be': 'should also be ready'."
+        },
+        {
+          "options": [
+            "beneficiaries",
+            "beneficial",
+            "beneficent",
+            "benefits"
+          ],
+          "answer": "D",
+          "explanation": "'Benefits' nghĩa là phúc lợi nhân viên, như nghỉ phép và chăm sóc sức khỏe."
+        }
+      ]
+    },
+    {
+      "passage": "Getting a promotion is a great honor. It means your company ___ your merits. When you are promoted to the position of supervisor, your work life changes. You are now in a position of responsibility. It is important to set a good example because your staff ___ you. If you carry out your job responsibilities ___, you will gain their respect. This is the key to success in your new position.",
+      "questions": [
+        {
+          "options": [
+            "recruits",
+            "contributes",
+            "recognizes",
+            "dedicates"
+          ],
+          "answer": "C",
+          "explanation": "Công ty 'recognizes your merits' tức công nhận thành tích/năng lực của bạn."
+        },
+        {
+          "options": [
+            "looks for",
+            "looks up to",
+            "looks down on",
+            "looks forward to"
+          ],
+          "answer": "B",
+          "explanation": "'Looks up to' nghĩa là kính trọng, ngưỡng mộ người quản lý."
+        },
+        {
+          "options": [
+            "confident",
+            "confidence",
+            "confidently",
+            "confidentia"
+          ],
+          "answer": "C",
+          "explanation": "Cần trạng từ 'confidently' để bổ nghĩa cho động từ 'carry out'."
+        }
+      ]
+    }
+  ]
+}

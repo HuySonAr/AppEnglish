@@ -1,0 +1,260 @@
+{
+  "number": 33,
+  "title": "Ordering Lunch",
+  "vocabulary": [
+    {
+      "word": "burden",
+      "partOfSpeech": "noun",
+      "meaning": "gánh nặng, trách nhiệm nặng nề",
+      "example": "Ordering lunch for forty people every day became a burden for the receptionist.",
+      "exampleMeaning": "Việc đặt bữa trưa cho bốn mươi người mỗi ngày đã trở thành gánh nặng cho nhân viên tiếp tân."
+    },
+    {
+      "word": "commonly",
+      "partOfSpeech": "adverb",
+      "meaning": "thường, phổ biến",
+      "example": "Sandwiches and salads are the dishes most commonly ordered by our office.",
+      "exampleMeaning": "Bánh mì kẹp và salad là những món văn phòng chúng tôi gọi phổ biến nhất."
+    },
+    {
+      "word": "delivery",
+      "partOfSpeech": "noun",
+      "meaning": "sự giao hàng; hàng được giao",
+      "example": "The deli promises delivery within thirty minutes of receiving an order.",
+      "exampleMeaning": "Cửa hàng đồ ăn nhanh cam kết giao hàng trong vòng ba mươi phút kể từ khi nhận đơn."
+    },
+    {
+      "word": "elegance",
+      "partOfSpeech": "noun",
+      "meaning": "sự thanh lịch, sự trang nhã",
+      "example": "The caterer's boxed lunches combine simple food with a touch of elegance.",
+      "exampleMeaning": "Các hộp cơm trưa của công ty tiệc kết hợp món ăn đơn giản với một chút thanh lịch."
+    },
+    {
+      "word": "fall to",
+      "partOfSpeech": "verb",
+      "meaning": "rơi vào, thuộc về (trách nhiệm của ai)",
+      "example": "It falls to the newest assistant to collect everyone's lunch order.",
+      "exampleMeaning": "Việc thu thập đơn ăn trưa của mọi người thuộc về trợ lý mới nhất."
+    },
+    {
+      "word": "impress",
+      "partOfSpeech": "verb",
+      "meaning": "gây ấn tượng",
+      "example": "The catering company impressed us with its fresh bread and quick service.",
+      "exampleMeaning": "Công ty tiệc đã gây ấn tượng với chúng tôi bằng bánh mì tươi và phục vụ nhanh."
+    },
+    {
+      "word": "individual",
+      "partOfSpeech": "adjective",
+      "meaning": "riêng lẻ, dành cho từng người; (danh từ) cá nhân",
+      "example": "Each individual order is labeled with the employee's name and desk number.",
+      "exampleMeaning": "Mỗi suất ăn riêng được dán nhãn tên nhân viên và số bàn làm việc."
+    },
+    {
+      "word": "list",
+      "partOfSpeech": "noun",
+      "meaning": "danh sách, bản liệt kê",
+      "example": "Please add any dietary needs to the list before ten o'clock.",
+      "exampleMeaning": "Vui lòng thêm mọi yêu cầu ăn kiêng vào danh sách trước mười giờ."
+    },
+    {
+      "word": "multiple",
+      "partOfSpeech": "adjective",
+      "meaning": "nhiều, đa dạng, gồm nhiều phần",
+      "example": "The restaurant accepted multiple payment methods, including company vouchers.",
+      "exampleMeaning": "Nhà hàng chấp nhận nhiều phương thức thanh toán, kể cả phiếu ăn của công ty."
+    },
+    {
+      "word": "narrow",
+      "partOfSpeech": "verb",
+      "meaning": "thu hẹp, giới hạn (lựa chọn); (tính từ) hẹp",
+      "example": "We narrowed the choice of caterers to two companies near the office.",
+      "exampleMeaning": "Chúng tôi đã thu hẹp lựa chọn nhà cung cấp tiệc xuống còn hai công ty gần văn phòng."
+    },
+    {
+      "word": "pick up",
+      "partOfSpeech": "verb",
+      "meaning": "đến lấy, nhận (hàng, đồ ăn)",
+      "example": "Someone from the sales team will pick up the lunch boxes at noon.",
+      "exampleMeaning": "Một người của nhóm kinh doanh sẽ đến lấy các hộp cơm trưa vào buổi trưa."
+    },
+    {
+      "word": "settle",
+      "partOfSpeech": "verb",
+      "meaning": "thanh toán (hóa đơn); giải quyết, dàn xếp",
+      "example": "The company settles the catering bill at the end of each month.",
+      "exampleMeaning": "Công ty thanh toán hóa đơn tiệc vào cuối mỗi tháng."
+    }
+  ],
+  "fillIn": {
+    "passage": "At Northgate Architects, the job of ordering lunch for the monthly partners' meeting ___ Dawit Bekele, the newest administrative assistant. In the past, the job had been a ___ for whoever did it, because twelve partners ordered from ___ restaurants and the receipts never matched. Dawit decided to make the process simpler.\n\nFirst, he sent everyone a short form and used the answers to ___ the options to three caterers that could handle every dietary need. Salads and grain bowls are the dishes most ___ requested, so he looked for places that prepare them well. Then he asked each partner to choose one ___ meal from a single menu and wrote the ___ on a shared sheet. He arranged ___ for 11:45 so the food would be ready before the meeting; if the van is late, a colleague can ___ the order on the way back from the bank.\n\nThe first lunch ___ the partners. The boxes were packed with surprising ___, each labeled with a name. Finance now ___ one invoice a month instead of twelve, and Dawit's form has become the standard for every meeting.",
+    "answers": ["falls to", "burden", "multiple", "narrow", "commonly", "individual", "list", "delivery", "pick up", "impressed", "elegance", "settles"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người giao hàng đang đưa túi thức ăn cho một nhân viên văn phòng đứng ở quầy tiếp tân.",
+      "options": [
+        "A courier is handing a bag to a receptionist.",
+        "The receptionist is answering the telephone.",
+        "The man is eating lunch at his desk.",
+        "The workers are loading boxes into a van."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người giao hàng đưa túi đồ ăn cho nhân viên tiếp tân. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Who's going to pick up the sandwiches from the deli?",
+        "options": ["Lena said she would go at noon.", "I picked the chicken salad.", "Yes, the deli is on Fifth Street."],
+        "answer": "A",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người. (B) lặp âm 'pick' với nghĩa khác, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "How would you like to settle the bill, by card or in cash?",
+        "options": ["The settlement was signed yesterday.", "By card, please. It's a company expense.", "The bill arrived this morning."],
+        "answer": "B",
+        "explanation": "Câu hỏi lựa chọn giữa thẻ và tiền mặt; (B) chọn thẻ. (A) dùng từ cùng gốc 'settlement' với nghĩa khác, (C) lặp từ 'bill' nhưng không trả lời."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Hi Sofia, I'm putting together the lunch order for tomorrow's client workshop. Do you have the final list of attendees?\nWoman: Yes, eighteen people, including two who are vegetarian and one who can't eat gluten. Which restaurant are you thinking of?\nMan: I had five options, but I've narrowed it down to two: Green Fork and the Lebanese place on Harbor Road. Both offer individual boxes rather than shared platters.\nWoman: Individual boxes are better for a workshop; people can eat while they work. Does either of them deliver?\nMan: Green Fork does, and delivery is free for orders over two hundred dollars. The Lebanese place would need someone to pick the food up.\nWoman: Then let's go with Green Fork. Can you ask them to label the vegetarian and gluten-free boxes clearly? Last time two people got the wrong meals.\nMan: Sure. I'll place the order this afternoon and ask for delivery at a quarter to twelve.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["A client presentation", "Lunch for a workshop", "A new restaurant opening", "A delivery schedule for office supplies"],
+          "answer": "B",
+          "explanation": "Người đàn ông đang 'putting together the lunch order for tomorrow's client workshop'."
+        },
+        {
+          "prompt": "Why does the man prefer Green Fork?",
+          "options": ["Its food is cheaper", "It is closer to the office", "It delivers for free on large orders", "It has more vegetarian dishes"],
+          "answer": "C",
+          "explanation": "'Green Fork does [deliver], and delivery is free for orders over two hundred dollars', còn quán kia phải có người đến lấy."
+        },
+        {
+          "prompt": "What does the woman ask the man to do?",
+          "options": ["Pick up the food himself", "Invite more attendees", "Request clear labels on special meals", "Order shared platters"],
+          "answer": "C",
+          "explanation": "Cô ấy hỏi 'Can you ask them to label the vegetarian and gluten-free boxes clearly?'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hi everyone, this is Rashid from Office Services. From next Monday we are changing how we order lunch for meetings. Until now, the job has usually fallen to whichever assistant happened to be free, and it has become a real burden: last month we received invoices from eleven different restaurants. Starting Monday, all meeting lunches will be ordered through our new partner, Maple Street Catering, using the online form on the intranet. The form lets you choose from the dishes most commonly requested in our office, plus a few more elegant options for client meetings. Maple Street delivers between eleven thirty and twelve fifteen, and Finance will settle a single invoice at the end of each month. Please place orders at least one working day in advance. I think the quality will impress you; their sample lunch last week got excellent comments from everyone who tried it. Questions? Call me at extension 318.",
+      "questions": [
+        {
+          "prompt": "What is the announcement mainly about?",
+          "options": ["A new catering arrangement", "A change in meeting rooms", "A late invoice", "A new finance manager"],
+          "answer": "A",
+          "explanation": "Người nói thông báo cách đặt bữa trưa mới qua đối tác Maple Street Catering."
+        },
+        {
+          "prompt": "What problem does the speaker mention?",
+          "options": ["Lunches often arrived cold", "Invoices came from many different restaurants", "The intranet was too slow", "Staff skipped lunch during meetings"],
+          "answer": "B",
+          "explanation": "'last month we received invoices from eleven different restaurants' là vấn đề khiến việc đặt ăn thành gánh nặng."
+        },
+        {
+          "prompt": "What are listeners asked to do?",
+          "options": ["Pay for lunches in cash", "Try the sample lunch", "Order at least one working day ahead", "Call Maple Street directly"],
+          "answer": "C",
+          "explanation": "'Please place orders at least one working day in advance.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The caterer's lunch boxes _____ our clients with their fresh bread and neat packaging.",
+        "options": ["impress", "impression", "impressive", "impressively"],
+        "answer": "A",
+        "explanation": "Câu cần động từ chính cho chủ ngữ số nhiều 'lunch boxes': 'impress'."
+      },
+      {
+        "prompt": "Soup and a sandwich are the items most _____ ordered by our staff.",
+        "options": ["common", "commonly", "commonness", "commoner"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho phân từ 'ordered': 'most commonly ordered'."
+      },
+      {
+        "prompt": "Each _____ order is labeled with the employee's name.",
+        "options": ["individual", "individually", "individuality", "individualize"],
+        "answer": "A",
+        "explanation": "Trước danh từ 'order' cần tính từ: 'individual' (riêng cho từng người)."
+      },
+      {
+        "prompt": "We offer _____ options for lunch, including vegetarian and gluten-free meals.",
+        "options": ["multiply", "multiple", "multiplied", "multiplicity"],
+        "answer": "B",
+        "explanation": "Trước danh từ 'options' cần tính từ: 'multiple' (nhiều)."
+      },
+      {
+        "prompt": "The accounting team _____ the catering bill on the last day of each month.",
+        "options": ["settle", "settlement", "settles", "settling"],
+        "answer": "C",
+        "explanation": "Chủ ngữ 'The accounting team' là số ít, nên động từ thì hiện tại đơn thêm -s: 'settles'."
+      },
+      {
+        "prompt": "After tasting samples, the committee _____ the list of caterers down to two.",
+        "options": ["narrow", "narrowly", "narrowed", "narrowness"],
+        "answer": "C",
+        "explanation": "Hành động đã xảy ra sau khi nếm thử; câu cần động từ quá khứ: 'narrowed ... down to'."
+      }
+    ],
+    "part6": {
+      "passage": "To: Marketing Team\nFrom: Imogen Hale\nSubject: Lunch for Friday's planning session\n\nHello all,\n\nLunch for Friday's planning session will come from Rosetta's Kitchen. Please add your meal choice to the ___ on the shared drive by Wednesday at 5 p.m. The restaurant has confirmed ___ to our fourth-floor kitchen at 12:30. Because the building's front desk closes for lunch at noon, Tomas has kindly agreed to ___ the order at the loading entrance and bring it upstairs. If you have any allergies, write them next to your name so that the kitchen can prepare a separate box.\n\nThanks,\nImogen",
+      "questions": [
+        {
+          "options": ["list", "burden", "delivery", "elegance"],
+          "answer": "A",
+          "explanation": "Mọi người thêm lựa chọn món ăn vào một 'list' (danh sách) trên ổ đĩa chung; các danh từ còn lại không hợp nghĩa."
+        },
+        {
+          "options": ["deliver", "delivery", "delivered", "deliverable"],
+          "answer": "B",
+          "explanation": "Sau 'has confirmed' cần một danh từ làm tân ngữ: 'delivery' (việc giao hàng)."
+        },
+        {
+          "options": ["pick up", "picks up", "picked up", "picking up"],
+          "answer": "A",
+          "explanation": "'agreed to' + động từ nguyên mẫu: 'agreed to pick up'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "MAPLE STREET CATERING\nOrder Confirmation\n\nCustomer: Halden & Rowe Consulting, 220 Birch Avenue, Suite 400\nContact: Priyanka Desai, extension 212\nEvent: Quarterly client review, Thursday, June 11\nDelivery time: 11:45 a.m., fourth-floor reception\n\n| Item | Quantity | Unit price | Total |\n| Executive box (grilled chicken, grain salad, fruit) | 14 | $16.50 | $231.00 |\n| Garden box (roasted vegetables, hummus, fruit) | 4 | $14.00 | $56.00 |\n| Gluten-free box (salmon, rice salad, fruit) | 2 | $17.00 | $34.00 |\n| Sparkling water, 750 ml | 10 | $3.00 | $30.00 |\n| Delivery (free on orders over $300) | 1 | $0.00 | $0.00 |\n| Total | | | $351.00 |\n\nEach box is packed as an individual meal and labeled with the guest's name, as requested. Napkins, cutlery and a cloth table runner are included; many clients tell us the runner adds a touch of elegance to a meeting-room lunch.\n\nPayment: Customers with a monthly account settle their balance on the last working day of the month. Multiple orders in the same month appear on one statement.\n\nChanges: Quantities can be changed until 3 p.m. on the day before the event. Later cancellations are charged in full.\n\nThank you for your order. We hope to impress your guests.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of this document?",
+          "options": ["To confirm a catering order", "To request payment for a late invoice", "To advertise a new menu", "To cancel an event"],
+          "answer": "A",
+          "explanation": "Tiêu đề là 'Order Confirmation' và nội dung liệt kê chi tiết đơn đặt tiệc của khách hàng."
+        },
+        {
+          "prompt": "How many lunch boxes were ordered in total?",
+          "options": ["14", "18", "20", "30"],
+          "answer": "C",
+          "explanation": "14 hộp Executive + 4 hộp Garden + 2 hộp Gluten-free = 20 hộp. Nước khoáng không phải hộp ăn."
+        },
+        {
+          "prompt": "Why is there no charge for delivery?",
+          "options": ["The customer has a monthly account", "The order is over $300", "The event is in the same building", "The customer ordered sparkling water"],
+          "answer": "B",
+          "explanation": "Dòng trong bảng ghi 'Delivery (free on orders over $300)' và tổng đơn là $351."
+        },
+        {
+          "prompt": "What is indicated about the boxes?",
+          "options": ["They are all gluten-free", "They are packed without cutlery", "They are labeled with each guest's name", "They cost the same price"],
+          "answer": "C",
+          "explanation": "'Each box is packed as an individual meal and labeled with the guest's name, as requested.'"
+        },
+        {
+          "prompt": "By when can Halden & Rowe change the quantities?",
+          "options": ["June 11 at 11:45 a.m.", "June 10 at 3 p.m.", "The last working day of June", "Any time before delivery"],
+          "answer": "B",
+          "explanation": "'Quantities can be changed until 3 p.m. on the day before the event'; sự kiện diễn ra ngày 11 tháng Sáu nên hạn là 3 giờ chiều ngày 10."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,260 @@
+{
+  "number": 20,
+  "title": "Inventory",
+  "vocabulary": [
+    {
+      "word": "adjustment",
+      "partOfSpeech": "noun",
+      "meaning": "sự điều chỉnh, sửa đổi",
+      "example": "After the count, the clerk made a small adjustment to the number of chairs in the system.",
+      "exampleMeaning": "Sau khi kiểm kê, nhân viên đã điều chỉnh nhẹ số ghế trong hệ thống."
+    },
+    {
+      "word": "automatically",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách tự động",
+      "example": "The software automatically reorders paper when the stock falls below twenty boxes.",
+      "exampleMeaning": "Phần mềm tự động đặt lại giấy khi tồn kho giảm xuống dưới hai mươi thùng."
+    },
+    {
+      "word": "crucial",
+      "partOfSpeech": "adjective",
+      "meaning": "then chốt, cực kỳ quan trọng",
+      "example": "An accurate count is crucial before the auditors arrive next week.",
+      "exampleMeaning": "Một lần kiểm kê chính xác là cực kỳ quan trọng trước khi kiểm toán viên đến tuần sau."
+    },
+    {
+      "word": "discrepancy",
+      "partOfSpeech": "noun",
+      "meaning": "sự chênh lệch, sự không khớp (giữa hai số liệu)",
+      "example": "There is a discrepancy of fifteen units between the shelf count and the computer record.",
+      "exampleMeaning": "Có sự chênh lệch mười lăm đơn vị giữa số đếm trên kệ và dữ liệu máy tính."
+    },
+    {
+      "word": "disturb",
+      "partOfSpeech": "verb",
+      "meaning": "làm phiền, làm gián đoạn; làm xáo trộn",
+      "example": "Please do not disturb the counting team until they have finished aisle six.",
+      "exampleMeaning": "Vui lòng không làm phiền đội kiểm kê cho đến khi họ xong lối đi số sáu."
+    },
+    {
+      "word": "liability",
+      "partOfSpeech": "noun",
+      "meaning": "khoản nợ, nghĩa vụ tài chính; trách nhiệm pháp lý; gánh nặng",
+      "example": "Unsold stock that is out of date becomes a liability rather than an asset.",
+      "exampleMeaning": "Hàng tồn hết hạn chưa bán được trở thành gánh nặng thay vì tài sản."
+    },
+    {
+      "word": "reflection",
+      "partOfSpeech": "noun",
+      "meaning": "sự phản ánh; sự suy ngẫm; hình phản chiếu",
+      "example": "The inventory report is a reflection of how carefully the staff record each sale.",
+      "exampleMeaning": "Báo cáo tồn kho phản ánh mức độ cẩn thận của nhân viên khi ghi lại từng giao dịch."
+    },
+    {
+      "word": "run",
+      "partOfSpeech": "verb",
+      "meaning": "chạy, vận hành (báo cáo, máy, chương trình); điều hành",
+      "example": "The manager runs an inventory report every Monday morning before the store opens.",
+      "exampleMeaning": "Quản lý chạy báo cáo tồn kho vào mỗi sáng thứ Hai trước khi cửa hàng mở."
+    },
+    {
+      "word": "scan",
+      "partOfSpeech": "verb",
+      "meaning": "quét (mã vạch, tài liệu); đọc lướt",
+      "example": "Workers scan the barcode on each box as it comes off the truck.",
+      "exampleMeaning": "Công nhân quét mã vạch trên từng thùng khi hàng được dỡ khỏi xe."
+    },
+    {
+      "word": "subtract",
+      "partOfSpeech": "verb",
+      "meaning": "trừ đi, khấu trừ",
+      "example": "Remember to subtract the damaged units from the total before you submit the count.",
+      "exampleMeaning": "Nhớ trừ số đơn vị bị hỏng khỏi tổng trước khi nộp kết quả kiểm kê."
+    },
+    {
+      "word": "tedious",
+      "partOfSpeech": "adjective",
+      "meaning": "tẻ nhạt, nhàm chán và mất thời gian",
+      "example": "Counting thousands of screws by hand is tedious, so we now weigh them instead.",
+      "exampleMeaning": "Đếm hàng nghìn con vít bằng tay rất tẻ nhạt, nên giờ chúng tôi cân thay vì đếm."
+    },
+    {
+      "word": "verify",
+      "partOfSpeech": "verb",
+      "meaning": "xác minh, kiểm chứng",
+      "example": "A second employee must verify every count before it is entered into the system.",
+      "exampleMeaning": "Một nhân viên thứ hai phải xác minh mỗi số đếm trước khi nhập vào hệ thống."
+    }
+  ],
+  "fillIn": {
+    "passage": "Once a year, Pinewood Hardware closes for a day so that staff can count everything in the store and the back room. The owner, Yusuf Demir, admits that the job is ___, but he also says it is ___ to the health of the business. Stock that has been lost or damaged is a ___ on the books until someone records it, and the yearly count is the only true ___ of what is on the shelves.\n\nThe team works in pairs. One person ___ the barcode on each product with a handheld reader, and the other ___ the number by counting the items on the shelf. The reader sends the figures to the computer, which ___ compares them with the sales records. When the computer ___ its report at the end of the day, it lists every ___ between the count and the records. Last year it showed nine missing cans of paint; the clerk had forgotten to ___ a damaged case from the total, and a single ___ fixed the record.\n\nYusuf tells staff to switch their phones to silent so that nothing will ___ the people counting.",
+    "answers": ["tedious", "crucial", "liability", "reflection", "scans", "verifies", "automatically", "runs", "discrepancy", "subtract", "adjustment", "disturb"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nhân viên kho đang cầm máy quét cầm tay quét mã vạch trên thùng hàng xếp trên kệ cao.",
+      "options": [
+        "A worker is scanning a box on a shelf.",
+        "A worker is sweeping the warehouse floor.",
+        "Some boxes are falling off the shelf.",
+        "A worker is climbing a ladder."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy nhân viên dùng máy quét trên thùng hàng ở kệ. (B) và (D) là hành động khác, (C) mô tả sự việc không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Why is there a discrepancy between the count and the report?",
+        "options": ["Two boxes were sold after the report was run.", "The report is on page three.", "No, the count is finished."],
+        "answer": "A",
+        "explanation": "Câu hỏi Why cần lời giải thích nguyên nhân. (B) nói về vị trí trong báo cáo, (C) trả lời No cho câu hỏi Wh."
+      },
+      {
+        "question": "Could you run the inventory report before the meeting?",
+        "options": ["I ran to the station this morning.", "Sure, I'll print it in ten minutes.", "The meeting room is upstairs."],
+        "answer": "B",
+        "explanation": "Lời đề nghị 'Could you...' cần câu đồng ý hoặc từ chối; (B) đồng ý và nói khi nào xong. (A) nhầm 'ran' nghĩa là chạy bộ, (C) nhầm sang địa điểm."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Ravi, I've finished counting the printer cartridges in aisle two, and there's a discrepancy. The system says we should have forty-eight, but I count forty-two.\nMan: Six missing? Did you subtract the three cartridges that were sent back to the supplier yesterday? They may still be in the system.\nWoman: Good point. That leaves three. Could you verify my count before I enter an adjustment?\nMan: Sure, I'll come over in a minute. I don't want to disturb Elena while she's in the middle of aisle five.\nWoman: No problem. Honestly, counting these small boxes is tedious, but it's the only way to catch these errors.\nMan: Agreed. Once I've checked, write the new figure on the sheet and I'll enter it into the system this afternoon.",
+      "questions": [
+        {
+          "prompt": "What are the speakers doing?",
+          "options": ["Ordering printer cartridges", "Counting stock", "Repairing a printer", "Training a new employee"],
+          "answer": "B",
+          "explanation": "Người phụ nữ vừa 'finished counting the printer cartridges' và so với số trong hệ thống, tức họ đang kiểm kê."
+        },
+        {
+          "prompt": "What does the man suggest might explain part of the difference?",
+          "options": ["A supplier delivered too few boxes.", "Some cartridges were returned.", "A customer took some cartridges.", "The system crashed."],
+          "answer": "B",
+          "explanation": "Anh ấy hỏi về 'the three cartridges that were sent back to the supplier yesterday', tức hàng trả lại chưa được trừ."
+        },
+        {
+          "prompt": "What will the man do next?",
+          "options": ["Call the supplier", "Help Elena in aisle five", "Check the woman's count", "Enter the figure immediately"],
+          "answer": "C",
+          "explanation": "Cô ấy nhờ 'verify my count' và anh ấy nói 'I'll come over in a minute'. Việc nhập số vào hệ thống là chiều nay."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good morning, team. The new stock-control system goes live on Monday, so I want to walk you through the main points. From Monday, you will scan every item twice: when it arrives at the receiving dock and when it leaves on a delivery truck. The system then updates our stock levels automatically, so there is no more typing numbers into a spreadsheet after a shift. This is crucial, because the figures in the system are a direct reflection of what is on our shelves, and our accountants use them to value the warehouse. Stock that is missing or out of date is recorded as a liability, which affects the figures we report to the bank. I will run a full report every Friday and share any discrepancies with the team leaders. Training sessions are at ten and two today in the meeting room; please attend one of them.",
+      "questions": [
+        {
+          "prompt": "What is the talk mainly about?",
+          "options": ["A new delivery schedule", "A new stock-control system", "A visit from the bank", "A change in working hours"],
+          "answer": "B",
+          "explanation": "Người nói giải thích các điểm chính của 'the new stock-control system' sẽ hoạt động từ thứ Hai."
+        },
+        {
+          "prompt": "What will employees no longer need to do?",
+          "options": ["Scan items at the dock", "Attend training sessions", "Enter figures into a spreadsheet", "Load delivery trucks"],
+          "answer": "C",
+          "explanation": "'there is no more typing numbers into a spreadsheet at the end of a shift' vì hệ thống cập nhật tự động."
+        },
+        {
+          "prompt": "What are listeners asked to do today?",
+          "options": ["Count all stock", "Attend a training session", "Meet with the accountants", "Print a weekly report"],
+          "answer": "B",
+          "explanation": "Câu cuối: 'Training sessions are at ten and two today ...; please attend one of them.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The computer _____ updates the stock level whenever a sale is recorded.",
+        "options": ["automatic", "automatically", "automation", "automate"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'updates': 'automatically' (tự động)."
+      },
+      {
+        "prompt": "Checking every barcode by hand is _____, but it prevents costly errors.",
+        "options": ["tedious", "tediously", "tedium", "tediousness"],
+        "answer": "A",
+        "explanation": "Sau 'is' cần tính từ mô tả chủ ngữ: 'tedious' (tẻ nhạt, mất thời gian)."
+      },
+      {
+        "prompt": "Please _____ the damaged units from the total before you submit the report.",
+        "options": ["subtract", "subtraction", "subtracted", "subtractive"],
+        "answer": "A",
+        "explanation": "Câu mệnh lệnh sau 'Please' cần động từ nguyên mẫu: 'subtract ... from' (trừ ... khỏi)."
+      },
+      {
+        "prompt": "The auditor found a _____ between the invoices and the delivery records.",
+        "options": ["discrepancy", "discrepant", "discrepancies", "discreet"],
+        "answer": "A",
+        "explanation": "Sau 'a' cần danh từ số ít: 'a discrepancy between' (sự chênh lệch giữa)."
+      },
+      {
+        "prompt": "Accurate records are _____ when the company applies for a bank loan.",
+        "options": ["crucial", "tedious", "automatic", "disturbed"],
+        "answer": "A",
+        "explanation": "Cần tính từ hợp nghĩa: hồ sơ chính xác là 'crucial' (then chốt) khi vay ngân hàng; các từ khác không hợp nghĩa."
+      },
+      {
+        "prompt": "Unpaid taxes appear as a _____ on the company's balance sheet.",
+        "options": ["liability", "liable", "liably", "liabilities"],
+        "answer": "A",
+        "explanation": "Sau 'a' cần danh từ số ít: 'a liability' (một khoản nợ)."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Store Staff\nFrom: Beatriz Moreno, Operations Manager\nSubject: Annual stock count, Sunday, June 12\n\nThe store will be closed to customers on Sunday for the annual stock count. Please arrive at 7:30 a.m. and report to your team leader for your aisle assignment. Counting teams should not be ___ while they are working, so all phone calls will go to the office. Each count must be ___ by a second person before it is written on the sheet. Any ___ to the system records will be made by the office team on Monday; do not change figures yourself. Lunch will be provided at noon. Thank you for your help.",
+      "questions": [
+        {
+          "options": ["disturbed", "disturb", "disturbing", "disturbance"],
+          "answer": "A",
+          "explanation": "'should not be disturbed' là dạng bị động, cần quá khứ phân từ."
+        },
+        {
+          "options": ["verified", "verify", "verification", "verifying"],
+          "answer": "A",
+          "explanation": "'must be verified by a second person' là dạng bị động, cần quá khứ phân từ."
+        },
+        {
+          "options": ["adjustments", "adjust", "adjusted", "adjustable"],
+          "answer": "A",
+          "explanation": "Sau 'Any' và trước 'to the system records' cần danh từ: 'adjustments' (các điều chỉnh)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "To: Regional Operations\nFrom: Kenji Watanabe, Store Manager, Elm Street branch\nSubject: Results of the June stock count\n\nOur annual stock count took place on Sunday, June 12, with twenty-two staff in eleven pairs. For the first time we used handheld readers to scan each product instead of paper count sheets. The readers sent figures to the central system, which automatically compared them with sales records. A count that used to take two full days was finished by 4 p.m.\n\n| Area | Items counted | Discrepancies | Value of difference |\n| Sales floor | 9,840 | 31 | -$612 |\n| Back room | 4,215 | 8 | -$145 |\n| Garden center | 1,370 | 2 | +$40 |\n\nAfter we subtracted items written off after the spring flood, the net difference fell to $517, less than half of last year's figure. Most of the remaining discrepancies were small tools near the exit, so we plan to move those shelves closer to the checkout.\n\nThese results are a fair reflection of the improved receiving procedures we introduced this year. The office team verified every discrepancy over $50 on Monday before any adjustment was entered. I will run a follow-up count of the tool section in September.\n\nRegards,\nKenji Watanabe",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the email?",
+          "options": ["To request more staff", "To report the results of a stock count", "To announce a store closure", "To explain a new flood policy"],
+          "answer": "B",
+          "explanation": "Tiêu đề là 'Results of the June stock count' và nội dung trình bày kết quả cùng bảng số liệu."
+        },
+        {
+          "prompt": "What was new about this year's count?",
+          "options": ["It was done on a Sunday.", "It used handheld readers.", "It covered the garden center.", "It took two days."],
+          "answer": "B",
+          "explanation": "'For the first time we used handheld readers to scan each product instead of counting onto paper sheets.'"
+        },
+        {
+          "prompt": "Where were the most discrepancies found?",
+          "options": ["On the sales floor", "In the back room", "In the garden center", "Near the receiving dock"],
+          "answer": "A",
+          "explanation": "Bảng ghi khu 'Sales floor' có 31 chênh lệch, nhiều hơn phòng sau (8) và khu vườn (2)."
+        },
+        {
+          "prompt": "What does Mr. Watanabe plan to do about the small tools?",
+          "options": ["Stop selling them", "Lock them in the back room", "Move their shelves nearer the checkout", "Count them every week"],
+          "answer": "C",
+          "explanation": "'we plan to move those shelves closer to the checkout' nói về kệ dụng cụ nhỏ gần lối ra."
+        },
+        {
+          "prompt": "What will happen in September?",
+          "options": ["A new system will be installed.", "The store will close for a day.", "Part of the stock will be counted again.", "The office team will be trained."],
+          "answer": "C",
+          "explanation": "'I will run a follow-up count of the tool section in September', tức kiểm kê lại khu dụng cụ."
+        }
+      ]
+    }
+  }
+}

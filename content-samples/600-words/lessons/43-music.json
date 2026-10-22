@@ -1,0 +1,260 @@
+{
+  "number": 43,
+  "title": "Music",
+  "vocabulary": [
+    {
+      "word": "available",
+      "partOfSpeech": "adjective",
+      "meaning": "có sẵn, có thể mua hoặc sử dụng; rảnh",
+      "example": "The new album will be available in stores and online from the first of June.",
+      "exampleMeaning": "Album mới sẽ có bán tại cửa hàng và trên mạng từ ngày 1 tháng Sáu."
+    },
+    {
+      "word": "broaden",
+      "partOfSpeech": "verb",
+      "meaning": "mở rộng (kiến thức, phạm vi, tầm nhìn)",
+      "example": "Listening to jazz every week has broadened my understanding of rhythm.",
+      "exampleMeaning": "Nghe nhạc jazz mỗi tuần đã mở rộng hiểu biết của tôi về nhịp điệu."
+    },
+    {
+      "word": "category",
+      "partOfSpeech": "noun",
+      "meaning": "loại, hạng mục, nhóm",
+      "example": "The shop sorts its records into categories such as classical, jazz and folk.",
+      "exampleMeaning": "Cửa hàng xếp đĩa nhạc thành các loại như cổ điển, jazz và dân gian."
+    },
+    {
+      "word": "disparate",
+      "partOfSpeech": "adjective",
+      "meaning": "khác biệt hoàn toàn, không đồng nhất",
+      "example": "The festival brings together disparate styles, from brass bands to electronic music.",
+      "exampleMeaning": "Liên hoan quy tụ những phong cách rất khác nhau, từ kèn đồng đến nhạc điện tử."
+    },
+    {
+      "word": "divide",
+      "partOfSpeech": "verb",
+      "meaning": "chia, phân chia; gây chia rẽ",
+      "example": "The concert hall is divided into three seating areas with different prices.",
+      "exampleMeaning": "Phòng hòa nhạc được chia thành ba khu ghế với mức giá khác nhau."
+    },
+    {
+      "word": "favor",
+      "partOfSpeech": "verb",
+      "meaning": "ưa thích, thiên về; (danh từ) sự ưu ái, ân huệ",
+      "example": "Most of our customers favor live recordings over studio albums.",
+      "exampleMeaning": "Phần lớn khách hàng của chúng tôi thích bản thu trực tiếp hơn album phòng thu."
+    },
+    {
+      "word": "instinct",
+      "partOfSpeech": "noun",
+      "meaning": "bản năng, trực giác",
+      "example": "A good sound engineer has an instinct for when a track is too loud.",
+      "exampleMeaning": "Một kỹ sư âm thanh giỏi có trực giác nhận ra khi nào bản nhạc quá to."
+    },
+    {
+      "word": "prefer",
+      "partOfSpeech": "verb",
+      "meaning": "thích hơn, ưa chuộng hơn",
+      "example": "Many office workers prefer quiet instrumental music while they work.",
+      "exampleMeaning": "Nhiều nhân viên văn phòng thích nhạc không lời nhẹ nhàng hơn khi làm việc."
+    },
+    {
+      "word": "reason",
+      "partOfSpeech": "noun",
+      "meaning": "lý do, nguyên nhân; lý trí",
+      "example": "The main reason for the price increase is the higher cost of shipping vinyl records.",
+      "exampleMeaning": "Lý do chính của việc tăng giá là chi phí vận chuyển đĩa than cao hơn."
+    },
+    {
+      "word": "relaxation",
+      "partOfSpeech": "noun",
+      "meaning": "sự thư giãn, nghỉ ngơi",
+      "example": "The hotel plays soft piano music in the lobby to encourage relaxation.",
+      "exampleMeaning": "Khách sạn mở nhạc piano nhẹ ở sảnh để khách cảm thấy thư giãn."
+    },
+    {
+      "word": "taste",
+      "partOfSpeech": "noun",
+      "meaning": "sở thích, gu (âm nhạc, nghệ thuật); vị, khẩu vị",
+      "example": "Her taste in music changed after she worked at a radio station for a year.",
+      "exampleMeaning": "Gu âm nhạc của cô ấy đã thay đổi sau một năm làm việc ở đài phát thanh."
+    },
+    {
+      "word": "urge",
+      "partOfSpeech": "verb",
+      "meaning": "thúc giục, khuyên nên; (danh từ) sự thôi thúc",
+      "example": "The manager urged the staff to attend the free concert in the park.",
+      "exampleMeaning": "Người quản lý thúc giục nhân viên đến dự buổi hòa nhạc miễn phí trong công viên."
+    }
+  ],
+  "fillIn": {
+    "passage": "Last year, Bellamy Cafes hired a music consultant, Mr. Haddad, to choose the background music for its twelve shops. The owner's ___ for the project was simple: customers who feel calm stay longer and order more. Mr. Haddad began by ___ the day into three parts. In the morning, he ___ soft guitar pieces, since most customers want a moment of ___ before work. At lunchtime, the playlists moved to a livelier ___, and in the evening they returned to slow jazz.\n\nThe staff had very ___ opinions. Younger baristas ___ newer songs, while older ones trusted their ___ and asked for classics. Mr. Haddad ___ everyone to listen to the full list before judging it. He also wanted to ___ the choice beyond the usual styles, so each playlist included one piece from another country.\n\nThe lists were made ___ to all shops through a shared account, and every manager could adjust them to local ___. Six months later, the average visit was twelve minutes longer than before.",
+    "answers": ["reason", "dividing", "favored", "relaxation", "category", "disparate", "preferred", "instinct", "urged", "broaden", "available", "taste"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người phụ nữ đứng trong cửa hàng băng đĩa, đang lật xem các đĩa nhạc xếp trên kệ; phía sau có một cây đàn guitar treo trên tường.",
+      "options": [
+        "A woman is looking through records on a shelf.",
+        "A woman is playing a guitar on stage.",
+        "Some customers are waiting at the checkout.",
+        "A man is hanging a guitar on the wall."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy một người phụ nữ đang xem các đĩa nhạc trên kệ. (B) và (D) nhầm cây đàn treo trên tường với hành động chơi đàn hoặc treo đàn, (C) không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Which kind of music do you prefer for the waiting room?",
+        "options": ["Something quiet, like piano music.", "Yes, I'd like that very much.", "The waiting room is on the second floor."],
+        "answer": "A",
+        "explanation": "Câu hỏi Which cần câu trả lời chỉ ra lựa chọn. (B) trả lời Yes cho câu hỏi Wh, (C) nhắc lại 'waiting room' nhưng nói về vị trí."
+      },
+      {
+        "question": "Is the new recording available yet?",
+        "options": ["It comes out next Tuesday.", "I usually listen in the car.", "There are three categories."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc bản thu đã có bán chưa; (A) trả lời gián tiếp rằng tuần sau mới phát hành. (B) và (C) không liên quan."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Hiroshi, the owner wants us to broaden the selection in the shop. He says we sell mostly rock and pop and nothing else.\nMan: He's right. I checked last month's sales: almost ninety percent came from those two categories.\nWoman: So what do you suggest? We don't have much extra shelf space.\nMan: We could divide the back wall into small sections: one for jazz, one for folk, one for film music. Even thirty titles each would be a start.\nWoman: That sounds good. And I'd urge us to ask customers what they want. A short survey at the checkout, maybe.\nMan: Fine. I'll draft the survey tonight. Could you order the first batch of jazz titles tomorrow?\nWoman: Sure, as long as the budget is approved by then.",
+      "questions": [
+        {
+          "prompt": "Why does the owner want to change the shop?",
+          "options": ["Sales have dropped sharply.", "The shop sells few styles of music.", "The back wall is damaged.", "Customers complained about prices."],
+          "answer": "B",
+          "explanation": "Người phụ nữ nói chủ cửa hàng muốn 'broaden the selection' vì cửa hàng hầu như chỉ bán rock và pop."
+        },
+        {
+          "prompt": "What does the man suggest?",
+          "options": ["Opening a second shop", "Reducing the rock section", "Splitting the back wall into sections", "Lowering the price of pop albums"],
+          "answer": "C",
+          "explanation": "Anh ấy đề nghị 'divide the back wall into small sections'; 'split' đồng nghĩa với 'divide'."
+        },
+        {
+          "prompt": "What will the man do tonight?",
+          "options": ["Order jazz titles", "Write a customer survey", "Approve the budget", "Call the owner"],
+          "answer": "B",
+          "explanation": "Anh ấy nói 'I'll draft the survey tonight'. Việc đặt đĩa jazz là việc của người phụ nữ vào ngày mai."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hello, this is Marina Castellanos from the human resources department. I'm calling about the lunchtime music program that starts next Monday in the main meeting room. We're trying this for one simple reason: many of you told us in the staff survey that you wanted a short break for relaxation during the day. Each session lasts twenty-five minutes. On Mondays and Wednesdays, a pianist from the city music school will play; Fridays will feature recorded music from disparate traditions, from folk songs to film scores. The survey showed that most staff favor live music, so we will add more live dates if the first month goes well. Seats are available on a first-come basis, and you may bring your lunch. If you prefer a quieter room, the small library on the third floor will stay open as usual. Please tell your team about the program. Thank you.",
+      "questions": [
+        {
+          "prompt": "Why was the program created?",
+          "options": ["To raise money for a music school", "To give staff a break during the day", "To train staff in public speaking", "To test a new meeting room"],
+          "answer": "B",
+          "explanation": "Người nói nêu lý do: nhân viên 'wanted a short break for relaxation during the day'."
+        },
+        {
+          "prompt": "What will happen on Fridays?",
+          "options": ["A pianist will perform.", "Recorded music will be played.", "The meeting room will be closed.", "A survey will be given."],
+          "answer": "B",
+          "explanation": "'Fridays will feature recorded music from disparate traditions'. Nghệ sĩ piano chơi vào thứ Hai và thứ Tư."
+        },
+        {
+          "prompt": "What is suggested about the library?",
+          "options": ["It will be closed for repairs.", "It will host the live concerts.", "It is an option for people who want quiet.", "It is open only on Fridays."],
+          "answer": "C",
+          "explanation": "'If you prefer a quieter room, the small library on the third floor will stay open as usual.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The limited edition is _____ only through the shop's website.",
+        "options": ["available", "availability", "avail", "availing"],
+        "answer": "A",
+        "explanation": "Sau động từ 'is' cần tính từ: 'available' (có sẵn, có thể mua)."
+      },
+      {
+        "prompt": "Attending concerts abroad helped the young conductor _____ her musical knowledge.",
+        "options": ["broad", "broaden", "broadly", "breadth"],
+        "answer": "B",
+        "explanation": "Cấu trúc 'help someone do something' cần động từ nguyên mẫu: 'broaden' (mở rộng)."
+      },
+      {
+        "prompt": "Although their _____ in music are very different, the two partners run the shop well together.",
+        "options": ["taste", "tastes", "tasty", "tasting"],
+        "answer": "B",
+        "explanation": "Động từ 'are' số nhiều nên chủ ngữ phải là danh từ số nhiều: 'tastes' (sở thích của hai người)."
+      },
+      {
+        "prompt": "Last week the manager _____ all staff to attend the training on the new sound system.",
+        "options": ["urge", "urged", "urgent", "urgency"],
+        "answer": "B",
+        "explanation": "'Last week' cho biết thì quá khứ đơn; 'urged someone to do' là thúc giục ai làm gì."
+      },
+      {
+        "prompt": "Experienced producers often rely on _____ when choosing which song to release first.",
+        "options": ["instinct", "instinctive", "instinctively", "instinctual"],
+        "answer": "A",
+        "explanation": "Sau giới từ 'on' cần danh từ: 'instinct' (bản năng, trực giác)."
+      },
+      {
+        "prompt": "The two record labels have _____ goals, so a merger seems unlikely.",
+        "options": ["disparate", "disparity", "disparately", "disparage"],
+        "answer": "A",
+        "explanation": "Trước danh từ 'goals' cần tính từ: 'disparate' (khác biệt hoàn toàn). 'disparity' là danh từ, 'disparage' là động từ."
+      }
+    ],
+    "part6": {
+      "passage": "NOTICE TO SEASON TICKET HOLDERS\n\nFrom January, the Alder Concert Hall will ___ its Sunday afternoon series into two shorter programs: a one-hour concert at 2 p.m. and another at 4 p.m. We made this change for a practical ___: our survey showed that many families with young children find a full two-hour concert too long. Ticket holders who ___ the original format may exchange their Sunday tickets for any Saturday evening concert at no extra cost. Please contact the box office before December 15 to arrange an exchange.\n\nAlder Concert Hall Management",
+      "questions": [
+        {
+          "options": ["divide", "division", "divided", "divisible"],
+          "answer": "A",
+          "explanation": "Sau trợ động từ 'will' cần động từ nguyên mẫu: 'divide' (chia)."
+        },
+        {
+          "options": ["reason", "reasonable", "reasonably", "reasoned"],
+          "answer": "A",
+          "explanation": "Sau 'a practical' cần danh từ: 'reason' (lý do)."
+        },
+        {
+          "options": ["prefer", "preference", "preferable", "preferably"],
+          "answer": "A",
+          "explanation": "Mệnh đề quan hệ 'who ___ the original format' cần động từ: 'prefer' (thích hơn)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "SOUNDFRAME FOR BUSINESS\nBackground music that fits your space\n\nSoundframe provides licensed background music for shops, restaurants, hotels and offices. Our playlists are divided into clear categories so that you can match the music to your customers' taste and to the time of day.\n\n| Plan | Monthly fee | Features |\n| Basic | 15 dollars | 20 playlists, one location |\n| Plus | 35 dollars | 60 playlists, up to three locations, time-of-day scheduling |\n| Custom | 90 dollars | Unlimited playlists, any number of locations, a personal music adviser |\n\nNot sure what your customers favor? Our advisers do not rely on instinct alone. They study data from more than two thousand businesses and will suggest playlists for every part of your day, from quiet morning relaxation sets to lively evening programs. Many clients tell us the service has broadened their customers' listening habits as well as their own.\n\nAll plans include a free 30-day trial, and support is available by phone seven days a week. Plus and Custom subscribers may cancel at any time; Basic subscribers sign up for a minimum of six months.\n\nTo start your trial, visit our website or call 555-0188.",
+      "questions": [
+        {
+          "prompt": "What is being advertised?",
+          "options": ["A music school", "A background music service for businesses", "A chain of record shops", "A concert series"],
+          "answer": "B",
+          "explanation": "Quảng cáo giới thiệu dịch vụ nhạc nền có bản quyền cho cửa hàng, nhà hàng, khách sạn và văn phòng."
+        },
+        {
+          "prompt": "What is included in the Plus plan but not in the Basic plan?",
+          "options": ["A free trial", "Phone support", "Time-of-day scheduling", "A personal adviser"],
+          "answer": "C",
+          "explanation": "Bảng ghi gói Plus có 'time-of-day scheduling', gói Basic không có. Dùng thử và hỗ trợ qua điện thoại có ở mọi gói; cố vấn riêng chỉ có ở gói Custom."
+        },
+        {
+          "prompt": "How do the advisers decide which playlists to suggest?",
+          "options": ["By following their instinct only", "By asking the client's customers", "By using data from many businesses", "By visiting each location"],
+          "answer": "C",
+          "explanation": "'They study data from more than two thousand businesses', chứ không chỉ dựa vào trực giác."
+        },
+        {
+          "prompt": "Which subscribers must commit for at least six months?",
+          "options": ["Basic", "Plus", "Custom", "All subscribers"],
+          "answer": "A",
+          "explanation": "'Basic subscribers sign up for a minimum of six months'; gói Plus và Custom có thể hủy bất cứ lúc nào."
+        },
+        {
+          "prompt": "How can a business begin using the service?",
+          "options": ["By visiting a shop", "By signing a one-year contract", "By starting a free trial online or by phone", "By sending an email to an adviser"],
+          "answer": "C",
+          "explanation": "Cuối bài: 'To start your trial, visit our website or call 555-0188', và mọi gói đều có 30 ngày dùng thử miễn phí."
+        }
+      ]
+    }
+  }
+}

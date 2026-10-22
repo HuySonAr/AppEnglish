@@ -1,0 +1,260 @@
+{
+  "number": 49,
+  "title": "Hospitals",
+  "vocabulary": [
+    {
+      "word": "admit",
+      "partOfSpeech": "verb",
+      "meaning": "nhận (bệnh nhân) vào viện; thừa nhận",
+      "example": "The patient was admitted to the hospital on Sunday night for observation.",
+      "exampleMeaning": "Bệnh nhân được nhập viện tối Chủ nhật để theo dõi."
+    },
+    {
+      "word": "authorize",
+      "partOfSpeech": "verb",
+      "meaning": "cho phép, phê duyệt; ủy quyền",
+      "example": "Only the head nurse can authorize a change to a patient's medication schedule.",
+      "exampleMeaning": "Chỉ y tá trưởng mới được phép phê duyệt thay đổi lịch dùng thuốc của bệnh nhân."
+    },
+    {
+      "word": "designate",
+      "partOfSpeech": "verb",
+      "meaning": "chỉ định, dành riêng (cho mục đích cụ thể)",
+      "example": "The hospital designated the east wing as a quiet area for recovering patients.",
+      "exampleMeaning": "Bệnh viện dành riêng khu phía đông làm khu yên tĩnh cho bệnh nhân hồi phục."
+    },
+    {
+      "word": "escort",
+      "partOfSpeech": "verb",
+      "meaning": "đi kèm, dẫn (ai) đến nơi nào",
+      "example": "A volunteer will escort each new patient from the entrance to the ward.",
+      "exampleMeaning": "Một tình nguyện viên sẽ dẫn từng bệnh nhân mới từ cổng vào đến khoa."
+    },
+    {
+      "word": "identify",
+      "partOfSpeech": "verb",
+      "meaning": "xác định, nhận diện (danh tính, vấn đề)",
+      "example": "Staff must identify every patient by checking the name on the wristband.",
+      "exampleMeaning": "Nhân viên phải xác định danh tính mỗi bệnh nhân bằng cách kiểm tra tên trên vòng đeo tay."
+    },
+    {
+      "word": "mission",
+      "partOfSpeech": "noun",
+      "meaning": "sứ mệnh, nhiệm vụ (của tổ chức)",
+      "example": "The hospital's mission is to provide good care to everyone in the region.",
+      "exampleMeaning": "Sứ mệnh của bệnh viện là chăm sóc tốt cho mọi người trong khu vực."
+    },
+    {
+      "word": "permit",
+      "partOfSpeech": "verb",
+      "meaning": "cho phép (làm gì)",
+      "example": "Visitors are permitted on the ward between two and eight in the evening.",
+      "exampleMeaning": "Khách thăm được phép vào khoa từ hai giờ đến tám giờ tối."
+    },
+    {
+      "word": "pertinent",
+      "partOfSpeech": "adjective",
+      "meaning": "có liên quan, thích hợp (với vấn đề đang xét)",
+      "example": "Please bring any pertinent documents, such as test results from other clinics.",
+      "exampleMeaning": "Vui lòng mang theo mọi giấy tờ liên quan, chẳng hạn kết quả xét nghiệm từ phòng khám khác."
+    },
+    {
+      "word": "procedure",
+      "partOfSpeech": "noun",
+      "meaning": "thủ thuật (y khoa); quy trình, thủ tục",
+      "example": "The procedure takes about forty minutes, and most patients go home the same day.",
+      "exampleMeaning": "Thủ thuật kéo dài khoảng bốn mươi phút, và hầu hết bệnh nhân về nhà trong ngày."
+    },
+    {
+      "word": "result",
+      "partOfSpeech": "noun",
+      "meaning": "kết quả",
+      "example": "Your test results will be sent to your doctor within two working days.",
+      "exampleMeaning": "Kết quả xét nghiệm của bạn sẽ được gửi đến bác sĩ trong vòng hai ngày làm việc."
+    },
+    {
+      "word": "statement",
+      "partOfSpeech": "noun",
+      "meaning": "bản kê (chi phí), bảng sao kê; lời tuyên bố",
+      "example": "The billing office will mail you a statement listing every charge from your stay.",
+      "exampleMeaning": "Phòng thu phí sẽ gửi cho bạn bản kê liệt kê mọi khoản phí trong thời gian nằm viện."
+    },
+    {
+      "word": "usually",
+      "partOfSpeech": "adverb",
+      "meaning": "thường, thường thường",
+      "example": "Patients are usually discharged two days after this kind of surgery.",
+      "exampleMeaning": "Bệnh nhân thường được xuất viện hai ngày sau loại phẫu thuật này."
+    }
+  ],
+  "fillIn": {
+    "passage": "Riverbend General Hospital receives dozens of new patients every day, and the front desk team follows the same steps for each one. When Mr. Novak arrived on Monday morning to be ___ for a knee operation, a clerk first asked for his insurance card and a photo ID to ___ him. She checked that his doctor had ___ the surgery and that the hospital had ___ a bed for him on the fourth floor.\n\nPatients are ___ asked to arrive two hours before a ___ so that the nurses have time to prepare. A volunteer then ___ Mr. Novak to his room, since the building is large and visitors often get lost. His nurse reviewed the ___ parts of his medical history, such as allergies and current medicines, and reminded him that the hospital does not ___ food after midnight before an operation.\n\nThe operation went as planned, and the ___ pleased everyone. Before Mr. Novak went home, the billing office gave him a ___ of the expected charges, and he noticed the hospital's ___, printed on the back, which promises clear information for every patient.",
+    "answers": ["admitted", "identify", "authorized", "designated", "usually", "procedure", "escorted", "pertinent", "permit", "result", "statement", "mission"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nữ y tá đang đẩy xe lăn chở một bệnh nhân lớn tuổi dọc hành lang bệnh viện.",
+      "options": [
+        "The nurse is pushing a wheelchair.",
+        "The nurse is washing her hands.",
+        "The patient is climbing the stairs.",
+        "The woman is carrying a tray of food."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy y tá đẩy xe lăn trong hành lang. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Who authorized the change to the visiting hours?",
+        "options": ["The hospital director did.", "Visiting hours end at eight.", "Yes, I changed it."],
+        "answer": "A",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người. (B) nhắc lại 'visiting hours' nhưng trả lời về thời gian, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Could you escort Mrs. Bell to the X-ray department?",
+        "options": ["Sure, I'll take her right now.", "The X-ray result was normal.", "She usually arrives at nine."],
+        "answer": "A",
+        "explanation": "Câu yêu cầu 'Could you ...' cần câu đồng ý hoặc từ chối; (A) đồng ý. (B) nhắc lại 'X-ray' nhưng không trả lời, (C) nói về giờ đến."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Excuse me, I'm here to see my father, Henry Platt. He was admitted yesterday afternoon.\nMan: Let me check. Yes, Mr. Platt is in Room 412 on the fourth floor. May I see some identification, please?\nWoman: Of course. Here's my driver's license.\nMan: Thank you. I'll print a visitor badge for you. Visiting is permitted until eight o'clock, and only two visitors are allowed in the room at one time.\nWoman: That's fine, it's only me today. Do you know if his test results have come back?\nMan: I'm sorry, I can't give out medical information at the desk. His nurse will be able to tell you anything pertinent when you get upstairs.\nWoman: I understand. Which way are the elevators?\nMan: Straight ahead and to the left. A volunteer in a blue jacket can escort you if you'd like.",
+      "questions": [
+        {
+          "prompt": "Why is the woman at the hospital?",
+          "options": ["To have a test", "To visit a patient", "To apply for a job", "To pick up a prescription"],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'I'm here to see my father' và ông đã nhập viện hôm qua."
+        },
+        {
+          "prompt": "What does the man ask the woman to show?",
+          "options": ["A visitor badge", "An insurance card", "A photo ID", "A doctor's letter"],
+          "answer": "C",
+          "explanation": "Anh ấy hỏi 'May I see some identification, please?' và cô đưa bằng lái xe."
+        },
+        {
+          "prompt": "Why does the man NOT answer the woman's question about test results?",
+          "options": ["The results are not ready", "He is not allowed to share medical details", "The computer is not working", "The doctor has gone home"],
+          "answer": "B",
+          "explanation": "Anh ấy nói 'I can't give out medical information at the desk' và hướng cô đến y tá."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Welcome to Northgate Community Hospital, and thank you for joining our volunteer program. Before you begin, I'd like to explain a few procedures. Our mission is to make every patient and visitor feel safe and welcome, and volunteers are usually the first people they meet. Each of you has been designated to one area: the main entrance, the outpatient clinic, or the family waiting room. Your badge identifies your area, so please wear it at all times. One of your main tasks is to escort visitors to the correct ward; the building has three wings, and people often lose their way. Remember that you are not permitted to discuss a patient's condition, even with family members. If someone asks, direct them to the nurse in charge. Finally, if you cannot come for your shift, call the volunteer office at least two hours in advance so we can find a replacement.",
+      "questions": [
+        {
+          "prompt": "Who is the talk intended for?",
+          "options": ["New patients", "Hospital doctors", "New volunteers", "Visiting families"],
+          "answer": "C",
+          "explanation": "Người nói mở đầu bằng 'thank you for joining our volunteer program', tức nói với tình nguyện viên mới."
+        },
+        {
+          "prompt": "What does the speaker say about the badge?",
+          "options": ["It must be returned after each shift", "It shows which area the volunteer works in", "It allows access to patient records", "It is only needed on weekends"],
+          "answer": "B",
+          "explanation": "'Your badge identifies your area, so please wear it at all times.'"
+        },
+        {
+          "prompt": "What should volunteers do if someone asks about a patient's condition?",
+          "options": ["Check the patient's file", "Call the family", "Refer the person to the nurse in charge", "Ask the volunteer office"],
+          "answer": "C",
+          "explanation": "Tình nguyện viên không được bàn về tình trạng bệnh nhân; 'If someone asks, direct them to the nurse in charge.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The patient was _____ to the hospital after the doctor reviewed her X-rays.",
+        "options": ["admit", "admitted", "admission", "admitting"],
+        "answer": "B",
+        "explanation": "Câu bị động 'was + quá khứ phân từ': 'was admitted to' nghĩa là được nhập viện."
+      },
+      {
+        "prompt": "Only the department head is _____ to approve overtime for nursing staff.",
+        "options": ["authority", "authorized", "authorizing", "authorization"],
+        "answer": "B",
+        "explanation": "'is authorized to' là dạng bị động nghĩa là được phép; cần quá khứ phân từ."
+      },
+      {
+        "prompt": "Please include only _____ information in the patient's discharge summary.",
+        "options": ["pertinent", "pertinence", "pertain", "pertinently"],
+        "answer": "A",
+        "explanation": "Trước danh từ 'information' cần tính từ: 'pertinent' (có liên quan)."
+      },
+      {
+        "prompt": "Patients _____ wait about twenty minutes before seeing a doctor in the clinic.",
+        "options": ["usual", "usually", "unusual", "usefully"],
+        "answer": "B",
+        "explanation": "Cần trạng từ chỉ tần suất đứng trước động từ 'wait': 'usually'. 'usual' là tính từ."
+      },
+      {
+        "prompt": "The _____ took longer than expected because the equipment had to be replaced.",
+        "options": ["proceed", "procedural", "procedure", "procedurally"],
+        "answer": "C",
+        "explanation": "Sau 'The' cần danh từ làm chủ ngữ: 'procedure' (thủ thuật)."
+      },
+      {
+        "prompt": "The hospital will mail a detailed _____ of charges to each patient within ten days.",
+        "options": ["state", "stated", "statement", "stating"],
+        "answer": "C",
+        "explanation": "Sau 'a detailed' cần danh từ: 'statement' (bản kê chi phí)."
+      }
+    ],
+    "part6": {
+      "passage": "NOTICE TO VISITORS\nLakeshore Medical Center\n\nBeginning April 1, the parking lot behind the main building will be ___ for patients and visitors only. Staff members should use the garage on Elm Street. Visitors are reminded that children under twelve are ___ on the wards only when accompanied by an adult. Please also note that test ___ are given to patients by their doctors, not by the information desk, so our staff cannot answer questions about them by phone. We thank you for your patience while we make these changes to improve the comfort and safety of everyone in the building.",
+      "questions": [
+        {
+          "options": ["designate", "designated", "designation", "designating"],
+          "answer": "B",
+          "explanation": "Câu bị động 'will be + quá khứ phân từ': 'will be designated for' nghĩa là sẽ được dành riêng cho."
+        },
+        {
+          "options": ["permit", "permitted", "permission", "permitting"],
+          "answer": "B",
+          "explanation": "'are permitted on the wards' là dạng bị động nghĩa là được phép vào khoa; cần quá khứ phân từ."
+        },
+        {
+          "options": ["result", "results", "resulted", "resulting"],
+          "answer": "B",
+          "explanation": "Động từ 'are given' số nhiều nên chủ ngữ phải là danh từ số nhiều: 'test results'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "GREENHILL REGIONAL HOSPITAL\nPre-Admission Information for Day Surgery Patients\n\nDear Ms. Farouk,\n\nYour procedure is scheduled for Thursday, July 10, at 10:30 a.m. with Dr. Lindqvist.\n\nBefore your visit\n- Do not eat or drink anything after midnight on Wednesday.\n- Bring a photo ID and your insurance card so that staff can identify you.\n- Bring a list of all medicines you currently take.\n\nOn the day\n- Report to the Day Surgery Unit on the second floor at 8:30 a.m. A staff member will escort you to the preparation area.\n- A nurse will review your medical history and ask you to sign a form that authorizes the surgery.\n- You will usually be ready to leave about three hours after the procedure. You must be driven home by an adult; patients are not permitted to drive or take a taxi alone.\n\nAfter your visit\n- A statement of charges will be mailed to you within fourteen days.\n- Call 555-0199 if you have a fever above 38 degrees or unusual pain in the first 48 hours.\n\nIf you cannot keep this date, please call at least three working days in advance.\n\nDay Surgery Unit",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the letter?",
+          "options": ["To confirm a hospital bill", "To give instructions before a surgery", "To announce a new doctor", "To change the date of a procedure"],
+          "answer": "B",
+          "explanation": "Thư hướng dẫn bệnh nhân những việc cần làm trước, trong và sau ngày phẫu thuật."
+        },
+        {
+          "prompt": "What time should Ms. Farouk arrive at the hospital?",
+          "options": ["8:30 a.m.", "10:30 a.m.", "Midnight", "3:00 p.m."],
+          "answer": "A",
+          "explanation": "'Report to the Day Surgery Unit on the second floor at 8:30 a.m.' 10:30 là giờ phẫu thuật."
+        },
+        {
+          "prompt": "What will the nurse ask Ms. Farouk to do?",
+          "options": ["Pay a deposit", "Sign a consent form", "Call her insurer", "Take her medicine"],
+          "answer": "B",
+          "explanation": "'A nurse will ... ask you to sign a form that authorizes the surgery', tức ký giấy đồng ý phẫu thuật."
+        },
+        {
+          "prompt": "How should Ms. Farouk get home after the procedure?",
+          "options": ["By driving herself", "By taxi", "With an adult who drives her", "By hospital shuttle"],
+          "answer": "C",
+          "explanation": "'You must be driven home by an adult; patients are not permitted to drive or take a taxi alone.'"
+        },
+        {
+          "prompt": "What should Ms. Farouk do if she needs to change the date?",
+          "options": ["Email Dr. Lindqvist", "Call at least three working days ahead", "Visit the Day Surgery Unit", "Wait for the statement of charges"],
+          "answer": "B",
+          "explanation": "'If you cannot keep this date, please call at least three working days in advance.'"
+        }
+      ]
+    }
+  }
+}

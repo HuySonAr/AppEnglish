@@ -98,6 +98,16 @@ export class AuthGrpcController {
   adminAccountStats({ accessToken }) {
     return this.reply(() => this.handlers.adminStats(optional(accessToken)));
   }
+  adminInviteAccount({ accessToken, email, displayName, role }) {
+    return this.reply(() =>
+      this.handlers.adminInvite({ email, ...withoutEmpty({ displayName, role }) }, optional(accessToken)),
+    );
+  }
+  acceptInvite({ email, otp, password }) {
+    return this.reply((response) =>
+      this.handlers.acceptInvite({ email, otp, password }, response),
+    );
+  }
   updateProfile({ accessToken, payloadJson }) {
     return this.reply(() =>
       this.handlers.updateProfile(parseJson(payloadJson), optional(accessToken)),
@@ -191,6 +201,8 @@ for (const rpc of [
   'AdminUpdateAccount',
   'AdminAccountAction',
   'AdminAccountStats',
+  'AdminInviteAccount',
+  'AcceptInvite',
   'UpdateProfile',
   'VerifyPassword',
   'ChangePassword',

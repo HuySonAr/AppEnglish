@@ -1,0 +1,223 @@
+{
+  "unit": 2,
+  "title": "Office Issues",
+  "part5": [
+    {
+      "prompt": "Who is _____ hiring?",
+      "options": [
+        "in charge by",
+        "in charge on",
+        "in charge of",
+        "in charge for"
+      ],
+      "answer": "C",
+      "explanation": "'In charge of' nghĩa là chịu trách nhiệm về việc tuyển dụng."
+    },
+    {
+      "prompt": "Most office furniture is bought more on the basis of _____ than comfort.",
+      "options": [
+        "afford",
+        "affording",
+        "afforded",
+        "affordability"
+      ],
+      "answer": "D",
+      "explanation": "Sau 'on the basis of' cần danh từ; 'affordability' là khả năng chi trả."
+    },
+    {
+      "prompt": "The office _____ samples of its products.",
+      "options": [
+        "display",
+        "displayed",
+        "displaying",
+        "displayable"
+      ],
+      "answer": "B",
+      "explanation": "'Displayed' là động từ quá khứ đơn, diễn tả văn phòng đã trưng bày mẫu sản phẩm."
+    },
+    {
+      "prompt": "The staff expressed their _____ for the leadership of their boss.",
+      "options": [
+        "appreciate",
+        "appreciated",
+        "appreciating",
+        "appreciation"
+      ],
+      "answer": "D",
+      "explanation": "Sau 'their' cần danh từ 'appreciation' (sự đánh giá cao, lòng biết ơn)."
+    },
+    {
+      "prompt": "Ms. Ming was pleased that the new employee showed such _____.",
+      "options": [
+        "initiate",
+        "initiative",
+        "initiated",
+        "initiating"
+      ],
+      "answer": "C",
+      "explanation": "'Show initiative' là thể hiện tính chủ động; sau 'such' dùng danh từ."
+    },
+    {
+      "prompt": "Before you send the letter, you should _____ it to make sure there are no errors.",
+      "options": [
+        "proof",
+        "fold",
+        "petition",
+        "assemble"
+      ],
+      "answer": "A",
+      "explanation": "'Proof' là đọc và rà soát lỗi trước khi gửi thư."
+    },
+    {
+      "prompt": "The secretary sent a copy of the revised contract by _____ mail.",
+      "options": [
+        "register",
+        "registered",
+        "registering",
+        "registration"
+      ],
+      "answer": "B",
+      "explanation": "'Registered mail' là thư bảo đảm, cụm từ cố định."
+    },
+    {
+      "prompt": "Many office supply businesses specialize in furniture that is as _____ as it is affordable.",
+      "options": [
+        "duration",
+        "durable",
+        "durability",
+        "durableness"
+      ],
+      "answer": "B",
+      "explanation": "Cấu trúc 'as + tính từ + as'; 'durable' là bền."
+    },
+    {
+      "prompt": "The office manager finally _____ why the new software wasn’t working properly.",
+      "options": [
+        "figured in",
+        "figured for",
+        "figured out",
+        "figured about"
+      ],
+      "answer": "C",
+      "explanation": "'Figure out' là tìm ra nguyên nhân, hiểu ra vấn đề."
+    },
+    {
+      "prompt": "The letter from our accountant _____ that our petty cash spending was almost equal to budgeted items.",
+      "options": [
+        "mention",
+        "mentioned",
+        "mentioning",
+        "mentionable"
+      ],
+      "answer": "B",
+      "explanation": "Chủ ngữ số ít và ngữ cảnh quá khứ cần động từ 'mentioned'."
+    }
+  ],
+  "part6": [
+    {
+      "passage": "The use of computers ___ the workplace. Thirty years ago, many people had never touched a computer. Now almost everyone uses a computer for work. Computers facilitate work so that jobs can be completed more efficiently. Documents are easily duplicated and distributed with computers. The Internet has made it easy ___ for information. Computers have become very ___. Even the smallest businesses are able to buy them.",
+      "questions": [
+        {
+          "options": [
+            "revolutionize",
+            "will revolutionize",
+            "had revolutionized",
+            "has revolutionized"
+          ],
+          "answer": "D",
+          "explanation": "'Has revolutionized' là hiện tại hoàn thành, nói về thay đổi từ trước đến hiện tại."
+        },
+        {
+          "options": [
+            "search",
+            "to search",
+            "searching",
+            "can search"
+          ],
+          "answer": "B",
+          "explanation": "'Make it easy to do something' là cấu trúc đúng: dễ dàng làm việc gì."
+        },
+        {
+          "options": [
+            "afford",
+            "affording",
+            "affordably",
+            "affordable"
+          ],
+          "answer": "D",
+          "explanation": "Sau 'have become very' cần tính từ 'affordable' (có giá phải chăng)."
+        }
+      ]
+    },
+    {
+      "passage": "To: George Stanley\nFrom: Marya Obermeyer\nSubject: Photocopier issues\n\nGeorge,\n\nWe are almost out ___ paper for the photocopier. There is just one package left in the supply closet. I would appreciate your ordering a new box today. In the future, please stay on top of things like this. The order should have been made much sooner.\n\nAlso, we will have to ___ the photocopy machine sometime in the near future. We need a new one that doesn’t break down so often. Please start researching this and see if you can find one that is affordable. I would also like one that is not ___ to use.\n\nMarya",
+      "questions": [
+        {
+          "options": [
+            "of",
+            "on",
+            "at",
+            "to"
+          ],
+          "answer": "A",
+          "explanation": "'Be out of' là hết, cạn một thứ gì đó; 'out of paper' là hết giấy."
+        },
+        {
+          "options": [
+            "report",
+            "repeal",
+            "replace",
+            "repeat"
+          ],
+          "answer": "C",
+          "explanation": "'Replace' là thay thế máy photocopy cũ bằng máy mới."
+        },
+        {
+          "options": [
+            "complicate",
+            "complicated",
+            "complicating",
+            "complication"
+          ],
+          "answer": "B",
+          "explanation": "Sau 'not' và trước 'to use' cần tính từ 'complicated' (phức tạp)."
+        }
+      ]
+    },
+    {
+      "passage": "Memo\nTo: All office staff\nFrom: Office Manager\nRe: New photocopier\n\nWe have finally purchased a new photocopier. ___, it is a great improvement over our old one. It can ___ documents so you don’t have to put them together yourself. It also folds documents for mailing. However, it does not correct mistakes in your writing. When making multiple copies of a document, please ___ it beforehand and correct any errors. This will save us a great deal in both paper and time. Please let me know if you have any questions about using the new machine.",
+      "questions": [
+        {
+          "options": [
+            "Technical",
+            "Technician",
+            "Technicality",
+            "Technically"
+          ],
+          "answer": "D",
+          "explanation": "'Technically' là trạng từ dùng để nhận xét về mặt kỹ thuật, đứng đầu câu."
+        },
+        {
+          "options": [
+            "assemble",
+            "assume",
+            "assuage",
+            "assert"
+          ],
+          "answer": "A",
+          "explanation": "'Assemble documents' nghĩa là tập hợp/sắp xếp các trang tài liệu."
+        },
+        {
+          "options": [
+            "probe",
+            "proof",
+            "prove",
+            "prompt"
+          ],
+          "answer": "B",
+          "explanation": "'Proof' là đọc soát bản thảo để phát hiện và sửa lỗi trước khi sao chép."
+        }
+      ]
+    }
+  ]
+}

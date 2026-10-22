@@ -16,7 +16,7 @@ import { ListeningPracticeService } from '../src/listening/listening.service.js'
 import { listeningHarness } from './listening-helpers.js';
 import { CourseGrpcController } from '../src/course/course.grpc.controller.js';
 import { CourseLessonService } from '../src/course/course.service.js';
-import { courseHarness, rightAnswers, testAnswers as courseTestAnswers } from './course-helpers.js';
+import { courseHarness, testAnswers as courseTestAnswers } from './course-helpers.js';
 import { admin, manager, student } from './helpers.js';
 import { createCurriculum, createLessonRepository, placementWith, quizAnswers, testAnswers } from './lesson-helpers.js';
 
@@ -118,6 +118,11 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       assert.equal(locked.status, 409);
       assert.deepEqual(locked.json, { code: 54, msg: 'fail', data: { placementRequired: false } });
       assert.equal((await call('GET', `${lesson}/quiz/other`)).status, 400);
+      // A unit without a published review has none to take (D121).
+      const noReview = await call('GET', `/learning/units/${content.units[0].id}/review`);
+      assert.equal(noReview.status, 404);
+      assert.equal(noReview.json.code, 63);
+      assert.equal((await call('POST', `/learning/units/${content.units[0].id}/review/submit`, { body: { answers: {} } })).json.code, 63);
     });
 
     await t.test('a student goes through a lesson over HTTP', async () => {
@@ -172,38 +177,28 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       });
       assert.deepEqual([checked.status, checked.json.data.accuracy], [201, 100]);
       assert.equal((await call('POST', `/learning/practice/listening/${photo.exercise.id}/check`, { body: { mode: 'all', answers: {} } })).status, 400);
-      // Listening course (F05C).
+      // Listening course (D145).
       const courseMap = await call('GET', '/learning/listening-course');
-      assert.deepEqual([courseMap.status, courseMap.json.data.levels[0].units[0].lessons.length, courseMap.json.data.currentLevel], [200, 2, 'A1']);
-      const courseLesson = course.paper.content.lessons[0];
-      const lessonUrl = `/learning/listening-course/units/${course.unit.id}/lessons/${courseLesson.id}`;
-      const opened = await call('GET', lessonUrl);
-      assert.deepEqual([opened.status, opened.json.data.lesson.title, opened.json.data.closeSegments.length], [200, 'Ordering', 2]);
-      assert.equal((await call('GET', `/learning/listening-course/units/${course.unit.id}/lessons/nope`)).status, 400);
-      const sentenceId = courseLesson.closeSegmentIds[0];
-      const stepped = await call('POST', `${lessonUrl}/check`, { body: { step: 'close', segmentId: sentenceId, answers: { [sentenceId]: 'large please' } } });
-      assert.deepEqual([stepped.status, stepped.json.data.sentence.accuracy], [201, 100]);
-      assert.equal((await call('POST', `${lessonUrl}/check`, { body: { step: 'close', answers: {} } })).status, 400);
-      const finished = await call('POST', `${lessonUrl}/complete`, { body: { versionId: opened.json.data.versionId, answers: rightAnswers(courseLesson, course.segments) } });
-      assert.deepEqual([finished.status, finished.json.data.score, finished.json.data.passed], [201, 100, true]);
+      assert.deepEqual([courseMap.status, courseMap.json.data.levels[0].topics.length, courseMap.json.data.currentLevel], [200, 2, 'A1']);
       assert.equal((await call('GET', '/learning/listening-course', { as: 'manager' })).status, 403);
+      const topicUrl = `/learning/listening-course/topics/${course.paying.item.id}`;
+      const opened = await call('GET', topicUrl);
+      assert.deepEqual([opened.status, opened.json.data.topic.title, opened.json.data.sentences.length], [200, 'Paying', 4]);
+      assert.equal((await call('GET', '/learning/listening-course/topics/nope')).status, 400);
+      assert.deepEqual((await call('GET', `/learning/listening-course/topics/${course.meetings.item.id}`)).json.code, 61);
+      const sentence = course.segments[1];
+      const checkedSentence = await call('POST', `${topicUrl}/check`, { body: { versionId: opened.json.data.versionId, segmentId: sentence.id, mode: 'full', text: 'yes a coffee please' } });
+      assert.deepEqual([checkedSentence.status, checkedSentence.json.data.accuracy], [201, 100]);
+      assert.equal((await call('POST', `${topicUrl}/check`, { body: { segmentId: sentence.id, mode: 'all' } })).status, 400);
+      const completed = await call('POST', `${topicUrl}/complete`);
+      assert.deepEqual([completed.status, completed.json.data.done, completed.json.data.progress.topics.done], [201, true, 1]);
       const progress = await call('GET', '/learning/listening-course/progress');
-      assert.deepEqual([progress.status, progress.json.data.lessons.passed, progress.json.data.mistakeCount], [200, 1, 0]);
-      const notebook = await call('GET', '/learning/listening-course/mistakes');
-      assert.deepEqual([notebook.status, notebook.json.data.mistakes], [200, []]);
-      assert.equal((await call('POST', '/learning/listening-course/mistakes/99999999-9999-4999-8999-999999999999/check', { body: { text: 'x' } })).status, 404);
+      assert.deepEqual([progress.status, progress.json.data.topics.done, progress.json.data.openLevels], [200, 1, 1]);
       assert.equal((await call('GET', '/learning/listening-course/placement')).status, 404);
-      course.publishPlacement();
-      assert.equal((await call('GET', '/learning/listening-course/placement')).json.data.sections.length, 5);
-      const skipped = await call('POST', '/learning/listening-course/placement/skip');
-      assert.deepEqual([skipped.status, skipped.json.data.startLevel], [201, 'A1']);
-      const again = await call('POST', '/learning/listening-course/placement/submit', { body: { answers: {} } });
-      assert.deepEqual([again.status, again.json.code], [409, 62]);
-      const lockedCheck = await call('GET', `/learning/listening-course/tests/${course.unit.id}`);
-      assert.deepEqual([lockedCheck.status, lockedCheck.json.code], [409, 61]);
-      const levelTestUrl = `/learning/listening-course/tests/${course.levelTest.item.id}`;
+      assert.equal((await call('GET', '/learning/listening-course/mistakes')).status, 404);
+      const levelTestUrl = `/learning/listening-course/tests/${course.a1Test.item.id}`;
       assert.equal((await call('GET', levelTestUrl)).json.data.sections[0].questions.length, 4);
-      const moved = await call('POST', `${levelTestUrl}/submit`, { body: { answers: courseTestAnswers(course.levelTest, 4) } });
+      const moved = await call('POST', `${levelTestUrl}/submit`, { body: { answers: courseTestAnswers(course.a1Test, 4) } });
       assert.deepEqual([moved.status, moved.json.data.score, moved.json.data.levelUp], [201, 100, { from: 'A1', to: 'A2' }]);
       assert.equal((await call('POST', `${levelTestUrl}/submit`, { body: { answers: [] } })).status, 400);
       const practice = await call('GET', '/learning/practice/vocabulary');

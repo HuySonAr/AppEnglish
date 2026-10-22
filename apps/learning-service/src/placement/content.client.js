@@ -38,6 +38,15 @@ export class ContentClient {
     });
   }
 
+  // A unit's published review (the current version, or the given one) with
+  // its answers (D121); null when the unit or its review is not published.
+  getUnitReviewPaper(unitId, versionId) {
+    return this.call('getUnitReviewPaper', {
+      id: unitId,
+      payloadJson: JSON.stringify(versionId ? { versionId } : {}),
+    });
+  }
+
   // Published mock tests with the number of questions in each part.
   listPublishedMockTests() {
     return this.call('listPublishedMockTests', {});

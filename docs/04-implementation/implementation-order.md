@@ -9,11 +9,12 @@
 | F04 | Lesson flow | Review bắt buộc, gate >=80%, tuần tự |
 | F05A | Mock tests (full + mini) | Soạn đề, làm bài, chấm, điểm ước tính, lịch sử |
 | F05B | Practice | Luyện nhớ từ (F05B-1) và luyện nghe chép theo chủ đề/cấp độ (F05B-2 đến F05B-4) theo D84 |
-| F05C | Listening course | Giáo trình nghe A1 → C1 theo D100: soạn, học 5 bước, kiểm tra lên cấp, placement nghe, sổ lỗi |
+| F05C | Listening course | Giáo trình nghe A1 → C1 theo D100, D141: soạn, học 5 bước, kiểm tra lên cấp, placement nghe, sổ lỗi |
 | F06 | Progress | Reading/Listening theo policy đã chốt |
 | F07 | XP/leaderboard | Mock best score, không XP trùng |
 | F08 | Client integration/e2e | Luồng đầu cuối đạt acceptance |
 | F09 | Hồ sơ cá nhân | Tên hiển thị, avatar, đổi mật khẩu; bảng xếp hạng hiện tên + avatar thay email (D113) |
+| F10 | Unit review | Bài review 19 câu Reading khép unit (10 Part 5, 3 đoạn Part 6), đậu 80% mới mở unit kế (D121, D129) |
 
 ## Đối chiếu ID và file prompt
 

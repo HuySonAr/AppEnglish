@@ -1,0 +1,260 @@
+{
+  "number": 42,
+  "title": "Theater",
+  "vocabulary": [
+    {
+      "word": "action",
+      "partOfSpeech": "noun",
+      "meaning": "hành động; diễn biến (của vở kịch, bộ phim)",
+      "example": "The action of the play takes place in a hotel lobby during one long night.",
+      "exampleMeaning": "Diễn biến của vở kịch xảy ra trong sảnh một khách sạn suốt một đêm dài."
+    },
+    {
+      "word": "approach",
+      "partOfSpeech": "noun",
+      "meaning": "cách tiếp cận, phương pháp; (động từ) tiến đến gần",
+      "example": "The new director has a fresh approach to staging classic plays with modern costumes.",
+      "exampleMeaning": "Đạo diễn mới có cách tiếp cận mới mẻ khi dựng các vở kịch kinh điển với trang phục hiện đại."
+    },
+    {
+      "word": "audience",
+      "partOfSpeech": "noun",
+      "meaning": "khán giả, người xem",
+      "example": "The audience applauded for several minutes after the final scene.",
+      "exampleMeaning": "Khán giả vỗ tay suốt mấy phút sau cảnh cuối."
+    },
+    {
+      "word": "creative",
+      "partOfSpeech": "adjective",
+      "meaning": "sáng tạo, giàu ý tưởng",
+      "example": "The set designer found a creative way to show a storm using only light and sound.",
+      "exampleMeaning": "Người thiết kế sân khấu đã tìm ra cách sáng tạo để thể hiện cơn bão chỉ bằng ánh sáng và âm thanh."
+    },
+    {
+      "word": "dialogue",
+      "partOfSpeech": "noun",
+      "meaning": "lời đối thoại (trong kịch, phim); cuộc đối thoại",
+      "example": "The playwright cut ten minutes of dialogue to make the second act move faster.",
+      "exampleMeaning": "Nhà soạn kịch đã cắt mười phút đối thoại để màn hai diễn ra nhanh hơn."
+    },
+    {
+      "word": "element",
+      "partOfSpeech": "noun",
+      "meaning": "yếu tố, thành phần",
+      "example": "Live music is an important element of every production at the Riverside Playhouse.",
+      "exampleMeaning": "Nhạc sống là một yếu tố quan trọng trong mọi vở diễn tại nhà hát Riverside."
+    },
+    {
+      "word": "experience",
+      "partOfSpeech": "noun",
+      "meaning": "kinh nghiệm; trải nghiệm; (động từ) trải qua",
+      "example": "Our lighting technician has fifteen years of experience in regional theaters.",
+      "exampleMeaning": "Kỹ thuật viên ánh sáng của chúng tôi có mười lăm năm kinh nghiệm ở các nhà hát địa phương."
+    },
+    {
+      "word": "occur",
+      "partOfSpeech": "verb",
+      "meaning": "xảy ra, diễn ra",
+      "example": "A costume change occurs between the first and second scenes, so the lights go down briefly.",
+      "exampleMeaning": "Việc thay trang phục diễn ra giữa cảnh một và cảnh hai, nên đèn tắt trong chốc lát."
+    },
+    {
+      "word": "perform",
+      "partOfSpeech": "verb",
+      "meaning": "biểu diễn, trình diễn; thực hiện",
+      "example": "The company will perform the comedy six nights a week until the end of March.",
+      "exampleMeaning": "Đoàn kịch sẽ biểu diễn vở hài này sáu đêm mỗi tuần cho đến cuối tháng Ba."
+    },
+    {
+      "word": "rehearse",
+      "partOfSpeech": "verb",
+      "meaning": "diễn tập, tập dượt",
+      "example": "The cast rehearses every afternoon in the hall behind the main stage.",
+      "exampleMeaning": "Dàn diễn viên diễn tập mỗi buổi chiều trong hội trường phía sau sân khấu chính."
+    },
+    {
+      "word": "review",
+      "partOfSpeech": "noun",
+      "meaning": "bài phê bình, bài đánh giá; (động từ) xem xét lại, đánh giá",
+      "example": "A positive review in the morning paper doubled ticket sales within a day.",
+      "exampleMeaning": "Một bài phê bình tích cực trên tờ báo sáng đã làm doanh số vé tăng gấp đôi trong một ngày."
+    },
+    {
+      "word": "sell out",
+      "partOfSpeech": "verb",
+      "meaning": "bán hết (vé, hàng hóa)",
+      "example": "Tickets for the opening night usually sell out within an hour of going on sale.",
+      "exampleMeaning": "Vé đêm khai diễn thường bán hết trong vòng một giờ sau khi mở bán."
+    }
+  ],
+  "fillIn": {
+    "passage": "The Copperfield Players is a small theater company managed by Mr. Nakamura. Last autumn the company chose a new comedy about a family-run bakery. Most of the ___ takes place in the shop's kitchen, and the ___ between the two sisters is fast and funny. The director, Ms. Oyelaran, took a bold ___: she asked the actors to make their own costumes from second-hand clothes, which gave the show a ___ look at very low cost.\n\nThe cast ___ for five weeks, often until late in the evening. Two days before the opening, a problem ___: the lead actor lost his voice. Fortunately, his understudy had plenty of ___ and was ready to ___ in his place. The first ___ was small, but the local paper printed a warm ___, praising the music as the strongest ___ of the production. By the second weekend, every show began to ___, and the company added four extra dates in December to meet the demand.",
+    "answers": ["action", "dialogue", "approach", "creative", "rehearsed", "occurred", "experience", "perform", "audience", "review", "element", "sell out"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nhóm diễn viên đứng trên sân khấu đang tập dượt; một người phụ nữ cầm kịch bản chỉ tay về phía họ, hàng ghế khán giả phía dưới trống.",
+      "options": [
+        "Some actors are rehearsing on a stage.",
+        "The audience is leaving the theater.",
+        "A woman is painting the scenery.",
+        "The curtains are being closed."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy các diễn viên đang tập trên sân khấu với một người phụ nữ cầm kịch bản. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How many people were in the audience last night?",
+        "options": ["About two hundred, mostly students.", "Yes, they enjoyed it very much.", "The show starts at seven thirty."],
+        "answer": "A",
+        "explanation": "Câu hỏi How many cần câu trả lời về số lượng. (B) trả lời Yes cho câu hỏi Wh, (C) trả lời về giờ diễn."
+      },
+      {
+        "question": "Has the Saturday show sold out yet?",
+        "options": ["The tickets are twenty dollars each.", "Not yet, but only a few seats are left.", "She sells costumes online."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về việc vé đã bán hết chưa; (B) trả lời chưa và thêm chi tiết. (A) nói về giá vé, (C) nhầm 'sells' với nghĩa bán hàng khác."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Rosa, did you see the review of our new play in this morning's paper?\nWoman: I did. The critic loved the second act, but she thought the dialogue in the first scene was too slow.\nMan: The director agrees, actually. The cast is going to rehearse a shorter version this afternoon.\nWoman: Good. Even so, the review helped. The box office says Friday and Saturday have already sold out, and Sunday is almost full.\nMan: That's great news. Should we add a matinee next weekend?\nWoman: I'd like to, but two of the actors perform in another show on Saturday afternoons. Let me check with the stage manager first.\nMan: Please do, and let me know by tomorrow so we can update the website.",
+      "questions": [
+        {
+          "prompt": "What is the conversation mainly about?",
+          "options": ["The response to a new play", "A new ticket price", "The hiring of a theater critic", "Repairs to the stage"],
+          "answer": "A",
+          "explanation": "Hai người nói về bài phê bình trên báo và lượng vé bán ra sau đó, tức phản ứng đối với vở kịch mới."
+        },
+        {
+          "prompt": "What will the cast do this afternoon?",
+          "options": ["Meet the critic", "Practice a shorter scene", "Sign programs for the audience", "Perform a matinee"],
+          "answer": "B",
+          "explanation": "Người đàn ông nói 'The cast is going to rehearse a shorter version this afternoon'; 'practice' đồng nghĩa với 'rehearse'."
+        },
+        {
+          "prompt": "Why is the woman unsure about adding a matinee?",
+          "options": ["The theater is being repaired.", "Some actors have another commitment.", "Tickets are too expensive.", "The director is on vacation."],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'two of the actors perform in another show on Saturday afternoons', tức hai diễn viên đã bận diễn vở khác."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good evening, ladies and gentlemen, and welcome to the Greenway Playhouse. Before tonight's performance of The Clockmaker's Daughter begins, I have a few short announcements. Please switch off your phones, as any light or sound disturbs both the actors and the people around you. The action of the play moves between a workshop and a railway station, and the scene changes occur in full darkness, so please remain in your seats during those moments. Tonight's show runs two hours with one twenty-minute interval. Sound is an important element of this production; some of the effects are quite loud, especially in the second act. Our creative team has worked for six months to make this experience as real as possible for you. Finally, members of the audience are invited to stay after the show for a short discussion with the director. Enjoy the performance.",
+      "questions": [
+        {
+          "prompt": "Where is the announcement most likely being made?",
+          "options": ["At a railway station", "In a theater", "At a workshop", "In a cinema lobby"],
+          "answer": "B",
+          "explanation": "Người nói chào mừng khán giả đến Greenway Playhouse trước buổi diễn kịch, nhắc đến diễn viên, cảnh và giờ nghỉ giữa giờ."
+        },
+        {
+          "prompt": "Why are people asked to stay in their seats at certain moments?",
+          "options": ["The doors will be locked.", "The scene changes happen in darkness.", "The interval is very short.", "The actors will walk through the aisles."],
+          "answer": "B",
+          "explanation": "'the scene changes occur in full darkness, so please remain in your seats during those moments'."
+        },
+        {
+          "prompt": "What can the audience do after the show?",
+          "options": ["Meet the director for a discussion", "Visit the workshop", "Buy a signed program", "Watch a second performance"],
+          "answer": "A",
+          "explanation": "Cuối bài: khán giả được mời ở lại 'for a short discussion with the director'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The company will _____ the musical twice on Saturdays during the summer.",
+        "options": ["perform", "performance", "performer", "performing"],
+        "answer": "A",
+        "explanation": "Sau trợ động từ 'will' cần động từ nguyên mẫu: 'perform'."
+      },
+      {
+        "prompt": "Ticket sales were slow at first, but a strong _____ in the weekend paper changed everything.",
+        "options": ["review", "reviewer", "reviewed", "reviewing"],
+        "answer": "A",
+        "explanation": "Sau 'a strong' cần danh từ chỉ bài viết trên báo: 'review' (bài phê bình). 'reviewer' là người viết, không hợp nghĩa."
+      },
+      {
+        "prompt": "The young director is known for her _____ use of light and shadow.",
+        "options": ["create", "creation", "creative", "creatively"],
+        "answer": "C",
+        "explanation": "Trước danh từ 'use' cần tính từ: 'creative' (sáng tạo)."
+      },
+      {
+        "prompt": "Yesterday the cast _____ the final scene three more times before the dress rehearsal.",
+        "options": ["rehearse", "rehearsed", "rehearsal", "rehearsing"],
+        "answer": "B",
+        "explanation": "'Yesterday' cho biết thì quá khứ đơn, nên cần 'rehearsed'."
+      },
+      {
+        "prompt": "Nobody expected a technical problem to _____ during the opening night.",
+        "options": ["occur", "occurs", "occurrence", "occurred"],
+        "answer": "A",
+        "explanation": "Sau 'to' cần động từ nguyên mẫu: 'occur' (xảy ra)."
+      },
+      {
+        "prompt": "Because the two front rows were reserved, the _____ sat farther from the stage than usual.",
+        "options": ["audience", "auditor", "audible", "audition"],
+        "answer": "A",
+        "explanation": "Cần danh từ chỉ người xem làm chủ ngữ: 'audience'. 'auditor' là kiểm toán viên, 'audition' là buổi thử vai, 'audible' là tính từ."
+      }
+    ],
+    "part6": {
+      "passage": "Dear Subscriber,\n\nThank you for supporting the Lantern Street Theater this season. Our next production, A Table for Nine, opens on November 8. The playwright is new to our stage, but our director has twenty years of ___ with comedies of this kind. Live piano music is a key ___ of the show, so we recommend seats in the center section for the best sound. Please note that subscribers may reserve seats until October 25; after that date, remaining tickets go on general sale and usually ___ within a few days. To reserve, call the box office at 555-0142 between ten and six.\n\nWarm regards,\nFelix Mbatha\nSubscriber Services",
+      "questions": [
+        {
+          "options": ["experience", "experienced", "experiences", "experiential"],
+          "answer": "A",
+          "explanation": "Sau 'twenty years of' cần danh từ không đếm được: 'experience' (kinh nghiệm)."
+        },
+        {
+          "options": ["element", "elementary", "elemental", "elements"],
+          "answer": "A",
+          "explanation": "Sau 'a key' cần danh từ số ít: 'element' (yếu tố)."
+        },
+        {
+          "options": ["sell out", "sold out", "selling out", "sells out"],
+          "answer": "A",
+          "explanation": "Chủ ngữ 'remaining tickets' số nhiều, thì hiện tại đơn với 'usually', nên dùng 'sell out'. 'sells out' sai về số, 'sold out' là quá khứ."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "HILLSIDE COMMUNITY THEATER\nCall for Actors: Spring Production\n\nLocal actors are invited to audition for our spring production, The Lighthouse Keepers. The action follows three generations of one family on a small island, and the dialogue includes a few lines in the family's own invented language.\n\n| Role | Age range | Audition date |\n| Marta, the keeper | 45-60 | March 3 |\n| Jonas, her son | 25-35 | March 3 |\n| Lea, the granddaughter | 16-22 | March 4 |\n| Island visitors (4 roles) | any | March 4 |\n\nAuditions take place at the theater on Mill Road from 6 p.m. Please prepare a two-minute speech of your own choice; no singing is required. Our director, Hugo Fenn, takes a creative approach to rehearsals, often asking actors to improvise scenes before working from the script, so previous stage experience is welcome but not required.\n\nThe cast will rehearse on Tuesday and Thursday evenings from March 10 and will perform in May. All roles are unpaid, but travel costs are reimbursed. To register, email the casting office with your name, the role you want and a recent photograph.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the notice?",
+          "options": ["To announce a new theater building", "To invite actors to try out for a play", "To sell tickets for a spring show", "To hire a new director"],
+          "answer": "B",
+          "explanation": "Thông báo mời diễn viên địa phương đến thử vai ('audition') cho vở kịch mùa xuân."
+        },
+        {
+          "prompt": "On what date can someone audition for the role of Lea?",
+          "options": ["March 3", "March 4", "March 10", "In May"],
+          "answer": "B",
+          "explanation": "Bảng ghi vai Lea thử vai ngày 'March 4'. Ngày 10 tháng Ba là ngày bắt đầu tập, tháng Năm là thời gian diễn."
+        },
+        {
+          "prompt": "What should actors prepare for the audition?",
+          "options": ["A song", "A scene from the play", "A short speech of their choice", "A written application"],
+          "answer": "C",
+          "explanation": "'Please prepare a two-minute speech of your own choice; no singing is required.'"
+        },
+        {
+          "prompt": "What is indicated about Hugo Fenn?",
+          "options": ["He requires professional experience.", "He wrote the play.", "He often has actors improvise.", "He will perform in the show."],
+          "answer": "C",
+          "explanation": "Đạo diễn Hugo Fenn 'often asking actors to improvise scenes before working from the script'. Kinh nghiệm sân khấu không bắt buộc."
+        },
+        {
+          "prompt": "What will actors receive for taking part?",
+          "options": ["A small salary", "Payment for travel costs", "Free tickets for friends", "A costume to keep"],
+          "answer": "B",
+          "explanation": "'All roles are unpaid, but travel costs are reimbursed', tức diễn viên được hoàn chi phí đi lại chứ không có lương."
+        }
+      ]
+    }
+  }
+}

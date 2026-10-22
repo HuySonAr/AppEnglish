@@ -13,6 +13,7 @@ import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { cn } from '../../../lib/utils.js';
 import { listMockTests } from '../api/mock-api.js';
 import { CardGridPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { useListState } from '../../../hooks/use-list-state.js';
 
 const PAGE_SIZE = 6;
 const takenOptions = [
@@ -27,12 +28,7 @@ export function MockTestsPage() {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
   // Search, filters and sort of the list; changing one goes back to page 1.
-  const [filters, setFilters] = useState({ search: '', level: 'all', examType: 'all', taken: 'all', sort: MockListSort.RECOMMENDED });
-  const [page, setPage] = useState(1);
-  const setFilter = (name) => (value) => {
-    setFilters((current) => ({ ...current, [name]: value }));
-    setPage(1);
-  };
+  const { filters, setFilters, setFilter, page, setPage } = useListState({ search: '', level: 'all', examType: 'all', taken: 'all', sort: MockListSort.RECOMMENDED });
 
   async function load() {
     setState('loading');

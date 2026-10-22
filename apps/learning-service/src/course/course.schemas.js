@@ -1,34 +1,27 @@
 import { z } from 'zod';
-import { CourseLessonStep } from '@appenglish/learning-contracts';
+import { CourseDictationMode } from '@appenglish/learning-contracts';
 
-export const unitIdSchema = z.string().uuid();
-export const itemIdSchema = unitIdSchema;
+export const itemIdSchema = z.string().uuid();
+export const unitIdSchema = itemIdSchema;
 
-// Which lesson of the unit; versionId keeps the checks on the version the
-// learner opened.
-const lessonRef = { lessonId: z.string().uuid(), versionId: z.string().uuid().optional() };
-
-// Option id by question id, and what was written by sentence id.
+// Option id by question id.
 const answers = z
   .record(z.string().max(80), z.string().max(2000))
   .default({})
   .refine((value) => Object.keys(value).length <= 50, { message: 'Too many answers' });
 
-export const lessonOpenSchema = z.object({ lessonId: lessonRef.lessonId }).strict();
+// One dictation sentence checked (D145): what was written in the full mode,
+// or the words typed in each blank in the blanks mode. versionId keeps the
+// check on the version the learner opened.
+export const sentenceCheckSchema = z
+  .object({
+    versionId: z.string().uuid().optional(),
+    segmentId: z.string().uuid(),
+    mode: z.enum(Object.values(CourseDictationMode)),
+    text: z.string().max(2000).default(''),
+    blanks: z.array(z.string().max(200)).max(30).default([]),
+  })
+  .strict();
 
-// One step checked as the learner goes: the main-idea question, the detail
-// questions, or one sentence written down (segmentId).
-export const stepCheckSchema = z
-  .object({ ...lessonRef, step: z.enum(Object.values(CourseLessonStep)), segmentId: z.string().uuid().optional(), answers })
-  .strict()
-  .refine((value) => value.step !== CourseLessonStep.CLOSE || value.segmentId, { message: 'Choose the sentence', path: ['segmentId'] });
-
-// Every answer of the lesson, scored together when the learner finishes.
-export const lessonAnswersSchema = z.object({ ...lessonRef, answers }).strict();
-
-// The answers of a unit check, level test or the placement: option id by
-// question id.
+// The answers of a level test: option id by question id.
 export const testAnswersSchema = z.object({ versionId: z.string().uuid().optional(), answers }).strict();
-
-// A sentence of the mistakes notebook written again.
-export const mistakeCheckSchema = z.object({ text: z.string().max(2000).default('') }).strict();

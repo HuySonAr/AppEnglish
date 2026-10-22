@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDown, ArrowUp, Library, Pencil, Plus } from 'lucide-react';
-import { MIN_PUBLISHED_LESSONS_PER_UNIT, UnitStatus } from '@appenglish/content-contracts';
+import { ArrowDown, ArrowUp, ClipboardCheck, Library, Pencil, Plus } from 'lucide-react';
+import { UnitStatus } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import {
   createLesson,
   createUnit,
+  deleteUnit,
   listUnits,
   publishUnit,
+  unpublishUnit,
   updateLesson,
   updateUnit,
 } from '../api/content-api.js';
+import { ContentDangerActions } from '../components/ContentDangerActions.jsx';
+import { PublishButton, usePublishAction } from '../../../components/shared/PublishButton.jsx';
 import {
   Badge,
   Button,
@@ -44,6 +48,8 @@ import {
 } from '../lib/content-list.js';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { useListState } from '../../../hooks/use-list-state.js';
+import { useFocusReturn, useListLinkState, useReturnTo } from '../../../hooks/use-return-to.js';
 
 function MoveButtons({ label, index, count, onMove, disabled }) {
   return (
@@ -89,16 +95,15 @@ export function ContentUnitsPage() {
   const [units, setUnits] = useState([]);
   const [state, setState] = useState('loading');
   const [busy, setBusy] = useState(false);
+  // The publish animation of the unit being published (D126).
+  const publish = usePublishAction();
+  const [publishingUnitId, setPublishingUnitId] = useState(null);
   const [newUnitTitle, setNewUnitTitle] = useState('');
   const [lessonTitles, setLessonTitles] = useState({});
   const [editing, setEditing] = useState(null);
   // Search, filter and sort of the list; changing one goes back to page 1.
-  const [filters, setFilters] = useState({ search: '', status: StatusFilter.ALL, sort: LessonSort.ORDER });
-  const [page, setPage] = useState(1);
-  const setFilter = (name) => (value) => {
-    setFilters((current) => ({ ...current, [name]: value }));
-    setPage(1);
-  };
+  const linkState = useListLinkState();
+  const { filters, setFilters, setFilter, page, setPage } = useListState({ search: '', status: StatusFilter.ALL, sort: LessonSort.ORDER });
 
   async function load({ quiet = false } = {}) {
     if (!quiet) setState('loading');
@@ -118,6 +123,7 @@ export function ContentUnitsPage() {
   useEffect(() => {
     load();
   }, []);
+  useFocusReturn(state === 'ready');
 
   // Runs one change, then reloads the list so positions and badges stay true.
   async function run(action, { success, failure }) {
@@ -172,7 +178,7 @@ export function ContentUnitsPage() {
       <PageHeader
         eyebrow="Content Manager"
         title="Units and lessons"
-        description={`Learners see a unit once it is published, and only its published lessons. A unit needs at least ${MIN_PUBLISHED_LESSONS_PER_UNIT} published lesson${MIN_PUBLISHED_LESSONS_PER_UNIT === 1 ? '' : 's'}.`}
+        description="Create, order and publish units and their lessons."
       />
 
       <form onSubmit={addUnit} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row">
@@ -218,7 +224,7 @@ export function ContentUnitsPage() {
           const publishedLessons = unit.publishedCount;
           const isPublished = unit.status === UnitStatus.PUBLISHED;
           return (
-            <Card key={unit.id}>
+            <Card key={unit.id} id={`focus-${unit.id}`} className="scroll-mt-24">
               <CardHeader className="space-y-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-2">
@@ -255,17 +261,45 @@ export function ContentUnitsPage() {
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
+                    <Button asChild variant="outline" size="sm" className="gap-1.5">
+                      <Link to={`/content-manager/units/${unit.id}/review`} state={linkState(unit.id)}>
+                        <ClipboardCheck className="h-4 w-4" />
+                        Unit review
+                        {unit.review?.publishedVersionNumber ? (
+                          <Badge variant="success">v{unit.review.publishedVersionNumber}</Badge>
+                        ) : unit.review?.hasDraft ? (
+                          <Badge variant="warning">Draft</Badge>
+                        ) : (
+                          <Badge variant="outline">None</Badge>
+                        )}
+                      </Link>
+                    </Button>
                     {isPublished ? null : (
-                      <Button
+                      <PublishButton
                         size="sm"
+                        label="Publish unit"
+                        state={publishingUnitId === unit.id ? publish.state : 'idle'}
                         disabled={busy}
-                        onClick={() =>
-                          run(() => publishUnit(unit.id), { success: 'Unit published', failure: 'Unit cannot be published yet' })
-                        }
-                      >
-                        Publish unit
-                      </Button>
+                        onClick={() => {
+                          setPublishingUnitId(unit.id);
+                          publish.run(() => run(() => publishUnit(unit.id), { success: 'Unit published', failure: 'Unit cannot be published yet' }));
+                        }}
+                      />
                     )}
+                    <ContentDangerActions
+                      noun="unit"
+                      published={isPublished}
+                      busy={busy}
+                      onUnpublish={async () => {
+                        await unpublishUnit(unit.id);
+                        await load({ quiet: true });
+                      }}
+                      onDelete={async () => {
+                        await deleteUnit(unit.id);
+                        await load({ quiet: true });
+                      }}
+                      deleteNote="Every lesson of the unit goes with it."
+                    />
                   </div>
                 </div>
               </CardHeader>
@@ -282,6 +316,7 @@ export function ContentUnitsPage() {
                           <span className="text-sm text-muted-foreground">{lesson.position}.</span>
                           <Link
                             to={`/content-manager/lessons/${lesson.id}`}
+                            state={linkState(unit.id)}
                             className="font-medium text-foreground underline-offset-4 hover:underline"
                           >
                             {lesson.title}

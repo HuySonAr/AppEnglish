@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, BookOpen, CheckCircle2, Circle, ClipboardCheck, Compass, FileText, GraduationCap, Headphones, Library, PenLine, Tags } from 'lucide-react';
+import { ArrowRight, BookOpen, CheckCircle2, Circle, ClipboardCheck, FileText, GraduationCap, Headphones, Library, PenLine, Tags } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
@@ -12,6 +12,7 @@ import { greeting } from '../../student/lib/home.js';
 import { getPlacementTest, listListeningCourse, listListeningExercises, listMockTests, listUnits } from '../api/content-api.js';
 import { lessonState } from '../lib/lesson-draft.js';
 import { contentSummary, courseCoverage, exercisesByLevel, lessonsByUnit, pendingDrafts, readinessChecks } from '../lib/dashboard.js';
+import { OrphanMediaPanel } from '../components/OrphanMediaPanel.jsx';
 
 // Chart colours (D78): published in --chart-1, not yet published in muted.
 const chartConfig = {
@@ -93,18 +94,18 @@ function ExercisesChart({ rows }) {
   );
 }
 
-const testTone = { published: 'text-success', draft: 'text-warning', missing: 'text-muted-foreground' };
-const testLabel = { published: 'Level test live', draft: 'Level test in draft', missing: 'No level test' };
+const testTone = { published: 'text-success', draft: 'text-warning', missing: 'text-muted-foreground', none: 'text-muted-foreground' };
+const testLabel = { published: 'Level test live', draft: 'Level test in draft', missing: 'No level test', none: 'Last level, no test' };
 
 function CourseLevels({ rows }) {
   return (
-    <ol className="grid gap-2 sm:grid-cols-5">
+    <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
       {rows.map((row) => (
-        <li key={row.level} className={cn('rounded-xl border p-3', row.publishedUnits === 0 && 'border-dashed')}>
+        <li key={row.level} className={cn('rounded-xl border p-3', row.publishedTopics === 0 && 'border-dashed')}>
           <p className="flex items-center justify-between">
             <span className="font-semibold">{row.level}</span>
             <span className="text-xs tabular-nums text-muted-foreground">
-              {row.publishedUnits}/{row.units} units
+              {row.publishedTopics}/{row.topics} topics
             </span>
           </p>
           <p className={cn('mt-1 text-xs', testTone[row.levelTest])}>{testLabel[row.levelTest]}</p>
@@ -197,7 +198,7 @@ export function ContentManagerDashboardPage() {
         <Tile icon={Library} label="Lessons" published={summary.lessons.published} total={summary.lessons.total} extra={`${summary.units.published} of ${summary.units.total} units published`} to="/content-manager/units" />
         <Tile icon={FileText} label="Mock tests" published={summary.mockTests.published} total={summary.mockTests.total} to="/content-manager/mock-tests" tone="bg-info/10 text-info" />
         <Tile icon={Headphones} label="Listening exercises" published={summary.exercises.published} total={summary.exercises.total} to="/content-manager/listening" tone="bg-warning/10 text-warning" />
-        <Tile icon={GraduationCap} label="Listening course units" published={summary.courseUnits.published} total={summary.courseUnits.total} extra={`${summary.levelTests.published} of ${summary.levelTests.total} level tests published`} to="/content-manager/listening-course" tone="bg-success/10 text-success" />
+        <Tile icon={GraduationCap} label="Listening course topics" published={summary.courseTopics.published} total={summary.courseTopics.total} extra={`${summary.levelTests.published} of ${summary.levelTests.total} level tests published`} to="/content-manager/listening-course" tone="bg-success/10 text-success" />
       </div>
 
       {data.partial ? <p className="text-sm text-muted-foreground">Some areas could not be loaded; their numbers show as 0 until you reload.</p> : null}
@@ -295,14 +296,15 @@ export function ContentManagerDashboardPage() {
         <CourseLevels rows={courseCoverage(data.course)} />
       </Panel>
 
+      <OrphanMediaPanel />
+
       <div className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Tools</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <FeatureCard icon={Library} title="Units and lessons" description="Create, order, edit and publish content" to="/content-manager/units" />
           <FeatureCard icon={ClipboardCheck} title="Placement test" description="Write and publish the test new learners take" to="/content-manager/placement" tone="success" />
           <FeatureCard icon={FileText} title="Mock tests" description="Write and publish full TOEIC-style tests" to="/content-manager/mock-tests" tone="info" />
-          <FeatureCard icon={GraduationCap} title="Listening course" description="Units, lessons and level tests from A1 to C1" to="/content-manager/listening-course" tone="success" />
-          <FeatureCard icon={Compass} title="Listening placement" description="The test that finds the level a learner starts the course at" to="/content-manager/listening-placement" />
+          <FeatureCard icon={GraduationCap} title="Listening course" description="Topics and level tests from A1 to C2" to="/content-manager/listening-course" tone="success" />
           <FeatureCard icon={Headphones} title="Listening exercises" description="Dictation and song exercises for the practice library" to="/content-manager/listening" tone="warning" />
           <FeatureCard icon={Tags} title="Listening topics" description="Topics the exercises are grouped by" to="/content-manager/listening-topics" tone="info" />
           <FeatureCard icon={BookOpen} title="Lesson editor tips" description="Paste a whole passage, a vocabulary list or questions to fill a lesson quickly" to="/content-manager/units" />

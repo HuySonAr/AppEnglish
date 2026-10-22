@@ -90,6 +90,14 @@ test('Gateway HTTP to auth-service gRPC contract', async (t) => {
     const base = `http://127.0.0.1:${gateway.getHttpServer().address().port}`;
     const adminCookie = { cookie: 'appenglish_access=admin-token; other=1' };
 
+    await t.test('invitation routes (D131) are registered: admin invite needs a session, accept-invite validates its body', async () => {
+      const invite = await fetch(`${base}/auth/admin/accounts`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: 'x@example.com', role: 'STUDENT' }) });
+      assert.equal(invite.status, 401);
+      const accept = await fetch(`${base}/auth/accept-invite`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: 'not-an-email', otp: '12', password: 'short' }) });
+      assert.equal(accept.status, 400);
+      assert.equal((await accept.json()).code, 30);
+    });
+
     for (const [query, status, field] of [
       ['?page=1&pageSize=20', 200],
       ['?role=&page=1&pageSize=20', 400, 'role'],
@@ -197,7 +205,7 @@ test('Gateway HTTP to auth-service gRPC contract', async (t) => {
       assert.equal((await ready.json()).database, 'ok');
       // The dashboard probe (D115): always 200, auth-service answers over gRPC.
       const services = await (await fetch(`${base}/health/services`)).json();
-      assert.deepEqual(services.services.map((service) => service.name), ['auth-service', 'content-service', 'learning-service', 'progress-service']);
+      assert.deepEqual(services.services.map((service) => service.name), ['auth-service', 'content-service', 'learning-service', 'progress-service', 'speech-service']);
       assert.equal(services.services[0].status, 'ok');
       assert.equal(services.services[0].database, 'ok');
       assert.ok(['ok', 'degraded'].includes(services.status));

@@ -16,6 +16,7 @@ import { FillInExercise } from '../components/FillInExercise.jsx';
 import { VocabularyQuiz } from '../components/VocabularyQuiz.jsx';
 import { VocabularyStudy } from '../components/VocabularyStudy.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { useFocusReturn, useListLinkState, useReturnTo } from '../../../hooks/use-return-to.js';
 
 const stepLabels = {
   [LessonStep.REVIEW]: 'Review',
@@ -29,6 +30,7 @@ const stepLabels = {
 // quiz, fill-in, then the lesson test. Steps open in order.
 export function LessonPage() {
   const { lessonId } = useParams();
+  const back = useReturnTo('/student/lessons');
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
   const [active, setActive] = useState(null);
@@ -66,7 +68,7 @@ export function LessonPage() {
         <Button variant="outline" onClick={() => load()}>
           Try again
         </Button>
-        <Link className="block text-sm text-primary underline-offset-4 hover:underline" to="/student/lessons">
+        <Link className="block text-sm text-primary underline-offset-4 hover:underline" to={back.to} state={back.state}>
           Back to lessons
         </Link>
       </div>
@@ -93,7 +95,7 @@ export function LessonPage() {
   return (
     <section className="space-y-6">
       <Link
-        to="/student/lessons"
+        to={back.to} state={back.state}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -189,7 +191,7 @@ export function LessonPage() {
                 : ''}
             </p>
             <Button asChild className="mt-4">
-              <Link to={`/student/lessons/${lessonId}/test`}>Go to the lesson test</Link>
+              <Link to={`/student/lessons/${lessonId}/test`} state={back.passThrough}>Go to the lesson test</Link>
             </Button>
           </div>
         ) : null}

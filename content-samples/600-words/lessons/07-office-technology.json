@@ -1,0 +1,260 @@
+{
+  "number": 7,
+  "title": "Office Technology",
+  "vocabulary": [
+    {
+      "word": "affordable",
+      "partOfSpeech": "adjective",
+      "meaning": "có giá phải chăng, vừa túi tiền",
+      "example": "The new copier is affordable for a small office like ours, and its toner is cheap too.",
+      "exampleMeaning": "Máy photocopy mới có giá phải chăng với một văn phòng nhỏ như chúng ta, và mực của nó cũng rẻ."
+    },
+    {
+      "word": "as needed",
+      "partOfSpeech": "phrase",
+      "meaning": "khi cần, tùy theo nhu cầu",
+      "example": "Toner cartridges are ordered as needed rather than kept in large quantities.",
+      "exampleMeaning": "Hộp mực được đặt mua khi cần thay vì trữ với số lượng lớn."
+    },
+    {
+      "word": "be in charge of",
+      "partOfSpeech": "phrase",
+      "meaning": "phụ trách, chịu trách nhiệm về",
+      "example": "Ms. Delgado will be in charge of all the printers and scanners on the third floor from Monday.",
+      "exampleMeaning": "Từ thứ Hai, cô Delgado sẽ phụ trách toàn bộ máy in và máy quét ở tầng ba."
+    },
+    {
+      "word": "capacity",
+      "partOfSpeech": "noun",
+      "meaning": "sức chứa, công suất; năng lực",
+      "example": "The new paper tray has a capacity of 500 sheets, so it needs refilling less often.",
+      "exampleMeaning": "Khay giấy mới có sức chứa 500 tờ, nên ít phải nạp giấy hơn."
+    },
+    {
+      "word": "durable",
+      "partOfSpeech": "adjective",
+      "meaning": "bền, dùng được lâu",
+      "example": "We chose a more durable laminator because the previous one broke within a year.",
+      "exampleMeaning": "Chúng tôi chọn một máy ép nhựa bền hơn vì chiếc trước đã hỏng chỉ trong vòng một năm."
+    },
+    {
+      "word": "initiative",
+      "partOfSpeech": "noun",
+      "meaning": "sáng kiến; sự chủ động, tính chủ động",
+      "example": "The office manager took the initiative to recycle every used cartridge.",
+      "exampleMeaning": "Quản lý văn phòng đã chủ động tái chế mọi hộp mực đã dùng."
+    },
+    {
+      "word": "physically",
+      "partOfSpeech": "adverb",
+      "meaning": "về mặt vật lý, bằng tay, trực tiếp (có mặt tại chỗ)",
+      "example": "Someone must physically press the reset button on the router when it stops working.",
+      "exampleMeaning": "Phải có người trực tiếp nhấn nút khởi động lại trên bộ định tuyến khi nó ngừng hoạt động."
+    },
+    {
+      "word": "provider",
+      "partOfSpeech": "noun",
+      "meaning": "nhà cung cấp (dịch vụ, thiết bị)",
+      "example": "Our internet provider promised to double the connection speed by next month.",
+      "exampleMeaning": "Nhà cung cấp internet của chúng tôi hứa sẽ tăng gấp đôi tốc độ kết nối vào tháng sau."
+    },
+    {
+      "word": "recur",
+      "partOfSpeech": "verb",
+      "meaning": "tái diễn, xảy ra lặp lại",
+      "example": "The paper jam problem recurs every time someone loads the wrong size of paper.",
+      "exampleMeaning": "Sự cố kẹt giấy tái diễn mỗi khi có người nạp sai khổ giấy."
+    },
+    {
+      "word": "reduction",
+      "partOfSpeech": "noun",
+      "meaning": "sự cắt giảm, sự giảm bớt",
+      "example": "Switching to one multifunction machine led to a 30 percent reduction in printing costs.",
+      "exampleMeaning": "Chuyển sang dùng một máy đa năng đã giúp giảm 30 phần trăm chi phí in ấn."
+    },
+    {
+      "word": "stay on top of",
+      "partOfSpeech": "phrase",
+      "meaning": "theo sát, nắm chắc, kiểm soát tốt (công việc, tình hình)",
+      "example": "A weekly checklist helps the assistant stay on top of supply orders.",
+      "exampleMeaning": "Một danh sách kiểm tra hằng tuần giúp trợ lý theo sát các đơn đặt văn phòng phẩm."
+    },
+    {
+      "word": "stock",
+      "partOfSpeech": "noun",
+      "meaning": "hàng dự trữ, hàng tồn kho; (v) trữ hàng",
+      "example": "We keep a small stock of ink cartridges in the cabinet next to the copier.",
+      "exampleMeaning": "Chúng tôi trữ một ít hộp mực trong tủ cạnh máy photocopy."
+    }
+  ],
+  "fillIn": {
+    "passage": "Grant Street Dental Clinic has three receptionists, and until recently each of them printed, scanned and faxed on a different machine. The machines broke often, and the same paper jam seemed to ___ every week. Last spring, the clinic manager, Ms. Adeyemi, took the ___ to replace them all with one multifunction device.\n\nShe compared offers from three equipment ___ and chose a model that was ___ for a small clinic but still ___ enough to last several years. Its paper tray has a ___ of 600 sheets, and it can scan documents directly to e-mail. Since the clinic no longer keeps a large ___ of toner for three different machines, it orders cartridges ___ from an online shop. The change produced a ___ in monthly printing costs of nearly 25 percent.\n\nOne receptionist, Daniel, agreed to ___ the new machine. He ___ its maintenance by checking the page counter every Monday, and if a jam occurs, he can ___ remove the paper himself instead of waiting for a technician.",
+    "answers": ["recur", "initiative", "providers", "affordable", "durable", "capacity", "stock", "as needed", "reduction", "be in charge of", "stays on top of", "physically"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người phụ nữ đứng cạnh máy photocopy trong văn phòng, đang đặt một xấp giấy vào khay giấy của máy.",
+      "options": [
+        "She is loading paper into a machine.",
+        "She is stacking boxes on a shelf.",
+        "She is writing on a whiteboard.",
+        "She is pouring coffee into a cup."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ đang nạp giấy vào máy photocopy. (B), (C) và (D) mô tả hành động và đồ vật không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Who is in charge of ordering toner?",
+        "options": ["Marta handles all the supply orders.", "The toner is black.", "Yes, we need more."],
+        "answer": "A",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người: Marta. (B) nhầm từ 'toner', (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Is the new scanner more affordable than the old one?",
+        "options": ["It scans very quickly.", "Yes, it costs almost half as much.", "The old one is on the shelf."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về giá cả; (B) trả lời Yes và nói rõ giá rẻ hơn. (A) nói về tốc độ, (C) nói về vị trí máy cũ."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Hi, Elena. The internet connection dropped again during my video call this morning. That's the third time this week.\nWoman: I know. The problem keeps recurring, so I called our provider yesterday. They said the router we have can't handle the number of devices we use now.\nMan: So it's a capacity problem, not a line problem?\nWoman: Right. They offered a newer router at no extra charge, but someone has to be here physically to let the technician in on Saturday morning.\nMan: I can do that. I live ten minutes away. What time?\nWoman: Between eight and ten. I'll e-mail you the confirmation number so you can stay on top of any changes to the schedule.\nMan: Great. I'll also ask the technician how many devices the new one supports.\nWoman: Good idea. Please write it in the equipment file afterward.",
+      "questions": [
+        {
+          "prompt": "What problem are the speakers discussing?",
+          "options": ["A broken printer", "An unreliable internet connection", "A late delivery", "A missing file"],
+          "answer": "B",
+          "explanation": "Người đàn ông mở đầu bằng 'The internet connection dropped again', và cả cuộc nói chuyện xoay quanh sự cố này."
+        },
+        {
+          "prompt": "According to the woman, what causes the problem?",
+          "options": ["The router cannot handle enough devices.", "The phone line is damaged.", "The provider's office is closed.", "The cable is too short."],
+          "answer": "A",
+          "explanation": "Nhà cung cấp nói 'the router we have can't handle the number of devices we use now', tức bộ định tuyến không đủ công suất."
+        },
+        {
+          "prompt": "What does the man offer to do?",
+          "options": ["Buy a new router", "Call the provider again", "Meet the technician on Saturday", "Move his video calls"],
+          "answer": "C",
+          "explanation": "Khi nghe cần người có mặt để mở cửa cho kỹ thuật viên vào sáng thứ Bảy, anh ấy nói 'I can do that'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good afternoon, everyone. I have a short update about office supplies. As part of our cost reduction initiative, we are changing the way we order paper, toner and other items. Until now, the storage room has held a large stock of supplies, and some boxes have stayed there for more than a year. Starting in July, we will order most items as needed, once every two weeks, from a single supplier. The supplier's prices are affordable, and they deliver within two days, so nobody should run out of anything. We have also replaced the three old staplers and hole punches in the mail room with more durable models that come with a five-year guarantee. If you notice that a frequently used item is running low, write it on the order sheet by the storage room door before Wednesday. Thank you.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the talk?",
+          "options": ["To introduce a new employee", "To explain a new way of ordering supplies", "To announce an office move", "To report a safety problem"],
+          "answer": "B",
+          "explanation": "Người nói cho biết 'we are changing the way we order paper, toner and other items' và giải thích cách đặt hàng mới từ tháng Bảy."
+        },
+        {
+          "prompt": "What is mentioned about the new mail room equipment?",
+          "options": ["It was very expensive.", "It is guaranteed for five years.", "It arrived late.", "It is kept in the storage room."],
+          "answer": "B",
+          "explanation": "Các dụng cụ mới là 'more durable models that come with a five-year guarantee'."
+        },
+        {
+          "prompt": "What should listeners do before Wednesday?",
+          "options": ["Return old supplies", "Call the supplier", "Note low items on the order sheet", "Clean the storage room"],
+          "answer": "C",
+          "explanation": "Cuối bài: 'write it on the order sheet by the storage room door before Wednesday' khi thấy một món đồ sắp hết."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The clinic needs a copier that is _____ and easy to repair.",
+        "options": ["afford", "affordable", "affordably", "affordability"],
+        "answer": "B",
+        "explanation": "Sau 'is' và song song với tính từ 'easy' cần tính từ: 'affordable'."
+      },
+      {
+        "prompt": "Mr. Osei has _____ the mail room equipment since he joined the company.",
+        "options": ["been in charge of", "be in charge of", "being in charge of", "to be in charge of"],
+        "answer": "A",
+        "explanation": "Thì hiện tại hoàn thành 'has + quá khứ phân từ' với 'since': 'has been in charge of'."
+      },
+      {
+        "prompt": "The new storage server has three times the _____ of the old one.",
+        "options": ["capacity", "capable", "capably", "capacitate"],
+        "answer": "A",
+        "explanation": "Sau 'the' cần danh từ: 'capacity' (dung lượng, sức chứa)."
+      },
+      {
+        "prompt": "The same software error _____ every Monday until the technician replaced the cable.",
+        "options": ["recurrence", "recurring", "recurred", "recurs"],
+        "answer": "C",
+        "explanation": "Mệnh đề 'until the technician replaced' ở quá khứ nên động từ chính cũng ở quá khứ: 'recurred'."
+      },
+      {
+        "prompt": "The office assistant must _____ check the meter on the postage machine each month.",
+        "options": ["physical", "physically", "physique", "physicality"],
+        "answer": "B",
+        "explanation": "Bổ nghĩa cho động từ 'check' cần trạng từ: 'physically' (trực tiếp, bằng tay)."
+      },
+      {
+        "prompt": "A good assistant _____ every delivery schedule so that nothing arrives late.",
+        "options": ["stays on top of", "stay on top", "staying on top of", "to stay on top of"],
+        "answer": "A",
+        "explanation": "Chủ ngữ số ít 'A good assistant' cần động từ chia ở hiện tại đơn: 'stays on top of'; (B) thiếu 'of'."
+      }
+    ],
+    "part6": {
+      "passage": "To: Department Heads\nFrom: Gloria Mensah, Operations\nSubject: Printer toner\n\nOur toner supplier has informed us that the price of cartridges will rise by 12 percent next month. To avoid this increase, we will buy a six-month ___ of cartridges before the end of May and keep it in the second-floor storage room. After that, departments should request cartridges from Operations ___ instead of ordering them directly. We expect this change to produce a ___ of about 20 percent in our annual toner costs. Please send me the model number of each printer in your department by Friday.",
+      "questions": [
+        {
+          "options": ["stock", "stocking", "stocked", "stocks"],
+          "answer": "A",
+          "explanation": "Sau 'a six-month' cần danh từ số ít: 'stock' (lượng hàng dự trữ)."
+        },
+        {
+          "options": ["as needed", "in charge", "on top", "physically"],
+          "answer": "A",
+          "explanation": "Các phòng ban xin hộp mực 'as needed' (khi cần) thay vì tự đặt mua; các lựa chọn khác không hợp nghĩa."
+        },
+        {
+          "options": ["reduce", "reduced", "reduction", "reducing"],
+          "answer": "C",
+          "explanation": "Sau 'a' cần danh từ: 'reduction' (sự cắt giảm) chi phí."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "SUMMIT OFFICE SOLUTIONS\nYour local provider of printers, copiers and scanners since 2009\n\nIs your office still waiting for a technician every time the copier jams? Summit Office Solutions offers an easier way to manage your equipment.\n\n| Plan | Monthly fee | Includes |\n| Basic | $45 | One multifunction printer, toner delivered as needed |\n| Plus | $80 | Two printers, toner, repairs within 24 hours |\n| Premium | $130 | Unlimited devices, toner, repairs within 4 hours, monthly usage report |\n\nAll our machines are durable models with a paper capacity of at least 500 sheets, and every plan is affordable for offices with five to fifty employees. With the Premium plan, you never have to count cartridges yourself: our monitoring system reads each machine's meter and ships toner before it runs out, so your staff can stay on top of printing without physically checking the machines.\n\nSpecial offer: sign a twelve-month contract before June 30 and receive your first month free. To arrange a visit, call Teresa Alvarado at 555-0188 between 9 a.m. and 5 p.m. on weekdays.",
+      "questions": [
+        {
+          "prompt": "What is being advertised?",
+          "options": ["A paper supplier", "Equipment rental and service plans", "A computer training course", "An office moving service"],
+          "answer": "B",
+          "explanation": "Quảng cáo giới thiệu ba gói thuê máy in, máy photocopy kèm mực và sửa chữa theo tháng."
+        },
+        {
+          "prompt": "What does the Plus plan include that the Basic plan does not?",
+          "options": ["A multifunction printer", "Toner delivery", "Repairs within 24 hours", "A monthly usage report"],
+          "answer": "C",
+          "explanation": "Bảng cho thấy gói Plus có 'repairs within 24 hours'; gói Basic chỉ có máy in và mực. Báo cáo sử dụng chỉ có ở gói Premium."
+        },
+        {
+          "prompt": "How much does the Premium plan cost each month?",
+          "options": ["$45", "$80", "$130", "$500"],
+          "answer": "C",
+          "explanation": "Dòng Premium trong bảng ghi phí hằng tháng là $130."
+        },
+        {
+          "prompt": "According to the advertisement, what does the monitoring system do?",
+          "options": ["It counts the number of employees.", "It orders toner before it runs out.", "It repairs machines automatically.", "It prints usage reports every day."],
+          "answer": "B",
+          "explanation": "'Our monitoring system reads each machine's meter and ships toner before it runs out.'"
+        },
+        {
+          "prompt": "How can a customer receive a free month?",
+          "options": ["By ordering 500 sheets of paper", "By signing a one-year contract before June 30", "By calling before 9 a.m.", "By choosing the Basic plan"],
+          "answer": "B",
+          "explanation": "Ưu đãi: 'sign a twelve-month contract before June 30 and receive your first month free'."
+        }
+      ]
+    }
+  }
+}

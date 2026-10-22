@@ -11,6 +11,8 @@ import { ListeningGrpcController } from './listening/listening.grpc.controller.j
 import { ListeningRepository } from './listening/listening.repository.js';
 import { ListeningService } from './listening/listening.service.js';
 import { SpeechBroker } from './speech/speech.broker.js';
+import { VersionGrpcController } from './versions/version.grpc.controller.js';
+import { ContentVersionService } from './versions/version.service.js';
 import {
   CONTENT_DATA_SOURCE,
   CONTENT_REPOSITORY,
@@ -21,13 +23,26 @@ import {
   PRONUNCIATION_SOURCE,
   createPronunciationSource,
 } from './pronunciation/dictionary-pronunciation.source.js';
+import { SpeechPronunciationSource } from './pronunciation/speech-pronunciation.source.js';
 
 export class AppModule {}
 Module({
-  controllers: [HealthController, ContentGrpcController, ListeningGrpcController, CourseGrpcController],
+  controllers: [HealthController, ContentGrpcController, ListeningGrpcController, CourseGrpcController, VersionGrpcController],
   providers: [
     { provide: MEDIA_STORAGE, useFactory: () => createMediaStorage() },
-    { provide: PRONUNCIATION_SOURCE, useFactory: () => createPronunciationSource() },
+    // One RabbitMQ link to speech-service: auto-time answers (D97) and
+    // pronunciation requests (D123).
+    { provide: SpeechBroker, useFactory: () => new SpeechBroker(process.env.RABBITMQ_URL || 'amqp://localhost:5672') },
+    {
+      // Pronunciation from speech-service (D123); the dictionary of D47 stays
+      // available with PRONUNCIATION_SOURCE=dictionary.
+      provide: PRONUNCIATION_SOURCE,
+      useFactory: (broker) =>
+        process.env.PRONUNCIATION_SOURCE === 'dictionary'
+          ? createPronunciationSource()
+          : new SpeechPronunciationSource(broker, { ipaAccent: process.env.PRONUNCIATION_IPA_ACCENT === 'us' ? 'us' : 'uk' }),
+      inject: [SpeechBroker],
+    },
     { provide: CONTENT_DATA_SOURCE, useFactory: createContentDataSource },
     {
       provide: CONTENT_REPOSITORY,
@@ -43,19 +58,25 @@ Module({
     {
       provide: ListeningService,
       // Auto-time answers from speech-service arrive over RabbitMQ (D97).
-      useFactory: (dataSource, contentService) => {
-        const broker = new SpeechBroker(process.env.RABBITMQ_URL || 'amqp://localhost:5672');
+      useFactory: (dataSource, contentService, broker) => {
         const service = new ListeningService(new ListeningRepository(dataSource), contentService, { broker });
         broker.start((answer) => service.onAutoTimeResult(answer));
         return service;
       },
-      inject: [CONTENT_DATA_SOURCE, ContentService],
+      inject: [CONTENT_DATA_SOURCE, ContentService, SpeechBroker],
     },
     {
       provide: CourseService,
       useFactory: (dataSource, contentService, listeningService) =>
         new CourseService(new CourseRepository(dataSource), contentService, listeningService),
       inject: [CONTENT_DATA_SOURCE, ContentService, ListeningService],
+    },
+    {
+      // Version history of every versioned content (D122).
+      provide: ContentVersionService,
+      useFactory: (repository, contentService, listeningService, courseService) =>
+        new ContentVersionService(repository, contentService, listeningService, courseService),
+      inject: [CONTENT_REPOSITORY, ContentService, ListeningService, CourseService],
     },
   ],
   exports: [MEDIA_STORAGE],

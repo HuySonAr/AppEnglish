@@ -1,44 +1,34 @@
 import { randomUUID } from 'node:crypto';
-import { COURSE_LEVELS, COURSE_SECTIONS, CourseItemType, LessonVersionStatus } from '@appenglish/content-contracts';
+import { COURSE_LEVELS, COURSE_RECORDING_KIND, CourseItemType, LessonVersionStatus, SpeechTask } from '@appenglish/content-contracts';
 import { contentErrors } from '../content/content.errors.js';
-import { contentSchemaOf, courseExerciseIds, courseIssues } from './course.schemas.js';
+import { contentSchemaOf, courseIssues, courseMediaIds } from './course.schemas.js';
 
 const iso = (date) => (date ? new Date(date).toISOString() : null);
 const withId = (item) => ({ ...item, id: item.id || randomUUID() });
-const questionWithIds = (question) => ({
-  ...withId(question),
-  options: question.options.map(withId),
-});
-const sectionWithIds = (section) => ({
-  ...withId(section),
-  questions: section.questions.map(questionWithIds),
-});
+const questionWithIds = (question) => ({ ...withId(question), options: question.options.map(withId) });
+const sectionWithIds = (section) => ({ ...withId(section), questions: section.questions.map(questionWithIds) });
 
-// The units of a level in learning order: section by section (D107), then
-// by position within the section.
-const sectionRank = (unit) => COURSE_SECTIONS.indexOf(unit.section);
-const inCourseOrder = (units) => [...units].sort((a, b) => sectionRank(a) - sectionRank(b) || a.position - b.position);
-const unitsOf = (items, level, section) =>
-  inCourseOrder(items.filter((item) => item.level === level && item.type === CourseItemType.UNIT && (!section || item.section === section)));
+// The topics of a level in order.
+const topicsOf = (items, level) =>
+  items.filter((item) => item.level === level && item.type === CourseItemType.TOPIC).sort((a, b) => a.position - b.position);
 
-// Items keep the ids the editor sent so learners' progress can follow them
-// across versions; new items get one here.
+// Items keep the ids the editor sent; new ones get one here.
 function withIds(type, content) {
-  if (type !== CourseItemType.UNIT) return { sections: content.sections.map(sectionWithIds) };
+  if (type !== CourseItemType.TOPIC) return { sections: content.sections.map(sectionWithIds) };
   return {
-    lessons: content.lessons.map((lesson) => ({
-      ...withId(lesson),
-      keywords: lesson.keywords.map(withId),
-      gist: questionWithIds(lesson.gist),
-      detail: lesson.detail.map(questionWithIds),
-    })),
-    check: { sections: content.check.sections.map(sectionWithIds) },
+    ...content,
+    segments: content.segments.map(withId),
+    vocabulary: content.vocabulary.map(withId),
+    questions: content.questions.map(questionWithIds),
+    ordering: { ...content.ordering, items: content.ordering.items.map(withId) },
   };
 }
 
-// The Listening course (F05C, D100): units and level tests of each CEFR level,
-// written and published by a Content Manager like mock tests. Recordings come
-// from the listening library (ListeningService).
+// The Listening course (F05C, D143–D145): each level A1–C2 has topics in
+// order, each topic one listening lesson, and every level but the last a level
+// test. Written and published by a Content Manager like mock tests. Each
+// topic and level-test section holds its own recording (D147); speech jobs on
+// a topic's recording go through ListeningService.
 export class CourseService {
   constructor(repository, contentService, listeningService) {
     this.repository = repository;
@@ -51,34 +41,23 @@ export class CourseService {
   }
 
   itemView(item) {
-    return {
-      id: item.id,
-      level: item.level,
-      type: item.type,
-      section: item.section ?? null,
-      title: item.title,
-      description: item.description,
-      position: item.position,
-    };
+    return { id: item.id, level: item.level, type: item.type, title: item.title, description: item.description, position: item.position };
   }
 
   // How much a content holds, for the course overview.
   counts(type, content) {
-    if (!content) return { lessons: 0, questions: 0 };
+    if (!content) return { questions: 0, words: 0, hasRecording: false };
     const parsed = contentSchemaOf(type).parse(content);
-    const sections = type === CourseItemType.UNIT ? parsed.check.sections : parsed.sections;
+    if (type === CourseItemType.TOPIC)
+      return { questions: parsed.questions.length, words: parsed.vocabulary.length, hasRecording: Boolean(parsed.audioMediaId), ordering: parsed.ordering.enabled };
     return {
-      ...(type === CourseItemType.PLACEMENT
-        ? {
-            levels: [...new Set(parsed.sections.map((section) => section.level).filter(Boolean))].length,
-          }
-        : {}),
-      lessons: type === CourseItemType.UNIT ? parsed.lessons.length : 0,
-      questions: sections.reduce((sum, section) => sum + section.questions.length, 0),
+      questions: parsed.sections.reduce((sum, section) => sum + section.questions.length, 0),
+      words: 0,
+      hasRecording: parsed.sections.length > 0 && parsed.sections.every((section) => section.audioMediaId),
     };
   }
 
-  // The course by level: its units in order and its level test.
+  // The course by level: its topics in order and its level test.
   async listCourse(actor) {
     this.assertManager(actor);
     const [items, versions] = await Promise.all([this.repository.listItems(), this.repository.listVersionSummaries()]);
@@ -97,49 +76,34 @@ export class CourseService {
         ...this.counts(item.type, shown?.content),
       };
     };
-    const placement = items.find((item) => item.type === CourseItemType.PLACEMENT);
     return {
-      placement: placement ? await summary(placement) : null,
       levels: await Promise.all(
         COURSE_LEVELS.map(async (level) => {
-          const own = items.filter((item) => item.level === level);
-          const test = own.find((item) => item.type === CourseItemType.LEVEL_TEST);
-          return {
-            level,
-            units: await Promise.all(inCourseOrder(own.filter((item) => item.type === CourseItemType.UNIT)).map(summary)),
-            levelTest: test ? await summary(test) : null,
-          };
+          const test = items.find((item) => item.level === level && item.type === CourseItemType.LEVEL_TEST);
+          return { level, topics: await Promise.all(topicsOf(items, level).map(summary)), levelTest: test ? await summary(test) : null };
         }),
       ),
     };
   }
 
-  // A unit is added at the end of its section (D107).
-  async createItem(actor, { level, type, section, title, description }) {
+  // A topic is added at the end of its level.
+  async createItem(actor, { level, type, title, description }) {
     this.assertManager(actor);
-    const units = type === CourseItemType.UNIT ? unitsOf(await this.repository.listItems(), level, section) : [];
+    const topics = type === CourseItemType.TOPIC ? topicsOf(await this.repository.listItems(), level) : [];
     const created = await this.repository.createItemWithDraft(
       {
         level,
         type,
-        section,
+        section: null,
         title,
         description,
-        position: type === CourseItemType.UNIT ? units.length + 1 : 0,
+        position: type === CourseItemType.TOPIC ? topics.length + 1 : 0,
         publishedVersionId: null,
         createdBy: actor.id,
       },
-      {
-        versionNumber: 1,
-        status: LessonVersionStatus.DRAFT,
-        content: contentSchemaOf(type).parse({}),
-        createdBy: actor.id,
-      },
+      { versionNumber: 1, status: LessonVersionStatus.DRAFT, content: contentSchemaOf(type).parse({}), createdBy: actor.id },
     );
-    if (!created)
-      throw type === CourseItemType.PLACEMENT
-        ? contentErrors.courseItemInvalid('PLACEMENT_EXISTS', 'The listening placement already exists')
-        : contentErrors.courseItemInvalid('LEVEL_TEST_EXISTS', `Level ${level} already has a level test`);
+    if (!created) throw contentErrors.courseItemInvalid('LEVEL_TEST_EXISTS', `Level ${level} already has a level test`);
     return this.managedView(created.item, created.draft, null);
   }
 
@@ -149,35 +113,19 @@ export class CourseService {
     return item;
   }
 
-  // Title and description apply at once. A unit can move within its section
-  // (position) or to the end of the other section of its level (D107).
-  async updateItem(actor, itemId, { title, description, section, position }) {
+  // Title and description apply at once; a topic can move within its level.
+  async updateItem(actor, itemId, { title, description, position }) {
     this.assertManager(actor);
     const item = await this.findItemOrThrow(itemId);
     if (title !== undefined) item.title = title;
     if (description !== undefined) item.description = description;
-    const unit = item.type === CourseItemType.UNIT;
-    const moved = unit && section !== undefined && section !== item.section;
-    if (unit && (moved || position !== undefined)) {
-      const items = await this.repository.listItems();
-      const changed = [];
-      if (moved) {
-        // The section left closes its gap.
-        unitsOf(items, item.level, item.section)
-          .filter((other) => other.id !== item.id)
-          .forEach((other, index) => {
-            other.position = index + 1;
-            changed.push(other);
-          });
-        item.section = section;
-      }
-      const units = unitsOf(items, item.level, item.section).filter((other) => other.id !== item.id);
-      const at = position === undefined || moved ? units.length : Math.min(position, units.length + 1) - 1;
-      units.splice(at, 0, item);
-      units.forEach((other, index) => {
+    if (item.type === CourseItemType.TOPIC && position !== undefined) {
+      const topics = topicsOf(await this.repository.listItems(), item.level).filter((other) => other.id !== item.id);
+      topics.splice(Math.min(position, topics.length + 1) - 1, 0, item);
+      topics.forEach((other, index) => {
         other.position = index + 1;
       });
-      await this.repository.saveItems([...changed, ...units]);
+      await this.repository.saveItems(topics);
     } else await this.repository.saveItem(item);
     return { item: this.itemView(item) };
   }
@@ -196,7 +144,10 @@ export class CourseService {
     this.assertManager(actor);
     const item = await this.findItemOrThrow(itemId);
     let draft = await this.repository.findDraft(itemId);
-    const parsed = contentSchemaOf(item.type).parse(content);
+    const schema = contentSchemaOf(item.type);
+    const previous = draft ? schema.safeParse(draft.content) : null;
+    const previousMediaIds = previous?.success ? courseMediaIds(previous.data) : [];
+    const parsed = schema.parse(content);
     if (draft) draft.content = withIds(item.type, parsed);
     else
       draft = {
@@ -207,19 +158,23 @@ export class CourseService {
         createdBy: actor.id,
       };
     draft = await this.repository.saveVersion(draft);
+    // A recording or pronunciation this save dropped is removed from storage
+    // when no other version uses it.
+    const kept = new Set(courseMediaIds(draft.content));
+    await this.contentService.removeUnusedMedia(previousMediaIds.filter((mediaId) => !kept.has(mediaId)));
     return this.managedView(item, draft, await this.publishedVersion(item));
   }
 
-  // Publishing freezes the draft as the next version; every recording it uses
-  // must be published in the library.
+  // Publishing freezes the draft as the next version.
   async publish(actor, itemId) {
     this.assertManager(actor);
     const item = await this.findItemOrThrow(itemId);
     const draft = await this.repository.findDraft(itemId);
     if (!draft) throw contentErrors.noDraft();
     draft.content = contentSchemaOf(item.type).parse(draft.content);
-    const exercises = await this.exercisesOf([draft]);
-    const issues = courseIssues(item.type, draft.content, new Map(Object.entries(exercises)));
+    const mediaIds = courseMediaIds(draft.content);
+    const media = mediaIds.length ? await this.contentService.repository.findMediaByIds(mediaIds) : [];
+    const issues = courseIssues(item.type, draft.content, new Map(media.map((asset) => [asset.id, asset])));
     if (issues.length) throw contentErrors.notPublishable(issues);
     draft.status = LessonVersionStatus.PUBLISHED;
     draft.publishedAt = new Date();
@@ -229,102 +184,157 @@ export class CourseService {
     return this.managedView(item, null, draft);
   }
 
-  // ----- Reads for learning-service (F05C). No actor: not exposed by the gateway.
+  async unpublish(actor, itemId) {
+    this.assertManager(actor);
+    const item = await this.findItemOrThrow(itemId);
+    const published = await this.publishedVersion(item);
+    if (item.publishedVersionId) {
+      item.publishedVersionId = null;
+      await this.repository.saveItem(item);
+    }
+    let draft = await this.repository.findDraft(itemId);
+    // The version taken down becomes the draft when there is none (D122).
+    if (!draft && published)
+      draft = await this.repository.saveVersion({
+        itemId,
+        versionNumber: (await this.repository.maxVersionNumber(itemId)) + 1,
+        status: LessonVersionStatus.DRAFT,
+        content: structuredClone(published.content),
+        createdBy: actor.id,
+      });
+    return this.managedView(item, draft, null);
+  }
 
-  // The published course: by level, the published units in order (with their
-  // lessons' ids and titles) and the published level test.
+  // Removes a topic or a level test with its versions, its speech jobs and the
+  // recordings and pronunciations only it used. The gateway only calls this
+  // when no learner has results for the item.
+  async delete(actor, itemId) {
+    this.assertManager(actor);
+    const item = await this.findItemOrThrow(itemId);
+    const versions = (await this.repository.listVersionSummaries()).filter((version) => version.itemId === itemId);
+    const mediaIds = [];
+    for (const summary of versions) {
+      const version = await this.repository.findVersion(summary.id);
+      const parsed = version ? contentSchemaOf(item.type).safeParse(version.content) : null;
+      if (parsed?.success) mediaIds.push(...courseMediaIds(parsed.data));
+    }
+    await this.repository.deleteItemWithVersions(itemId);
+    if (item.type === CourseItemType.TOPIC) {
+      const rest = topicsOf(await this.repository.listItems(), item.level).filter((other) => other.id !== itemId);
+      await this.repository.saveItems(rest.map((other, index) => ({ ...other, position: index + 1 })));
+    }
+    const removedMedia = await this.contentService.removeUnusedMedia([...new Set(mediaIds)]);
+    return { deleted: true, type: item.type, level: item.level, removedMedia: removedMedia.length };
+  }
+
+  // ----- Speech jobs on a topic's recording (D147): Auto-time finds the times
+  // of the saved sentences, Transcribe writes them from the recording.
+
+  async topicForSpeech(actor, itemId) {
+    this.assertManager(actor);
+    const item = await this.findItemOrThrow(itemId);
+    if (item.type !== CourseItemType.TOPIC)
+      throw contentErrors.courseItemInvalid('NOT_A_TOPIC', 'Only a topic has sentences to time');
+    return item;
+  }
+
+  async startSpeechJob(actor, itemId, task) {
+    const item = await this.topicForSpeech(actor, itemId);
+    const version = (await this.repository.findDraft(itemId)) || (await this.publishedVersion(item));
+    const content = version ? contentSchemaOf(item.type).parse(version.content) : null;
+    return this.listeningService.queueSpeechJob(actor, {
+      owner: { courseItemId: itemId },
+      task,
+      kind: COURSE_RECORDING_KIND,
+      audioMediaId: content?.audioMediaId,
+      segments: content?.segments || [],
+    });
+  }
+
+  requestAutoTime(actor, itemId) {
+    return this.startSpeechJob(actor, itemId, SpeechTask.ALIGN);
+  }
+
+  requestTranscribe(actor, itemId) {
+    return this.startSpeechJob(actor, itemId, SpeechTask.TRANSCRIBE);
+  }
+
+  async getAutoTime(actor, itemId) {
+    await this.topicForSpeech(actor, itemId);
+    return this.listeningService.latestSpeechJob({ courseItemId: itemId });
+  }
+
+  // ----- Reads for learning-service. No actor: not exposed by the gateway.
+
+  // The published course: by level, the published topics in order and the
+  // published level test.
   async listPublished() {
     const items = (await this.repository.listItems()).filter((item) => item.publishedVersionId);
     const summary = async (item) => {
       const version = await this.repository.findVersion(item.publishedVersionId);
       const content = contentSchemaOf(item.type).parse(version.content);
-      const sections = item.type === CourseItemType.UNIT ? content.check.sections : content.sections;
       return {
         ...this.itemView(item),
         versionId: version.id,
-        lessons:
-          item.type === CourseItemType.UNIT
-            ? content.lessons.map((lesson) => ({
-                id: lesson.id,
-                title: lesson.title,
-              }))
-            : [],
-        questionCount: sections.reduce((sum, section) => sum + section.questions.length, 0),
+        questionCount:
+          item.type === CourseItemType.TOPIC ? content.questions.length : content.sections.reduce((sum, section) => sum + section.questions.length, 0),
       };
     };
-    const placement = items.find((item) => item.type === CourseItemType.PLACEMENT);
     return {
-      placement: placement ? await summary(placement) : null,
       levels: await Promise.all(
         COURSE_LEVELS.map(async (level) => {
-          const own = items.filter((item) => item.level === level);
-          const test = own.find((item) => item.type === CourseItemType.LEVEL_TEST);
-          return {
-            level,
-            units: await Promise.all(inCourseOrder(own.filter((item) => item.type === CourseItemType.UNIT)).map(summary)),
-            levelTest: test ? await summary(test) : null,
-          };
+          const test = items.find((item) => item.level === level && item.type === CourseItemType.LEVEL_TEST);
+          return { level, topics: await Promise.all(topicsOf(items, level).map(summary)), levelTest: test ? await summary(test) : null };
         }),
       ),
     };
   }
 
-  // A published unit or level test (the current version, or the given one)
-  // with its answers and the recordings it uses.
+  // A published topic or level test (the current version, or the given one)
+  // with its answers and the URLs of its recordings and pronunciations.
   async getPaper(itemId, { versionId } = {}) {
     const item = await this.repository.findItem(itemId);
     if (!item?.publishedVersionId) throw contentErrors.courseItemNotFound();
     const version = await this.repository.findVersion(versionId || item.publishedVersionId);
     if (version?.itemId !== item.id || version.status !== LessonVersionStatus.PUBLISHED) throw contentErrors.courseItemNotFound();
+    const content = contentSchemaOf(item.type).parse(version.content);
     return {
       item: this.itemView(item),
       versionId: version.id,
       versionNumber: version.versionNumber,
-      content: contentSchemaOf(item.type).parse(version.content),
-      exercises: await this.exercisesOf([version]),
+      content,
+      media: await this.mediaUrls(courseMediaIds(content)),
     };
   }
 
-  // The published library exercises the versions use, by id: title, level,
-  // kind, topic, recording and sentences, so the editor can show and choose
-  // them. An exercise not published is left out.
-  async exercisesOf(versions) {
-    const ids = [...new Set(versions.filter(Boolean).flatMap((version) => courseExerciseIds(version.content)))];
-    const found = {};
-    for (const exerciseId of ids) {
-      try {
-        const paper = await this.listeningService.getPaper(exerciseId);
-        const { audioMediaId, segments } = paper.content;
-        found[exerciseId] = {
-          ...paper.exercise,
-          audioUrl: (audioMediaId && paper.media[audioMediaId]?.url) || null,
-          segments: segments.map(({ id, speaker, text, start, end }) => ({
-            id,
-            speaker,
-            text,
-            start,
-            end,
-          })),
-        };
-      } catch (error) {
-        if (error?.status !== 404) throw error;
-      }
-    }
-    return found;
+  // id → URL of the given media.
+  async mediaUrls(ids) {
+    if (!ids.length) return {};
+    const assets = await this.contentService.repository.findMediaByIds(ids);
+    return Object.fromEntries(assets.map((asset) => [asset.id, asset.url]));
+  }
+
+  // The media the versions use, by id, for the editor: kind, file name and
+  // URL (none for a locally stored file, which cannot be played).
+  async mediaOf(versions) {
+    const ids = [...new Set(versions.filter(Boolean).flatMap((version) => {
+      const parsed = contentSchemaOf(version.type).safeParse(version.content);
+      return parsed.success ? courseMediaIds(parsed.data) : [];
+    }))];
+    if (!ids.length) return {};
+    const assets = await this.contentService.repository.findMediaByIds(ids);
+    return Object.fromEntries(
+      assets.map((asset) => [asset.id, { kind: asset.kind, fileName: asset.fileName, url: asset.storage === 'local' ? null : asset.url }]),
+    );
   }
 
   async managedView(item, draft, published) {
     return {
       item: this.itemView(item),
-      exercises: await this.exercisesOf([draft, published]),
+      media: await this.mediaOf([draft, published].filter(Boolean).map((version) => ({ type: item.type, content: version.content }))),
       draft: draft ? { versionNumber: draft.versionNumber, content: draft.content } : null,
       published: published
-        ? {
-            versionId: published.id,
-            versionNumber: published.versionNumber,
-            publishedAt: iso(published.publishedAt),
-            content: published.content,
-          }
+        ? { versionId: published.id, versionNumber: published.versionNumber, publishedAt: iso(published.publishedAt), content: published.content }
         : null,
     };
   }

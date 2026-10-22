@@ -90,3 +90,5 @@ F02A intentionally has no media database model or upload API.
 - Tái sử dụng services/contracts hiện có khi phù hợp; không tạo service chỉ vì tài liệu có một domain.
 - Không xóa service hiện hữu tự động (repository hiện không có payment-service). Xác minh chức năng, dependencies và yêu cầu người dùng trước khi loại bỏ hoặc tái sử dụng.
 - Reading/Listening là phạm vi sản phẩm, nhưng codebase có thể còn service cũ ngoài phạm vi. Ghi rõ giữ, migrate, deprecate hay bỏ chỉ sau khi phân tích dependencies và có quyết định.
+
+Redis (Docker Compose) is used by the api-gateway rate limiter (D117) through `ioredis@^5.8.1`; no other service uses it yet.

@@ -11,12 +11,17 @@ import { ContentGrpcController } from '../src/content/content.grpc.controller.js
 import { ContentService } from '../src/content/content.service.js';
 import { ListeningGrpcController } from '../src/listening/listening.grpc.controller.js';
 import { ListeningService } from '../src/listening/listening.service.js';
+import { CourseService } from '../src/course/course.service.js';
+import { VersionGrpcController } from '../src/versions/version.grpc.controller.js';
+import { ContentVersionService } from '../src/versions/version.service.js';
 import { LocalMediaStorageAdapter } from '../src/media/local-media-storage.adapter.js';
 import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { AUTH_GRPC_CLIENT } from '../../api-gateway/src/auth/auth-gateway.controller.js';
 import { CONTENT_GRPC_CLIENT, ContentGatewayController } from '../../api-gateway/src/content/content-gateway.controller.js';
+import { LEARNING_GRPC_CLIENT } from '../../api-gateway/src/learning/learning-gateway.controller.js';
+import { learningGrpcOptions } from '@appenglish/learning-contracts/grpc';
 import { admin, createMemoryRepository, manager, publishableContent, student, toeicTopicId } from './memory-repository.js';
 
 function freePort() {
@@ -53,11 +58,14 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
   class TestAuthModule {}
   Module({ controllers: [FakeAuthController] })(TestAuthModule);
   class TestContentModule {}
+  const listening = new ListeningService(repository.listening, service);
+  const course = new CourseService(repository.course, service, listening);
   Module({
-    controllers: [ContentGrpcController, ListeningGrpcController],
+    controllers: [ContentGrpcController, ListeningGrpcController, VersionGrpcController],
     providers: [
       { provide: ContentService, useValue: service },
-      { provide: ListeningService, useValue: new ListeningService(repository.listening, service) },
+      { provide: ListeningService, useValue: listening },
+      { provide: ContentVersionService, useValue: new ContentVersionService(repository, service, listening, course) },
     ],
   })(TestContentModule);
   class TestGatewayModule {}
@@ -65,6 +73,8 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
     imports: [ClientsModule.register([
       { name: AUTH_GRPC_CLIENT, transport: Transport.GRPC, options: authGrpcOptions(authUrl) },
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions(contentUrl) },
+      // Only deletes consult learning-service; nothing listens here.
+      { name: LEARNING_GRPC_CLIENT, transport: Transport.GRPC, options: learningGrpcOptions('127.0.0.1:1') },
     ])],
     controllers: [ContentGatewayController],
   })(TestGatewayModule);
@@ -136,6 +146,38 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
       const missing = await call('GET', '/content/lessons/00000000-0000-4000-8000-000000000000', { as: 'manager' });
       assert.equal(missing.status, 404);
       assert.equal(missing.json.code, 40);
+    });
+    await t.test('the review of a unit is written over HTTP (D121)', async () => {
+      const url = `/content/units/${unitId}/review`;
+      assert.equal((await call('GET', url)).status, 401);
+      assert.equal((await call('GET', url, { as: 'student' })).status, 403);
+      const empty = await call('GET', url, { as: 'manager' });
+      assert.equal(empty.status, 200);
+      assert.deepEqual([empty.json.data.questionCount, empty.json.data.draft, empty.json.data.published], [19, null, null]);
+      const saved = await call('PUT', `${url}/draft`, { as: 'manager', body: { test: { part5: { questions: [{ prompt: 'A _____ sentence.' }] } } } });
+      assert.equal(saved.status, 200);
+      assert.equal(saved.json.data.draft.versionNumber, 1);
+      const bad = await call('PUT', `${url}/draft`, { as: 'manager', body: { test: { part1: {} } } });
+      assert.equal(bad.status, 400);
+      const refused = await call('POST', `${url}/publish`, { as: 'manager' });
+      assert.equal(refused.status, 409);
+      assert.equal(refused.json.code, 42);
+      assert.ok(refused.json.data.issues.some((issue) => issue.path === 'test.part6.groups'));
+      assert.equal((await call('POST', `${url}/unpublish`, { as: 'manager' })).json.data.published, null);
+      assert.equal((await call('GET', '/content/units', { as: 'manager' })).json.data.units[0].review.hasDraft, true);
+      // Version history (D122) by kind and owner.
+      const history = await call('GET', `/content/versions/unitReview/${unitId}`, { as: 'manager' });
+      assert.equal(history.status, 200);
+      assert.deepEqual(history.json.data.versions.map((version) => [version.versionNumber, version.status, version.current]), [[1, 'DRAFT', false]]);
+      assert.equal((await call('GET', `/content/versions/lesson/${unitId}`, { as: 'manager' })).json.code, 40);
+      assert.equal((await call('GET', `/content/versions/other/${unitId}`, { as: 'manager' })).status, 400);
+      assert.equal((await call('POST', `/content/versions/unitReview/${unitId}/${history.json.data.versions[0].id}/restore`, { as: 'manager' })).json.code, 41);
+      // Discarding the draft (D127) leaves no version behind.
+      const discarded = await call('DELETE', `/content/versions/unitReview/${unitId}/draft`, { as: 'manager' });
+      assert.equal(discarded.status, 200);
+      assert.deepEqual([discarded.json.data.discarded.versionNumber, discarded.json.data.removedMedia], [1, 0]);
+      assert.equal((await call('DELETE', `/content/versions/unitReview/${unitId}/draft`, { as: 'manager' })).json.code, 41);
+      assert.deepEqual((await call('GET', `/content/versions/unitReview/${unitId}`, { as: 'manager' })).json.data.versions, []);
     });
     await t.test('media upload goes through multipart, gRPC bytes and storage validation', async () => {
       const forbidden = await upload('student', 'audio', 'q.mp3', 'audio/mpeg', new Uint8Array([1, 2, 3]));

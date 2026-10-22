@@ -98,6 +98,28 @@ export const LessonTestAttemptEntity = new EntitySchema({
   ],
 });
 
+// One finished attempt at a unit review (D121): untimed, scored on submit.
+// answers maps question id to the chosen option id; reviewVersionId is the
+// content-service version it was scored against.
+export const UnitReviewAttemptEntity = new EntitySchema({
+  name: 'UnitReviewAttempt',
+  tableName: 'unit_review_attempts',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    accountId: { type: 'uuid' },
+    unitId: { type: 'uuid' },
+    reviewVersionId: { type: 'uuid' },
+    attemptNumber: { type: 'int' },
+    answers: { type: 'jsonb', default: {} },
+    totalCount: { type: 'int' },
+    correctCount: { type: 'int' },
+    passed: { type: 'boolean' },
+    submittedAt: { type: 'timestamptz' },
+    createdAt: { type: 'timestamptz', createDate: true },
+  },
+  indices: [{ name: 'UQ_unit_review_attempts_number', columns: ['accountId', 'unitId', 'attemptNumber'], unique: true }],
+});
+
 // One attempt at a mock test: the full test (kind FULL, partKey '') or the
 // mini test of one part (kind MINI, partKey e.g. 'part5'). listeningScore and
 // readingScore are the estimated TOEIC section scores of a full attempt.
@@ -193,45 +215,6 @@ export const CourseTestResultEntity = new EntitySchema({
     updatedAt: { type: 'timestamptz', updateDate: true },
   },
   indices: [{ name: 'UQ_course_test_results_account_item', columns: ['accountId', 'itemId'], unique: true }],
-});
-
-export const CoursePlacementEntity = new EntitySchema({
-  name: 'CoursePlacement',
-  tableName: 'course_placements',
-  columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    accountId: { type: 'uuid', unique: true },
-    status: { type: 'varchar', length: 12 },
-    versionId: { type: 'uuid', nullable: true },
-    startLevel: { type: 'varchar', length: 2 },
-    levelScores: { type: 'jsonb', default: () => "'[]'" },
-    answers: { type: 'jsonb', default: () => "'{}'" },
-    completedAt: { type: 'timestamptz' },
-    createdAt: { type: 'timestamptz', createDate: true },
-  },
-});
-
-export const CourseMistakeEntity = new EntitySchema({
-  name: 'CourseMistake',
-  tableName: 'course_mistakes',
-  columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    accountId: { type: 'uuid' },
-    unitId: { type: 'uuid' },
-    lessonId: { type: 'uuid' },
-    segmentId: { type: 'uuid' },
-    level: { type: 'varchar', length: 2 },
-    unitTitle: { type: 'varchar', length: 200 },
-    lessonTitle: { type: 'varchar', length: 200 },
-    text: { type: 'text' },
-    speaker: { type: 'varchar', length: 100, default: '' },
-    missedWords: { type: 'jsonb', default: () => "'[]'" },
-    timesMissed: { type: 'int', default: 1 },
-    lastMissedAt: { type: 'timestamptz' },
-    createdAt: { type: 'timestamptz', createDate: true },
-    updatedAt: { type: 'timestamptz', updateDate: true },
-  },
-  indices: [{ name: 'UQ_course_mistakes_account_lesson_segment', columns: ['accountId', 'lessonId', 'segmentId'], unique: true }],
 });
 
 export const ListeningResultEntity = new EntitySchema({

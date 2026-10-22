@@ -1,0 +1,260 @@
+{
+  "number": 38,
+  "title": "Trains",
+  "vocabulary": [
+    {
+      "word": "comprehensive",
+      "partOfSpeech": "adjective",
+      "meaning": "toàn diện, đầy đủ, bao quát",
+      "example": "The railway website gives a comprehensive list of every station and connecting bus.",
+      "exampleMeaning": "Trang web đường sắt cung cấp danh sách đầy đủ mọi nhà ga và xe buýt nối tuyến."
+    },
+    {
+      "word": "deluxe",
+      "partOfSpeech": "adjective",
+      "meaning": "sang trọng, hạng cao cấp",
+      "example": "The deluxe sleeping car has private cabins with a shower and a small desk.",
+      "exampleMeaning": "Toa giường nằm hạng cao cấp có buồng riêng với vòi sen và một bàn làm việc nhỏ."
+    },
+    {
+      "word": "directory",
+      "partOfSpeech": "noun",
+      "meaning": "danh bạ, bảng chỉ dẫn; thư mục",
+      "example": "A directory near the station entrance lists every platform, shop and ticket office.",
+      "exampleMeaning": "Bảng chỉ dẫn gần lối vào nhà ga liệt kê mọi sân ga, cửa hàng và phòng bán vé."
+    },
+    {
+      "word": "duration",
+      "partOfSpeech": "noun",
+      "meaning": "khoảng thời gian kéo dài, thời lượng",
+      "example": "Passengers must keep their tickets for the duration of the journey.",
+      "exampleMeaning": "Hành khách phải giữ vé trong suốt thời gian của hành trình."
+    },
+    {
+      "word": "entitle",
+      "partOfSpeech": "verb",
+      "meaning": "cho quyền, cho phép được hưởng",
+      "example": "A first-class ticket entitles you to a free meal and access to the station lounge.",
+      "exampleMeaning": "Vé hạng nhất cho bạn quyền hưởng một bữa ăn miễn phí và vào phòng chờ của nhà ga."
+    },
+    {
+      "word": "fare",
+      "partOfSpeech": "noun",
+      "meaning": "tiền vé, giá vé (tàu, xe, máy bay)",
+      "example": "The fare between the two cities is lower if you buy the ticket a week ahead.",
+      "exampleMeaning": "Giá vé giữa hai thành phố thấp hơn nếu bạn mua vé trước một tuần."
+    },
+    {
+      "word": "offset",
+      "partOfSpeech": "verb",
+      "meaning": "bù lại, bù đắp",
+      "example": "Higher ticket sales helped offset the cost of repairing the old tracks.",
+      "exampleMeaning": "Doanh thu bán vé cao hơn đã giúp bù lại chi phí sửa chữa đường ray cũ."
+    },
+    {
+      "word": "operate",
+      "partOfSpeech": "verb",
+      "meaning": "vận hành, hoạt động; điều hành",
+      "example": "The express trains operate every hour between six in the morning and ten at night.",
+      "exampleMeaning": "Các chuyến tàu tốc hành hoạt động mỗi giờ từ sáu giờ sáng đến mười giờ tối."
+    },
+    {
+      "word": "punctually",
+      "partOfSpeech": "adverb",
+      "meaning": "đúng giờ",
+      "example": "The morning train to the capital leaves punctually at 7:05, so do not be late.",
+      "exampleMeaning": "Chuyến tàu sáng đi thủ đô khởi hành đúng giờ lúc 7:05, vì vậy đừng đến muộn."
+    },
+    {
+      "word": "relatively",
+      "partOfSpeech": "adverb",
+      "meaning": "tương đối, khá",
+      "example": "Compared with flying, the train is relatively cheap for short business trips.",
+      "exampleMeaning": "So với đi máy bay, tàu hỏa tương đối rẻ cho những chuyến công tác ngắn."
+    },
+    {
+      "word": "remainder",
+      "partOfSpeech": "noun",
+      "meaning": "phần còn lại",
+      "example": "After the first stop, the remainder of the journey takes about three hours.",
+      "exampleMeaning": "Sau điểm dừng đầu tiên, phần còn lại của hành trình mất khoảng ba giờ."
+    },
+    {
+      "word": "remote",
+      "partOfSpeech": "adjective",
+      "meaning": "xa xôi, hẻo lánh; từ xa",
+      "example": "The new line connects several remote towns to the regional business center.",
+      "exampleMeaning": "Tuyến mới nối một số thị trấn xa xôi với trung tâm kinh doanh của khu vực."
+    }
+  ],
+  "fillIn": {
+    "passage": "Hillcrest Rail ___ a passenger line between Easton, a busy port city, and a number of ___ mountain villages. For years the company lost money on this route, but a new manager, Teodora Ilic, decided to change that. First she asked her team to prepare a ___ report covering costs, passenger numbers and customer opinions. The report showed that many travelers found the ___ to the villages ___ high compared with the bus, even though the train was faster.\n\nMs. Ilic cut prices on weekday mornings and added a ___ carriage with wide leather seats and free coffee. A ticket for this carriage ___ the holder to use the station lounge for the whole ___ of the wait before the train. The extra income from these seats helped ___ the lower prices on the standard carriages. She also printed a small ___ listing every station, taxi company and hotel along the line.\n\nTrains now leave ___ at the times posted, and passenger numbers rose in the first three months. The ___ of the year is expected to be even better.",
+    "answers": ["operates", "remote", "comprehensive", "fare", "relatively", "deluxe", "entitles", "duration", "offset", "directory", "punctually", "remainder"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một đoàn tàu đang dừng ở sân ga; hành khách xách va li bước lên toa, một nhân viên nhà ga đứng cạnh cửa.",
+      "options": [
+        "Travelers are getting on a train.",
+        "A train is leaving an empty platform.",
+        "Workers are repairing the tracks.",
+        "People are buying tickets at a machine."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy hành khách đang lên tàu. (B) sai vì sân ga có người, (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How long does the train journey to Milton take?",
+        "options": ["A little over two hours.", "It's a very long platform.", "Yes, it stops at Milton."],
+        "answer": "A",
+        "explanation": "Câu hỏi How long cần câu trả lời về khoảng thời gian. (B) lặp từ 'long' với nghĩa khác, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Do you know how much the fare to the airport is?",
+        "options": ["That's fair enough.", "Twelve dollars one way.", "It leaves from platform four."],
+        "answer": "B",
+        "explanation": "Câu hỏi gián tiếp về giá vé; (B) nêu số tiền. (A) nhầm âm 'fare' với 'fair', (C) trả lời cho câu hỏi Where."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Good morning. I'd like two tickets to Ashford for the 9:15 train. Is it running on time today?\nWoman: Yes, it departs punctually at 9:15 from platform 2. Would you like standard or deluxe class?\nMan: What does the deluxe ticket include?\nWoman: It entitles you to a reserved seat, a hot drink, and the use of the lounge at Ashford for the duration of your stay there.\nMan: That sounds useful. We have a four-hour wait before our meeting. How much more is the fare?\nWoman: It's eighteen dollars more per person, which is relatively small for the lounge alone.\nMan: All right, two deluxe tickets, please. Can I pay by company card?\nWoman: Of course. Here is a station directory as well; the lounge is marked on the second page.",
+      "questions": [
+        {
+          "prompt": "Where does this conversation most likely take place?",
+          "options": ["At a hotel reception", "At a railway ticket office", "In an airport lounge", "On a bus"],
+          "answer": "B",
+          "explanation": "Người đàn ông mua vé tàu và người phụ nữ nói về sân ga, hạng vé và giá vé, nên đây là phòng bán vé tàu."
+        },
+        {
+          "prompt": "What is included with a deluxe ticket?",
+          "options": ["A free meal", "A taxi to the meeting", "Access to a lounge", "A discount on the return trip"],
+          "answer": "C",
+          "explanation": "Vé deluxe 'entitles you to a reserved seat, a hot drink, and the use of the lounge at Ashford'. Chỉ có đồ uống nóng, không có bữa ăn."
+        },
+        {
+          "prompt": "What does the woman give the man?",
+          "options": ["A refund", "A guide to the station", "A hot drink", "A company card"],
+          "answer": "B",
+          "explanation": "Cuối hội thoại cô ấy đưa 'a station directory', tức bảng chỉ dẫn các khu vực trong nhà ga."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good evening, ladies and gentlemen, and welcome aboard the Riverland Express to Castlebridge. We are leaving punctually at 6:40, and the total duration of tonight's journey is three hours and ten minutes. Because of track maintenance near Fenwick, this train will operate on a slower line for the first thirty minutes; after that we will travel at full speed, which should offset the earlier slow section, so we still expect to arrive on time. Passengers in the deluxe carriage are entitled to a complimentary dinner, which will be served shortly after we pass Fenwick. For everyone else, the cafe car in coach D is open for the remainder of the trip. Please note that mobile phone coverage is poor in the more remote parts of the route, so you may want to download any documents you need now. Thank you for choosing Riverland Rail, and have a pleasant journey.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the announcement?",
+          "options": ["To apologize for a canceled train", "To give information about the journey", "To sell tickets for the cafe car", "To announce a change of platform"],
+          "answer": "B",
+          "explanation": "Người nói chào mừng hành khách và cung cấp thông tin về thời gian, tốc độ, bữa ăn và sóng điện thoại trong hành trình."
+        },
+        {
+          "prompt": "Why will the train move slowly at first?",
+          "options": ["The weather is bad.", "There is maintenance on the track.", "The driver is new.", "Dinner is being served."],
+          "answer": "B",
+          "explanation": "Bài nói nêu 'Because of track maintenance near Fenwick, this train will operate on a slower line for the first thirty minutes'."
+        },
+        {
+          "prompt": "What are passengers advised to do?",
+          "options": ["Download documents before the signal is lost", "Move to coach D", "Keep their tickets in their pockets", "Order dinner in advance"],
+          "answer": "A",
+          "explanation": "Vì sóng điện thoại yếu ở các đoạn xa xôi, người nói khuyên 'download any documents you need now'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The train company published a _____ guide to every route in the region.",
+        "options": ["comprehensive", "comprehensively", "comprehend", "comprehension"],
+        "answer": "A",
+        "explanation": "Trước danh từ 'guide' cần tính từ: 'comprehensive' (đầy đủ, toàn diện)."
+      },
+      {
+        "prompt": "This season ticket _____ its holder to unlimited travel between the two stations.",
+        "options": ["entitles", "entitle", "entitlement", "entitling"],
+        "answer": "A",
+        "explanation": "Chủ ngữ 'This season ticket' số ít ở thì hiện tại đơn nên động từ thêm -s: 'entitles ... to'."
+      },
+      {
+        "prompt": "Thanks to the new timetable, the evening trains now arrive _____.",
+        "options": ["punctual", "punctually", "punctuality", "punctuate"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'arrive': 'punctually' (đúng giờ)."
+      },
+      {
+        "prompt": "Compared with last year's prices, the fares are _____ low this season.",
+        "options": ["relative", "relatively", "relate", "relation"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho tính từ 'low': 'relatively' (tương đối)."
+      },
+      {
+        "prompt": "The new line _____ seven days a week, including public holidays.",
+        "options": ["operate", "operation", "operates", "operating"],
+        "answer": "C",
+        "explanation": "Chủ ngữ 'The new line' số ít, câu cần động từ chính ở hiện tại đơn: 'operates'."
+      },
+      {
+        "prompt": "The _____ of the passengers will be transferred to buses at the next station.",
+        "options": ["remain", "remains", "remaining", "remainder"],
+        "answer": "D",
+        "explanation": "Sau 'The' và trước 'of the passengers' cần danh từ chỉ phần còn lại: 'remainder'. 'remaining' là tính từ và phải đứng trước danh từ."
+      }
+    ],
+    "part6": {
+      "passage": "NOTICE TO PASSENGERS\nWeekend track repairs on the Harbor Line\n\nFrom Saturday, March 14, to Sunday, March 22, trains between Harbor Central and Pine Valley will ___ on a reduced timetable while the tracks near Mill Street are replaced. For the ___ of this period, buses will run between the two stations every twenty minutes, and your rail ticket is valid on them. We know the bus is ___ slow compared with the train, so all fares on this section will be reduced by half until the work is finished. A full list of bus stops is posted in the station directory. We apologize for the inconvenience.",
+      "questions": [
+        {
+          "options": ["operate", "operation", "operational", "operator"],
+          "answer": "A",
+          "explanation": "Sau 'will' cần động từ nguyên mẫu: 'operate on a reduced timetable' nghĩa là chạy theo lịch rút gọn."
+        },
+        {
+          "options": ["duration", "durable", "during", "endure"],
+          "answer": "A",
+          "explanation": "Sau 'For the' và trước 'of this period' cần danh từ: 'duration' (suốt khoảng thời gian). 'during' là giới từ, không đi với 'the'."
+        },
+        {
+          "options": ["relatively", "relative", "relation", "relate"],
+          "answer": "A",
+          "explanation": "Cần trạng từ bổ nghĩa cho tính từ 'slow': 'relatively' (tương đối)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "GREENLINE RAIL\nCorporate Account Summary\n\nTo: Ms. Anneliese Vogt, Office Manager, Carter & Holm Consulting\nFrom: Rashid Qureshi, Corporate Accounts, Greenline Rail\n\nDear Ms. Vogt,\n\nThank you for opening a corporate account with us. This letter explains how your staff can use it.\n\nBooking: Employees book through our business portal using the account code CH-5520. The portal shows a comprehensive timetable for all 46 stations we serve, including the remote northern towns we reach twice a day.\n\nFares: Your account receives a 15 percent discount on standard fares and 10 percent on deluxe fares. The discount is applied automatically when booking.\n\n| Route | Standard fare | Deluxe fare | Duration |\n| Central to Westport | $42 | $68 | 1 h 50 min |\n| Central to Northfield | $57 | $90 | 2 h 35 min |\n| Central to Lakeside | $31 | $49 | 1 h 10 min |\n\nEach deluxe ticket entitles the traveler to a reserved seat, a meal and lounge access. If a train arrives more than thirty minutes late, the passenger may claim a voucher worth 25 percent of the fare to offset the inconvenience.\n\nInvoices are sent on the first working day of each month. The remainder of this year's trips will appear on your November and December statements.\n\nSincerely,\nRashid Qureshi",
+      "questions": [
+        {
+          "prompt": "Why did Mr. Qureshi write the letter?",
+          "options": ["To explain how to use a new account", "To announce a fare increase", "To apologize for a late train", "To ask for payment of an invoice"],
+          "answer": "A",
+          "explanation": "Đoạn đầu: 'This letter explains how your staff can use it', tức hướng dẫn dùng tài khoản doanh nghiệp mới mở."
+        },
+        {
+          "prompt": "How much does a deluxe ticket from Central to Westport cost before the discount?",
+          "options": ["$42", "$49", "$68", "$90"],
+          "answer": "C",
+          "explanation": "Bảng ghi tuyến Central to Westport có giá vé deluxe là $68; $42 là giá vé thường."
+        },
+        {
+          "prompt": "What does a deluxe ticket include?",
+          "options": ["A free taxi", "Lounge access", "A hotel discount", "A second ticket"],
+          "answer": "B",
+          "explanation": "Thư nêu 'Each deluxe ticket entitles the traveler to a reserved seat, a meal and lounge access'."
+        },
+        {
+          "prompt": "When can a passenger claim a voucher?",
+          "options": ["When the train is more than 30 minutes late", "When booking on the portal", "When traveling to a remote town", "On the first working day of the month"],
+          "answer": "A",
+          "explanation": "'If a train arrives more than thirty minutes late, the passenger may claim a voucher worth 25 percent of the fare.'"
+        },
+        {
+          "prompt": "How often will Carter & Holm receive an invoice?",
+          "options": ["After every trip", "Once a week", "Once a month", "Twice a year"],
+          "answer": "C",
+          "explanation": "'Invoices are sent on the first working day of each month', tức mỗi tháng một lần."
+        }
+      ]
+    }
+  }
+}

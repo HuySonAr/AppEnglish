@@ -36,6 +36,13 @@ class FakeAuthController {
 }
 Controller()(FakeAuthController);
 GrpcMethod(AUTH_GRPC_SERVICE, 'Me')(FakeAuthController.prototype, 'me', Object.getOwnPropertyDescriptor(FakeAuthController.prototype, 'me'));
+// The audit row of a placement reset (D131): remembers what the gateway sent.
+const audited = [];
+FakeAuthController.prototype.adminAccountAction = function ({ accessToken, accountId, action, reason }) {
+  audited.push({ accessToken, accountId, action, reason });
+  return { httpStatus: 200, code: 0, msg: 'success', dataJson: JSON.stringify({ account: { id: accountId, status: 'ACTIVE' }, changed: true }), setCookies: [] };
+};
+GrpcMethod(AUTH_GRPC_SERVICE, 'AdminAccountAction')(FakeAuthController.prototype, 'adminAccountAction', Object.getOwnPropertyDescriptor(FakeAuthController.prototype, 'adminAccountAction'));
 
 test('Gateway HTTP to learning-service gRPC contract for placement', async (t) => {
   const paper = placementPaper();
@@ -130,6 +137,17 @@ test('Gateway HTTP to learning-service gRPC contract for placement', async (t) =
       assert.equal(updated.status, 200);
       assert.deepEqual(updated.json.data.settings, { unit2Threshold: 50, unit3Threshold: 75 });
       assert.equal(repository.tables.settings.updatedBy, admin.id);
+    });
+
+    await t.test('an admin resets a learner\'s placement; the audit goes to auth-service (D131)', async () => {
+      assert.equal((await call('POST', `/placement/admin/learners/${student.id}/reset`, { as: 'student', body: { reason: 'x' } })).status, 403);
+      assert.equal((await call('POST', '/placement/admin/learners/not-a-uuid/reset', { as: 'admin', body: {} })).status, 400);
+      const reset = await call('POST', `/placement/admin/learners/${student.id}/reset`, { as: 'admin', body: { reason: 'Took it on a friend\'s account' } });
+      assert.equal(reset.status, 201);
+      assert.equal(reset.json.data.reset, true);
+      assert.equal(reset.json.data.account.id, student.id);
+      assert.deepEqual(audited, [{ accessToken: 'admin', accountId: student.id, action: 'RESET_PLACEMENT', reason: 'Took it on a friend\'s account' }]);
+      assert.equal((await call('GET', '/placement', { as: 'student' })).json.data.status, 'NOT_STARTED');
     });
 
     await t.test('an unreachable learning-service becomes a 503 gateway envelope', async () => {

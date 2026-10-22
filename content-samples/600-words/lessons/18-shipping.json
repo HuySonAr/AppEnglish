@@ -1,0 +1,260 @@
+{
+  "number": 18,
+  "title": "Shipping",
+  "vocabulary": [
+    {
+      "word": "accurately",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách chính xác, đúng",
+      "example": "Please weigh each parcel accurately so that the postage label shows the right amount.",
+      "exampleMeaning": "Vui lòng cân từng bưu kiện chính xác để nhãn bưu phí ghi đúng số tiền."
+    },
+    {
+      "word": "carrier",
+      "partOfSpeech": "noun",
+      "meaning": "hãng vận chuyển, đơn vị vận tải",
+      "example": "Our regular carrier picks up packages from the loading dock at four o'clock every afternoon.",
+      "exampleMeaning": "Hãng vận chuyển quen của chúng tôi đến lấy bưu kiện ở bến bốc hàng lúc bốn giờ mỗi chiều."
+    },
+    {
+      "word": "catalog",
+      "partOfSpeech": "noun",
+      "meaning": "danh mục sản phẩm, ca-ta-lô",
+      "example": "Every product in the spring catalog has a code that the warehouse uses to find it quickly.",
+      "exampleMeaning": "Mỗi sản phẩm trong ca-ta-lô mùa xuân có một mã để kho tìm hàng nhanh."
+    },
+    {
+      "word": "fulfill",
+      "partOfSpeech": "verb",
+      "meaning": "hoàn thành, thực hiện (đơn hàng, lời hứa); đáp ứng",
+      "example": "The warehouse team fulfilled more than nine hundred orders during the holiday week.",
+      "exampleMeaning": "Đội kho đã hoàn thành hơn chín trăm đơn hàng trong tuần lễ hội."
+    },
+    {
+      "word": "integral",
+      "partOfSpeech": "adjective",
+      "meaning": "thiết yếu, không thể thiếu, là một phần cấu thành",
+      "example": "Tracking numbers are an integral part of our shipping service.",
+      "exampleMeaning": "Mã theo dõi là một phần thiết yếu của dịch vụ vận chuyển của chúng tôi."
+    },
+    {
+      "word": "inventory",
+      "partOfSpeech": "noun",
+      "meaning": "hàng tồn kho; danh sách hàng trong kho",
+      "example": "The system updates the inventory as soon as a package leaves the warehouse.",
+      "exampleMeaning": "Hệ thống cập nhật hàng tồn kho ngay khi một gói hàng rời kho."
+    },
+    {
+      "word": "minimize",
+      "partOfSpeech": "verb",
+      "meaning": "giảm đến mức tối thiểu",
+      "example": "Packing fragile items in foam helps minimize damage during transport.",
+      "exampleMeaning": "Đóng gói đồ dễ vỡ bằng xốp giúp giảm tối thiểu hư hỏng trong quá trình vận chuyển."
+    },
+    {
+      "word": "on hand",
+      "partOfSpeech": "phrase",
+      "meaning": "có sẵn, sẵn có (trong kho, tại chỗ)",
+      "example": "We keep two hundred shipping boxes on hand so that orders are never delayed.",
+      "exampleMeaning": "Chúng tôi luôn có sẵn hai trăm thùng vận chuyển để đơn hàng không bao giờ bị trễ."
+    },
+    {
+      "word": "remember",
+      "partOfSpeech": "verb",
+      "meaning": "nhớ, ghi nhớ",
+      "example": "Remember to attach the customs form to any parcel going outside the country.",
+      "exampleMeaning": "Nhớ đính kèm tờ khai hải quan vào mọi bưu kiện gửi ra nước ngoài."
+    },
+    {
+      "word": "ship",
+      "partOfSpeech": "verb",
+      "meaning": "gửi hàng, vận chuyển (bằng tàu, xe, máy bay)",
+      "example": "Orders received before noon are shipped the same day.",
+      "exampleMeaning": "Đơn hàng nhận trước giữa trưa được gửi đi trong ngày."
+    },
+    {
+      "word": "sufficiently",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách đầy đủ, đủ mức",
+      "example": "The boxes were not sufficiently padded, so two glass vases arrived broken.",
+      "exampleMeaning": "Các thùng không được lót đủ, nên hai bình thủy tinh đến nơi bị vỡ."
+    },
+    {
+      "word": "supply",
+      "partOfSpeech": "noun",
+      "meaning": "nguồn cung, lượng dự trữ; (động từ) cung cấp",
+      "example": "The supply of bubble wrap ran low after the large order for the museum shop.",
+      "exampleMeaning": "Lượng màng xốp dự trữ cạn dần sau đơn hàng lớn cho cửa hàng của bảo tàng."
+    }
+  ],
+  "fillIn": {
+    "passage": "Willow Creek Pottery sells handmade bowls and mugs through its website and a printed ___ that goes out twice a year. Because every piece is fragile, the packing room is an ___ part of the business. Grace Mbeki, who runs it, says that her goal is simple: to ___ every order within two working days and to ___ the number of items that arrive broken.\n\nEach morning Grace checks the ___ to see which products are ___ and which are still drying in the studio. She keeps a large ___ of boxes, paper and foam so that packing never stops. Her staff weigh each parcel ___ and print the labels; one wrong figure can cost more than the mug inside. The team also makes sure every box is ___ padded before it is sealed.\n\nWillow Creek uses two companies to deliver its parcels. The main ___ collects at three o'clock, and a second one handles overseas orders. Grace tells new workers to ___ a single rule: never ___ a parcel without a tracking number, because customers want to know where their order is.",
+    "answers": ["catalog", "integral", "fulfill", "minimize", "inventory", "on hand", "supply", "accurately", "sufficiently", "carrier", "remember", "ship"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người phụ nữ đang dán nhãn lên một thùng hàng trong kho, xung quanh có nhiều hộp xếp chồng.",
+      "options": [
+        "She is putting a label on a box.",
+        "She is opening a package with scissors.",
+        "She is driving a forklift down an aisle.",
+        "The boxes have been loaded onto a truck."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ đang dán nhãn lên thùng hàng. (B) và (C) là hành động khác, (D) nói về xe tải không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Which carrier do we use for overseas shipments?",
+        "options": ["The one with the blue vans, Trident Express.", "Yes, it shipped yesterday.", "It takes about a week to carry."],
+        "answer": "A",
+        "explanation": "Câu hỏi Which cần câu trả lời chỉ ra hãng vận chuyển cụ thể. (B) trả lời Yes cho câu hỏi Wh, (C) nhầm âm 'carry'."
+      },
+      {
+        "question": "Do we have enough packing tape on hand?",
+        "options": ["Hand me that box, please.", "There are six rolls in the cupboard.", "The shipment left this morning."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về lượng băng keo có sẵn; (B) trả lời bằng số lượng cụ thể. (A) nhầm từ 'hand' với nghĩa khác, (C) không liên quan."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Hi, Omar. A customer just called about order number 4471, the oak desk lamp from the autumn catalog. She was told it would ship on Monday, but she hasn't received a tracking number.\nMan: Let me check. Hmm, the inventory shows zero lamps on hand. The last five went out on Friday.\nWoman: So we can't fulfill her order this week?\nMan: Not from this warehouse. But the Riverton branch has twelve in stock. I can ask them to ship it directly to her today.\nWoman: Perfect. Please remember to update the tracking number in her account so she gets the email automatically.\nMan: Will do. And I'll flag the lamp in the system so sales doesn't promise a date we can't keep.",
+      "questions": [
+        {
+          "prompt": "Why is the woman talking to the man?",
+          "options": ["A customer's order has not shipped.", "A product has arrived damaged.", "A catalog has a printing error.", "A carrier has raised its rates."],
+          "answer": "A",
+          "explanation": "Khách hàng được hẹn gửi hàng vào thứ Hai nhưng 'hasn't received a tracking number', tức đơn hàng chưa được gửi."
+        },
+        {
+          "prompt": "What does the man find in the system?",
+          "options": ["The order was canceled.", "The customer's address is wrong.", "The warehouse has no lamps left.", "The lamp was discontinued."],
+          "answer": "C",
+          "explanation": "Anh ấy nói 'the inventory shows zero lamps on hand', tức kho không còn đèn."
+        },
+        {
+          "prompt": "What does the woman ask the man to do?",
+          "options": ["Call the Riverton branch", "Update the tracking information", "Print a new catalog", "Offer the customer a refund"],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'Please remember to update the tracking number in her account'. Việc liên hệ chi nhánh Riverton là ý của người đàn ông."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Welcome to the Fairview distribution center. Before you start on the packing line, I want to explain three things that are integral to how we work. First, accuracy. Every order is scanned twice: when you pick the item and when the box is sealed. If the two scans do not match, stop and call a supervisor. Second, packing. Glass and electronics must be sufficiently wrapped so that nothing moves inside the box; shake it gently before you tape it. We pack this way to minimize damage claims, which cost us far more than a little extra foam. Third, timing. Our main carrier arrives at half past four, and anything not on the dock by then waits until tomorrow. Tape, labels and boxes are kept at the end of each aisle; if a shelf is nearly empty, tell the supply clerk before it runs out. Let's get started.",
+      "questions": [
+        {
+          "prompt": "Who most likely are the listeners?",
+          "options": ["Delivery drivers", "New warehouse employees", "Customers of the center", "Sales representatives"],
+          "answer": "B",
+          "explanation": "Người nói chào mừng mọi người đến trung tâm phân phối 'before you start on the packing line', tức đây là nhân viên kho mới."
+        },
+        {
+          "prompt": "What should a worker do if the two scans do not match?",
+          "options": ["Reseal the box", "Call a supervisor", "Cancel the order", "Reprint the label"],
+          "answer": "B",
+          "explanation": "'If the two scans do not match, stop and call a supervisor.'"
+        },
+        {
+          "prompt": "What happens to a parcel that misses the carrier?",
+          "options": ["It is sent by air.", "It is returned to the shelf.", "It leaves the next day.", "It is delivered by the supervisor."],
+          "answer": "C",
+          "explanation": "'anything not on the dock by then waits until tomorrow', tức bưu kiện lỡ chuyến sẽ đi vào ngày hôm sau."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The warehouse must _____ orders within twenty-four hours of receiving payment.",
+        "options": ["fulfill", "fulfillment", "fulfilling", "fulfilled"],
+        "answer": "A",
+        "explanation": "Sau 'must' cần động từ nguyên mẫu: 'fulfill orders' (hoàn thành đơn hàng)."
+      },
+      {
+        "prompt": "Please record the weight of each parcel _____ before printing the shipping label.",
+        "options": ["accurate", "accuracy", "accurately", "accurateness"],
+        "answer": "C",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'record': 'accurately' (chính xác)."
+      },
+      {
+        "prompt": "Good packaging is _____ to reducing the number of damaged deliveries.",
+        "options": ["integral", "integrate", "integration", "integrally"],
+        "answer": "A",
+        "explanation": "Sau 'is' cần tính từ; 'integral to' nghĩa là thiết yếu đối với."
+      },
+      {
+        "prompt": "The company changed its _____ because too many parcels were arriving late.",
+        "options": ["carrier", "carry", "carriage", "carried"],
+        "answer": "A",
+        "explanation": "Sau 'its' cần danh từ chỉ hãng vận chuyển: 'carrier'. 'carriage' là phí hoặc toa xe, không hợp nghĩa."
+      },
+      {
+        "prompt": "We keep extra boxes _____ during the busy season so that packing is never delayed.",
+        "options": ["on hand", "in hand", "by hand", "on hands"],
+        "answer": "A",
+        "explanation": "'on hand' nghĩa là có sẵn để dùng. 'in hand' là đang được xử lý, 'by hand' là làm thủ công."
+      },
+      {
+        "prompt": "The shipment was not _____ insured, so the company lost money when the truck was damaged.",
+        "options": ["sufficient", "sufficiently", "sufficiency", "suffice"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho quá khứ phân từ 'insured': 'sufficiently insured' (được bảo hiểm đủ mức)."
+      }
+    ],
+    "part6": {
+      "passage": "Dear Customer,\n\nThank you for your order with Lantern Street Books. Because of high demand this month, orders placed after December 15 will ___ within three working days rather than the usual one. Our ___ of gift boxes is also limited, so gift wrapping may not be available for every title. To ___ delays, please check that your delivery address is complete, including the apartment number, before you confirm your order. You will receive a tracking number by email as soon as your parcel leaves our warehouse.\n\nLantern Street Books Customer Service",
+      "questions": [
+        {
+          "options": ["ship", "shipment", "shipping", "shipped"],
+          "answer": "A",
+          "explanation": "Sau trợ động từ 'will' cần động từ nguyên mẫu: 'will ship' (sẽ được gửi đi)."
+        },
+        {
+          "options": ["supply", "supplier", "supplies", "supplied"],
+          "answer": "A",
+          "explanation": "Cần danh từ số ít hợp với 'is limited': 'Our supply of gift boxes' (lượng hộp quà dự trữ)."
+        },
+        {
+          "options": ["minimize", "minimum", "minimal", "minimally"],
+          "answer": "A",
+          "explanation": "Sau 'To' chỉ mục đích cần động từ nguyên mẫu: 'To minimize delays' (để giảm tối thiểu chậm trễ)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "HARBORLIGHT KITCHENWARE\nShipping Information for Catalog Orders\n\nPlease read the following before ordering from the Harborlight autumn catalog.\n\nProcessing time\nOrders are fulfilled from our Dalton warehouse. Items marked \"in stock\" are on hand and ship within one working day. Items marked \"made to order\" take ten to fourteen days, because they are produced after payment is received. Our inventory is updated every evening, so the status shown on the website may differ slightly from the printed catalog.\n\nDelivery options\n| Service | Carrier | Time | Cost |\n| Standard | Regional Post | 3-5 working days | $6.50, free over $75 |\n| Express | Swiftway Courier | 1-2 working days | $14.00 |\n| Store pickup | - | Next day | Free |\n\nPlease remember that express delivery is not available for made-to-order items or for addresses outside the mainland.\n\nTracking and problems\nA tracking number is emailed when your parcel leaves the warehouse. If a package arrives damaged, photograph the box and its contents and send the pictures to our claims desk within seven days; we will send a replacement at no charge. Enter your address accurately at checkout; we cannot redirect a parcel once the carrier has collected it.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the information?",
+          "options": ["To announce a new catalog", "To explain how orders are delivered", "To advertise a sale on kitchenware", "To introduce a new warehouse"],
+          "answer": "B",
+          "explanation": "Tài liệu trình bày thời gian xử lý, các lựa chọn giao hàng và cách theo dõi bưu kiện cho đơn đặt từ ca-ta-lô."
+        },
+        {
+          "prompt": "How long do made-to-order items take to produce?",
+          "options": ["One working day", "Three to five days", "Ten to fourteen days", "Seven days"],
+          "answer": "C",
+          "explanation": "'Items marked \"made to order\" take ten to fourteen days'."
+        },
+        {
+          "prompt": "How much does standard delivery cost on an order of $90?",
+          "options": ["$6.50", "$14.00", "Nothing", "$75"],
+          "answer": "C",
+          "explanation": "Bảng ghi giao hàng tiêu chuẩn '$6.50, free over $75'; đơn $90 vượt mức $75 nên được miễn phí."
+        },
+        {
+          "prompt": "What is NOT available for made-to-order items?",
+          "options": ["Store pickup", "Express delivery", "A tracking number", "A replacement"],
+          "answer": "B",
+          "explanation": "'express delivery is not available for made-to-order items or for addresses outside the mainland'."
+        },
+        {
+          "prompt": "What should a customer do if a package arrives damaged?",
+          "options": ["Return it to the carrier", "Call the Dalton warehouse", "Send photographs within seven days", "Request a refund at checkout"],
+          "answer": "C",
+          "explanation": "Khách được yêu cầu 'photograph the box and its contents and send the pictures ... within seven days'."
+        }
+      ]
+    }
+  }
+}

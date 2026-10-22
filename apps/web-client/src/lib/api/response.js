@@ -19,6 +19,7 @@ const messages = Object.freeze({
   [ResponseCode.AUTH_CURRENT_PASSWORD_INVALID]: 'The current password is incorrect.',
   [ResponseCode.AVATAR_INVALID]: 'This picture cannot be used.',
   [ResponseCode.AUTH_REASON_REQUIRED]: 'Give a reason before locking the account.',
+  [ResponseCode.RATE_LIMITED]: 'Too many attempts. Please wait a moment and try again.',
   [ResponseCode.EMAIL_SEND_ERROR]: 'We could not send the email. Check the server email configuration.',
   [ResponseCode.VALIDATION_ERROR]: 'Please check the highlighted fields.',
   [ContentResponseCode.CONTENT_NOT_FOUND]: 'This content no longer exists.',
@@ -26,7 +27,8 @@ const messages = Object.freeze({
   [ContentResponseCode.CONTENT_NOT_PUBLISHABLE]: 'This content does not meet the publishing requirements yet.',
   [ContentResponseCode.MEDIA_INVALID]: 'This file type or size is not allowed.',
   [ContentResponseCode.EXAM_TYPE_INVALID]: 'This exam type cannot be used here.',
-  [ContentResponseCode.PRONUNCIATION_UNAVAILABLE]: 'The dictionary is not answering. Try again, or enter the pronunciation yourself.',
+  [ContentResponseCode.CONTENT_IN_USE]: 'Learners already have results for this content; unpublish it instead of deleting.',
+  [ContentResponseCode.PRONUNCIATION_UNAVAILABLE]: 'The speech service is not answering. Check that it is running, then try again, or enter the pronunciation yourself.',
   [LearningResponseCode.PLACEMENT_NOT_AVAILABLE]: 'The placement test is not available yet.',
   [LearningResponseCode.PLACEMENT_ALREADY_TAKEN]: 'You have already taken or skipped the placement test.',
   [LearningResponseCode.PLACEMENT_NOT_IN_PROGRESS]: 'There is no placement test in progress.',
@@ -38,7 +40,9 @@ const messages = Object.freeze({
   [LearningResponseCode.MOCK_TEST_NOT_IN_PROGRESS]: 'There is no mock test in progress.',
   [LearningResponseCode.COURSE_LESSON_NOT_FOUND]: 'This part of the listening course is not available.',
   [LearningResponseCode.COURSE_ITEM_LOCKED]: 'This part of the listening course is still locked. Pass the one before it first.',
-  [LearningResponseCode.COURSE_PLACEMENT_DONE]: 'You have already taken or skipped the listening placement.'
+  [LearningResponseCode.COURSE_PLACEMENT_DONE]: 'You have already taken or skipped the listening placement.',
+  [LearningResponseCode.UNIT_REVIEW_NOT_FOUND]: 'This unit has no review.',
+  [LearningResponseCode.UNIT_REVIEW_LOCKED]: 'The unit review opens once every lesson of the unit is completed.',
 });
 
 // data.reason of a MEDIA_INVALID error says which upload rule failed.
@@ -80,8 +84,18 @@ export function errorNextAction(error) {
   return error?.response?.data?.data?.nextAction ?? null;
 }
 
+// "Try again in 2 minutes" from a 429's retryAfterSeconds.
+function waitText(seconds) {
+  if (!seconds) return '';
+  if (seconds < 90) return ` Try again in ${Math.max(1, Math.round(seconds))} second${seconds === 1 ? '' : 's'}.`;
+  const minutes = Math.ceil(seconds / 60);
+  return ` Try again in ${minutes} minute${minutes === 1 ? '' : 's'}.`;
+}
+
 export function getApiErrorMessage(error) {
   const code = errorCode(error);
+  if (code === ResponseCode.RATE_LIMITED || error?.response?.status === 429)
+    return `Too many attempts.${waitText(error?.response?.data?.data?.retryAfterSeconds)}`;
   // The gateway refuses files above its own limit before content-service sees them.
   if (error?.response?.status === 413) return mediaReasons.MEDIA_FILE_TOO_LARGE;
   const reason = mediaReasons[error?.response?.data?.data?.reason];

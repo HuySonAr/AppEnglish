@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Plus } from 'lucide-react';
 import {
   Accent,
@@ -9,6 +9,9 @@ import {
   MediaSection,
 } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
+import { ContentDangerActions } from '../components/ContentDangerActions.jsx';
+import { DiscardDraftButton } from '../components/DiscardDraftButton.jsx';
+import { deleteLesson, unpublishLesson } from '../api/content-api.js';
 import { notify } from '../../../lib/notify.js';
 import {
   autofillPronunciation,
@@ -32,11 +35,6 @@ import {
   Button,
   Input,
   Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Skeleton,
   Tabs,
   TabsContent,
@@ -45,22 +43,30 @@ import {
 } from '../../../components/ui';
 import { PartEditor, questionRange } from '../components/PartEditor.jsx';
 import { PasteVocabularyDialog } from '../components/PasteVocabularyDialog.jsx';
+import { ImportExportJson } from '../components/ImportExportJson.jsx';
+import { exportLesson, jsonFileName, planLessonImport } from '../lib/authoring-import.js';
 import { TextField } from '../components/TextField.jsx';
 import { VocabularyCard } from '../components/VocabularyCard.jsx';
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { VersionHistory } from '../components/VersionHistory.jsx';
+import { PublishButton, usePublishAction } from '../../../components/shared/PublishButton.jsx';
+import { useFocusReturn, useListLinkState, useReturnTo } from '../../../hooks/use-return-to.js';
 
 const saveErrorMessage = (error) =>
   `${error?.fileName ? `${error.fileName}: ` : ''}${getApiErrorMessage(error)}`;
 
 export function LessonEditorPage() {
   const { lessonId } = useParams();
+  const back = useReturnTo('/content-manager/units');
   const [state, setState] = useState('loading');
   const [lesson, setLesson] = useState(null);
+  const navigate = useNavigate();
   const [status, setStatus] = useState(lessonState(null));
   const [title, setTitle] = useState('');
   const [content, setContent] = useState(null);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
+  const publish = usePublishAction();
   const [issues, setIssues] = useState([]);
   const [tab, setTab] = useState('vocabulary');
   const [partTab, setPartTab] = useState(LESSON_TEST_PARTS[0].key);
@@ -122,8 +128,8 @@ export function LessonEditorPage() {
   });
   const { media } = draftMedia;
 
-  // Fills the phonetic text and the audio slots that are still empty from the
-  // free dictionary; anything it lacks stays for manual entry or upload.
+  // Fills the phonetic text and the audio slots that are still empty with the
+  // speech service (D123); anything it lacks stays for manual entry or upload.
   async function onAutofill(item) {
     const missing = [
       item.audioUkMediaId ? null : Accent.UK,
@@ -164,7 +170,7 @@ export function LessonEditorPage() {
       notify(
         !found
           ? {
-              title: `"${item.word.trim()}" is not in the dictionary`,
+              title: `"${item.word.trim()}" could not be pronounced`,
               description: 'Enter the phonetic and upload the audio yourself.',
               variant: 'destructive',
             }
@@ -172,7 +178,7 @@ export function LessonEditorPage() {
             ? {
                 title: 'Partly filled',
                 variant: 'warning',
-                description: `The dictionary has no ${lacking.join(', ')} for this word. Add it yourself.`,
+                description: `No ${lacking.join(', ')} came back for this word. Add it yourself.`,
               }
             : { title: 'Pronunciation filled' },
       );
@@ -229,6 +235,7 @@ export function LessonEditorPage() {
       apply(data);
       setIssues([]);
       notify({ title: `Published version ${data.published.versionNumber}` });
+      return true;
     } catch (error) {
       const found = error?.response?.data?.data?.issues;
       if (
@@ -281,24 +288,19 @@ export function LessonEditorPage() {
         </Button>
         <Link
           className="block text-sm text-primary underline-offset-4 hover:underline"
-          to="/content-manager/units"
+          to={back.to} state={back.state}
         >
           Back to units
         </Link>
       </div>
     );
 
-  const words = [
-    ...new Set(
-      content.vocabulary.map((item) => item.word.trim()).filter(Boolean),
-    ),
-  ];
   const canPublish = dirty || status.hasDraft;
 
   return (
     <section className="space-y-6">
       <Link
-        to="/content-manager/units"
+        to={back.to} state={back.state}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -327,7 +329,19 @@ export function LessonEditorPage() {
             onChange={(event) => setTitle(event.target.value)}
             className="text-lg font-semibold"
           />
-          <div className="flex gap-2 justify-end">
+          <div className="flex flex-wrap gap-2 justify-end">
+            <ImportExportJson
+              noun="lesson"
+              disabled={busy}
+              plan={(text) => planLessonImport(text, content)}
+              onImport={(imported) => {
+                setContent(imported);
+                setDirty(true);
+                setIssues([]);
+              }}
+              exportData={() => exportLesson(content, { number: lesson.position, title: lesson.title })}
+              fileName={jsonFileName(lesson.title)}
+            />
             <Button
               variant="outline"
               disabled={busy || !title.trim() || title.trim() === lesson.title}
@@ -342,9 +356,21 @@ export function LessonEditorPage() {
             >
               {busy ? 'Working…' : 'Save draft'}
             </Button>
-            <Button disabled={busy || !canPublish} onClick={onPublish}>
-              Publish
-            </Button>
+            <PublishButton state={publish.state} disabled={busy || !canPublish} onClick={() => publish.run(onPublish)} />
+            {status.hasDraft ? (
+              <DiscardDraftButton kind="lesson" id={lessonId} noun="lesson" disabled={busy} onDiscarded={load} />
+            ) : null}
+            <ContentDangerActions
+              noun="lesson"
+              published={Boolean(status.publishedVersion)}
+              busy={busy}
+              onUnpublish={async () => setStatus(lessonState((await unpublishLesson(lessonId)).data))}
+              onDelete={async () => {
+                await deleteLesson(lessonId);
+                navigate(back.to, { replace: true, state: back.state });
+              }}
+              deleteNote="Later lessons of the unit move up one place."
+            />
           </div>
         </div>
       </div>
@@ -432,8 +458,9 @@ export function LessonEditorPage() {
 
         <TabsContent value="fillIn" className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Write one passage and type {FILL_IN_BLANK} for each blank. Learners
-            fill the blanks with words from this lesson&apos;s vocabulary.
+            Write one passage and type {FILL_IN_BLANK} for each blank, then
+            type the answer of each blank below. Learners get exactly these
+            answers as a shuffled word bank and place them in the blanks.
           </p>
           <TextField
             id="fill-in-passage"
@@ -458,29 +485,16 @@ export function LessonEditorPage() {
               {content.fillIn.answers.map((answer, index) => (
                 <div key={index} className="space-y-2">
                   <Label htmlFor={`blank-${index}`}>Blank {index + 1}</Label>
-                  <Select
-                    value={words.includes(answer) ? answer : undefined}
-                    onValueChange={(value) =>
-                      edit(['fillIn', 'answers', index], value)
+                  <Input
+                    id={`blank-${index}`}
+                    value={answer}
+                    maxLength={100}
+                    placeholder="Answer"
+                    autoComplete="off"
+                    onChange={(event) =>
+                      edit(['fillIn', 'answers', index], event.target.value)
                     }
-                  >
-                    <SelectTrigger id={`blank-${index}`}>
-                      <SelectValue
-                        placeholder={
-                          words.length
-                            ? 'Choose a word'
-                            : 'Add vocabulary first'
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {words.map((word) => (
-                        <SelectItem key={word} value={word}>
-                          {word}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
               ))}
             </div>
@@ -514,6 +528,8 @@ export function LessonEditorPage() {
           </Tabs>
         </TabsContent>
       </Tabs>
+
+      <VersionHistory kind="lesson" id={lessonId} noun="lesson" refreshKey={`${status.publishedVersion}-${status.draftVersion}`} onRestored={load} />
     </section>
   );
 }

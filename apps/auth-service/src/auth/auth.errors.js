@@ -32,6 +32,13 @@ export const authErrors = Object.freeze({
     new AuthError(23, 'The last active administrator cannot be demoted or disabled', 409),
   emailVerificationRequired: () =>
     new AuthError(25, 'Email verification is required before activation', 409),
+  // D131: what the account's state allows.
+  notPending: () =>
+    new AuthError(25, 'The account is not waiting for verification', 409),
+  notInvited: () =>
+    new AuthError(25, 'The account was not created by invitation', 409),
+  invitedPending: () =>
+    new AuthError(25, 'An invited account is activated when the person accepts the invitation', 409),
   forbiddenRole: () =>
     new AuthError(26, 'Account does not have the required role', 403),
   invalidRole: () =>

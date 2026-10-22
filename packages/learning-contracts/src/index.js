@@ -50,6 +50,17 @@ export const StepStatus = Object.freeze({ DONE: 'DONE', CURRENT: 'CURRENT', LOCK
 // The two vocabulary quizzes: this lesson's words, or the previous lesson's.
 export const QuizKind = Object.freeze({ VOCABULARY: 'vocabulary', REVIEW: 'review' });
 
+// The review that closes a unit (D121): NONE when the unit has none, LOCKED
+// until every lesson of the unit is completed, OPEN to take, PASSED once a
+// score reaches the lesson pass mark. The next unit's first lesson waits for
+// PASSED. Retakes are unlimited and earn nothing.
+export const UnitReviewState = Object.freeze({
+  NONE: 'NONE',
+  LOCKED: 'LOCKED',
+  OPEN: 'OPEN',
+  PASSED: 'PASSED',
+});
+
 export const LessonTestStatus = Object.freeze({
   LOCKED: 'LOCKED',
   READY: 'READY',
@@ -74,20 +85,12 @@ export const VOCABULARY_PRACTICE_SIZE = 20;
 // How a listening exercise is practised (D88): every sentence written down,
 // or only the blanks of a song filled in. The best score is kept per mode.
 export const ListeningMode = Object.freeze({ FULL: 'full', BLANKS: 'blanks' });
-// The steps of a Listening course lesson that are checked (F05C, D100): the
-// main-idea question, the detail questions, and each sentence written down.
-export const CourseLessonStep = Object.freeze({ GIST: 'gist', DETAIL: 'detail', FOCUS: 'focus', CLOSE: 'close' });
-// The answer key of one blank of a "complete the sentence" question (its id)
-// or of the Focus on passage (COURSE_FOCUS_ID), by blank index (D109).
-export const COURSE_FOCUS_ID = 'focus';
-export const courseBlankKey = (id, index) => `${id}:${index}`;
-// What is open in the Listening course (D102): each lesson, unit check and
-// level test is LOCKED, OPEN or PASSED; each level is DONE (before the
-// learner's level, open for review), CURRENT or LOCKED.
-export const CourseItemState = Object.freeze({ LOCKED: 'LOCKED', OPEN: 'OPEN', PASSED: 'PASSED' });
-export const CourseLevelState = Object.freeze({ DONE: 'DONE', CURRENT: 'CURRENT', LOCKED: 'LOCKED' });
-// The listening placement (D103) is taken or skipped once.
-export const CoursePlacementStatus = Object.freeze({ NOT_STARTED: 'NOT_STARTED', COMPLETED: 'COMPLETED', SKIPPED: 'SKIPPED' });
+// The Listening course for learners (D145): a level is OPEN (the first one,
+// or the one after a level whose test is passed) or LOCKED; inside an open
+// level every topic can be studied. The dictation of a topic is checked
+// sentence by sentence in one of two modes, nothing is kept.
+export const CourseLevelState = Object.freeze({ OPEN: 'OPEN', LOCKED: 'LOCKED' });
+export const CourseDictationMode = Object.freeze({ BLANKS: 'blanks', FULL: 'full' });
 export const PracticeDirection = Object.freeze({ MEANING: 'MEANING', WORD: 'WORD' });
 
 export const LESSON_TEST_DURATION_MINUTES = 25;
@@ -120,7 +123,8 @@ export const LearningResponseCode = Object.freeze({
   LISTENING_EXERCISE_NOT_FOUND: 59,
   COURSE_LESSON_NOT_FOUND: 60,
   COURSE_ITEM_LOCKED: 61,
-  COURSE_PLACEMENT_DONE: 62,
+  UNIT_REVIEW_NOT_FOUND: 63,
+  UNIT_REVIEW_LOCKED: 64,
 });
 
 // Results leaving learning-service for progress-service (F06, D110) go as

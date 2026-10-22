@@ -1,0 +1,223 @@
+{
+  "unit": 7,
+  "title": "Restaurants and Events",
+  "part5": [
+    {
+      "prompt": "The aroma coming from the restaurant was so ___ that the tourists did not hesitate before entering.",
+      "options": [
+        "appeal",
+        "appealed",
+        "appealing",
+        "appeals"
+      ],
+      "answer": "C",
+      "explanation": "Sau “so” cần tính từ “appealing” (hấp dẫn) mô tả mùi thơm của nhà hàng."
+    },
+    {
+      "prompt": "Because the menu was not in his native language, the visitor asked the waiter for ___.",
+      "options": [
+        "guide",
+        "guided",
+        "guiding",
+        "guidance"
+      ],
+      "answer": "D",
+      "explanation": "“Ask someone for guidance” nghĩa là xin sự hướng dẫn; cần danh từ “guidance”."
+    },
+    {
+      "prompt": "The waiter ___ that the customer would enjoy the duck.",
+      "options": [
+        "predict",
+        "predicted",
+        "predicting",
+        "prediction"
+      ],
+      "answer": "B",
+      "explanation": "Câu kể chuyện ở quá khứ, nên dùng “predicted” (dự đoán)."
+    },
+    {
+      "prompt": "Food critics are also expected to ___ a restaurant’s service and atmosphere.",
+      "options": [
+        "judge",
+        "judges",
+        "judging",
+        "judgment"
+      ],
+      "answer": "A",
+      "explanation": "Sau “are expected to” dùng động từ nguyên mẫu “judge” (đánh giá)."
+    },
+    {
+      "prompt": "The host usually ___ the check for his guest.",
+      "options": [
+        "picks over",
+        "picks on",
+        "picks off",
+        "picks up"
+      ],
+      "answer": "D",
+      "explanation": "“Pick up the check” nghĩa là trả hóa đơn cho người khác; chủ ngữ số ít nên dùng “picks up”."
+    },
+    {
+      "prompt": "Sometimes diners request ___, or “separate,” checks.",
+      "options": [
+        "individuality",
+        "individually",
+        "individual",
+        "individualize"
+      ],
+      "answer": "C",
+      "explanation": "“Individual checks” là các hóa đơn riêng; cần tính từ “individual”."
+    },
+    {
+      "prompt": "The most ___ customers seem to be the worst tippers.",
+      "options": [
+        "demand",
+        "demanded",
+        "demanding",
+        "demandingly"
+      ],
+      "answer": "C",
+      "explanation": "“Demanding” là tính từ chỉ khách hàng hay đòi hỏi, đứng trước danh từ “customers”."
+    },
+    {
+      "prompt": "Food preparation is not just frying hamburgers; it is a respected ___.",
+      "options": [
+        "profess",
+        "professing",
+        "profession",
+        "professional"
+      ],
+      "answer": "C",
+      "explanation": "Sau “a respected” phải là danh từ “profession” (nghề nghiệp)."
+    },
+    {
+      "prompt": "An event planner must ___ the entire affair, not just choose the menu.",
+      "options": [
+        "coordinated",
+        "coordinating",
+        "coordinator",
+        "coordinate"
+      ],
+      "answer": "D",
+      "explanation": "Sau động từ khuyết thiếu “must” dùng động từ nguyên mẫu “coordinate” (điều phối)."
+    },
+    {
+      "prompt": "The planner must also ensure that participants observe all local ___.",
+      "options": [
+        "regulated",
+        "regulations",
+        "regulating",
+        "regulate"
+      ],
+      "answer": "B",
+      "explanation": "“Observe regulations” nghĩa là tuân thủ các quy định; cần danh từ số nhiều “regulations”."
+    }
+  ],
+  "part6": [
+    {
+      "passage": "To: Robert Hughes\nFrom: Betsy Wyman\nSubject: re: places to eat\n\nHi Rob,\n\nI got your message asking for ideas about places to take your clients to dinner. I have a great ___ for you. The Waterfall Room is a fantastic restaurant that just opened on Maple Avenue. The atmosphere is pleasant and the food is very good. If you ___ before 6:30, you can get the dinner special—a complete three-course meal including a glass of wine—for only $30. It’s a great deal. I really think this is the best place in town to enjoy an ___ meal at a reasonable price. Let me know how you like it.\n\nBetsy",
+      "questions": [
+        {
+          "options": [
+            "suggest",
+            "suggesting",
+            "suggestion",
+            "suggestible"
+          ],
+          "answer": "C",
+          "explanation": "Sau “a great” cần danh từ “suggestion” (gợi ý)."
+        },
+        {
+          "options": [
+            "arrive",
+            "demand",
+            "appeal",
+            "predict"
+          ],
+          "answer": "A",
+          "explanation": "Trong câu điều kiện “If you ___ before 6:30”, “arrive” (đến) đúng nghĩa và đúng dạng hiện tại đơn."
+        },
+        {
+          "options": [
+            "elegantly",
+            "elegance",
+            "elegies",
+            "elegant"
+          ],
+          "answer": "D",
+          "explanation": "Trước danh từ “meal” phải dùng tính từ “elegant” (sang trọng)."
+        }
+      ]
+    },
+    {
+      "passage": "To: Sue Evans\nFrom: Ron Smith\nSubject: lunch tomorrow\n\nSue,\n\nGeorge will be out of the office all week, so it will ___ you to order the lunch for tomorrow’s staff meeting. We always order from Sam’s Deli. We’ll need enough for 15 people. Look at their list of sandwiches and order three or four different kinds. ___ to order a variety of desserts, too. People always like a sweet treat with their meal. Please make sure that the food ___ by noon tomorrow. Thanks.\n\nRon",
+      "questions": [
+        {
+          "options": [
+            "pick up",
+            "fall to",
+            "rely on",
+            "mix up"
+          ],
+          "answer": "B",
+          "explanation": "“It will fall to you to do something” nghĩa là việc đó sẽ thuộc trách nhiệm của bạn."
+        },
+        {
+          "options": [
+            "No forget",
+            "Not forget",
+            "No forgetting",
+            "Don’t forget"
+          ],
+          "answer": "D",
+          "explanation": "Câu mệnh lệnh phủ định cần “Don’t forget” (đừng quên)."
+        },
+        {
+          "options": [
+            "delivers",
+            "is delivered",
+            "is delivering",
+            "will deliver"
+          ],
+          "answer": "B",
+          "explanation": "“Food” nhận hành động giao; dùng bị động “is delivered” để chỉ đồ ăn được giao đúng hạn."
+        }
+      ]
+    },
+    {
+      "passage": "Do you have what it takes to become a professional chef? The first requirement, of course, is an interest in the ___ arts. There is no point in becoming a chef if you don’t love fine food. You will also need to be willing to work long hours because this is a very ___ profession. In addition, you will need leadership qualities. A working chef has ___ the work of everyone in the kitchen.",
+      "questions": [
+        {
+          "options": [
+            "fine",
+            "visual",
+            "culinary",
+            "performing"
+          ],
+          "answer": "C",
+          "explanation": "“Culinary arts” là nghệ thuật ẩm thực, đúng với nghề đầu bếp."
+        },
+        {
+          "options": [
+            "demand",
+            "demander",
+            "demanded",
+            "demanding"
+          ],
+          "answer": "D",
+          "explanation": "“Demanding” là tính từ mô tả nghề đòi hỏi nhiều công sức, thời gian."
+        },
+        {
+          "options": [
+            "to coordinate",
+            "coordinating",
+            "coordinates",
+            "coordinate"
+          ],
+          "answer": "A",
+          "explanation": "Sau “has” chỉ nghĩa vụ cần làm, cụm “has to coordinate” nghĩa là phải điều phối công việc."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+{
+  "unit": 5,
+  "title": "Financing and Budgeting",
+  "part5": [
+    {
+      "prompt": "The Small Business Administration will help you to arrange to ___ money to start a business.",
+      "options": [
+        "borrow",
+        "borrowed",
+        "borrowing",
+        "borrower"
+      ],
+      "answer": "A",
+      "explanation": "Sau “arrange to” dùng động từ nguyên mẫu “borrow” (vay tiền)."
+    },
+    {
+      "prompt": "When we ___ a loan, we found very good terms.",
+      "options": [
+        "take out",
+        "took out",
+        "taken out",
+        "taking out"
+      ],
+      "answer": "B",
+      "explanation": "Câu kể trong quá khứ (“found”), nên dùng “took out a loan” (vay một khoản tiền)."
+    },
+    {
+      "prompt": "Most people get nervous when someone is ___ their books.",
+      "options": [
+        "audit",
+        "audits",
+        "audited",
+        "auditing"
+      ],
+      "answer": "D",
+      "explanation": "Sau “is” trong cấu trúc tiếp diễn cần V-ing: “auditing” (kiểm toán sổ sách)."
+    },
+    {
+      "prompt": "Sometimes it is difficult to ___ of bad investments.",
+      "options": [
+        "pull up",
+        "pull out",
+        "pull at",
+        "pull to"
+      ],
+      "answer": "B",
+      "explanation": "“Pull out of” nghĩa là rút khỏi một khoản đầu tư."
+    },
+    {
+      "prompt": "I prefer ___ in social-conscience funds.",
+      "options": [
+        "invest",
+        "investment",
+        "investing",
+        "investor"
+      ],
+      "answer": "C",
+      "explanation": "“Prefer investing” diễn tả sở thích đầu tư; cần danh động từ."
+    },
+    {
+      "prompt": "When the Dow is dropping, investors need to be ___.",
+      "options": [
+        "resource",
+        "resources",
+        "resourceful",
+        "resourcefulness"
+      ],
+      "answer": "C",
+      "explanation": "Sau “be” cần tính từ: “resourceful” (tháo vát, linh hoạt)."
+    },
+    {
+      "prompt": "Sometimes it is difficult to understand how the government ___ tax liability.",
+      "options": [
+        "calculating",
+        "calculations",
+        "calculators",
+        "calculates"
+      ],
+      "answer": "D",
+      "explanation": "“The government” là chủ ngữ số ít; động từ hiện tại đơn “calculates”."
+    },
+    {
+      "prompt": "One decision with tax returns is whether to ___ itemizing in favor of the standard deduction.",
+      "options": [
+        "give up",
+        "giving up",
+        "gave up",
+        "given up"
+      ],
+      "answer": "A",
+      "explanation": "Sau “whether to” cần động từ nguyên mẫu “give up” (từ bỏ)."
+    },
+    {
+      "prompt": "The company’s ___ earnings over the next six months were exciting.",
+      "options": [
+        "project",
+        "projects",
+        "projection",
+        "projected"
+      ],
+      "answer": "D",
+      "explanation": "“Projected earnings” là thu nhập dự kiến; “projected” bổ nghĩa cho “earnings”."
+    },
+    {
+      "prompt": "Some parts of the tax code are so confusing that they need ___.",
+      "options": [
+        "translate",
+        "translates",
+        "translated",
+        "translation"
+      ],
+      "answer": "D",
+      "explanation": "“Need translation” nghĩa là cần được giải nghĩa/dịch; “translation” là danh từ."
+    }
+  ],
+  "part6": [
+    {
+      "passage": "At Grover Investment Services, we understand that you work hard to earn your money, and it is important to invest it ___. This is where we come in. We offer our ___ a full range of investment services. Whether you are a conservative or aggressive investor, we can help you develop an investment plan that suits your needs. At Grover, we are ___ to helping you get the best possible return for your money. Call us today.",
+      "questions": [
+        {
+          "options": [
+            "wise",
+            "wisely",
+            "wizened",
+            "wisdom"
+          ],
+          "answer": "B",
+          "explanation": "Trạng từ “wisely” bổ nghĩa cho động từ “invest”."
+        },
+        {
+          "options": [
+            "accountants",
+            "officers",
+            "spouses",
+            "clients"
+          ],
+          "answer": "D",
+          "explanation": "Dịch vụ được cung cấp cho “clients” (khách hàng)."
+        },
+        {
+          "options": [
+            "commit",
+            "committee",
+            "committed",
+            "commitment"
+          ],
+          "answer": "C",
+          "explanation": "Cấu trúc “be committed to + V-ing” nghĩa là cam kết làm việc gì."
+        }
+      ]
+    },
+    {
+      "passage": "First-time home buyers may feel overwhelmed by the process of applying for a mortgage. However, the process of ___ money to buy a house is not very complicated. First, you will have to fill out a form giving information about your financial situation. You need to show that you have a good income. It is also important not to have a lot of ___. If you already owe a lot of money, the bank may hesitate to lend you more. Then, you will have to make a ___, usually about 10 percent of the total price of the house. The bank lends you the rest of the money for the purchase.",
+      "questions": [
+        {
+          "options": [
+            "borrow",
+            "borrows",
+            "borrowed",
+            "borrowing"
+          ],
+          "answer": "D",
+          "explanation": "Sau “the process of” cần danh động từ “borrowing” (vay tiền)."
+        },
+        {
+          "options": [
+            "debut",
+            "debt",
+            "doubt",
+            "dubbed"
+          ],
+          "answer": "B",
+          "explanation": "“Debt” nghĩa là khoản nợ; phù hợp với mệnh đề “already owe a lot of money”."
+        },
+        {
+          "options": [
+            "refund",
+            "target",
+            "down payment",
+            "forecast"
+          ],
+          "answer": "C",
+          "explanation": "“Down payment” là khoản tiền trả trước khi mua nhà."
+        }
+      ]
+    },
+    {
+      "passage": "Many people use the services of an accountant to help ___ their tax forms. They consider it well worth the money. An accountant can help you avoid ___ for underpayment of taxes and, in general, ensure that your tax form has been filled out correctly. But remember, accountants have deadlines too. Be sure to give all your tax information to your accountant early, then you can be sure that your taxes will be ready to ___ on time. No one wants to pay a fine for sending in their tax form too late.",
+      "questions": [
+        {
+          "options": [
+            "prepare",
+            "preparer",
+            "preparation",
+            "preparatory"
+          ],
+          "answer": "A",
+          "explanation": "Cấu trúc “help prepare” sử dụng động từ nguyên mẫu “prepare” (chuẩn bị)."
+        },
+        {
+          "options": [
+            "pennants",
+            "penalties",
+            "penitents",
+            "pendants"
+          ],
+          "answer": "B",
+          "explanation": "“Penalties” là tiền phạt/hình phạt do nộp thiếu thuế."
+        },
+        {
+          "options": [
+            "file",
+            "fund",
+            "budget",
+            "invest"
+          ],
+          "answer": "A",
+          "explanation": "“File” nghĩa là nộp hồ sơ thuế đúng hạn."
+        }
+      ]
+    }
+  ]
+}

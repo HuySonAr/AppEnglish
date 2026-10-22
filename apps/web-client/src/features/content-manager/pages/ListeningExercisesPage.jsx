@@ -31,6 +31,7 @@ import {
   statusOptions,
 } from '../lib/content-list.js';
 import { listeningKindOf } from '../lib/listening-draft.js';
+import { useListState } from '../../../hooks/use-list-state.js';
 
 const PAGE_SIZE = 10;
 const levelOptions = [{ value: 'all', label: 'All levels' }, ...LISTENING_LEVELS.map((level) => ({ value: level, label: level }))];
@@ -54,12 +55,7 @@ export function ListeningExercisesPage() {
   const [form, setForm] = useState({ title: '', topicId: '', level: 'B1', kind: 'part1' });
   const [busy, setBusy] = useState(false);
   // Search, filters and sort of the list; changing one goes back to page 1.
-  const [filters, setFilters] = useState({ search: '', topic: 'all', level: 'all', kind: 'all', status: StatusFilter.ALL, sort: ListeningSort.NEWEST });
-  const [page, setPage] = useState(1);
-  const setFilter = (name) => (value) => {
-    setFilters((current) => ({ ...current, [name]: value }));
-    setPage(1);
-  };
+  const { filters, setFilters, setFilter, page, setPage } = useListState({ search: '', topic: 'all', level: 'all', kind: 'all', status: StatusFilter.ALL, sort: ListeningSort.NEWEST });
 
   async function load() {
     setState('loading');

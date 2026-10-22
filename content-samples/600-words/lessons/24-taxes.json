@@ -1,0 +1,260 @@
+{
+  "number": 24,
+  "title": "Taxes",
+  "vocabulary": [
+    {
+      "word": "calculation",
+      "partOfSpeech": "noun",
+      "meaning": "sự tính toán, phép tính",
+      "example": "A small error in the calculation of overtime led to the wrong amount of tax.",
+      "exampleMeaning": "Một lỗi nhỏ trong việc tính giờ làm thêm đã dẫn đến số thuế sai."
+    },
+    {
+      "word": "deadline",
+      "partOfSpeech": "noun",
+      "meaning": "hạn chót, thời hạn cuối",
+      "example": "The deadline for submitting the quarterly tax report is the fifteenth of next month.",
+      "exampleMeaning": "Hạn chót nộp báo cáo thuế quý là ngày mười lăm tháng sau."
+    },
+    {
+      "word": "file",
+      "partOfSpeech": "verb",
+      "meaning": "nộp (hồ sơ, tờ khai); lưu hồ sơ",
+      "example": "Most employees file their tax returns online in the first week of April.",
+      "exampleMeaning": "Hầu hết nhân viên nộp tờ khai thuế trực tuyến vào tuần đầu tháng Tư."
+    },
+    {
+      "word": "fill out",
+      "partOfSpeech": "verb",
+      "meaning": "điền (vào mẫu đơn, biểu mẫu)",
+      "example": "New staff must fill out a tax form on their first day at the company.",
+      "exampleMeaning": "Nhân viên mới phải điền một mẫu khai thuế vào ngày đầu tiên làm việc tại công ty."
+    },
+    {
+      "word": "give up",
+      "partOfSpeech": "verb",
+      "meaning": "từ bỏ, bỏ cuộc",
+      "example": "Many people give up on the paper form after an hour and switch to the online version.",
+      "exampleMeaning": "Nhiều người bỏ cuộc với mẫu đơn giấy sau một giờ và chuyển sang bản trực tuyến."
+    },
+    {
+      "word": "joint",
+      "partOfSpeech": "adjective",
+      "meaning": "chung, liên kết (của hai hay nhiều người)",
+      "example": "The two partners opened a joint account to pay the shop's expenses.",
+      "exampleMeaning": "Hai đối tác đã mở một tài khoản chung để chi trả các khoản của cửa hàng."
+    },
+    {
+      "word": "owe",
+      "partOfSpeech": "verb",
+      "meaning": "nợ, còn thiếu (tiền, nghĩa vụ)",
+      "example": "According to the notice, the company still owes 2,300 dollars in property tax.",
+      "exampleMeaning": "Theo thông báo, công ty vẫn còn nợ 2.300 đô la tiền thuế bất động sản."
+    },
+    {
+      "word": "penalty",
+      "partOfSpeech": "noun",
+      "meaning": "tiền phạt, hình phạt",
+      "example": "Late payments carry a penalty of five percent of the amount due.",
+      "exampleMeaning": "Thanh toán trễ phải chịu tiền phạt năm phần trăm số tiền phải trả."
+    },
+    {
+      "word": "preparation",
+      "partOfSpeech": "noun",
+      "meaning": "sự chuẩn bị, việc soạn sửa",
+      "example": "Good preparation of your receipts makes the tax appointment much shorter.",
+      "exampleMeaning": "Chuẩn bị tốt các hóa đơn giúp buổi hẹn khai thuế ngắn hơn nhiều."
+    },
+    {
+      "word": "refund",
+      "partOfSpeech": "noun",
+      "meaning": "tiền hoàn lại, khoản hoàn trả",
+      "example": "She received a refund of 410 dollars because too much tax had been taken from her pay.",
+      "exampleMeaning": "Cô ấy nhận được khoản hoàn thuế 410 đô la vì đã bị trừ thuế quá nhiều từ lương."
+    },
+    {
+      "word": "spouse",
+      "partOfSpeech": "noun",
+      "meaning": "vợ hoặc chồng",
+      "example": "Employees may add their spouse to the company health plan at a reduced rate.",
+      "exampleMeaning": "Nhân viên có thể thêm vợ hoặc chồng vào chương trình bảo hiểm sức khỏe của công ty với mức giá ưu đãi."
+    },
+    {
+      "word": "withhold",
+      "partOfSpeech": "verb",
+      "meaning": "giữ lại, khấu lưu (thuế từ lương); từ chối cung cấp",
+      "example": "Employers withhold income tax from each paycheck and send it to the government.",
+      "exampleMeaning": "Người sử dụng lao động khấu lưu thuế thu nhập từ mỗi kỳ lương và nộp cho nhà nước."
+    }
+  ],
+  "fillIn": {
+    "passage": "Every March, Tomás Herrera and his ___, Ana, sit down at the kitchen table to work on their tax return. Because they both work, they ___ a ___ return, which combines their two incomes in a single form. This year the ___ for sending the form is April 15, and Tomás wants to finish early to avoid a ___ for late submission.\n\nThe ___ takes most of a weekend. Ana collects the pay slips, which show how much tax each employer chose to ___ during the year. Tomás then does the ___ to see whether they still ___ money or whether they can expect a ___. The first time he tried to ___ the forms by hand, he was ready to ___ after an hour of confusing instructions. Now they use a free online program that checks every figure, and last year it told them to expect 380 dollars back within three weeks.",
+    "answers": ["spouse", "file", "joint", "deadline", "penalty", "preparation", "withhold", "calculation", "owe", "refund", "fill out", "give up"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người phụ nữ ngồi ở bàn bếp với máy tính xách tay, xung quanh là giấy tờ và một chiếc máy tính bỏ túi; cô đang viết vào một mẫu đơn.",
+      "options": [
+        "She is cooking a meal in the kitchen.",
+        "She is writing on a form.",
+        "She is closing the laptop.",
+        "She is washing the dishes."
+      ],
+      "answer": "B",
+      "explanation": "Ảnh cho thấy người phụ nữ đang viết vào mẫu đơn. (A) và (D) nhầm vì bối cảnh nhà bếp, (C) sai hành động."
+    },
+    "part2": [
+      {
+        "question": "When is the deadline for the tax forms?",
+        "options": ["It's the last day of this month.", "The forms are in the top drawer.", "No, I haven't filed yet."],
+        "answer": "A",
+        "explanation": "Câu hỏi When cần một mốc thời gian. (B) lặp từ 'forms' nhưng trả lời về nơi chốn, (C) trả lời No cho câu hỏi Wh."
+      },
+      {
+        "question": "Do you owe anything this year, or are you getting a refund?",
+        "options": ["I'm getting about two hundred dollars back.", "The office closes at five.", "Yes, I own a small car."],
+        "answer": "A",
+        "explanation": "Câu hỏi lựa chọn giữa phải nộp thêm hay được hoàn tiền; (A) trả lời sẽ được nhận lại tiền. (C) nhầm âm 'owe' với 'own', (B) lạc đề."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Hi, Claire. Could you help me with the new tax form? I'm not sure how to fill out section three.\nWoman: Sure. Section three is about how much tax the company should withhold from your pay. If you tick the first box, we take the standard amount.\nMan: Last year too much was taken and I had to wait months for a refund. Is there a way to adjust it?\nWoman: Yes. If you and your spouse file a joint return, you can tick the second box and enter her income here. The amount withheld will then be closer to what you actually owe.\nMan: That's what I want. Do I need to attach anything?\nWoman: Just a copy of last year's return. Leave the form in my tray by Thursday, and the change will apply from next month's pay.\nMan: Great, thank you.",
+      "questions": [
+        {
+          "prompt": "What does the man need help with?",
+          "options": ["Opening a bank account", "Completing a tax form", "Booking a holiday", "Finding a lost document"],
+          "answer": "B",
+          "explanation": "Người đàn ông hỏi 'Could you help me with the new tax form? I'm not sure how to fill out section three'."
+        },
+        {
+          "prompt": "What problem did the man have last year?",
+          "options": ["He missed the deadline", "He lost his form", "Too much tax was taken from his pay", "He paid a penalty"],
+          "answer": "C",
+          "explanation": "Anh ấy nói 'Last year too much was taken and I had to wait months for a refund'."
+        },
+        {
+          "prompt": "What should the man do by Thursday?",
+          "options": ["Send a copy to the tax office", "Give the form to the woman", "Talk to his spouse", "Change his bank details"],
+          "answer": "B",
+          "explanation": "Người phụ nữ yêu cầu 'Leave the form in my tray by Thursday'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "This is a reminder from the Riverton Tax Office. The deadline for filing your personal income tax return is Monday, April 15. Returns received after that date are subject to a penalty of five percent of the amount due, plus one percent for each additional month. If you have never filed online before, we encourage you to try our new website, which does every calculation for you and shows your result immediately. Some people give up when they see the length of the form, so please remember that most sections do not apply to employees with a single job. For help with your preparation, our office at 40 Bridge Street will stay open until eight in the evening every weekday until the deadline, and volunteers will be available to answer questions free of charge. No appointment is necessary. Thank you for listening.",
+      "questions": [
+        {
+          "prompt": "What is the announcement mainly about?",
+          "options": ["A change in office hours", "The deadline for tax returns", "A new tax rate", "A job opening"],
+          "answer": "B",
+          "explanation": "Thông báo nhắc 'The deadline for filing your personal income tax return is Monday, April 15' và cách nộp đúng hạn."
+        },
+        {
+          "prompt": "What happens if a return is received after April 15?",
+          "options": ["It is rejected", "A fee is charged", "The refund is delayed", "A warning letter is sent"],
+          "answer": "B",
+          "explanation": "Tờ khai nộp trễ 'are subject to a penalty of five percent of the amount due', tức bị tính tiền phạt."
+        },
+        {
+          "prompt": "What is said about the office on Bridge Street?",
+          "options": ["It closes at five", "It requires an appointment", "It offers free help in the evening", "It is open on weekends"],
+          "answer": "C",
+          "explanation": "Văn phòng mở đến tám giờ tối các ngày trong tuần và tình nguyện viên trả lời câu hỏi 'free of charge'; không cần đặt hẹn."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Please double-check every _____ before you send the report to the tax office.",
+        "options": ["calculate", "calculation", "calculated", "calculating"],
+        "answer": "B",
+        "explanation": "Sau 'every' cần danh từ số ít: 'calculation' (phép tính)."
+      },
+      {
+        "prompt": "The company still _____ the city nearly four thousand dollars in property tax.",
+        "options": ["owe", "owes", "owing", "owed"],
+        "answer": "B",
+        "explanation": "Chủ ngữ 'The company' số ít ở thì hiện tại đơn nên động từ thêm -s: 'owes'."
+      },
+      {
+        "prompt": "Employers are required to _____ a portion of each salary for income tax.",
+        "options": ["withhold", "withheld", "withholding", "withholder"],
+        "answer": "A",
+        "explanation": "Sau 'required to' cần động từ nguyên mẫu: 'withhold' (khấu lưu)."
+      },
+      {
+        "prompt": "Careful _____ of your receipts will make the tax appointment shorter.",
+        "options": ["prepare", "prepared", "preparation", "preparatory"],
+        "answer": "C",
+        "explanation": "Sau tính từ 'Careful' và trước 'of' cần danh từ làm chủ ngữ: 'preparation'."
+      },
+      {
+        "prompt": "The two companies made a _____ request for an extension of the deadline.",
+        "options": ["join", "joined", "jointly", "joint"],
+        "answer": "D",
+        "explanation": "Trước danh từ 'request' cần tính từ: 'joint' (chung của hai công ty)."
+      },
+      {
+        "prompt": "Customers who return a damaged product will receive a full _____ within ten days.",
+        "options": ["refund", "refunded", "refunding", "refundable"],
+        "answer": "A",
+        "explanation": "Sau 'a full' cần danh từ: 'refund' (khoản hoàn tiền)."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Staff\nFrom: Payroll Office\nSubject: Annual tax statements\n\nYour annual tax statement will be sent to your home address on January 20. Please check that your address is correct in the staff portal before that date. Employees who changed jobs or started a second job during the year must ___ Form T-12, which is available from the payroll office. The tax authority applies a ___ to any return received after April 15, so we strongly recommend that you prepare your documents well before the ___. For questions, call Mr. Keller at extension 412.",
+      "questions": [
+        {
+          "options": ["give up", "fill out", "pull out", "take out"],
+          "answer": "B",
+          "explanation": "Với một mẫu đơn (Form T-12), động từ phù hợp là 'fill out' (điền vào)."
+        },
+        {
+          "options": ["penalize", "penal", "penalty", "penalized"],
+          "answer": "C",
+          "explanation": "Sau 'applies a' cần danh từ: 'penalty' (tiền phạt) cho tờ khai nộp trễ."
+        },
+        {
+          "options": ["dead", "deadline", "deadly", "deadlines"],
+          "answer": "B",
+          "explanation": "Sau 'before the' cần danh từ số ít chỉ mốc thời gian đã nêu (April 15): 'deadline'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "Northfield Regional Tax Office\nTaxpayer Services, 112 Linden Avenue\n\nJune 3\n\nDear Ms. Dubois,\n\nThank you for filing your income tax return for last year. We have reviewed the figures you submitted together with the statements sent by your employer.\n\nOur calculation shows that your employer withheld 6,140 dollars during the year, while the tax you owe is 5,710 dollars. You are therefore entitled to a refund of 430 dollars. The amount will be transferred to the bank account listed on your return within fourteen days of the date of this letter.\n\nPlease note two points for next year. First, you indicated that you were married in October, so you and your spouse may choose to file a joint return, which often results in a lower total tax. Second, the deadline for next year's return is April 15. Returns filed after that date are subject to a penalty, even when a refund is expected.\n\nIf you believe any figure in this letter is incorrect, you may request a review by filling out Form R-2 and returning it to this office within 30 days.\n\nSincerely,\nHenry Ashford\nTaxpayer Services",
+      "questions": [
+        {
+          "prompt": "Why was the letter sent?",
+          "options": ["To request a missing document", "To explain the result of a tax return", "To announce a new tax rate", "To confirm a change of address"],
+          "answer": "B",
+          "explanation": "Thư thông báo kết quả xem xét tờ khai thuế: số tiền đã khấu lưu, số thuế phải nộp và khoản hoàn lại."
+        },
+        {
+          "prompt": "How much will Ms. Dubois receive?",
+          "options": ["430 dollars", "5,710 dollars", "6,140 dollars", "14 dollars"],
+          "answer": "A",
+          "explanation": "'You are therefore entitled to a refund of 430 dollars.' 6,140 là số đã khấu lưu, 5,710 là số thuế phải nộp."
+        },
+        {
+          "prompt": "What happened in October?",
+          "options": ["Ms. Dubois changed jobs", "Ms. Dubois moved house", "Ms. Dubois got married", "Ms. Dubois filed her return"],
+          "answer": "C",
+          "explanation": "Thư ghi 'you indicated that you were married in October'."
+        },
+        {
+          "prompt": "What is suggested about joint returns?",
+          "options": ["They must be filed in October", "They can reduce the tax paid", "They take longer to process", "They are required for married couples"],
+          "answer": "B",
+          "explanation": "Khai chung 'often results in a lower total tax'; đây là lựa chọn ('may choose'), không bắt buộc."
+        },
+        {
+          "prompt": "What should Ms. Dubois do if she disagrees with a figure?",
+          "options": ["Visit the office in person", "Call Henry Ashford", "Submit a form within 30 days", "Wait fourteen days"],
+          "answer": "C",
+          "explanation": "Đoạn cuối: 'request a review by filling out Form R-2 and returning it to this office within 30 days'."
+        }
+      ]
+    }
+  }
+}

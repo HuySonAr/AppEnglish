@@ -26,6 +26,7 @@ import {
   resultOf,
   topicModes,
 } from '../lib/listening-practice.js';
+import { useListState } from '../../../hooks/use-list-state.js';
 
 const PAGE_SIZE = 10;
 const levelOptions = [{ value: 'all', label: 'All levels' }, ...LISTENING_LEVELS.map((level) => ({ value: level, label: level }))];
@@ -37,12 +38,7 @@ export function ListeningExerciseListPage() {
   const { topicId, mode } = useParams();
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
-  const [filters, setFilters] = useState({ search: '', level: 'all', kind: 'all', done: ListeningDone.ALL, sort: ListeningSort.LEVEL });
-  const [page, setPage] = useState(1);
-  const setFilter = (name) => (value) => {
-    setFilters((current) => ({ ...current, [name]: value }));
-    setPage(1);
-  };
+  const { filters, setFilters, setFilter, page, setPage } = useListState({ search: '', level: 'all', kind: 'all', done: ListeningDone.ALL, sort: ListeningSort.LEVEL });
 
   async function load() {
     setState('loading');

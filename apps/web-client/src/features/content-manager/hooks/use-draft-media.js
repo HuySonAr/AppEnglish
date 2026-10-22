@@ -15,6 +15,10 @@ export function useDraftMedia({ edit, sectionFor, lessonId }) {
   const [stored, setStored] = useState({});
   // Names of files uploaded in this session; saved content only holds ids.
   const [fileNames, setFileNames] = useState({});
+  // Temporary ids being uploaded right now, and the error of the ones that
+  // failed in the last save (D125): MediaField shows both.
+  const [uploading, setUploading] = useState(new Set());
+  const [failed, setFailed] = useState({});
   const pendingRef = useRef(pending);
   pendingRef.current = pending;
 
@@ -48,6 +52,8 @@ export function useDraftMedia({ edit, sectionFor, lessonId }) {
     fileNames,
     pending,
     stored,
+    uploading,
+    failed,
     // A file that was never uploaded is just dropped. Removing a stored file
     // also deletes it unless a saved version still uses it; in that case the
     // server deletes it when the draft is saved.
@@ -70,12 +76,24 @@ export function useDraftMedia({ edit, sectionFor, lessonId }) {
   // the real media ids, whether anything was uploaded, and the error of the
   // upload that failed (its fileName says which file).
   async function uploadAll(content) {
-    const result = await uploadPending(content, pending, async ({ kind, file, section }) => {
+    const idOf = (item) => Object.keys(pending).find((id) => pending[id] === item);
+    setFailed({});
+    const result = await uploadPending(content, pending, async (item) => {
+      const { kind, file, section } = item;
+      const id = idOf(item);
+      setUploading((current) => new Set([...current, id]));
       try {
         return (await uploadMedia({ kind, file, lessonId, section })).data.media;
       } catch (error) {
         error.fileName = file.name;
+        setFailed((current) => ({ ...current, [id]: error?.response?.data?.data?.reason === 'MEDIA_FILE_TOO_LARGE' ? 'Larger than the upload limit' : 'Upload failed' }));
         throw error;
+      } finally {
+        setUploading((current) => {
+          const next = new Set(current);
+          next.delete(id);
+          return next;
+        });
       }
     });
     const done = Object.entries(result.uploaded);

@@ -139,13 +139,58 @@ matching RPC of `appenglish.content.v1.ContentService`
 | — | not exposed | `GetMockPaper` | learning-service | Mock test id + `{ versionId? }` → a published version with answers and media URLs |
 | — | not exposed | `GetCurriculum` | learning-service, progress-service | Published units in order with their published lessons; takes no actor |
 | — | not exposed | `GetLessonPaper` | learning-service | Lesson id + `{ versionId? }` → a published lesson version with answers and media URLs; 404 when the lesson or its unit is not published |
-| POST | `/content/pronunciation` | `AutofillPronunciation` | Content Manager | `{ word, accents? }`; looks the word up in the free dictionary and returns `{ found, phonetic, audio: { uk, us } }` with stored media or `null` |
+| POST | `/content/pronunciation` | `AutofillPronunciation` | Content Manager | `{ word, accents? }`; asks the pronunciation source (speech-service by default, D123; the free dictionary only with `PRONUNCIATION_SOURCE=dictionary`) and returns `{ found, phonetic, audio: { uk, us } }` with stored media (each with its `url` to play at once, `null` for a locally stored file) or `null` |
 
 Responses use the `{ code, msg, data }` envelope. Content codes
 (`packages/content-contracts/src/index.js`): 40 not found, 41 invalid state
 (no draft to publish), 42 not publishable (`data.issues` lists `{ path,
 message }`), 43 media rejected (`data.reason`); 26 forbidden role, 30
 validation, 32 gateway/system keep their meaning from auth.
+
+### Unit review (D121)
+
+Migration `1720000011000-create-unit-reviews.js`: `units.reviewVersionId` (the
+published review version, or null) and `unit_review_versions` (`unitId`,
+`versionNumber`, `status`, `content`, one `DRAFT` per unit; `PUBLISHED` rows
+never updated). Content shape `unitReviewContentSchema`: `{ test: { part5,
+part6 } }` in the mock-test part shape (Part 6 passages are `groups`, their
+questions carry `groupId`); no media. Publishing rules `unitReviewIssues`:
+exactly 10 Part 5 questions with text; exactly 3 Part 6 passages, each with
+exactly 3 `___` blanks and 3 questions (D129; the counts are the
+`UNIT_REVIEW_*` constants of content-contracts); every question four different options,
+one correct, an explanation.
+
+| Method | Gateway route | RPC | Who | Purpose |
+|---|---|---|---|---|
+| GET | `/content/units/:id/review` | `GetUnitReview` | Content Manager | `{ unit, questionCount, draft, published }` |
+| PUT | `/content/units/:id/review/draft` | `SaveUnitReviewDraft` | Content Manager | Replace the draft `{ test }`; creates the next draft version after a publish |
+| POST | `/content/units/:id/review/publish` | `PublishUnitReview` | Content Manager | Validate and freeze the draft as the next version; sets `units.reviewVersionId` |
+| POST | `/content/units/:id/review/unpublish` | `UnpublishUnitReview` | Content Manager | Clears `reviewVersionId`; versions are kept |
+| — | not exposed | `GetUnitReviewPaper` | learning-service | Unit id + `{ versionId? }` → `{ unit, versionId, versionNumber, test }` with answers; 404 unless the unit and its review are published |
+
+`ListUnits` (Content Manager) adds `review: { publishedVersionNumber,
+hasDraft }` to each unit; `GetCurriculum` adds `reviewVersionId`. Deleting a
+unit removes its review versions; the gateway refuses the delete while any
+learner has a review attempt (`GetContentUsage` kind `unit`).
+
+### Version history (D122)
+
+`src/versions/version.service.js` (`ContentVersionService`) serves every
+versioned content by `kind` (`ContentVersionKind`: `lesson`, `mockTest`,
+`listeningExercise`, `courseItem`, `unitReview`); `id` is the owner (lesson,
+mock test, exercise, course item or unit). Repository: `listVersionsOf`,
+`findVersionOf`.
+
+| Method | Gateway route | RPC | Who | Purpose |
+|---|---|---|---|---|
+| GET | `/content/versions/:kind/:id` | `ListContentVersions` | Content Manager | `{ versions: [{ id, versionNumber, status, current, publishedAt, publishedBy, createdAt, createdBy }] }`, newest first; `current` marks the version learners get |
+| GET | `/content/versions/:kind/:id/:versionId` | `GetContentVersion` | Content Manager | The same facts plus `content`; 404 when the version belongs to another owner |
+| POST | `/content/versions/:kind/:id/:versionId/restore` | `RestoreContentVersion` | Content Manager | Copies the version over the draft through the kind's save-draft call (ids and media clean-up as usual) and returns the editor's view plus `restoredFrom`; 41 when the version is the draft itself |
+| DELETE | `/content/versions/:kind/:id/draft` | `DiscardContentDraft` | Content Manager | Deletes the draft row and, afterwards, the media files no remaining version refers to (`removeUnusedMedia`) → `{ discarded: { versionId, versionNumber }, removedMedia }`; 41 without a draft (D127) |
+| DELETE | `/content/versions/:kind/:id/:versionId` | `DeleteContentVersion` | Content Manager | Removes an old version and the files only it used → `{ deleted: { versionId, versionNumber }, removedMedia }`; 41 for the draft or the live version (`data.reason` `CURRENT`); the gateway answers 409 CONTENT_IN_USE first while learner attempts refer to the version (`GetContentUsage` kinds `lessonVersion`, `mockVersion`, `unitReviewVersion`, `courseVersion`; `listeningVersion` is never used) (D128) |
+
+Unpublishing any kind now creates a draft from the version taken down when
+there is no draft, so the editor keeps the content.
 
 ### Placement test (F03, D46, D57, D58)
 
@@ -204,8 +249,8 @@ messages up to 64 MB.
     American audio are optional for now (D51), but audio that is set must be
     an existing audio asset; a word may repeat only with a different part of
     speech.
-  - Fill-in: a passage with at least one `___`, one answer per blank, each
-    answer a vocabulary word.
+  - Fill-in: a passage with at least one `___`, one typed, non-empty answer
+    per blank (D119; the answer need not be a vocabulary word).
   - Test: all seven parts with their exact question and option counts; exactly
     one correct option and an explanation per question; text options non-empty
     and distinct (Parts 3–7; Part 1 and 2 options are letters only); one audio
@@ -266,8 +311,8 @@ only with the `CONTENT_MANAGER` role:
   see each lesson's published version and draft state.
 - `/content-manager/lessons/:lessonId` (`LessonEditorPage.jsx`): rename the
   lesson; edit vocabulary (word, part of speech, IPA, meaning, example and its
-  translation, British and American MP3), the fill-in passage (one word chosen
-  per blank) and the seven test parts on their own tabs, each showing its
+  translation, British and American MP3), the fill-in passage (one answer typed
+  per blank, D119) and the seven test parts on their own tabs, each showing its
   fixed questions and options; save the draft; publish. A
   rejected publish lists the issues and opens the tab of the first one.
 
@@ -284,6 +329,19 @@ sentences joined into the passage, the flat test reset to the empty seven-part
 test. No lesson had been published in the old shape.
 
 ### Pronunciation auto-fill (D47)
+
+**Since D123 the source is speech-service**: `SpeechPronunciationSource`
+(`src/pronunciation/speech-pronunciation.source.js`) sends `{ word, accents }`
+on `speech.pronounce.requests` through `SpeechBroker.request` (reply queue +
+correlation id, 30 s) and gets IPA and MP3 bytes per accent back; the service
+stores the MP3s as lesson media exactly as it stored the dictionary files.
+`found` is always true (a phrase is pronounced like a word); a broker that is
+away or a FAILED answer is code 46 (unavailable). `PRONUNCIATION_SOURCE=dictionary`
+restores the dictionary source below; `PRONUNCIATION_IPA_ACCENT` (`uk`
+default since D148, or `us`) picks which IPA is shown. The Listening course
+editor asks for the British audio only (D148). `scripts/pronounce-600-words.mjs`
+(`pnpm pronounce:600-words`) fills every empty phonetic/audio field of the
+lesson drafts through `AutofillPronunciation` and saves the drafts.
 
 `src/pronunciation/dictionary-pronunciation.source.js` queries
 `DICTIONARY_API_URL` (default `https://api.dictionaryapi.dev/api/v2/entries/en`),
@@ -362,58 +420,62 @@ draft by the editor ("Apply times"), never by the service.
 Migration `1720000007000-listening-timing-job-task` adds `task` (default `align`).
 One job at a time per exercise, whatever its task.
 
-## Listening course (F05C, D100)
+## Listening course (F05C, D143–D147)
 
-Code in `apps/content-service/src/course/` (schemas with the publishing rules,
-repository, service, gRPC controller). Migration
-`1720000008000-create-listening-course`: `listening_course_items` (`level`
-A1–C1, `type` `unit`/`level_test`, `title`, `description`, `position`,
-`publishedVersionId`; one level test per level) and
-`listening_course_versions` (DRAFT/PUBLISHED, one draft per item).
-Migration `1720000010000-listening-course-section` (D107): `section`
-(`social_and_travel`/`work_and_study`, required on a unit, null otherwise;
-`COURSE_SECTIONS` in content-contracts). The units of a level are listed
-section by section, then by `position` within the section.
+`listening_course_items` holds topics (`type = topic`, level A1–C2,
+`position` within the level) and level tests (`type = level_test`, level
+A1–C1, one per level); `section` is always null (migration `1720000012000`).
+Each item has versions in `listening_course_versions` like mock tests.
 
-Content of a unit: `{ lessons: [{ id, title, exerciseId, keywords: [{ id, word, meaning }],
-gist: question, detail: [question], focus, closeSegmentIds }], check: { sections } }`;
-of a level test: `{ sections }`; a section is `{ id, exerciseId, questions }` and
-a question `{ id, kind: choice|complete, skill: gist|detail|inference, prompt, options: [{ id, text, isCorrect }], answers, explanation }`
-(D109: `complete` only for detail questions of a lesson: `prompt` with `___`
-blanks, `answers` the words heard, one per blank, up to 4). `focus` (D109) is
-null or `{ title, passage, words, answers }`: a dialogue with `___` blanks (up
-to 8), 2–12 different words and the right word of each blank, taken from
-`words`; a focus without a passage counts as none.
-Recordings are exercises of the listening library, by id.
+A topic's content (D147): its own recording `audioMediaId` (uploaded in the
+editor, section `listening`), `segments` (each sentence: `id`, `speaker`,
+`text`, `start`, `end`, Vietnamese `translation`, `gap` = the sentence with
+the words to write in `[brackets]` or empty), `vocabulary` (4–6 words: word,
+IPA, meaning, `audioMediaId` made with the speech-service pronunciation),
+`questions` (multiple choice, at least 1), `ordering` (`enabled`, `prompt`,
+3–8 `items` in the order heard). Publishing needs the audio, at least one
+sentence, a start and end and a translation for every sentence, sentences in
+the order of the recording, and at least one blank. A level test: `sections`,
+each with its own `audioMediaId`, a `transcript` (text, one sentence per line,
+shown after the test) and multiple-choice questions; at least 8 questions.
+Saving a draft removes the files it dropped when no other version uses them;
+deleting an item removes its recordings, pronunciations and speech jobs.
 
-| Method | Path | RPC | Who |
+Content Manager RPCs (gateway `/content/listening-course…`): `ListListeningCourse`
+(levels with topics and level test), `CreateCourseItem` (`{ level, type,
+title, description }`), `UpdateCourseItem` (`title`, `description`,
+`position`), `GetCourseItem` (with `media` of the draft and published version:
+kind, file name, URL), `SaveCourseItemDraft`, `PublishCourseItem` (issues
+listed when not ready), `UnpublishCourseItem`, `DeleteCourseItem` (refused
+while learners completed the topic or took the test).
+
+Speech jobs on a topic's recording (D147), stored in `listening_timing_jobs`
+with `courseItemId` and answered like the library's:
+
+| Method | Gateway route | RPC | Purpose |
 |---|---|---|---|
-| GET | `/content/listening-course` | `ListListeningCourse` | Content Manager: `{ levels: [{ level, units, levelTest }] }` with status and counts |
-| POST | `/content/listening-course/items` | `CreateCourseItem` | `{ level, type, section, title, description }` (section on units only; a unit is added last in its section); 409 `LEVEL_TEST_EXISTS` |
-| PATCH | `/content/listening-course/items/:id` | `UpdateCourseItem` | `{ title?, description?, section?, position? }` (a unit moves within its section; a new section puts it last there) |
-| GET | `/content/listening-course/items/:id` | `GetCourseItem` | Item, draft, published, and the used library exercises with sentences and recording |
-| PUT | `/content/listening-course/items/:id/draft` | `SaveCourseItemDraft` | Content by the item's type; ids given to new lessons, keywords, questions, options, sections |
-| POST | `/content/listening-course/items/:id/publish` | `PublishCourseItem` | 42 with `issues` |
+| POST | `/content/listening-course/items/:id/auto-time` | `RequestCourseAutoTime` | Times the saved sentences (kind `part3`); 409 `NO_AUDIO` / `NO_LINES`, 409 `NOT_A_TOPIC` for a level test, 503 without the broker. A job still waiting or running is returned |
+| POST | `/content/listening-course/items/:id/transcribe` | `RequestCourseTranscribe` | Writes the sentences from the recording alone |
+| GET | `/content/listening-course/items/:id/auto-time` | `GetCourseAutoTime` | The latest job of the topic, or null |
 
-Publishing rules (limits in `COURSE_LIMITS`): a unit has 1–8 lessons, each
-with a title, a published recording, keywords with word and meaning (up to
-10), one gist question, 2–5 detail questions, 1–6 sentences of its recording
-to write down; and a unit check of at least 5 questions. A level test has at
-least 8 questions. A choice question has a prompt, 2–4 different options and
-exactly one correct; a completed sentence has as many answers as blanks, none
-empty.
+learning-service reads `ListPublishedCourse` and `GetCoursePaper` (the content
+with answers and `media`: id → URL of the recordings and pronunciations).
 
-Listening placement (D103): one item of type `placement` without a level
-(migration `1720000009000-listening-course-placement`: `level` nullable, checks
-rebuilt, unique index on the placement). Content `{ sections: [{ id,
-exerciseId, level, questions }] }`; publishing needs a level on every
-recording and at least 2 questions for each level A1–C1. `ListListeningCourse`
-and `ListPublishedCourse` return it as `placement` (or null).
+## Unpublish, delete and orphan media (D118)
 
-Reads for learning-service (step 2, no actor; not routed by the gateway):
-`ListPublishedCourse` → `{ levels: [{ level, units: [{ id, section, title, description,
-position, versionId, lessons: [{ id, title }], questionCount }], levelTest }] }`
-(published items only); `GetCoursePaper` (id, payload `{ versionId? }`) → the
-published version with answers and the library exercises it uses (recording
-URL and timed sentences with text); 404 when not published or the version is
-not one of the item's published versions.
+| Method | Gateway route | RPC | Notes |
+|---|---|---|---|
+| POST | `/content/units/:id/unpublish` | `UnpublishUnit` | Unit back to DRAFT; lessons keep their versions |
+| DELETE | `/content/units/:id` | `DeleteUnit` | Gateway first checks `GetContentUsage` for every lesson (409 `CONTENT_IN_USE`); removes lessons, versions, media only they used; renumbers units |
+| POST | `/content/lessons/:id/unpublish` | `UnpublishLesson` | `publishedVersionId = null`; curriculum skips it |
+| DELETE | `/content/lessons/:id` | `DeleteLesson` | Usage check; removes versions and unused media; renumbers the unit's lessons |
+| POST | `/content/mock-tests/:id/unpublish` | `UnpublishMockTest` | |
+| DELETE | `/content/mock-tests/:id` | `DeleteMockTest` | Usage check (`mock_attempts`) |
+| POST | `/content/listening-exercises/:id/unpublish` | `UnpublishListeningExercise` | |
+| DELETE | `/content/listening-exercises/:id` | `DeleteListeningExercise` | Usage check (`listening_results`); refused with `reason COURSE_REFERENCE` while any course version names the exercise; removes timing jobs, versions, unused recording |
+| POST | `/content/listening-course/items/:id/unpublish` | `UnpublishCourseItem` | |
+| DELETE | `/content/listening-course/items/:id` | `DeleteCourseItem` | Usage check by type (topic → `courseTopic`: learners who completed it; level test → `courseTest`: attempts, D145); removes the pronunciations only the topic used |
+| GET | `/content/media/orphans` | `ListOrphanMedia` | Media not referenced by any version (lesson, placement, mock, listening, course) and older than one hour |
+| DELETE | `/content/media/orphans` | `DeleteOrphanMedia` | `{ ids[] }`; re-checks references; returns `{ deleted[], skipped[] }` |
+
+`isMediaReferenced` now also scans `listening_course_versions`. The main placement test has no unpublish or delete.

@@ -10,6 +10,8 @@ import {
   adminAccountIdSchema,
   adminAccountUpdateSchema,
   adminAccountActionSchema,
+  adminInviteSchema,
+  acceptInviteSchema,
   updateProfileSchema,
   changePasswordSchema,
   verifyPasswordSchema,
@@ -169,6 +171,24 @@ export class AuthController {
   async adminStats(accessToken) {
     try {
       return this.envelope(await this.authService.adminStats(accessToken));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
+  // Invitations (D131).
+  async adminInvite(body, accessToken) {
+    try {
+      return this.envelope(await this.authService.adminInvite(accessToken, adminInviteSchema.parse(body)));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
+  async acceptInvite(body, response) {
+    try {
+      const result = await this.authService.acceptInvite(acceptInviteSchema.parse(body));
+      // An already accepted invitation answers LOGIN guidance without a session.
+      if (this.isEnvelope(result)) return result;
+      return this.withCookies(this.envelope(result), response);
     } catch (error) {
       throw this.normalizeError(error);
     }

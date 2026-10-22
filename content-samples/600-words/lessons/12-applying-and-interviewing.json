@@ -1,0 +1,260 @@
+{
+  "number": 12,
+  "title": "Applying and Interviewing",
+  "vocabulary": [
+    {
+      "word": "ability",
+      "partOfSpeech": "noun",
+      "meaning": "khả năng, năng lực làm việc gì",
+      "example": "The job requires the ability to stay calm when several customers are waiting at once.",
+      "exampleMeaning": "Công việc đòi hỏi khả năng giữ bình tĩnh khi nhiều khách hàng cùng chờ một lúc."
+    },
+    {
+      "word": "apply",
+      "partOfSpeech": "verb",
+      "meaning": "nộp đơn xin (việc, học bổng); áp dụng",
+      "example": "More than fifty people applied for the receptionist position in the first week.",
+      "exampleMeaning": "Hơn năm mươi người đã nộp đơn cho vị trí lễ tân trong tuần đầu tiên."
+    },
+    {
+      "word": "background",
+      "partOfSpeech": "noun",
+      "meaning": "lý lịch, quá trình học tập và làm việc; nền tảng",
+      "example": "Her background in hotel management made her a strong choice for the front desk role.",
+      "exampleMeaning": "Nền tảng về quản lý khách sạn khiến cô ấy là lựa chọn sáng giá cho vị trí lễ tân."
+    },
+    {
+      "word": "be ready for",
+      "partOfSpeech": "phrase",
+      "meaning": "sẵn sàng cho, chuẩn bị kỹ cho",
+      "example": "Candidates should be ready for questions about why they left their previous employers.",
+      "exampleMeaning": "Ứng viên nên sẵn sàng cho các câu hỏi về lý do rời công ty cũ."
+    },
+    {
+      "word": "call in",
+      "partOfSpeech": "verb",
+      "meaning": "gọi (ai) đến (phỏng vấn, làm việc); gọi điện vào",
+      "example": "The committee will call in six applicants for a second interview next week.",
+      "exampleMeaning": "Hội đồng sẽ gọi sáu ứng viên đến phỏng vấn vòng hai vào tuần tới."
+    },
+    {
+      "word": "confidence",
+      "partOfSpeech": "noun",
+      "meaning": "sự tự tin; sự tin tưởng",
+      "example": "She answered every question with confidence, even the difficult ones about her past mistakes.",
+      "exampleMeaning": "Cô ấy trả lời mọi câu hỏi một cách tự tin, kể cả những câu khó về sai lầm trước đây."
+    },
+    {
+      "word": "constantly",
+      "partOfSpeech": "adverb",
+      "meaning": "liên tục, không ngừng, thường xuyên",
+      "example": "Job seekers should constantly update their resumes with new skills and projects.",
+      "exampleMeaning": "Người tìm việc nên liên tục cập nhật sơ yếu lý lịch với các kỹ năng và dự án mới."
+    },
+    {
+      "word": "expert",
+      "partOfSpeech": "noun",
+      "meaning": "chuyên gia, người rất giỏi trong một lĩnh vực",
+      "example": "An expert in tax law reviewed the applicant's written test before the final interview.",
+      "exampleMeaning": "Một chuyên gia về luật thuế đã xem lại bài kiểm tra viết của ứng viên trước buổi phỏng vấn cuối."
+    },
+    {
+      "word": "follow up",
+      "partOfSpeech": "verb",
+      "meaning": "liên hệ lại, theo dõi tiếp (sau phỏng vấn, cuộc gọi, thư)",
+      "example": "Remember to follow up with a short thank-you email the day after your interview.",
+      "exampleMeaning": "Nhớ liên hệ lại bằng một email cảm ơn ngắn vào ngày sau buổi phỏng vấn."
+    },
+    {
+      "word": "hesitant",
+      "partOfSpeech": "adjective",
+      "meaning": "ngập ngừng, do dự, lưỡng lự",
+      "example": "He seemed hesitant when asked why he had left his last job after only four months.",
+      "exampleMeaning": "Anh ấy có vẻ ngập ngừng khi được hỏi vì sao rời công việc gần nhất chỉ sau bốn tháng."
+    },
+    {
+      "word": "present",
+      "partOfSpeech": "verb",
+      "meaning": "trình bày, giới thiệu; đưa ra",
+      "example": "Each finalist will present a ten-minute plan for improving customer service.",
+      "exampleMeaning": "Mỗi ứng viên vào vòng cuối sẽ trình bày một kế hoạch mười phút để cải thiện dịch vụ khách hàng."
+    },
+    {
+      "word": "weakly",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách yếu ớt, thiếu thuyết phục",
+      "example": "The candidate responded weakly to the question about teamwork, giving only a one-word answer.",
+      "exampleMeaning": "Ứng viên trả lời yếu ớt câu hỏi về làm việc nhóm, chỉ đáp bằng một từ."
+    }
+  ],
+  "fillIn": {
+    "passage": "When Northgate Freight advertised a logistics coordinator position, Elena Ruiz decided to ___ the same day. Her ___ matched the job well: a degree in supply chain management and four years at a small shipping firm. A week later, the company decided to ___ six people for interviews, and Elena was one of them.\n\nElena prepared carefully because she wanted to ___ every question. She practiced talking about her ___ to manage several shipments at once, and she asked a friend who is an ___ in interview coaching to listen to her answers. At first she spoke ___ and seemed ___ when describing her mistakes, but after several evenings of practice she could ___ her work history clearly and with ___. She also reminded herself not to check her phone ___ during the conversation, a habit her friend had noticed.\n\nThe interview went well. Two days later, Elena wrote a short email to ___ and thank the panel for their time. The following Monday, Northgate offered her the job.",
+    "answers": ["apply", "background", "call in", "be ready for", "ability", "expert", "weakly", "hesitant", "present", "confidence", "constantly", "follow up"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người phụ nữ ngồi đối diện hai người phỏng vấn tại bàn họp, đang bắt tay một người trong số họ; trên bàn có vài tờ hồ sơ.",
+      "options": [
+        "A woman is shaking hands with an interviewer.",
+        "A woman is handing out drinks to the guests.",
+        "The people are standing by the window.",
+        "The chairs are being stacked against the wall."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ đang bắt tay người phỏng vấn. (B) dùng 'handing' có âm gần với 'hands'; (C) và (D) mô tả tư thế và hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "When should I follow up after the interview?",
+        "options": ["A day or two later is fine.", "I followed the map to the office.", "Yes, follow me, please."],
+        "answer": "A",
+        "explanation": "Câu hỏi 'When' cần câu trả lời về thời điểm. (B) và (C) lặp lại từ 'follow' với nghĩa khác và (C) còn trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Did the candidate seem hesitant about relocating?",
+        "options": ["The new location is downtown.", "No, she said she was happy to move.", "He applied last Monday."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về thái độ của ứng viên; (B) trả lời No và giải thích. (A) nhầm 'relocating' với 'location'; (C) trả lời một câu hỏi khác."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Hi, Tom. How did the interviews for the sales assistant job go this morning?\nMan: Two were strong. The third candidate had a good background, but he answered very weakly when I asked about his sales targets.\nWoman: Was he nervous, or did he simply not know the numbers?\nMan: Hard to say. He seemed hesitant every time I mentioned figures. The other two spoke with real confidence.\nWoman: Then let's call in those two for a second round with the regional director next week. Can you arrange that?\nMan: Sure. I'll email them today and ask them to be ready for a short role-play with a customer.\nWoman: Good idea. And please follow up with the third applicant so he isn't left waiting.\nMan: I'll send him a polite note this afternoon.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["A sales target for next year", "Interviews that took place this morning", "A complaint from a customer", "The regional director's schedule"],
+          "answer": "B",
+          "explanation": "Người phụ nữ hỏi 'How did the interviews ... go this morning?' và cả cuộc trò chuyện xoay quanh các ứng viên vừa phỏng vấn."
+        },
+        {
+          "prompt": "What does the man say about the third candidate?",
+          "options": ["He arrived late", "He had no sales experience", "He gave weak answers about sales numbers", "He asked for a higher salary"],
+          "answer": "C",
+          "explanation": "Người đàn ông nói ứng viên thứ ba 'answered very weakly when I asked about his sales targets'."
+        },
+        {
+          "prompt": "What will the two strong candidates be asked to prepare for?",
+          "options": ["A written test", "A role-play with a customer", "A presentation to the whole team", "A visit to a client's office"],
+          "answer": "B",
+          "explanation": "Người đàn ông sẽ yêu cầu họ 'be ready for a short role-play with a customer'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hello, this message is for Jonathan Reyes. This is Amira Haddad from the human resources office at Pinecrest Dental Clinics. Thank you for applying for the office coordinator position and for sending such a clear summary of your background. We would like to call you in for an interview on Thursday, October 9, at ten o'clock, at our main office on Linden Avenue. The interview will last about an hour. You will meet our clinic manager and one of our senior dentists, who is an expert in patient scheduling, and we will ask you to present a short plan for handling a busy morning at the front desk. Please be ready for a few questions about the software you have used in previous jobs. If Thursday does not suit you, call me at 555-0142 and we will find another time. Thank you, and we look forward to meeting you.",
+      "questions": [
+        {
+          "prompt": "Why is the speaker calling?",
+          "options": ["To offer the listener a job", "To invite the listener to an interview", "To ask for a missing document", "To cancel an appointment"],
+          "answer": "B",
+          "explanation": "Người nói muốn 'call you in for an interview on Thursday', tức mời người nghe đến phỏng vấn."
+        },
+        {
+          "prompt": "What will the listener be asked to do during the interview?",
+          "options": ["Present a plan for a busy morning", "Take a typing test", "Meet several patients", "Install new software"],
+          "answer": "A",
+          "explanation": "'We will ask you to present a short plan for handling a busy morning at the front desk' là yêu cầu trong buổi phỏng vấn."
+        },
+        {
+          "prompt": "What should the listener do if he cannot attend on Thursday?",
+          "options": ["Send an email to the clinic manager", "Come on Friday instead", "Phone the speaker to arrange another time", "Apply again next month"],
+          "answer": "C",
+          "explanation": "Cuối tin nhắn: 'If Thursday does not suit you, call me at 555-0142 and we will find another time'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Over two hundred people _____ for the three openings at the new call center.",
+        "options": ["apply", "applied", "applicant", "application"],
+        "answer": "B",
+        "explanation": "Câu cần động từ chính; chủ ngữ số nhiều 'people' và ngữ cảnh kể lại sự việc đã xảy ra nên dùng quá khứ 'applied'. 'Apply' số nhiều hiện tại cũng đúng ngữ pháp nhưng không khớp với 'the new call center' đã mở; đáp án tự nhiên nhất là 'applied'."
+      },
+      {
+        "prompt": "The interviewer was impressed by her _____ to explain technical ideas in simple words.",
+        "options": ["able", "ability", "ably", "enable"],
+        "answer": "B",
+        "explanation": "Sau tính từ sở hữu 'her' cần danh từ: 'ability to do something'."
+      },
+      {
+        "prompt": "Candidates who answer _____ in the first round are rarely invited back.",
+        "options": ["weak", "weaken", "weakly", "weakness"],
+        "answer": "C",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'answer': 'weakly'."
+      },
+      {
+        "prompt": "Mr. Dao spoke with such _____ that the panel forgot he was the youngest applicant.",
+        "options": ["confident", "confide", "confidently", "confidence"],
+        "answer": "D",
+        "explanation": "Sau 'with such' cần danh từ: 'confidence'. 'Such ... that' diễn tả mức độ."
+      },
+      {
+        "prompt": "The clinic brought in an _____ to review the test results of the finalists.",
+        "options": ["expert", "expertise", "expertly", "expertness"],
+        "answer": "A",
+        "explanation": "Sau 'an' cần danh từ đếm được chỉ người: 'expert'. 'Expertise' là danh từ không đếm được chỉ chuyên môn."
+      },
+      {
+        "prompt": "Our recruiters are _____ looking for sales staff who speak a second language.",
+        "options": ["constant", "constantly", "constancy", "constants"],
+        "answer": "B",
+        "explanation": "Cần trạng từ đứng giữa 'are' và 'looking' để bổ nghĩa cho động từ: 'constantly'."
+      }
+    ],
+    "part6": {
+      "passage": "Dear Ms. Oyelaran,\n\nThank you for meeting with me yesterday about the junior accountant position. I enjoyed learning more about your team and the new reporting system. I was glad to ___ my experience with monthly closing, and I hope my answers showed the ___ I have in my own work. I was ___ about one question, the one on cost allocation, so I have attached a short note with a fuller answer. Please let me know if you need any other documents from me. I look forward to hearing from you.\n\nSincerely,\nDaniel Mbeki",
+      "questions": [
+        {
+          "options": ["present", "presence", "presentable", "presently"],
+          "answer": "A",
+          "explanation": "Sau 'glad to' cần động từ nguyên mẫu: 'present' (trình bày) kinh nghiệm của mình."
+        },
+        {
+          "options": ["confident", "confidence", "confidently", "confide"],
+          "answer": "B",
+          "explanation": "Sau 'the' và trước mệnh đề quan hệ rút gọn 'I have' cần danh từ: 'confidence'."
+        },
+        {
+          "options": ["hesitate", "hesitation", "hesitant", "hesitantly"],
+          "answer": "C",
+          "explanation": "Sau 'was' cần tính từ: 'hesitant about'. Người viết thừa nhận đã do dự ở một câu hỏi nên gửi thêm câu trả lời đầy đủ."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "HARLOW AND FINCH INSURANCE\nAssessment Day for Customer Service Trainee Applicants\nSaturday, March 14 - Training Center, 2nd Floor\n\nDear Candidate,\n\nCongratulations on being selected from more than 300 people who applied for our trainee program. The assessment day is designed to show us your abilities in real situations, not only on paper. The schedule is below.\n\n| Time | Activity |\n| 8:30 | Registration and coffee |\n| 9:00 | Written test on reading and basic arithmetic |\n| 10:15 | Group exercise: solving a customer problem as a team |\n| 11:30 | Individual interview about your background and goals |\n| 12:30 | Lunch and informal talk with current trainees |\n\nPlease be ready for the group exercise by reading the two short case studies attached to this letter. There are no right or wrong answers; we are interested in how you listen and how you explain your ideas. Dress comfortably but neatly, and bring one form of photo identification.\n\nWe will follow up with every candidate by email within ten days of the assessment. If you have a question before March 14, call Grace Lindqvist at extension 408.\n\nWe look forward to meeting you.",
+      "questions": [
+        {
+          "prompt": "Why was the letter sent?",
+          "options": ["To offer the reader a trainee position", "To give details about a selection event", "To announce a change of office address", "To request a copy of a resume"],
+          "answer": "B",
+          "explanation": "Thư gửi cho ứng viên được chọn tham dự ngày đánh giá và cung cấp lịch trình cùng hướng dẫn chuẩn bị."
+        },
+        {
+          "prompt": "What will candidates do at 10:15?",
+          "options": ["Take a written test", "Work on a problem in a group", "Have an individual interview", "Eat lunch with trainees"],
+          "answer": "B",
+          "explanation": "Bảng ghi 10:15 là 'Group exercise: solving a customer problem as a team'."
+        },
+        {
+          "prompt": "What should candidates do before the assessment day?",
+          "options": ["Read two case studies", "Send a photo to the office", "Call Grace Lindqvist", "Prepare a presentation"],
+          "answer": "A",
+          "explanation": "Thư yêu cầu 'be ready for the group exercise by reading the two short case studies attached'."
+        },
+        {
+          "prompt": "What must candidates bring with them?",
+          "options": ["A copy of their degree", "A letter from a previous employer", "A photo identification document", "A laptop computer"],
+          "answer": "C",
+          "explanation": "Thư ghi 'bring one form of photo identification'."
+        },
+        {
+          "prompt": "When will candidates hear about the results?",
+          "options": ["On the same day", "Within ten days", "At the end of March", "After a second interview"],
+          "answer": "B",
+          "explanation": "'We will follow up with every candidate by email within ten days of the assessment'."
+        }
+      ]
+    }
+  }
+}

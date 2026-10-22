@@ -108,6 +108,18 @@ rows of `/learning/lessons/:id/ranking` and `/progress/leaderboard`, removing
 Avatar files live on ImageKit (D68) or under `storage/avatars` locally; no
 service reads another service's database and no RabbitMQ event is added.
 
+## Invitations, activation and placement reset (D131)
+
+**VERIFIED (2026-10-21, tests and live route checks):** auth-service RPCs
+`AdminInviteAccount` (`POST /auth/admin/accounts`) and `AcceptInvite`
+(`POST /auth/accept-invite`), OTP purpose `INVITE` (72 hours), column
+`accounts.invitedAt` (migration `1710000006000`), new `AdminAccountAction`
+values and audit actions. learning-service RPC `AdminResetPlacement`
+(`POST /placement/admin/learners/:id/reset`) deletes the learner's own
+`placement_attempts` row; the gateway then asks auth-service to write the audit
+row. No service reads another service's database. Env `WEB_APP_URL` gives the
+link in the invitation email.
+
 ## F01B admin management contract (D114)
 
 **VERIFIED (2026-10-19):** the gateway adds `GET /auth/admin/accounts/stats` and
@@ -119,6 +131,56 @@ service reads another service's database and no RabbitMQ event is added.
 error. `accounts.lastLoginAt` is written by auth-service on sign-in. No service
 reads another service's database; the learner summary is served by
 progress-service from its own tables.
+
+## Unit review contract (D121)
+
+**VERIFIED (2026-10-20):** content-service owns `unit_review_versions` and
+`units.reviewVersionId` (migration `1720000011000`); the gateway exposes
+`GET /content/units/:id/review`, `PUT /content/units/:id/review/draft`,
+`POST /content/units/:id/review/publish` and `.../unpublish` (RPCs
+`GetUnitReview`, `SaveUnitReviewDraft`, `PublishUnitReview`,
+`UnpublishUnitReview`). learning-service owns `unit_review_attempts`
+(migration `1730000010000`) and reads the published review through the
+internal `GetUnitReviewPaper` RPC; the gateway exposes
+`GET /learning/units/:id/review` and `POST /learning/units/:id/review/submit`
+(`GetUnitReview`, `SubmitUnitReview`). `GetCurriculum` carries
+`reviewVersionId` per unit so learning-service knows which units close with a
+review. No RabbitMQ event: a review earns no XP. `GetContentUsage` gains kind
+`unit` for the delete rule of D118.
+
+## Version history contract (D122)
+
+**VERIFIED (2026-10-20):** the gateway exposes `GET /content/versions/:kind/:id`,
+`GET /content/versions/:kind/:id/:versionId` and
+`POST /content/versions/:kind/:id/:versionId/restore`, relayed to
+content-service `ListContentVersions`, `GetContentVersion` and
+`RestoreContentVersion` (`VersionGrpcController`), and since D127
+`DELETE /content/versions/:kind/:id/draft` (`DiscardContentDraft`), which
+removes the draft row and the media files only it used, and
+`DELETE /content/versions/:kind/:id/:versionId` (`DeleteContentVersion`, D128),
+which the gateway allows only after learning-service `GetContentUsage` (kinds
+`lessonVersion`, `mockVersion`, `unitReviewVersion`, `courseVersion`) reports no
+attempt on that version. No new table: the
+existing version tables are read; restoring writes the draft through the usual
+save-draft path. No event.
+
+## Content removal contract (D118)
+
+**VERIFIED (2026-10-19):** the gateway orchestrates deletes: it asks
+learning-service `GetContentUsage` for the ids involved and only then calls the
+content-service `Delete*` RPC; with results it answers 409 `CONTENT_IN_USE`
+(48, `data.reason HAS_RESULTS`). `Unpublish*` RPCs need no check. The content
+gateway controller therefore holds the learning gRPC client as well. Orphan
+media are listed and deleted through `ListOrphanMedia`/`DeleteOrphanMedia`.
+No service reads another service's database.
+
+## Gateway rate limits (D117)
+
+**VERIFIED (2026-10-19):** a global guard in api-gateway
+(`src/rate-limit/`) counts requests per fixed window in Redis (`REDIS_URL`) or
+memory and answers 429 `{ code: 33, msg: 'fail', data: { scope, limit,
+retryAfterSeconds } }` with `Retry-After`. Health routes are exempt; a failing
+store lets requests through. Redis is used for nothing else yet.
 
 ## Admin dashboard health probe (D115)
 

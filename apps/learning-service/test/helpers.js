@@ -26,6 +26,11 @@ export function createMemoryRepository() {
       tables.attempts.push(stored);
       return copy(stored);
     },
+    async deleteAttempt(accountId) {
+      const before = tables.attempts.length;
+      tables.attempts = tables.attempts.filter((attempt) => attempt.accountId !== accountId);
+      return tables.attempts.length < before;
+    },
     async findSettings() {
       return copy(tables.settings);
     },

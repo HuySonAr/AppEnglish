@@ -229,6 +229,44 @@ export class ListeningService {
   // ----- Speech jobs: Auto-time (D97) finds the times of the lines,
   // Transcribe (D98) writes the lines from the recording.
 
+  async unpublish(actor, exerciseId) {
+    this.assertManager(actor);
+    const exercise = await this.findExerciseOrThrow(exerciseId);
+    const published = exercise.publishedVersionId ? await this.repository.findVersion(exercise.publishedVersionId) : null;
+    if (exercise.publishedVersionId) {
+      exercise.publishedVersionId = null;
+      await this.repository.saveExercise(exercise);
+    }
+    let draft = await this.repository.findDraft(exerciseId);
+    // The version taken down becomes the draft when there is none (D122).
+    if (!draft && published)
+      draft = await this.repository.saveVersion({
+        exerciseId,
+        versionNumber: (await this.repository.maxVersionNumber(exerciseId)) + 1,
+        status: LessonVersionStatus.DRAFT,
+        content: structuredClone(published.content),
+        createdBy: actor.id,
+      });
+    return this.managedView(exercise, draft, null);
+  }
+
+  // Removes an exercise with its versions, timing jobs and the recording only
+  // it used; the gateway refuses it first when learners have results (D118).
+  async delete(actor, exerciseId) {
+    this.assertManager(actor);
+    await this.findExerciseOrThrow(exerciseId);
+    const summaries = (await this.repository.listVersionSummaries()).filter((version) => version.exerciseId === exerciseId);
+    const mediaIds = [];
+    for (const summary of summaries) {
+      const version = await this.repository.findVersion(summary.id);
+      const parsed = version ? listeningContentSchema.safeParse(version.content) : null;
+      if (parsed?.success) mediaIds.push(...listeningMediaIds(parsed.data));
+    }
+    await this.repository.deleteExerciseWithVersions(exerciseId);
+    const removedMedia = await this.contentService.removeUnusedMedia([...new Set(mediaIds)]);
+    return { deleted: true, removedMedia: removedMedia.length };
+  }
+
   timingJobView(job) {
     const late = active(job) && this.now().getTime() - new Date(job.createdAt).getTime() > AUTOTIME_TIMEOUT_MS;
     const task = job.task || SpeechTask.ALIGN;
@@ -252,28 +290,45 @@ export class ListeningService {
     const exercise = await this.findExerciseOrThrow(exerciseId);
     const version = (await this.repository.findDraft(exerciseId)) || (await this.publishedVersion(exercise));
     const content = version ? listeningContentSchema.parse(version.content) : null;
-    if (!content?.audioMediaId) throw contentErrors.autoTimeInvalid('NO_AUDIO', 'Add the recording and save the draft first');
-    const [asset] = await this.contentService.repository.findMediaByIds([content.audioMediaId]);
+    return this.queueSpeechJob(actor, {
+      owner: { exerciseId },
+      task,
+      kind: exercise.kind,
+      audioMediaId: content?.audioMediaId,
+      segments: content?.segments || [],
+      lineText: (segment) => (exercise.kind === 'song' ? lyricText(segment.text) : segment.text),
+    });
+  }
+
+  // A speech job for one owner ({ exerciseId }, or { courseItemId } for a
+  // course topic, D147) on the given recording and lines.
+  async queueSpeechJob(actor, { owner, task, kind, audioMediaId, segments, lineText = (segment) => segment.text }) {
+    if (!audioMediaId) throw contentErrors.autoTimeInvalid('NO_AUDIO', 'Add the recording and save the draft first');
+    const [asset] = await this.contentService.repository.findMediaByIds([audioMediaId]);
     if (!asset?.url || asset.storage === 'local')
       throw contentErrors.autoTimeInvalid('NO_AUDIO', 'The recording is not stored where the speech service can download it');
     const lines =
       task === SpeechTask.ALIGN
-        ? content.segments
-            .filter((segment) => segment.text.trim())
-            .map((segment) => ({ id: segment.id, text: exercise.kind === 'song' ? lyricText(segment.text) : segment.text }))
+        ? segments.filter((segment) => segment.text.trim()).map((segment) => ({ id: segment.id, text: lineText(segment) }))
         : [];
     if (task === SpeechTask.ALIGN && !lines.length)
       throw contentErrors.autoTimeInvalid('NO_LINES', 'Write or paste the lines and save the draft first');
-    const latest = await this.repository.findLatestTimingJob(exerciseId);
+    const latest = await this.repository.findLatestTimingJob(owner);
     if (latest && active(latest) && this.timingJobView(latest).status !== AutoTimeStatus.FAILED)
       return { job: this.timingJobView(latest) };
     if (!this.broker?.ready) throw contentErrors.speechUnavailable();
-    const job = await this.repository.saveTimingJob({ exerciseId, task, status: AutoTimeStatus.QUEUED, lines, requestedBy: actor.id });
-    if (!this.broker.publish({ jobId: job.id, task, audioUrl: asset.url, language: 'en', kind: exercise.kind, lines })) {
+    const job = await this.repository.saveTimingJob({ ...owner, task, status: AutoTimeStatus.QUEUED, lines, requestedBy: actor.id });
+    if (!this.broker.publish({ jobId: job.id, task, audioUrl: asset.url, language: 'en', kind, lines })) {
       await this.repository.saveTimingJob({ ...job, status: AutoTimeStatus.FAILED, error: 'The message broker could not be reached.' });
       throw contentErrors.speechUnavailable();
     }
     return { job: this.timingJobView(job) };
+  }
+
+  // The latest speech job of an owner, or null.
+  async latestSpeechJob(owner) {
+    const job = await this.repository.findLatestTimingJob(owner);
+    return { job: job ? this.timingJobView(job) : null };
   }
 
   // Auto-time (D97): the times of the saved lines.
@@ -290,8 +345,7 @@ export class ListeningService {
   async getAutoTime(actor, exerciseId) {
     this.assertManager(actor);
     await this.findExerciseOrThrow(exerciseId);
-    const job = await this.repository.findLatestTimingJob(exerciseId);
-    return { job: job ? this.timingJobView(job) : null };
+    return this.latestSpeechJob({ exerciseId });
   }
 
   // An answer of speech-service: RUNNING, then DONE with the times or FAILED.

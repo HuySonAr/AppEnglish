@@ -1,0 +1,260 @@
+{
+  "number": 31,
+  "title": "Selecting a Restaurant",
+  "vocabulary": [
+    {
+      "word": "appeal",
+      "partOfSpeech": "verb",
+      "meaning": "hấp dẫn, lôi cuốn; sức hấp dẫn",
+      "example": "The quiet garden terrace appeals to clients who want to talk business over dinner.",
+      "exampleMeaning": "Khoảng sân vườn yên tĩnh hấp dẫn những khách hàng muốn bàn công việc trong bữa tối."
+    },
+    {
+      "word": "arrive",
+      "partOfSpeech": "verb",
+      "meaning": "đến, tới nơi",
+      "example": "Our guests from the Osaka office will arrive at the restaurant around seven.",
+      "exampleMeaning": "Các vị khách từ văn phòng Osaka sẽ đến nhà hàng vào khoảng bảy giờ."
+    },
+    {
+      "word": "compromise",
+      "partOfSpeech": "noun",
+      "meaning": "sự thỏa hiệp, giải pháp dung hòa",
+      "example": "Choosing the seafood place was a compromise between the two teams' preferences.",
+      "exampleMeaning": "Chọn quán hải sản là một giải pháp dung hòa giữa sở thích của hai nhóm."
+    },
+    {
+      "word": "daringly",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách táo bạo, liều lĩnh",
+      "example": "The new chef daringly added chili to the dessert menu, and customers loved it.",
+      "exampleMeaning": "Bếp trưởng mới đã táo bạo thêm ớt vào thực đơn tráng miệng, và khách hàng rất thích."
+    },
+    {
+      "word": "familiar",
+      "partOfSpeech": "adjective",
+      "meaning": "quen thuộc, thân quen",
+      "example": "Most of our visitors prefer familiar dishes when they eat with clients.",
+      "exampleMeaning": "Phần lớn khách của chúng tôi thích những món quen thuộc khi ăn cùng khách hàng."
+    },
+    {
+      "word": "guide",
+      "partOfSpeech": "noun",
+      "meaning": "sách hướng dẫn, cẩm nang; người hướng dẫn",
+      "example": "The city's restaurant guide lists every place that serves lunch before noon.",
+      "exampleMeaning": "Cẩm nang nhà hàng của thành phố liệt kê mọi quán phục vụ bữa trưa trước buổi trưa."
+    },
+    {
+      "word": "majority",
+      "partOfSpeech": "noun",
+      "meaning": "phần lớn, đa số",
+      "example": "The majority of the staff voted for the Italian restaurant near the station.",
+      "exampleMeaning": "Đa số nhân viên đã bỏ phiếu cho nhà hàng Ý gần nhà ga."
+    },
+    {
+      "word": "mix",
+      "partOfSpeech": "noun",
+      "meaning": "sự pha trộn, sự kết hợp (nhiều thứ khác nhau)",
+      "example": "The menu offers a good mix of light salads and heavier main courses.",
+      "exampleMeaning": "Thực đơn có sự kết hợp hợp lý giữa các món salad nhẹ và các món chính đậm hơn."
+    },
+    {
+      "word": "rely",
+      "partOfSpeech": "verb",
+      "meaning": "dựa vào, tin cậy vào",
+      "example": "We rely on online reviews when we book a table in a city we do not know.",
+      "exampleMeaning": "Chúng tôi dựa vào các đánh giá trực tuyến khi đặt bàn ở một thành phố mình chưa biết."
+    },
+    {
+      "word": "secure",
+      "partOfSpeech": "verb",
+      "meaning": "giành được, đặt được (chỗ, bàn); bảo đảm an toàn",
+      "example": "Please secure a table for eight before the holiday rush begins.",
+      "exampleMeaning": "Hãy đặt được một bàn cho tám người trước khi mùa cao điểm lễ bắt đầu."
+    },
+    {
+      "word": "subjective",
+      "partOfSpeech": "adjective",
+      "meaning": "chủ quan, theo cảm nhận cá nhân",
+      "example": "Taste is subjective, so we asked three colleagues to rate the new cafe.",
+      "exampleMeaning": "Khẩu vị là chuyện chủ quan, vì vậy chúng tôi đã nhờ ba đồng nghiệp chấm điểm quán cà phê mới."
+    },
+    {
+      "word": "suggestion",
+      "partOfSpeech": "noun",
+      "meaning": "lời đề nghị, gợi ý",
+      "example": "The receptionist's suggestion of a rooftop restaurant impressed our visitors.",
+      "exampleMeaning": "Gợi ý của nhân viên tiếp tân về một nhà hàng trên tầng thượng đã gây ấn tượng với khách của chúng tôi."
+    }
+  ],
+  "fillIn": {
+    "passage": "Priya Nair, the office manager at Harbor Logistics, was asked to choose a restaurant for a dinner with six visiting clients. She did not want to ___ only on her own taste, because opinions about food are ___. Instead she asked her coworkers for a ___ or two and checked the local dining ___ published by the tourist office.\n\nThe ___ of her colleagues preferred a steakhouse that the team already knew well, but Priya worried that a ___ menu might bore guests who eat out often. One coworker ___ proposed a new place that serves fried insects, which everyone else rejected at once. In the end she found a ___: a bistro that offers a ___ of traditional dishes and a few modern specials. Its riverside terrace should ___ to the clients, who had mentioned that they enjoy views of the water.\n\nPriya called the bistro the same afternoon to ___ a table for ten. The clients will ___ at seven, and she has asked the kitchen to keep the terrace quiet until then.",
+    "answers": ["rely", "subjective", "suggestion", "guide", "majority", "familiar", "daringly", "compromise", "mix", "appeal", "secure", "arrive"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người đàn ông và một người phụ nữ đứng trước cửa một nhà hàng; người phụ nữ đang chỉ vào tờ thực đơn dán trên cửa kính.",
+      "options": [
+        "The woman is pointing at a menu in the window.",
+        "The man is paying the bill at the counter.",
+        "The people are seated at an outdoor table.",
+        "The waiter is carrying a tray of glasses."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ chỉ vào thực đơn trên cửa kính. (B), (C) và (D) mô tả hành động hoặc người không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Which restaurant would you suggest for the client dinner?",
+        "options": ["The one by the harbor has a great view.", "Yes, I'd love to come.", "Dinner is at seven."],
+        "answer": "A",
+        "explanation": "Câu hỏi Which cần câu trả lời chỉ ra một nhà hàng cụ thể. (B) trả lời Yes cho câu hỏi Wh, (C) trả lời về thời gian."
+      },
+      {
+        "question": "Has the majority of the team replied to the invitation?",
+        "options": ["Almost everyone has, except Marcus.", "The team won the match on Sunday.", "Please reply by Thursday."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc trả lời lời mời; (A) xác nhận gần như tất cả đã trả lời. (B) lặp từ 'team' với nghĩa khác, (C) là lời yêu cầu, không phải câu trả lời."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Elena, have you picked a place for Thursday's dinner with the auditors yet?\nWoman: Not yet. I've been reading the city dining guide, but there are too many choices. Half of the team wants the Thai place on Mill Street, and the other half wants the steakhouse.\nMan: What about a compromise? The new grill on Pier Road serves both Asian dishes and steaks, and it's a five-minute walk from the hotel where the auditors are staying.\nWoman: That could work. Have you eaten there?\nMan: Twice. The service is quick, and the menu is familiar enough that nobody will feel lost.\nWoman: Great. I'll call them now to secure a table for twelve. The auditors arrive at six, so I'll book for seven.\nMan: Good idea. Ask for the room at the back; it's quieter for business talk.",
+      "questions": [
+        {
+          "prompt": "Why is the woman having trouble choosing a restaurant?",
+          "options": ["The dining guide is out of date", "Her colleagues want different kinds of food", "The hotel has no restaurant", "The auditors have canceled the dinner"],
+          "answer": "B",
+          "explanation": "Cô ấy nói một nửa nhóm muốn quán Thái, nửa còn lại muốn quán bít tết, nên khó chọn."
+        },
+        {
+          "prompt": "What does the man say about the grill on Pier Road?",
+          "options": ["It is next to the office", "It has a long waiting list", "It is close to the auditors' hotel", "It serves only steaks"],
+          "answer": "C",
+          "explanation": "Anh ấy nói quán 'a five-minute walk from the hotel where the auditors are staying'. Quán phục vụ cả món Á và bít tết, không chỉ bít tết."
+        },
+        {
+          "prompt": "What will the woman do next?",
+          "options": ["Reserve a table", "Walk to the hotel", "Print the menu", "Ask the auditors for suggestions"],
+          "answer": "A",
+          "explanation": "Cô ấy nói 'I'll call them now to secure a table for twelve', tức là gọi đặt bàn."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hello, this is Nadia from the events team with a quick message for everyone joining the regional sales dinner on the twentieth. Thank you for sending in your suggestions; we received more than forty, which shows how much this dinner appeals to you. Because taste is subjective, we did not pick the restaurant ourselves. Instead we relied on your votes, and the majority chose Harvest Table on Linden Avenue. The restaurant offers a mix of vegetarian, fish and meat dishes, so there is something for everyone, and the chef has daringly promised a dessert made with local honey and black pepper. Please arrive by half past six, because the kitchen will serve the first course at seven sharp. If you have any food allergies, email me by Monday so that I can inform the restaurant. Thanks, and see you there.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the message?",
+          "options": ["To cancel a sales dinner", "To announce the chosen restaurant", "To ask staff to vote for a venue", "To introduce a new chef"],
+          "answer": "B",
+          "explanation": "Người nói thông báo nhà hàng đã được chọn cho bữa tối bán hàng khu vực: 'the majority chose Harvest Table'."
+        },
+        {
+          "prompt": "How was the restaurant selected?",
+          "options": ["By the events team", "By the company president", "By a staff vote", "By a dining guide"],
+          "answer": "C",
+          "explanation": "'we relied on your votes, and the majority chose...' cho thấy nhà hàng được chọn qua bỏ phiếu của nhân viên."
+        },
+        {
+          "prompt": "What are listeners with food allergies asked to do?",
+          "options": ["Call the restaurant directly", "Email the speaker by Monday", "Arrive earlier than six thirty", "Order a vegetarian dish"],
+          "answer": "B",
+          "explanation": "Cuối bài: 'If you have any food allergies, email me by Monday'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The bright dining room is designed to _____ to young professionals who work nearby.",
+        "options": ["appeal", "appealing", "appeals", "appealed"],
+        "answer": "A",
+        "explanation": "Sau 'to' (động từ nguyên mẫu có 'to') cần dạng nguyên mẫu: 'appeal to'."
+      },
+      {
+        "prompt": "Many managers _____ on online reviews when they choose a place for a business lunch.",
+        "options": ["reliance", "rely", "reliable", "reliably"],
+        "answer": "B",
+        "explanation": "Câu cần động từ chính cho chủ ngữ số nhiều 'Many managers': 'rely on'."
+      },
+      {
+        "prompt": "Because reviews are often _____, Mr. Okafor visits a restaurant himself before recommending it.",
+        "options": ["subjectively", "subjectivity", "subjective", "subject"],
+        "answer": "C",
+        "explanation": "Sau 'are often' cần tính từ mô tả chủ ngữ 'reviews': 'subjective' (chủ quan)."
+      },
+      {
+        "prompt": "The _____ of our guests asked for a table near the window.",
+        "options": ["majority", "major", "majored", "majorly"],
+        "answer": "A",
+        "explanation": "Sau 'The' và trước 'of our guests' cần danh từ: 'majority' (đa số)."
+      },
+      {
+        "prompt": "The two directors could not agree, so they reached a _____ and booked a restaurant halfway between their offices.",
+        "options": ["compromising", "compromise", "compromised", "compromises"],
+        "answer": "B",
+        "explanation": "Sau 'a' cần danh từ số ít: 'compromise'. 'reach a compromise' là cách nói cố định."
+      },
+      {
+        "prompt": "Guests who are not _____ with local dishes may ask the waiter to explain the menu.",
+        "options": ["familiar", "familiarity", "familiarize", "familiarly"],
+        "answer": "A",
+        "explanation": "Sau 'are not' và trước 'with' cần tính từ: 'familiar with' (quen với)."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Staff\nFrom: Theo Lindqvist, Office Manager\nSubject: Year-end team dinner\n\nThank you to everyone who sent in a ___ for this year's team dinner. After reading all of your ideas, we have chosen Cedar House on Bridge Street, which most of you already know. I have ___ a private room for forty people on Friday, December 12, at 7 p.m. Please ___ on time, because the restaurant will start serving at 7:15 sharp. If you cannot attend, let me know by December 5 so that I can update the booking.",
+      "questions": [
+        {
+          "options": ["suggest", "suggestion", "suggested", "suggestive"],
+          "answer": "B",
+          "explanation": "Sau 'a' cần danh từ: 'suggestion' (gợi ý)."
+        },
+        {
+          "options": ["secure", "securely", "secured", "security"],
+          "answer": "C",
+          "explanation": "'I have ___ a private room' là thì hiện tại hoàn thành, cần quá khứ phân từ: 'secured'."
+        },
+        {
+          "options": ["arrive", "arrival", "arrived", "arriving"],
+          "answer": "A",
+          "explanation": "Câu mệnh lệnh 'Please ___ on time' cần động từ nguyên mẫu: 'arrive'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "BAYVIEW BUSINESS JOURNAL\nDining Guide: Three Places to Take Clients This Spring\n\nWhere should you take an important client? Reviews are subjective, so this year we relied on a different method: we asked 120 local office managers which restaurants they book most often and why. Three names came up again and again.\n\n| Restaurant | Best for | Average price per person |\n| The Copper Kettle, 14 Quay Street | Quiet lunches | $28 |\n| Marisol, 3 Orchard Lane | Dinners with large groups | $45 |\n| Hollow Oak, Westgate Market | Impressing adventurous guests | $60 |\n\nThe Copper Kettle appeals to managers who need a familiar menu and fast service; most tables are finished in under an hour. Marisol can secure a private room for up to thirty people with one day's notice, and its menu offers a good mix of fish, grilled meats and vegetarian plates. Hollow Oak is the bold choice: the chef changes the menu every week and daringly pairs local cheese with seaweed. The majority of managers said they take first-time visitors to the Copper Kettle and return visitors to Hollow Oak.\n\nReaders can send their own suggestions to the editor by April 30.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the article?",
+          "options": ["To review a new restaurant", "To recommend restaurants for client meals", "To announce a cooking contest", "To compare food prices in two cities"],
+          "answer": "B",
+          "explanation": "Bài viết trả lời câu hỏi 'where should I take an important client?' bằng ba nhà hàng được giới thiệu."
+        },
+        {
+          "prompt": "How did the journal choose the restaurants?",
+          "options": ["By tasting the food itself", "By reading online reviews", "By surveying office managers", "By visiting the tourist office"],
+          "answer": "C",
+          "explanation": "'We asked 120 local office managers which restaurants they book most often and why.'"
+        },
+        {
+          "prompt": "Which restaurant is the least expensive?",
+          "options": ["The Copper Kettle", "Marisol", "Hollow Oak", "Westgate Market"],
+          "answer": "A",
+          "explanation": "Bảng ghi giá trung bình của The Copper Kettle là $28, thấp nhất trong ba nhà hàng. Westgate Market là địa điểm, không phải nhà hàng."
+        },
+        {
+          "prompt": "What is indicated about Marisol?",
+          "options": ["It changes its menu weekly", "It can arrange a private room", "It serves only fish", "It closes at lunchtime"],
+          "answer": "B",
+          "explanation": "'Marisol can secure a private room for up to thirty people with one day's notice.' Nhà hàng đổi thực đơn hàng tuần là Hollow Oak."
+        },
+        {
+          "prompt": "Where would most managers take a client who has visited the city before?",
+          "options": ["The Copper Kettle", "Marisol", "Hollow Oak", "Quay Street"],
+          "answer": "C",
+          "explanation": "Câu cuối đoạn ba: đa số quản lý đưa khách đến lần đầu tới The Copper Kettle và khách quay lại tới Hollow Oak."
+        }
+      ]
+    }
+  }
+}

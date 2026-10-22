@@ -12,10 +12,11 @@ import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { getAdminAccountStats, listAdminAccounts } from '../../auth/api/auth-api.js';
 import { greeting } from '../../student/lib/home.js';
 import { getServicesHealth } from '../api/system-api.js';
-import { SignupsChart, StatusBars, Tile } from '../components/AccountStats.jsx';
-import { RoleBadge, StatusBadge } from '../components/AccountBadges.jsx';
+import { SignupsChart, StatusBreakdown, Tile, shortDay } from '../components/AccountStats.jsx';
+import { RoleBadge } from '../components/AccountBadges.jsx';
+import { InviteAccountDialog } from '../components/InviteAccountDialog.jsx';
 import { signupSeries, statusBreakdown, timeAgo } from '../lib/accounts.js';
-import { attentionItems, overallHealth, weeklyTrend } from '../lib/dashboard.js';
+import { attentionItems, overallHealth, signupSummary, weeklyTrend } from '../lib/dashboard.js';
 
 const tones = {
   warning: 'border-warning/40 bg-warning/10 text-warning',
@@ -97,15 +98,23 @@ function SystemHealth() {
   );
 }
 
-function AccountRows({ title, description, icon: Icon, items, state, empty, meta }) {
+function AccountRows({ title, description, icon: Icon, items, state, empty, meta, to }) {
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Icon className="h-4 w-4" aria-hidden="true" />
-          {title}
-        </CardTitle>
-        <CardDescription>{description}</CardDescription>
+      <CardHeader className="flex-row items-start justify-between gap-3 space-y-0 pb-3">
+        <div>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Icon className="h-4 w-4" aria-hidden="true" />
+            {title}
+          </CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </div>
+        <Button asChild variant="ghost" size="sm" className="-mr-2 h-8 shrink-0 px-2 text-xs">
+          <Link to={to}>
+            View all
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </Button>
       </CardHeader>
       <CardContent>
         {state === 'loading' ? (
@@ -143,6 +152,7 @@ function AccountRows({ title, description, icon: Icon, items, state, empty, meta
 export function AdminDashboardPage() {
   const [stats, setStats] = useState({ state: 'loading', data: null });
   const [recent, setRecent] = useState({ state: 'loading', newest: [], active: [] });
+  const [inviting, setInviting] = useState(false);
 
   async function loadStats() {
     setStats({ state: 'loading', data: null });
@@ -173,12 +183,31 @@ export function AdminDashboardPage() {
   const data = stats.data;
   const points = data ? signupSeries(data.newPerDay, { days: data.days }) : [];
   const trend = weeklyTrend(points);
+  const summary = signupSummary(points);
   const attention = data ? attentionItems(data) : [];
   const today = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
 
   return (
     <section className="space-y-8">
-      <PageHeader eyebrow="Admin" title={`${greeting()}.`} description={`${today}. Here is how AppEnglish is doing.`} />
+      <PageHeader
+        eyebrow="Admin"
+        title={`${greeting()}.`}
+        description={`${today}. Here is how AppEnglish is doing.`}
+        actions={
+          <>
+            <Button variant="outline" asChild>
+              <Link to="/admin/accounts">
+                <Users className="h-4 w-4" />
+                Accounts
+              </Link>
+            </Button>
+            <Button onClick={() => setInviting(true)}>
+              <UserPlus className="h-4 w-4" />
+              Add account
+            </Button>
+          </>
+        }
+      />
 
       {stats.state === 'loading' ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -211,30 +240,11 @@ export function AdminDashboardPage() {
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
-        <Card>
-          <CardHeader className="flex-row items-start justify-between gap-3 space-y-0 pb-2">
-            <div>
-              <CardTitle className="text-base">Sign-ups</CardTitle>
-              <CardDescription>New accounts per day over the last {data?.days || 30} days</CardDescription>
-            </div>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/admin/accounts">
-                All accounts
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent>{data ? <SignupsChart points={points} /> : <Skeleton className="h-48 rounded-lg" />}</CardContent>
-        </Card>
-        <SystemHealth />
-      </div>
-
       {attention.length ? (
         <div className="grid gap-3 sm:grid-cols-3">
           {attention.map((item) => (
             <Link key={item.key} to={item.to} className={cn('flex items-center justify-between gap-3 rounded-xl border px-4 py-3 transition hover:shadow-md', tones[item.tone])}>
-              <span>
+              <span className="min-w-0">
                 <span className="block font-semibold">{item.label}</span>
                 <span className="block text-xs opacity-80">{item.hint}</span>
               </span>
@@ -244,9 +254,40 @@ export function AdminDashboardPage() {
         </div>
       ) : null}
 
+      <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+        <Card>
+          <CardHeader className="flex-col gap-4 space-y-0 pb-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <CardTitle className="text-base">Sign-ups</CardTitle>
+              <CardDescription>New accounts per day over the last {data?.days || 30} days</CardDescription>
+            </div>
+            {data ? (
+              <dl className="flex gap-6 sm:text-right">
+                <div>
+                  <dt className="text-xs text-muted-foreground">Total</dt>
+                  <dd className="text-lg font-bold tabular-nums">{summary.total}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-muted-foreground">Per day</dt>
+                  <dd className="text-lg font-bold tabular-nums">{summary.average}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-muted-foreground">Busiest day</dt>
+                  <dd className="text-lg font-bold tabular-nums">{summary.peak ? summary.peak.count : '—'}</dd>
+                  {summary.peak ? <dd className="text-xs text-muted-foreground">{shortDay(summary.peak.day)}</dd> : null}
+                </div>
+              </dl>
+            ) : null}
+          </CardHeader>
+          <CardContent>{data ? <SignupsChart points={points} /> : <Skeleton className="h-56 rounded-lg" />}</CardContent>
+        </Card>
+        <SystemHealth />
+      </div>
+
+
       <div className="grid gap-6 lg:grid-cols-3">
-        <AccountRows title="Just joined" description="The newest accounts" icon={UserPlus} state={recent.state} items={recent.newest} empty="Nobody has registered yet." meta={(account) => timeAgo(account.createdAt)} />
-        <AccountRows title="Recently active" description="The latest sign-ins" icon={Activity} state={recent.state} items={recent.active} empty="No sign-in recorded yet." meta={(account) => timeAgo(account.lastLoginAt)} />
+        <AccountRows title="Just joined" description="The newest accounts" icon={UserPlus} state={recent.state} items={recent.newest} empty="Nobody has registered yet." meta={(account) => timeAgo(account.createdAt)} to="/admin/accounts" />
+        <AccountRows title="Recently active" description="The latest sign-ins" icon={Activity} state={recent.state} items={recent.active} empty="No sign-in recorded yet." meta={(account) => timeAgo(account.lastLoginAt)} to={`/admin/accounts?sort=${AdminAccountSort.LAST_LOGIN}`} />
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Accounts by status</CardTitle>
@@ -254,19 +295,13 @@ export function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             {data ? (
-              <StatusBars rows={statusBreakdown(data.byStatus, data.total)} />
+              <StatusBreakdown rows={statusBreakdown(data.byStatus, data.total)} />
             ) : (
               <div className="space-y-3">
-                {[0, 1, 2, 3].map((item) => <Skeleton key={item} className="h-8 rounded-lg" />)}
+                <Skeleton className="h-3 rounded-full" />
+                {[0, 1, 2, 3].map((item) => <Skeleton key={item} className="h-7 rounded-lg" />)}
               </div>
             )}
-            {data ? (
-              <p className="mt-3 flex flex-wrap gap-1.5 text-xs text-muted-foreground">
-                <StatusBadge status="ACTIVE" className="font-normal" /> sign in freely ·
-                <StatusBadge status="SUSPENDED" className="font-normal" /> temporarily locked ·
-                <StatusBadge status="DISABLED" className="font-normal" /> closed
-              </p>
-            ) : null}
           </CardContent>
         </Card>
       </div>
@@ -274,13 +309,21 @@ export function AdminDashboardPage() {
       <div className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Tools</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <FeatureCard icon={Users} title="Accounts" description="Roles, locks with a reason, devices, history and each learner's progress" to="/admin/accounts" />
+          <FeatureCard icon={Users} title="Accounts" description="Invite people, change roles and status, reset a placement, read each history" to="/admin/accounts" />
           <FeatureCard icon={ClipboardCheck} title="Placement" description="The scores that decide a learner's starting unit" to="/admin/placement" tone="warning" />
           <FeatureCard icon={Layers} title="Exam types" description="The exams mock tests are modelled on" to="/admin/exam-types" tone="info" />
           <FeatureCard icon={Calculator} title="Score table" description="How raw answers convert to a band score" to="/admin/score-conversion" tone="success" />
           <FeatureCard icon={Tags} title="Listening topics" description="Topics of the listening practice library" to="/admin/listening-topics" tone="info" />
         </div>
       </div>
+      <InviteAccountDialog
+        open={inviting}
+        onOpenChange={setInviting}
+        onInvited={() => {
+          loadStats();
+          loadRecent();
+        }}
+      />
     </section>
   );
 }

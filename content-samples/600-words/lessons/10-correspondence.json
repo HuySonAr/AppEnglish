@@ -1,0 +1,260 @@
+{
+  "number": 10,
+  "title": "Correspondence",
+  "vocabulary": [
+    {
+      "word": "assemble",
+      "partOfSpeech": "verb",
+      "meaning": "tập hợp, gom lại; lắp ráp",
+      "example": "Two assistants assembled the brochures, cover letters and envelopes into 300 mailing packets.",
+      "exampleMeaning": "Hai trợ lý đã gom tờ gấp, thư ngỏ và phong bì thành 300 gói thư."
+    },
+    {
+      "word": "beforehand",
+      "partOfSpeech": "adverb",
+      "meaning": "trước đó, từ trước",
+      "example": "Please check the client's mailing address beforehand so the letter does not come back.",
+      "exampleMeaning": "Vui lòng kiểm tra địa chỉ gửi thư của khách hàng trước để thư không bị trả lại."
+    },
+    {
+      "word": "complication",
+      "partOfSpeech": "noun",
+      "meaning": "sự rắc rối, vấn đề phát sinh làm phức tạp thêm",
+      "example": "A complication with the customs form delayed the parcel by a week.",
+      "exampleMeaning": "Một rắc rối với tờ khai hải quan đã làm bưu kiện chậm một tuần."
+    },
+    {
+      "word": "courier",
+      "partOfSpeech": "noun",
+      "meaning": "người (hoặc dịch vụ) chuyển phát nhanh",
+      "example": "A courier will pick up the signed documents from reception at four o'clock.",
+      "exampleMeaning": "Nhân viên chuyển phát sẽ đến quầy lễ tân nhận các tài liệu đã ký lúc bốn giờ."
+    },
+    {
+      "word": "express",
+      "partOfSpeech": "adjective",
+      "meaning": "hỏa tốc, chuyển phát nhanh; (v) bày tỏ, diễn đạt",
+      "example": "We sent the contract by express mail so that it would arrive the next morning.",
+      "exampleMeaning": "Chúng tôi gửi hợp đồng bằng thư hỏa tốc để nó đến vào sáng hôm sau."
+    },
+    {
+      "word": "fold",
+      "partOfSpeech": "verb",
+      "meaning": "gấp, xếp (giấy, thư)",
+      "example": "Fold the letter in three so that the address shows through the envelope window.",
+      "exampleMeaning": "Gấp thư làm ba để địa chỉ hiện ra qua ô cửa sổ của phong bì."
+    },
+    {
+      "word": "layout",
+      "partOfSpeech": "noun",
+      "meaning": "bố cục, cách trình bày (trang, tài liệu)",
+      "example": "The new letterhead layout places the company logo at the top left of the page.",
+      "exampleMeaning": "Bố cục giấy tiêu đề mới đặt logo công ty ở góc trên bên trái trang."
+    },
+    {
+      "word": "mention",
+      "partOfSpeech": "verb",
+      "meaning": "đề cập, nhắc đến",
+      "example": "The customer's e-mail mentioned that the invoice was addressed to the wrong department.",
+      "exampleMeaning": "E-mail của khách hàng đề cập rằng hóa đơn đã được gửi sai phòng ban."
+    },
+    {
+      "word": "petition",
+      "partOfSpeech": "noun",
+      "meaning": "đơn kiến nghị, thư thỉnh nguyện (có nhiều người ký)",
+      "example": "Residents signed a petition asking the post office to keep its Saturday opening hours.",
+      "exampleMeaning": "Cư dân đã ký đơn kiến nghị yêu cầu bưu điện giữ giờ mở cửa ngày thứ Bảy."
+    },
+    {
+      "word": "proof",
+      "partOfSpeech": "noun",
+      "meaning": "bằng chứng; bản in thử để duyệt",
+      "example": "Keep the receipt as proof that the package was mailed on the right date.",
+      "exampleMeaning": "Hãy giữ biên nhận làm bằng chứng rằng gói hàng đã được gửi đúng ngày."
+    },
+    {
+      "word": "register",
+      "partOfSpeech": "verb",
+      "meaning": "gửi (thư) bảo đảm; đăng ký, ghi vào sổ",
+      "example": "For legal notices, we always register the letter and keep the tracking number.",
+      "exampleMeaning": "Với các thông báo pháp lý, chúng tôi luôn gửi thư bảo đảm và giữ lại mã theo dõi."
+    },
+    {
+      "word": "revise",
+      "partOfSpeech": "verb",
+      "meaning": "sửa lại, chỉnh sửa (văn bản, kế hoạch)",
+      "example": "The assistant revised the cover letter twice before the manager approved it.",
+      "exampleMeaning": "Trợ lý đã sửa thư ngỏ hai lần trước khi quản lý duyệt."
+    }
+  ],
+  "fillIn": {
+    "passage": "Every autumn, Oakridge Community College mails a printed course guide to about 2,000 former students. This year the job fell to Marcus, a new assistant in the admissions office. His supervisor, Ms. Kowalski, warned him ___ that the mailing always takes longer than expected.\n\nMarcus began by asking the design team to ___ the cover letter, since last year's version ___ courses that no longer exist. He also changed the ___ of the guide so that the enrollment form was on the last page, where it was easy to tear off and ___. On the morning of the mailing, two student helpers ___ the letters, guides and return envelopes into packets.\n\nOne ___ appeared at the end of the day. Fifty guides for overseas students needed a customs form, and the post office required ___ of the contents before it would accept them. Rather than wait, Marcus hired a ___ to deliver them by ___ service, and he asked the clerk to ___ each package so it could be tracked. A week later, a group of former students sent in a ___ asking the college to offer evening classes again, which showed that the guide had arrived.",
+    "answers": ["beforehand", "revise", "mentioned", "layout", "fold", "assembled", "complication", "proof", "courier", "express", "register", "petition"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người phụ nữ ngồi ở bàn trong phòng thư tín, đang cho một lá thư vào phong bì; trên bàn có nhiều chồng phong bì.",
+      "options": [
+        "The woman is putting letters into envelopes.",
+        "The woman is opening a window.",
+        "The woman is sealing a large box with tape.",
+        "The woman is posting a sign on the wall."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ đang cho thư vào phong bì. (B), (C) và (D) mô tả hành động và đồ vật không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "When will the courier pick up the package?",
+        "options": ["Sometime after three o'clock.", "It weighs about two kilograms.", "No, by regular mail."],
+        "answer": "A",
+        "explanation": "Câu hỏi When cần câu trả lời chỉ thời gian. (B) trả lời về cân nặng, (C) trả lời No cho câu hỏi Wh."
+      },
+      {
+        "question": "Should I fold the letters before putting them in the envelopes?",
+        "options": ["Yes, in three, please.", "The folder is on my desk.", "They were mailed yesterday."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc gấp thư; (A) trả lời Yes và nói rõ gấp làm ba. (B) nhầm âm 'folder', (C) không trả lời câu hỏi."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Sophie, the revised contract for the Wellington account is finally ready. It needs to be in their office by Thursday morning.\nWoman: Thursday? That's tight. Regular mail takes three days, so we'll have to use express delivery.\nMan: Fine. Could you also register it? The legal department wants proof of delivery for the file.\nWoman: Of course. The courier company gives us a tracking number and a signature from the person who receives it.\nMan: Perfect. One more thing: the client mentioned that their mailroom closes at noon, so it has to arrive in the morning.\nWoman: Then I'll book the overnight service with delivery before ten. It costs about fifteen dollars more.\nMan: That's fine. Please send me the tracking number once you have it.\nWoman: Will do. I'll drop it off at the counter on my way to lunch.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["How to send a document", "A problem with a client", "A new legal department rule", "A lunch meeting"],
+          "answer": "A",
+          "explanation": "Hai người bàn cách gửi hợp đồng đã sửa để đến văn phòng khách hàng kịp sáng thứ Năm."
+        },
+        {
+          "prompt": "Why does the man want the letter registered?",
+          "options": ["To save money", "To have proof that it was delivered", "To avoid customs forms", "To get a discount"],
+          "answer": "B",
+          "explanation": "'The legal department wants proof of delivery for the file.'"
+        },
+        {
+          "prompt": "What will the woman do next?",
+          "options": ["Call the client", "Revise the contract", "Book an overnight delivery", "Change the layout"],
+          "answer": "C",
+          "explanation": "Cô ấy nói 'I'll book the overnight service with delivery before ten' và sẽ mang thư ra quầy trên đường đi ăn trưa."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hello, this is Grace Oduya from Pinewood Printing, calling for Mr. Lambert at Rivera Associates. I'm calling about your order of five thousand letterhead sheets and envelopes. We have finished the new layout with your updated logo and address, and I e-mailed you a proof this morning. Please look at it carefully, especially the spelling of the street name, and let us know beforehand if anything needs to be revised, because once printing starts we cannot change the plates. There is one small complication: the envelope paper you chose is out of stock until the twentieth. We can either wait, or use a similar paper at the same price and deliver everything on the twelfth as planned. If you approve the proof and choose the paper by Wednesday, our team will assemble the full order and send it by courier on the twelfth. You can reach me at five five five, zero one four two. Thank you.",
+      "questions": [
+        {
+          "prompt": "Why is the speaker calling?",
+          "options": ["To report a late payment", "To ask for approval of a print sample", "To cancel an order", "To offer a discount"],
+          "answer": "B",
+          "explanation": "Cô ấy đã gửi 'a proof' (bản in thử) và yêu cầu ông Lambert xem kỹ rồi duyệt trước khi in."
+        },
+        {
+          "prompt": "What problem does the speaker mention?",
+          "options": ["The logo is the wrong color.", "The street name is misspelled.", "The chosen envelope paper is not available.", "The courier is fully booked."],
+          "answer": "C",
+          "explanation": "'There is one small complication: the envelope paper you chose is out of stock until the twentieth.'"
+        },
+        {
+          "prompt": "What does the speaker ask Mr. Lambert to do by Wednesday?",
+          "options": ["Pay the invoice", "Visit the printing shop", "Approve the proof and choose a paper", "Send a new logo"],
+          "answer": "C",
+          "explanation": "'If you approve the proof and choose the paper by Wednesday, our team will assemble the full order.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The volunteers _____ 500 information packets in less than two hours.",
+        "options": ["assemble", "assembled", "assembly", "assembling"],
+        "answer": "B",
+        "explanation": "Câu kể một việc đã hoàn thành ('in less than two hours') cần động từ quá khứ: 'assembled'."
+      },
+      {
+        "prompt": "Please confirm the delivery address _____ to avoid any delay.",
+        "options": ["beforehand", "afterward", "meanwhile", "nearby"],
+        "answer": "A",
+        "explanation": "Để tránh chậm trễ thì phải xác nhận địa chỉ trước: 'beforehand'. Các trạng từ khác không hợp nghĩa."
+      },
+      {
+        "prompt": "A _____ with the customs paperwork delayed the shipment by four days.",
+        "options": ["complicate", "complicated", "complication", "complicating"],
+        "answer": "C",
+        "explanation": "Sau 'A' cần danh từ làm chủ ngữ: 'complication' (rắc rối)."
+      },
+      {
+        "prompt": "The editor asked the writer to _____ the second paragraph of the letter.",
+        "options": ["revise", "revision", "revised", "revising"],
+        "answer": "A",
+        "explanation": "Cấu trúc 'ask someone to + động từ nguyên mẫu': 'to revise'."
+      },
+      {
+        "prompt": "The receipt serves as _____ that the parcel was sent on March 3.",
+        "options": ["prove", "proof", "proven", "proving"],
+        "answer": "B",
+        "explanation": "Sau 'serves as' cần danh từ: 'proof' (bằng chứng)."
+      },
+      {
+        "prompt": "Ms. Hale _____ in her e-mail that the invoice had already been paid.",
+        "options": ["mention", "mentions", "mentioned", "mentioning"],
+        "answer": "C",
+        "explanation": "Mệnh đề phụ 'had already been paid' ở quá khứ hoàn thành nên động từ chính ở quá khứ đơn: 'mentioned'."
+      }
+    ],
+    "part6": {
+      "passage": "To: Mailroom Staff\nFrom: Daniel Ferreira, Office Services\nSubject: Outgoing mail procedures\n\nFrom next Monday, all outgoing letters must be placed in the gray trays by 3:30 p.m. Letters that must arrive the next day should be marked for ___ delivery and placed in the red tray; these are collected by a ___ at 4 p.m. Please ___ each letter neatly in three before placing it in a window envelope so that the address is fully visible. Letters that are not ready by 3:30 will be sent the following day. Thank you for your cooperation.",
+      "questions": [
+        {
+          "options": ["express", "expressly", "expression", "expressive"],
+          "answer": "A",
+          "explanation": "'express delivery' là cụm cố định chỉ chuyển phát nhanh; cần tính từ 'express' bổ nghĩa cho 'delivery'."
+        },
+        {
+          "options": ["courier", "petition", "proof", "layout"],
+          "answer": "A",
+          "explanation": "Thư được 'collected by a courier' (nhân viên chuyển phát). Các danh từ khác không hợp nghĩa."
+        },
+        {
+          "options": ["fold", "folds", "folded", "folding"],
+          "answer": "A",
+          "explanation": "Câu mệnh lệnh sau 'Please' cần động từ nguyên mẫu: 'fold' (gấp)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "Greenfield Business Association\n12 Market Lane, Greenfield\n\nApril 18\n\nMs. Carol Jensen\nBranch Manager, Greenfield Post Office\n\nDear Ms. Jensen,\n\nI am writing on behalf of the 46 members of the Greenfield Business Association about the change to the branch's opening hours mentioned in your notice of April 2. Under the new schedule, the counter will close at 4 p.m. instead of 6 p.m. from May 1.\n\nMany of our members are small shops and offices that send registered letters and express parcels at the end of the working day. Closing at 4 p.m. will create a serious complication for them, since most cannot leave their premises before 5. Several members have already said they would have to pay a private courier instead.\n\nEnclosed is a petition signed by 212 local business owners and employees asking you to revise the schedule and keep the counter open until at least 5:30 p.m. on weekdays. We would be glad to meet you beforehand to discuss other options, such as a self-service parcel machine in the lobby.\n\nPlease let us know by April 30 whether a meeting is possible.\n\nYours sincerely,\n\nThomas Reinholt\nChair, Greenfield Business Association",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the letter?",
+          "options": ["To complain about a lost parcel", "To object to new opening hours", "To apply for a business license", "To order postal supplies"],
+          "answer": "B",
+          "explanation": "Thư viết về việc bưu điện đóng cửa sớm hơn từ ngày 1 tháng Năm và đề nghị sửa lại lịch này."
+        },
+        {
+          "prompt": "When will the new schedule begin?",
+          "options": ["April 2", "April 18", "April 30", "May 1"],
+          "answer": "D",
+          "explanation": "'The counter will close at 4 p.m. instead of 6 p.m. from May 1.' Ngày 2 tháng Tư là ngày ra thông báo."
+        },
+        {
+          "prompt": "According to the letter, why is the change a problem for members?",
+          "options": ["They cannot leave their businesses before 5 p.m.", "The new hours are too long.", "They prefer to use e-mail.", "The post office is too far away."],
+          "answer": "A",
+          "explanation": "'Most cannot leave their premises before 5', nên không kịp đến bưu điện trước 4 giờ."
+        },
+        {
+          "prompt": "What is enclosed with the letter?",
+          "options": ["A list of association members", "A petition with 212 signatures", "A map of the lobby", "A payment for parcels"],
+          "answer": "B",
+          "explanation": "'Enclosed is a petition signed by 212 local business owners and employees.'"
+        },
+        {
+          "prompt": "What does Mr. Reinholt suggest as another option?",
+          "options": ["Opening on Sundays", "A self-service parcel machine", "Lower postage prices", "A private courier contract"],
+          "answer": "B",
+          "explanation": "Ông đề nghị gặp để bàn các lựa chọn khác, 'such as a self-service parcel machine in the lobby'."
+        }
+      ]
+    }
+  }
+}

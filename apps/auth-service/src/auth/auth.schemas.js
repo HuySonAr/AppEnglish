@@ -55,6 +55,20 @@ export const adminAccountActionSchema = z.object({
   action: z.enum(Object.values(AdminAccountAction)),
   reason,
 }).strict();
+// Invitation (D131): the admin gives the email, an optional display name and
+// the role; the person chooses the password with the emailed code.
+export const adminInviteSchema = z.object({
+  email,
+  displayName: z
+    .string()
+    .trim()
+    .max(PROFILE_LIMITS.displayNameMax)
+    .transform((value) => value.replace(/\s+/g, ' '))
+    .optional()
+    .default(''),
+  role: z.enum(Object.values(AccountRole)).default(AccountRole.STUDENT),
+}).strict();
+export const acceptInviteSchema = resetPasswordSchema;
 
 // Profile (F09, D113). An empty display name clears it; whitespace-only
 // names count as empty.

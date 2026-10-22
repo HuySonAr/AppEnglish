@@ -1,0 +1,223 @@
+{
+  "unit": 9,
+  "title": "Entertainment",
+  "part5": [
+    {
+      "prompt": "Movies are probably the most popular form of ___ in the United States.",
+      "options": [
+        "entertain",
+        "entertained",
+        "entertaining",
+        "entertainment"
+      ],
+      "answer": "D",
+      "explanation": "Sau “form of” cần danh từ “entertainment” (giải trí)."
+    },
+    {
+      "prompt": "Television has seriously ___ society.",
+      "options": [
+        "influence",
+        "influenced",
+        "influencing",
+        "influential"
+      ],
+      "answer": "B",
+      "explanation": "Thì hiện tại hoàn thành “has + V3” dùng “influenced” (đã ảnh hưởng)."
+    },
+    {
+      "prompt": "Actors can spend too much time ___ as well as too little.",
+      "options": [
+        "rehearse",
+        "rehearsed",
+        "rehearsing",
+        "rehearsal"
+      ],
+      "answer": "C",
+      "explanation": "Cấu trúc “spend time doing something” cần V-ing “rehearsing” (diễn tập)."
+    },
+    {
+      "prompt": "Even when a show is ___, it is sometimes possible to get in.",
+      "options": [
+        "sell out",
+        "sell on",
+        "sold off",
+        "sold out"
+      ],
+      "answer": "D",
+      "explanation": "“Sold out” nghĩa là đã bán hết vé, phù hợp với “even when a show is …”."
+    },
+    {
+      "prompt": "Orchestra music is wonderfully conducive to ___.",
+      "options": [
+        "relaxation",
+        "relaxed",
+        "relaxes",
+        "relax"
+      ],
+      "answer": "A",
+      "explanation": "“Conducive to” đi với danh từ/V-ing; “relaxation” là sự thư giãn."
+    },
+    {
+      "prompt": "There is no good or bad music, only that which does or does not appeal to your ___.",
+      "options": [
+        "taste",
+        "tastes",
+        "tasted",
+        "tasting"
+      ],
+      "answer": "A",
+      "explanation": "“Appeal to your taste” nghĩa là hợp gu/sở thích của bạn."
+    },
+    {
+      "prompt": "New ___ are one of the most exciting aspects of museum work.",
+      "options": [
+        "acquire",
+        "acquisitions",
+        "acquires",
+        "acquisitive"
+      ],
+      "answer": "B",
+      "explanation": "Cần danh từ số nhiều “acquisitions” (hiện vật/tác phẩm mới được thu nhận) làm chủ ngữ."
+    },
+    {
+      "prompt": "Sometimes I look at a famous painting and wonder why it is considered more ___ than the ones on either side of it.",
+      "options": [
+        "signify",
+        "signified",
+        "significant",
+        "significantly"
+      ],
+      "answer": "C",
+      "explanation": "Sau “considered more” cần tính từ “significant” (có ý nghĩa/quan trọng hơn)."
+    },
+    {
+      "prompt": "The Internet ___ information faster than any other medium.",
+      "options": [
+        "disseminate",
+        "disseminates",
+        "dissemination",
+        "disseminating"
+      ],
+      "answer": "B",
+      "explanation": "Chủ ngữ số ít “The Internet” đi với động từ hiện tại đơn “disseminates” (phổ biến)."
+    },
+    {
+      "prompt": "In any news medium, the only news is what the editor ___ is news.",
+      "options": [
+        "decide",
+        "decides",
+        "decision",
+        "decisions"
+      ],
+      "answer": "B",
+      "explanation": "Chủ ngữ “the editor” số ít dùng “decides”."
+    }
+  ],
+  "part6": [
+    {
+      "passage": "Because of DVD players and cable TV, it is no longer necessary to leave home in search of ___. Families can watch movies in the comfort of their own living rooms. Nevertheless, going out to the movies is still a popular way to spend a weekend evening. Many people enjoy going to movie theaters because they like to see new movies as soon as they ___. They may also ___ to spend an evening out in public rather than quietly at home.",
+      "questions": [
+        {
+          "options": [
+            "entertain",
+            "entertained",
+            "entertaining",
+            "entertainment"
+          ],
+          "answer": "D",
+          "explanation": "Sau “in search of” cần danh từ “entertainment” (sự giải trí)."
+        },
+        {
+          "options": [
+            "release",
+            "released",
+            "are released",
+            "will be released"
+          ],
+          "answer": "C",
+          "explanation": "Phim được phát hành nên dùng bị động hiện tại đơn “are released” sau “as soon as”."
+        },
+        {
+          "options": [
+            "prefer",
+            "defer",
+            "refer",
+            "infer"
+          ],
+          "answer": "A",
+          "explanation": "“Prefer to do something” nghĩa là thích làm điều gì hơn."
+        }
+      ]
+    },
+    {
+      "passage": "If you are looking for an activity that the whole family can enjoy, consider visiting one of our city’s fine museums. It is the perfect way to ___ fun with education. Depending on your family’s interests, you might ___ to visit a science, history, or art museum. If your children are older, they will want to visit exhibits that particularly interest them and take the time to give each one a ___ look. Younger children have a shorter attention span. Museums with interactive exhibits are best for them.",
+      "questions": [
+        {
+          "options": [
+            "separate",
+            "combine",
+            "rehearse",
+            "subscribe"
+          ],
+          "answer": "B",
+          "explanation": "“Combine fun with education” nghĩa là kết hợp vui chơi với giáo dục."
+        },
+        {
+          "options": [
+            "chose",
+            "choice",
+            "choose",
+            "choosy"
+          ],
+          "answer": "C",
+          "explanation": "Sau động từ khuyết thiếu “might” cần nguyên mẫu “choose” (chọn)."
+        },
+        {
+          "options": [
+            "thorough",
+            "through",
+            "thought",
+            "though"
+          ],
+          "answer": "A",
+          "explanation": "“A thorough look” là một cái nhìn/xem xét kỹ lưỡng; cần tính từ “thorough”."
+        }
+      ]
+    },
+    {
+      "passage": "The new play, Sunflower Sunset, opened at the Westwood Playhouse last night. A lot of effort went into this production. The actors ___ for months, and an elaborate set was constructed. Unfortunately, this effort could not save the dull dialogue. It was easy to see that the ___ was bored—snoring was heard throughout the theater, and many people left before the end of the play. The actors made a fine effort with their ___, but the best acting in the world cannot save a poorly written play.",
+      "questions": [
+        {
+          "options": [
+            "rehearse",
+            "rehearsed",
+            "will rehearse",
+            "are rehearsing"
+          ],
+          "answer": "B",
+          "explanation": "Câu kể về hoạt động đã diễn ra trước đêm công diễn, dùng quá khứ đơn “rehearsed”."
+        },
+        {
+          "options": [
+            "audio",
+            "audition",
+            "audience",
+            "audacity"
+          ],
+          "answer": "C",
+          "explanation": "“The audience” nghĩa là khán giả; họ chán đến mức ngáy và bỏ về giữa chừng."
+        },
+        {
+          "options": [
+            "perform",
+            "performer",
+            "performable",
+            "performance"
+          ],
+          "answer": "D",
+          "explanation": "Sau tính từ sở hữu “their” cần danh từ “performance” (phần biểu diễn)."
+        }
+      ]
+    }
+  ]
+}

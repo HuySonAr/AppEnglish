@@ -1,0 +1,260 @@
+{
+  "number": 13,
+  "title": "Hiring and Training",
+  "vocabulary": [
+    {
+      "word": "conduct",
+      "partOfSpeech": "verb",
+      "meaning": "tiến hành, thực hiện (phỏng vấn, khảo sát, buổi đào tạo)",
+      "example": "The department will conduct interviews over three days next week.",
+      "exampleMeaning": "Phòng ban sẽ tiến hành phỏng vấn trong ba ngày vào tuần tới."
+    },
+    {
+      "word": "generate",
+      "partOfSpeech": "verb",
+      "meaning": "tạo ra, sinh ra (ý tưởng, doanh thu, sự quan tâm)",
+      "example": "The new training program generated a lot of interest among junior staff.",
+      "exampleMeaning": "Chương trình đào tạo mới đã tạo ra nhiều sự quan tâm trong số nhân viên trẻ."
+    },
+    {
+      "word": "hire",
+      "partOfSpeech": "verb",
+      "meaning": "thuê, tuyển (nhân viên)",
+      "example": "We plan to hire two more technicians before the busy winter season.",
+      "exampleMeaning": "Chúng tôi dự định tuyển thêm hai kỹ thuật viên trước mùa đông bận rộn."
+    },
+    {
+      "word": "keep up with",
+      "partOfSpeech": "verb",
+      "meaning": "theo kịp, bắt kịp (tiến độ, thay đổi, người khác)",
+      "example": "New employees often struggle to keep up with the pace of the production line at first.",
+      "exampleMeaning": "Nhân viên mới lúc đầu thường vất vả để theo kịp nhịp độ của dây chuyền sản xuất."
+    },
+    {
+      "word": "look up to",
+      "partOfSpeech": "verb",
+      "meaning": "kính trọng, ngưỡng mộ (ai đó)",
+      "example": "Many of the trainees look up to Ms. Fernandes because she started in the same entry-level job.",
+      "exampleMeaning": "Nhiều học viên kính trọng cô Fernandes vì cô từng bắt đầu từ chính vị trí thấp nhất đó."
+    },
+    {
+      "word": "mentor",
+      "partOfSpeech": "noun",
+      "meaning": "người hướng dẫn, người cố vấn giàu kinh nghiệm",
+      "example": "Every new employee is paired with a mentor for the first six months.",
+      "exampleMeaning": "Mỗi nhân viên mới được ghép với một người hướng dẫn trong sáu tháng đầu."
+    },
+    {
+      "word": "on track",
+      "partOfSpeech": "phrase",
+      "meaning": "đúng tiến độ, đi đúng hướng",
+      "example": "The training schedule is on track, and all twelve recruits will finish by the end of May.",
+      "exampleMeaning": "Lịch đào tạo đang đúng tiến độ, và cả mười hai người mới sẽ hoàn thành trước cuối tháng Năm."
+    },
+    {
+      "word": "reject",
+      "partOfSpeech": "verb",
+      "meaning": "từ chối, loại bỏ (đơn, đề nghị, ứng viên)",
+      "example": "The committee rejected two applications because they arrived after the deadline.",
+      "exampleMeaning": "Hội đồng đã loại hai hồ sơ vì chúng đến sau hạn chót."
+    },
+    {
+      "word": "set up",
+      "partOfSpeech": "verb",
+      "meaning": "sắp xếp, tổ chức; lắp đặt, thiết lập",
+      "example": "Could you set up a meeting room with a projector for Friday's orientation?",
+      "exampleMeaning": "Bạn có thể chuẩn bị một phòng họp có máy chiếu cho buổi định hướng thứ Sáu không?"
+    },
+    {
+      "word": "success",
+      "partOfSpeech": "noun",
+      "meaning": "sự thành công, kết quả tốt đẹp",
+      "example": "The success of the program is measured by how many trainees stay for at least two years.",
+      "exampleMeaning": "Thành công của chương trình được đo bằng số học viên ở lại ít nhất hai năm."
+    },
+    {
+      "word": "training",
+      "partOfSpeech": "noun",
+      "meaning": "sự đào tạo, huấn luyện",
+      "example": "All cashiers receive two weeks of training before they work alone at a register.",
+      "exampleMeaning": "Tất cả thu ngân được đào tạo hai tuần trước khi đứng quầy một mình."
+    },
+    {
+      "word": "update",
+      "partOfSpeech": "verb",
+      "meaning": "cập nhật (thông tin, phần mềm, tài liệu)",
+      "example": "Please update the employee handbook to include the new safety procedures.",
+      "exampleMeaning": "Vui lòng cập nhật sổ tay nhân viên để bổ sung các quy trình an toàn mới."
+    }
+  ],
+  "fillIn": {
+    "passage": "Last spring, the Seaview Hotel decided to ___ eight new front desk clerks before the summer season. The general manager asked her assistant, Raúl Castellano, to ___ the interviews and to ___ a two-week ___ course for the people chosen. Of the thirty applicants, the hotel had to ___ most, but eight strong people accepted offers.\n\nEach new clerk was paired with a ___, an experienced employee who answered questions during the first month. Raúl also asked the IT team to ___ the booking software so that every newcomer saw the same screens as the senior staff. In the first week some of the group found it hard to ___ the many steps of the check-in process, but their guides were patient, and by the end of the course everyone was ___.\n\nThe program was a clear ___. Guest reviews that summer were the best in five years, and the new clerks said they ___ Raúl because he had worked at the front desk himself. His approach has since ___ interest from two other hotels in the chain, which plan to copy it next year.",
+    "answers": ["hire", "conduct", "set up", "training", "reject", "mentor", "update", "keep up with", "on track", "success", "look up to", "generated"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nhóm nhân viên mới ngồi trong phòng đào tạo, một người hướng dẫn đứng cạnh màn hình chiếu đang chỉ vào biểu đồ.",
+      "options": [
+        "A trainer is pointing at a screen.",
+        "The trainees are leaving the room.",
+        "A man is repairing the projector.",
+        "The chairs are being carried outside."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người hướng dẫn đang chỉ vào màn hình. (B), (C) và (D) mô tả hành động không có trong ảnh; (C) nhắc đến máy chiếu nhưng không ai sửa nó."
+    },
+    "part2": [
+      {
+        "question": "Who will conduct the safety training on Monday?",
+        "options": ["Ms. Alvarez from the warehouse team.", "It's on the second floor.", "Yes, I'll be there at nine."],
+        "answer": "A",
+        "explanation": "Câu hỏi 'Who' cần câu trả lời chỉ người. (B) trả lời về địa điểm; (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Have you set up the laptops for the new hires yet?",
+        "options": ["The laptops cost too much.", "Not yet, but they'll be ready by noon.", "She was hired in March."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về việc chuẩn bị máy tính; (B) trả lời chưa và cho biết khi nào xong. (A) lặp từ 'laptops' nhưng lạc đề; (C) nhầm 'hires' với 'hired'."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Hi, Sofia. How is the new group of sales trainees doing?\nWoman: Mostly well. Eight of the ten are on track to finish the course next Friday, but two are struggling to keep up with the product knowledge tests.\nMan: Should we extend their training by a week?\nWoman: I'd rather pair each of them with a mentor from the senior team. Daniel and Ines have both offered to help.\nMan: That sounds good. The trainees really look up to Ines; she won the sales award last year.\nWoman: Exactly. Could you set up a short meeting with the two mentors tomorrow morning so we can agree on a plan?\nMan: Of course. I'll book the small conference room for nine o'clock and send everyone the updated schedule.",
+      "questions": [
+        {
+          "prompt": "What is the conversation mainly about?",
+          "options": ["A sales award ceremony", "The progress of new trainees", "A change in the product line", "A conference room booking"],
+          "answer": "B",
+          "explanation": "Người đàn ông hỏi 'How is the new group of sales trainees doing?' và cả cuộc trò chuyện nói về tiến độ của họ."
+        },
+        {
+          "prompt": "What does the woman suggest doing for the two struggling trainees?",
+          "options": ["Extending their course by a week", "Giving each one an experienced guide", "Moving them to another team", "Repeating the product tests"],
+          "answer": "B",
+          "explanation": "Cô ấy muốn 'pair each of them with a mentor from the senior team' thay vì kéo dài khóa học."
+        },
+        {
+          "prompt": "What does the woman ask the man to do?",
+          "options": ["Arrange a meeting with the mentors", "Write a new training schedule", "Call Ines about the award", "Cancel Friday's test"],
+          "answer": "A",
+          "explanation": "Cô ấy nhờ anh 'set up a short meeting with the two mentors tomorrow morning'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good morning, and welcome to Meridian Logistics. My name is Kenji Watanabe, and I lead the training department. Over the next three weeks you will learn how our warehouse, our fleet and our customer service team work together. Each of you has been assigned a mentor, an experienced colleague who will sit with you during your first deliveries and answer your questions. We hired you because we believe you can grow here, and our records show that drivers who complete this program have a much higher rate of success in their first year. Please keep up with the daily reading in your handbook; the quizzes on Friday are based on it. One more thing: we have just updated the safety rules for loading trucks, so the printed copies on your desks replace the version on the website. Now, let's begin with a tour of the loading dock.",
+      "questions": [
+        {
+          "prompt": "Who most likely are the listeners?",
+          "options": ["Customers of the company", "Newly hired employees", "Senior managers", "Visiting suppliers"],
+          "answer": "B",
+          "explanation": "Người nói chào mừng người nghe đến công ty, nói 'We hired you' và giới thiệu chương trình đào tạo ba tuần, nên người nghe là nhân viên mới."
+        },
+        {
+          "prompt": "What will the mentors do?",
+          "options": ["Give the Friday quizzes", "Accompany new drivers on their first deliveries", "Write the employee handbook", "Lead the tour of the loading dock"],
+          "answer": "B",
+          "explanation": "Người hướng dẫn 'will sit with you during your first deliveries and answer your questions'."
+        },
+        {
+          "prompt": "What does the speaker say about the safety rules?",
+          "options": ["They are only available online", "They were recently changed", "They will be explained next week", "They apply only to the warehouse"],
+          "answer": "B",
+          "explanation": "'We have just updated the safety rules for loading trucks', và bản in thay thế bản trên trang web."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The agency will _____ a survey of new employees at the end of their first month.",
+        "options": ["conduct", "conductor", "conduction", "conductive"],
+        "answer": "A",
+        "explanation": "Sau 'will' cần động từ nguyên mẫu: 'conduct a survey' (tiến hành khảo sát)."
+      },
+      {
+        "prompt": "Three of the candidates were _____ because they lacked a driver's license.",
+        "options": ["reject", "rejection", "rejected", "rejecting"],
+        "answer": "C",
+        "explanation": "'Were' + quá khứ phân từ tạo thể bị động: các ứng viên bị loại."
+      },
+      {
+        "prompt": "Thanks to the new _____ program, mistakes at the packing station have fallen by half.",
+        "options": ["train", "trained", "trainer", "training"],
+        "answer": "D",
+        "explanation": "Cần danh từ ghép 'training program' (chương trình đào tạo); 'trainer program' không phải cách nói thông thường."
+      },
+      {
+        "prompt": "The team's _____ depends on how quickly new members learn the ordering system.",
+        "options": ["succeed", "success", "successful", "successfully"],
+        "answer": "B",
+        "explanation": "Sau sở hữu cách 'The team's' cần danh từ làm chủ ngữ cho 'depends': 'success'."
+      },
+      {
+        "prompt": "The campaign _____ more than two hundred applications in only ten days.",
+        "options": ["generated", "generation", "generous", "generator"],
+        "answer": "A",
+        "explanation": "Câu cần động từ chính; 'generated' (tạo ra) hợp với tân ngữ 'applications'."
+      },
+      {
+        "prompt": "Please _____ the contact list every time a new employee joins the department.",
+        "options": ["updating", "updated", "update", "updates"],
+        "answer": "C",
+        "explanation": "Câu mệnh lệnh với 'Please' cần động từ nguyên mẫu: 'update'."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Supervisors\nFrom: Lorna Baptiste, Training Manager\nSubject: Mentor program for new employees\n\nStarting on August 1, every employee we ___ will be matched with a mentor from his or her own department for the first ninety days. Mentors will meet their new colleagues twice a week to answer questions and to make sure their training stays ___. Please send me the names of two experienced staff members from your team who would be willing to take part. We will ___ a one-hour briefing for all mentors on July 25 to explain the program and answer questions. Thank you for your support.",
+      "questions": [
+        {
+          "options": ["hire", "hired", "hiring", "hires"],
+          "answer": "A",
+          "explanation": "Mệnh đề quan hệ rút gọn 'every employee (that) we hire': sau chủ ngữ 'we' cần động từ ở hiện tại đơn, dạng nguyên mẫu."
+        },
+        {
+          "options": ["in track", "on track", "at track", "by track"],
+          "answer": "B",
+          "explanation": "'Stay on track' là cụm cố định nghĩa là giữ đúng tiến độ; các giới từ khác không đi với 'track' theo nghĩa này."
+        },
+        {
+          "options": ["set up", "set in", "set off", "set back"],
+          "answer": "A",
+          "explanation": "'Set up a briefing' nghĩa là tổ chức buổi họp. 'Set off' là khởi hành, 'set back' là làm chậm lại, không hợp nghĩa."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "GRANVILLE MEDICAL SUPPLY\nOrientation Week for New Employees - Schedule\nWeek of September 8\n\nWelcome to Granville Medical Supply. All nine employees who joined us this month will attend the sessions below; tell your supervisor in advance if you must miss one.\n\n| Day | Session | Leader |\n| Monday | Company history and tour of the warehouse | Carla Esteves, Operations |\n| Tuesday | Order system training (bring your laptop) | IT Department |\n| Wednesday | Safety procedures and first aid | Omar Siddiqui, Safety Officer |\n| Thursday | Meeting your mentor; setting ninety-day goals | Department heads |\n| Friday | Customer service standards and quiz | Carla Esteves |\n\nOn Thursday each of you will meet the mentor assigned to you. Mentors are experienced colleagues who will guide you during your first three months. They will check with you every two weeks to make sure you are on track with your goals and to help you keep up with changes in the product catalog.\n\nThe order system was updated in August; if you used an older version at a previous employer, pay special attention on Tuesday. Schedule questions: training office, extension 311.",
+      "questions": [
+        {
+          "prompt": "For whom is the notice intended?",
+          "options": ["Customers of the company", "Employees who recently joined the company", "Department heads", "Visitors to the warehouse"],
+          "answer": "B",
+          "explanation": "Thông báo gửi tới 'All nine employees who joined us this month', tức nhân viên mới."
+        },
+        {
+          "prompt": "What should employees bring on Tuesday?",
+          "options": ["A photo ID", "A copy of the product catalog", "A laptop computer", "A first aid kit"],
+          "answer": "C",
+          "explanation": "Bảng ghi phiên thứ Ba là 'Order system training (bring your laptop)'."
+        },
+        {
+          "prompt": "Who will lead the safety session?",
+          "options": ["Carla Esteves", "The IT Department", "Omar Siddiqui", "The department heads"],
+          "answer": "C",
+          "explanation": "Phiên thứ Tư 'Safety procedures and first aid' do 'Omar Siddiqui, Safety Officer' phụ trách."
+        },
+        {
+          "prompt": "How often will mentors meet with new employees?",
+          "options": ["Every day", "Once a week", "Every two weeks", "Once a month"],
+          "answer": "C",
+          "explanation": "'They will check with you every two weeks to make sure you are on track with your goals'."
+        },
+        {
+          "prompt": "Why should some employees pay special attention on Tuesday?",
+          "options": ["The order system has changed recently", "The session will include a quiz", "The warehouse will be closed", "The laptops are new"],
+          "answer": "A",
+          "explanation": "'The order system was updated in August', nên ai từng dùng bản cũ ở công ty trước cần chú ý."
+        }
+      ]
+    }
+  }
+}

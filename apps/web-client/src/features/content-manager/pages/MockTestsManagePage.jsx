@@ -31,6 +31,7 @@ import {
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { createMockTest, listMockTests } from '../api/content-api.js';
 import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { useListState } from '../../../hooks/use-list-state.js';
 
 const PAGE_SIZE = 10;
 const levelOptions = [
@@ -47,12 +48,7 @@ export function MockTestsManagePage() {
   const [form, setForm] = useState({ title: '', examTypeId: '', level: '1', durationMinutes: String(MOCK_TEST_DURATION_MINUTES) });
   const [busy, setBusy] = useState(false);
   // Search, filters and sort of the list; changing one goes back to page 1.
-  const [filters, setFilters] = useState({ search: '', examType: 'all', level: 'all', status: StatusFilter.ALL, sort: MockSort.LEVEL });
-  const [page, setPage] = useState(1);
-  const setFilter = (name) => (value) => {
-    setFilters((current) => ({ ...current, [name]: value }));
-    setPage(1);
-  };
+  const { filters, setFilters, setFilter, page, setPage } = useListState({ search: '', examType: 'all', level: 'all', status: StatusFilter.ALL, sort: MockSort.LEVEL });
 
   async function load() {
     setState('loading');

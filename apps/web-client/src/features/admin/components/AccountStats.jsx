@@ -1,20 +1,18 @@
-import { Activity, Clock, UserCheck, Users } from 'lucide-react';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { AccountRole } from '@appenglish/auth-contracts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, ChartContainer, ChartTooltip, Skeleton } from '../../../components/ui';
-import { RoleLabels } from '../../../constants/auth.js';
+import { Link } from 'react-router-dom';
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { AccountStatus } from '@appenglish/auth-contracts';
+import { ChartContainer, ChartTooltip } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
-import { signupSeries, statusBreakdown } from '../lib/accounts.js';
 
-// The numbers behind the accounts page (D114): tiles, sign-ups per day and
-// the status breakdown. Colours: --chart-1 for the single series; status bars
-// carry their label and count, never colour alone.
+// The account numbers of the admin dashboard (D114, D115): tiles, the daily
+// sign-ups line and the status breakdown. Colours: --chart-1 for the single
+// series; status colours always come with their label and count.
 const series = 'hsl(var(--chart-1))';
-const statusTone = {
-  PENDING_VERIFICATION: 'bg-info',
-  ACTIVE: 'bg-success',
-  DISABLED: 'bg-destructive',
-  SUSPENDED: 'bg-warning',
+export const statusTone = {
+  [AccountStatus.ACTIVE]: 'bg-success',
+  [AccountStatus.PENDING_VERIFICATION]: 'bg-info',
+  [AccountStatus.SUSPENDED]: 'bg-warning',
+  [AccountStatus.DISABLED]: 'bg-destructive',
 };
 
 export function Tile({ icon: Icon, label, value, detail, tone = 'bg-primary/10 text-primary' }) {
@@ -32,115 +30,91 @@ export function Tile({ icon: Icon, label, value, detail, tone = 'bg-primary/10 t
   );
 }
 
-const shortDay = (day) => new Date(`${day}T00:00:00Z`).toLocaleDateString(undefined, { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const utcDate = (day) => new Date(`${day}T00:00:00Z`);
+export const shortDay = (day) => utcDate(day).toLocaleDateString(undefined, { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const longDay = (day) => utcDate(day).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
 
+// Sign-ups per day as a line over the window (user's choice, 2026-10-21): a
+// 2px line on a faint fill, a crosshair and a dot under the pointer with the
+// day and its count. One series, so the card title names it and no legend.
 export function SignupsChart({ points }) {
   const total = points.reduce((sum, point) => sum + point.count, 0);
   return (
     <ChartContainer
       config={{ count: { label: 'Sign-ups', color: series } }}
-      className="aspect-auto h-48 w-full"
+      className="aspect-auto h-56 w-full"
       role="img"
       aria-label={`Sign-ups per day over ${points.length} days, ${total} in total`}
     >
-      <BarChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
-        <CartesianGrid vertical={false} />
-        <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={11} interval={6} tickFormatter={shortDay} />
-        <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={11} />
+      <AreaChart data={points} margin={{ top: 12, right: 12, bottom: 0, left: -20 }}>
+        <defs>
+          <linearGradient id="signups-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--color-count)" stopOpacity={0.22} />
+            <stop offset="100%" stopColor="var(--color-count)" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid vertical={false} strokeDasharray="3 3" />
+        <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={11} interval={6} tickMargin={8} tickFormatter={shortDay} />
+        <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={11} width={40} />
         <ChartTooltip
-          cursor={{ fill: 'hsl(var(--muted))' }}
+          cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
           content={({ active, payload }) => {
             const point = active ? payload?.[0]?.payload : null;
             if (!point) return null;
             return (
               <div className="rounded-lg border bg-background px-3 py-2 text-xs shadow-xl">
-                <p className="font-medium">{new Date(`${point.day}T00:00:00Z`).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })}</p>
-                <p className="text-muted-foreground">
-                  {point.count} sign-up{point.count === 1 ? '' : 's'}
+                <p className="font-medium">{longDay(point.day)}</p>
+                <p className="mt-0.5 flex items-center gap-1.5 text-muted-foreground">
+                  <span className="h-2 w-2 rounded-full bg-[var(--color-count)]" aria-hidden="true" />
+                  <span className="font-semibold tabular-nums text-foreground">{point.count}</span> sign-up{point.count === 1 ? '' : 's'}
                 </p>
               </div>
             );
           }}
         />
-        <Bar dataKey="count" fill="var(--color-count)" radius={[3, 3, 0, 0]} maxBarSize={18} isAnimationActive={false} />
-      </BarChart>
+        <Area
+          type="monotone"
+          dataKey="count"
+          stroke="var(--color-count)"
+          strokeWidth={2}
+          fill="url(#signups-fill)"
+          dot={false}
+          activeDot={{ r: 5, strokeWidth: 2, stroke: 'hsl(var(--card))', fill: 'var(--color-count)' }}
+          isAnimationActive={false}
+        />
+      </AreaChart>
     </ChartContainer>
   );
 }
 
-export function StatusBars({ rows }) {
-  return (
-    <ul className="space-y-3">
-      {rows.map((row) => (
-        <li key={row.status} className="space-y-1">
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2">
-              <span className={cn('h-2.5 w-2.5 rounded-full', statusTone[row.status])} aria-hidden="true" />
-              {row.label}
-            </span>
-            <span className="tabular-nums text-muted-foreground">
-              <span className="font-semibold text-foreground">{row.count}</span> · {row.percent}%
-            </span>
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-            <div className={cn('h-full rounded-full transition-all', statusTone[row.status])} style={{ width: `${row.percent}%` }} />
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-export function AccountStatsSkeleton() {
+// Accounts by status (D115): one bar split by status with a 2px gap between
+// parts, then a row per status with its count and share, each opening the
+// filtered list.
+export function StatusBreakdown({ rows }) {
+  const shown = rows.filter((row) => row.count > 0);
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {[0, 1, 2, 3].map((item) => <Skeleton key={item} className="h-[88px] rounded-xl" />)}
+      <div className="flex h-3 gap-0.5 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+        {shown.map((row) => (
+          <div key={row.status} className={cn('h-full first:rounded-l-full last:rounded-r-full', statusTone[row.status])} style={{ width: `${row.percent}%`, minWidth: '4px' }} />
+        ))}
       </div>
-      <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
-        <Skeleton className="h-64 rounded-xl" />
-        <Skeleton className="h-64 rounded-xl" />
-      </div>
-    </div>
-  );
-}
-
-export function AccountStats({ stats }) {
-  const points = signupSeries(stats.newPerDay, { days: stats.days });
-  const recent = points.reduce((sum, point) => sum + point.count, 0);
-  const rows = statusBreakdown(stats.byStatus, stats.total);
-  const active = stats.byStatus?.ACTIVE || 0;
-  const roles = Object.values(AccountRole).map((role) => `${stats.byRole?.[role] || 0} ${RoleLabels[role].toLowerCase()}${(stats.byRole?.[role] || 0) === 1 ? '' : 's'}`);
-  return (
-    <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Tile icon={Users} label="All accounts" value={stats.total} detail={roles.join(' · ')} />
-        <Tile icon={UserCheck} label="Active" value={active} detail={stats.total ? `${Math.round((active * 100) / stats.total)}% of all accounts` : 'No accounts yet'} tone="bg-success/10 text-success" />
-        <Tile icon={Activity} label="Signed in this week" value={stats.activeLast7Days} detail="Accounts with a sign-in in the last 7 days" tone="bg-chart-2/10 text-chart-2" />
-        <Tile icon={Clock} label="Stale sign-ups" value={stats.stalePending} detail="Pending verification for over 7 days" tone="bg-warning/10 text-warning" />
-      </div>
-      <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">New accounts</CardTitle>
-            <CardDescription>
-              {recent} sign-up{recent === 1 ? '' : 's'} in the last {stats.days} days
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SignupsChart points={points} />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">By status</CardTitle>
-            <CardDescription>Share of all accounts</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <StatusBars rows={rows} />
-          </CardContent>
-        </Card>
-      </div>
+      <ul className="space-y-1">
+        {rows.map((row) => (
+          <li key={row.status}>
+            <Link to={`/admin/accounts?status=${row.status}`} className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-accent/60">
+              <span className="flex items-center gap-2">
+                <span className={cn('h-2.5 w-2.5 rounded-full', statusTone[row.status])} aria-hidden="true" />
+                {row.label}
+              </span>
+              <span className="tabular-nums text-muted-foreground">
+                <span className="font-semibold text-foreground">{row.count}</span>
+                <span className="ml-2 inline-block w-10 text-right">{row.percent}%</span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

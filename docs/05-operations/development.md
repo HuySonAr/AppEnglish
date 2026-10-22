@@ -87,6 +87,20 @@ The current official Node SDK/upload documentation was checked for the
 server-side integration. Protected audio delivery is intentionally not claimed
 until ImageKit's current private-file/signed-URL documentation is verified.
 
+## Rate limits (D117)
+
+The gateway limits every public route (sign-in 10 per 15 min per address and
+email, registration 5 per hour, OTP routes 10 per 15 min, password change 10
+per 15 min, uploads 60 per hour, everything 300 per minute per address) and
+answers 429 with `Retry-After`. Counters live in Redis (`REDIS_URL`, started
+with Docker Compose) so several gateway instances share them; set
+`RATE_LIMIT_STORE=memory` to count in process memory, or
+`RATE_LIMIT_ENABLED=false` to switch the limits off while testing by hand. When
+Redis is down the gateway logs a warning once a minute and lets requests
+through. Behind a reverse proxy set `TRUST_PROXY=true` so the client address
+comes from `X-Forwarded-For`; leave it off otherwise, or a caller could pick
+its own address.
+
 ## Health endpoints
 
 `GET /health` (gateway alive), `GET /health/ready` (gateway + auth-service +
@@ -169,6 +183,14 @@ with the new contract. The Vite dev server proxies `/placement` to the gateway.
    default `small.en`, about 480 MB).
 5. Optional `.env`: `WHISPER_MODEL`, `WHISPER_DEVICE`, `WHISPER_COMPUTE_TYPE`,
    `WHISPER_VAD_FILTER` (see `docs/03-service-specs/speech-service.md`).
+6. Pronunciation (D123) needs no extra install: `python:setup` brings Piper
+   (`piper-tts`), and the two voices (`PIPER_VOICE_UK`, `PIPER_VOICE_US`, about
+   60 MB each) are downloaded into `apps/speech-service/.cache/voices` the
+   first time a word is asked. An existing `.venv` needs
+   `pnpm --filter @appenglish/speech-service python:setup` again to get Piper.
+   To fill the 600 words of the lesson drafts at once, with content-service
+   and speech-service running:
+   `pnpm --filter @appenglish/content-service pronounce:600-words -- --manager-id <id>`.
 
 On Windows, Hugging Face warns that it cannot use symlinks for its cache
 without Developer Mode; the model still downloads and works.
@@ -177,15 +199,18 @@ speech-service keeps the words it heard in `apps/speech-service/.cache/words`
 does not reload by itself, and an old worker still running takes jobs in turn
 with the new one.
 
-## Nội dung demo của Listening course (D105)
+## Nội dung 50 lesson theo 600 Essential Words (D120)
 
-`content-samples/listening-course/` có 30 bản ghi A1–C1 và 125 câu hỏi (xem
-README trong thư mục). Khi content-service đang chạy, nhập bằng:
+`content-samples/600-words/` có 10 unit, 50 lesson (12 từ, đoạn điền từ, test
+23 câu với transcript Part 1–4; chưa có audio, ảnh và phiên âm) và 10 bài Unit
+review (19 câu Reading, D121, D129). Kiểm tra file
+rồi nhập làm bản nháp khi content-service đang chạy:
 
 ```
-pnpm --filter @appenglish/content-service seed:listening-course -- --manager-id <id tài khoản Content Manager>
+pnpm --filter @appenglish/content-service validate:600-words
+pnpm --filter @appenglish/content-service seed:600-words -- --manager-id <id tài khoản Content Manager>
 ```
 
-Script tải 30 file MP3 lên kho media trong `.env` và xuất bản thư viện nghe,
-các unit, Level test và Listening placement; chạy lại không tạo trùng.
+Lesson đã có đủ 12 từ được giữ nguyên (`--force` để ghi đè); `--only 6,7`
+chỉ nhập các lesson đó. Xem README trong thư mục.
 

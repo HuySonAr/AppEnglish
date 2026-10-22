@@ -13,13 +13,13 @@ const exercises = [
   { id: 'e2', title: 'Weather song', level: 'A2', topic: null, publishedVersionNumber: null, hasDraft: true },
 ];
 const course = {
-  placement: { id: 'p1', title: 'Listening placement', publishedVersionNumber: null, hasDraft: true },
   levels: [
-    { level: 'A1', units: [{ id: 'c1', title: 'Hello', publishedVersionNumber: 1, hasDraft: false }], levelTest: { id: 't1', title: 'A1 test', publishedVersionNumber: null, hasDraft: true } },
-    { level: 'A2', units: [], levelTest: null },
-    { level: 'B1', units: [], levelTest: null },
-    { level: 'B2', units: [], levelTest: null },
-    { level: 'C1', units: [], levelTest: null },
+    { level: 'A1', topics: [{ id: 'c1', title: 'Hello', publishedVersionNumber: 1, hasDraft: false }], levelTest: { id: 't1', title: 'A1 test', publishedVersionNumber: null, hasDraft: true } },
+    { level: 'A2', topics: [], levelTest: null },
+    { level: 'B1', topics: [], levelTest: null },
+    { level: 'B2', topics: [], levelTest: null },
+    { level: 'C1', topics: [], levelTest: null },
+    { level: 'C2', topics: [], levelTest: null },
   ],
 };
 
@@ -29,7 +29,7 @@ test('the summary counts each area', () => {
   assert.deepEqual(summary.lessons, { total: 3, published: 1, drafts: 2 });
   assert.deepEqual(summary.mockTests, { total: 1, published: 1, drafts: 0 });
   assert.deepEqual(summary.exercises, { total: 2, published: 1, drafts: 1 });
-  assert.deepEqual(summary.courseUnits, { total: 1, published: 1, drafts: 0 });
+  assert.deepEqual(summary.courseTopics, { total: 1, published: 1, drafts: 0 });
   assert.deepEqual(summary.levelTests, { total: 1, published: 0, drafts: 1 });
   assert.equal(contentSummary().lessons.total, 0);
 });
@@ -40,7 +40,6 @@ test('pending drafts come unpublished first, each with its editor path', () => {
     ['Lesson', 'Numbers', false],
     ['Level test', 'A1 test', false],
     ['Listening exercise', 'Weather song', false],
-    ['Listening placement', 'Listening placement', false],
     ['Lesson', 'Greetings', true],
   ]);
   assert.equal(rows[0].to, '/content-manager/lessons/l2');
@@ -55,13 +54,12 @@ test('readiness checks say what learners are missing', () => {
     lessons: true,
     emptyUnits: false,
     mock: true,
-    coursePlacement: false,
     courseLevels: false,
     levelTests: false,
     exercises: true,
   });
   assert.match(checks.find((check) => check.key === 'emptyUnits').detail, /Unit 2/);
-  assert.match(checks.find((check) => check.key === 'courseLevels').detail, /A2, B1, B2, C1/);
+  assert.match(checks.find((check) => check.key === 'courseLevels').detail, /A2, B1, B2, C1, C2/);
   assert.equal(readinessChecks({ placement: { publishedVersion: 3 } })[0].detail, 'Version 3');
 });
 
@@ -71,8 +69,10 @@ test('chart data per unit, per level and per course level', () => {
   assert.equal(byLevel.length, 6);
   assert.deepEqual(byLevel[1], { level: 'A2', published: 1, unpublished: 1, total: 2 });
   assert.deepEqual(courseCoverage(course).slice(0, 2), [
-    { level: 'A1', units: 1, publishedUnits: 1, levelTest: 'draft' },
-    { level: 'A2', units: 0, publishedUnits: 0, levelTest: 'missing' },
+    { level: 'A1', topics: 1, publishedTopics: 1, levelTest: 'draft' },
+    { level: 'A2', topics: 0, publishedTopics: 0, levelTest: 'missing' },
   ]);
-  assert.equal(courseCoverage(null).length, 5);
+  assert.equal(courseCoverage(null).length, 6);
+  // The last level has no level test (D145).
+  assert.equal(courseCoverage(course)[5].levelTest, 'none');
 });

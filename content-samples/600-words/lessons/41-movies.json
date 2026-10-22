@@ -1,0 +1,260 @@
+{
+  "number": 41,
+  "title": "Movies",
+  "vocabulary": [
+    {
+      "word": "attainment",
+      "partOfSpeech": "noun",
+      "meaning": "sự đạt được, thành tựu (mục tiêu, trình độ)",
+      "example": "The award recognizes the attainment of excellence in film editing over a long career.",
+      "exampleMeaning": "Giải thưởng ghi nhận việc đạt tới sự xuất sắc trong dựng phim qua một sự nghiệp dài."
+    },
+    {
+      "word": "combine",
+      "partOfSpeech": "verb",
+      "meaning": "kết hợp, phối hợp",
+      "example": "The studio combined live footage with animation to keep production costs low.",
+      "exampleMeaning": "Hãng phim đã kết hợp cảnh quay thật với hoạt hình để giữ chi phí sản xuất thấp."
+    },
+    {
+      "word": "continue",
+      "partOfSpeech": "verb",
+      "meaning": "tiếp tục, kéo dài",
+      "example": "The cinema will continue to show the documentary for two more weeks because of strong ticket sales.",
+      "exampleMeaning": "Rạp sẽ tiếp tục chiếu bộ phim tài liệu thêm hai tuần nữa vì vé bán rất tốt."
+    },
+    {
+      "word": "description",
+      "partOfSpeech": "noun",
+      "meaning": "sự mô tả, bản mô tả, lời giới thiệu",
+      "example": "The program gives a short description of each film so viewers can choose quickly.",
+      "exampleMeaning": "Tờ chương trình đưa ra phần mô tả ngắn về từng bộ phim để người xem chọn nhanh."
+    },
+    {
+      "word": "disperse",
+      "partOfSpeech": "verb",
+      "meaning": "giải tán, tản ra; phân tán",
+      "example": "After the late screening ended, the crowd dispersed slowly into the parking lot.",
+      "exampleMeaning": "Sau khi suất chiếu muộn kết thúc, đám đông tản ra chậm rãi về phía bãi đỗ xe."
+    },
+    {
+      "word": "entertainment",
+      "partOfSpeech": "noun",
+      "meaning": "sự giải trí; ngành giải trí",
+      "example": "Our company offers entertainment packages to hotels, including movie nights for guests.",
+      "exampleMeaning": "Công ty chúng tôi cung cấp các gói giải trí cho khách sạn, gồm cả đêm chiếu phim cho khách."
+    },
+    {
+      "word": "influence",
+      "partOfSpeech": "noun",
+      "meaning": "ảnh hưởng, tác động; (động từ) gây ảnh hưởng",
+      "example": "Online reviews have a strong influence on which films people decide to see.",
+      "exampleMeaning": "Các bài đánh giá trên mạng có ảnh hưởng lớn đến việc mọi người quyết định xem phim nào."
+    },
+    {
+      "word": "range",
+      "partOfSpeech": "noun",
+      "meaning": "phạm vi, loạt, dãy (sản phẩm, lựa chọn)",
+      "example": "The theater shows a wide range of films, from family comedies to foreign dramas.",
+      "exampleMeaning": "Rạp chiếu nhiều loại phim, từ hài gia đình đến phim chính kịch nước ngoài."
+    },
+    {
+      "word": "release",
+      "partOfSpeech": "verb",
+      "meaning": "phát hành, công chiếu; thả ra, giải phóng",
+      "example": "The studio plans to release its new comedy in theaters at the start of summer.",
+      "exampleMeaning": "Hãng phim dự định công chiếu bộ phim hài mới tại các rạp vào đầu mùa hè."
+    },
+    {
+      "word": "representation",
+      "partOfSpeech": "noun",
+      "meaning": "sự thể hiện, sự miêu tả; sự đại diện",
+      "example": "Critics praised the film for its realistic representation of life in a small fishing town.",
+      "exampleMeaning": "Giới phê bình khen bộ phim vì cách thể hiện chân thực cuộc sống ở một thị trấn đánh cá nhỏ."
+    },
+    {
+      "word": "separately",
+      "partOfSpeech": "adverb",
+      "meaning": "riêng rẽ, tách biệt",
+      "example": "Tickets for the two evening screenings are sold separately at the box office.",
+      "exampleMeaning": "Vé cho hai suất chiếu buổi tối được bán riêng tại quầy vé."
+    },
+    {
+      "word": "successive",
+      "partOfSpeech": "adjective",
+      "meaning": "liên tiếp, kế tiếp nhau",
+      "example": "The film stayed at the top of the box office for three successive weekends.",
+      "exampleMeaning": "Bộ phim đứng đầu doanh thu phòng vé trong ba cuối tuần liên tiếp."
+    }
+  ],
+  "fillIn": {
+    "passage": "Starling Cinema is a small theater run by Ms. Delgado. Last spring, a local studio asked her to show its new documentary about fishermen. The studio planned to ___ the film in May, and it hoped that a small screen would help the story reach a wider ___ of viewers before it opened in larger theaters downtown.\n\nMs. Delgado read the ___ in the press kit and liked its honest ___ of life on a fishing boat. To promote the screening, she ___ a short talk by the director with a tasting of local seafood. For six ___ nights, every seat was taken. Viewers could buy tickets for the talk and the film ___, but most bought both. After each show, the crowd did not ___ right away; people stayed in the lobby to discuss the story. The studio later said that this word of mouth had a clear ___ on sales when the film opened downtown.\n\nFor Ms. Delgado, the success was the ___ of a long-held goal: proving that a small theater can offer more than simple ___. She plans to ___ the program with a new film each month.",
+    "answers": ["release", "range", "description", "representation", "combined", "successive", "separately", "disperse", "influence", "attainment", "entertainment", "continue"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một hàng người đứng xếp hàng trước quầy bán vé của một rạp chiếu phim; một nhân viên nam đứng sau quầy, phía trên có bảng giờ chiếu.",
+      "options": [
+        "People are waiting in line at a ticket counter.",
+        "People are leaving the theater through a side door.",
+        "A man is sweeping the floor of the lobby.",
+        "The posters are being taken down from the wall."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy một hàng người đang chờ trước quầy vé. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "When will the studio release the new film?",
+        "options": ["Early next month, I think.", "No, it was quite long.", "At the cinema on Fifth Street."],
+        "answer": "A",
+        "explanation": "Câu hỏi When cần câu trả lời về thời gian. (B) trả lời No cho câu hỏi Wh, (C) trả lời cho câu hỏi Where."
+      },
+      {
+        "question": "Did the audience disperse quickly after the screening?",
+        "options": ["Yes, the lobby was empty in ten minutes.", "The film was about two hours long.", "It was released last Friday."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc đám đông có tản đi nhanh không; (A) trả lời Yes và thêm chi tiết. (B) nói về độ dài phim, (C) nói về ngày công chiếu, đều không trả lời câu hỏi."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Hi, Victor. I'm finalizing the schedule for the autumn release of the two short films. Should we release them separately or as a double feature?\nMan: I'd combine them into one program. They're both under an hour, and together they'd fill a normal evening slot.\nWoman: That's what I thought. But the distributor sent two separate descriptions for the website, and they don't mention each other at all.\nMan: Could you rewrite them as one description? Something that explains why the two stories work well together.\nWoman: Sure, I can have a draft ready by Thursday. One more thing: the smaller theaters in our range only have one screen. Will they get the program at the same time?\nMan: No, the first week is for the city theaters. The others follow one week later.\nWoman: Okay. I'll note that on the schedule and send it to the marketing team.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["How to present two short films", "Hiring a new distributor", "The price of evening tickets", "A problem with the website"],
+          "answer": "A",
+          "explanation": "Hai người bàn xem nên chiếu hai phim ngắn riêng rẽ hay gộp thành một chương trình; người đàn ông đề nghị 'combine them into one program'."
+        },
+        {
+          "prompt": "What does the man ask the woman to do?",
+          "options": ["Call the distributor", "Write a single description", "Shorten the two films", "Visit the smaller theaters"],
+          "answer": "B",
+          "explanation": "Anh ấy hỏi 'Could you rewrite them as one description?', tức viết lại thành một bản mô tả chung."
+        },
+        {
+          "prompt": "When will the smaller theaters receive the program?",
+          "options": ["On the same day as the city theaters", "On Thursday", "One week after the city theaters", "At the end of autumn"],
+          "answer": "C",
+          "explanation": "Người đàn ông nói tuần đầu dành cho rạp trong thành phố, 'The others follow one week later'. Thứ Năm là hạn nộp bản nháp mô tả, không phải ngày chiếu."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good evening, and thank you all for coming to the staff briefing. Tomorrow night we host the first screening of Quiet Harbor, a film shot right here in our town. Tickets for all three successive shows sold out in two days, so expect a full house each time. After each screening, please guide guests to the side exits so the crowd can disperse before the next group arrives. The director will give a short talk before the first show; her work has had a real influence on young filmmakers in the region, and this premiere is a proud attainment for the local film office. Remember that we are in the entertainment business: a smile at the door matters as much as a clean screen. The program will continue through the weekend, and the schedule for Saturday is posted in the break room. Thank you, and see you tomorrow.",
+      "questions": [
+        {
+          "prompt": "Where most likely is the speaker?",
+          "options": ["At a film studio", "At a movie theater", "At a travel agency", "At a radio station"],
+          "answer": "B",
+          "explanation": "Người nói nhắc đến suất chiếu, chỗ ngồi kín rạp, lối ra bên hông và màn ảnh, cho thấy đây là một rạp chiếu phim."
+        },
+        {
+          "prompt": "What are the staff asked to do after each screening?",
+          "options": ["Clean the screen", "Sell tickets for the next show", "Direct guests to the side exits", "Introduce the director"],
+          "answer": "C",
+          "explanation": "Người nói yêu cầu 'guide guests to the side exits so the crowd can disperse', tức hướng dẫn khách ra lối bên hông."
+        },
+        {
+          "prompt": "What is mentioned about the Saturday schedule?",
+          "options": ["It has not been decided yet.", "It is posted in the break room.", "It includes only one screening.", "It will be emailed to the staff."],
+          "answer": "B",
+          "explanation": "Cuối bài: 'the schedule for Saturday is posted in the break room'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The studio hopes to _____ the sequel before the holiday season.",
+        "options": ["release", "releasing", "released", "releases"],
+        "answer": "A",
+        "explanation": "Sau 'hopes to' cần động từ nguyên mẫu: 'release'."
+      },
+      {
+        "prompt": "The two theaters are owned by the same company but are managed _____.",
+        "options": ["separate", "separately", "separation", "separating"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'are managed': 'separately' (một cách riêng rẽ)."
+      },
+      {
+        "prompt": "The festival offers a wide _____ of films from more than twenty countries.",
+        "options": ["range", "ranging", "ranged", "ranger"],
+        "answer": "A",
+        "explanation": "'a wide range of' là cụm danh từ cố định nghĩa là nhiều loại; sau 'a wide' cần danh từ 'range'."
+      },
+      {
+        "prompt": "The film's _____ of office life was so accurate that many viewers laughed in recognition.",
+        "options": ["represent", "representative", "representation", "represented"],
+        "answer": "C",
+        "explanation": "Sau sở hữu 'The film's' cần danh từ làm chủ ngữ; 'representation' (sự thể hiện) đúng nghĩa. 'representative' là người đại diện, không hợp nghĩa."
+      },
+      {
+        "prompt": "Reaching one million viewers was a remarkable _____ for such a small production company.",
+        "options": ["attain", "attainable", "attainment", "attained"],
+        "answer": "C",
+        "explanation": "Sau 'a remarkable' cần danh từ: 'attainment' (thành tựu đạt được)."
+      },
+      {
+        "prompt": "Ticket sales at the downtown cinema rose for the third _____ month.",
+        "options": ["succession", "successive", "successively", "succeed"],
+        "answer": "B",
+        "explanation": "Trước danh từ 'month' cần tính từ; 'the third successive month' nghĩa là tháng thứ ba liên tiếp."
+      }
+    ],
+    "part6": {
+      "passage": "To: Programming Team\nFrom: Anita Rowe, Director of Programming\nSubject: Summer schedule\n\nThank you for your suggestions for the summer season. We have decided to ___ the family matinee series through August, since attendance has grown every month. Each week we will pair a classic film with a new short; the two will not be sold ___, so one ticket covers both. Please send me a brief ___ of each short you propose, no longer than fifty words, by Friday. We will meet on Monday morning to make the final choices and confirm the dates with the distributors.",
+      "questions": [
+        {
+          "options": ["continue", "continuation", "continuous", "continually"],
+          "answer": "A",
+          "explanation": "Sau 'decided to' cần động từ nguyên mẫu: 'continue' (tiếp tục loạt chiếu)."
+        },
+        {
+          "options": ["separate", "separately", "separation", "separated"],
+          "answer": "B",
+          "explanation": "Cần trạng từ bổ nghĩa cho 'be sold': 'sold separately' là bán riêng."
+        },
+        {
+          "options": ["describe", "descriptive", "description", "described"],
+          "answer": "C",
+          "explanation": "Sau 'a brief' cần danh từ: 'description' (bản mô tả ngắn về mỗi phim)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "MERIDIAN FILM SOCIETY\nAutumn Program Announcement\n\nThe Meridian Film Society is pleased to announce its autumn program at the Orchard Street Theater. This season we combine new releases with older films that have had a lasting influence on today's directors.\n\n| Date | Film | Notes |\n| October 4 | Paper Lanterns | Opening night; the director will answer questions |\n| October 11 | The Last Ferry | New release, first showing in our city |\n| October 18 | Night Shift | Followed by a talk on film music |\n| October 25 | Winter Orchard | Closing night; members only |\n\nTickets cover a range of prices: 8 dollars for members, 12 dollars for non-members, and 5 dollars for students with a valid ID. Season passes for all four evenings are 30 dollars and are available only until September 30.\n\nBecause the theater has one narrow exit, please remain seated after each film until the ushers ask your row to leave; this helps the audience disperse safely.\n\nThe society is a non-profit organization; all income supports free entertainment programs in local schools. For questions, call the program office at 555-0134.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the announcement?",
+          "options": ["To advertise a new theater", "To present a series of film screenings", "To recruit volunteers for a school", "To report last season's ticket sales"],
+          "answer": "B",
+          "explanation": "Thông báo giới thiệu chương trình mùa thu gồm bốn buổi chiếu phim với ngày, phim và giá vé."
+        },
+        {
+          "prompt": "What is indicated about The Last Ferry?",
+          "options": ["It is a members-only screening.", "It was filmed in the city.", "It has not been shown locally before.", "It will be followed by a talk."],
+          "answer": "C",
+          "explanation": "Bảng ghi 'New release, first showing in our city', tức chưa từng chiếu tại thành phố này."
+        },
+        {
+          "prompt": "How much does a student pay for one evening?",
+          "options": ["5 dollars", "8 dollars", "12 dollars", "30 dollars"],
+          "answer": "A",
+          "explanation": "Giá vé: '5 dollars for students with a valid ID'. 8 đô la là giá cho hội viên, 12 đô la cho người ngoài hội, 30 đô la là vé cả mùa."
+        },
+        {
+          "prompt": "By when must a season pass be bought?",
+          "options": ["October 4", "September 30", "October 25", "October 11"],
+          "answer": "B",
+          "explanation": "'Season passes ... are available only until September 30.'"
+        },
+        {
+          "prompt": "What are viewers asked to do after each film?",
+          "options": ["Leave through the lobby quickly", "Buy food in the hall", "Wait until the ushers direct them out", "Call the program office"],
+          "answer": "C",
+          "explanation": "Thông báo yêu cầu 'remain seated after each film until the ushers ask your row to leave' để khán giả tản ra an toàn."
+        }
+      ]
+    }
+  }
+}

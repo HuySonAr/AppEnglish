@@ -1,0 +1,260 @@
+{
+  "number": 2,
+  "title": "Marketing",
+  "vocabulary": [
+    {
+      "word": "attract",
+      "partOfSpeech": "verb",
+      "meaning": "thu hút, lôi cuốn (khách hàng, sự chú ý)",
+      "example": "The new window display attracted many shoppers during the holiday weekend.",
+      "exampleMeaning": "Cách trưng bày cửa kính mới đã thu hút nhiều người mua sắm trong kỳ nghỉ cuối tuần."
+    },
+    {
+      "word": "compare",
+      "partOfSpeech": "verb",
+      "meaning": "so sánh, đối chiếu",
+      "example": "Before choosing a printer, the office manager compared prices from three suppliers.",
+      "exampleMeaning": "Trước khi chọn máy in, quản lý văn phòng đã so sánh giá của ba nhà cung cấp."
+    },
+    {
+      "word": "competition",
+      "partOfSpeech": "noun",
+      "meaning": "sự cạnh tranh; đối thủ cạnh tranh",
+      "example": "Competition among coffee shops downtown has pushed prices down this year.",
+      "exampleMeaning": "Sự cạnh tranh giữa các quán cà phê ở trung tâm đã kéo giá xuống trong năm nay."
+    },
+    {
+      "word": "consume",
+      "partOfSpeech": "verb",
+      "meaning": "tiêu thụ, tiêu dùng; dùng hết",
+      "example": "Office workers consume more bottled tea in summer than in any other season.",
+      "exampleMeaning": "Nhân viên văn phòng tiêu thụ nhiều trà đóng chai vào mùa hè hơn bất kỳ mùa nào khác."
+    },
+    {
+      "word": "convince",
+      "partOfSpeech": "verb",
+      "meaning": "thuyết phục, làm cho tin",
+      "example": "The sales team convinced the client to try the premium plan for three months.",
+      "exampleMeaning": "Đội bán hàng đã thuyết phục khách hàng dùng thử gói cao cấp trong ba tháng."
+    },
+    {
+      "word": "currently",
+      "partOfSpeech": "adverb",
+      "meaning": "hiện nay, hiện tại",
+      "example": "The company currently sells its products in twelve countries across Asia and Europe.",
+      "exampleMeaning": "Hiện nay công ty bán sản phẩm tại mười hai quốc gia ở châu Á và châu Âu."
+    },
+    {
+      "word": "fad",
+      "partOfSpeech": "noun",
+      "meaning": "mốt nhất thời, trào lưu ngắn ngủi",
+      "example": "Many managers thought online meetings were a fad, but they are now part of daily work.",
+      "exampleMeaning": "Nhiều quản lý từng nghĩ họp trực tuyến chỉ là trào lưu nhất thời, nhưng nay nó đã là một phần công việc hằng ngày."
+    },
+    {
+      "word": "inspiration",
+      "partOfSpeech": "noun",
+      "meaning": "nguồn cảm hứng; ý tưởng bất chợt",
+      "example": "The designer found inspiration for the new logo in old railway posters.",
+      "exampleMeaning": "Nhà thiết kế tìm được cảm hứng cho logo mới từ những áp phích đường sắt cũ."
+    },
+    {
+      "word": "market",
+      "partOfSpeech": "noun",
+      "meaning": "thị trường; (động từ) tiếp thị, đưa ra bán",
+      "example": "There is a growing market for healthy snacks among young office workers.",
+      "exampleMeaning": "Thị trường đồ ăn nhẹ lành mạnh đang lớn dần trong giới nhân viên văn phòng trẻ."
+    },
+    {
+      "word": "persuasion",
+      "partOfSpeech": "noun",
+      "meaning": "sự thuyết phục, khả năng thuyết phục",
+      "example": "It took some persuasion before the owner agreed to advertise on the radio.",
+      "exampleMeaning": "Phải thuyết phục một lúc chủ cửa hàng mới đồng ý quảng cáo trên đài phát thanh."
+    },
+    {
+      "word": "productive",
+      "partOfSpeech": "adjective",
+      "meaning": "hiệu quả, năng suất cao; có kết quả tốt",
+      "example": "The meeting with the advertising agency was productive, and we left with three new ideas.",
+      "exampleMeaning": "Cuộc họp với công ty quảng cáo rất hiệu quả, và chúng tôi ra về với ba ý tưởng mới."
+    },
+    {
+      "word": "satisfaction",
+      "partOfSpeech": "noun",
+      "meaning": "sự hài lòng, sự thỏa mãn",
+      "example": "Customer satisfaction rose sharply after the store extended its return period.",
+      "exampleMeaning": "Mức độ hài lòng của khách hàng tăng mạnh sau khi cửa hàng kéo dài thời gian đổi trả."
+    }
+  ],
+  "fillIn": {
+    "passage": "Sunny Ridge Juice is a small drinks company that ___ sells its products only in local shops. Its owner, Mr. Okafor, wants to reach a wider ___, so he asked a young assistant, Lena, who studied advertising at college, to prepare a plan.\n\nLena began by studying the ___. She ___ the prices and bottle sizes of six rival brands and discovered that most of them focus on the same thing: low price. Her ___ came from a different place, a survey showing that office workers ___ more fruit juice when it is sold near their desks. She suggested placing small fridges in office buildings. Mr. Okafor thought the idea might be a passing ___ and needed some ___ before he agreed. Lena ___ him by showing the results of a two-week trial: the fridges ___ new buyers every day, and customer ___ scores were higher than in the shops.\n\nThe trial was so ___ that the company will add twenty more fridges next month.",
+    "answers": ["currently", "market", "competition", "compared", "inspiration", "consume", "fad", "persuasion", "convinced", "attracted", "satisfaction", "productive"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người đàn ông đứng trong cửa hàng, đang dán một tấm áp phích quảng cáo lớn lên tường.",
+      "options": [
+        "The man is hanging a poster on the wall.",
+        "The man is painting the wall.",
+        "The man is reading a newspaper.",
+        "The man is closing the shop door."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người đàn ông đang treo tấm áp phích lên tường. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How did you attract so many visitors to the booth?",
+        "options": ["We gave away free samples.", "The booth is next to the entrance.", "Yes, about two hundred people."],
+        "answer": "A",
+        "explanation": "Câu hỏi How hỏi về cách làm; (A) nêu cách thu hút khách. (B) trả lời cho câu hỏi Where, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Are we currently selling the new model in Europe?",
+        "options": ["Not yet, only in Asia.", "The current issue is on the desk.", "It sells for two hundred dollars."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc hiện có bán ở châu Âu không; (A) trả lời 'chưa' và nói rõ nơi đang bán. (B) nhầm âm 'current', (C) trả lời về giá."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Marco, have you seen the sales report for our sparkling water? Sales dropped again last month.\nMan: I saw it. Our competition launched two new flavors in the spring, and customers are trying those instead.\nWoman: Do you think flavored water is just a fad?\nMan: I don't think so. When I compared the figures for the last three years, the market for flavored drinks had grown every single year.\nWoman: Then we need to move quickly. Could you prepare a short presentation for the directors on Thursday?\nMan: Sure. It won't be easy to convince them to spend money on a new product line, but the numbers should help.\nWoman: Good. I'll book the meeting room and send the invitations this afternoon.",
+      "questions": [
+        {
+          "prompt": "What problem does the woman mention?",
+          "options": ["A shipment arrived late", "Sales have fallen", "A flavor was recalled", "A report is missing"],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'Sales dropped again last month', tức doanh số đã giảm."
+        },
+        {
+          "prompt": "What does the man say about flavored drinks?",
+          "options": ["They are a temporary trend.", "They are too expensive to produce.", "Their market has grown each year.", "They are sold only in spring."],
+          "answer": "C",
+          "explanation": "Anh ấy nói thị trường nước uống có hương vị 'had grown every single year' trong ba năm qua, và phủ nhận đó chỉ là 'fad' (trào lưu nhất thời)."
+        },
+        {
+          "prompt": "What will the woman do this afternoon?",
+          "options": ["Taste the new flavors", "Call the directors", "Reserve a room and send invitations", "Rewrite the sales report"],
+          "answer": "C",
+          "explanation": "Câu cuối: 'I'll book the meeting room and send the invitations this afternoon'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Welcome, everyone, to the first session of our marketing workshop. My name is Priya Raman, and I run a small agency that helps family businesses grow. Over the next two days, we will look at how customers decide what to buy and how much they are willing to consume. This morning we start with the basics of persuasion: why a short, honest message works better than a long list of features. After lunch, we will visit a local bakery whose window displays attract hundreds of passers-by each day; I hope it gives you some inspiration for your own shops. Tomorrow we will talk about measuring customer satisfaction with simple surveys. To make the workshop as productive as possible, please write down one marketing problem from your business and hand it to me before the coffee break. I will use your examples in the afternoon session.",
+      "questions": [
+        {
+          "prompt": "Who most likely is the speaker?",
+          "options": ["A bakery owner", "A marketing consultant", "A radio host", "A hotel manager"],
+          "answer": "B",
+          "explanation": "Người nói điều hành một 'agency that helps family businesses grow' và dẫn dắt hội thảo về tiếp thị, nên là một nhà tư vấn tiếp thị."
+        },
+        {
+          "prompt": "What will the participants do after lunch?",
+          "options": ["Take a survey", "Visit a bakery", "Write a long list of features", "Meet a radio host"],
+          "answer": "B",
+          "explanation": "'After lunch, we will visit a local bakery' là hoạt động buổi chiều. Khảo sát được nói đến cho ngày mai."
+        },
+        {
+          "prompt": "What are listeners asked to do before the coffee break?",
+          "options": ["Hand in a marketing problem", "Fill out a satisfaction survey", "Pay the workshop fee", "Choose a partner"],
+          "answer": "A",
+          "explanation": "Người nói yêu cầu 'write down one marketing problem from your business and hand it to me before the coffee break'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The colorful packaging was designed to _____ younger customers.",
+        "options": ["attract", "attraction", "attractive", "attractively"],
+        "answer": "A",
+        "explanation": "Sau 'to' trong cấu trúc 'designed to' cần động từ nguyên mẫu: 'attract'."
+      },
+      {
+        "prompt": "Shoppers often _____ prices online before visiting a store.",
+        "options": ["compare", "comparison", "comparable", "comparative"],
+        "answer": "A",
+        "explanation": "Câu cần động từ chính cho chủ ngữ 'Shoppers'; 'compare prices' là so sánh giá."
+      },
+      {
+        "prompt": "The _____ between the two delivery companies has led to faster service.",
+        "options": ["compete", "competitive", "competition", "competitively"],
+        "answer": "C",
+        "explanation": "Sau 'The' và trước 'between' cần danh từ làm chủ ngữ: 'competition'."
+      },
+      {
+        "prompt": "Our team is _____ testing three slogans for the spring campaign.",
+        "options": ["current", "currently", "currency", "currents"],
+        "answer": "B",
+        "explanation": "Giữa 'is' và 'testing' cần trạng từ bổ nghĩa cho động từ: 'currently' (hiện đang)."
+      },
+      {
+        "prompt": "The brochure was so _____ that half of the readers requested a free trial.",
+        "options": ["persuasion", "persuade", "persuasive", "persuasively"],
+        "answer": "C",
+        "explanation": "Sau 'was so' cần tính từ: 'persuasive' (có sức thuyết phục). 'persuasion' là danh từ nên không đứng sau 'so'."
+      },
+      {
+        "prompt": "A longer lunch break made the afternoon meetings more _____.",
+        "options": ["product", "productive", "productively", "production"],
+        "answer": "B",
+        "explanation": "Cấu trúc 'made + tân ngữ + tính từ'; sau 'more' cần tính từ 'productive'."
+      }
+    ],
+    "part6": {
+      "passage": "To: Marketing Team\nFrom: Jonas Lindqvist, Brand Manager\nSubject: Spring campaign\n\nHello everyone,\n\nThank you for your work on the spring campaign. Early results show that the new video has ___ more than 40,000 viewers in its first week, and the online store reports a 15 percent rise in orders. Some of you asked whether the short-video format is only a passing ___. Our research team believes it will remain popular for several years, so we will continue to invest in it. Next week we will send a short survey to measure customer ___ with the new product line. Please share any feedback you receive directly from clients.\n\nBest regards,\nJonas",
+      "questions": [
+        {
+          "options": ["attracted", "attraction", "attractive", "attracts"],
+          "answer": "A",
+          "explanation": "Sau 'has' cần quá khứ phân từ để tạo thì hiện tại hoàn thành: 'has attracted'."
+        },
+        {
+          "options": ["fad", "fade", "fading", "faded"],
+          "answer": "A",
+          "explanation": "Sau 'a passing' cần danh từ; 'a passing fad' là trào lưu nhất thời. 'fade' là động từ nghĩa là nhạt dần."
+        },
+        {
+          "options": ["satisfy", "satisfied", "satisfaction", "satisfying"],
+          "answer": "C",
+          "explanation": "Sau 'measure customer' cần danh từ: 'customer satisfaction' (sự hài lòng của khách hàng)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "GREENLEAF MARKET RESEARCH\nMonthly Client Newsletter - October\n\nUnderstanding the Lunchtime Market\n\nOur latest study looked at how office workers in the city center consume food at midday. We surveyed 1,200 employees in September. The main findings are listed below.\n\n| Finding | Share of respondents |\n| Buy lunch outside the office at least three days a week | 62% |\n| Compare prices on a phone app before choosing a restaurant | 48% |\n| Would try a new restaurant after a friend's recommendation | 71% |\n| Consider healthy menus more important than low prices | 39% |\n\nWhat this means for our clients: competition for lunchtime customers is strong, and advertising alone will not convince most workers to change their habits. Personal recommendations are currently the most powerful tool, so restaurants should encourage satisfied customers to share their experience online.\n\nWe hope these numbers give you some inspiration for your autumn promotions. Clients who wish to see the full report can request it from their account manager before October 31. A short presentation will be held at our office on November 5 at 10 a.m.; please reply to this newsletter to reserve a seat.",
+      "questions": [
+        {
+          "prompt": "What is the main purpose of the newsletter?",
+          "options": ["To advertise a new restaurant", "To share the results of a survey", "To announce a price increase", "To introduce a new account manager"],
+          "answer": "B",
+          "explanation": "Bản tin trình bày các phát hiện chính của cuộc khảo sát 1.200 nhân viên về bữa trưa."
+        },
+        {
+          "prompt": "How many people took part in the study?",
+          "options": ["39", "62", "1,200", "12,000"],
+          "answer": "C",
+          "explanation": "'We surveyed 1,200 employees in September.' Các số 39 và 62 là tỷ lệ phần trăm trong bảng."
+        },
+        {
+          "prompt": "According to the newsletter, what influences most workers to try a new restaurant?",
+          "options": ["Low prices", "A friend's recommendation", "A phone app", "A healthy menu"],
+          "answer": "B",
+          "explanation": "71% sẽ thử nhà hàng mới 'after a friend's recommendation', tỷ lệ cao nhất trong bảng."
+        },
+        {
+          "prompt": "What is suggested about advertising?",
+          "options": ["It is the most powerful tool.", "It is too expensive for restaurants.", "It is not enough on its own to change habits.", "It should be done only online."],
+          "answer": "C",
+          "explanation": "'advertising alone will not convince most workers to change their habits'; công cụ mạnh nhất là lời giới thiệu cá nhân, không phải quảng cáo."
+        },
+        {
+          "prompt": "What should clients do to attend the presentation?",
+          "options": ["Pay a fee before October 31", "Contact their account manager", "Reply to the newsletter", "Visit a restaurant in the city center"],
+          "answer": "C",
+          "explanation": "Câu cuối: 'please reply to this newsletter to reserve a seat'. Liên hệ quản lý tài khoản là để nhận báo cáo đầy đủ."
+        }
+      ]
+    }
+  }
+}

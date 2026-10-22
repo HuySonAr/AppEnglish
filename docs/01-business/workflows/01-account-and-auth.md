@@ -105,4 +105,33 @@ backend.
    thiết bị; gửi email đặt lại mật khẩu (tài khoản ACTIVE, admin không biết mật
    khẩu); xóa ảnh đại diện; đặt lại tên hiển thị.
 6. Không có: đăng nhập thay học viên, xóa cứng tài khoản, khóa hàng loạt, đổi
-   email, đặt mật khẩu thay người dùng.
+   email, đặt mật khẩu thay người dùng. (Thêm tài khoản bằng lời mời: D131.)
+
+## Lời mời, kích hoạt, reset placement và bảng tài khoản (D131)
+
+1. `/admin/accounts` là một bảng: tài khoản (avatar, tên, email), vai trò (đổi
+   ngay trong hàng, qua hộp thoại xác nhận), trạng thái (viên màu có icon; menu
+   chuyển Active/Suspended/Disabled, khóa cần lý do), ngày tham gia, đăng nhập
+   cuối, nút mở trang và menu ⋯ với các hành động hợp trạng thái. Tìm kiếm, lọc,
+   sắp xếp, số dòng mỗi trang nằm trong URL. Thống kê ở dashboard admin.
+2. "Add account": admin nhập email, tên hiển thị (tùy chọn), vai trò. Hệ thống tạo
+   tài khoản chờ (PENDING_VERIFICATION) và gửi email mời có mã 6 số hiệu lực 72
+   giờ. Người được mời mở `/accept-invite`, nhập email, mã và mật khẩu tự chọn;
+   tài khoản thành ACTIVE và đăng nhập. Mã hết hạn thì admin gửi lại lời mời.
+3. Tài khoản tự đăng ký chưa xác minh: admin gửi mã xác minh mới, hoặc kích hoạt
+   không cần mã khi đã xác thực người đó bằng cách khác; lý do bắt buộc và được
+   ghi lịch sử. Tài khoản được mời chỉ kích hoạt bằng cách chấp nhận lời mời.
+4. Học viên: admin reset placement (ghi chú tùy chọn). Kết quả placement bị xóa,
+   học viên làm hoặc bỏ qua lại để có unit bắt đầu mới; lesson đã hoàn thành và
+   kết quả giữ nguyên.
+5. Mọi hành động ghi vào lịch sử của tài khoản (người làm, lúc, lý do).
+
+## Giới hạn tần suất (D117)
+
+- Gateway đếm số lần gọi theo địa chỉ IP (và theo email với đăng nhập, OTP):
+  đăng nhập 10 lần/15 phút cho một email từ một địa chỉ, 30/15 phút cho một
+  địa chỉ; đăng ký 5/giờ; gửi và nhập OTP 10/15 phút theo email, 30/15 phút
+  theo địa chỉ; đổi mật khẩu 10/15 phút; tải ảnh 60/giờ; toàn bộ API 300/phút.
+- Vượt ngưỡng nhận HTTP 429, mã `RATE_LIMITED` (33) và thời gian chờ; web báo
+  "Too many attempts. Try again in N minutes". Không khóa tài khoản.
+- Mã OTP vẫn chỉ được thử 5 lần và hết hạn sau 5 phút như F01.

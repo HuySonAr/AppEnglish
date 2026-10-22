@@ -1,0 +1,260 @@
+{
+  "number": 47,
+  "title": "Dentist's Office",
+  "vocabulary": [
+    {
+      "word": "aware",
+      "partOfSpeech": "adjective",
+      "meaning": "nhận biết, ý thức được (điều gì)",
+      "example": "Few patients are aware that gum problems can start without any pain.",
+      "exampleMeaning": "Ít bệnh nhân biết rằng các vấn đề về nướu có thể bắt đầu mà không hề đau."
+    },
+    {
+      "word": "catch up",
+      "partOfSpeech": "verb",
+      "meaning": "bắt kịp, làm cho xong việc còn tồn đọng; cập nhật tin tức",
+      "example": "I used my lunch break to catch up on the paperwork from the morning patients.",
+      "exampleMeaning": "Tôi dùng giờ nghỉ trưa để làm nốt giấy tờ của các bệnh nhân buổi sáng."
+    },
+    {
+      "word": "distraction",
+      "partOfSpeech": "noun",
+      "meaning": "sự làm xao lãng; thứ khiến mất tập trung hoặc giúp quên đi lo lắng",
+      "example": "The dentist plays quiet music as a distraction for nervous patients.",
+      "exampleMeaning": "Nha sĩ mở nhạc nhẹ để bệnh nhân lo lắng bớt chú ý vào việc khám."
+    },
+    {
+      "word": "encouragement",
+      "partOfSpeech": "noun",
+      "meaning": "sự khích lệ, động viên",
+      "example": "A few words of encouragement from the nurse helped the boy sit still for his cleaning.",
+      "exampleMeaning": "Vài lời động viên của y tá giúp cậu bé ngồi yên để làm sạch răng."
+    },
+    {
+      "word": "evident",
+      "partOfSpeech": "adjective",
+      "meaning": "rõ ràng, hiển nhiên",
+      "example": "It was evident from the X-ray that the tooth needed a filling.",
+      "exampleMeaning": "Từ phim X-quang có thể thấy rõ chiếc răng cần được trám."
+    },
+    {
+      "word": "habit",
+      "partOfSpeech": "noun",
+      "meaning": "thói quen",
+      "example": "Brushing twice a day is a habit that saves money on dental bills later.",
+      "exampleMeaning": "Đánh răng hai lần mỗi ngày là thói quen giúp tiết kiệm chi phí nha khoa về sau."
+    },
+    {
+      "word": "illuminate",
+      "partOfSpeech": "verb",
+      "meaning": "chiếu sáng, soi sáng; làm sáng tỏ",
+      "example": "A small lamp above the chair illuminates the patient's mouth during the examination.",
+      "exampleMeaning": "Một chiếc đèn nhỏ phía trên ghế chiếu sáng miệng bệnh nhân trong lúc khám."
+    },
+    {
+      "word": "irritate",
+      "partOfSpeech": "verb",
+      "meaning": "gây kích ứng, làm khó chịu (da, nướu); làm bực mình",
+      "example": "The new mouthwash irritated my gums, so the dentist suggested a milder one.",
+      "exampleMeaning": "Loại nước súc miệng mới làm nướu tôi bị kích ứng, nên nha sĩ gợi ý loại dịu hơn."
+    },
+    {
+      "word": "overview",
+      "partOfSpeech": "noun",
+      "meaning": "cái nhìn tổng quan, bản tóm lược",
+      "example": "The hygienist gave me a quick overview of the treatment plan before we started.",
+      "exampleMeaning": "Nhân viên vệ sinh răng miệng tóm tắt nhanh kế hoạch điều trị trước khi chúng tôi bắt đầu."
+    },
+    {
+      "word": "position",
+      "partOfSpeech": "noun",
+      "meaning": "vị trí, tư thế; chức vụ",
+      "example": "The assistant adjusted the position of the chair so the dentist could see clearly.",
+      "exampleMeaning": "Trợ lý chỉnh lại vị trí của ghế để nha sĩ có thể nhìn rõ."
+    },
+    {
+      "word": "regularly",
+      "partOfSpeech": "adverb",
+      "meaning": "thường xuyên, đều đặn",
+      "example": "Patients who visit regularly usually need less expensive treatment.",
+      "exampleMeaning": "Bệnh nhân đến khám đều đặn thường cần điều trị ít tốn kém hơn."
+    },
+    {
+      "word": "restore",
+      "partOfSpeech": "verb",
+      "meaning": "phục hồi, khôi phục; sửa lại như cũ",
+      "example": "A crown will restore the broken tooth to its normal shape and strength.",
+      "exampleMeaning": "Một mão răng sẽ khôi phục chiếc răng gãy về hình dáng và độ chắc bình thường."
+    }
+  ],
+  "fillIn": {
+    "passage": "Lena works at a busy marketing agency and had not seen a dentist for almost three years. Last month a sharp pain in one tooth finally made her ___ of the problem, so she booked a visit at Pine Street Dental. On the morning of the visit she was nervous, and she brought a podcast to listen to as a ___.\n\nDr. Ramos began with a short ___ of what she would do. She adjusted the ___ of the chair, switched on a bright lamp to ___ Lena's mouth, and looked at every tooth. The damage to one molar was ___ even without an X-ray. Dr. Ramos explained that a small filling would ___ the tooth and that the treatment would not ___ the gum around it.\n\nLena admitted that she skipped flossing most nights. The dentist did not criticize her; instead she offered some ___ and suggested making flossing a daily ___. She also asked Lena to come back ___, every six months, so that small problems can be found early. On the way back to the office, Lena called her assistant to ___ on the messages she had missed.",
+    "answers": ["aware", "distraction", "overview", "position", "illuminate", "evident", "restore", "irritate", "encouragement", "habit", "regularly", "catch up"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nha sĩ nam đeo khẩu trang đang khám răng cho một bệnh nhân nữ nằm trên ghế nha khoa, đèn khám chiếu sáng phía trên.",
+      "options": [
+        "The patient is sitting in a waiting room.",
+        "The dentist is examining the woman's teeth.",
+        "The man is brushing his teeth.",
+        "The woman is adjusting the lamp."
+      ],
+      "answer": "B",
+      "explanation": "Ảnh cho thấy nha sĩ đang khám răng cho bệnh nhân nằm trên ghế. (A) sai địa điểm, (C) và (D) sai hành động."
+    },
+    "part2": [
+      {
+        "question": "How often should I have my teeth cleaned?",
+        "options": ["The cleaning costs sixty dollars.", "Every six months is a good habit.", "Yes, I brush every morning."],
+        "answer": "B",
+        "explanation": "Câu hỏi How often cần câu trả lời về tần suất. (A) nói về giá, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Are you aware that the clinic moved to a new location?",
+        "options": ["No, I didn't know that. Where is it now?", "The chair is in a good position.", "It opened in 2015."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc có biết phòng khám chuyển địa điểm; (A) trả lời No và hỏi thêm. (B) và (C) không trả lời câu hỏi."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Hi, Marcus. You look tired. Busy morning?\nMan: Very. I had four patients before ten, and the X-ray machine stopped working for half an hour. I'm still trying to catch up on my notes.\nWoman: I can help with that after lunch. By the way, Mr. Dunn called about his new crown. He says the edge irritates his tongue.\nMan: That's not unusual in the first week, but I'd like to check it. Can you offer him a short appointment on Thursday?\nWoman: Sure. He also asked whether the lamp in Room 2 could be adjusted. He said it illuminated his eyes more than his mouth during the last visit.\nMan: Good point. The arm is loose. I'll ask the maintenance company to look at it before Thursday.\nWoman: I'll make a note. Anything else?\nMan: Yes, please remind the afternoon patients that flossing regularly matters more than the brand of toothpaste they use.",
+      "questions": [
+        {
+          "prompt": "What is the man doing?",
+          "options": ["Repairing the X-ray machine", "Finishing his patient notes", "Calling Mr. Dunn", "Cleaning Room 2"],
+          "answer": "B",
+          "explanation": "Người đàn ông nói 'I'm still trying to catch up on my notes', tức đang làm nốt phần ghi chép còn tồn."
+        },
+        {
+          "prompt": "What problem does Mr. Dunn report?",
+          "options": ["His appointment was cancelled", "His crown feels uncomfortable", "His bill is too high", "His toothpaste is too strong"],
+          "answer": "B",
+          "explanation": "Người phụ nữ nói 'He says the edge irritates his tongue' về chiếc mão răng mới."
+        },
+        {
+          "prompt": "What will the man do before Thursday?",
+          "options": ["Order a new lamp", "Replace the X-ray machine", "Have the lamp arm repaired", "Close Room 2"],
+          "answer": "C",
+          "explanation": "Anh ấy nói 'I'll ask the maintenance company to look at it before Thursday' về cánh tay đèn bị lỏng."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good morning, team. Before we open, I want to give you a quick overview of the changes starting this week. First, as you are probably aware, we now have two hygienists on Mondays and Wednesdays, so the morning schedule will be fuller than before. Please be in position at eight sharp. Second, we have installed new screens on the ceiling above each chair. They show nature videos as a distraction for anxious patients, especially children. Third, a reminder about our six-month recall letters: they go out automatically, but patients respond better when they also hear a word of encouragement from us at the end of a visit. A simple comment that regular cleanings keep their teeth healthy is often enough. Finally, Dr. Kim will be away on Friday, so her patients have been moved to next Tuesday. Thank you, and have a good day.",
+      "questions": [
+        {
+          "prompt": "What is the main purpose of the talk?",
+          "options": ["To introduce a new dentist", "To inform staff about changes at the office", "To announce a holiday closure", "To explain a new payment system"],
+          "answer": "B",
+          "explanation": "Người nói mở đầu bằng 'a quick overview of the changes starting this week' và nêu các thay đổi ở phòng khám."
+        },
+        {
+          "prompt": "What is the purpose of the new ceiling screens?",
+          "options": ["To show patients their X-rays", "To help nervous patients relax", "To display the daily schedule", "To train new staff"],
+          "answer": "B",
+          "explanation": "Màn hình chiếu video thiên nhiên 'as a distraction for anxious patients', tức giúp bệnh nhân lo lắng bớt căng thẳng."
+        },
+        {
+          "prompt": "What are staff asked to do at the end of each visit?",
+          "options": ["Give patients a recall letter", "Encourage patients to return for cleanings", "Clean the screens", "Book Dr. Kim's patients"],
+          "answer": "B",
+          "explanation": "Người nói muốn bệnh nhân nghe 'a word of encouragement from us at the end of a visit' về việc làm sạch răng định kỳ."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Patients should be made _____ of the total cost before any treatment begins.",
+        "options": ["aware", "awareness", "awake", "awarding"],
+        "answer": "A",
+        "explanation": "'be made aware of' là cụm cố định với tính từ 'aware'. 'awareness' là danh từ, không đi với 'of' theo cách này."
+      },
+      {
+        "prompt": "Even a small _____ in the treatment room can make it hard for the dentist to concentrate.",
+        "options": ["distract", "distracted", "distraction", "distracting"],
+        "answer": "C",
+        "explanation": "Sau 'a small' cần danh từ làm chủ ngữ: 'distraction'."
+      },
+      {
+        "prompt": "After the accident, two visits were needed to _____ the patient's front teeth.",
+        "options": ["restore", "restoration", "restored", "restoring"],
+        "answer": "A",
+        "explanation": "Sau 'to' chỉ mục đích cần động từ nguyên mẫu: 'restore'."
+      },
+      {
+        "prompt": "It was _____ from the X-ray that the tooth could not be saved.",
+        "options": ["evidence", "evident", "evidently", "evidenced"],
+        "answer": "B",
+        "explanation": "Cấu trúc 'It was + tính từ + that ...' cần tính từ: 'evident' (rõ ràng)."
+      },
+      {
+        "prompt": "Dr. Alvarez's gentle _____ helped the nervous child open his mouth for the examination.",
+        "options": ["encourage", "encouraging", "encouraged", "encouragement"],
+        "answer": "D",
+        "explanation": "Sau tính từ 'gentle' và sở hữu cách cần danh từ làm chủ ngữ: 'encouragement'."
+      },
+      {
+        "prompt": "A good hygienist checks the _____ of the patient's head before beginning the cleaning.",
+        "options": ["position", "positive", "positively", "positioned"],
+        "answer": "A",
+        "explanation": "Sau 'the' và trước 'of' cần danh từ: 'position' (tư thế, vị trí)."
+      }
+    ],
+    "part6": {
+      "passage": "NOTICE TO PATIENTS\nBrightwater Dental Care\n\nFrom Monday, March 3, our clinic will open at 7:30 a.m. on weekdays. We hope the earlier hours will make it easier for working patients to visit ___ without missing office time. Please also note that we have replaced the overhead lamps in all treatment rooms. The new lights ___ the mouth more clearly and produce less heat, so patients should feel more comfortable. Finally, if any product we give you, such as a mouthwash, ___ your gums, stop using it and tell your dentist at your next visit. Thank you for choosing Brightwater Dental Care.",
+      "questions": [
+        {
+          "options": ["regular", "regularly", "regularity", "regulate"],
+          "answer": "B",
+          "explanation": "Sau động từ 'visit' cần trạng từ chỉ tần suất: 'regularly' (đều đặn)."
+        },
+        {
+          "options": ["illuminate", "illumination", "illuminating", "illuminated"],
+          "answer": "A",
+          "explanation": "Chủ ngữ 'The new lights' số nhiều, thì hiện tại đơn, cần động từ nguyên thể: 'illuminate'."
+        },
+        {
+          "options": ["irritate", "irritates", "irritation", "irritating"],
+          "answer": "B",
+          "explanation": "Chủ ngữ 'any product' số ít trong mệnh đề 'if' hiện tại đơn, nên động từ thêm -s: 'irritates'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "To: Daniel Osei\nFrom: Patient Services, Pine Street Dental\nSubject: Your treatment plan and next steps\nDate: May 14\n\nDear Mr. Osei,\n\nThank you for visiting us on Tuesday. As Dr. Ramos explained, the X-rays showed early wear on two back teeth, most likely caused by grinding your teeth at night. This habit is common among people with stressful jobs and often goes unnoticed until the damage is evident.\n\nDr. Ramos recommends the following plan:\n\n| Step | Treatment | Estimated cost |\n| 1 | Night guard fitted to your upper teeth | $180 |\n| 2 | Fillings to restore the two worn teeth | $240 |\n| 3 | Cleaning and check-up every six months | $95 per visit |\n\nThe night guard will be ready ten days after we take the mold, which we can do at your next visit. Please avoid very hard foods until the fillings are complete, as they may irritate the affected teeth.\n\nIf you would like to go ahead, call us at 555-0171 or reply to this email, and we will book two appointments for you. If you have questions about the plan or the costs, Dr. Ramos is happy to give you a fuller overview by phone.\n\nKind regards,\nPriya Nair\nPatient Services Coordinator",
+      "questions": [
+        {
+          "prompt": "Why was the email sent?",
+          "options": ["To confirm a cancelled appointment", "To explain a recommended treatment plan", "To request payment for Tuesday's visit", "To introduce a new dentist"],
+          "answer": "B",
+          "explanation": "Email trình bày kế hoạch điều trị mà bác sĩ Ramos đề xuất sau lần khám hôm thứ Ba, kèm chi phí và các bước tiếp theo."
+        },
+        {
+          "prompt": "What most likely caused the damage to Mr. Osei's teeth?",
+          "options": ["Eating hard foods", "Skipping check-ups", "Grinding his teeth while sleeping", "Using the wrong toothpaste"],
+          "answer": "C",
+          "explanation": "'most likely caused by grinding your teeth at night', tức nghiến răng khi ngủ."
+        },
+        {
+          "prompt": "How much will the fillings cost?",
+          "options": ["$95", "$180", "$240", "$420"],
+          "answer": "C",
+          "explanation": "Bảng ghi 'Fillings to restore the two worn teeth: $240'. $180 là giá máng chống nghiến."
+        },
+        {
+          "prompt": "When will the night guard be ready?",
+          "options": ["On Tuesday", "Ten days after the mold is taken", "At the next check-up", "Within six months"],
+          "answer": "B",
+          "explanation": "'The night guard will be ready ten days after we take the mold', và việc lấy dấu sẽ làm ở lần hẹn tiếp theo."
+        },
+        {
+          "prompt": "What is Mr. Osei asked to do if he wants to continue?",
+          "options": ["Visit the clinic without an appointment", "Pay a deposit online", "Contact the office to book appointments", "Send a copy of his X-rays"],
+          "answer": "C",
+          "explanation": "'call us at 555-0171 or reply to this email, and we will book two appointments for you.'"
+        }
+      ]
+    }
+  }
+}

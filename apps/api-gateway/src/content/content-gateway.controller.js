@@ -2,6 +2,9 @@ import { Body, Controller, Delete, Get, HttpException, Inject, Param, Patch, Pos
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { CONTENT_GRPC_SERVICE } from '@appenglish/content-contracts/grpc';
+import { ContentResponseCode, ContentUsageKind } from '@appenglish/content-contracts';
+import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
+import { LEARNING_GRPC_CLIENT } from '../learning/learning-gateway.controller.js';
 import { AUTH_GRPC_CLIENT, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
 import { callService } from '../grpc/grpc-call.js';
 
@@ -11,15 +14,137 @@ export const CONTENT_GRPC_CLIENT = 'CONTENT_GRPC_CLIENT';
 // configured MEDIA_MAX_FILE_SIZE_BYTES and the type rules.
 const MAX_UPLOAD_BYTES = 48 * 1024 * 1024;
 
+// The usage kind that counts learner attempts on one stored version of each
+// versioned content (D128).
+const VERSION_USAGE_KINDS = Object.freeze({
+  lesson: ContentUsageKind.LESSON_VERSION,
+  mockTest: ContentUsageKind.MOCK_VERSION,
+  unitReview: ContentUsageKind.UNIT_REVIEW_VERSION,
+  courseItem: ContentUsageKind.COURSE_VERSION,
+  listeningExercise: ContentUsageKind.LISTENING_VERSION,
+});
+
 export class ContentGatewayController {
-  constructor(authClient, contentClient) {
+  constructor(authClient, contentClient, learningClient) {
     this.authClient = authClient;
     this.contentClient = contentClient;
+    this.learningClient = learningClient;
   }
 
   onModuleInit() {
     this.auth = this.authClient.getService(AUTH_GRPC_SERVICE);
     this.content = this.contentClient.getService(CONTENT_GRPC_SERVICE);
+    this.learning = this.learningClient?.getService(LEARNING_GRPC_SERVICE);
+  }
+
+  // Taking content away (D118). Unpublishing only hides it; deleting is
+  // refused with 409 CONTENT_IN_USE while any learner has results for it,
+  // which learning-service counts.
+  unpublishUnit(id, request) {
+    return this.forward('UnpublishUnit', request, { id });
+  }
+  async deleteUnit(id, request) {
+    const actor = await this.actor(request);
+    const units = await this.call('ListUnits', actor);
+    const unit = (units.data.units || []).find((item) => item.id === id);
+    if (!unit) throw new HttpException({ code: ContentResponseCode.CONTENT_NOT_FOUND, msg: 'fail', data: {} }, 404);
+    await this.assertUnused(actor, ContentUsageKind.LESSON, unit.lessons.map((lesson) => lesson.id));
+    // Attempts at the unit's review count too (D121).
+    await this.assertUnused(actor, ContentUsageKind.UNIT, [id]);
+    return this.respond(await callService(this.content, 'DeleteUnit', { actor, id, payloadJson: '' }, 'Content'));
+  }
+  // Version history (D122): kind is a ContentVersionKind, id its owner.
+  listContentVersions(kind, id, request) {
+    return this.forward('ListContentVersions', request, { id, body: { kind } });
+  }
+  getContentVersion(kind, id, versionId, request) {
+    return this.forward('GetContentVersion', request, { id, body: { kind, versionId } });
+  }
+  restoreContentVersion(kind, id, versionId, request) {
+    return this.forward('RestoreContentVersion', request, { id, body: { kind, versionId } });
+  }
+  discardContentDraft(kind, id, request) {
+    return this.forward('DiscardContentDraft', request, { id, body: { kind } });
+  }
+  // An old version goes only when no learner attempt refers to it (D128).
+  async deleteContentVersion(kind, id, versionId, request) {
+    const actor = await this.actor(request);
+    const usageKind = VERSION_USAGE_KINDS[kind];
+    if (usageKind) await this.assertUnused(actor, usageKind, [versionId]);
+    return this.respond(await callService(this.content, 'DeleteContentVersion', { actor, id, payloadJson: JSON.stringify({ kind, versionId }) }, 'Content'));
+  }
+  // Unit review (D121): the Reading test that closes a unit.
+  getUnitReview(id, request) {
+    return this.forward('GetUnitReview', request, { id });
+  }
+  saveUnitReviewDraft(id, body, request) {
+    return this.forward('SaveUnitReviewDraft', request, { id, body });
+  }
+  publishUnitReview(id, request) {
+    return this.forward('PublishUnitReview', request, { id });
+  }
+  unpublishUnitReview(id, request) {
+    return this.forward('UnpublishUnitReview', request, { id });
+  }
+  unpublishLesson(id, request) {
+    return this.forward('UnpublishLesson', request, { id });
+  }
+  deleteLesson(id, request) {
+    return this.deleteUnused('DeleteLesson', ContentUsageKind.LESSON, id, request);
+  }
+  unpublishMockTest(id, request) {
+    return this.forward('UnpublishMockTest', request, { id });
+  }
+  deleteMockTest(id, request) {
+    return this.deleteUnused('DeleteMockTest', ContentUsageKind.MOCK_TEST, id, request);
+  }
+  unpublishListeningExercise(id, request) {
+    return this.forward('UnpublishListeningExercise', request, { id });
+  }
+  deleteListeningExercise(id, request) {
+    return this.deleteUnused('DeleteListeningExercise', ContentUsageKind.LISTENING_EXERCISE, id, request);
+  }
+  unpublishCourseItem(id, request) {
+    return this.forward('UnpublishCourseItem', request, { id });
+  }
+  async deleteCourseItem(id, request) {
+    const actor = await this.actor(request);
+    const item = await this.call('GetCourseItem', actor, id);
+    const type = item.data.item?.type;
+    // A topic counts the learners who completed it; a level test its attempts (D145).
+    const kind = type === 'topic' ? ContentUsageKind.COURSE_TOPIC : ContentUsageKind.COURSE_TEST;
+    await this.assertUnused(actor, kind, [id]);
+    return this.respond(await callService(this.content, 'DeleteCourseItem', { actor, id, payloadJson: '' }, 'Content'));
+  }
+  listOrphanMedia(request) {
+    return this.forward('ListOrphanMedia', request);
+  }
+  deleteOrphanMedia(body, request) {
+    return this.forward('DeleteOrphanMedia', request, { body });
+  }
+
+  async deleteUnused(rpc, kind, id, request) {
+    const actor = await this.actor(request);
+    await this.assertUnused(actor, kind, [id]);
+    return this.respond(await callService(this.content, rpc, { actor, id, payloadJson: '' }, 'Content'));
+  }
+
+  // 409 when learners already have results for any of the ids.
+  async assertUnused(actor, kind, ids) {
+    if (!ids.length) return;
+    const usage = await callService(this.learning, 'GetContentUsage', { actor, id: '', payloadJson: JSON.stringify({ kind, ids }) }, 'Learning');
+    if (usage.status >= 400) throw new HttpException(usage.payload, usage.status);
+    if (usage.payload.data.total > 0)
+      throw new HttpException(
+        { code: ContentResponseCode.CONTENT_IN_USE, msg: 'fail', data: { reason: 'HAS_RESULTS', results: usage.payload.data.total, kind } },
+        409,
+      );
+  }
+
+  async call(rpc, actor, id = '') {
+    const { status, payload } = await callService(this.content, rpc, { actor, id, payloadJson: '' }, 'Content');
+    if (status >= 400) throw new HttpException(payload, status);
+    return payload;
   }
 
   listUnits(request) {
@@ -142,6 +267,16 @@ export class ContentGatewayController {
   publishCourseItem(id, request) {
     return this.forward('PublishCourseItem', request, { id });
   }
+  // D147: speech jobs on a course topic's own recording.
+  requestCourseAutoTime(id, request) {
+    return this.forward('RequestCourseAutoTime', request, { id });
+  }
+  getCourseAutoTime(id, request) {
+    return this.forward('GetCourseAutoTime', request, { id });
+  }
+  requestCourseTranscribe(id, request) {
+    return this.forward('RequestCourseTranscribe', request, { id });
+  }
   deleteMedia(id, request) {
     return this.forward('DeleteMedia', request, { id });
   }
@@ -196,6 +331,7 @@ export class ContentGatewayController {
 Controller('content')(ContentGatewayController);
 Inject(AUTH_GRPC_CLIENT)(ContentGatewayController, undefined, 0);
 Inject(CONTENT_GRPC_CLIENT)(ContentGatewayController, undefined, 1);
+Inject(LEARNING_GRPC_CLIENT)(ContentGatewayController, undefined, 2);
 const routes = [
   [Get, 'units', 'listUnits', [Req()]],
   [Post, 'units', 'createUnit', [Body(), Req()]],
@@ -234,9 +370,34 @@ const routes = [
   [Get, 'listening-course/items/:id', 'getCourseItem', [Param('id'), Req()]],
   [Put, 'listening-course/items/:id/draft', 'saveCourseItemDraft', [Param('id'), Body(), Req()]],
   [Post, 'listening-course/items/:id/publish', 'publishCourseItem', [Param('id'), Req()]],
+  [Post, 'listening-course/items/:id/auto-time', 'requestCourseAutoTime', [Param('id'), Req()]],
+  [Get, 'listening-course/items/:id/auto-time', 'getCourseAutoTime', [Param('id'), Req()]],
+  [Post, 'listening-course/items/:id/transcribe', 'requestCourseTranscribe', [Param('id'), Req()]],
   [Get, 'placement', 'getPlacement', [Req()]],
   [Put, 'placement/draft', 'savePlacementDraft', [Body(), Req()]],
   [Post, 'placement/publish', 'publishPlacement', [Req()]],
+  [Post, 'units/:id/unpublish', 'unpublishUnit', [Param('id'), Req()]],
+  [Delete, 'units/:id', 'deleteUnit', [Param('id'), Req()]],
+  [Get, 'versions/:kind/:id', 'listContentVersions', [Param('kind'), Param('id'), Req()]],
+  [Get, 'versions/:kind/:id/:versionId', 'getContentVersion', [Param('kind'), Param('id'), Param('versionId'), Req()]],
+  [Post, 'versions/:kind/:id/:versionId/restore', 'restoreContentVersion', [Param('kind'), Param('id'), Param('versionId'), Req()]],
+  [Delete, 'versions/:kind/:id/draft', 'discardContentDraft', [Param('kind'), Param('id'), Req()]],
+  // After the literal "draft" route: Nest matches in declaration order.
+  [Delete, 'versions/:kind/:id/:versionId', 'deleteContentVersion', [Param('kind'), Param('id'), Param('versionId'), Req()]],
+  [Get, 'units/:id/review', 'getUnitReview', [Param('id'), Req()]],
+  [Put, 'units/:id/review/draft', 'saveUnitReviewDraft', [Param('id'), Body(), Req()]],
+  [Post, 'units/:id/review/publish', 'publishUnitReview', [Param('id'), Req()]],
+  [Post, 'units/:id/review/unpublish', 'unpublishUnitReview', [Param('id'), Req()]],
+  [Post, 'lessons/:id/unpublish', 'unpublishLesson', [Param('id'), Req()]],
+  [Delete, 'lessons/:id', 'deleteLesson', [Param('id'), Req()]],
+  [Post, 'mock-tests/:id/unpublish', 'unpublishMockTest', [Param('id'), Req()]],
+  [Delete, 'mock-tests/:id', 'deleteMockTest', [Param('id'), Req()]],
+  [Post, 'listening-exercises/:id/unpublish', 'unpublishListeningExercise', [Param('id'), Req()]],
+  [Delete, 'listening-exercises/:id', 'deleteListeningExercise', [Param('id'), Req()]],
+  [Post, 'listening-course/items/:id/unpublish', 'unpublishCourseItem', [Param('id'), Req()]],
+  [Delete, 'listening-course/items/:id', 'deleteCourseItem', [Param('id'), Req()]],
+  [Get, 'media/orphans', 'listOrphanMedia', [Req()]],
+  [Delete, 'media/orphans', 'deleteOrphanMedia', [Body(), Req()]],
   [Delete, 'media/:id', 'deleteMedia', [Param('id'), Req()]],
   [Post, 'media', 'uploadMedia', [UploadedFile(), Body(), Req()]],
 ];

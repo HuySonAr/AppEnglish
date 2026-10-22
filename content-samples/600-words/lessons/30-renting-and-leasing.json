@@ -1,0 +1,260 @@
+{
+  "number": 30,
+  "title": "Renting and Leasing",
+  "vocabulary": [
+    {
+      "word": "apprehensive",
+      "partOfSpeech": "adjective",
+      "meaning": "lo lắng, e ngại (về điều sắp xảy ra)",
+      "example": "The owners were apprehensive about signing a five-year lease for a shop they had never seen.",
+      "exampleMeaning": "Các chủ sở hữu e ngại việc ký hợp đồng thuê năm năm cho một cửa hàng họ chưa từng thấy."
+    },
+    {
+      "word": "circumstance",
+      "partOfSpeech": "noun",
+      "meaning": "hoàn cảnh, tình huống, điều kiện xung quanh",
+      "example": "Under normal circumstances, the deposit is returned within thirty days of moving out.",
+      "exampleMeaning": "Trong hoàn cảnh bình thường, tiền đặt cọc được trả lại trong vòng ba mươi ngày sau khi dọn đi."
+    },
+    {
+      "word": "condition",
+      "partOfSpeech": "noun",
+      "meaning": "tình trạng; điều kiện (trong hợp đồng)",
+      "example": "The tenant must leave the office in the same condition as when the lease began.",
+      "exampleMeaning": "Người thuê phải trả văn phòng trong tình trạng như khi bắt đầu hợp đồng thuê."
+    },
+    {
+      "word": "due to",
+      "partOfSpeech": "phrase",
+      "meaning": "do, bởi vì, vì lý do",
+      "example": "Due to rising demand, rents in the business district went up eight percent this year.",
+      "exampleMeaning": "Do nhu cầu tăng, giá thuê ở khu thương mại đã tăng tám phần trăm trong năm nay."
+    },
+    {
+      "word": "fluctuate",
+      "partOfSpeech": "verb",
+      "meaning": "dao động, lên xuống thất thường",
+      "example": "Warehouse rents in the port area fluctuate with the volume of shipping each season.",
+      "exampleMeaning": "Giá thuê nhà kho ở khu cảng dao động theo lượng hàng vận chuyển mỗi mùa."
+    },
+    {
+      "word": "get out of",
+      "partOfSpeech": "verb",
+      "meaning": "thoát khỏi, rút khỏi (hợp đồng, nghĩa vụ)",
+      "example": "The bakery wants to get out of its lease early because the street is being closed for construction.",
+      "exampleMeaning": "Tiệm bánh muốn rút khỏi hợp đồng thuê sớm vì con đường sắp bị đóng để thi công."
+    },
+    {
+      "word": "indicator",
+      "partOfSpeech": "noun",
+      "meaning": "chỉ số, dấu hiệu cho thấy điều gì",
+      "example": "A long waiting list is a good indicator that rents in this building will rise next year.",
+      "exampleMeaning": "Danh sách chờ dài là một dấu hiệu rõ cho thấy giá thuê trong tòa nhà này sẽ tăng vào năm tới."
+    },
+    {
+      "word": "lease",
+      "partOfSpeech": "noun",
+      "meaning": "hợp đồng thuê (nhà, đất, thiết bị); (động từ) cho thuê, thuê",
+      "example": "The company signed a three-year lease on two floors of the Riverside Tower.",
+      "exampleMeaning": "Công ty đã ký hợp đồng thuê ba năm hai tầng của tòa Riverside Tower."
+    },
+    {
+      "word": "lock into",
+      "partOfSpeech": "verb",
+      "meaning": "ràng buộc (ai) vào (hợp đồng, thỏa thuận) không thể rút ra",
+      "example": "We do not want to lock ourselves into a ten-year contract while the market is so uncertain.",
+      "exampleMeaning": "Chúng tôi không muốn tự ràng buộc mình vào một hợp đồng mười năm khi thị trường còn quá bất ổn."
+    },
+    {
+      "word": "occupy",
+      "partOfSpeech": "verb",
+      "meaning": "sử dụng, ở trong, chiếm giữ (một không gian)",
+      "example": "A design studio has occupied the top floor since the building opened.",
+      "exampleMeaning": "Một studio thiết kế đã sử dụng tầng trên cùng từ khi tòa nhà mở cửa."
+    },
+    {
+      "word": "option",
+      "partOfSpeech": "noun",
+      "meaning": "quyền lựa chọn, phương án; quyền chọn (gia hạn, mua)",
+      "example": "The lease gives the tenant the option to renew for another two years at the same rent.",
+      "exampleMeaning": "Hợp đồng thuê cho người thuê quyền chọn gia hạn thêm hai năm với cùng mức giá."
+    },
+    {
+      "word": "subject to",
+      "partOfSpeech": "phrase",
+      "meaning": "tùy thuộc vào, phải chịu (điều kiện, sự phê duyệt)",
+      "example": "The rent increase is subject to approval by the property owner's board.",
+      "exampleMeaning": "Việc tăng giá thuê tùy thuộc vào sự phê duyệt của hội đồng chủ sở hữu tòa nhà."
+    }
+  ],
+  "fillIn": {
+    "passage": "When Clearview Dental decided to open a second clinic, its two partners spent weeks looking at commercial space. They were ___ about renting in the new shopping center, because rents there ___ from year to year, and a small clinic cannot plan around sudden increases. Instead, they chose a ground-floor unit in an older building that a travel agency had ___ for twelve years.\n\nThe ___ runs for three years. The rent is fixed, and the agreement gives the partners the ___ to renew for two more years at a price agreed now. They did not want to be ___ a longer term, since a dental practice can grow quickly, and under some ___ they might need twice the space. One clause allows them to ___ the agreement after eighteen months if either partner has to stop working ___ illness. The clinic must also return the unit in good ___, apart from normal wear.\n\nFinal approval of the deal is ___ a building inspection next week, but the partners see the agent's quick reply as a positive ___ that the owner wants them as tenants.",
+    "answers": ["apprehensive", "fluctuate", "occupied", "lease", "option", "locked into", "circumstances", "get out of", "due to", "condition", "subject to", "indicator"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nữ môi giới bất động sản đưa chìa khóa cho một người đàn ông trước cửa một mặt bằng cửa hàng còn trống, trên kính có dán biển cho thuê.",
+      "options": [
+        "A woman is handing keys to a man.",
+        "A man is locking the door of a shop.",
+        "The people are carrying boxes into the store.",
+        "A woman is painting a sign above the door."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ đang trao chìa khóa cho người đàn ông. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "When does the lease on the warehouse expire?",
+        "options": ["At the end of September.", "It's about 400 square meters.", "Yes, we leased it last year."],
+        "answer": "A",
+        "explanation": "Câu hỏi When cần câu trả lời về thời gian; (A) trả lời đúng. (B) nói về diện tích, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Are you apprehensive about the rent increase next year?",
+        "options": ["The rent is paid on the first.", "A little, but the lease caps it at three percent.", "Next year is a leap year."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về sự lo lắng; (B) trả lời có một chút và giải thích. (A) nhầm với từ 'rent', (C) nhầm với 'next year'."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Sophie, the landlord sent the draft lease for the new showroom. Have you had a chance to read it?\nWoman: I have, and I'm a bit apprehensive about one part. The rent is subject to review every year, based on an index that fluctuates a lot.\nMan: That makes budgeting hard. Is there an option to fix the rent for the first three years instead?\nWoman: Not in this draft, but we can ask. I'd also like a clause that lets us get out of the lease if the main road is closed for the subway construction.\nMan: Good point. The city says the work could start in two years, and we don't want to be locked into paying for a showroom nobody can reach.\nWoman: Exactly. Shall I call the agent this afternoon and propose both changes?\nMan: Yes, please. And ask how long the current tenant will occupy the space; we need the keys by the first of August.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["The design of a new showroom", "Terms of a lease agreement", "A construction project downtown", "The cost of moving"],
+          "answer": "B",
+          "explanation": "Hai người bàn về bản nháp hợp đồng thuê ('draft lease') và các điều khoản muốn thay đổi."
+        },
+        {
+          "prompt": "What is the woman concerned about?",
+          "options": ["The size of the showroom", "The yearly rent review", "The landlord's reputation", "The length of the moving process"],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'I'm a bit apprehensive about one part. The rent is subject to review every year', tức lo về việc xét lại giá thuê hằng năm."
+        },
+        {
+          "prompt": "What does the man ask the woman to find out?",
+          "options": ["When the subway will open", "How much the deposit is", "When the current tenant will leave", "Whether parking is included"],
+          "answer": "C",
+          "explanation": "Anh ấy nói 'ask how long the current tenant will occupy the space', tức hỏi người thuê hiện tại còn ở đến khi nào."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "You're listening to Business Hour, and here is this week's property update. Office rents in the city center have fallen for the third month in a row, which analysts see as an indicator that companies are keeping fewer desks than they did before. Landlords are responding with shorter leases and more flexible conditions. Several buildings now offer twelve-month agreements with an option to extend, instead of the five-year terms that used to be standard. Under those circumstances, tenants who signed long contracts two years ago are looking for ways to get out of them, often by subletting the space they no longer occupy. Rents in the suburbs, however, continue to fluctuate from month to month due to strong demand from small firms. If you are about to sign a lease, our guest next week, a commercial property lawyer, will explain which clauses you should read twice. Stay with us.",
+      "questions": [
+        {
+          "prompt": "What is the report mainly about?",
+          "options": ["Changes in the office rental market", "A new subway line", "The opening of a shopping center", "Rules for subletting apartments"],
+          "answer": "A",
+          "explanation": "Bản tin nói về giá thuê văn phòng giảm, hợp đồng ngắn hơn và cách người thuê phản ứng, tức những thay đổi của thị trường thuê văn phòng."
+        },
+        {
+          "prompt": "What are some landlords now offering?",
+          "options": ["Free parking for tenants", "Five-year contracts at lower rents", "Twelve-month agreements with an option to extend", "Furnished offices in the suburbs"],
+          "answer": "C",
+          "explanation": "'Several buildings now offer twelve-month agreements with an option to extend'; hợp đồng năm năm là chuẩn cũ."
+        },
+        {
+          "prompt": "Who will speak on the program next week?",
+          "options": ["A city planner", "A commercial property lawyer", "A suburban landlord", "A real estate agent"],
+          "answer": "B",
+          "explanation": "Cuối bài: 'our guest next week, a commercial property lawyer, will explain which clauses you should read twice'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Many new tenants feel _____ about signing a long-term lease in an uncertain market.",
+        "options": ["apprehend", "apprehensive", "apprehension", "apprehensively"],
+        "answer": "B",
+        "explanation": "Sau 'feel' cần tính từ: 'apprehensive about' (e ngại về)."
+      },
+      {
+        "prompt": "Demand for warehouse space tends to _____ with the shipping season.",
+        "options": ["fluctuate", "fluctuation", "fluctuating", "fluctuated"],
+        "answer": "A",
+        "explanation": "Sau 'tends to' cần động từ nguyên mẫu: 'fluctuate' (dao động)."
+      },
+      {
+        "prompt": "The shop has been _____ by the same family business for over twenty years.",
+        "options": ["occupy", "occupant", "occupied", "occupying"],
+        "answer": "C",
+        "explanation": "'has been + quá khứ phân từ + by' là dạng bị động: 'has been occupied by'."
+      },
+      {
+        "prompt": "_____ a delay in the renovation, the new tenants cannot move in until October.",
+        "options": ["Due to", "Because", "Although", "In spite"],
+        "answer": "A",
+        "explanation": "'Due to' đi với cụm danh từ 'a delay'. 'Because' cần một mệnh đề, 'In spite' thiếu 'of', 'Although' cần mệnh đề và sai nghĩa."
+      },
+      {
+        "prompt": "The number of empty storefronts on Main Street is a clear _____ of the local economy.",
+        "options": ["indicate", "indicator", "indicative", "indicatively"],
+        "answer": "B",
+        "explanation": "Sau 'a clear' cần danh từ: 'indicator' (dấu hiệu, chỉ báo). 'indicative' là tính từ và không đi sau mạo từ 'a'."
+      },
+      {
+        "prompt": "The sale of the building is _____ approval by the city's planning office.",
+        "options": ["subject to", "subjected", "subjective", "subjecting"],
+        "answer": "A",
+        "explanation": "'be subject to + danh từ' nghĩa là tùy thuộc vào, phải được (phê duyệt). 'subjective' nghĩa là chủ quan."
+      }
+    ],
+    "part6": {
+      "passage": "Dear Ms. Whitfield,\n\nThank you for your interest in Unit 4 at Bramble Court. The unit is available from 1 September on a two-year ___ at 2,400 dollars per month. The agreement includes an ___ to extend for a further year at a rent to be agreed. Please note that the premises must be kept in good ___ and that no structural changes may be made without written permission. If these terms suit you, I can send the full contract for your review by Friday.\n\nKind regards,\nOliver Grant\nProperty Manager, Bramble Court",
+      "questions": [
+        {
+          "options": ["lease", "leased", "leasing", "lessee"],
+          "answer": "A",
+          "explanation": "Sau 'a two-year' cần danh từ chỉ hợp đồng: 'lease'. 'lessee' là người thuê, không hợp nghĩa."
+        },
+        {
+          "options": ["opt", "option", "optional", "optionally"],
+          "answer": "B",
+          "explanation": "Sau 'an' cần danh từ: 'an option to extend' (quyền chọn gia hạn)."
+        },
+        {
+          "options": ["condition", "conditional", "conditionally", "conditioned"],
+          "answer": "A",
+          "explanation": "'kept in good condition' là cụm cố định, cần danh từ 'condition' (tình trạng)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "HARBORSIDE COMMERCIAL PROPERTIES\nOffice and Retail Space Available - Autumn Listings\n\n| Property | Size | Monthly rent | Term |\n| 18 Quay Street, Unit 2 (retail) | 85 sq m | 3,100 dollars | 3 years |\n| Anchor House, 4th floor (office) | 240 sq m | 6,800 dollars | 2 to 5 years |\n| Marina Plaza, kiosk 7 | 12 sq m | 900 dollars | 12 months |\n\nAll rents are subject to an annual review based on the regional price index. In the current market, the index has fluctuated between two and four percent a year, and we consider this a reliable indicator of what tenants should budget for.\n\nEach lease includes an option to renew, and tenants who occupy a unit for more than three years receive a one-month rent credit. Tenants may get out of a lease early under two circumstances: if the building is sold, or if the tenant's business closes due to illness of the owner. In both cases, two months' notice is required, and the unit must be returned in its original condition.\n\nProspective tenants who feel apprehensive about committing to a long term may ask about our six-month trial agreement for the Marina Plaza kiosk.\n\nTo arrange a viewing, call Harborside at 555-0188 or visit our office at 3 Quay Street, open Monday to Friday.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the document?",
+          "options": ["To announce the sale of a building", "To advertise commercial space for rent", "To explain a change in parking rules", "To invite tenants to an opening event"],
+          "answer": "B",
+          "explanation": "Tiêu đề 'Office and Retail Space Available' và bảng liệt kê các mặt bằng cùng giá thuê cho thấy đây là quảng cáo cho thuê."
+        },
+        {
+          "prompt": "Which property offers the shortest lease term?",
+          "options": ["18 Quay Street, Unit 2", "Anchor House, 4th floor", "Marina Plaza, kiosk 7", "The Harborside office"],
+          "answer": "C",
+          "explanation": "Bảng ghi kiosk 7 ở Marina Plaza có thời hạn 12 tháng, ngắn hơn 3 năm và 2 đến 5 năm của hai mặt bằng còn lại."
+        },
+        {
+          "prompt": "How does the company describe the regional price index?",
+          "options": ["It has stayed the same for years.", "It is a reliable indicator for budgeting.", "It is reviewed every month.", "It applies only to retail units."],
+          "answer": "B",
+          "explanation": "'we consider this a reliable indicator of what tenants should budget for'; chỉ số này dao động từ hai đến bốn phần trăm mỗi năm chứ không đứng yên."
+        },
+        {
+          "prompt": "Under which circumstance can a tenant leave a lease early?",
+          "options": ["If the rent rises more than four percent", "If the tenant finds a cheaper unit", "If the building is sold", "If the tenant moves to another city"],
+          "answer": "C",
+          "explanation": "Hai trường hợp được nêu là 'if the building is sold' hoặc nếu doanh nghiệp đóng cửa do chủ bị bệnh."
+        },
+        {
+          "prompt": "What is suggested for people who are nervous about a long commitment?",
+          "options": ["Renting the kiosk on a six-month trial", "Paying two months' rent in advance", "Choosing the office at Anchor House", "Waiting until the spring listings"],
+          "answer": "A",
+          "explanation": "Người 'apprehensive about committing to a long term' được gợi ý hỏi về 'six-month trial agreement for the Marina Plaza kiosk'; 'nervous' đồng nghĩa với 'apprehensive'."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "unit": 10,
+  "title": "Health",
+  "part5": [
+    {
+      "prompt": "Your doctor’s ___ are as important as his prescriptions.",
+      "options": [
+        "recommend",
+        "recommended",
+        "recommending",
+        "recommendations"
+      ],
+      "answer": "D",
+      "explanation": "Động từ “are” đòi hỏi chủ ngữ số nhiều; “recommendations” là các lời khuyên của bác sĩ."
+    },
+    {
+      "prompt": "Dentists are as concerned with your dental ___ as with the condition of your teeth.",
+      "options": [
+        "habits",
+        "habitual",
+        "habitually",
+        "habituated"
+      ],
+      "answer": "A",
+      "explanation": "“Dental habits” chỉ các thói quen chăm sóc răng miệng; cần danh từ số nhiều."
+    },
+    {
+      "prompt": "To avoid ___ any additional charges, you should ask to be discharged from the hospital.",
+      "options": [
+        "incur",
+        "incurs",
+        "incurred",
+        "incurring"
+      ],
+      "answer": "D",
+      "explanation": "Sau “avoid” dùng V-ing: “incurring additional charges” (phát sinh thêm phí)."
+    },
+    {
+      "prompt": "It is as fast and efficient to ___ with your pharmacist as with your physician.",
+      "options": [
+        "consult",
+        "consulting",
+        "consulted",
+        "consultation"
+      ],
+      "answer": "A",
+      "explanation": "Sau “to” dùng động từ nguyên mẫu “consult” (tham khảo ý kiến)."
+    },
+    {
+      "prompt": "Although an annual checkup is important, you should also make an ___ whenever you have a health concern.",
+      "options": [
+        "appoint",
+        "appointed",
+        "appointment",
+        "appointments"
+      ],
+      "answer": "C",
+      "explanation": "“Make an appointment” là cụm cố định, nghĩa là đặt lịch hẹn."
+    },
+    {
+      "prompt": "A dentist can perform dental ___ as well as routine maintenance.",
+      "options": [
+        "restore",
+        "restored",
+        "restoring",
+        "restoration"
+      ],
+      "answer": "D",
+      "explanation": "“Dental restoration” là thủ thuật phục hồi răng, trong cấu trúc này cần danh từ."
+    },
+    {
+      "prompt": "A good medical insurance will ___ preventive health programs as well as treatment.",
+      "options": [
+        "emphasize",
+        "emphasis",
+        "emphasizing",
+        "emphasized"
+      ],
+      "answer": "A",
+      "explanation": "Sau “will” cần động từ nguyên mẫu “emphasize” (chú trọng)."
+    },
+    {
+      "prompt": "The most difficult part of hospitalization is being ___.",
+      "options": [
+        "admit",
+        "admitted",
+        "admissions",
+        "admitting"
+      ],
+      "answer": "B",
+      "explanation": "“Being admitted” là cấu trúc bị động, nghĩa là được nhập viện."
+    },
+    {
+      "prompt": "A pharmacist will ___ the customer’s medications.",
+      "options": [
+        "monitor",
+        "monitors",
+        "monitoring",
+        "monitored"
+      ],
+      "answer": "A",
+      "explanation": "Sau “will” cần động từ nguyên mẫu “monitor” (theo dõi)."
+    },
+    {
+      "prompt": "I don’t understand most of what I read in a hospital’s billing ___.",
+      "options": [
+        "state",
+        "stated",
+        "stating",
+        "statement"
+      ],
+      "answer": "D",
+      "explanation": "“Billing statement” nghĩa là bảng kê/hóa đơn chi phí y tế; cần danh từ “statement”."
+    }
+  ],
+  "part6": [
+    {
+      "passage": "The most important part of your health care is the ___ visit to your doctor. By visiting your doctor once a year, you can feel sure that any changes in your health will be detected. Your doctor might ___ lifestyle changes, such as diet and exercise, that you will need to make in order to maintain your health. The best way to ___ serious disease, after all, is to maintain a healthy lifestyle.",
+      "questions": [
+        {
+          "options": [
+            "daily",
+            "monthly",
+            "annual",
+            "perennial"
+          ],
+          "answer": "C",
+          "explanation": "“Once a year” cho biết chuyến khám hằng năm; dùng tính từ “annual”."
+        },
+        {
+          "options": [
+            "recommend",
+            "recommends",
+            "to recommend",
+            "recommending"
+          ],
+          "answer": "A",
+          "explanation": "Sau “might” cần động từ nguyên mẫu “recommend” (khuyến nghị)."
+        },
+        {
+          "options": [
+            "prevent",
+            "prevention",
+            "preventive",
+            "preventively"
+          ],
+          "answer": "A",
+          "explanation": "Cấu trúc “the best way to + V” dùng “prevent” (ngăn ngừa)."
+        }
+      ]
+    },
+    {
+      "passage": "Memo\n\nTo: All company staff\nFrom: Human Resources Office\nRe: Dental insurance\n\nDental insurance is now available to all company ___. We can offer you a policy that covers all the ___ dental procedures, such as cleanings and fillings. Unfortunately, surgery and other complicated procedures will not be covered. If you are interested in applying for this insurance, please notify our office before the end of this month. We ___ you to take advantage of this opportunity to obtain affordable dental care for yourself and your family.",
+      "questions": [
+        {
+          "options": [
+            "person",
+            "personal",
+            "personify",
+            "personnel"
+          ],
+          "answer": "D",
+          "explanation": "“Company personnel” nghĩa là nhân viên của công ty, danh từ tập hợp phù hợp với “all”."
+        },
+        {
+          "options": [
+            "usually",
+            "usual",
+            "unusual",
+            "unusually"
+          ],
+          "answer": "B",
+          "explanation": "Tính từ “usual” (thông thường) bổ nghĩa cho “dental procedures”."
+        },
+        {
+          "options": [
+            "are encouraged",
+            "encouraging",
+            "encouraged",
+            "encourage"
+          ],
+          "answer": "D",
+          "explanation": "Chủ ngữ “We” chủ động khuyến khích nhân viên; động từ “encourage” phù hợp."
+        }
+      ]
+    },
+    {
+      "passage": "Your doctor has prescribed this medication to treat your symptoms. Take it as instructed by your doctor. It is most ___ when taken with meals. Consult with your doctor before taking any additional medications to avoid ___ harmful interactions. Possible side effects of this medication include sleepiness and ___ of the stomach.",
+      "questions": [
+        {
+          "options": [
+            "effect",
+            "effective",
+            "effectively",
+            "effectiveness"
+          ],
+          "answer": "B",
+          "explanation": "Sau “is most” cần tính từ “effective” (hiệu quả nhất)."
+        },
+        {
+          "options": [
+            "potent",
+            "potion",
+            "potential",
+            "potentially"
+          ],
+          "answer": "D",
+          "explanation": "Tính từ “potential” bổ nghĩa cho “harmful interactions”, nghĩa là những tương tác có thể xảy ra."
+        },
+        {
+          "options": [
+            "irritate",
+            "irritant",
+            "irritation",
+            "irritating"
+          ],
+          "answer": "C",
+          "explanation": "Sau “include sleepiness and” cần danh từ “irritation” (sự kích ứng dạ dày)."
+        }
+      ]
+    }
+  ]
+}

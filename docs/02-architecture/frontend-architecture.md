@@ -27,8 +27,8 @@ apps/web-client/src/
     content-manager/     # api, lib, components, pages
   components/
     ui/                  # shadcn/ui (Radix) primitives
-    shared/              # PageHeader, FeatureCard, EmptyState, PageSkeleton, ListFilter, Pagination
-  hooks/                 # use-theme
+    shared/              # PageHeader, FeatureCard, EmptyState, PageSkeleton, ListFilter, Pagination, FileDropzone, FileRow, PublishButton
+  hooks/                 # use-theme, use-list-state, use-return-to
   lib/                   # api/ (HTTP client, response), utils.js (cn), notify.js (Sonner notifications), list.js (search, sort, paging), leave-guard.js
   constants/
   styles/index.css       # design tokens sáng/tối
@@ -81,6 +81,12 @@ Không cài toàn bộ đề xuất một cách máy móc. Trước tiên kiểm
 Áp dụng cho mọi trang và component mới của web client. Trước khi viết giao
 diện, đọc mục này và dùng lại các thành phần đã có; không tự tạo biến thể riêng.
 
+### Chữ trên giao diện (D149)
+- Description của trang, phần, hộp thoại và dòng hướng dẫn tối đa một câu
+  ngắn, chỉ nói cần làm gì. Không giải thích nghiệp vụ (ai thấy gì, cách chấm,
+  điều kiện mở khóa) và không ghi mã quyết định (Dxx); nghiệp vụ nằm trong docs.
+- Thông báo và hộp thoại xác nhận vẫn nói rõ hậu quả của thao tác.
+
 ### Trạng thái đang tải
 - Trang đang tải dữ liệu lần đầu phải hiện skeleton có hình dạng giống trang
   thật, không hiện một khối xám hay chữ "Loading". Dùng các component trong
@@ -110,11 +116,25 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
 - Dùng `SearchField` và `FilterSelect` (`components/shared/ListFilter.jsx`),
   `Pagination` (`components/shared/Pagination.jsx`) và các hàm trong
   `src/lib/list.js` (`matchesSearch` không phân biệt hoa thường và dấu,
-  `compareText`, `paginate`).
+  `compareText`, `paginate`, `pageRange`).
+- Thanh phân trang có một bố cục duy nhất: bên trái "43 accounts · page 2 of
+  5", bên phải một khối liền Previous · 1 2 3 … 10 · Next (số trang theo
+  `pageRange`: luôn có trang đầu, cuối, trang hiện tại và hai trang kề; tối đa
+  7 trang thì hiện hết). Màn hình hẹp giấu dãy số, chỉ còn "2 / 5" giữa hai
+  mũi tên. Không có ô nhập số trang hay nút đầu/cuối. Chỉ danh sách phân trang ở
+  server (tài khoản) bật "Rows per page" 10/20/50 qua prop
+  `pageSize` + `onPageSizeChange`; đổi số dòng quay về trang 1.
 - Luật lọc và sắp xếp của từng danh sách viết thành hàm thuần trong `lib/` của
   feature (ví dụ `content-list.js`, `student-list.js`) và có test.
 - Đổi tìm kiếm, bộ lọc hay cách sắp xếp thì quay về trang 1. Danh sách lọc ra
   rỗng thì hiện `EmptyState` "… matches", khác với trạng thái chưa có dữ liệu.
+- Tìm kiếm, bộ lọc, sắp xếp và số trang nằm trong URL qua `useListState`
+  (`hooks/use-list-state.js`, thuần ở `listStateFromParams` /
+  `paramsFromListState` trong `lib/list.js`, có test), không dùng `useState`
+  riêng, để quay lại từ trang con hay tải lại trang vẫn đúng chỗ (D130). Link
+  sang trang con dùng `useListLinkState()` để mang `from` và `focusId`; trang
+  con dùng `useReturnTo(fallback)` cho nút quay lại; danh sách gọi
+  `useFocusReturn(ready)` và đặt `id="focus-<id>"` trên hàng để cuộn tới.
 - Danh sách nhỏ (cỡ vài trăm mục) được lọc và phân trang trong trình duyệt trên
   dữ liệu đã tải. Danh sách có thể lớn không giới hạn (tài khoản) phân trang ở
   server.
@@ -122,13 +142,49 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
   tác đổi thứ tự bị khóa khi danh sách đang được tìm, lọc hoặc sắp theo tiêu
   chí khác.
 
+### Xuất bản và gỡ (D126)
+- Mọi nút xuất bản dùng `PublishButton` với hook `usePublishAction()`
+  (`components/shared/PublishButton.jsx`): `publish.run(onPublish)` chạy hành
+  động, hiện "Publishing…" (mũi tên bay vào mây) rồi "Done" (dấu tick) khi
+  `onPublish` trả về `true`, hoặc về "Publish" ngay khi thất bại. Hoạt ảnh
+  định nghĩa trong `styles/index.css` (`publish-arrow`, `publish-cloud`,
+  `publish-pop`), tắt khi `prefers-reduced-motion`.
+- `ContentDangerActions` hiện nút Unpublish (chỉ khi đang xuất bản) và nút
+  biểu tượng Delete; cả hai hỏi xác nhận bằng `AlertDialog`. Không gom vào menu.
+- `DiscardDraftButton` (D127) hiện khi có bản nháp: ở toolbar và ở dòng Draft
+  của `VersionHistory`; sau khi gỡ gọi `load()` của trang. Dòng version cũ
+  (không phải draft, không phải live) có nút thùng rác xóa version (D128) với
+  xác nhận; 409 CONTENT_IN_USE được giải thích bằng số lượt làm bài.
+
+### Chọn file (D125)
+- Mọi chỗ nhận file dùng `FileDropzone` (`components/shared/FileDropzone.jsx`):
+  vùng kéo-thả có `accept`, `maxBytes`, `kindLabel`, biến thể `compact` cho ô
+  trong form; kiểm tra loại và dung lượng bằng `fileIssue()` của `lib/files.js`
+  (có test) và báo lỗi bằng `notify()`. Không dùng `<input type="file">` trần.
+- File đã chọn hoặc đã tải hiện bằng `FileRow` (`components/shared/FileRow.jsx`):
+  tên, dung lượng (`formatBytes()`), trạng thái `pending` / `uploading` /
+  `done` / `failed` với thanh tiến trình, nút xóa, phần xem trước là children.
+  `useDraftMedia` cung cấp `uploading` và `failed` để `MediaField` hiện đúng
+  trạng thái trong lúc lưu.
+
 ### Thông báo và thành phần chung
 - Thông báo dùng `notify()` trong `src/lib/notify.js` (Sonner): `success` mặc
   định, `destructive` cho lỗi, `info`, `warning`, `loading`.
 - Tiêu đề trang dùng `PageHeader`; danh sách rỗng dùng `EmptyState`; ô dashboard
   dùng `FeatureCard`.
-- Ô mật khẩu dùng `PasswordInput` (`components/shared/PasswordInput.jsx`): có nút
-  con mắt hiện/ẩn, nhận mọi prop của `Input` và `register` của react-hook-form.
+- Ô mật khẩu dùng `PasswordInput` (`components/shared/PasswordInput.jsx`): nút
+  con mắt hiện/ẩn chỉ xuất hiện khi ô đã có chữ; nút reveal mặc định của trình
+  duyệt (Edge `::-ms-reveal`) bị ẩn trong `styles/index.css` để không có hai con
+  mắt. Nhận mọi prop của `Input` và `register` của react-hook-form.
+- Trình soạn nội dung có version đặt `VersionHistory`
+  (`features/content-manager/components/VersionHistory.jsx`) ở cuối trang:
+  danh sách version, xem tóm tắt chỉ đọc (`lib/version-outline.js`, thuần, có
+  test) và khôi phục thành bản nháp rồi gọi `load()` của trang (D122).
+- Trình soạn lesson và Unit review có `ImportExportJson`
+  (`features/content-manager/components/ImportExportJson.jsx`): nhập file JSON
+  theo định dạng soạn (`lib/authoring-import.js` kiểm tra, chuyển đổi qua
+  `@appenglish/content-contracts/authoring` và gộp media đang có; có test) và
+  xuất bản đang soạn (D124). Không gọi API: nội dung nhập vào state của editor.
 - Người dùng hiện bằng `Avatar` (`components/shared/Avatar.jsx`): ảnh đại diện,
   hoặc chữ cái đầu của tên khi chưa có ảnh; tên lấy từ `displayNameOf()` của
   `@appenglish/auth-contracts` (D113). Không hiện email đầy đủ của người khác.

@@ -1,0 +1,260 @@
+{
+  "number": 46,
+  "title": "Doctor's Office",
+  "vocabulary": [
+    {
+      "word": "annually",
+      "partOfSpeech": "adverb",
+      "meaning": "hằng năm, mỗi năm một lần",
+      "example": "Our company asks every employee to have a basic health check annually.",
+      "exampleMeaning": "Công ty chúng tôi yêu cầu mọi nhân viên khám sức khỏe cơ bản hằng năm."
+    },
+    {
+      "word": "appointment",
+      "partOfSpeech": "noun",
+      "meaning": "cuộc hẹn (khám bệnh, gặp mặt); sự bổ nhiệm",
+      "example": "I booked a dentist appointment for Tuesday afternoon, so I will leave the office early.",
+      "exampleMeaning": "Tôi đã đặt hẹn nha sĩ vào chiều thứ Ba, nên tôi sẽ rời văn phòng sớm."
+    },
+    {
+      "word": "assess",
+      "partOfSpeech": "verb",
+      "meaning": "đánh giá, thẩm định (tình trạng, mức độ)",
+      "example": "The nurse will assess your blood pressure before the doctor sees you.",
+      "exampleMeaning": "Y tá sẽ đánh giá huyết áp của bạn trước khi bác sĩ khám."
+    },
+    {
+      "word": "diagnose",
+      "partOfSpeech": "verb",
+      "meaning": "chẩn đoán (bệnh)",
+      "example": "After a short examination, the doctor diagnosed a mild ear infection.",
+      "exampleMeaning": "Sau một lượt khám ngắn, bác sĩ chẩn đoán bị viêm tai nhẹ."
+    },
+    {
+      "word": "effective",
+      "partOfSpeech": "adjective",
+      "meaning": "có hiệu quả; có hiệu lực",
+      "example": "Rest and plenty of water are still the most effective treatment for a common cold.",
+      "exampleMeaning": "Nghỉ ngơi và uống nhiều nước vẫn là cách điều trị hiệu quả nhất cho cảm lạnh thông thường."
+    },
+    {
+      "word": "instrument",
+      "partOfSpeech": "noun",
+      "meaning": "dụng cụ, thiết bị (y tế, đo lường); nhạc cụ",
+      "example": "Every instrument in the examination room is cleaned after each patient.",
+      "exampleMeaning": "Mọi dụng cụ trong phòng khám đều được làm sạch sau mỗi bệnh nhân."
+    },
+    {
+      "word": "manage",
+      "partOfSpeech": "verb",
+      "meaning": "kiểm soát, xử lý được (bệnh, tình huống); quản lý",
+      "example": "With the right medicine, most patients can manage their allergies easily.",
+      "exampleMeaning": "Với thuốc phù hợp, phần lớn bệnh nhân có thể kiểm soát dị ứng dễ dàng."
+    },
+    {
+      "word": "prevent",
+      "partOfSpeech": "verb",
+      "meaning": "ngăn ngừa, phòng tránh",
+      "example": "Washing your hands often is a simple way to prevent the spread of illness in the office.",
+      "exampleMeaning": "Rửa tay thường xuyên là cách đơn giản để ngăn bệnh lây lan trong văn phòng."
+    },
+    {
+      "word": "recommendation",
+      "partOfSpeech": "noun",
+      "meaning": "lời khuyên, sự đề xuất; lời giới thiệu",
+      "example": "The doctor's recommendation was to take a short walk every day after lunch.",
+      "exampleMeaning": "Lời khuyên của bác sĩ là đi bộ một đoạn ngắn mỗi ngày sau bữa trưa."
+    },
+    {
+      "word": "record",
+      "partOfSpeech": "noun",
+      "meaning": "hồ sơ, bản ghi chép; thành tích",
+      "example": "The clinic keeps a record of every visit and every test result.",
+      "exampleMeaning": "Phòng khám lưu hồ sơ của mọi lần khám và mọi kết quả xét nghiệm."
+    },
+    {
+      "word": "refer",
+      "partOfSpeech": "verb",
+      "meaning": "chuyển (bệnh nhân) đến bác sĩ chuyên khoa; đề cập, tham khảo",
+      "example": "Dr. Okafor referred me to a specialist for a closer look at my knee.",
+      "exampleMeaning": "Bác sĩ Okafor đã chuyển tôi đến bác sĩ chuyên khoa để kiểm tra kỹ hơn đầu gối."
+    },
+    {
+      "word": "serious",
+      "partOfSpeech": "adjective",
+      "meaning": "nghiêm trọng, nặng; nghiêm túc",
+      "example": "The results showed nothing serious, so no further treatment was needed.",
+      "exampleMeaning": "Kết quả không cho thấy điều gì nghiêm trọng, nên không cần điều trị thêm."
+    }
+  ],
+  "fillIn": {
+    "passage": "Harbor View Clinic sends every patient a reminder card once a year, and this spring it was my turn. I called the front desk and made an ___ for Thursday morning. Most people at my company have a check-up ___ because our employer pays for it, and I did not want to miss mine.\n\nWhen I arrived, a nurse weighed me and used a small ___ to measure my blood pressure. She wrote the numbers in my ___ and asked a few questions about sleep and exercise. Then Dr. Mendez came in to ___ the results. She said that nothing looked ___, but my blood pressure was a little higher than last year. Her first ___ was simple: less salt and a short walk every day. She explained that small changes now can ___ bigger problems later and are often more ___ than medicine.\n\nDr. Mendez did not want to ___ a condition without more information, so she ordered a blood test. If the test shows a problem, she will ___ me to a specialist who can help me ___ it.",
+    "answers": ["appointment", "annually", "instrument", "record", "assess", "serious", "recommendation", "prevent", "effective", "diagnose", "refer", "manage"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một bác sĩ nữ đang dùng ống nghe khám cho một bệnh nhân nam ngồi trên giường khám trong phòng khám.",
+      "options": [
+        "The doctor is examining a patient.",
+        "The doctor is writing on a whiteboard.",
+        "The patient is lying on the floor.",
+        "The doctor is cleaning the window."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy bác sĩ đang khám cho bệnh nhân bằng ống nghe. (B), (C) và (D) mô tả hành động hoặc đồ vật không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "When is your next appointment with Dr. Lee?",
+        "options": ["On Monday at ten.", "Yes, he is a good doctor.", "The clinic is on Fifth Street."],
+        "answer": "A",
+        "explanation": "Câu hỏi When cần câu trả lời về thời gian. (B) trả lời Yes cho câu hỏi Wh, (C) trả lời về địa điểm."
+      },
+      {
+        "question": "Has the doctor assessed the test results yet?",
+        "options": ["The test was quite long.", "No, she'll look at them this afternoon.", "It costs forty dollars."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về việc bác sĩ đã xem kết quả chưa; (B) trả lời No và nói khi nào sẽ xem. (A) nhắc lại từ 'test' nhưng không trả lời, (C) nói về giá tiền."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Good morning, Harbor View Clinic. How can I help you?\nMan: Hello, this is Peter Hale. I'd like to make an appointment for my yearly check-up. My company requires one annually.\nWoman: Of course. Dr. Mendez has an opening on Wednesday at nine, or Friday at two.\nMan: Friday at two works better. Also, last year the doctor said she might refer me to an eye specialist. Can we talk about that too?\nWoman: Yes, she can assess your eyes during the visit and write the referral if needed. Please bring your insurance card and a list of any medicine you take.\nMan: I will. Should I come early to fill out forms?\nWoman: Ten minutes early is enough. We already have your record on file, so you only need to confirm your address.\nMan: Great, thank you. See you Friday.",
+      "questions": [
+        {
+          "prompt": "Why is the man calling?",
+          "options": ["To cancel a visit", "To schedule a yearly check-up", "To ask about a bill", "To change his address"],
+          "answer": "B",
+          "explanation": "Người đàn ông nói 'I'd like to make an appointment for my yearly check-up', tức muốn đặt lịch khám hằng năm."
+        },
+        {
+          "prompt": "When will the man visit the clinic?",
+          "options": ["Wednesday at nine", "Wednesday at two", "Friday at nine", "Friday at two"],
+          "answer": "D",
+          "explanation": "Người phụ nữ đưa ra hai lựa chọn và người đàn ông chọn 'Friday at two works better'."
+        },
+        {
+          "prompt": "What does the woman ask the man to bring?",
+          "options": ["His insurance card", "His eyeglasses", "His test results", "A letter from his employer"],
+          "answer": "A",
+          "explanation": "Cô ấy nói 'Please bring your insurance card and a list of any medicine you take'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hello, this message is for Ms. Dana Whitfield. This is Carlos from Dr. Patel's office at Maple Street Family Practice. The doctor has reviewed the results of the blood test you had on Monday, and I am happy to tell you that nothing serious was found. Your cholesterol level is slightly above the normal range, but Dr. Patel believes you can manage it with diet and exercise rather than medicine. Her recommendation is to reduce fried food and walk for thirty minutes at least four times a week. She would also like to see you again in six months to check whether these changes are effective. Please call our front desk at 555-0142 to make that appointment. If you have any questions about the results before then, leave a message for the nurse, and she will return your call within one working day. Thank you.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the message?",
+          "options": ["To cancel an appointment", "To report test results", "To request a payment", "To announce new office hours"],
+          "answer": "B",
+          "explanation": "Người gọi báo rằng bác sĩ đã xem kết quả xét nghiệm máu và thông báo kết quả cho bệnh nhân."
+        },
+        {
+          "prompt": "What does Dr. Patel recommend?",
+          "options": ["Taking a new medicine", "Having another blood test this week", "Changing diet and exercising more", "Seeing a specialist"],
+          "answer": "C",
+          "explanation": "Lời khuyên là 'reduce fried food and walk for thirty minutes at least four times a week'; bác sĩ chưa muốn dùng thuốc ở giai đoạn này."
+        },
+        {
+          "prompt": "What is the listener asked to do?",
+          "options": ["Call to schedule a follow-up visit", "Visit the office today", "Send her diet plan by email", "Wait for the nurse to call"],
+          "answer": "A",
+          "explanation": "Tin nhắn yêu cầu 'call our front desk at 555-0142 to make that appointment' cho lần tái khám sau sáu tháng."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Staff members are encouraged to have a dental check-up _____.",
+        "options": ["annually", "annual", "annuals", "annualize"],
+        "answer": "A",
+        "explanation": "Cần trạng từ bổ nghĩa cho hành động 'have a check-up': 'annually' (hằng năm). 'annual' là tính từ."
+      },
+      {
+        "prompt": "The nurse will _____ each patient's condition before the doctor arrives.",
+        "options": ["assessment", "assess", "assessing", "assessed"],
+        "answer": "B",
+        "explanation": "Sau trợ động từ 'will' cần động từ nguyên mẫu: 'assess'."
+      },
+      {
+        "prompt": "The clinic has found that reminder text messages are a highly _____ way to reduce missed visits.",
+        "options": ["effect", "effectively", "effective", "effectiveness"],
+        "answer": "C",
+        "explanation": "Trước danh từ 'way' và sau trạng từ 'highly' cần tính từ: 'effective'."
+      },
+      {
+        "prompt": "Please keep a written _____ of every medicine you take and bring it to your visit.",
+        "options": ["record", "recorder", "recorded", "recording"],
+        "answer": "A",
+        "explanation": "Sau 'a written' cần danh từ chỉ bản ghi chép: 'record'. 'recorder' là máy ghi, không hợp nghĩa."
+      },
+      {
+        "prompt": "Because the symptoms were not _____, the doctor suggested rest instead of medicine.",
+        "options": ["serious", "seriously", "seriousness", "series"],
+        "answer": "A",
+        "explanation": "Sau 'were not' cần tính từ mô tả triệu chứng: 'serious' (nghiêm trọng)."
+      },
+      {
+        "prompt": "The doctor _____ the patient to a specialist after the second test.",
+        "options": ["referred", "reference", "referral", "referring"],
+        "answer": "A",
+        "explanation": "Câu cần động từ chính ở thì quá khứ: 'referred ... to' nghĩa là chuyển bệnh nhân đến chuyên khoa. 'referral' là danh từ."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Employees\nFrom: Human Resources\nSubject: Health screening day\n\nOn Thursday, June 12, nurses from Cedar Lane Medical Group will be in Conference Room B from 9:00 a.m. to 3:00 p.m. to offer free health screenings. Each screening takes about fifteen minutes. A nurse will measure your blood pressure with a small ___ and check your weight and heart rate. The nurses cannot ___ any illness, but they will give you a written summary and a ___ to see your own doctor if any result is outside the normal range. To reserve a time, please sign the sheet outside the HR office by Monday.",
+      "questions": [
+        {
+          "options": ["instrument", "instrumental", "instrumentally", "instruments"],
+          "answer": "A",
+          "explanation": "Sau 'a small' cần danh từ số ít: 'instrument' (dụng cụ đo huyết áp)."
+        },
+        {
+          "options": ["diagnosis", "diagnose", "diagnosed", "diagnostic"],
+          "answer": "B",
+          "explanation": "Sau 'cannot' cần động từ nguyên mẫu: 'diagnose'. 'diagnosis' là danh từ."
+        },
+        {
+          "options": ["recommend", "recommended", "recommendation", "recommending"],
+          "answer": "C",
+          "explanation": "Sau mạo từ 'a' cần danh từ: 'recommendation' (lời khuyên đi khám bác sĩ riêng)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "WESTBROOK FAMILY HEALTH CENTER\nNotice to Patients: Flu Season Preparation\n\nDear Patients,\n\nFlu season usually begins in late October, and the best way to prevent the illness is a yearly vaccination. From October 1 to November 30, Westbrook Family Health Center will offer flu shots on a walk-in basis every weekday from 8:00 a.m. to 11:00 a.m. No appointment is needed during these hours. Patients who prefer an afternoon time can book online or by calling 555-0188.\n\n| Patient group | Where to go |\n| Adults with a current record at the center | Room 2, ground floor |\n| Children under 12 | Pediatric suite, second floor |\n| New patients | Registration desk first, then Room 2 |\n\nAnyone with a fever or a serious ongoing condition should speak to a nurse before receiving the vaccine. The nurse will assess whether the shot is suitable that day or whether a later date is better. The vaccine is covered by most insurance plans; patients without insurance pay a flat fee of $25.\n\nOur doctors strongly recommend the vaccine for everyone over six months of age. Protecting yourself also helps protect your coworkers and family.\n\nDr. Anita Rowe\nMedical Director",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the notice?",
+          "options": ["To announce new opening hours", "To inform patients about flu vaccinations", "To introduce a new doctor", "To explain a change in fees"],
+          "answer": "B",
+          "explanation": "Thông báo nói về việc tiêm phòng cúm từ ngày 1 tháng Mười đến 30 tháng Mười Một và hướng dẫn bệnh nhân cách nhận vắc-xin."
+        },
+        {
+          "prompt": "When can patients receive a flu shot without an appointment?",
+          "options": ["Weekday mornings", "Weekday afternoons", "Weekends only", "Any time in December"],
+          "answer": "A",
+          "explanation": "'on a walk-in basis every weekday from 8:00 a.m. to 11:00 a.m. No appointment is needed during these hours.' Buổi chiều phải đặt trước."
+        },
+        {
+          "prompt": "Where should a new patient go first?",
+          "options": ["Room 2", "The pediatric suite", "The registration desk", "The nurse's office"],
+          "answer": "C",
+          "explanation": "Bảng ghi 'New patients: Registration desk first, then Room 2'."
+        },
+        {
+          "prompt": "Who should speak to a nurse before getting the vaccine?",
+          "options": ["Children under 12", "Patients with insurance", "People with a fever", "Patients over 65"],
+          "answer": "C",
+          "explanation": "'Anyone with a fever or a serious ongoing condition should speak to a nurse before receiving the vaccine.'"
+        },
+        {
+          "prompt": "How much will a patient without insurance pay?",
+          "options": ["Nothing", "$25", "$55", "It depends on the plan"],
+          "answer": "B",
+          "explanation": "'patients without insurance pay a flat fee of $25.' Những người có bảo hiểm thường được chi trả."
+        }
+      ]
+    }
+  }
+}

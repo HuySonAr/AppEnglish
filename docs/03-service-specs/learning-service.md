@@ -45,6 +45,7 @@ valid session; the gateway calls auth-service `Me` and passes the actor to
 | POST | `/placement/skip` | `SkipPlacement` | Student | Uses up the attempt; start at unit 1 |
 | GET | `/placement/settings` | `GetPlacementSettings` | Admin | Thresholds and duration |
 | PUT | `/placement/settings` | `UpdatePlacementSettings` | Admin | `{ unit2Threshold, unit3Threshold }`, whole percents 1–100, unit 2 below unit 3 |
+| POST | `/placement/admin/learners/:id/reset` | `AdminResetPlacement` | Admin | D131: deletes the learner's single attempt (`{ reset: true|false }`); the gateway then calls auth-service `AdminAccountAction` RESET_PLACEMENT with the optional `reason` for the audit and returns `account` too. Lesson progress is untouched |
 
 Responses use the `{ code, msg, data }` envelope. Learning codes
 (`packages/learning-contracts/src/index.js`): 50 placement not available (no
@@ -143,6 +144,49 @@ earlier step is not finished (`data.step`), 56 no lesson test in progress.
 - No XP, no progress event yet: Reading/Listening mastery (D33) is F06 and
   will read the per-skill counts stored on each attempt.
 
+## Unit review (D121)
+
+The 19-question Reading test that closes a unit (10 Part 5 sentences, 3 Part 6
+passages of 3 blanks; D129), written by a Content Manager
+(see content-service). Rules in `lesson.rules.js` (`lessonAccess` takes the
+passed reviews, `unitReviewAccess`), service methods in `lesson.service.js`.
+
+### Data (`app_learning`)
+
+Migration `1730000010000-create-unit-review-attempts.js`.
+
+| Table | Purpose |
+|---|---|
+| `unit_review_attempts` | One row per finished attempt: `accountId`, `unitId`, `reviewVersionId` (content-service version scored against), `attemptNumber`, `answers`, `totalCount`, `correctCount`, `passed`, `submittedAt`. No attempt in progress: the review is untimed and scored on submit |
+
+### API
+
+| Method | Gateway route | RPC | Purpose |
+|---|---|---|---|
+| GET | `/learning/curriculum` | `GetCurriculum` | Each unit now carries `review`: null without a published review, else `{ state (NONE/LOCKED/OPEN/PASSED), questionCount, passPercent, lessonsLeft, attemptCount, bestPercent }` |
+| GET | `/learning/units/:id/review` | `GetUnitReview` | The review of unit `:id`: `unit { id, number, title }`, the summary above, `attempts` (`attemptNumber`, `correctCount`, `totalCount`, `scorePercent`, `passed`, `submittedAt`) and `parts` (Parts 5 and 6 as `testParts` gives them, questions numbered 1–19, options shuffled, no answers) |
+| POST | `/learning/units/:id/review/submit` | `SubmitUnitReview` | `{ answers: { questionId: optionId } }` scored against the current published review → `{ attempt, parts }` with correct answers and explanations |
+
+Codes: 63 the unit has no published review (or is not published), 64 the
+review is locked (`data.lessonsLeft`, `data.placementRequired`).
+
+### Rules
+
+- `unitReviewAccess`: NONE without a published review; PASSED once an attempt
+  reached `lessonTestPassed` (80%); OPEN when every lesson of the unit is
+  completed, or the unit lies before the starting unit (its lessons are open
+  freely, D35); LOCKED otherwise, and always before the placement is taken or
+  skipped.
+- `lessonAccess`: the first lesson of a unit stays LOCKED while the unit
+  before has a published review (and lessons) that is not passed, even though
+  that unit's last lesson is completed. The first lesson of the starting unit
+  and the units before it are not affected.
+- Retakes are unlimited, every attempt is kept, a worse retake changes
+  nothing; no XP, no ranking, no event to progress-service.
+- Unpublishing the review (content-service) makes the unit close with its
+  last lesson again; attempts are kept and still count as content usage for
+  `GetContentUsage` kind `unit` (D118).
+
 ## Vocabulary practice (F05B-1, D84)
 
 Code in `apps/learning-service/src/lesson/` (`getVocabularyPractice`,
@@ -181,77 +225,33 @@ so the best never goes down and concurrent checks all count.
 Student only (26). 59 `LISTENING_EXERCISE_NOT_FOUND` for an exercise that is
 not published. Scoring rules: D86.
 
-## Listening course (F05C, D100, D101)
+## Listening course (F05C, D143–D147)
 
-Code in `apps/learning-service/src/course/`. Units and lessons are read from
-content-service (`ListPublishedCourse`, `GetCoursePaper`).
+The learner side of the course. Levels A1–C2 come from content-service
+`ListPublishedCourse` (topics in order and, for A1–C1, the level test). A1 is
+open; each later level opens once the level test of the level before is
+passed (`course.rules.js` `courseMap`). Inside an open level every topic can
+be studied in any order. Nothing in a topic is scored: questions and the
+ordering task are checked on the page from the answers the topic carries;
+dictation sentences are checked by the service but not kept. A topic marked
+done is stored in `course_lesson_results` with the topic id as `unitId` and
+`lessonId` (score 100). Level-test attempts are stored in
+`course_test_results` (best score kept, first pass kept). There is no
+placement and no mistakes notebook (D145); their tables were dropped (D146).
+The recording, sentences, translations and blanks come from the topic's own
+content (`audioMediaId`, `segments`) and the paper's `media` URLs (D147); a
+level-test section's `transcript` text is returned after the test as lines,
+"Man: …" at the start of a line being the speaker.
 
-Data (`app_learning`, migration `1730000005000-create-course-lesson-results`):
-`course_lesson_results`, one row per learner and lesson (`accountId`,
-`unitId`, `lessonId`, `bestScore`, `lastScore`, `attemptCount`, `passedAt`
-(first pass, kept), `lastAttemptAt`; unique pair). Recorded with one
-`INSERT … ON CONFLICT DO UPDATE`.
-
-| Method | Path | RPC | Result |
+| Method | Gateway route | RPC | Purpose |
 |---|---|---|---|
-| GET | `/learning/listening-course` | `GetListeningCourse` | `{ passPercent, levels: [{ level, units: [{ id, section, title, description, lessons: [{ id, title, bestScore, lastScore, attemptCount, passed }], checkQuestionCount }], levelTest }] }` |
-| GET | `/learning/listening-course/units/:unitId/lessons/:lessonId` | `GetCourseLesson` | `{ unit, versionId, lesson: { id, title, number, count, nextLessonId }, passPercent, keywords, audioUrl, gist, detail, focus, closeSegments: [{ id, speaker, start, end }] }` and the learner's result; no answers, no text of the sentences to write down. A detail question of kind `complete` comes as `{ id, kind, skill, prompt, blankCount }`; `focus` (D109) is null or `{ title, passage, blankCount, words }` with the words in alphabetical order |
-| POST | `…/check` | `CheckCourseLessonStep` | Body `{ versionId?, step: gist\|detail\|focus\|close, segmentId? (close), answers }`. Answers: option id by question id, the words of a blank by `courseBlankKey(questionId, index)` (`<id>:<index>`) and of the Focus on by `focus:<index>`, text by sentence id. Choice questions come back with `chosenOptionId`, `correctOptionId`, `correct`, `accuracy` (100/0), `explanation`; a completed sentence with `blanks: [{ index, expected, typed, correct }]`, `correct`, `accuracy`; `focus` with the same blanks; a sentence with `text`, `typed`, `words`, `accuracy`. Nothing is kept; 30 for a sentence not chosen or a focus step of a lesson without one |
-| POST | `…/complete` | `CompleteCourseLesson` | Body `{ versionId?, answers }` (option id by question id, text by sentence id). `{ score, passed (this attempt), lessonPassed, passPercent, bestScore, lastScore, attemptCount, nextLessonId, questions, focus (or null), sentences, transcript: [{ …, writtenDown }] }`. Score (D101, D109): every question one point (a choice right or not, a completed sentence the share of its blanks right), the Focus on one point by its blanks, every sentence its accuracy; the share of points, passed at `passPercent` |
-
-| GET | `/learning/listening-course/tests/:itemId` | `GetCourseTest` | A unit check (itemId = the unit id) or level test: `{ test: { id, kind: unit_check\|level_test, title, level, nextLevel }, versionId, passPercent, sections: [{ id, audioUrl, questions }] }` without answers, and the learner's result |
-| POST | `/learning/listening-course/tests/:itemId/submit` | `SubmitCourseTest` | Body `{ versionId?, answers }`. `{ score, passed, testPassed, passPercent, rightCount, questionCount, bestScore, lastScore, attemptCount, levelUp: { from, to } \| null, next, sections: [{ id, audioUrl, questions (marked), transcript }] }` |
-
-Student only (26). 60 `COURSE_LESSON_NOT_FOUND` for a unit, lesson, test,
-version or recording that is not published; 61 `COURSE_ITEM_LOCKED` (409) for
-a lesson or test locked for the learner. Lesson score: each question 1 point,
-each sentence its accuracy (0–1); passed at 70% (D101). Unit check and level
-test score: share of right questions; passed at 75% and 70%.
-
-What is open (`course.rules.js`, D102): the current level is the first level
-from the starting level (A1 until the listening placement) whose level test is
-not passed; earlier levels are open for review, later ones locked. In the
-current level a lesson opens when the lesson or unit check before it is
-passed, a unit check when every lesson of its unit is passed, and the level
-test at any time. `GET /learning/listening-course` adds `currentLevel`,
-`next` (`{ type: lesson|unit_check|level_test, … }`), `state` on each level
-(DONE/CURRENT/LOCKED) and on each lesson, `check` and level test
-(LOCKED/OPEN/PASSED) with their results.
-
-Listening placement (D103):
-
-| Method | Path | RPC | Result |
-|---|---|---|---|
-| GET | `/learning/listening-course/placement` | `GetCoursePlacement` | Not taken: `{ status: NOT_STARTED, versionId, title, levelPassPercent, sections: [{ id, audioUrl, questions }] }` without answers or levels (404 code 60 when not published); taken or skipped: `{ status, startLevel, levelScores }` |
-| POST | `/learning/listening-course/placement/submit` | `SubmitCoursePlacement` | Body `{ versionId?, answers }`. `{ status, startLevel, currentLevel, levelScores: [{ level, right, total }], levelPassPercent, next, sections (with level, marked questions, transcript) }`; 409 code 62 once taken or skipped |
-| POST | `/learning/listening-course/placement/skip` | `SkipCoursePlacement` | `{ status: SKIPPED, startLevel: A1 }`; 409 code 62 once taken or skipped |
-
-A level is known at 60% of its questions; the start is the first level not
-known (C1 when all are). `GET /learning/listening-course` adds `placement:
-{ status, available, startLevel }`. Data: `course_placements` (migration
-`1730000007000-create-course-placements`), one row per learner (`accountId`
-unique, `status` COMPLETED/SKIPPED, `versionId`, `startLevel`, `levelScores`,
-`answers`, `completedAt`), inserted with `ON CONFLICT DO NOTHING`.
-
-Progress and mistakes notebook (D104):
-
-| Method | Path | RPC | Result |
-|---|---|---|---|
-| GET | `/learning/listening-course/progress` | `GetCourseProgress` | `{ currentLevel, placement, lessons: { passed, total }, averageBestScore, attemptCount, mistakeCount, mostMissedWords: [{ word, count }], levels: [{ level, state, lessons, unitChecks, levelTest: { bestScore, passed } \| null }] }` |
-| GET | `/learning/listening-course/mistakes` | `ListCourseMistakes` | `{ mistakes: [{ id, level, unitId, unitTitle, lessonId, lessonTitle, speaker, missedWords: [{ text, typed }], timesMissed, lastMissedAt, audioUrl, start, end }], mostMissedWords }`; no sentence text |
-| POST | `/learning/listening-course/mistakes/:id/check` | `CheckCourseMistake` | Body `{ text }`. `{ sentence (checked word by word, with its text), fixed }`; right removes it, wrong keeps it with the words missed this time; 404 code 60 for an unknown id |
-
-Finishing a lesson keeps each written sentence below 100% in the notebook
-(once more if already there) and removes those written right. Data:
-`course_mistakes` (migration `1730000008000-create-course-mistakes`), one row
-per learner, lesson and sentence (`unitId`, `segmentId`, `level`, `unitTitle`,
-`lessonTitle`, `text`, `speaker` kept as they were, `missedWords`,
-`timesMissed`, `lastMissedAt`).
-
-Data: `course_test_results` (migration `1730000006000-create-course-test-results`),
-one row per learner and unit check or level test (`accountId`, `itemId`,
-`kind`, `level`, `bestScore`, `lastScore`, `attemptCount`, `passedAt`,
-`lastAttemptAt`; unique pair), recorded like the lesson results.
+| GET | `/learning/listening-course` | `GetListeningCourse` | Levels with `state` (`OPEN`/`LOCKED`), topics with `done`, level test with `nextLevel`, best score, attempts, `passed`; `currentLevel` (highest open level); `passPercent.levelTest` |
+| GET | `/learning/listening-course/topics/:id` | `GetCourseTopic` | One topic of an open level: audio URL, vocabulary (IPA, meaning, pronunciation URL), questions with `correctOptionId` and explanation, ordering (`items` shuffled per learner, `order`), sentences (speaker, text, times, translation, blank `pieces`), previous/next topic, `done`, `versionId`. 409 code 61 in a locked level, 404 code 60 when not published |
+| POST | `/learning/listening-course/topics/:id/check` | `CheckCourseSentence` | `{ versionId?, segmentId, mode: full|blanks, text?, blanks? }`: full → words marked (D86) and accuracy; blanks → each blank right or wrong. Nothing kept. 400 when the sentence has no blanks in the blanks mode |
+| POST | `/learning/listening-course/topics/:id/complete` | `CompleteCourseTopic` | Marks the topic done; returns `done` and the progress |
+| GET | `/learning/listening-course/tests/:id` | `GetCourseTest` | A level test of an open level without its answers |
+| POST | `/learning/listening-course/tests/:id/submit` | `SubmitCourseTest` | `{ versionId?, answers }`: score, `passed`, best score, `levelUp` when the next level opened, review with answers, explanations and transcripts |
+| GET | `/learning/listening-course/progress` | `GetCourseProgress` | `currentLevel`, `openLevels`, topics done/total, by level topics done/total and the level test result |
 
 ## Mock tests (F05A, D63, D64)
 
@@ -378,3 +378,7 @@ to write the outbox is logged and never fails the learner's submit.
 in-memory repository and a content stand-in, and the gateway HTTP ↔ gRPC
 contract with a stand-in for auth-service. Results are in
 `docs/04-implementation/feature-status.md`.
+
+## Content usage (D118, D128)
+
+`GetContentUsage` (gateway-internal, no learner route): `payloadJson = { kind, ids[] }` with `kind` in `ContentUsageKind` (`lesson`, `mockTest`, `listeningExercise`, `courseTopic`, `courseTest`, and the version kinds of D128). Answers `{ kind, counts: { [id]: n }, total }` from `lesson_test_attempts` + `lesson_progress`, `mock_attempts`, `listening_results`, `course_lesson_results` (by `unitId`, which holds the topic id) and `course_test_results` (by `itemId`). The gateway refuses to delete content whose total is above 0. Code in `apps/learning-service/src/usage/`.

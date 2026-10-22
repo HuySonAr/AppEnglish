@@ -45,6 +45,20 @@ export class HealthService {
           }
         }),
       ),
+      // The Python worker answers through content-service (D133).
+      this.probe('speech-service', async () => {
+        const port = env.CONTENT_SERVICE_PORT || 3002;
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
+        try {
+          const response = await fetchImpl(`http://localhost:${port}/health/speech`, { signal: controller.signal });
+          if (!response.ok) return { status: 'down', detail: `HTTP ${response.status}` };
+          const body = await response.json().catch(() => ({}));
+          return body.status === 'ok' ? { status: 'ok' } : { status: 'down', detail: body.detail || 'down' };
+        } finally {
+          clearTimeout(timer);
+        }
+      }),
     ];
     const services = await Promise.all(probes);
     return {

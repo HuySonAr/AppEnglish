@@ -6,7 +6,8 @@
   "main": "src/index.js",
   "exports": {
     ".": "./src/index.js",
-    "./grpc": "./src/grpc.js"
+    "./grpc": "./src/grpc.js",
+    "./authoring": "./src/authoring.js"
   },
   "scripts": {
     "build": "node --check src/index.js",

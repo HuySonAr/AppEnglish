@@ -41,12 +41,16 @@ export function xpBars(xp, { maxTitle = 18 } = {}) {
   });
 }
 
-// The listening course levels as steps: passed, current or locked.
+// The listening course levels as steps (D145), from GET
+// /learning/listening-course/progress: DONE when its level test is passed,
+// CURRENT for the learner's level, OPEN or LOCKED otherwise, with the topics
+// done out of all.
+export const LevelStep = Object.freeze({ DONE: 'DONE', CURRENT: 'CURRENT', OPEN: 'OPEN', LOCKED: 'LOCKED' });
 export function levelSteps(course) {
   return (course?.levels || []).map((level) => ({
     level: level.level,
-    state: level.state,
-    lessons: level.lessons || null,
+    state: level.levelTest?.passed ? LevelStep.DONE : level.level === course.currentLevel ? LevelStep.CURRENT : level.state === 'OPEN' ? LevelStep.OPEN : LevelStep.LOCKED,
+    topics: level.topics || null,
   }));
 }
 

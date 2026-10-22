@@ -5,23 +5,18 @@ import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
 import { LearningError } from '../placement/placement.errors.js';
 import { actorSchema } from '../placement/placement.schemas.js';
 import { CourseLessonService } from './course.service.js';
-import { lessonAnswersSchema, lessonOpenSchema, mistakeCheckSchema, stepCheckSchema, testAnswersSchema, unitIdSchema } from './course.schemas.js';
+import { itemIdSchema, sentenceCheckSchema, testAnswersSchema } from './course.schemas.js';
 
-// Each RPC: whether it targets an id (a unit, or a level test), the schema of its JSON payload (if
-// any) and the service call.
+// Each RPC: whether it targets an id (a topic or a level test), the schema of
+// its JSON payload (if any) and the service call.
 const rpcs = {
   GetListeningCourse: { run: (service, { actor }) => service.getCourse(actor) },
-  GetCourseLesson: { id: true, payload: lessonOpenSchema, run: (service, { actor, id, payload }) => service.getLesson(actor, id, payload) },
-  CheckCourseLessonStep: { id: true, payload: stepCheckSchema, run: (service, { actor, id, payload }) => service.checkStep(actor, id, payload) },
-  CompleteCourseLesson: { id: true, payload: lessonAnswersSchema, run: (service, { actor, id, payload }) => service.complete(actor, id, payload) },
+  GetCourseTopic: { id: true, run: (service, { actor, id }) => service.getTopic(actor, id) },
+  CheckCourseSentence: { id: true, payload: sentenceCheckSchema, run: (service, { actor, id, payload }) => service.checkSentence(actor, id, payload) },
+  CompleteCourseTopic: { id: true, run: (service, { actor, id }) => service.completeTopic(actor, id) },
   GetCourseTest: { id: true, run: (service, { actor, id }) => service.getTest(actor, id) },
   SubmitCourseTest: { id: true, payload: testAnswersSchema, run: (service, { actor, id, payload }) => service.submitTest(actor, id, payload) },
-  GetCoursePlacement: { run: (service, { actor }) => service.getPlacement(actor) },
-  SubmitCoursePlacement: { payload: testAnswersSchema, run: (service, { actor, payload }) => service.submitPlacement(actor, payload) },
-  SkipCoursePlacement: { run: (service, { actor }) => service.skipPlacement(actor) },
   GetCourseProgress: { run: (service, { actor }) => service.getProgress(actor) },
-  ListCourseMistakes: { run: (service, { actor }) => service.listMistakes(actor) },
-  CheckCourseMistake: { id: true, payload: mistakeCheckSchema, run: (service, { actor, id, payload }) => service.checkMistake(actor, id, payload) },
 };
 
 function parseJson(text) {
@@ -45,7 +40,7 @@ export class CourseGrpcController {
     try {
       const data = await spec.run(this.courseService, {
         actor: actorSchema.parse(request.actor),
-        id: spec.id ? unitIdSchema.parse(request.id) : undefined,
+        id: spec.id ? itemIdSchema.parse(request.id) : undefined,
         payload: spec.payload ? spec.payload.parse(parseJson(request.payloadJson)) : undefined,
       });
       return this.toReply(200, LearningResponseCode.SUCCESS, 'success', data);

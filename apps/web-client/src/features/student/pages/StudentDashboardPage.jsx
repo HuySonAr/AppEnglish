@@ -14,7 +14,7 @@ import { listMockTests } from '../api/mock-api.js';
 import { getPlacement } from '../api/placement-api.js';
 import { getProgress } from '../api/progress-api.js';
 import { bestMockPercent, greeting, lessonStats, nextLessonStep, suggestedMockTest } from '../lib/home.js';
-import { nextKind, nextPath } from '../lib/listening-course.js';
+import { nextKind, nextStep } from '../lib/listening-course.js';
 
 // What the home page shows. Each part loads on its own, so one service being
 // away hides only its part.
@@ -184,7 +184,9 @@ export function StudentDashboardPage() {
   const suggested = suggestedMockTest(mocks);
   const bestMock = bestMockPercent(mocks);
   const name = account?.email?.split('@')[0] || 'learner';
-  const listeningLevel = failed.course ? '—' : course.currentLevel || (course.levels?.length ? 'C1 passed' : '—');
+  const listeningLevel = failed.course ? '—' : course.currentLevel || '—';
+  // What to do next in the listening course (D145), worked out on the page.
+  const courseNext = failed.course ? null : nextStep(course);
 
   return (
     <section className="space-y-6">
@@ -223,7 +225,7 @@ export function StudentDashboardPage() {
             <p className="text-sm text-muted-foreground">Listening level</p>
             <p className="mt-1 text-2xl font-bold">{listeningLevel}</p>
             <p className="truncate text-xs text-muted-foreground">
-              {failed.course ? 'Could not load' : course.next ? `${nextKind[course.next.type]}: ${course.next.title}` : 'Listening course'}
+              {failed.course ? 'Could not load' : courseNext ? `${nextKind[courseNext.type]}: ${courseNext.title}` : 'Listening course'}
             </p>
           </div>
         </div>
@@ -262,26 +264,23 @@ export function StudentDashboardPage() {
         </Section>
 
         <Section icon={GraduationCap} title="Listening course" to="/student/listening-course" linkLabel="Open the course" failed={failed.course}>
-          {course?.next ? (
+          {courseNext ? (
             <>
               <p className="text-sm text-muted-foreground">
-                {nextKind[course.next.type]} at {course.next.level}
+                {nextKind[courseNext.type]} at {courseNext.level}
               </p>
-              <p className="truncate font-semibold">{course.next.title}</p>
-              {course.next.unitTitle ? <p className="truncate text-sm text-muted-foreground">{course.next.unitTitle}</p> : null}
+              <p className="truncate font-semibold">{courseNext.title}</p>
               <Button asChild variant="outline" size="sm" className="mt-auto w-fit gap-1.5">
-                <Link to={nextPath(course.next)}>
+                <Link to={courseNext.path}>
                   <Headphones className="h-4 w-4" />
                   Continue listening
                 </Link>
               </Button>
             </>
           ) : course?.currentLevel ? (
-            <p className="text-sm text-muted-foreground">Nothing more to take at {course.currentLevel} yet. New lessons will appear when they are published.</p>
-          ) : course?.levels?.length ? (
-            <p className="text-sm text-muted-foreground">You have passed every level test. Well done!</p>
+            <p className="text-sm text-muted-foreground">Every {course.currentLevel} topic is done. New topics will appear when they are published.</p>
           ) : (
-            <p className="text-sm text-muted-foreground">Listening lessons will appear here when they are published.</p>
+            <p className="text-sm text-muted-foreground">Listening topics will appear here when they are published.</p>
           )}
         </Section>
 

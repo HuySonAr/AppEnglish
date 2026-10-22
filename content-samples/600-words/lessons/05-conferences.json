@@ -1,0 +1,260 @@
+{
+  "number": 5,
+  "title": "Conferences",
+  "vocabulary": [
+    {
+      "word": "accommodate",
+      "partOfSpeech": "verb",
+      "meaning": "chứa được, có đủ chỗ cho; đáp ứng (yêu cầu)",
+      "example": "The new hall can accommodate up to four hundred guests for a seated dinner.",
+      "exampleMeaning": "Hội trường mới có thể chứa tới bốn trăm khách cho một bữa tiệc ngồi."
+    },
+    {
+      "word": "arrangement",
+      "partOfSpeech": "noun",
+      "meaning": "sự sắp xếp, sự chuẩn bị; thỏa thuận",
+      "example": "Ms. Ito is making the travel arrangements for everyone going to the trade fair.",
+      "exampleMeaning": "Cô Ito đang sắp xếp việc đi lại cho tất cả những người đi hội chợ thương mại."
+    },
+    {
+      "word": "association",
+      "partOfSpeech": "noun",
+      "meaning": "hiệp hội; sự liên kết, mối liên hệ",
+      "example": "The regional dental association organizes its annual meeting every October.",
+      "exampleMeaning": "Hiệp hội nha khoa khu vực tổ chức cuộc họp thường niên vào tháng Mười hằng năm."
+    },
+    {
+      "word": "attend",
+      "partOfSpeech": "verb",
+      "meaning": "tham dự, có mặt tại",
+      "example": "More than two hundred engineers attended the workshop on solar energy.",
+      "exampleMeaning": "Hơn hai trăm kỹ sư đã tham dự hội thảo về năng lượng mặt trời."
+    },
+    {
+      "word": "get in touch",
+      "partOfSpeech": "verb",
+      "meaning": "liên lạc, liên hệ (với ai)",
+      "example": "Please get in touch with the organizer if you need a vegetarian lunch.",
+      "exampleMeaning": "Vui lòng liên hệ với ban tổ chức nếu bạn cần bữa trưa chay."
+    },
+    {
+      "word": "hold",
+      "partOfSpeech": "verb",
+      "meaning": "tổ chức (sự kiện); giữ, chứa",
+      "example": "The company will hold its sales conference in a seaside hotel this year.",
+      "exampleMeaning": "Năm nay công ty sẽ tổ chức hội nghị bán hàng tại một khách sạn ven biển."
+    },
+    {
+      "word": "location",
+      "partOfSpeech": "noun",
+      "meaning": "địa điểm, vị trí",
+      "example": "The organizers chose a location close to the airport so that visitors could arrive easily.",
+      "exampleMeaning": "Ban tổ chức chọn một địa điểm gần sân bay để khách đến dễ dàng."
+    },
+    {
+      "word": "overcrowded",
+      "partOfSpeech": "adjective",
+      "meaning": "quá đông, chật chội",
+      "example": "The morning talk was so overcrowded that some people had to stand at the back.",
+      "exampleMeaning": "Buổi nói chuyện sáng đông đến mức một số người phải đứng ở cuối phòng."
+    },
+    {
+      "word": "register",
+      "partOfSpeech": "verb",
+      "meaning": "đăng ký, ghi tên",
+      "example": "Participants who register before June 1 pay a reduced fee.",
+      "exampleMeaning": "Người tham dự đăng ký trước ngày 1 tháng Sáu được giảm phí."
+    },
+    {
+      "word": "select",
+      "partOfSpeech": "verb",
+      "meaning": "chọn, lựa chọn (kỹ lưỡng)",
+      "example": "The committee selected six speakers from more than forty proposals.",
+      "exampleMeaning": "Ban tổ chức đã chọn sáu diễn giả từ hơn bốn mươi đề xuất."
+    },
+    {
+      "word": "session",
+      "partOfSpeech": "noun",
+      "meaning": "phiên họp, buổi (hội thảo, làm việc)",
+      "example": "The afternoon session on digital marketing lasted ninety minutes and ended with questions.",
+      "exampleMeaning": "Phiên buổi chiều về tiếp thị số kéo dài chín mươi phút và kết thúc bằng phần hỏi đáp."
+    },
+    {
+      "word": "take part in",
+      "partOfSpeech": "verb",
+      "meaning": "tham gia vào (hoạt động, sự kiện)",
+      "example": "Anyone with a ticket may take part in the question-and-answer panel.",
+      "exampleMeaning": "Bất kỳ ai có vé đều có thể tham gia phần hỏi đáp."
+    }
+  ],
+  "fillIn": {
+    "passage": "Every autumn the Eastern Hotel Managers' ___ organizes a two-day conference for its members. This year the planning committee asked Nadia Petrov to ___ the ___. Last year's venue was ___: more than three hundred people tried to fit into a hall built for two hundred, and many of the people who ___ complained that they could not hear the speakers.\n\nNadia visited four conference centers before choosing one by the lake that can ___ five hundred guests. She then made ___ for buses from the main railway station, since the center is far from town. Members who want to ___ must do so online by September 15, and anyone who needs a special meal should ___ with Nadia's office before that date.\n\nThe program has eight ___ in total, including a workshop in which small groups ___ a real hotel case study. The committee will ___ the opening dinner on the first evening, and the closing speech is planned for four o'clock on the second day.",
+    "answers": ["Association", "select", "location", "overcrowded", "attended", "accommodate", "arrangements", "register", "get in touch", "sessions", "take part in", "hold"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một hội trường lớn đông người ngồi nghe, một diễn giả nam đứng trên sân khấu cạnh màn hình chiếu.",
+      "options": [
+        "A speaker is standing on a stage.",
+        "The audience is leaving the hall.",
+        "A man is setting up chairs.",
+        "The screen is being carried away."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy diễn giả đứng trên sân khấu trước khán giả. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Where will the association hold its annual meeting this year?",
+        "options": ["At the Lakeside Convention Center.", "It holds about three hundred people.", "Yes, in early November."],
+        "answer": "A",
+        "explanation": "Câu hỏi Where cần câu trả lời chỉ nơi chốn. (B) nhầm nghĩa 'hold' là chứa được, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Have you registered for the afternoon session yet?",
+        "options": ["The register is kept at reception.", "No, I'll do it after lunch.", "It lasts about two hours."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về việc đã đăng ký chưa; (B) trả lời No và nói khi nào sẽ làm. (A) nhầm nghĩa 'register' là sổ đăng ký, (C) trả lời về thời lượng."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Hi, Sofia. I've just come back from the Grand Plaza Hotel. I don't think it's the right location for the training conference.\nWoman: Why not? The price was reasonable, and it's close to the train station.\nMan: The main room only accommodates eighty people, and we already have one hundred and ten people registered. It would be terribly overcrowded.\nWoman: I see. What about the Riverside Center? Their website says the large hall seats two hundred.\nMan: I'll get in touch with their events manager this afternoon and ask if the hall is free on the fourteenth.\nWoman: Good. If it is, we'll need to change the catering arrangements too. The caterer has to know the new address by Friday.\nMan: I'll let you know as soon as I hear from them.",
+      "questions": [
+        {
+          "prompt": "What is the problem with the Grand Plaza Hotel?",
+          "options": ["It is too expensive.", "It is far from the train station.", "Its room is too small.", "It is closed on the fourteenth."],
+          "answer": "C",
+          "explanation": "Phòng chính chỉ chứa được tám mươi người trong khi đã có một trăm mười người đăng ký, nên 'It would be terribly overcrowded'. Giá cả và vị trí đều được khen."
+        },
+        {
+          "prompt": "How many people have registered so far?",
+          "options": ["Eighty", "One hundred and ten", "Two hundred", "Fourteen"],
+          "answer": "B",
+          "explanation": "'we already have one hundred and ten people registered'. Tám mươi là sức chứa của phòng, hai trăm là sức chứa của Riverside Center."
+        },
+        {
+          "prompt": "What will the man do this afternoon?",
+          "options": ["Visit the Riverside Center", "Contact an events manager", "Call the caterer", "Cancel the conference"],
+          "answer": "B",
+          "explanation": "'I'll get in touch with their events manager this afternoon'; 'contact' đồng nghĩa với 'get in touch with'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good morning, and welcome to the third annual conference of the Northern Logistics Association, which holds this event every spring. My name is Khalid Mansour, and I am the program chair. Before the first session begins, I have a few announcements. If you have not yet registered, please go to the desk at the main entrance; your badge is needed to enter every room. Today's talks take place in Halls A and B, and the full schedule is printed on the back of your badge. At two o'clock, you can take part in a panel discussion on delivery drones. The panel has only sixty seats, so please select this option on the sign-up sheet outside Hall B if you wish to attend. Lunch will be served in the garden restaurant from twelve to one thirty. Finally, please turn off your phones during the talks. Thank you, and enjoy the conference.",
+      "questions": [
+        {
+          "prompt": "Who is the speaker?",
+          "options": ["A hotel receptionist", "The program chair of a conference", "A drone manufacturer", "A restaurant manager"],
+          "answer": "B",
+          "explanation": "Người nói tự giới thiệu 'I am the program chair' của hội nghị."
+        },
+        {
+          "prompt": "Why should attendees go to the desk at the main entrance?",
+          "options": ["To collect a lunch ticket", "To register and receive a badge", "To turn in their phones", "To buy a printed schedule"],
+          "answer": "B",
+          "explanation": "'If you have not yet registered, please go to the desk at the main entrance; your badge is needed to enter every room.'"
+        },
+        {
+          "prompt": "What is mentioned about the panel discussion?",
+          "options": ["It takes place in the garden restaurant.", "It starts at twelve o'clock.", "It has a limited number of seats.", "It is open only to speakers."],
+          "answer": "C",
+          "explanation": "'The panel has only sixty seats', nên người nghe phải chọn trên tờ đăng ký. Phiên thảo luận bắt đầu lúc hai giờ, không phải mười hai giờ."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The conference center can _____ up to six hundred participants in its largest hall.",
+        "options": ["accommodate", "accommodation", "accommodating", "accommodated"],
+        "answer": "A",
+        "explanation": "Sau động từ khuyết thiếu 'can' cần động từ nguyên mẫu: 'accommodate'."
+      },
+      {
+        "prompt": "Travel _____ for the speakers were made by the association's secretary.",
+        "options": ["arrange", "arrangements", "arranged", "arranging"],
+        "answer": "B",
+        "explanation": "Chủ ngữ của 'were made' phải là danh từ số nhiều: 'Travel arrangements'."
+      },
+      {
+        "prompt": "Everyone who wants to _____ the workshop must sign up by Monday.",
+        "options": ["attendance", "attend", "attending", "attendant"],
+        "answer": "B",
+        "explanation": "Sau 'wants to' cần động từ nguyên mẫu: 'attend'."
+      },
+      {
+        "prompt": "The committee will _____ three papers for the opening session.",
+        "options": ["select", "selection", "selective", "selectively"],
+        "answer": "A",
+        "explanation": "Sau 'will' cần động từ nguyên mẫu: 'select' (chọn)."
+      },
+      {
+        "prompt": "Please _____ with the hotel if you need to change your check-in date.",
+        "options": ["get in touch", "get touch", "getting in touch", "got in touch"],
+        "answer": "A",
+        "explanation": "Câu mệnh lệnh bắt đầu bằng 'Please' cần động từ nguyên mẫu; cụm cố định là 'get in touch with', không bỏ 'in'."
+      },
+      {
+        "prompt": "The _____ of this year's meeting is a resort about two hours from the capital.",
+        "options": ["locate", "located", "location", "locally"],
+        "answer": "C",
+        "explanation": "Sau 'The' và trước 'of' cần danh từ làm chủ ngữ: 'location' (địa điểm)."
+      }
+    ],
+    "part6": {
+      "passage": "Dear Dr. Okonkwo,\n\nThank you for agreeing to speak at the Coastal Teachers' Conference on March 21. Your talk has been placed in the morning ___, which runs from nine to ten thirty in Room 4. Because the room seats only seventy people and your topic is very popular, we have asked the hotel to open the wall to the next room so that it can ___ a larger audience. Please ___ with our coordinator, Mei Lin, at least one week before the event to confirm your equipment needs. A projector and microphone will be provided.\n\nWe look forward to welcoming you.\n\nKind regards,\nPaulo Ferreira\nConference Secretary",
+      "questions": [
+        {
+          "options": ["session", "sessions", "section", "seating"],
+          "answer": "A",
+          "explanation": "Sau 'the morning' cần danh từ số ít chỉ phiên làm việc: 'session'. 'section' là mục, phần của tài liệu."
+        },
+        {
+          "options": ["accommodate", "accommodation", "accommodated", "accommodating"],
+          "answer": "A",
+          "explanation": "Sau 'can' cần động từ nguyên mẫu: 'accommodate a larger audience' (chứa được nhiều khán giả hơn)."
+        },
+        {
+          "options": ["get in touch", "register", "attend", "hold"],
+          "answer": "A",
+          "explanation": "Câu yêu cầu diễn giả liên hệ với điều phối viên để xác nhận thiết bị; 'get in touch with' đúng nghĩa và đi với 'with'. 'register', 'attend' và 'hold' không đi với 'with' ở đây."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "WESTLAND RETAIL ASSOCIATION\nSpring Conference 2026 - Registration Information\n\nDates: April 16-17\nLocation: Pinecrest Convention Center, 48 Harbor Road, Westland\n\nThe Westland Retail Association will hold its spring conference at a new location this year. The Pinecrest Convention Center was selected after last year's event became overcrowded, and it accommodates up to 900 participants.\n\n| Registration type | Deadline | Fee |\n| Early member | March 15 | $180 |\n| Member | April 10 | $230 |\n| Non-member | April 10 | $310 |\n| Student | April 10 | $60 |\n\nFees include lunch on both days and entry to all sessions. Members who wish to take part in the Friday evening dinner must select that option when they register; it costs an extra $45, and seats are limited to 200.\n\nTo register, complete the online form on the association's website. Payment by credit card or bank transfer is accepted. Cancellations made before April 1 receive a full refund; after that date, no refund is possible, but a colleague may attend in your place.\n\nQuestions? Get in touch with the conference office at 555-0188, Monday to Friday, 9 a.m. to 5 p.m.",
+      "questions": [
+        {
+          "prompt": "Why was a new location chosen for the conference?",
+          "options": ["The old center closed.", "Last year's event was too crowded.", "The new center is cheaper.", "Members asked for a seaside venue."],
+          "answer": "B",
+          "explanation": "'The Pinecrest Convention Center was selected after last year's event became overcrowded.'"
+        },
+        {
+          "prompt": "How much does a member pay when registering on March 20?",
+          "options": ["$60", "$180", "$230", "$310"],
+          "answer": "C",
+          "explanation": "Ngày 20 tháng Ba đã qua hạn 'Early member' (15 tháng Ba), nên hội viên trả mức 'Member' là 230 đô la."
+        },
+        {
+          "prompt": "What is included in the registration fee?",
+          "options": ["The Friday evening dinner", "Hotel accommodation", "Lunch on both days", "Parking at the center"],
+          "answer": "C",
+          "explanation": "'Fees include lunch on both days and entry to all sessions.' Bữa tối thứ Sáu phải trả thêm 45 đô la."
+        },
+        {
+          "prompt": "What must participants do to join the dinner?",
+          "options": ["Pay $45 at the door", "Select the option when registering", "Call the conference office", "Arrive before 6 p.m."],
+          "answer": "B",
+          "explanation": "'must select that option when they register'."
+        },
+        {
+          "prompt": "What can a participant do after canceling on April 5?",
+          "options": ["Receive a full refund", "Receive half of the fee back", "Send a colleague instead", "Move the registration to next year"],
+          "answer": "C",
+          "explanation": "Sau ngày 1 tháng Tư không được hoàn tiền, 'but a colleague may attend in your place'."
+        }
+      ]
+    }
+  }
+}

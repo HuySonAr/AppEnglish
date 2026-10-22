@@ -4,7 +4,7 @@ import { LearningResponseCode } from '@appenglish/learning-contracts';
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
 import { LearningError } from './placement.errors.js';
 import { PlacementService } from './placement.service.js';
-import { actorSchema, answersSchema, settingsSchema } from './placement.schemas.js';
+import { accountIdSchema, actorSchema, answersSchema, settingsSchema } from './placement.schemas.js';
 
 // Each RPC: the schema of its JSON payload (if any) and the service call.
 const rpcs = {
@@ -24,6 +24,7 @@ const rpcs = {
     payload: settingsSchema,
     run: (service, { actor, payload }) => service.updatePlacementSettings(actor, payload),
   },
+  AdminResetPlacement: { run: (service, { actor, id }) => service.adminResetPlacement(actor, accountIdSchema.parse(id)) },
 };
 
 function parseJson(text) {
@@ -47,6 +48,7 @@ export class PlacementGrpcController {
     try {
       const data = await spec.run(this.placementService, {
         actor: actorSchema.parse(request.actor),
+        id: request.id || '',
         payload: spec.payload ? spec.payload.parse(parseJson(request.payloadJson)) : undefined,
       });
       return this.toReply(200, LearningResponseCode.SUCCESS, 'success', data);

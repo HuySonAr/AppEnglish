@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 // out like a database would.
 export function createMemoryRepository() {
   const tables = {
-    units: [], lessons: [], versions: [], media: [], placement: [], mockTests: [], mockVersions: [],
+    units: [], lessons: [], versions: [], reviewVersions: [], media: [], placement: [], mockTests: [], mockVersions: [],
     listeningExercises: [], listeningVersions: [], timingJobs: [], courseItems: [], courseVersions: [],
     listeningTopics: [{ id: toeicTopicId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
     // The migration creates TOEIC.
@@ -12,6 +12,13 @@ export function createMemoryRepository() {
   };
   const copy = (row) => (row ? structuredClone(row) : null);
   const byPosition = (a, b) => a.position - b.position;
+  const versionTables = {
+    LessonVersion: 'versions',
+    MockTestVersion: 'mockVersions',
+    ListeningExerciseVersion: 'listeningVersions',
+    ListeningCourseVersion: 'courseVersions',
+    UnitReviewVersion: 'reviewVersions',
+  };
   function save(table, row) {
     const stored = { id: randomUUID(), ...structuredClone(row) };
     const index = tables[table].findIndex((item) => item.id === stored.id);
@@ -43,12 +50,18 @@ export function createMemoryRepository() {
       save('listeningVersions', version);
       save('listeningExercises', exercise);
     },
+    async deleteExerciseWithVersions(exerciseId) {
+      tables.timingJobs = tables.timingJobs.filter((job) => job.exerciseId !== exerciseId);
+      tables.listeningVersions = tables.listeningVersions.filter((version) => version.exerciseId !== exerciseId);
+      tables.listeningExercises = tables.listeningExercises.filter((exercise) => exercise.id !== exerciseId);
+    },
     async saveTimingJob(job) {
       return save('timingJobs', { createdAt: new Date(), ...job, updatedAt: new Date() });
     },
     async findTimingJob(id) { return copy(tables.timingJobs.find((job) => job.id === id)); },
-    async findLatestTimingJob(exerciseId) {
-      return copy(tables.timingJobs.filter((job) => job.exerciseId === exerciseId).at(-1));
+    async findLatestTimingJob(owner) {
+      const [[field, value]] = Object.entries(owner);
+      return copy(tables.timingJobs.filter((job) => job[field] === value).at(-1));
     },
   };
   // In-memory stand-in for CourseRepository.
@@ -64,6 +77,12 @@ export function createMemoryRepository() {
       if (item.type === 'placement' && tables.courseItems.some((other) => other.type === 'placement')) return null;
       const saved = save('courseItems', item);
       return { item: saved, draft: save('courseVersions', { ...draft, itemId: saved.id }) };
+    },
+    async deleteItemWithVersions(itemId) {
+      // The speech jobs of the item go with it (ON DELETE CASCADE, D147).
+      tables.timingJobs = tables.timingJobs.filter((job) => job.courseItemId !== itemId);
+      tables.courseVersions = tables.courseVersions.filter((version) => version.itemId !== itemId);
+      tables.courseItems = tables.courseItems.filter((item) => item.id !== itemId);
     },
     async listVersionSummaries() {
       return tables.courseVersions.map(({ id, itemId, versionNumber, status }) => ({ id, itemId, versionNumber, status }));
@@ -116,8 +135,60 @@ export function createMemoryRepository() {
     async findMediaByIds(ids) { return tables.media.filter((asset) => ids.includes(asset.id)).map(copy); },
     async saveMedia(asset) { return save('media', asset); },
     async deleteMedia(id) { tables.media = tables.media.filter((asset) => asset.id !== id); },
+    async listMediaBefore(before) { return tables.media.filter((asset) => new Date(asset.createdAt || 0) < before).map(copy); },
+    async deleteLessonWithVersions(lessonId) {
+      tables.versions = tables.versions.filter((version) => version.lessonId !== lessonId);
+      tables.lessons = tables.lessons.filter((lesson) => lesson.id !== lessonId);
+    },
+    async deleteUnitWithLessons(unitId, lessonIds) {
+      tables.versions = tables.versions.filter((version) => !lessonIds.includes(version.lessonId));
+      tables.lessons = tables.lessons.filter((lesson) => !lessonIds.includes(lesson.id));
+      tables.reviewVersions = tables.reviewVersions.filter((version) => version.unitId !== unitId);
+      tables.units = tables.units.filter((unit) => unit.id !== unitId);
+    },
+    // Version history (D122): the table of a version entity, by its name.
+    async listVersionsOf(entity, ownerColumn, ownerId) {
+      const table = versionTables[entity.options.name];
+      return tables[table]
+        .filter((version) => version[ownerColumn] === ownerId)
+        .sort((a, b) => b.versionNumber - a.versionNumber)
+        .map(({ content, ...meta }) => copy(meta));
+    },
+    async findVersionOf(entity, id) {
+      return copy(tables[versionTables[entity.options.name]].find((version) => version.id === id));
+    },
+    async deleteVersionOf(entity, id) {
+      const table = versionTables[entity.options.name];
+      tables[table] = tables[table].filter((version) => version.id !== id);
+    },
+    async listReviewVersionSummaries() {
+      return tables.reviewVersions.map(({ id, unitId, versionNumber, status }) => ({ id, unitId, versionNumber, status }));
+    },
+    async findReviewDraft(unitId) {
+      return copy(tables.reviewVersions.find((version) => version.unitId === unitId && version.status === 'DRAFT'));
+    },
+    async findReviewVersion(id) { return copy(tables.reviewVersions.find((version) => version.id === id)); },
+    async maxReviewVersionNumber(unitId) {
+      return Math.max(0, ...tables.reviewVersions.filter((version) => version.unitId === unitId).map((version) => version.versionNumber));
+    },
+    async saveReviewVersion(version) { return save('reviewVersions', version); },
+    async publishReviewVersion(unit, version) {
+      save('reviewVersions', version);
+      save('units', unit);
+    },
+    async deleteMockTestWithVersions(mockTestId) {
+      tables.mockVersions = tables.mockVersions.filter((version) => version.mockTestId !== mockTestId);
+      tables.mockTests = tables.mockTests.filter((mockTest) => mockTest.id !== mockTestId);
+    },
+    async listReferencedMediaIds() {
+      const uuid = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+      const referenced = new Set();
+      for (const version of [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions, ...tables.courseVersions, ...tables.reviewVersions])
+        for (const match of JSON.stringify(version.content).matchAll(uuid)) referenced.add(match[0].toLowerCase());
+      return referenced;
+    },
     async isMediaReferenced(id) {
-      return [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions].some((version) => JSON.stringify(version.content).includes(id));
+      return [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions, ...tables.courseVersions].some((version) => JSON.stringify(version.content).includes(id));
     },
     async listExamTypes() { return tables.examTypes.map(copy); },
     async findExamType(id) { return copy(tables.examTypes.find((item) => item.id === id)); },

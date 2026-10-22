@@ -1,4 +1,4 @@
-import { LessonProgressEntity, LessonTestAttemptEntity } from '../database/learning.entities.js';
+import { LessonProgressEntity, LessonTestAttemptEntity, UnitReviewAttemptEntity } from '../database/learning.entities.js';
 
 export class LessonRepository {
   constructor(dataSource) {
@@ -66,6 +66,30 @@ export class LessonRepository {
   // attempt still in progress goes, so a submit racing it is kept.
   async deleteOpenAttempt(id) {
     await (await this.repo(LessonTestAttemptEntity)).delete({ id, status: 'IN_PROGRESS' });
+  }
+
+  // ----- Unit reviews (D121)
+
+  // The learner's finished review attempts, oldest first: of one unit, or of
+  // every unit when unitId is omitted.
+  async listReviewAttempts(accountId, unitId) {
+    return (await this.repo(UnitReviewAttemptEntity)).find({
+      where: unitId ? { accountId, unitId } : { accountId },
+      order: { unitId: 'ASC', attemptNumber: 'ASC' },
+    });
+  }
+
+  // Keeps a finished attempt; two submits racing for the same number both
+  // get kept, the second with the next number.
+  async createReviewAttempt(attempt) {
+    const repository = await this.repo(UnitReviewAttemptEntity);
+    for (let tries = 0; ; tries++) {
+      try {
+        return await repository.save({ ...attempt, attemptNumber: attempt.attemptNumber + tries });
+      } catch (error) {
+        if (error?.code !== '23505' || tries >= 5) throw error; // unique violation
+      }
+    }
   }
 
   // First attempts of a lesson, best first: more right answers, then less

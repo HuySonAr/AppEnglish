@@ -1,0 +1,223 @@
+{
+  "unit": 4,
+  "title": "Purchasing",
+  "part5": [
+    {
+      "prompt": "Most merchants are happy to find any way to ___ their customer base.",
+      "options": [
+        "expand",
+        "expanding",
+        "expansion",
+        "expanded"
+      ],
+      "answer": "A",
+      "explanation": "Sau 'to' chỉ mục đích cần động từ nguyên mẫu 'expand' (mở rộng)."
+    },
+    {
+      "prompt": "All fashion ___ have a limited life span.",
+      "options": [
+        "trend",
+        "trends",
+        "trendy",
+        "trending"
+      ],
+      "answer": "B",
+      "explanation": "Động từ 'have' và 'all' cần danh từ số nhiều 'trends' (các xu hướng)."
+    },
+    {
+      "prompt": "It is a poorly run office that does not ___ adequate office supplies.",
+      "options": [
+        "maintain",
+        "maintained",
+        "maintaining",
+        "maintenance"
+      ],
+      "answer": "A",
+      "explanation": "Sau trợ động từ 'does not' dùng động từ nguyên mẫu 'maintain' (duy trì)."
+    },
+    {
+      "prompt": "Sometimes office policy doesn’t allow the company to ___ less expensive supplies when they are available from someone other than a preferred provider.",
+      "options": [
+        "obtain",
+        "obtained",
+        "obtaining",
+        "obtainable"
+      ],
+      "answer": "A",
+      "explanation": "Cấu trúc 'allow somebody to do something' cần động từ nguyên mẫu 'obtain' (mua/thu được)."
+    },
+    {
+      "prompt": "A supplier who has chronic trouble ___ his obligations to a customer will quickly lose customers.",
+      "options": [
+        "fulfill",
+        "fulfills",
+        "fulfilling",
+        "fulfillment"
+      ],
+      "answer": "C",
+      "explanation": "Cấu trúc 'have trouble doing something' dùng V-ing: 'fulfilling' (thực hiện nghĩa vụ)."
+    },
+    {
+      "prompt": "To ___ disruption, buyers should order well ahead of need.",
+      "options": [
+        "minimum",
+        "minimal",
+        "minimize",
+        "minimally"
+      ],
+      "answer": "C",
+      "explanation": "Sau 'to' chỉ mục đích cần động từ 'minimize' (giảm thiểu)."
+    },
+    {
+      "prompt": "It is wise to begin by ___ an inventory of equipment on hand.",
+      "options": [
+        "compile",
+        "compiling",
+        "compiler",
+        "compilation"
+      ],
+      "answer": "B",
+      "explanation": "Sau giới từ 'by' cần V-ing: 'compiling an inventory' (lập bảng kiểm kê)."
+    },
+    {
+      "prompt": "If the provider does not meet his client’s demand, he should ___ the problem as soon as possible.",
+      "options": [
+        "rectify",
+        "rectifier",
+        "rectifiable",
+        "rectification"
+      ],
+      "answer": "A",
+      "explanation": "Sau 'should' cần động từ nguyên mẫu 'rectify' (khắc phục)."
+    },
+    {
+      "prompt": "If some supplies show a steady rise in consumption, the office manager should make an appropriate ___ in his standard order.",
+      "options": [
+        "adjust",
+        "adjuster",
+        "adjusting",
+        "adjustment"
+      ],
+      "answer": "D",
+      "explanation": "Sau 'an appropriate' cần danh từ 'adjustment' (sự điều chỉnh)."
+    },
+    {
+      "prompt": "The office manager should also ascertain whether the inventory of supplies properly ___ the volume of use in the office.",
+      "options": [
+        "reflect",
+        "reflects",
+        "reflecting",
+        "reflection"
+      ],
+      "answer": "B",
+      "explanation": "Chủ ngữ 'the inventory' số ít cần động từ hiện tại đơn 'reflects' (phản ánh)."
+    }
+  ],
+  "part6": [
+    {
+      "passage": "Memo\nTo: Floor Managers\nFrom: Head Manager\nRe: Spring Sale\n\nOur large Spring Sale begins next week. Before the store opens on Monday, all sale items should be placed on racks near the ___ area. This ensures that customers will see them right before they pay for their purchases. We expect large crowds in the store during the sale, so it will be important to ___ order. This means picking up any items that fall on the floor or end up on the wrong shelf, and making sure that all items are clearly marked with the correct price. ___, an attractive store attracts more customers.",
+      "questions": [
+        {
+          "options": [
+            "catalog",
+            "merchandise",
+            "carrier",
+            "checkout"
+          ],
+          "answer": "D",
+          "explanation": "'Checkout area' là khu vực thanh toán, nơi khách trả tiền sau khi chọn hàng."
+        },
+        {
+          "options": [
+            "pertain",
+            "maintain",
+            "remain",
+            "plantain"
+          ],
+          "answer": "B",
+          "explanation": "'Maintain order' nghĩa là duy trì trật tự, đúng ngữ cảnh sắp xếp hàng hóa."
+        },
+        {
+          "options": [
+            "Remember",
+            "Remembering",
+            "To remember",
+            "Must remember"
+          ],
+          "answer": "A",
+          "explanation": "'Remember,' dùng dạng mệnh lệnh để nhắc nhở người đọc về tầm quan trọng của cửa hàng đẹp."
+        }
+      ]
+    },
+    {
+      "passage": "To: Betsy Barnes\nFrom: Lighting Limited Customer Service\nSubject: Your order\n\nDear Betsy Barnes,\n\nWe have received your message about your recent order of a desk lamp with a glass shade. You state that the ___ arrived in damaged condition. We will be happy to replace the damaged merchandise at no extra ___ to you. You will not have to pay anything. Simply place the damaged item back in the box and affix the “postage paid” sticker to the outside. As soon as we receive it, a replacement lamp will be ___ sent to you. We are sorry for any inconvenience this may have caused.\n\nManuel Gozanlez\nLighting Limited Customer Service Associate",
+      "questions": [
+        {
+          "options": [
+            "ship",
+            "shipping",
+            "shipment",
+            "shippable"
+          ],
+          "answer": "C",
+          "explanation": "'The shipment' là lô hàng được giao, hợp nghĩa với 'arrived in damaged condition'."
+        },
+        {
+          "options": [
+            "chase",
+            "chance",
+            "change",
+            "charge"
+          ],
+          "answer": "D",
+          "explanation": "'At no extra charge' là cụm cố định nghĩa là không tính thêm phí."
+        },
+        {
+          "options": [
+            "prompt",
+            "promptly",
+            "prompter",
+            "promptness"
+          ],
+          "answer": "B",
+          "explanation": "Trạng từ 'promptly' (ngay lập tức) bổ nghĩa cho 'sent'."
+        }
+      ]
+    },
+    {
+      "passage": "To: Joanne Simmons\nFrom: Bill Smithers\nSubject: Supplies\n\nJoanne,\n\nIt’s time to order some supplies. We need several boxes of ___, including large and small envelopes as well as letter paper. Don’t order this from XYZ Printers. I was not satisfied with the ___ of the paper in our last order. It tore very easily. Zippo Printers on Elm Street might be a better source. Let’s try them this time. It might be a good idea to get some ink cartridges, too. Why don’t you check to see how many we have ___ hand? If we have just one or two boxes left, you should order more. Thanks.\n\nBill",
+      "questions": [
+        {
+          "options": [
+            "stationery",
+            "invoice",
+            "bargain",
+            "inventory"
+          ],
+          "answer": "A",
+          "explanation": "'Stationery' nghĩa là văn phòng phẩm như phong bì và giấy viết thư."
+        },
+        {
+          "options": [
+            "quantity",
+            "quarry",
+            "quality",
+            "quandary"
+          ],
+          "answer": "C",
+          "explanation": "Giấy dễ rách là vấn đề về 'quality' (chất lượng), không phải số lượng."
+        },
+        {
+          "options": [
+            "by",
+            "to",
+            "up",
+            "on"
+          ],
+          "answer": "D",
+          "explanation": "'On hand' nghĩa là có sẵn trong kho, đang có để sử dụng."
+        }
+      ]
+    }
+  ]
+}

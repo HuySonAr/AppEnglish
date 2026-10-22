@@ -10,10 +10,32 @@ export const UnitEntity = new EntitySchema({
     position: { type: 'int' },
     status: { type: 'varchar', length: 16, default: 'DRAFT' },
     publishedAt: { type: 'timestamptz', nullable: true },
+    // The published version of the unit's review (D121), if any.
+    reviewVersionId: { type: 'uuid', nullable: true },
     createdBy: { type: 'uuid' },
     createdAt: { type: 'timestamptz', createDate: true },
     updatedAt: { type: 'timestamptz', updateDate: true },
   },
+});
+
+// One row per version of a unit's review (D121); same life cycle as
+// LessonVersion: one DRAFT per unit, PUBLISHED rows never updated.
+export const UnitReviewVersionEntity = new EntitySchema({
+  name: 'UnitReviewVersion',
+  tableName: 'unit_review_versions',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    unitId: { type: 'uuid' },
+    versionNumber: { type: 'int' },
+    status: { type: 'varchar', length: 16, default: 'DRAFT' },
+    content: { type: 'jsonb' },
+    createdBy: { type: 'uuid' },
+    publishedBy: { type: 'uuid', nullable: true },
+    publishedAt: { type: 'timestamptz', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'UQ_unit_review_versions_number', columns: ['unitId', 'versionNumber'], unique: true }],
 });
 
 export const LessonEntity = new EntitySchema({
@@ -200,14 +222,16 @@ export const ListeningExerciseVersionEntity = new EntitySchema({
 });
 
 // Auto-time jobs (D97): one row per request for the times of an exercise's
-// lines, answered by speech-service. lines are the lines asked about
+// or a course topic's (D147) lines, answered by speech-service. Exactly one
+// of exerciseId and courseItemId is set. lines are the lines asked about
 // ({ id, text }), result the answer ({ id, start, end, matched }).
 export const ListeningTimingJobEntity = new EntitySchema({
   name: 'ListeningTimingJob',
   tableName: 'listening_timing_jobs',
   columns: {
     id: { type: 'uuid', primary: true, generated: 'uuid' },
-    exerciseId: { type: 'uuid' },
+    exerciseId: { type: 'uuid', nullable: true },
+    courseItemId: { type: 'uuid', nullable: true },
     // align (Auto-time, D97) or transcribe (D98).
     task: { type: 'varchar', length: 16, default: 'align' },
     status: { type: 'varchar', length: 16 },
@@ -218,7 +242,10 @@ export const ListeningTimingJobEntity = new EntitySchema({
     createdAt: { type: 'timestamptz', createDate: true },
     updatedAt: { type: 'timestamptz', updateDate: true },
   },
-  indices: [{ name: 'IDX_listening_timing_jobs_exercise', columns: ['exerciseId', 'createdAt'] }],
+  indices: [
+    { name: 'IDX_listening_timing_jobs_exercise', columns: ['exerciseId', 'createdAt'] },
+    { name: 'IDX_listening_timing_jobs_course_item', columns: ['courseItemId', 'createdAt'] },
+  ],
 });
 
 // Listening course (F05C, D100): units and level tests of the CEFR levels,

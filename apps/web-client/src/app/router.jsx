@@ -13,6 +13,7 @@ import { UnauthorizedPage } from '../features/auth/pages/UnauthorizedPage.jsx';
 import { NotFoundPage } from '../features/auth/pages/NotFoundPage.jsx';
 import { StudentDashboardPage } from '../features/student/pages/StudentDashboardPage.jsx';
 import { AdminDashboardPage } from '../features/admin/pages/AdminDashboardPage.jsx';
+import { AcceptInvitePage } from '../features/auth/pages/AcceptInvitePage.jsx';
 import { AdminAccountsPage } from '../features/admin/pages/AdminAccountsPage.jsx';
 import { AdminAccountDetailPage } from '../features/admin/pages/AdminAccountDetailPage.jsx';
 import { ContentManagerDashboardPage } from '../features/content-manager/pages/ContentManagerDashboardPage.jsx';
@@ -35,23 +36,22 @@ import { ListeningPracticePage } from '../features/student/pages/ListeningPracti
 import { ListeningExerciseListPage } from '../features/student/pages/ListeningExerciseListPage.jsx';
 import { ListeningTopicPage } from '../features/student/pages/ListeningTopicPage.jsx';
 import { ListeningCoursePage } from '../features/student/pages/ListeningCoursePage.jsx';
-import { CourseLessonPage } from '../features/student/pages/CourseLessonPage.jsx';
+import { CourseTopicPage } from '../features/student/pages/CourseTopicPage.jsx';
 import { CourseTestPage } from '../features/student/pages/CourseTestPage.jsx';
-import { CoursePlacementPage } from '../features/student/pages/CoursePlacementPage.jsx';
 import { CourseProgressPage } from '../features/student/pages/CourseProgressPage.jsx';
-import { CourseMistakesPage } from '../features/student/pages/CourseMistakesPage.jsx';
 import { ProgressPage } from '../features/student/pages/ProgressPage.jsx';
 import { LeaderboardPage } from '../features/student/pages/LeaderboardPage.jsx';
 import { ListeningExerciseEditorPage } from '../features/content-manager/pages/ListeningExerciseEditorPage.jsx';
 import { CourseItemEditorPage } from '../features/content-manager/pages/CourseItemEditorPage.jsx';
 import { CourseManagePage } from '../features/content-manager/pages/CourseManagePage.jsx';
-import { CoursePlacementManagePage } from '../features/content-manager/pages/CoursePlacementManagePage.jsx';
 import { ListeningExercisesPage } from '../features/content-manager/pages/ListeningExercisesPage.jsx';
 import { ListeningTopicsPage } from '../features/content-manager/pages/ListeningTopicsPage.jsx';
 import { VocabularyPracticePage } from '../features/student/pages/VocabularyPracticePage.jsx';
 import { ScoreConversionPage } from '../features/admin/pages/ScoreConversionPage.jsx';
 import { ExamTypesPage } from '../features/admin/pages/ExamTypesPage.jsx';
 import { ProfilePage } from '../features/profile/pages/ProfilePage.jsx';
+import { UnitReviewEditorPage } from '../features/content-manager/pages/UnitReviewEditorPage.jsx';
+import { UnitReviewPage } from '../features/student/pages/UnitReviewPage.jsx';
 import { Roles } from '../constants/auth.js';
 import { dashboardPathForRole } from '../features/auth/flow/auth-flow.js';
 import { useAuth } from '../features/auth/context/AuthContext.jsx';
@@ -72,6 +72,7 @@ export function AppRouter() {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/accept-invite" element={<AcceptInvitePage />} />
         </Route>
       </Route>
       <Route element={<ProtectedRoute />}>
@@ -88,15 +89,14 @@ export function AppRouter() {
             <Route path="lessons" element={<LessonsPage />} />
             <Route path="lessons/:lessonId" element={<LessonPage />} />
             <Route path="lessons/:lessonId/test" element={<LessonTestPage />} />
+            <Route path="units/:unitId/review" element={<UnitReviewPage />} />
             <Route path="mock-tests" element={<MockTestsPage />} />
             <Route path="mock-tests/:mockTestId" element={<MockTestPage />} />
             <Route path="mock-tests/:mockTestId/mini/:partKey" element={<MockMiniHistoryPage />} />
             <Route path="listening-course" element={<ListeningCoursePage />} />
-            <Route path="listening-course/units/:unitId/lessons/:lessonId" element={<CourseLessonPage />} />
+            <Route path="listening-course/topics/:topicId" element={<CourseTopicPage />} />
             <Route path="listening-course/tests/:itemId" element={<CourseTestPage />} />
-            <Route path="listening-course/placement" element={<CoursePlacementPage />} />
             <Route path="listening-course/progress" element={<CourseProgressPage />} />
-            <Route path="listening-course/mistakes" element={<CourseMistakesPage />} />
             <Route path="progress" element={<ProgressPage />} />
             <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="practice" element={<PracticePage />} />
@@ -127,6 +127,7 @@ export function AppRouter() {
           <Route element={<SidebarLayout role={Roles.CONTENT_MANAGER} />}>
             <Route index element={<ContentManagerDashboardPage />} />
             <Route path="units" element={<ContentUnitsPage />} />
+            <Route path="units/:unitId/review" element={<UnitReviewEditorPage />} />
             <Route path="placement" element={<PlacementEditorPage />} />
             <Route path="mock-tests" element={<MockTestsManagePage />} />
             <Route path="mock-tests/:mockTestId" element={<MockTestEditorPage />} />
@@ -134,7 +135,6 @@ export function AppRouter() {
             <Route path="listening/:exerciseId" element={<ListeningExerciseEditorPage />} />
             <Route path="listening-topics" element={<ListeningTopicsPage eyebrow="Content Manager" />} />
             <Route path="listening-course" element={<CourseManagePage />} />
-            <Route path="listening-placement" element={<CoursePlacementManagePage />} />
             <Route path="listening-course/:itemId" element={<CourseItemEditorPage />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
             <Route path="profile" element={<ProfilePage />} />

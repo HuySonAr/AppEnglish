@@ -10,12 +10,16 @@
     "lint": "node ../../scripts/check-syntax.mjs src test",
     "test": "node --test test/*.test.js",
     "migration:run": "node --env-file=../../.env src/database/run-migrations.js",
-    "seed:listening-course": "node --env-file=../../.env scripts/seed-listening-course.mjs",
+    "seed:600-words": "node --env-file=../../.env scripts/seed-600-words.mjs",
+    "validate:600-words": "node scripts/validate-600-words.mjs",
+    "pronounce:600-words": "node --env-file=../../.env scripts/pronounce-600-words.mjs",
+    "export:600-words": "node --env-file=../../.env scripts/export-600-words.mjs",
     "media:migrate-to-r2": "node --env-file=../../.env src/media/migrate-media-to-r2.js"
   },
   "dependencies": {
     "@appenglish/auth-contracts": "workspace:*",
     "@appenglish/content-contracts": "workspace:*",
+    "@appenglish/learning-contracts": "workspace:*",
     "@aws-sdk/client-s3": "^3.1149.0",
     "@grpc/grpc-js": "^1.14.0",
     "@grpc/proto-loader": "^0.8.0",

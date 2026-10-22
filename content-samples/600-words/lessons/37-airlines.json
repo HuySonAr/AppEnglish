@@ -1,0 +1,260 @@
+{
+  "number": 37,
+  "title": "Airlines",
+  "vocabulary": [
+    {
+      "word": "deal with",
+      "partOfSpeech": "verb",
+      "meaning": "xử lý, giải quyết; làm việc với (ai đó)",
+      "example": "The airline hired more staff to deal with complaints about lost luggage.",
+      "exampleMeaning": "Hãng hàng không tuyển thêm nhân viên để xử lý các khiếu nại về hành lý thất lạc."
+    },
+    {
+      "word": "destination",
+      "partOfSpeech": "noun",
+      "meaning": "điểm đến, nơi đến",
+      "example": "The screen in the departure hall shows the destination and gate for every flight.",
+      "exampleMeaning": "Màn hình ở sảnh khởi hành hiển thị điểm đến và cửa ra của mọi chuyến bay."
+    },
+    {
+      "word": "distinguish",
+      "partOfSpeech": "verb",
+      "meaning": "phân biệt; làm cho khác biệt, nổi bật",
+      "example": "Wider seats and free meals distinguish the airline's business class from its economy cabin.",
+      "exampleMeaning": "Ghế rộng hơn và bữa ăn miễn phí làm khoang thương gia của hãng khác biệt với khoang phổ thông."
+    },
+    {
+      "word": "economize",
+      "partOfSpeech": "verb",
+      "meaning": "tiết kiệm, cắt giảm chi tiêu",
+      "example": "To economize, the company now books flights several weeks in advance.",
+      "exampleMeaning": "Để tiết kiệm, công ty hiện đặt vé máy bay trước vài tuần."
+    },
+    {
+      "word": "equivalent",
+      "partOfSpeech": "adjective",
+      "meaning": "tương đương, ngang bằng; (n) vật hoặc khoản tương đương",
+      "example": "A refund voucher of equivalent value was offered to passengers whose flight was canceled.",
+      "exampleMeaning": "Hành khách có chuyến bay bị hủy được tặng phiếu hoàn tiền có giá trị tương đương."
+    },
+    {
+      "word": "excursion",
+      "partOfSpeech": "noun",
+      "meaning": "chuyến đi ngắn, chuyến tham quan",
+      "example": "The hotel organizes a half-day excursion to the old town for guests who arrive early.",
+      "exampleMeaning": "Khách sạn tổ chức một chuyến tham quan nửa ngày đến khu phố cổ cho khách đến sớm."
+    },
+    {
+      "word": "expense",
+      "partOfSpeech": "noun",
+      "meaning": "chi phí, khoản chi",
+      "example": "Staff must keep every receipt so that their travel expenses can be repaid.",
+      "exampleMeaning": "Nhân viên phải giữ mọi hóa đơn để chi phí đi lại của họ được hoàn lại."
+    },
+    {
+      "word": "extend",
+      "partOfSpeech": "verb",
+      "meaning": "kéo dài, gia hạn; mở rộng",
+      "example": "Ms. Delgado asked to extend her stay by two nights after the meeting was moved.",
+      "exampleMeaning": "Bà Delgado xin kéo dài thời gian lưu trú thêm hai đêm sau khi cuộc họp bị dời."
+    },
+    {
+      "word": "prospective",
+      "partOfSpeech": "adjective",
+      "meaning": "tiềm năng, có triển vọng, trong tương lai",
+      "example": "The airline sent a special fare offer to prospective customers who had visited its website.",
+      "exampleMeaning": "Hãng hàng không gửi ưu đãi giá vé đặc biệt tới các khách hàng tiềm năng đã truy cập trang web của hãng."
+    },
+    {
+      "word": "situation",
+      "partOfSpeech": "noun",
+      "meaning": "tình huống, tình hình, hoàn cảnh",
+      "example": "The crew explained the situation calmly when the plane had to return to the gate.",
+      "exampleMeaning": "Phi hành đoàn giải thích tình hình một cách bình tĩnh khi máy bay phải quay lại cửa ra."
+    },
+    {
+      "word": "substantially",
+      "partOfSpeech": "adverb",
+      "meaning": "đáng kể, nhiều; về căn bản",
+      "example": "Ticket prices rise substantially during the last week before a holiday.",
+      "exampleMeaning": "Giá vé tăng đáng kể trong tuần cuối trước kỳ nghỉ lễ."
+    },
+    {
+      "word": "system",
+      "partOfSpeech": "noun",
+      "meaning": "hệ thống",
+      "example": "The new booking system lets passengers choose their seats on a phone.",
+      "exampleMeaning": "Hệ thống đặt vé mới cho phép hành khách chọn ghế trên điện thoại."
+    }
+  ],
+  "fillIn": {
+    "passage": "Blue Harbor Airways is a small regional airline that flies to twelve ___ along the coast. Last year its fuel costs rose ___, and the finance director asked every department to ___. The marketing team wanted to cut costs without losing passengers, so it studied the ___ carefully before making any changes.\n\nOne idea was to replace paper tickets with an online booking ___ that also shows seat maps. The change reduced printing ___ and made it easier to ___ the needs of frequent flyers from those of occasional travelers. The airline also began selling weekend ___ packages that include a flight and a guided tour, aimed at ___ customers who had never flown with Blue Harbor before. These packages are priced at a level ___ to a normal round-trip ticket, so they attract people who want more for the same money.\n\nFinally, the customer service staff were trained to ___ delays politely and to ___ the validity of a ticket for free whenever a flight is canceled. Six months later, passenger numbers were higher than ever.",
+    "answers": ["destinations", "substantially", "economize", "situation", "system", "expenses", "distinguish", "excursion", "prospective", "equivalent", "deal with", "extend"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nhân viên hãng hàng không ở quầy làm thủ tục đang nhận hộ chiếu từ một hành khách; phía sau là bảng thông tin chuyến bay.",
+      "options": [
+        "A passenger is handing a document to an airline employee.",
+        "A passenger is sleeping in a waiting area.",
+        "Two people are loading bags onto a cart.",
+        "A woman is cleaning the counter."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy hành khách đưa hộ chiếu cho nhân viên hãng. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How much did the round-trip ticket cost?",
+        "options": ["About the same as last year.", "The trip takes three hours.", "Yes, it's a round number."],
+        "answer": "A",
+        "explanation": "Câu hỏi How much cần câu trả lời về giá. (B) trả lời cho How long, (C) trả lời Yes cho câu hỏi Wh và nhầm từ 'round'."
+      },
+      {
+        "question": "Could you extend my return date by two days?",
+        "options": ["Yes, but there will be a change fee.", "The runway was extended last year.", "It's a short flight."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc gia hạn vé; (A) đồng ý và nêu điều kiện. (B) lặp từ 'extend' với nghĩa khác, (C) không liên quan."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Hi, Marcus. I'm trying to book the team's flights to the Lakeview conference, but the online system keeps rejecting my company card.\nMan: That happened to me last month. The system times out if you take more than ten minutes on the payment page.\nWoman: That explains it. I was comparing fares. The direct flight is much more expensive than the one with a stop.\nMan: How big is the difference?\nWoman: About two hundred dollars per person. With six of us traveling, that's substantial.\nMan: Then take the cheaper flight. The finance office has asked everyone to economize on travel expenses this quarter anyway.\nWoman: All right. One more thing: can I add the half-day excursion to the lake for the group? It's part of the conference program.\nMan: Only if the organizers include it in the registration fee. Otherwise we have to deal with it as a personal expense.",
+      "questions": [
+        {
+          "prompt": "What problem does the woman have?",
+          "options": ["Her card has expired.", "The booking system rejects her payment.", "The conference has been canceled.", "Her flight is delayed."],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'the online system keeps rejecting my company card'. Thẻ không hết hạn; hệ thống chỉ hết thời gian chờ."
+        },
+        {
+          "prompt": "Why does the man suggest taking the flight with a stop?",
+          "options": ["It arrives earlier.", "The company wants to save money.", "The direct flight is full.", "The team prefers it."],
+          "answer": "B",
+          "explanation": "Anh ấy nói 'The finance office has asked everyone to economize on travel expenses', tức công ty muốn tiết kiệm."
+        },
+        {
+          "prompt": "What does the man say about the excursion?",
+          "options": ["It is already included in the fare.", "It must be part of the registration fee.", "It has been canceled.", "He will book it himself."],
+          "answer": "B",
+          "explanation": "Anh ấy chỉ đồng ý 'if the organizers include it in the registration fee'; nếu không, đó là chi phí cá nhân."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Attention, passengers booked on Skyline Air flight 77 to Rosemont. Because of a technical problem with the aircraft, this flight has been canceled. We apologize for the situation and are working to get everyone to their destination as quickly as possible. Passengers with connecting flights will be rebooked automatically through our reservation system, and your new boarding pass will be sent to your phone within the next twenty minutes. If you prefer to travel tomorrow instead, our agents at desk 12 can extend your ticket by one day at no charge and arrange a hotel room for tonight. A meal voucher of equivalent value to a standard in-flight meal is available for all passengers at the same desk. Our staff will remain here to deal with any questions. Once again, we are sorry for the inconvenience and thank you for your patience.",
+      "questions": [
+        {
+          "prompt": "Why has the flight been canceled?",
+          "options": ["Bad weather at Rosemont", "A problem with the aircraft", "A shortage of crew", "A late connecting flight"],
+          "answer": "B",
+          "explanation": "Mở đầu bài nói: 'Because of a technical problem with the aircraft, this flight has been canceled.'"
+        },
+        {
+          "prompt": "What will passengers with connecting flights receive?",
+          "options": ["A refund in cash", "A new boarding pass on their phones", "A free hotel room", "A seat on a bus"],
+          "answer": "B",
+          "explanation": "Bài nói cho biết 'your new boarding pass will be sent to your phone within the next twenty minutes'. Phòng khách sạn chỉ dành cho người chọn bay ngày mai."
+        },
+        {
+          "prompt": "What can passengers do at desk 12?",
+          "options": ["Buy a new ticket", "Check their luggage", "Change their travel date for free", "Board the aircraft"],
+          "answer": "C",
+          "explanation": "Tại quầy 12, nhân viên 'can extend your ticket by one day at no charge', tức đổi ngày bay miễn phí."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The airline's new website makes it easy to _____ between refundable and non-refundable fares.",
+        "options": ["distinguish", "distinguished", "distinction", "distinguishable"],
+        "answer": "A",
+        "explanation": "Sau 'to' trong cấu trúc 'makes it easy to' cần động từ nguyên mẫu: 'distinguish between'."
+      },
+      {
+        "prompt": "Ticket prices have risen _____ since the airport raised its landing fees.",
+        "options": ["substance", "substantial", "substantially", "substantiate"],
+        "answer": "C",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'have risen': 'substantially' (đáng kể)."
+      },
+      {
+        "prompt": "Each _____ on the trip must be listed on the reimbursement form with a receipt.",
+        "options": ["expense", "expensive", "expend", "expensively"],
+        "answer": "A",
+        "explanation": "Sau 'Each' cần danh từ số ít: 'expense' (khoản chi)."
+      },
+      {
+        "prompt": "The company offered a travel voucher _____ to the price of the canceled ticket.",
+        "options": ["equivalence", "equivalently", "equivalent", "equivalents"],
+        "answer": "C",
+        "explanation": "Tính từ 'equivalent to' đứng sau danh từ 'voucher' để bổ nghĩa, nghĩa là có giá trị tương đương với giá vé."
+      },
+      {
+        "prompt": "Mr. Reyes was asked to _____ the complaint from the passenger in seat 3A.",
+        "options": ["deal with", "deal", "dealt with", "dealing with"],
+        "answer": "A",
+        "explanation": "Sau 'asked to' cần động từ nguyên mẫu, và 'deal' phải đi với 'with' khi có tân ngữ: 'deal with the complaint'."
+      },
+      {
+        "prompt": "The marketing team invited _____ clients to a presentation on the new routes.",
+        "options": ["prospect", "prospective", "prospectively", "prospects"],
+        "answer": "B",
+        "explanation": "Trước danh từ 'clients' cần tính từ: 'prospective' (tiềm năng)."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Department Heads\nFrom: Oliver Brandt, Finance Director\nSubject: Travel costs for the next quarter\n\nAs you know, our travel ___ were almost twenty percent higher this year than last year. To bring them back under control, I am asking every team to ___ on flights wherever possible. From now on, please book through the new online ___, which compares fares from several airlines and shows the cheapest option for each destination. Trips longer than three days, and any excursion added to a business trip, must be approved by me in advance. Thank you for your cooperation.",
+      "questions": [
+        {
+          "options": ["expenses", "expensive", "expends", "expensively"],
+          "answer": "A",
+          "explanation": "Sau 'our travel' cần danh từ làm chủ ngữ của 'were': 'expenses' (chi phí)."
+        },
+        {
+          "options": ["economy", "economize", "economic", "economically"],
+          "answer": "B",
+          "explanation": "Sau 'to' cần động từ nguyên mẫu: 'economize on flights' nghĩa là tiết kiệm tiền vé máy bay."
+        },
+        {
+          "options": ["system", "situation", "excursion", "destination"],
+          "answer": "A",
+          "explanation": "Thứ dùng để đặt vé và so sánh giá của nhiều hãng là một hệ thống đặt vé trực tuyến: 'system'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "NORTHWIND AIR\nFly More, Pay Less: The Horizon Club\n\nNorthwind Air is pleased to introduce the Horizon Club, a new rewards program for business travelers. Members earn one point for every dollar spent on Northwind tickets, and points can be used for free flights to any of our 38 destinations.\n\nWhat distinguishes the Horizon Club from other programs?\n- Points never expire as long as you fly with us at least once a year.\n- Members may extend a ticket's travel date up to two times without paying a change fee.\n- If your flight is canceled, our agents deal with your rebooking before the general queue is served.\n- Members receive a monthly newsletter with weekend excursion packages to coastal cities at substantially reduced prices.\n\n| Level | Flights per year | Main benefit |\n| Silver | 1 to 9 | Free seat selection |\n| Gold | 10 to 24 | One free checked bag |\n| Platinum | 25 or more | Lounge access at all airports |\n\nJoining is free. Prospective members can register online at the Horizon Club page or ask a Northwind agent at any airport counter. Companies that enroll ten or more employees receive a travel-expense report every month, which shows where money can be saved.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the advertisement?",
+          "options": ["To announce new flight routes", "To introduce a rewards program", "To explain a change in baggage rules", "To sell excursion packages only"],
+          "answer": "B",
+          "explanation": "Đoạn đầu giới thiệu 'the Horizon Club, a new rewards program for business travelers'."
+        },
+        {
+          "prompt": "What happens to points if a member does not fly for a year?",
+          "options": ["They are doubled.", "They are transferred to another member.", "They expire.", "They are converted to cash."],
+          "answer": "C",
+          "explanation": "Điểm 'never expire as long as you fly with us at least once a year', nên không bay trong một năm thì điểm sẽ hết hạn."
+        },
+        {
+          "prompt": "Which benefit is given to Gold members?",
+          "options": ["Free seat selection", "A free checked bag", "Lounge access", "A private car to the airport"],
+          "answer": "B",
+          "explanation": "Bảng ghi hạng Gold (10 đến 24 chuyến mỗi năm) được 'One free checked bag'."
+        },
+        {
+          "prompt": "How can a person join the Horizon Club?",
+          "options": ["By paying an annual fee", "By flying 25 times", "By registering online or at a counter", "By sending a letter to the company"],
+          "answer": "C",
+          "explanation": "Đoạn cuối: 'register online at the Horizon Club page or ask a Northwind agent at any airport counter'; việc tham gia miễn phí."
+        },
+        {
+          "prompt": "What do companies with ten or more enrolled employees receive?",
+          "options": ["A monthly report of travel expenses", "Free lounge access for all staff", "A discount on every ticket", "Platinum status immediately"],
+          "answer": "A",
+          "explanation": "Các công ty này 'receive a travel-expense report every month' để thấy có thể tiết kiệm ở đâu."
+        }
+      ]
+    }
+  }
+}

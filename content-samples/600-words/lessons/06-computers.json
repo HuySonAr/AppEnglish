@@ -1,0 +1,260 @@
+{
+  "number": 6,
+  "title": "Computers",
+  "vocabulary": [
+    {
+      "word": "access",
+      "partOfSpeech": "verb",
+      "meaning": "truy cập, vào được (dữ liệu, hệ thống); quyền truy cập",
+      "example": "Only the finance team can access the payroll folder on the shared drive.",
+      "exampleMeaning": "Chỉ nhóm tài chính mới có thể truy cập thư mục lương trên ổ đĩa dùng chung."
+    },
+    {
+      "word": "allocate",
+      "partOfSpeech": "verb",
+      "meaning": "phân bổ, cấp phát (ngân sách, tài nguyên, bộ nhớ)",
+      "example": "The IT department allocated more server space to the design team last month.",
+      "exampleMeaning": "Tháng trước, bộ phận IT đã phân bổ thêm dung lượng máy chủ cho nhóm thiết kế."
+    },
+    {
+      "word": "compatible",
+      "partOfSpeech": "adjective",
+      "meaning": "tương thích, dùng chung được với nhau",
+      "example": "Please check that the new printer is compatible with our older laptops before ordering it.",
+      "exampleMeaning": "Vui lòng kiểm tra máy in mới có tương thích với các laptop cũ của chúng ta trước khi đặt mua."
+    },
+    {
+      "word": "delete",
+      "partOfSpeech": "verb",
+      "meaning": "xóa (tập tin, dữ liệu, chữ)",
+      "example": "Do not delete any files from the project folder until the audit is complete.",
+      "exampleMeaning": "Không xóa bất kỳ tập tin nào trong thư mục dự án cho đến khi cuộc kiểm toán kết thúc."
+    },
+    {
+      "word": "display",
+      "partOfSpeech": "verb",
+      "meaning": "hiển thị, trưng bày; (n) màn hình hiển thị",
+      "example": "The monitor displays a short message when the battery is almost empty.",
+      "exampleMeaning": "Màn hình hiển thị một thông báo ngắn khi pin gần hết."
+    },
+    {
+      "word": "duplicate",
+      "partOfSpeech": "verb",
+      "meaning": "sao chép, tạo bản sao; (n) bản sao y",
+      "example": "The backup program duplicates every document onto a second hard drive each night.",
+      "exampleMeaning": "Chương trình sao lưu sao chép mọi tài liệu sang ổ cứng thứ hai mỗi đêm."
+    },
+    {
+      "word": "fail",
+      "partOfSpeech": "verb",
+      "meaning": "hỏng, ngừng hoạt động; thất bại",
+      "example": "If the main server fails, the backup system starts within a few seconds.",
+      "exampleMeaning": "Nếu máy chủ chính bị hỏng, hệ thống dự phòng sẽ khởi động trong vài giây."
+    },
+    {
+      "word": "figure out",
+      "partOfSpeech": "verb",
+      "meaning": "tìm ra, hiểu ra (nguyên nhân, cách giải quyết)",
+      "example": "It took the technician an hour to figure out why the screen kept freezing.",
+      "exampleMeaning": "Kỹ thuật viên mất một giờ để tìm ra lý do màn hình cứ bị treo."
+    },
+    {
+      "word": "ignore",
+      "partOfSpeech": "verb",
+      "meaning": "bỏ qua, không để ý, phớt lờ",
+      "example": "Many users ignore update reminders, which leaves their computers at risk.",
+      "exampleMeaning": "Nhiều người dùng bỏ qua lời nhắc cập nhật, khiến máy tính của họ gặp rủi ro."
+    },
+    {
+      "word": "search",
+      "partOfSpeech": "verb",
+      "meaning": "tìm kiếm, tra tìm; (n) cuộc tìm kiếm",
+      "example": "You can search the database by customer name or by invoice number.",
+      "exampleMeaning": "Bạn có thể tìm kiếm trong cơ sở dữ liệu theo tên khách hàng hoặc số hóa đơn."
+    },
+    {
+      "word": "shut down",
+      "partOfSpeech": "verb",
+      "meaning": "tắt (máy); ngừng hoạt động, đóng cửa",
+      "example": "Please shut down your computer before leaving the office on Friday.",
+      "exampleMeaning": "Vui lòng tắt máy tính trước khi rời văn phòng vào thứ Sáu."
+    },
+    {
+      "word": "warning",
+      "partOfSpeech": "noun",
+      "meaning": "lời cảnh báo, thông báo cảnh báo",
+      "example": "A warning appeared on the screen saying that the disk was almost full.",
+      "exampleMeaning": "Một cảnh báo hiện lên trên màn hình báo rằng ổ đĩa gần đầy."
+    }
+  ],
+  "fillIn": {
+    "passage": "Last month Harbor Travel Agency replaced its old booking computers. The manager, Mr. Okafor, asked an IT consultant, Linda Reyes, to ___ half of the budget to new monitors and the rest to software. Before the purchase, Linda checked that the new programs were ___ with the printers the agency already owned.\n\nOn the first morning, several problems appeared. One employee could not ___ the customer database because her password had not been copied over. Another saw a ___ on his screen about low memory, but he chose to ___ it and kept working until the program ___ completely. When he restarted, the system began to ___ every file on the hard drive, which took twenty minutes. Linda soon ___ that a setting was wrong: the screen was set to ___ two copies of the same window, so the computer ___ every task and ran out of memory.\n\nTo prevent further trouble, she asked everyone to ___ their computers at the end of the day and to ___ old temporary files every Friday. Since then, the agency has had no more problems.",
+    "answers": ["allocate", "compatible", "access", "warning", "ignore", "failed", "search", "figured out", "display", "duplicated", "shut down", "delete"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người đàn ông ngồi ở bàn làm việc, hai tay đặt trên bàn phím, trước mặt là hai màn hình máy tính đang sáng.",
+      "options": [
+        "The man is typing on a keyboard.",
+        "The man is hanging a picture on the wall.",
+        "The man is unplugging a monitor.",
+        "The man is reading a printed report."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người đàn ông đang gõ bàn phím trước hai màn hình. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How do I access the shared folder?",
+        "options": ["The folder is blue.", "Ask Mark for the password.", "Yes, I can."],
+        "answer": "B",
+        "explanation": "Câu hỏi How hỏi cách thực hiện; (B) chỉ cách lấy mật khẩu để vào thư mục. (A) nhầm từ 'folder', (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Did you figure out why the printer failed?",
+        "options": ["Yes, the cable was loose.", "It's on the second floor.", "I'll print two copies."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No; (A) trả lời Yes và nêu nguyên nhân máy in hỏng. (B) trả lời cho câu hỏi Where, (C) nhầm với từ 'printer'."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Tom, my computer shut down by itself twice this morning. Right before it happened, a warning popped up about the memory.\nMan: Did you read what the warning said, or did you just close it?\nWoman: To be honest, I ignored it the first time. The second time I wrote it down. It said the new photo program is not compatible with the system.\nMan: That explains it. The program was built for a newer version of the operating system. I can install the older version for you instead.\nWoman: Will I lose the files I edited yesterday?\nMan: No, your files are safe. But I will need to delete the current program first, so please save your work and close everything by two o'clock.\nWoman: All right. I'll send you a message when I'm ready.\nMan: Thanks. It should take about thirty minutes.",
+      "questions": [
+        {
+          "prompt": "What problem does the woman have?",
+          "options": ["Her computer turns off unexpectedly.", "Her printer is out of paper.", "She forgot her password.", "Her photos were deleted."],
+          "answer": "A",
+          "explanation": "Cô ấy nói 'my computer shut down by itself twice this morning', tức máy tự tắt bất ngờ."
+        },
+        {
+          "prompt": "What caused the problem?",
+          "options": ["A broken keyboard", "A program that does not work with the system", "A full hard drive", "A loose cable"],
+          "answer": "B",
+          "explanation": "Cảnh báo cho biết 'the new photo program is not compatible with the system', tức chương trình không tương thích với hệ thống."
+        },
+        {
+          "prompt": "What does the man ask the woman to do?",
+          "options": ["Buy a new computer", "Install the program herself", "Save her work and close her programs", "Restart the computer twice"],
+          "answer": "C",
+          "explanation": "Người đàn ông nói 'please save your work and close everything by two o'clock'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Attention, all staff. This is Rachel from the IT help desk with an announcement about the shared drive. Starting next Monday, each department will be allocated fifty gigabytes of storage instead of the current thirty. To make room, we have found that many folders contain duplicate files, so this weekend we will remove any file that has an exact copy in the same folder. Nothing else will be deleted. Also, the search tool on the drive has been updated. You can now search by date as well as by file name, and the results will display a small preview of each document. Finally, if you cannot access a folder on Monday morning, do not ignore the problem. Call extension four five zero, and we will reset your permissions within an hour. Thank you.",
+      "questions": [
+        {
+          "prompt": "What is the announcement mainly about?",
+          "options": ["A new printer", "Changes to the shared drive", "A security training course", "New office hours"],
+          "answer": "B",
+          "explanation": "Người nói mở đầu bằng 'an announcement about the shared drive' và nói về dung lượng, tập tin trùng và công cụ tìm kiếm trên ổ đĩa đó."
+        },
+        {
+          "prompt": "What will happen this weekend?",
+          "options": ["All old files will be deleted.", "New computers will be installed.", "Copies of files will be removed.", "The drive will be unavailable."],
+          "answer": "C",
+          "explanation": "'This weekend we will remove any file that has an exact copy in the same folder'; chỉ các bản sao bị xóa, không phải mọi tập tin cũ."
+        },
+        {
+          "prompt": "What should listeners do if they cannot open a folder?",
+          "options": ["Restart their computers", "E-mail their manager", "Call the help desk", "Wait until Tuesday"],
+          "answer": "C",
+          "explanation": "Cuối bài: 'Call extension four five zero, and we will reset your permissions', tức gọi cho bộ phận hỗ trợ."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Employees need a password to _____ the company's financial records.",
+        "options": ["access", "accessible", "accessibility", "accessing"],
+        "answer": "A",
+        "explanation": "Sau 'to' chỉ mục đích cần động từ nguyên mẫu: 'access'."
+      },
+      {
+        "prompt": "The new scanner is fully _____ with both laptop models used in the office.",
+        "options": ["compatibility", "compatibly", "compatible", "compatibles"],
+        "answer": "C",
+        "explanation": "Sau 'is fully' cần tính từ; 'compatible with' nghĩa là tương thích với."
+      },
+      {
+        "prompt": "The budget committee _____ extra funds to the computer upgrade last quarter.",
+        "options": ["allocation", "allocated", "allocating", "allocates"],
+        "answer": "B",
+        "explanation": "Câu cần động từ chính ở thì quá khứ vì có 'last quarter': 'allocated'."
+      },
+      {
+        "prompt": "Please do not _____ the system error; report it to the IT desk immediately.",
+        "options": ["ignore", "ignorance", "ignorant", "ignorantly"],
+        "answer": "A",
+        "explanation": "Sau 'do not' cần động từ nguyên mẫu: 'ignore' (bỏ qua)."
+      },
+      {
+        "prompt": "The technician could not _____ why the screen went dark every afternoon.",
+        "options": ["figure out", "figures out", "figuring out", "figured out"],
+        "answer": "A",
+        "explanation": "Sau 'could not' cần động từ nguyên mẫu; 'figure out' nghĩa là tìm ra nguyên nhân."
+      },
+      {
+        "prompt": "A _____ message will appear if the printer runs out of toner.",
+        "options": ["warn", "warned", "warning", "warns"],
+        "answer": "C",
+        "explanation": "Cần danh từ bổ nghĩa cho 'message': 'warning message' là thông báo cảnh báo."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Staff\nFrom: Kevin Lam, IT Support\nSubject: Weekly maintenance\n\nBeginning this Thursday, the IT team will update the office computers every week between 7:00 and 8:00 p.m. Please ___ your computer completely before you leave on Thursday evenings so that the update can be installed. If you leave a program open, the update may ___, and your computer will show an error the next morning. After each update, the screen will ___ a short report listing the changes. Please read it instead of closing it right away. Questions can be sent to the help desk at extension 450.",
+      "questions": [
+        {
+          "options": ["shutting down", "shut down", "shuts down", "to shut down"],
+          "answer": "B",
+          "explanation": "Câu mệnh lệnh sau 'Please' cần động từ nguyên mẫu không 'to': 'shut down'."
+        },
+        {
+          "options": ["failure", "failed", "fail", "failing"],
+          "answer": "C",
+          "explanation": "Sau 'may' cần động từ nguyên mẫu: 'fail' (thất bại, không chạy được)."
+        },
+        {
+          "options": ["display", "displayed", "displaying", "displays"],
+          "answer": "A",
+          "explanation": "Sau 'will' cần động từ nguyên mẫu: 'display' (hiển thị)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "To: Nadia Hussain, Office Manager\nFrom: Peter Collins, Brightline Software Support\nSubject: Ticket 4471 - Lost files on the sales computer\nDate: May 14\n\nDear Ms. Hussain,\n\nThank you for your call this morning. Here is what I found on the sales computer.\n\nThe hard drive did not fail. The files were moved to a backup folder on April 30 by the cleanup program, which is set to search the drive once a month and remove duplicate files. Unfortunately, it also moved several reports with similar names. Nothing was deleted, and I have copied all 112 files back to the Sales folder, and you can access them again.\n\nTo prevent this from happening again, the program now displays a warning and a list of files before it moves anything. Someone in your office must click \"Confirm\" each month, so please choose a person for this task.\n\nI also noticed that the accounting program on this computer is not compatible with the new operating system. We can update it for a fee of $120, or you can keep the current version until your license ends in December.\n\nPlease let me know which option you prefer by Friday.\n\nKind regards,\nPeter Collins",
+      "questions": [
+        {
+          "prompt": "Why did Mr. Collins write the e-mail?",
+          "options": ["To sell a new computer", "To report the results of a repair request", "To ask for payment of an invoice", "To schedule a training session"],
+          "answer": "B",
+          "explanation": "Thư trả lời cuộc gọi báo mất tập tin (Ticket 4471) và trình bày những gì anh ấy đã tìm thấy và sửa."
+        },
+        {
+          "prompt": "What caused the files to disappear?",
+          "options": ["The hard drive broke.", "An employee deleted them.", "A cleanup program moved them.", "A virus damaged them."],
+          "answer": "C",
+          "explanation": "'The files were moved to a backup folder ... by the cleanup program'; ổ cứng không hỏng và không có gì bị xóa."
+        },
+        {
+          "prompt": "What has Mr. Collins already done?",
+          "options": ["Replaced the hard drive", "Installed a new accounting program", "Returned the files to the Sales folder", "Canceled the software license"],
+          "answer": "C",
+          "explanation": "'I have copied all 112 files back to the Sales folder.' Việc cập nhật chương trình kế toán chỉ mới là đề xuất."
+        },
+        {
+          "prompt": "What must someone in the office now do every month?",
+          "options": ["Pay a service fee", "Confirm the list of files to be moved", "Back up the drive by hand", "Call Brightline Software"],
+          "answer": "B",
+          "explanation": "Chương trình giờ hiển thị cảnh báo và danh sách tập tin, và 'Someone in your office must click \"Confirm\" each month'."
+        },
+        {
+          "prompt": "What is Ms. Hussain asked to do by Friday?",
+          "options": ["Choose an option for the accounting program", "Delete the duplicate files", "Buy a new operating system", "Send the 112 files to Mr. Collins"],
+          "answer": "A",
+          "explanation": "Đoạn cuối nêu hai lựa chọn (cập nhật với phí $120 hoặc giữ bản hiện tại) và yêu cầu 'let me know which option you prefer by Friday'."
+        }
+      ]
+    }
+  }
+}

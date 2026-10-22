@@ -3,6 +3,10 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { ContentResponseCode } from '@appenglish/content-contracts';
 import { CONTENT_GRPC_SERVICE } from '@appenglish/content-contracts/grpc';
 import { ContentError } from './content.errors.js';
+import { z } from 'zod';
+
+// The orphan files the Content Manager chose to delete (D118).
+const orphanMediaDeleteSchema = z.object({ ids: z.array(z.string().uuid()).min(1).max(500) }).strict();
 import { ContentService } from './content.service.js';
 import {
   actorSchema,
@@ -19,6 +23,7 @@ import {
   placementPaperSchema,
   pronunciationSchema,
   unitCreateSchema,
+  unitReviewContentSchema,
   unitUpdateSchema,
 } from './content.schemas.js';
 
@@ -38,6 +43,23 @@ const rpcs = {
   PublishUnit: {
     id: true,
     run: (service, { actor, id }) => service.publishUnit(actor, id),
+  },
+  UnpublishUnit: { id: true, run: (service, { actor, id }) => service.unpublishUnit(actor, id) },
+  DeleteUnit: { id: true, run: (service, { actor, id }) => service.deleteUnit(actor, id) },
+  // Unit review (D121); id is the unit id.
+  GetUnitReview: { id: true, run: (service, { actor, id }) => service.getUnitReview(actor, id) },
+  SaveUnitReviewDraft: {
+    id: true,
+    payload: unitReviewContentSchema,
+    run: (service, { actor, id, payload }) => service.saveUnitReviewDraft(actor, id, payload),
+  },
+  PublishUnitReview: { id: true, run: (service, { actor, id }) => service.publishUnitReview(actor, id) },
+  UnpublishUnitReview: { id: true, run: (service, { actor, id }) => service.unpublishUnitReview(actor, id) },
+  GetUnitReviewPaper: {
+    internal: true,
+    id: true,
+    payload: placementPaperSchema,
+    run: (service, { id, payload }) => service.getUnitReviewPaper(id, payload),
   },
   CreateLesson: {
     id: true,
@@ -62,6 +84,12 @@ const rpcs = {
     id: true,
     run: (service, { actor, id }) => service.publishLesson(actor, id),
   },
+  UnpublishLesson: { id: true, run: (service, { actor, id }) => service.unpublishLesson(actor, id) },
+  DeleteLesson: { id: true, run: (service, { actor, id }) => service.deleteLesson(actor, id) },
+  ListOrphanMedia: { run: (service, { actor }) => service.listOrphanMedia(actor) },
+  DeleteOrphanMedia: { payload: orphanMediaDeleteSchema, run: (service, { actor, payload }) => service.deleteOrphanMedia(actor, payload) },
+  UnpublishMockTest: { id: true, run: (service, { actor, id }) => service.unpublishMockTest(actor, id) },
+  DeleteMockTest: { id: true, run: (service, { actor, id }) => service.deleteMockTest(actor, id) },
   DeleteMedia: {
     id: true,
     run: (service, { actor, id }) => service.deleteMedia(actor, id),

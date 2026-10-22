@@ -1,0 +1,260 @@
+{
+  "number": 21,
+  "title": "Banking",
+  "vocabulary": [
+    {
+      "word": "accept",
+      "partOfSpeech": "verb",
+      "meaning": "chấp nhận, nhận (đơn, thanh toán, đề nghị)",
+      "example": "The bank accepts online applications for savings accounts from customers over eighteen.",
+      "exampleMeaning": "Ngân hàng chấp nhận đơn đăng ký tài khoản tiết kiệm trực tuyến của khách hàng trên mười tám tuổi."
+    },
+    {
+      "word": "balance",
+      "partOfSpeech": "noun",
+      "meaning": "số dư (tài khoản); sự cân bằng",
+      "example": "Please check your account balance before you send the wire transfer on Friday.",
+      "exampleMeaning": "Vui lòng kiểm tra số dư tài khoản trước khi bạn chuyển khoản vào thứ Sáu."
+    },
+    {
+      "word": "borrow",
+      "partOfSpeech": "verb",
+      "meaning": "vay, mượn",
+      "example": "The company borrowed fifty thousand dollars to replace its delivery vans.",
+      "exampleMeaning": "Công ty đã vay năm mươi nghìn đô la để thay các xe giao hàng."
+    },
+    {
+      "word": "cautiously",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách thận trọng, cẩn thận",
+      "example": "Our treasurer cautiously moved the reserve funds into a low-risk savings account.",
+      "exampleMeaning": "Thủ quỹ của chúng tôi đã thận trọng chuyển quỹ dự phòng vào một tài khoản tiết kiệm ít rủi ro."
+    },
+    {
+      "word": "deduct",
+      "partOfSpeech": "verb",
+      "meaning": "khấu trừ, trừ đi (một khoản tiền)",
+      "example": "The bank deducts a small fee from every international transfer.",
+      "exampleMeaning": "Ngân hàng khấu trừ một khoản phí nhỏ từ mỗi lần chuyển tiền quốc tế."
+    },
+    {
+      "word": "dividend",
+      "partOfSpeech": "noun",
+      "meaning": "cổ tức; lợi ích thu được",
+      "example": "Shareholders will receive a dividend of two dollars per share in September.",
+      "exampleMeaning": "Các cổ đông sẽ nhận cổ tức hai đô la mỗi cổ phiếu vào tháng Chín."
+    },
+    {
+      "word": "down payment",
+      "partOfSpeech": "noun",
+      "meaning": "khoản trả trước, tiền đặt cọc ban đầu",
+      "example": "The couple made a down payment of ten percent on their first apartment.",
+      "exampleMeaning": "Cặp vợ chồng đã trả trước mười phần trăm cho căn hộ đầu tiên của họ."
+    },
+    {
+      "word": "mortgage",
+      "partOfSpeech": "noun",
+      "meaning": "khoản vay thế chấp (để mua nhà, bất động sản)",
+      "example": "The firm took a twenty-year mortgage to buy its new warehouse outside the city.",
+      "exampleMeaning": "Công ty đã vay thế chấp hai mươi năm để mua nhà kho mới ở ngoại ô thành phố."
+    },
+    {
+      "word": "restricted",
+      "partOfSpeech": "adjective",
+      "meaning": "bị hạn chế, bị giới hạn",
+      "example": "Access to the vault is restricted to two senior managers.",
+      "exampleMeaning": "Việc ra vào hầm két được giới hạn cho hai quản lý cấp cao."
+    },
+    {
+      "word": "signature",
+      "partOfSpeech": "noun",
+      "meaning": "chữ ký",
+      "example": "The check cannot be cashed without the signature of the account holder.",
+      "exampleMeaning": "Tấm séc không thể rút tiền nếu không có chữ ký của chủ tài khoản."
+    },
+    {
+      "word": "take out",
+      "partOfSpeech": "verb",
+      "meaning": "vay (một khoản vay); mở (thẻ, bảo hiểm); lấy ra",
+      "example": "Many small shops take out a short-term loan to buy stock before the holidays.",
+      "exampleMeaning": "Nhiều cửa hàng nhỏ vay ngắn hạn để nhập hàng trước kỳ nghỉ lễ."
+    },
+    {
+      "word": "transaction",
+      "partOfSpeech": "noun",
+      "meaning": "giao dịch (mua bán, ngân hàng)",
+      "example": "Every transaction over one thousand dollars must be approved by a supervisor.",
+      "exampleMeaning": "Mọi giao dịch trên một nghìn đô la phải được giám sát viên phê duyệt."
+    }
+  ],
+  "fillIn": {
+    "passage": "Priya Nair runs a bicycle repair shop and wants to buy the building she now rents. Last month she visited Harbor Street Bank to ask about a ___ for the property. The loan officer, Mr. Dubois, explained that the bank would ___ her application only if she could pay a ___ of twenty percent of the price. Priya had saved most of that amount, and she expected a ___ from shares she owns in a local cooperative to cover the rest.\n\nMr. Dubois reviewed her business account and noted that the ___ had stayed healthy for three years. He asked her to print a record of every ___ from the last six months. Priya read the terms ___, since she did not want to ___ more than she could repay. Each month, the bank will ___ the installment directly from her account. The loan is ___ to the purchase of the building, so she cannot use it for new tools. For everyday costs, she will ___ a small business credit card instead. Two weeks later, her ___ on the final page made the loan official.",
+    "answers": ["mortgage", "accept", "down payment", "dividend", "balance", "transaction", "cautiously", "borrow", "deduct", "restricted", "take out", "signature"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người đàn ông đứng trước máy ATM, đang bấm bàn phím; phía sau là một người phụ nữ xếp hàng chờ đến lượt.",
+      "options": [
+        "A man is using a cash machine.",
+        "A man is counting coins at a counter.",
+        "The people are waiting for a bus.",
+        "A woman is repairing the machine."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người đàn ông đang dùng máy rút tiền. (B) sai hành động, (C) sai địa điểm, (D) người phụ nữ chỉ đứng chờ chứ không sửa máy."
+    },
+    "part2": [
+      {
+        "question": "How much did you borrow for the new printer?",
+        "options": ["About two thousand dollars.", "The printer is on the second floor.", "Yes, I borrowed it yesterday."],
+        "answer": "A",
+        "explanation": "Câu hỏi How much cần một số tiền. (B) nhầm với từ 'printer', (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Has the bank accepted our loan application?",
+        "options": ["The application form is on my desk.", "Not yet, they'll call us on Monday.", "I'll balance the accounts tonight."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về việc đơn vay đã được chấp nhận chưa; (B) trả lời 'Not yet' và nói khi nào có kết quả. (A) lặp từ 'application', (C) lạc đề."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Good afternoon. I'm here about the mortgage application I submitted last week for the shop on Elm Street.\nMan: Yes, Ms. Okafor, I have your file here. The bank has approved the loan, but we still need two things before we can release the money.\nWoman: What are they?\nMan: First, proof that the down payment of thirty thousand dollars has been transferred to the seller. Second, your signature on the final agreement, which must be witnessed by a bank officer.\nWoman: I sent the down payment this morning, so I can bring the receipt tomorrow. Can I sign at the same time?\nMan: Of course. I'd also suggest reading the repayment schedule cautiously before you sign. The monthly amount will be deducted automatically on the fifth of each month.\nWoman: Thank you. I'll come by at ten tomorrow.",
+      "questions": [
+        {
+          "prompt": "Why is the woman at the bank?",
+          "options": ["To open a savings account", "To discuss a property loan", "To report a lost card", "To exchange currency"],
+          "answer": "B",
+          "explanation": "Người phụ nữ đến vì 'the mortgage application' cho cửa hàng trên phố Elm, tức khoản vay mua bất động sản."
+        },
+        {
+          "prompt": "What does the man ask the woman to provide?",
+          "options": ["A copy of her passport", "A letter from the seller", "A receipt for the down payment", "A list of monthly expenses"],
+          "answer": "C",
+          "explanation": "Người đàn ông cần 'proof that the down payment ... has been transferred', và cô ấy sẽ mang biên lai đến."
+        },
+        {
+          "prompt": "What will happen on the fifth of each month?",
+          "options": ["The woman will meet the man", "A payment will be taken from her account", "The bank will send a statement", "The interest rate will change"],
+          "answer": "B",
+          "explanation": "Câu 'The monthly amount will be deducted automatically on the fifth of each month' nghĩa là tiền sẽ được trừ khỏi tài khoản vào ngày mùng 5."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hello, this is Marcus Lindqvist from Westgate Savings Bank with a message for Ms. Chen. I'm calling about the business account you opened with us in March. First, I'm pleased to confirm that the dividend from your cooperative shares, four hundred and twenty dollars, was credited this morning, so your current balance is just over six thousand dollars. Second, you asked whether you could take out a second card for your assistant. That is possible, but the card would be restricted to purchases under five hundred dollars, and every transaction would appear on your monthly statement. If you would like us to issue the card, please call me back at extension 318 before Thursday, and bring your assistant's identification when you visit the branch. Thank you, and have a good day.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the call?",
+          "options": ["To report a problem with a card", "To give information about an account", "To invite the listener to a seminar", "To ask for a late payment"],
+          "answer": "B",
+          "explanation": "Người gọi thông báo về tài khoản doanh nghiệp: cổ tức đã vào tài khoản, số dư hiện tại và việc cấp thêm thẻ."
+        },
+        {
+          "prompt": "What is the listener's current balance?",
+          "options": ["About 420 dollars", "About 500 dollars", "About 6,000 dollars", "About 318 dollars"],
+          "answer": "C",
+          "explanation": "Người gọi nói 'your current balance is just over six thousand dollars'. 420 là cổ tức, 500 là giới hạn thẻ, 318 là số máy lẻ."
+        },
+        {
+          "prompt": "What should the listener do before Thursday?",
+          "options": ["Visit another branch", "Return the call", "Pay a fee", "Close the account"],
+          "answer": "B",
+          "explanation": "Cuối lời nhắn: 'please call me back at extension 318 before Thursday'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The committee _____ the proposal to open a second branch in the north of the city.",
+        "options": ["accept", "accepted", "acceptance", "acceptable"],
+        "answer": "B",
+        "explanation": "Câu cần động từ chính; chủ ngữ 'The committee' số ít nên 'accept' không đúng, 'accepted' (quá khứ) là hợp lý."
+      },
+      {
+        "prompt": "Please review each _____ on the statement and report anything you do not recognize.",
+        "options": ["transact", "transactional", "transaction", "transacted"],
+        "answer": "C",
+        "explanation": "Sau 'each' cần danh từ số ít: 'transaction' (giao dịch)."
+      },
+      {
+        "prompt": "The finance team _____ reduced spending until the new contract was signed.",
+        "options": ["caution", "cautious", "cautiously", "cautioned"],
+        "answer": "C",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'reduced': 'cautiously' (một cách thận trọng)."
+      },
+      {
+        "prompt": "The company will _____ a five-year loan to modernize its factory.",
+        "options": ["take out", "take over", "take off", "take in"],
+        "answer": "A",
+        "explanation": "'take out a loan' là cụm cố định nghĩa là vay một khoản tiền. 'take over' là tiếp quản, 'take off' là cất cánh/cởi ra."
+      },
+      {
+        "prompt": "The insurance premium is _____ automatically from each employee's salary.",
+        "options": ["deduct", "deduction", "deducted", "deductible"],
+        "answer": "C",
+        "explanation": "Sau 'is' cần quá khứ phân từ để tạo thể bị động: 'is deducted from' (được khấu trừ từ)."
+      },
+      {
+        "prompt": "Shareholders expect a higher _____ this year because profits rose by twelve percent.",
+        "options": ["dividend", "divide", "divided", "division"],
+        "answer": "A",
+        "explanation": "Sau 'a higher' cần danh từ, và nghĩa phù hợp với cổ đông và lợi nhuận là 'dividend' (cổ tức)."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Department Heads\nFrom: Elena Marsh, Finance Director\nSubject: Company credit cards\n\nFrom June 1, every department head will receive a company credit card for travel and small purchases. The cards are ___ to business expenses, and a monthly limit of two thousand dollars applies. Please keep the receipt for each ___ and attach it to your expense report. Any amount that cannot be explained will be ___ from the department's budget. If you have questions about the new cards, contact my office at extension 240.",
+      "questions": [
+        {
+          "options": ["restrict", "restriction", "restricted", "restricting"],
+          "answer": "C",
+          "explanation": "'are restricted to' là dạng bị động, nghĩa là chỉ được dùng cho chi phí công việc; cần quá khứ phân từ."
+        },
+        {
+          "options": ["transact", "transaction", "transactional", "transacted"],
+          "answer": "B",
+          "explanation": "Sau 'each' cần danh từ số ít: 'transaction' (mỗi giao dịch)."
+        },
+        {
+          "options": ["deduct", "deducted", "deduction", "deducting"],
+          "answer": "B",
+          "explanation": "'will be deducted from' là thể bị động ở tương lai: khoản tiền sẽ bị trừ khỏi ngân sách của phòng."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "Clearwater Credit Union\n14 Mill Road, Ashford\n\nMay 8\n\nDear Mr. Ramirez,\n\nThank you for applying for a business mortgage with Clearwater Credit Union. We are pleased to inform you that your application has been accepted.\n\n| Loan amount | 180,000 dollars |\n| Down payment received | 45,000 dollars |\n| Term | 15 years |\n| Monthly payment | 1,420 dollars, deducted on the 1st of each month |\n\nPlease note the following conditions. The loan is restricted to the purchase of the property at 22 Harbor Lane and may not be used for other purposes. Your business account must keep a balance of at least 3,000 dollars at the start of every month. Should the balance fall below that amount, a service charge of 25 dollars will apply.\n\nTo complete the process, please visit our Ashford branch before May 22 and provide your signature on the loan agreement in the presence of a loan officer. You may also borrow a copy of our guide \"Managing a Business Loan\" from the branch library at no cost.\n\nSincerely,\nDana Whitfield\nLoan Manager",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the letter?",
+          "options": ["To refuse a loan application", "To announce a change in fees", "To confirm the approval of a loan", "To request a late payment"],
+          "answer": "C",
+          "explanation": "Thư viết 'your application has been accepted' và nêu các điều kiện của khoản vay."
+        },
+        {
+          "prompt": "How much did Mr. Ramirez pay in advance?",
+          "options": ["3,000 dollars", "25 dollars", "45,000 dollars", "180,000 dollars"],
+          "answer": "C",
+          "explanation": "Bảng ghi 'Down payment received: 45,000 dollars'; 180,000 là tổng khoản vay."
+        },
+        {
+          "prompt": "What happens if the account balance falls below 3,000 dollars?",
+          "options": ["The loan is canceled", "A fee is charged", "The interest rate rises", "A new application is needed"],
+          "answer": "B",
+          "explanation": "'Should the balance fall below that amount, a service charge of 25 dollars will apply', tức sẽ bị thu phí."
+        },
+        {
+          "prompt": "What is Mr. Ramirez asked to do before May 22?",
+          "options": ["Send a check by mail", "Sign the agreement at the branch", "Transfer the down payment", "Call the loan manager"],
+          "answer": "B",
+          "explanation": "Thư yêu cầu 'visit our Ashford branch before May 22 and provide your signature on the loan agreement'."
+        },
+        {
+          "prompt": "What is suggested about Mr. Ramirez?",
+          "options": ["He has applied for a loan before", "He is buying a property on Harbor Lane", "He works at the Ashford branch", "He will repay the loan in five years"],
+          "answer": "B",
+          "explanation": "Khoản vay 'is restricted to the purchase of the property at 22 Harbor Lane', nên có thể suy ra ông ấy đang mua bất động sản ở đó. Thời hạn vay là 15 năm."
+        }
+      ]
+    }
+  }
+}

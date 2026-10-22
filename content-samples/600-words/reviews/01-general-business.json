@@ -1,0 +1,223 @@
+{
+  "unit": 1,
+  "title": "General Business",
+  "part5": [
+    {
+      "prompt": "Although negotiating a new contract was complicated, both parties came to an _____ that satisfied them.",
+      "options": [
+        "agree",
+        "agreeable",
+        "agreement",
+        "agreeably"
+      ],
+      "answer": "C",
+      "explanation": "Sau 'an' cần danh từ; 'come to an agreement' nghĩa là đi đến một thỏa thuận."
+    },
+    {
+      "prompt": "_____ conferences are a good way for employees to get in touch with people in similar organizations.",
+      "options": [
+        "Associating",
+        "Associated",
+        "Associations",
+        "Association"
+      ],
+      "answer": "D",
+      "explanation": "'Association' làm danh từ bổ nghĩa cho 'conferences', chỉ hội nghị của hiệp hội."
+    },
+    {
+      "prompt": "When the family decided to open a restaurant, they had to find a _____ that would attract business.",
+      "options": [
+        "locate",
+        "locator",
+        "locating",
+        "location"
+      ],
+      "answer": "D",
+      "explanation": "Sau mạo từ 'a' cần danh từ chỉ địa điểm: 'location'."
+    },
+    {
+      "prompt": "A _____ company will honor the terms set forth in its warranty.",
+      "options": [
+        "repute",
+        "reputedly",
+        "reputation",
+        "reputable"
+      ],
+      "answer": "D",
+      "explanation": "Trước danh từ 'company' cần tính từ 'reputable' (có uy tín)."
+    },
+    {
+      "prompt": "The goal of marketing is to _____ customers, to persuade them to buy a product or service.",
+      "options": [
+        "attract",
+        "attractive",
+        "attraction",
+        "attractiveness"
+      ],
+      "answer": "A",
+      "explanation": "Sau 'to' cần động từ nguyên mẫu 'attract' (thu hút)."
+    },
+    {
+      "prompt": "Once both parties have agreed to a contract, they have also agreed to abide by every _____ provision.",
+      "options": [
+        "specify",
+        "specific",
+        "specification",
+        "specificity"
+      ],
+      "answer": "B",
+      "explanation": "Trước 'provision' cần tính từ 'specific' (cụ thể)."
+    },
+    {
+      "prompt": "Good business planning includes developing an overall _____, addressing likely objections, and demonstrating why potential buyers need the product or service.",
+      "options": [
+        "strategy",
+        "strategic",
+        "strategically",
+        "strategize"
+      ],
+      "answer": "A",
+      "explanation": "Sau 'an overall' cần danh từ 'strategy' (chiến lược)."
+    },
+    {
+      "prompt": "When you register for out-of-town conferences, make room _____ as soon as you decide to attend.",
+      "options": [
+        "accommodate",
+        "accommodations",
+        "accommodating",
+        "accommodated"
+      ],
+      "answer": "B",
+      "explanation": "'Room accommodations' chỉ việc bố trí chỗ ở/phòng; đáp án theo sách là danh từ số nhiều 'accommodations'."
+    },
+    {
+      "prompt": "Marketers must avoid making promises they can't keep while they _____ the quality of their product or service.",
+      "options": [
+        "demonstrate",
+        "demonstration",
+        "demonstrative",
+        "demonstrable"
+      ],
+      "answer": "A",
+      "explanation": "Sau 'they' cần động từ chia theo chủ ngữ số nhiều: 'demonstrate' (chứng minh, thể hiện)."
+    },
+    {
+      "prompt": "A consultant must adhere carefully to his contract if he wants to _____ a good business reputation.",
+      "options": [
+        "establish",
+        "establishment",
+        "established",
+        "establishing"
+      ],
+      "answer": "A",
+      "explanation": "Sau 'wants to' cần động từ nguyên mẫu 'establish' (xây dựng)."
+    }
+  ],
+  "part6": [
+    {
+      "passage": "Are you looking for a place ___ your next conference? The Littleton Convention Center offers a convenient location at an affordable price. Whether your event is big or small, our site can accommodate your needs. We offer meeting rooms, several auditoriums, and a large exhibition hall. Catering services are also available. Get ___ touch with us at 555-0964 to make arrangements for your event. We know you'll ___ with our services.",
+      "questions": [
+        {
+          "options": [
+            "hold",
+            "holding",
+            "will hold",
+            "to hold"
+          ],
+          "answer": "D",
+          "explanation": "'a place to hold your next conference': động từ nguyên mẫu có 'to' chỉ mục đích sử dụng địa điểm."
+        },
+        {
+          "options": [
+            "on",
+            "in",
+            "at",
+            "to"
+          ],
+          "answer": "B",
+          "explanation": "Cụm cố định 'get in touch with' nghĩa là liên hệ với."
+        },
+        {
+          "options": [
+            "satisfy",
+            "satisfied",
+            "be satisfied",
+            "be satisfying"
+          ],
+          "answer": "C",
+          "explanation": "Sau 'you'll' (= you will) cần 'be satisfied with' (hài lòng với)."
+        }
+      ]
+    },
+    {
+      "passage": "Smart ___ compare prices before they buy. That's why nine out of ten shoppers choose Star Brand household cleaning products. Star Brand products are the most efficient cleaning products around. They are ___ enough to clean up even the toughest stains and dirt. Every Star Brand product comes with the company promise: If you are not 100% satisfied, your money will be returned with no questions asked. Next time you are shopping for cleaning products, ___ Star Brand. We know you'll be happy you did.",
+      "questions": [
+        {
+          "options": [
+            "presumers",
+            "consumers",
+            "assumers",
+            "resumers"
+          ],
+          "answer": "B",
+          "explanation": "'Consumers' là người tiêu dùng, phù hợp với hành động so sánh giá trước khi mua."
+        },
+        {
+          "options": [
+            "strong",
+            "stronger",
+            "strongly",
+            "strongest"
+          ],
+          "answer": "A",
+          "explanation": "Cấu trúc 'adjective + enough + to V': 'strong enough to clean'."
+        },
+        {
+          "options": [
+            "consideration",
+            "considering",
+            "consider",
+            "considers"
+          ],
+          "answer": "C",
+          "explanation": "Câu mệnh lệnh dùng động từ nguyên mẫu 'consider' (hãy cân nhắc)."
+        }
+      ]
+    },
+    {
+      "passage": "When purchasing a new appliance, check to make sure that a warranty is included. This ___ important protection to you, the consumer. If you decide to return a product that is under warranty, you will have ___ that any damage was not caused by misuse or mishandling. Also, make certain that you return a damaged product before the warranty ___. Companies do not have to accept products that are returned after the date stated in the warranty.",
+      "questions": [
+        {
+          "options": [
+            "offer",
+            "offers",
+            "are offering",
+            "have offered"
+          ],
+          "answer": "B",
+          "explanation": "'This' là chủ ngữ số ít nên động từ hiện tại đơn là 'offers'."
+        },
+        {
+          "options": [
+            "demonstration",
+            "demonstrative",
+            "demonstrator",
+            "to demonstrate"
+          ],
+          "answer": "D",
+          "explanation": "Sau 'will have' dùng 'to demonstrate' trong cấu trúc 'have to + V' (phải chứng minh)."
+        },
+        {
+          "options": [
+            "respires",
+            "inspires",
+            "expires",
+            "perspires"
+          ],
+          "answer": "C",
+          "explanation": "'Warranty expires' nghĩa là bảo hành hết hạn; chủ ngữ số ít dùng 'expires'."
+        }
+      ]
+    }
+  ]
+}

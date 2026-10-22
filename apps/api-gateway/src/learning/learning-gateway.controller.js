@@ -66,6 +66,20 @@ export class LearningGatewayController extends LearningRelay {
   updatePlacementSettings(body, request) {
     return this.forward('UpdatePlacementSettings', request, { body });
   }
+  // Admin (D131): learning-service removes the learner's attempt, then
+  // auth-service writes the audit row (who, when, why) on the account.
+  async adminResetPlacement(accountId, body, request) {
+    const result = await this.forward('AdminResetPlacement', request, { id: accountId });
+    const reason = body && typeof body.reason === 'string' ? body.reason : '';
+    const audit = await callAuth(this.auth, 'AdminAccountAction', {
+      accessToken: sessionTokens(request).accessToken,
+      accountId,
+      action: 'RESET_PLACEMENT',
+      reason,
+    });
+    if (audit.status >= 400) throw new HttpException(audit.payload, audit.status);
+    return { ...result, data: { ...result.data, account: audit.payload.data.account } };
+  }
 }
 
 Controller('placement')(LearningGatewayController);
@@ -79,6 +93,7 @@ const routes = [
   [Post, 'skip', 'skipPlacement', [Req()]],
   [Get, 'settings', 'getPlacementSettings', [Req()]],
   [Put, 'settings', 'updatePlacementSettings', [Body(), Req()]],
+  [Post, 'admin/learners/:id/reset', 'adminResetPlacement', [Param('id'), Body(), Req()]],
 ];
 for (const [verb, path, method, params] of routes) {
   const descriptor = Object.getOwnPropertyDescriptor(LearningGatewayController.prototype, method);
@@ -145,32 +160,25 @@ export class LessonGatewayController extends LearningRelay {
   getListeningCourse(request) {
     return this.forward('GetListeningCourse', request);
   }
-  getCourseLesson(unitId, lessonId, request) {
-    return this.forward('GetCourseLesson', request, { id: unitId, body: { lessonId } });
+  // A topic of the course (D145): id is the topic id.
+  getCourseTopic(id, request) {
+    return this.forward('GetCourseTopic', request, { id });
   }
-  checkCourseLessonStep(unitId, lessonId, body, request) {
-    return this.forward('CheckCourseLessonStep', request, { id: unitId, body: { ...body, lessonId } });
+  checkCourseSentence(id, body, request) {
+    return this.forward('CheckCourseSentence', request, { id, body });
   }
-  completeCourseLesson(unitId, lessonId, body, request) {
-    return this.forward('CompleteCourseLesson', request, { id: unitId, body: { ...body, lessonId } });
+  completeCourseTopic(id, request) {
+    return this.forward('CompleteCourseTopic', request, { id });
   }
   getCourseProgress(request) {
     return this.forward('GetCourseProgress', request);
   }
-  listCourseMistakes(request) {
-    return this.forward('ListCourseMistakes', request);
+  // Unit review (D121): id is the unit id.
+  getUnitReview(id, request) {
+    return this.forward('GetUnitReview', request, { id });
   }
-  checkCourseMistake(id, body, request) {
-    return this.forward('CheckCourseMistake', request, { id, body });
-  }
-  getCoursePlacement(request) {
-    return this.forward('GetCoursePlacement', request);
-  }
-  submitCoursePlacement(body, request) {
-    return this.forward('SubmitCoursePlacement', request, { body });
-  }
-  skipCoursePlacement(request) {
-    return this.forward('SkipCoursePlacement', request);
+  submitUnitReview(id, body, request) {
+    return this.forward('SubmitUnitReview', request, { id, body });
   }
   getCourseTest(itemId, request) {
     return this.forward('GetCourseTest', request, { id: itemId });
@@ -204,21 +212,18 @@ const lessonRoutes = [
   [Get, 'lessons/:id/test/review', 'getLessonTestReview', [Param('id'), Req()]],
   [Get, 'lessons/:id/test/review/:attemptNumber', 'getLessonTestAttemptReview', [Param('id'), Param('attemptNumber'), Req()]],
   [Get, 'lessons/:id/ranking', 'getLessonRanking', [Param('id'), Req()]],
+  [Get, 'units/:id/review', 'getUnitReview', [Param('id'), Req()]],
+  [Post, 'units/:id/review/submit', 'submitUnitReview', [Param('id'), Body(), Req()]],
   [Get, 'practice/vocabulary', 'getVocabularyPractice', [Req()]],
   [Get, 'practice/listening', 'listListeningPractice', [Req()]],
   [Get, 'practice/listening/:id', 'getListeningPractice', [Param('id'), Query(), Req()]],
   [Post, 'practice/listening/:id/check', 'checkListeningPractice', [Param('id'), Body(), Req()]],
   [Post, 'practice/listening/:id/check-line', 'checkListeningLine', [Param('id'), Body(), Req()]],
   [Get, 'listening-course', 'getListeningCourse', [Req()]],
-  [Get, 'listening-course/units/:unitId/lessons/:lessonId', 'getCourseLesson', [Param('unitId'), Param('lessonId'), Req()]],
-  [Post, 'listening-course/units/:unitId/lessons/:lessonId/check', 'checkCourseLessonStep', [Param('unitId'), Param('lessonId'), Body(), Req()]],
-  [Post, 'listening-course/units/:unitId/lessons/:lessonId/complete', 'completeCourseLesson', [Param('unitId'), Param('lessonId'), Body(), Req()]],
+  [Get, 'listening-course/topics/:id', 'getCourseTopic', [Param('id'), Req()]],
+  [Post, 'listening-course/topics/:id/check', 'checkCourseSentence', [Param('id'), Body(), Req()]],
+  [Post, 'listening-course/topics/:id/complete', 'completeCourseTopic', [Param('id'), Req()]],
   [Get, 'listening-course/progress', 'getCourseProgress', [Req()]],
-  [Get, 'listening-course/mistakes', 'listCourseMistakes', [Req()]],
-  [Post, 'listening-course/mistakes/:id/check', 'checkCourseMistake', [Param('id'), Body(), Req()]],
-  [Get, 'listening-course/placement', 'getCoursePlacement', [Req()]],
-  [Post, 'listening-course/placement/submit', 'submitCoursePlacement', [Body(), Req()]],
-  [Post, 'listening-course/placement/skip', 'skipCoursePlacement', [Req()]],
   [Get, 'listening-course/tests/:itemId', 'getCourseTest', [Param('itemId'), Req()]],
   [Post, 'listening-course/tests/:itemId/submit', 'submitCourseTest', [Param('itemId'), Body(), Req()]],
 ];

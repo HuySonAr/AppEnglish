@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { BookOpen, CalendarDays, CheckCircle2, GraduationCap, Headphones, KeyRound, Lock, Mail, Pencil, Shield, Timer, TrendingUp, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { displayNameOf } from '@appenglish/auth-contracts';
-import { CourseLevelState } from '@appenglish/learning-contracts';
 import { RoleLabels, Roles } from '../../../constants/auth.js';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { cn } from '../../../lib/utils.js';
@@ -17,7 +16,7 @@ import { getCourseProgress } from '../../student/api/course-api.js';
 import { ChangePasswordDialog } from '../components/ChangePasswordDialog.jsx';
 import { EditProfileDialog } from '../components/EditProfileDialog.jsx';
 import { LessonsRing, SkillsChart, XpChart } from '../components/ProfileCharts.jsx';
-import { lessonRing, levelSteps, memberFor, skillBars, xpBars } from '../lib/profile-charts.js';
+import { lessonRing, LevelStep, levelSteps, memberFor, skillBars, xpBars } from '../lib/profile-charts.js';
 
 const eyebrows = {
   [Roles.STUDENT]: 'Student',
@@ -62,8 +61,8 @@ function LevelSteps({ steps, currentLevel }) {
   return (
     <ol className="flex flex-wrap gap-2">
       {steps.map((step) => {
-        const done = step.state === CourseLevelState.DONE;
-        const current = step.state === CourseLevelState.CURRENT || step.level === currentLevel;
+        const done = step.state === LevelStep.DONE;
+        const current = step.state === LevelStep.CURRENT || step.level === currentLevel;
         return (
           <li
             key={step.level}
@@ -76,9 +75,9 @@ function LevelSteps({ steps, currentLevel }) {
           >
             <span className="font-semibold">{step.level}</span>
             {done ? <CheckCircle2 className="h-4 w-4 text-success" aria-label="Passed" /> : current ? <span className="text-[10px] uppercase tracking-wide">Now</span> : <Lock className="h-3.5 w-3.5" aria-label="Locked" />}
-            {step.lessons ? (
+            {step.topics?.total ? (
               <span className="text-[11px] tabular-nums text-muted-foreground">
-                {step.lessons.completed ?? step.lessons.passed ?? 0}/{step.lessons.total}
+                {step.topics.done}/{step.topics.total}
               </span>
             ) : null}
           </li>
@@ -149,14 +148,14 @@ function Standing() {
   const steps = levelSteps(course);
   const tests = (progress.attempts?.lessonTests || 0) + (progress.attempts?.mockTests || 0);
   const nothingYet = ring.completed === 0 && tests === 0 && !xpData.length;
-  const listeningLevel = course ? course.currentLevel || (steps.length ? 'All passed' : '—') : '—';
+  const listeningLevel = course ? course.currentLevel || '—' : '—';
 
   return (
     <div className="space-y-6">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat icon={BookOpen} label="Lessons completed" value={ring.total ? `${ring.completed}/${ring.total}` : '—'} detail={ring.percent === null ? 'No lesson published yet' : `${ring.percent}% of the course`} />
         <Stat icon={Trophy} label="XP" value={xp ? `${xp.totalXp} XP` : '—'} detail={xp ? (xp.rank ? `#${xp.rank} of ${xp.learnerCount} learners` : 'Finish a full mock test to earn XP') : 'XP not available'} tone="text-warning bg-warning/10" />
-        <Stat icon={Headphones} label="Listening level" value={listeningLevel} detail={course ? `${course.lessons?.passed ?? 0}/${course.lessons?.total ?? 0} course lessons passed` : 'Course not available'} tone="text-chart-2 bg-chart-2/10" />
+        <Stat icon={Headphones} label="Listening level" value={listeningLevel} detail={course ? `${course.topics?.done ?? 0}/${course.topics?.total ?? 0} course topics done` : 'Course not available'} tone="text-chart-2 bg-chart-2/10" />
         <Stat icon={Timer} label="Tests taken" value={tests} detail={`${plural(progress.attempts?.lessonTests || 0, 'lesson test')}, ${plural(progress.attempts?.mockTests || 0, 'full mock test')}`} />
       </div>
 
@@ -185,7 +184,7 @@ function Standing() {
       ) : (
         <>
           <div className="grid gap-6 lg:grid-cols-[1fr_16rem]">
-            <Panel title="Mastery" description="Your best score on each skill's questions over every lesson test and full mock test; retakes never lower it.">
+            <Panel title="Mastery" description="Your best score on each skill.">
               <SkillsChart bars={bars} />
             </Panel>
             <Panel title="Lessons" description="Completed over published.">

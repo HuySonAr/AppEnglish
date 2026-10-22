@@ -1,0 +1,260 @@
+{
+  "number": 27,
+  "title": "Board Meetings and Committees",
+  "vocabulary": [
+    {
+      "word": "adhere to",
+      "partOfSpeech": "verb",
+      "meaning": "tuân thủ, bám sát (quy định, lịch trình, kế hoạch)",
+      "example": "The chairperson asked all members to adhere to the five-minute limit for each report.",
+      "exampleMeaning": "Chủ tọa yêu cầu tất cả thành viên tuân thủ giới hạn năm phút cho mỗi báo cáo."
+    },
+    {
+      "word": "agenda",
+      "partOfSpeech": "noun",
+      "meaning": "chương trình nghị sự, danh sách các mục cần bàn",
+      "example": "Please send me any items for the agenda by noon on Wednesday.",
+      "exampleMeaning": "Vui lòng gửi cho tôi các mục cần đưa vào chương trình họp trước trưa thứ Tư."
+    },
+    {
+      "word": "bring up",
+      "partOfSpeech": "verb",
+      "meaning": "nêu ra, đưa ra (vấn đề) để bàn",
+      "example": "Ms. Alvarez will bring up the parking shortage at the next committee meeting.",
+      "exampleMeaning": "Bà Alvarez sẽ nêu vấn đề thiếu chỗ đậu xe tại cuộc họp ủy ban tới."
+    },
+    {
+      "word": "conclude",
+      "partOfSpeech": "verb",
+      "meaning": "kết thúc; kết luận, rút ra kết luận",
+      "example": "The board concluded the session with a vote on the new treasurer.",
+      "exampleMeaning": "Hội đồng kết thúc phiên họp bằng một cuộc bỏ phiếu bầu thủ quỹ mới."
+    },
+    {
+      "word": "go ahead",
+      "partOfSpeech": "verb",
+      "meaning": "tiến hành, bắt đầu làm; cứ làm đi",
+      "example": "The committee told the design team to go ahead with the new logo.",
+      "exampleMeaning": "Ủy ban bảo nhóm thiết kế cứ tiến hành với logo mới."
+    },
+    {
+      "word": "goal",
+      "partOfSpeech": "noun",
+      "meaning": "mục tiêu, đích nhắm tới",
+      "example": "Our goal for this year is to reduce meeting time by twenty percent.",
+      "exampleMeaning": "Mục tiêu của chúng ta năm nay là giảm hai mươi phần trăm thời gian họp."
+    },
+    {
+      "word": "lengthy",
+      "partOfSpeech": "adjective",
+      "meaning": "dài dòng, kéo dài (quá mức cần thiết)",
+      "example": "After a lengthy discussion about the budget, the members finally agreed to vote.",
+      "exampleMeaning": "Sau một cuộc thảo luận dài về ngân sách, các thành viên cuối cùng đồng ý bỏ phiếu."
+    },
+    {
+      "word": "matter",
+      "partOfSpeech": "noun",
+      "meaning": "vấn đề, việc cần bàn; (động từ) quan trọng, có ý nghĩa",
+      "example": "The secretary listed three matters that need a decision before the end of the quarter.",
+      "exampleMeaning": "Thư ký liệt kê ba vấn đề cần quyết định trước cuối quý."
+    },
+    {
+      "word": "periodically",
+      "partOfSpeech": "adverb",
+      "meaning": "định kỳ, theo từng khoảng thời gian",
+      "example": "The finance committee reviews the investment policy periodically, usually every six months.",
+      "exampleMeaning": "Ủy ban tài chính xem xét chính sách đầu tư định kỳ, thường là sáu tháng một lần."
+    },
+    {
+      "word": "priority",
+      "partOfSpeech": "noun",
+      "meaning": "việc ưu tiên, sự ưu tiên",
+      "example": "Hiring a new safety officer is the top priority on this month's list.",
+      "exampleMeaning": "Tuyển một cán bộ an toàn mới là việc ưu tiên hàng đầu trong danh sách tháng này."
+    },
+    {
+      "word": "progress",
+      "partOfSpeech": "noun",
+      "meaning": "sự tiến triển, tiến độ; (động từ) tiến triển",
+      "example": "The project leader reported steady progress on the new warehouse.",
+      "exampleMeaning": "Trưởng dự án báo cáo tiến độ ổn định của nhà kho mới."
+    },
+    {
+      "word": "waste",
+      "partOfSpeech": "verb",
+      "meaning": "lãng phí (thời gian, tiền bạc); (danh từ) sự lãng phí",
+      "example": "We wasted almost an hour waiting for the projector to be fixed.",
+      "exampleMeaning": "Chúng ta đã lãng phí gần một tiếng chờ sửa máy chiếu."
+    }
+  ],
+  "fillIn": {
+    "passage": "For years, the monthly board meeting at Pinecrest Community Bank was famous for being ___. Members would ___ new topics without warning, and a single ___ could take an hour to discuss. By the time the chair tried to ___ the meeting, half the room had left, and little real ___ had been made on the bank's plans.\n\nWhen Marianne Foster became chair in January, she set a clear ___: every meeting would finish within ninety minutes. She now sends a written ___ three days in advance, and members must ___ it; any new topic is written down and saved for the following month. The two most urgent items are marked as a ___ and discussed first. Marianne also asks the committees to report ___, every quarter rather than at every meeting, so that the board does not ___ time listening to the same updates.\n\nThe results have been striking. In March, the board approved the new branch on Elm Street in just forty minutes and told the project team to ___ with the construction tender.",
+    "answers": ["lengthy", "bring up", "matter", "conclude", "progress", "goal", "agenda", "adhere to", "priority", "periodically", "waste", "go ahead"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nhóm người ngồi quanh bàn họp dài trong phòng hội đồng, một người phụ nữ đứng chỉ vào màn hình trình chiếu.",
+      "options": [
+        "A woman is pointing at a screen.",
+        "The people are leaving the room.",
+        "A man is wiping the table.",
+        "The chairs are stacked against the wall."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ đứng chỉ vào màn hình trong khi mọi người ngồi họp. (B), (C) và (D) mô tả hành động hoặc tình trạng không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "What's the first item on today's agenda?",
+        "options": ["The budget for the new branch.", "Yes, I printed the agenda.", "It ends at eleven."],
+        "answer": "A",
+        "explanation": "Câu hỏi What hỏi về mục đầu tiên trong chương trình họp; (A) nêu đúng một mục. (B) trả lời Yes cho câu hỏi Wh, (C) trả lời về thời gian."
+      },
+      {
+        "question": "Should we go ahead with the vote now, or wait for Mr. Okoye?",
+        "options": ["He parked ahead of me.", "Let's wait; he'll be here in five minutes.", "The vote was unanimous last year."],
+        "answer": "B",
+        "explanation": "Câu hỏi lựa chọn giữa bỏ phiếu ngay hay chờ; (B) chọn phương án chờ. (A) nhầm từ 'ahead', (C) nói về năm ngoái, không trả lời câu hỏi."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Hassan, the planning committee meets on Thursday. Have you finished the progress report on the staff training program?\nMan: Almost. I've collected the numbers, but I'd like to bring up one problem: only forty percent of the branch staff have completed the online course.\nWoman: That's well below our goal. Do you know why?\nMan: Most people say they can't find two free hours during the work week. I want to suggest that we let them do the course in four shorter sessions.\nWoman: Good idea. Put it on the agenda as a separate item so we don't lose it in a lengthy discussion.\nMan: I will. Could you also ask the chair for ten minutes at the start? She usually likes to adhere to the order of the agenda.\nWoman: I'll email her this afternoon and copy you.",
+      "questions": [
+        {
+          "prompt": "What is the man preparing?",
+          "options": ["A training course", "A progress report", "A new budget", "An agenda for the board"],
+          "answer": "B",
+          "explanation": "Người phụ nữ hỏi 'Have you finished the progress report on the staff training program?' và anh ấy trả lời gần xong."
+        },
+        {
+          "prompt": "What problem does the man mention?",
+          "options": ["The course is too expensive.", "Few staff have completed the course.", "The committee meeting has been canceled.", "The chair is on leave."],
+          "answer": "B",
+          "explanation": "Anh ấy nêu vấn đề 'only forty percent of the branch staff have completed the online course', tức ít người hoàn thành khóa học."
+        },
+        {
+          "prompt": "What does the man ask the woman to do?",
+          "options": ["Shorten the online course", "Collect the training numbers", "Request time at the start of the meeting", "Print the agenda for Thursday"],
+          "answer": "C",
+          "explanation": "Anh ấy hỏi 'Could you also ask the chair for ten minutes at the start?', tức xin chủ tọa mười phút đầu cuộc họp."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hello, this is Priya Nair, secretary of the facilities committee, with a message for all members. Our next meeting is set for Tuesday the fourteenth at two o'clock in Room 3B. I have attached the agenda to the email you received this morning. Please note two changes. First, the discussion of the parking garage has been moved to the top of the list, because the board has made it a priority and wants our recommendation by the end of the month. Second, the report on the heating system will be short; the engineers inspect the boilers periodically and found nothing new, so we will not waste time on it. If you have a matter you would like to add, send it to me by Friday. I will circulate a final version on Monday. Thank you, and I look forward to seeing you on Tuesday.",
+      "questions": [
+        {
+          "prompt": "Why is the speaker calling?",
+          "options": ["To cancel a committee meeting", "To give details about an upcoming meeting", "To ask members for a vote by email", "To report a problem with the heating"],
+          "answer": "B",
+          "explanation": "Người nói thông báo thời gian, địa điểm và những thay đổi trong chương trình của cuộc họp sắp tới."
+        },
+        {
+          "prompt": "Why was the parking garage moved to the top of the agenda?",
+          "options": ["The engineers requested it.", "The board wants a recommendation soon.", "It is the cheapest item.", "Most members asked about it."],
+          "answer": "B",
+          "explanation": "'the board has made it a priority and wants our recommendation by the end of the month' là lý do mục này được đưa lên đầu."
+        },
+        {
+          "prompt": "What should members do by Friday?",
+          "options": ["Read the engineers' report", "Confirm their attendance", "Send any additional items to the speaker", "Visit the parking garage"],
+          "answer": "C",
+          "explanation": "'If you have a matter you would like to add, send it to me by Friday', tức gửi thêm mục cần bàn cho người nói."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "All committee members are expected to _____ the schedule printed on the agenda.",
+        "options": ["adhere", "adhere to", "adherence", "adhering to"],
+        "answer": "B",
+        "explanation": "Sau 'expected to' cần động từ nguyên mẫu, và 'adhere' luôn đi với 'to' khi có tân ngữ: 'adhere to the schedule'."
+      },
+      {
+        "prompt": "The treasurer gave a _____ explanation of the new accounting software, and several members began to look at their watches.",
+        "options": ["length", "lengthen", "lengthy", "lengthily"],
+        "answer": "C",
+        "explanation": "Trước danh từ 'explanation' cần tính từ: 'lengthy' (dài dòng). Vế sau cho thấy phần trình bày quá dài."
+      },
+      {
+        "prompt": "The board will review the safety policy _____ rather than waiting for an accident to happen.",
+        "options": ["period", "periodic", "periodically", "periodical"],
+        "answer": "C",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'review': 'periodically' (định kỳ)."
+      },
+      {
+        "prompt": "Improving customer service is the committee's main _____ for the coming year.",
+        "options": ["prior", "priority", "prioritize", "primarily"],
+        "answer": "B",
+        "explanation": "Sau tính từ 'main' cần danh từ: 'priority' (việc ưu tiên)."
+      },
+      {
+        "prompt": "The chair _____ the meeting by thanking the retiring members for their service.",
+        "options": ["concluded", "conclusion", "conclusive", "concluding"],
+        "answer": "A",
+        "explanation": "Câu cần động từ chính ở quá khứ với chủ ngữ 'The chair': 'concluded' (kết thúc)."
+      },
+      {
+        "prompt": "The report shows that the project has made good _____ since April.",
+        "options": ["progress", "progressed", "progressive", "progressively"],
+        "answer": "A",
+        "explanation": "'make progress' là cụm cố định; sau 'good' cần danh từ không đếm được 'progress'."
+      }
+    ],
+    "part6": {
+      "passage": "To: Members of the Marketing Committee\nFrom: Daniel Reyes, Chair\nSubject: Thursday's meeting\n\nThank you for a productive session last week. As agreed, we will ___ with the spring campaign, and the design agency has been informed. At Thursday's meeting I would like to ___ one more topic: the budget for trade fairs, which was left off the original agenda. Please come prepared with figures from your region. Our ___ is to finalize the full marketing plan before the board meets on the 28th, so we cannot afford to lose another week.",
+      "questions": [
+        {
+          "options": ["go ahead", "go along", "go over", "go off"],
+          "answer": "A",
+          "explanation": "'go ahead with' nghĩa là tiến hành (chiến dịch) như đã thống nhất. 'go over' là xem lại, 'go off' là nổ hoặc reo, không hợp nghĩa."
+        },
+        {
+          "options": ["bring up", "bring in", "bring back", "bring down"],
+          "answer": "A",
+          "explanation": "'bring up a topic' nghĩa là nêu một chủ đề ra để bàn. 'bring in' là đưa vào, 'bring down' là hạ xuống."
+        },
+        {
+          "options": ["goal", "waste", "matter", "progress"],
+          "answer": "A",
+          "explanation": "'Our goal is to finalize...' nghĩa là mục tiêu của chúng ta là hoàn tất kế hoạch; các danh từ còn lại không đi với 'is to + động từ' theo nghĩa này."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "OAKFIELD LIBRARY FOUNDATION\nMinutes of the Board Meeting - 12 September\nPresent: seven of nine trustees. Chair: Amelia Brooks. Minutes taken by: Tom Lindqvist.\n\n1. Opening. The chair opened the meeting at 6:05 p.m. and reminded trustees to adhere to the time shown next to each item on the agenda.\n\n2. Fundraising progress. The treasurer reported that the autumn appeal has raised 64,000 dollars so far, against a goal of 80,000 dollars. Two trustees brought up the idea of a second mailing in November; the board agreed to go ahead with it if printing costs stay below 3,000 dollars.\n\n3. Building committee. The committee now meets periodically, every two months instead of monthly, as the roof repairs are complete. The chair thanked the members for not letting the lengthy repair process delay other work.\n\n4. Other matters. A trustee asked whether the annual dinner wastes money that could be spent on books. The board agreed to review the cost of the dinner at the next meeting and made the question a priority item.\n\n5. Closing. The meeting concluded at 7:20 p.m. The next meeting is on 14 October.",
+      "questions": [
+        {
+          "prompt": "What kind of document is this?",
+          "options": ["A fundraising letter", "A record of a meeting", "An invitation to a dinner", "A repair estimate"],
+          "answer": "B",
+          "explanation": "Tiêu đề 'Minutes of the Board Meeting' cho biết đây là biên bản ghi lại nội dung cuộc họp hội đồng."
+        },
+        {
+          "prompt": "How much more money does the autumn appeal need to reach its goal?",
+          "options": ["3,000 dollars", "16,000 dollars", "64,000 dollars", "80,000 dollars"],
+          "answer": "B",
+          "explanation": "Đã quyên được 64,000 so với mục tiêu 80,000 dollars, còn thiếu 16,000 dollars. 3,000 là giới hạn chi phí in."
+        },
+        {
+          "prompt": "Under what condition will the second mailing take place?",
+          "options": ["If all nine trustees agree", "If the roof repairs are finished", "If printing costs remain under 3,000 dollars", "If the annual dinner is canceled"],
+          "answer": "C",
+          "explanation": "Hội đồng đồng ý tiến hành 'if printing costs stay below 3,000 dollars'."
+        },
+        {
+          "prompt": "Why does the building committee meet less often now?",
+          "options": ["Several members have resigned.", "The roof repairs are complete.", "The board asked it to save money.", "The library is closed in autumn."],
+          "answer": "B",
+          "explanation": "Mục 3 ghi ủy ban họp hai tháng một lần 'as the roof repairs are complete', tức vì việc sửa mái đã xong."
+        },
+        {
+          "prompt": "What will the board do at the October meeting?",
+          "options": ["Elect a new chair", "Approve the printing contract", "Examine the cost of the annual dinner", "Vote on new library hours"],
+          "answer": "C",
+          "explanation": "Mục 4 nói hội đồng 'agreed to review the cost of the dinner at the next meeting', và cuộc họp tiếp theo là ngày 14 tháng Mười."
+        }
+      ]
+    }
+  }
+}

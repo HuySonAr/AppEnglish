@@ -1,0 +1,260 @@
+{
+  "number": 14,
+  "title": "Salaries and Benefits",
+  "vocabulary": [
+    {
+      "word": "basis",
+      "partOfSpeech": "noun",
+      "meaning": "cơ sở, nền tảng; cách thức, định kỳ (theo giờ, theo tháng)",
+      "example": "Part-time staff are paid on an hourly basis, while managers receive a monthly salary.",
+      "exampleMeaning": "Nhân viên bán thời gian được trả theo giờ, còn quản lý nhận lương theo tháng."
+    },
+    {
+      "word": "be aware of",
+      "partOfSpeech": "phrase",
+      "meaning": "biết, nhận thức được, ý thức về",
+      "example": "Employees should be aware of the deadline for choosing their health plan.",
+      "exampleMeaning": "Nhân viên nên biết hạn chót để chọn gói bảo hiểm sức khỏe của mình."
+    },
+    {
+      "word": "benefit",
+      "partOfSpeech": "noun",
+      "meaning": "phúc lợi, quyền lợi (ngoài lương); lợi ích",
+      "example": "The benefits package includes health insurance, paid holidays and a transport allowance.",
+      "exampleMeaning": "Gói phúc lợi gồm bảo hiểm y tế, ngày nghỉ có lương và trợ cấp đi lại."
+    },
+    {
+      "word": "compensate",
+      "partOfSpeech": "verb",
+      "meaning": "trả công, trả thù lao; đền bù, bù đắp",
+      "example": "The company compensates staff for overtime with extra pay or additional days off.",
+      "exampleMeaning": "Công ty bù đắp cho nhân viên làm thêm giờ bằng tiền thưởng hoặc thêm ngày nghỉ."
+    },
+    {
+      "word": "delicately",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách khéo léo, tế nhị",
+      "example": "The manager delicately explained why the request for a higher salary could not be approved this year.",
+      "exampleMeaning": "Người quản lý đã khéo léo giải thích vì sao yêu cầu tăng lương chưa thể được duyệt trong năm nay."
+    },
+    {
+      "word": "eligible",
+      "partOfSpeech": "adjective",
+      "meaning": "đủ điều kiện, có đủ tư cách (để nhận, tham gia)",
+      "example": "Only employees who have worked here for one full year are eligible for the bonus.",
+      "exampleMeaning": "Chỉ những nhân viên đã làm việc ở đây trọn một năm mới đủ điều kiện nhận thưởng."
+    },
+    {
+      "word": "flexibly",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách linh hoạt",
+      "example": "Parents on our team can arrange their working hours flexibly around school schedules.",
+      "exampleMeaning": "Các phụ huynh trong nhóm có thể sắp xếp giờ làm việc linh hoạt theo lịch học của con."
+    },
+    {
+      "word": "negotiate",
+      "partOfSpeech": "verb",
+      "meaning": "đàm phán, thương lượng",
+      "example": "She negotiated a higher starting salary and an extra week of vacation before accepting the offer.",
+      "exampleMeaning": "Cô ấy đã thương lượng mức lương khởi điểm cao hơn và thêm một tuần nghỉ phép trước khi nhận lời."
+    },
+    {
+      "word": "raise",
+      "partOfSpeech": "noun",
+      "meaning": "sự tăng lương",
+      "example": "After a strong annual review, Mr. Petrov received a raise of five percent.",
+      "exampleMeaning": "Sau kỳ đánh giá năm với kết quả tốt, ông Petrov được tăng lương năm phần trăm."
+    },
+    {
+      "word": "retire",
+      "partOfSpeech": "verb",
+      "meaning": "nghỉ hưu",
+      "example": "Our head accountant will retire in June after thirty years with the firm.",
+      "exampleMeaning": "Kế toán trưởng của chúng tôi sẽ nghỉ hưu vào tháng Sáu sau ba mươi năm làm việc tại công ty."
+    },
+    {
+      "word": "vested",
+      "partOfSpeech": "adjective",
+      "meaning": "đã được xác lập quyền hưởng (không thể bị thu hồi), được trao quyền",
+      "example": "Contributions to the pension plan become fully vested after five years of service.",
+      "exampleMeaning": "Các khoản đóng góp vào quỹ hưu trí được xác lập quyền hưởng đầy đủ sau năm năm làm việc."
+    },
+    {
+      "word": "wage",
+      "partOfSpeech": "noun",
+      "meaning": "tiền công, tiền lương (thường tính theo giờ hoặc ngày)",
+      "example": "The minimum hourly wage at the plant will increase in January.",
+      "exampleMeaning": "Mức lương tối thiểu theo giờ tại nhà máy sẽ tăng vào tháng Một."
+    }
+  ],
+  "fillIn": {
+    "passage": "When Hana Kowalski was offered a job at Larkspur Packaging, the human resources officer, Mr. Abara, met her to explain the pay and the ___ package. New staff receive an hourly ___ for the first six months and then move to a monthly salary. The company also allows employees to arrange their hours ___ as long as the work is finished on time.\n\nMr. Abara wanted Hana to ___ a few rules. Employees become ___ for health insurance after ninety days, and the company's contributions to the pension plan become fully ___ after five years, so people who leave earlier keep only their own savings. Staff who work on public holidays are ___ with double pay. Performance is reviewed on an annual ___, and a good review usually leads to a ___.\n\nHana liked the offer but felt the starting pay was low, so she decided to ___. She ___ explained that another company had offered her more. Mr. Abara agreed to add two hundred dollars a month. He also mentioned that the head of her department would ___ next year, which could open a path to a senior position.",
+    "answers": ["benefits", "wage", "flexibly", "be aware of", "eligible", "vested", "compensated", "basis", "raise", "negotiate", "delicately", "retire"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Hai người ngồi tại bàn làm việc; một người đưa ra bản hợp đồng lao động, người kia đang chỉ vào một con số trên trang giấy.",
+      "options": [
+        "One person is pointing at a document.",
+        "The two people are leaving the office.",
+        "A woman is counting coins on the table.",
+        "The men are hanging a picture on the wall."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy một người đang chỉ vào tài liệu trên bàn. (B), (C) và (D) mô tả hành động không có trong ảnh; (C) nhắc đến tiền nhưng không có tiền xu trên bàn."
+    },
+    "part2": [
+      {
+        "question": "When will you be eligible for the company pension plan?",
+        "options": ["After my first full year here.", "The plan is on my desk.", "Yes, I'm eligible."],
+        "answer": "A",
+        "explanation": "Câu hỏi 'When' cần câu trả lời về thời điểm. (B) nhầm 'plan' thành bản kế hoạch; (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Did you negotiate a higher wage before you accepted the offer?",
+        "options": ["The wages are paid on Fridays.", "I accepted the package last week.", "Yes, I asked for ten percent more and got six."],
+        "answer": "C",
+        "explanation": "Câu hỏi Yes/No về việc thương lượng; (C) trả lời Yes và nói kết quả. (A) lặp từ 'wages' nhưng trả lời câu hỏi khác; (B) chỉ lặp từ 'accepted'."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Hi, Omar. I'd like your advice. My annual review is next Tuesday, and I want to ask for a raise.\nMan: That's reasonable; you've taken on two new clients this year. How much are you thinking of?\nWoman: About eight percent. I know the budget is tight, so I plan to raise the subject delicately.\nMan: Good idea. You could also ask about benefits instead of only money. Some people have negotiated an extra week of vacation or the option to work from home two days a week.\nWoman: Working flexibly would actually be more useful to me than the full eight percent.\nMan: Then say so. Managers often have more room on benefits than on wages. And bring a short list of what you've achieved since your last review.\nWoman: I'll prepare that tonight. Thanks, Omar.",
+      "questions": [
+        {
+          "prompt": "Why is the woman talking to the man?",
+          "options": ["To ask for advice before her performance review", "To complain about a client", "To request two days off", "To discuss the department budget"],
+          "answer": "A",
+          "explanation": "Cô ấy nói 'I'd like your advice. My annual review is next Tuesday', tức muốn được tư vấn trước kỳ đánh giá."
+        },
+        {
+          "prompt": "What does the man suggest the woman ask for?",
+          "options": ["A larger office", "Benefits in addition to a pay increase", "A new client", "A later review date"],
+          "answer": "B",
+          "explanation": "Anh ấy gợi ý 'ask about benefits instead of only money', ví dụ thêm tuần nghỉ phép hoặc làm việc tại nhà."
+        },
+        {
+          "prompt": "What will the woman do tonight?",
+          "options": ["Email her manager", "Write down her achievements", "Calculate her new salary", "Work from home"],
+          "answer": "B",
+          "explanation": "Người đàn ông khuyên mang theo 'a short list of what you've achieved', và cô ấy nói 'I'll prepare that tonight'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good afternoon, everyone. Thank you for joining this briefing about the changes to our retirement plan, which take effect on January 1. First, all full-time employees will now be eligible to join the plan after six months instead of one year. Second, the company will match your contributions up to five percent of your wages, and these matching contributions become fully vested after three years rather than five. If you are planning to retire within the next two years, please be aware of a new rule: you must give the pension office at least ninety days' notice so that your first payment is not delayed. Finally, you can now change your contribution rate flexibly, up to four times a year, through the employee website. A booklet explaining these changes is available at the door. If you have questions, the pension office is open every Wednesday afternoon.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the talk?",
+          "options": ["To introduce a new pension officer", "To explain changes to a retirement plan", "To announce a salary increase", "To describe a new employee website"],
+          "answer": "B",
+          "explanation": "Người nói mở đầu bằng 'this short briefing about the changes to our retirement plan' và liệt kê các thay đổi."
+        },
+        {
+          "prompt": "After how long will the company's contributions become fully vested?",
+          "options": ["Six months", "One year", "Three years", "Five years"],
+          "answer": "C",
+          "explanation": "'These matching contributions become fully vested after three years rather than five'. Sáu tháng là thời gian để đủ điều kiện tham gia."
+        },
+        {
+          "prompt": "What should employees who plan to retire soon do?",
+          "options": ["Visit the website every Wednesday", "Notify the pension office ninety days in advance", "Increase their contribution rate", "Collect a booklet from the office"],
+          "answer": "B",
+          "explanation": "'You must give the pension office at least ninety days' notice so that your first payment is not delayed'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Employees who join after June 1 will not be _____ for this year's bonus.",
+        "options": ["eligibility", "eligibly", "eligible", "eligibles"],
+        "answer": "C",
+        "explanation": "Sau 'will not be' cần tính từ: 'eligible for' (đủ điều kiện nhận)."
+      },
+      {
+        "prompt": "The union and the management will _____ a new contract this autumn.",
+        "options": ["negotiate", "negotiation", "negotiator", "negotiable"],
+        "answer": "A",
+        "explanation": "Sau 'will' cần động từ nguyên mẫu: 'negotiate a new contract'."
+      },
+      {
+        "prompt": "Hourly _____ at the factory are reviewed every January.",
+        "options": ["wage", "wages", "waged", "waging"],
+        "answer": "B",
+        "explanation": "Động từ 'are reviewed' ở số nhiều nên chủ ngữ phải là danh từ số nhiều: 'wages'."
+      },
+      {
+        "prompt": "The firm _____ employees who travel on weekends with an extra day off.",
+        "options": ["compensation", "compensates", "compensating", "compensatory"],
+        "answer": "B",
+        "explanation": "Câu cần động từ chính chia với chủ ngữ số ít 'The firm': 'compensates ... with'."
+      },
+      {
+        "prompt": "Mrs. Lindgren plans to _____ at the end of the year after thirty-five years in sales.",
+        "options": ["retire", "retired", "retirement", "retiring"],
+        "answer": "A",
+        "explanation": "Sau 'plans to' cần động từ nguyên mẫu: 'retire'."
+      },
+      {
+        "prompt": "Staff may choose their start and finish times _____ as long as they work eight hours a day.",
+        "options": ["flexible", "flexibility", "flexibly", "flex"],
+        "answer": "C",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'choose': 'flexibly'."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Warehouse Staff\nFrom: Payroll Department\nSubject: Holiday pay in December\n\nPlease ___ the following arrangements for the holiday period. Employees who work on December 25 or January 1 will be paid on a double-time ___ for those days, and the extra amount will appear in the January payslip. Part-time staff are also entitled to this ___, provided they have completed their probation period. If you believe your December pay is incorrect, contact the payroll office within ten days of receiving your payslip so that we can correct it before the next payment run.",
+      "questions": [
+        {
+          "options": ["be aware of", "be aware", "aware of", "being aware"],
+          "answer": "A",
+          "explanation": "Câu mệnh lệnh 'Please be aware of the following arrangements' cần động từ nguyên mẫu và giới từ 'of' trước tân ngữ."
+        },
+        {
+          "options": ["base", "basis", "basic", "basically"],
+          "answer": "B",
+          "explanation": "'On a double-time basis' nghĩa là theo cách tính lương gấp đôi; sau 'a double-time' cần danh từ 'basis'."
+        },
+        {
+          "options": ["benefit", "beneficial", "beneficially", "benefited"],
+          "answer": "A",
+          "explanation": "Sau 'this' cần danh từ chỉ quyền lợi vừa nêu (lương gấp đôi ngày lễ): 'benefit'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "WESTBROOK ENGINEERING GROUP\n\nMarch 3\n\nDear Ms. Tanaka,\n\nWe are pleased to offer you the position of Project Engineer, starting on Monday, April 6. Your pay and benefits are summarized below.\n\nSalary: $68,000 per year, paid on a monthly basis. Salaries are reviewed every March, and a raise is based on the results of your annual performance review.\n\nHealth insurance: You and your family are eligible for our medical and dental plan from your first day. The company pays eighty percent of the monthly premium.\n\nRetirement plan: You may contribute up to ten percent of your salary. Westbrook matches the first four percent, and our matching contributions become fully vested after three years of service.\n\nWorking hours: Engineers may arrange their hours flexibly between 7 a.m. and 7 p.m., provided they are in the office for the team meeting every Tuesday morning.\n\nVacation: Twenty days per year, plus public holidays.\n\nPlease be aware that this offer is valid until March 17. To accept, sign both copies of the enclosed contract and return one to me. If you have questions about any part of the offer, call me at 555-0187.\n\nSincerely,\nPaul Oduya\nHuman Resources Manager",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the letter?",
+          "options": ["To invite Ms. Tanaka to an interview", "To offer Ms. Tanaka a job", "To announce a change in working hours", "To explain a new retirement plan"],
+          "answer": "B",
+          "explanation": "Thư mở đầu bằng 'We are pleased to offer you the position of Project Engineer'."
+        },
+        {
+          "prompt": "How often are salaries reviewed?",
+          "options": ["Every month", "Twice a year", "Once a year", "Every three years"],
+          "answer": "C",
+          "explanation": "'Salaries are reviewed every March', tức mỗi năm một lần."
+        },
+        {
+          "prompt": "What is indicated about the health plan?",
+          "options": ["It starts after three months", "It covers only the employee", "The company pays most of the cost", "It does not include dental care"],
+          "answer": "C",
+          "explanation": "'The company pays eighty percent of the monthly premium', tức công ty trả phần lớn chi phí. Gói này áp dụng từ ngày đầu và cho cả gia đình."
+        },
+        {
+          "prompt": "When must engineers be in the office?",
+          "options": ["Every morning at 7 a.m.", "On Tuesday mornings", "Every Friday afternoon", "On the first day of each month"],
+          "answer": "B",
+          "explanation": "Giờ làm linh hoạt 'provided they are in the office for the team meeting every Tuesday morning'."
+        },
+        {
+          "prompt": "What should Ms. Tanaka do to accept the offer?",
+          "options": ["Call Mr. Oduya before April 6", "Return a signed copy of the contract", "Visit the office on March 17", "Send an email to Human Resources"],
+          "answer": "B",
+          "explanation": "'To accept, sign both copies of the enclosed contract and return one to me'."
+        }
+      ]
+    }
+  }
+}

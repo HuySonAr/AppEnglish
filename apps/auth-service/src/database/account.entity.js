@@ -20,6 +20,8 @@ export const AccountEntity = new EntitySchema({
     // Admin management (D114): last sign-in, and why the account is locked.
     lastLoginAt: { type: 'timestamptz', nullable: true },
     statusReason: { type: 'text', nullable: true },
+    // D131: set when an admin created the account by invitation.
+    invitedAt: { type: 'timestamptz', nullable: true },
     createdAt: { type: 'timestamptz', createDate: true },
     updatedAt: { type: 'timestamptz', updateDate: true }
   }

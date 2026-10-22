@@ -1,0 +1,381 @@
+{
+  "number": 26,
+  "title": "Property and Departments",
+  "vocabulary": [
+    {
+      "word": "adjacent",
+      "partOfSpeech": "adjective",
+      "meaning": "kề bên, liền kề, sát cạnh",
+      "example": "The design team will move into the office adjacent to the meeting room next week.",
+      "exampleMeaning": "Nhóm thiết kế sẽ chuyển sang văn phòng kề bên phòng họp vào tuần tới."
+    },
+    {
+      "word": "collaboration",
+      "partOfSpeech": "noun",
+      "meaning": "sự hợp tác, sự cộng tác",
+      "example": "Close collaboration between sales and marketing helped the company launch the catalog on time.",
+      "exampleMeaning": "Sự hợp tác chặt chẽ giữa bộ phận bán hàng và tiếp thị đã giúp công ty ra mắt catalog đúng hạn."
+    },
+    {
+      "word": "concentrate",
+      "partOfSpeech": "verb",
+      "meaning": "tập trung (vào); dồn nguồn lực vào",
+      "example": "It is hard to concentrate on the budget report when the phones ring all day.",
+      "exampleMeaning": "Thật khó tập trung vào báo cáo ngân sách khi điện thoại reo suốt ngày."
+    },
+    {
+      "word": "conducive",
+      "partOfSpeech": "adjective",
+      "meaning": "có lợi cho, tạo điều kiện thuận lợi cho",
+      "example": "A quiet floor with natural light is conducive to careful work.",
+      "exampleMeaning": "Một tầng yên tĩnh có ánh sáng tự nhiên tạo điều kiện thuận lợi cho công việc cần sự cẩn thận."
+    },
+    {
+      "word": "disruption",
+      "partOfSpeech": "noun",
+      "meaning": "sự gián đoạn, sự xáo trộn",
+      "example": "The repairs to the elevator caused a two-day disruption for the accounting department.",
+      "exampleMeaning": "Việc sửa thang máy đã gây gián đoạn hai ngày cho phòng kế toán."
+    },
+    {
+      "word": "hamper",
+      "partOfSpeech": "verb",
+      "meaning": "cản trở, gây khó khăn cho",
+      "example": "Poor lighting in the warehouse hampered the staff's efforts to count the stock.",
+      "exampleMeaning": "Ánh sáng kém trong nhà kho đã cản trở nỗ lực kiểm kê hàng của nhân viên."
+    },
+    {
+      "word": "inconsiderately",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách thiếu ý tứ, không nghĩ đến người khác",
+      "example": "Someone inconsiderately left the shared printer out of paper right before the meeting.",
+      "exampleMeaning": "Ai đó đã thiếu ý tứ để máy in chung hết giấy ngay trước cuộc họp."
+    },
+    {
+      "word": "lobby",
+      "partOfSpeech": "noun",
+      "meaning": "sảnh (tòa nhà, khách sạn); (động từ) vận động hành lang",
+      "example": "Visitors must sign in at the front desk in the lobby before taking the elevator.",
+      "exampleMeaning": "Khách phải đăng ký tại quầy tiếp tân ở sảnh trước khi đi thang máy."
+    },
+    {
+      "word": "move up",
+      "partOfSpeech": "verb",
+      "meaning": "chuyển lên (tầng, vị trí cao hơn); dời (lịch) lên sớm hơn",
+      "example": "The legal team will move up to the fifth floor once the painting is finished.",
+      "exampleMeaning": "Nhóm pháp lý sẽ chuyển lên tầng năm khi việc sơn hoàn tất."
+    },
+    {
+      "word": "open to",
+      "partOfSpeech": "phrase",
+      "meaning": "sẵn sàng tiếp nhận, sẵn lòng xem xét (ý kiến, đề xuất, thay đổi)",
+      "example": "The office manager said she was open to suggestions about the new seating plan.",
+      "exampleMeaning": "Quản lý văn phòng nói rằng cô ấy sẵn sàng tiếp nhận các đề xuất về sơ đồ chỗ ngồi mới."
+    },
+    {
+      "word": "opt",
+      "partOfSpeech": "verb",
+      "meaning": "chọn, quyết định chọn (opt for, opt to)",
+      "example": "Most employees opted to keep their desks near the windows.",
+      "exampleMeaning": "Hầu hết nhân viên chọn giữ bàn làm việc gần cửa sổ."
+    },
+    {
+      "word": "scrutiny",
+      "partOfSpeech": "noun",
+      "meaning": "sự xem xét kỹ lưỡng, sự soi xét",
+      "example": "Every request for extra office space comes under close scrutiny from the finance director.",
+      "exampleMeaning": "Mọi yêu cầu thêm diện tích văn phòng đều bị giám đốc tài chính xem xét rất kỹ."
+    }
+  ],
+  "fillIn": {
+    "passage": "Harbor Point Insurance has grown quickly, and its three departments no longer fit on one floor. Last month the office manager, Rosa Delgado, asked each team leader where they would prefer to sit. The claims team ___ to stay on the second floor, ___ to the mail room, because they receive dozens of envelopes every day. The customer service team asked to ___ to the fourth floor, where the large windows make the open space more ___ to long hours on the phone.\n\nThe relocation itself has not been easy. For two weeks, workers carrying desks through the ___ caused a constant ___ for visitors, and the noise made it difficult for the accountants to ___ on the quarterly figures. One supplier ___ parked a truck in front of the main entrance, which ___ the delivery of the new filing cabinets by half a day.\n\nRosa has promised that the costs of the relocation will receive careful ___ before the final invoice is approved, and she says she is ___ any idea that would make the next move smoother. Still, most staff agree that the new layout will improve ___ between departments that rarely spoke to each other before.",
+    "answers": [
+      "opted",
+      "adjacent",
+      "move up",
+      "conducive",
+      "lobby",
+      "disruption",
+      "concentrate",
+      "inconsiderately",
+      "hampered",
+      "scrutiny",
+      "open to",
+      "collaboration"
+    ]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người đàn ông đứng ở sảnh tòa nhà văn phòng, đang ký tên vào sổ khách tại quầy tiếp tân.",
+      "options": [
+        "The man is signing in at the reception desk.",
+        "The man is painting the lobby wall.",
+        "The man is waiting for the elevator.",
+        "The man is carrying a desk through the door."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người đàn ông đang ký tên tại quầy tiếp tân ở sảnh. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Which department is moving to the adjacent building?",
+        "options": [
+          "Yes, they moved last week.",
+          "Human Resources, as far as I know.",
+          "The building has six floors."
+        ],
+        "answer": "B",
+        "explanation": "Câu hỏi Which department cần câu trả lời nêu tên một bộ phận. (A) trả lời Yes cho câu hỏi Wh, (C) nhầm với từ 'building'."
+      },
+      {
+        "question": "Is the noise from the renovation hampering your work?",
+        "options": [
+          "A little, but I can concentrate with headphones.",
+          "The hamper is in the storage room.",
+          "It opens at nine."
+        ],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc tiếng ồn có cản trở công việc không; (A) trả lời trực tiếp. (B) nhầm 'hamper' là cái giỏ, (C) không liên quan."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Victor, have you seen the two floor plans for the new office? We need to opt for one by Thursday.\nMan: I have. The open plan looks good for collaboration, but I worry that people in finance won't be able to concentrate with sales staff on the phone all day.\nWoman: That's my concern too. The second plan keeps the sales team in the area adjacent to the lobby and gives finance a quieter corner at the back.\nMan: That sounds more conducive to careful work. Is the second plan more expensive?\nWoman: About eight percent more, because of the extra partitions. Any cost above the budget will come under scrutiny from the board.\nMan: Then let's prepare a one-page note explaining why the partitions are worth it. Could you send me the price breakdown this afternoon?\nWoman: Sure. I'll email it to you before three.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": [
+            "A new sales strategy",
+            "The layout of a new office",
+            "A board meeting agenda",
+            "The cost of new telephones"
+          ],
+          "answer": "B",
+          "explanation": "Hai người so sánh hai bản 'floor plans for the new office', tức cách bố trí văn phòng mới."
+        },
+        {
+          "prompt": "Where would the sales team sit under the second plan?",
+          "options": [
+            "At the back of the office",
+            "On the fourth floor",
+            "Next to the lobby",
+            "In the finance corner"
+          ],
+          "answer": "C",
+          "explanation": "Người phụ nữ nói phương án hai 'keeps the sales team in the area adjacent to the lobby'; 'adjacent to' nghĩa là kề bên."
+        },
+        {
+          "prompt": "What will the woman send the man?",
+          "options": [
+            "A floor plan",
+            "A price breakdown",
+            "A list of board members",
+            "A meeting invitation"
+          ],
+          "answer": "B",
+          "explanation": "Người đàn ông hỏi 'Could you send me the price breakdown this afternoon?' và cô ấy đồng ý gửi email trước ba giờ."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Attention, all tenants of Westbrook Tower. This is a message from the property management office. Beginning next Monday, the main lobby will be renovated for approximately three weeks. During this period, the front entrance will be closed, and all visitors and staff should use the side entrance adjacent to the parking garage. We understand that this will cause some disruption, and we have scheduled the noisiest work before eight in the morning so that it does not hamper your business during office hours. Companies that opt to receive deliveries during the renovation should notify the security desk, as couriers will be directed to the loading dock. We ask everyone to use the shared stairway considerately and to keep the side corridor clear at all times. We are open to suggestions, so please email the office if you see a way to make the work less disruptive. Thank you for your patience while we make the building more welcoming for your clients.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the announcement?",
+          "options": [
+            "To announce a change in parking fees",
+            "To inform tenants about renovation work",
+            "To introduce a new security company",
+            "To invite tenants to an opening event"
+          ],
+          "answer": "B",
+          "explanation": "Thông báo nói sảnh chính sẽ được cải tạo trong ba tuần và hướng dẫn người thuê cách đi lại trong thời gian đó."
+        },
+        {
+          "prompt": "Which entrance should people use during the work?",
+          "options": [
+            "The front entrance",
+            "The loading dock",
+            "The side entrance near the garage",
+            "The stairway on the roof"
+          ],
+          "answer": "C",
+          "explanation": "Người nói yêu cầu dùng 'the side entrance adjacent to the parking garage'. Cửa trước bị đóng, loading dock chỉ dành cho người giao hàng."
+        },
+        {
+          "prompt": "What should companies do if they expect deliveries?",
+          "options": [
+            "Cancel them for three weeks",
+            "Inform the security desk",
+            "Call the property manager",
+            "Meet couriers in the lobby"
+          ],
+          "answer": "B",
+          "explanation": "'Companies that opt to receive deliveries ... should notify the security desk', tức báo cho quầy an ninh."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The conference room _____ to the director's office will be used for interviews.",
+        "options": [
+          "adjacent",
+          "adjacently",
+          "adjacency",
+          "adjoin"
+        ],
+        "answer": "A",
+        "explanation": "Cần tính từ bổ nghĩa cho 'conference room'; 'adjacent to' là cụm cố định nghĩa là kề bên."
+      },
+      {
+        "prompt": "The two departments worked in close _____ on the new product catalog.",
+        "options": [
+          "collaborate",
+          "collaborative",
+          "collaboration",
+          "collaboratively"
+        ],
+        "answer": "C",
+        "explanation": "Sau tính từ 'close' và giới từ 'in' cần danh từ: 'in close collaboration'."
+      },
+      {
+        "prompt": "The noise from the street _____ the staff's ability to hear customers on the phone.",
+        "options": [
+          "hamper",
+          "hampers",
+          "hampering",
+          "to hamper"
+        ],
+        "answer": "B",
+        "explanation": "Chủ ngữ 'The noise' số ít và câu cần động từ chính ở hiện tại đơn: 'hampers'."
+      },
+      {
+        "prompt": "A clean, well-lit workspace is _____ to productivity.",
+        "options": [
+          "conduct",
+          "conducive",
+          "conductive",
+          "conducting"
+        ],
+        "answer": "B",
+        "explanation": "'conducive to' nghĩa là có lợi cho, tạo điều kiện cho. 'conductive' là dẫn điện, không hợp nghĩa."
+      },
+      {
+        "prompt": "Several colleagues complained that the intern had _____ played music without headphones.",
+        "options": [
+          "inconsiderate",
+          "inconsiderately",
+          "inconsideration",
+          "considerate"
+        ],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'played': 'inconsiderately' (một cách thiếu ý tứ)."
+      },
+      {
+        "prompt": "The audit committee will place every expense claim under careful _____.",
+        "options": [
+          "scrutinize",
+          "scrutiny",
+          "scrutinized",
+          "scrutinizing"
+        ],
+        "answer": "B",
+        "explanation": "Sau tính từ 'careful' cần danh từ; 'under careful scrutiny' là cách nói cố định."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Staff, Third Floor\nFrom: Grace Okafor, Facilities Manager\nSubject: Weekend relocation\n\nThis Saturday, the marketing department will ___ to the fifth floor, and the training room will take its place. Movers will be in the building from 7 a.m., so please pack your personal items in the boxes provided before you leave on Friday. We expect only minor ___ to the network, and all computers should be working again by Monday morning. If you ___ to keep your current desk chair, write your name on the label attached to it. Thank you for your cooperation.",
+      "questions": [
+        {
+          "options": [
+            "move up",
+            "moving up",
+            "moved up",
+            "moves up"
+          ],
+          "answer": "A",
+          "explanation": "Sau trợ động từ 'will' cần động từ nguyên mẫu: 'will move up to the fifth floor'."
+        },
+        {
+          "options": [
+            "disrupt",
+            "disruption",
+            "disruptive",
+            "disrupted"
+          ],
+          "answer": "B",
+          "explanation": "Sau tính từ 'minor' cần danh từ: 'minor disruption to the network'."
+        },
+        {
+          "options": [
+            "opt",
+            "option",
+            "optional",
+            "opted"
+          ],
+          "answer": "A",
+          "explanation": "Mệnh đề điều kiện với 'If you' cần động từ ở hiện tại đơn; 'opt to' nghĩa là chọn làm gì. 'option' là danh từ."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "NORTHGATE BUSINESS CENTER\nNotice to Tenants: Floor Reassignment and Shared Areas\n\nDear Tenants,\n\nFollowing a review of how our six floors are used, the management committee has approved the following changes, which take effect on 1 June.\n\n| Floor | Current use | New use |\n| Ground | Lobby and cafe | Lobby, cafe and visitor meeting rooms |\n| 2 | Storage | Open workspace for short-term tenants |\n| 5 | Vacant | Quiet floor (no telephone calls) |\n\nThe quiet floor was requested by several tenants whose staff find it hard to concentrate in open offices. Desks there can be booked by the hour at the front desk. The second floor is intended to encourage collaboration between small companies that cannot afford a full suite.\n\nWe have also received complaints that some visitors park inconsiderately in the loading zone outside the lobby. From June, vehicles left there for more than fifteen minutes will be ticketed, and the building's security cameras will be used to support this. Finally, applications for additional storage space will receive closer scrutiny this year, as the demand now exceeds the space available.\n\nQuestions may be sent to Leonard Hughes, Building Manager, at extension 400.\n\nNorthgate Property Services",
+      "questions": [
+        {
+          "prompt": "What is the main purpose of the notice?",
+          "options": [
+            "To announce higher rents",
+            "To explain changes to the use of the building's floors",
+            "To invite tenants to a cafe opening",
+            "To report a security incident"
+          ],
+          "answer": "B",
+          "explanation": "Thông báo trình bày các thay đổi về cách sử dụng các tầng, có hiệu lực từ ngày 1 tháng Sáu."
+        },
+        {
+          "prompt": "What will the fifth floor be used for?",
+          "options": [
+            "Storage",
+            "Visitor meeting rooms",
+            "Quiet work without phone calls",
+            "A cafe"
+          ],
+          "answer": "C",
+          "explanation": "Bảng ghi tầng 5 trở thành 'Quiet floor (no telephone calls)', dành cho người cần tập trung."
+        },
+        {
+          "prompt": "Who is the second floor intended for?",
+          "options": [
+            "Security staff",
+            "Small companies on short-term arrangements",
+            "The management committee",
+            "Visitors with appointments"
+          ],
+          "answer": "B",
+          "explanation": "Tầng 2 là 'Open workspace for short-term tenants' nhằm khuyến khích hợp tác giữa các công ty nhỏ không đủ tiền thuê cả một dãy phòng."
+        },
+        {
+          "prompt": "What will happen to vehicles left in the loading zone for too long?",
+          "options": [
+            "They will be towed to the garage",
+            "They will receive a ticket",
+            "They will be photographed and displayed in the lobby",
+            "They will be charged a parking fee"
+          ],
+          "answer": "B",
+          "explanation": "'vehicles left there for more than fifteen minutes will be ticketed', tức bị phạt bằng vé phạt."
+        },
+        {
+          "prompt": "What can be inferred about storage space in the building?",
+          "options": [
+            "It is no longer offered.",
+            "It is cheaper than last year.",
+            "More tenants want it than there is space for.",
+            "It is being moved to the fifth floor."
+          ],
+          "answer": "C",
+          "explanation": "Câu cuối nói đơn xin thêm kho sẽ bị xem xét kỹ hơn 'as the demand now exceeds the space available', nghĩa là nhu cầu vượt quá diện tích hiện có."
+        }
+      ]
+    }
+  }
+}

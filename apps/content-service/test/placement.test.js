@@ -130,7 +130,7 @@ test('learning-service reads the published curriculum and a lesson paper', async
 
   // Only published units and their published lessons, in order.
   assert.deepEqual(await service.getCurriculum(), {
-    units: [{ id: unit.id, title: 'Unit A', description: 'About A', lessons: [{ id: second.id, title: 'L2' }, { id: first.id, title: 'L1' }] }],
+    units: [{ id: unit.id, title: 'Unit A', description: 'About A', reviewVersionId: null, lessons: [{ id: second.id, title: 'L2' }, { id: first.id, title: 'L1' }] }],
   });
 
   const paper = await service.getLessonPaper(first.id);

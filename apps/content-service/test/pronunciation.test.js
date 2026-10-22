@@ -73,11 +73,12 @@ test('download only fetches HTTPS files on the dictionary host and limits size',
   for (let index = 0; index < 3; index++) await assert.rejects(() => source.download(media('a-uk.mp3')));
 });
 
-function serviceWith(pronunciationSource) {
+function serviceWith(pronunciationSource, where = 'local') {
   const repository = createMemoryRepository();
   const storage = {
     async upload(input) {
-      return { id: `stored-${input.fileName}`, kind: input.kind, fileName: input.fileName, mimeType: input.mimeType, sizeBytes: input.sizeBytes, url: 'http://localhost:3002/media/x', storage: 'local' };
+      const url = where === 'local' ? 'http://localhost:3002/media/x' : `https://media.test/${input.fileName}`;
+      return { id: `stored-${input.fileName}`, kind: input.kind, fileName: input.fileName, mimeType: input.mimeType, sizeBytes: input.sizeBytes, url, storage: where };
     },
   };
   return { service: new ContentService(repository, storage, pronunciationSource), repository };
@@ -101,6 +102,8 @@ test('auto-fill stores the audio it finds and reports what is missing', async ()
   assert.equal(result.audio.us, null);
   assert.equal(result.audio.uk.fileName, 'abide-by-uk.mp3');
   assert.equal(result.audio.uk.kind, 'audio');
+  // A locally stored file has no address to play from.
+  assert.equal(result.audio.uk.url, null);
   assert.equal(repository.tables.media.length, 1);
   assert.equal(repository.tables.media[0].id, result.audio.uk.id);
 
@@ -128,4 +131,22 @@ test('auto-fill survives a failed download and maps an unavailable dictionary to
   await assert.rejects(() => service.autofillPronunciation(manager, { word: 'x', accents: ['uk'] }), { code: 44, status: 503 });
   ({ service } = serviceWith({ async lookup() { return { found: false, phonetic: '', audio: { uk: null, us: null } }; } }));
   assert.deepEqual(await service.autofillPronunciation(manager, { word: 'zzzz', accents: ['uk', 'us'] }), { found: false, phonetic: '', audio: { uk: null, us: null } });
+});
+
+// The editor plays a new pronunciation at once (Listening course vocabulary),
+// so the answer carries the file's address when the storage gives one.
+test('auto-fill answers with the address of each stored pronunciation', async () => {
+  const { service } = serviceWith(
+    {
+      async lookup() {
+        return { found: true, phonetic: '/ˈtɪkɪt/', audio: { uk: Buffer.from([1]), us: Buffer.from([2]) } };
+      },
+      async download(bytes) {
+        return bytes;
+      },
+    },
+    'r2',
+  );
+  const result = await service.autofillPronunciation(manager, { word: 'ticket', accents: ['us'] });
+  assert.equal(result.audio.us.url, 'https://media.test/ticket-us.mp3');
 });

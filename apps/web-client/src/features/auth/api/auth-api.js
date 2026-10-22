@@ -53,6 +53,14 @@ export async function getAdminAccountStats() {
 export async function adminAccountAction(id, payload) {
   return (await httpClient.post(`/auth/admin/accounts/${id}/actions`, payload)).data;
 }
+// Invitations (D131): the admin creates the account; the person sets the
+// password with the emailed code.
+export async function inviteAdminAccount(payload) {
+  return (await httpClient.post('/auth/admin/accounts', payload)).data;
+}
+export async function acceptInvite(payload) {
+  return (await httpClient.post('/auth/accept-invite', payload)).data;
+}
 
 // Profile of the signed-in account (F09, D113).
 export async function updateProfile(payload) {

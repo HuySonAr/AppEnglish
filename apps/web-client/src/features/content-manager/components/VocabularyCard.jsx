@@ -64,10 +64,10 @@ export function VocabularyCard({ item, index, edit, update, media, filling, onAu
               disabled={!item.word.trim() || filling !== null || (item.phonetic && item.audioUkMediaId && item.audioUsMediaId)}
               onClick={() => onAutofill(item)}
             >
-              {filling === item.id ? 'Looking up…' : 'Auto-fill pronunciation'}
+              {filling === item.id ? 'Generating…' : 'Auto-fill pronunciation'}
             </Button>
             <span className="text-sm text-muted-foreground">
-              Fills the empty phonetic and audio fields from a free dictionary. Check them; replace anything wrong.
+              Fills the empty phonetic and audio fields. Check the result.
             </span>
           </div>
         </CardContent>

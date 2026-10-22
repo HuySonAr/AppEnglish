@@ -70,6 +70,15 @@ export class ListeningRepository {
     });
   }
 
+  async deleteExerciseWithVersions(exerciseId) {
+    await this.repo(ListeningExerciseEntity);
+    return this.dataSource.transaction(async (manager) => {
+      await manager.getRepository(ListeningTimingJobEntity).delete({ exerciseId });
+      await manager.getRepository(ListeningExerciseVersionEntity).delete({ exerciseId });
+      await manager.getRepository(ListeningExerciseEntity).delete({ id: exerciseId });
+    });
+  }
+
   async saveTimingJob(job) {
     return (await this.repo(ListeningTimingJobEntity)).save(job);
   }
@@ -78,7 +87,8 @@ export class ListeningRepository {
     return (await this.repo(ListeningTimingJobEntity)).findOne({ where: { id } });
   }
 
-  async findLatestTimingJob(exerciseId) {
-    return (await this.repo(ListeningTimingJobEntity)).findOne({ where: { exerciseId }, order: { createdAt: 'DESC' } });
+  // owner: { exerciseId } or { courseItemId } (D147).
+  async findLatestTimingJob(owner) {
+    return (await this.repo(ListeningTimingJobEntity)).findOne({ where: owner, order: { createdAt: 'DESC' } });
   }
 }

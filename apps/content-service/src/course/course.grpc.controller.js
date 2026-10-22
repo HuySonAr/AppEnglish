@@ -17,6 +17,11 @@ const rpcs = {
   GetCourseItem: { id: true, run: (service, { actor, id }) => service.getItem(actor, id) },
   SaveCourseItemDraft: { id: true, raw: true, run: (service, { actor, id, payload }) => service.saveDraft(actor, id, payload) },
   PublishCourseItem: { id: true, run: (service, { actor, id }) => service.publish(actor, id) },
+  UnpublishCourseItem: { id: true, run: (service, { actor, id }) => service.unpublish(actor, id) },
+  DeleteCourseItem: { id: true, run: (service, { actor, id }) => service.delete(actor, id) },
+  RequestCourseAutoTime: { id: true, run: (service, { actor, id }) => service.requestAutoTime(actor, id) },
+  RequestCourseTranscribe: { id: true, run: (service, { actor, id }) => service.requestTranscribe(actor, id) },
+  GetCourseAutoTime: { id: true, run: (service, { actor, id }) => service.getAutoTime(actor, id) },
   // Called by learning-service, not by the gateway: there is no actor.
   ListPublishedCourse: { internal: true, run: (service) => service.listPublished() },
   GetCoursePaper: { internal: true, id: true, payload: placementPaperSchema, run: (service, { id, payload }) => service.getPaper(id, payload) },

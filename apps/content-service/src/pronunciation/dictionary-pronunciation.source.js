@@ -85,6 +85,8 @@ export class DictionaryPronunciationSource {
   }
 }
 
+// The dictionary source is kept for PRONUNCIATION_SOURCE=dictionary; the
+// default since D123 is speech-service (see app.module).
 export function createPronunciationSource(source = process.env) {
   return new DictionaryPronunciationSource(
     source.DICTIONARY_API_URL ? { baseUrl: source.DICTIONARY_API_URL } : {},

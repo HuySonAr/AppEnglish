@@ -26,7 +26,8 @@ const editableStatuses = [AccountStatus.ACTIVE, AccountStatus.DISABLED, AccountS
 
 // Role and status of one account (F01B, D114). Locking needs a reason the
 // person is shown at sign-in; every change signs the account out everywhere.
-export function AccountStatusDialog({ account, open, onOpenChange, onSaved }) {
+// preset: { role?, status? } chosen in the table before the dialog opened (D131).
+export function AccountStatusDialog({ account, open, onOpenChange, onSaved, preset = null }) {
   const [role, setRole] = useState(account?.role);
   const [status, setStatus] = useState(account?.status);
   const [reason, setReason] = useState('');
@@ -34,10 +35,10 @@ export function AccountStatusDialog({ account, open, onOpenChange, onSaved }) {
 
   useEffect(() => {
     if (!open) return;
-    setRole(account?.role);
-    setStatus(account?.status);
+    setRole(preset?.role ?? account?.role);
+    setStatus(preset?.status ?? account?.status);
     setReason(account?.statusReason && account.status !== AccountStatus.ACTIVE ? account.statusReason : '');
-  }, [open, account]);
+  }, [open, account, preset]);
 
   const pendingVerification = account?.status === AccountStatus.PENDING_VERIFICATION;
   const needsReason = lockReasonRequired(account?.status, status);

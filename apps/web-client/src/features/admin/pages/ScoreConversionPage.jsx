@@ -84,7 +84,7 @@ export function ScoreConversionPage() {
       <PageHeader
         eyebrow="Admin"
         title="Estimated score table"
-        description="Turns the right answers of a full mock test into an estimated TOEIC section score (5–495). The official tables are not public, so learners see these as estimates."
+        description="Correct answers of a full mock test to an estimated TOEIC section score (5–495)."
         actions={isDefault ? <Badge variant="outline">Default table</Badge> : <Badge variant="info">Edited</Badge>}
       />
       <form onSubmit={onSubmit} className="space-y-5 rounded-xl border bg-card p-6 shadow-sm">

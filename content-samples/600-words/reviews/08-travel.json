@@ -1,0 +1,223 @@
+{
+  "unit": 8,
+  "title": "Travel",
+  "part5": [
+    {
+      "prompt": "When ___ your luggage, be sure to check the name on the tag.",
+      "options": [
+        "claim",
+        "claimed",
+        "claimant",
+        "claiming"
+      ],
+      "answer": "D",
+      "explanation": "Trong mệnh đề rút gọn “When claiming your luggage”, dùng V-ing để chỉ khi nhận hành lý."
+    },
+    {
+      "prompt": "The plane’s ___ was delayed until the wings were defrosted.",
+      "options": [
+        "depart",
+        "departed",
+        "departure",
+        "departing"
+      ],
+      "answer": "C",
+      "explanation": "Sau sở hữu cách “plane’s” cần danh từ “departure” (việc khởi hành)."
+    },
+    {
+      "prompt": "Many airlines ___ courtesy discounts to senior citizens.",
+      "options": [
+        "extend",
+        "extending",
+        "extension",
+        "extensive"
+      ],
+      "answer": "A",
+      "explanation": "Câu hiện tại đơn, chủ ngữ “Many airlines” số nhiều cần động từ “extend” (cung cấp)."
+    },
+    {
+      "prompt": "It is easier to ___ making reservations if you are specific about your requirements.",
+      "options": [
+        "deal in",
+        "deal from",
+        "deal out",
+        "deal with"
+      ],
+      "answer": "D",
+      "explanation": "“Deal with” nghĩa là xử lý/giải quyết công việc đặt chỗ."
+    },
+    {
+      "prompt": "Trains are generally more ___ than airlines.",
+      "options": [
+        "punctuality",
+        "punctually",
+        "punctual",
+        "punctuate"
+      ],
+      "answer": "C",
+      "explanation": "Sau “more” cần tính từ so sánh “punctual” (đúng giờ)."
+    },
+    {
+      "prompt": "Some travel agencies ___ on a very tight budget.",
+      "options": [
+        "operating",
+        "operation",
+        "operates",
+        "operate"
+      ],
+      "answer": "D",
+      "explanation": "Chủ ngữ số nhiều “agencies” ở hiện tại đơn đi với “operate”."
+    },
+    {
+      "prompt": "Even if you pay cash, you need a credit card just to ___ to a hotel.",
+      "options": [
+        "check in",
+        "checks in",
+        "checking in",
+        "checked in"
+      ],
+      "answer": "A",
+      "explanation": "Sau “to” dùng động từ nguyên mẫu; “check in” nghĩa là làm thủ tục nhận phòng."
+    },
+    {
+      "prompt": "Sometimes when you arrive, there is no room for you, even with a ___ reservation.",
+      "options": [
+        "confirm",
+        "confirms",
+        "confirmed",
+        "confirmation"
+      ],
+      "answer": "C",
+      "explanation": "Tính từ/ phân từ “confirmed” bổ nghĩa cho “reservation”: đặt phòng đã được xác nhận."
+    },
+    {
+      "prompt": "Without a reservation, renting a car could be a big ___.",
+      "options": [
+        "disappoint",
+        "disappointed",
+        "disappointing",
+        "disappointment"
+      ],
+      "answer": "D",
+      "explanation": "Sau “a big” cần danh từ “disappointment” (sự thất vọng)."
+    },
+    {
+      "prompt": "No one will allow someone who doesn’t have a ___ to rent a car.",
+      "options": [
+        "licensed",
+        "license",
+        "licensing",
+        "licensee"
+      ],
+      "answer": "B",
+      "explanation": "Sau “a” cần danh từ “license” (giấy phép lái xe trong ngữ cảnh)."
+    }
+  ],
+  "part6": [
+    {
+      "passage": "Do you need to ___? Trains are a great way to save money when it comes to travel. Train fare costs considerably less than plane fare in most cases. On the other hand, if comfort is more important to you than saving money, you will be happy to know that most trains offer ___ accommodations. When you ___ your ticket, simply notify the agent that you want a first-class seat.",
+      "questions": [
+        {
+          "options": [
+            "economy",
+            "economize",
+            "economist",
+            "economical"
+          ],
+          "answer": "B",
+          "explanation": "Sau “need to” dùng động từ “economize” (tiết kiệm tiền)."
+        },
+        {
+          "options": [
+            "deluxe",
+            "valid",
+            "remote",
+            "punctual"
+          ],
+          "answer": "A",
+          "explanation": "“Deluxe accommodations” nghĩa là chỗ ở/chỗ ngồi hạng sang, phù hợp với ưu tiên về sự thoải mái."
+        },
+        {
+          "options": [
+            "will reserve",
+            "reserving",
+            "reserved",
+            "reserve"
+          ],
+          "answer": "D",
+          "explanation": "Mệnh đề “When you ___ your ticket” diễn tả tương lai bằng hiện tại đơn: “reserve”."
+        }
+      ]
+    },
+    {
+      "passage": "To: Margaret Berdan\nFrom: Spring Flower Hotel Management\nSubject: Your reservation\n\nDear Ms. Berdan,\n\nThank you for making a reservation at the Spring Flower Hotel for the nights of May 11–14. We suggest that you call the hotel ___ your reservation 24 hours in advance. Payment in full is required at the time you check ___, before we can give you your room key. Remember, your status as a guest at the Spring Flower Hotel ___ you to unlimited use of the hotel fitness room and swimming pool. We look forward to seeing you.\n\nSincerely,\nThe Spring Flower Hotel Management Office",
+      "questions": [
+        {
+          "options": [
+            "confirm",
+            "confirming",
+            "to confirm",
+            "did confirm"
+          ],
+          "answer": "C",
+          "explanation": "“Call the hotel to confirm your reservation” chỉ mục đích gọi điện: để xác nhận đặt phòng."
+        },
+        {
+          "options": [
+            "in",
+            "up",
+            "out",
+            "through"
+          ],
+          "answer": "A",
+          "explanation": "“Check in” là cụm động từ cố định nghĩa là nhận phòng."
+        },
+        {
+          "options": [
+            "entitle",
+            "entitles",
+            "entitled",
+            "is entitled"
+          ],
+          "answer": "B",
+          "explanation": "Chủ ngữ “your status” số ít cần “entitles”; cấu trúc “entitle somebody to something”."
+        }
+      ]
+    },
+    {
+      "passage": "If you plan to pick up a rental car at the airport, it’s best to reserve a car ahead of time. This is easy to do on the Internet or by phone. When you pick up your car, you will have to show a valid ___ that proves you have legal permission to drive. Read the contract carefully and make sure that the ___ it states is the same one you were originally quoted. You don’t want to have to pay more than you expected. Also remember that certain features, such as stereo systems, are ___. You don’t have to accept and pay for them if you don’t want to.",
+      "questions": [
+        {
+          "options": [
+            "passport",
+            "ticket",
+            "itinerary",
+            "license"
+          ],
+          "answer": "D",
+          "explanation": "“License” trong ngữ cảnh là bằng lái xe, chứng minh quyền lái xe hợp pháp."
+        },
+        {
+          "options": [
+            "rate",
+            "route",
+            "riot",
+            "runt"
+          ],
+          "answer": "A",
+          "explanation": "“Rate” là mức giá cho thuê; cần đối chiếu với báo giá ban đầu."
+        },
+        {
+          "options": [
+            "opt",
+            "option",
+            "optional",
+            "optionally"
+          ],
+          "answer": "C",
+          "explanation": "Sau “are” cần tính từ “optional” (không bắt buộc)."
+        }
+      ]
+    }
+  ]
+}

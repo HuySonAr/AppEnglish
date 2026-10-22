@@ -26,3 +26,6 @@ export const settingsSchema = z
     message: 'The unit 3 threshold must be higher than the unit 2 threshold',
     path: ['unit3Threshold'],
   });
+
+// The learner whose placement an admin resets (D131).
+export const accountIdSchema = z.string().uuid();

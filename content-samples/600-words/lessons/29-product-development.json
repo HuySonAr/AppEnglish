@@ -1,0 +1,260 @@
+{
+  "number": 29,
+  "title": "Product Development",
+  "vocabulary": [
+    {
+      "word": "anxious",
+      "partOfSpeech": "adjective",
+      "meaning": "lo lắng, bồn chồn; nóng lòng muốn làm gì",
+      "example": "The engineers were anxious to see how the new kettle performed in the heat test.",
+      "exampleMeaning": "Các kỹ sư nóng lòng muốn xem chiếc ấm mới hoạt động thế nào trong bài kiểm tra nhiệt."
+    },
+    {
+      "word": "ascertain",
+      "partOfSpeech": "verb",
+      "meaning": "xác định chắc chắn, tìm hiểu cho rõ",
+      "example": "Before the launch, the team must ascertain whether the battery lasts a full day.",
+      "exampleMeaning": "Trước khi ra mắt, nhóm phải xác định chắc chắn liệu pin có dùng được trọn một ngày không."
+    },
+    {
+      "word": "assume",
+      "partOfSpeech": "verb",
+      "meaning": "cho rằng, giả định; đảm nhận (trách nhiệm)",
+      "example": "We assumed that customers wanted a smaller model, but the survey showed the opposite.",
+      "exampleMeaning": "Chúng tôi đã cho rằng khách hàng muốn mẫu nhỏ hơn, nhưng khảo sát cho thấy điều ngược lại."
+    },
+    {
+      "word": "decade",
+      "partOfSpeech": "noun",
+      "meaning": "thập kỷ, khoảng thời gian mười năm",
+      "example": "Over the past decade, the company has released six versions of its water filter.",
+      "exampleMeaning": "Trong thập kỷ qua, công ty đã ra mắt sáu phiên bản của bộ lọc nước."
+    },
+    {
+      "word": "examine",
+      "partOfSpeech": "verb",
+      "meaning": "xem xét kỹ, kiểm tra",
+      "example": "A second engineer examined the prototype and found a crack in the handle.",
+      "exampleMeaning": "Một kỹ sư thứ hai đã xem xét kỹ mẫu thử và phát hiện một vết nứt ở tay cầm."
+    },
+    {
+      "word": "experiment",
+      "partOfSpeech": "noun",
+      "meaning": "cuộc thí nghiệm, thử nghiệm; (động từ) làm thí nghiệm",
+      "example": "The lab ran an experiment to compare three types of plastic for the casing.",
+      "exampleMeaning": "Phòng thí nghiệm đã thực hiện một thí nghiệm để so sánh ba loại nhựa làm vỏ máy."
+    },
+    {
+      "word": "logical",
+      "partOfSpeech": "adjective",
+      "meaning": "hợp lý, hợp lôgic",
+      "example": "Reducing the weight of the device was the logical next step after the customer feedback.",
+      "exampleMeaning": "Giảm trọng lượng thiết bị là bước tiếp theo hợp lý sau phản hồi của khách hàng."
+    },
+    {
+      "word": "research",
+      "partOfSpeech": "noun",
+      "meaning": "sự nghiên cứu, công việc nghiên cứu; (động từ) nghiên cứu",
+      "example": "Months of market research showed that families wanted a quieter blender.",
+      "exampleMeaning": "Nhiều tháng nghiên cứu thị trường cho thấy các gia đình muốn một chiếc máy xay êm hơn."
+    },
+    {
+      "word": "responsibility",
+      "partOfSpeech": "noun",
+      "meaning": "trách nhiệm; nhiệm vụ được giao",
+      "example": "Testing the safety of each prototype is the responsibility of the lab manager.",
+      "exampleMeaning": "Kiểm tra độ an toàn của mỗi mẫu thử là trách nhiệm của quản lý phòng thí nghiệm."
+    },
+    {
+      "word": "solve",
+      "partOfSpeech": "verb",
+      "meaning": "giải quyết, tìm ra lời giải",
+      "example": "The team solved the overheating problem by adding a small vent to the back panel.",
+      "exampleMeaning": "Nhóm đã giải quyết vấn đề quá nhiệt bằng cách thêm một khe thoát khí nhỏ ở mặt sau."
+    },
+    {
+      "word": "supervisor",
+      "partOfSpeech": "noun",
+      "meaning": "người giám sát, người quản lý trực tiếp",
+      "example": "My supervisor reviews every test result before it is entered in the project file.",
+      "exampleMeaning": "Người giám sát của tôi xem lại mọi kết quả kiểm tra trước khi nhập vào hồ sơ dự án."
+    },
+    {
+      "word": "systematically",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách có hệ thống, theo trình tự",
+      "example": "The testers systematically checked each button on the remote control, one at a time.",
+      "exampleMeaning": "Những người kiểm thử đã kiểm tra một cách có hệ thống từng nút trên bộ điều khiển từ xa, lần lượt từng nút."
+    }
+  ],
+  "fillIn": {
+    "passage": "Bluewater Appliances has sold the same electric kettle for nearly a ___, and sales have started to fall. The product development team, led by ___ Carla Mendes, was given the ___ of designing a replacement within eight months.\n\nThe team began with market ___ to find out what customers disliked about the old model. Carla refused to ___ that she already knew the answer. Instead, her team interviewed two hundred buyers and ___ the comments one by one. The results were surprising: most people did not care about speed; they wanted a kettle that was quiet and easy to clean.\n\nThe engineers were ___ to start building, but Carla insisted on a ___ order of work. First they had to ___ which parts of the old design caused the noise. Then they ran an ___ with three different heating elements and ___ recorded the sound level of each. By the fifth month, the team had ___ the noise problem, and the new kettle was twenty percent quieter than any competing model.",
+    "answers": ["decade", "supervisor", "responsibility", "research", "assume", "examined", "anxious", "logical", "ascertain", "experiment", "systematically", "solved"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Hai kỹ thuật viên mặc áo khoác trắng trong phòng thí nghiệm, một người đang nhìn qua kính lúp vào một thiết bị điện tử nhỏ đặt trên bàn.",
+      "options": [
+        "A technician is examining a small device.",
+        "The technicians are washing their hands.",
+        "A technician is packing devices into a box.",
+        "The technicians are leaving the laboratory."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy một kỹ thuật viên đang soi kỹ thiết bị qua kính lúp. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Who is responsible for approving the final design?",
+        "options": ["The design was finished in May.", "The supervisor of the development team.", "Yes, it has been approved."],
+        "answer": "B",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người; (B) nêu đúng người giám sát. (A) trả lời về thời gian, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Have you ascertained why the prototype keeps overheating?",
+        "options": ["Not yet, but we're running another experiment tomorrow.", "The heater is in the corner.", "It costs about forty dollars."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc đã tìm ra nguyên nhân chưa; (A) trả lời chưa và nói bước tiếp theo. (B) nhầm 'overheating' với 'heater', (C) nói về giá."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Marcus, I've looked at the test results for the new desk lamp. The battery lasts only five hours, and the target was eight.\nMan: I know. I assumed the problem was the battery itself, but when I examined the circuit, I found that the light sensor draws power even when the lamp is off.\nWoman: So the logical fix is to shut the sensor off together with the lamp?\nMan: Exactly. I'd like to run an experiment this week with a small switch added to the board.\nWoman: Go ahead, but please record the results systematically so we can compare them with the first test. Our supervisor wants a full report by the twentieth.\nMan: I'll set up a table with the same columns as the original test.\nWoman: Thanks. And let me know as soon as you have the first numbers; marketing is anxious to confirm the launch date.",
+      "questions": [
+        {
+          "prompt": "What problem are the speakers discussing?",
+          "options": ["A lamp that is too heavy", "A battery that does not last long enough", "A missing test report", "A delay in the marketing plan"],
+          "answer": "B",
+          "explanation": "Người phụ nữ nói 'The battery lasts only five hours, and the target was eight', tức pin không đạt thời lượng mục tiêu."
+        },
+        {
+          "prompt": "What did the man discover?",
+          "options": ["The battery was defective.", "The sensor uses power when the lamp is off.", "The switch was installed backwards.", "The circuit board was the wrong size."],
+          "answer": "B",
+          "explanation": "Anh ấy phát hiện 'the light sensor draws power even when the lamp is off'; đó không phải lỗi của pin như anh đã giả định."
+        },
+        {
+          "prompt": "What does the woman ask the man to do?",
+          "options": ["Order a new battery", "Contact the marketing department", "Record the results in an organized way", "Change the launch date"],
+          "answer": "C",
+          "explanation": "Cô ấy yêu cầu 'please record the results systematically', tức ghi kết quả một cách có hệ thống để so sánh."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good afternoon, and thank you all for coming to the preview of the SilentStream dishwasher. A decade ago, our research department had only four people and one small lab. Today it has forty engineers, and this machine is the result of their work. When we started the project, many of us assumed that customers wanted a faster cycle. The team did not accept that assumption. They interviewed hundreds of households and ascertained that the real complaint was noise during the evening. Over eighteen months, they systematically tested twelve pump designs and solved a vibration problem that had puzzled the industry for years. I want to thank the project supervisor, Ingrid Halvorsen, who took responsibility for every decision along the way. The SilentStream goes on sale in March. Please take a brochure on your way out and try the demonstration unit in the lobby.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the talk?",
+          "options": ["To announce a new research director", "To introduce a new product to staff", "To explain a change in working hours", "To report a problem with a dishwasher"],
+          "answer": "B",
+          "explanation": "Người nói chào mừng mọi người đến buổi giới thiệu trước (preview) máy rửa bát SilentStream và kể quá trình phát triển nó."
+        },
+        {
+          "prompt": "What did the research show customers wanted?",
+          "options": ["A faster wash cycle", "A cheaper machine", "Less noise in the evening", "A larger capacity"],
+          "answer": "C",
+          "explanation": "Nhóm 'ascertained that the real complaint was noise during the evening'; chu trình nhanh hơn chỉ là giả định ban đầu."
+        },
+        {
+          "prompt": "What are listeners invited to do?",
+          "options": ["Buy the dishwasher at a discount", "Join the research department", "Try the demonstration unit", "Meet Ingrid Halvorsen in her office"],
+          "answer": "C",
+          "explanation": "Cuối bài: 'Please take a brochure on your way out and try the demonstration unit in the lobby'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The engineers were _____ to hear the results of the drop test.",
+        "options": ["anxious", "anxiously", "anxiety", "anxiousness"],
+        "answer": "A",
+        "explanation": "Sau 'were' cần tính từ: 'anxious to' (nóng lòng muốn)."
+      },
+      {
+        "prompt": "The team has _____ tested every model for safety before release.",
+        "options": ["system", "systematic", "systematically", "systematize"],
+        "answer": "C",
+        "explanation": "Giữa 'has' và 'tested' cần trạng từ bổ nghĩa cho động từ: 'systematically'."
+      },
+      {
+        "prompt": "The lab needs more time to _____ whether the plastic can withstand high temperatures.",
+        "options": ["ascertain", "ascertained", "ascertainment", "ascertaining"],
+        "answer": "A",
+        "explanation": "Sau 'to' cần động từ nguyên mẫu: 'to ascertain whether' (xác định xem liệu)."
+      },
+      {
+        "prompt": "Collecting customer feedback is the _____ of the marketing team, not the engineers.",
+        "options": ["responsible", "responsibly", "responsibility", "respond"],
+        "answer": "C",
+        "explanation": "Sau mạo từ 'the' cần danh từ: 'the responsibility of' (trách nhiệm của)."
+      },
+      {
+        "prompt": "It is _____ to test the cheaper material first before ordering the expensive one.",
+        "options": ["logic", "logical", "logically", "logician"],
+        "answer": "B",
+        "explanation": "Cấu trúc 'It is + tính từ + to V' cần tính từ: 'logical' (hợp lý)."
+      },
+      {
+        "prompt": "After a month of work, the technicians finally _____ the leak in the water pump.",
+        "options": ["solution", "solve", "solved", "solving"],
+        "answer": "C",
+        "explanation": "Câu kể về sự việc đã xảy ra ('After a month of work') nên động từ chia quá khứ đơn: 'solved'."
+      }
+    ],
+    "part6": {
+      "passage": "To: Product Development Team\nFrom: Rafael Costa, Project Lead\nSubject: Phase two of the air purifier\n\nThank you for finishing the first ___ on the filter material ahead of schedule. The results suggest that the carbon filter removes smoke more effectively than we had ___. Before we move on, I want each of you to ___ the test data for errors; one wrong reading last year cost us two months. Please send your notes to me by Wednesday, and we will discuss the next phase at Friday's meeting.",
+      "questions": [
+        {
+          "options": ["experiment", "experimental", "experimented", "experimentally"],
+          "answer": "A",
+          "explanation": "Sau 'the first' cần danh từ: 'experiment' (cuộc thí nghiệm)."
+        },
+        {
+          "options": ["assume", "assumed", "assuming", "assumption"],
+          "answer": "B",
+          "explanation": "Sau 'had' cần quá khứ phân từ để tạo thì quá khứ hoàn thành: 'than we had assumed'."
+        },
+        {
+          "options": ["examine", "examination", "examined", "examining"],
+          "answer": "A",
+          "explanation": "Cấu trúc 'want someone to + động từ nguyên mẫu': 'to examine the test data'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "THE RIDGEWAY REPORT - Staff Newsletter\nHow the TrailMate Backpack Was Born\n\nThree years ago, Ridgeway Outdoor sold a backpack that had hardly changed in a decade. Then a new product development supervisor, Yuki Tanaka, took over the team of five and gave them one responsibility: find out what hikers really needed.\n\nThe team did not assume anything. They spent four months on research, joining weekend hiking groups and examining the worn-out packs that customers brought in for repair. The findings were clear: straps broke at the same point, and water bottles were hard to reach.\n\nThe next step was logical. The engineers built eleven prototypes and ran an experiment on each, loading the straps with weights until they tore. Every result was recorded systematically in a shared file. By the ninth prototype, the strap problem was solved; a wider stitching pattern doubled its life.\n\nThe TrailMate launched in April and has already become the company's best-selling pack. Ms. Tanaka admits she was anxious before the launch. \"We had ascertained that the design worked,\" she says, \"but you never know how the market will react until the first week of sales.\"\n\nNext month: how the packaging team cut cardboard waste by half.",
+      "questions": [
+        {
+          "prompt": "What is the article mainly about?",
+          "options": ["The history of hiking in the region", "How a new backpack was developed", "A change in the company's management", "A repair service for old backpacks"],
+          "answer": "B",
+          "explanation": "Tiêu đề 'How the TrailMate Backpack Was Born' và toàn bài kể quá trình phát triển chiếc ba lô mới."
+        },
+        {
+          "prompt": "What was the team's first task under Ms. Tanaka?",
+          "options": ["To design a new logo", "To reduce production costs", "To learn what hikers needed", "To repair returned packs"],
+          "answer": "C",
+          "explanation": "Bà Tanaka giao cho nhóm 'one responsibility: find out what hikers really needed'."
+        },
+        {
+          "prompt": "How did the team test the straps?",
+          "options": ["By sending prototypes to customers", "By loading them with weights until they broke", "By washing them repeatedly", "By comparing them with competitors' packs"],
+          "answer": "B",
+          "explanation": "Bài viết ghi 'loading the straps with weights until they tore', tức chất tạ lên dây đeo đến khi rách."
+        },
+        {
+          "prompt": "Which prototype solved the strap problem?",
+          "options": ["The fourth", "The fifth", "The ninth", "The eleventh"],
+          "answer": "C",
+          "explanation": "'By the ninth prototype, the strap problem was solved'. Mười một là tổng số mẫu thử được chế tạo."
+        },
+        {
+          "prompt": "What does Ms. Tanaka suggest about the launch?",
+          "options": ["She was certain it would succeed.", "She felt nervous despite the test results.", "She wanted to delay it until May.", "She expected sales to be slow."],
+          "answer": "B",
+          "explanation": "Bà 'admits she was anxious before the launch' dù nhóm đã xác định thiết kế hoạt động tốt, tức vẫn lo lắng bất chấp kết quả thử nghiệm."
+        }
+      ]
+    }
+  }
+}

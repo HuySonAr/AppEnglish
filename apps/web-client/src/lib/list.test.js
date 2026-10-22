@@ -1,6 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { compareText, matchesSearch, normalizeText, paginate } from './list.js';
+import { compareText, listStateFromParams, matchesSearch, normalizeText, pageRange, paginate, paramsFromListState } from './list.js';
+
+test('a list keeps its filters and page in the URL, leaving defaults out', () => {
+  const defaults = { search: '', status: 'all', stale: false };
+  assert.deepEqual(listStateFromParams(new URLSearchParams(''), defaults), { filters: { search: '', status: 'all', stale: false }, page: 1 });
+  assert.deepEqual(listStateFromParams(new URLSearchParams('search=hop&status=DRAFT&stale=true&page=3'), defaults), { filters: { search: 'hop', status: 'DRAFT', stale: true }, page: 3 });
+  assert.equal(listStateFromParams(new URLSearchParams('page=zero'), defaults).page, 1);
+  assert.equal(paramsFromListState({ filters: { search: '', status: 'all', stale: false }, page: 1 }, defaults).toString(), '');
+  assert.equal(paramsFromListState({ filters: { search: 'hop', status: 'DRAFT', stale: true }, page: 2 }, defaults).toString(), 'search=hop&status=DRAFT&stale=true&page=2');
+  // Params that are not the list's stay as they are.
+  assert.equal(paramsFromListState({ filters: { search: '', status: 'all', stale: false }, page: 2 }, defaults, new URLSearchParams('tab=x&page=5')).toString(), 'tab=x&page=2');
+});
 
 test('search ignores case, accents and word order', () => {
   assert.equal(normalizeText('  Hợp Đồng  '), 'hop dong');
@@ -23,4 +34,17 @@ test('pages are cut from the list and never fall off its end', () => {
   assert.equal(paginate(items, 9, 10).page, 3);
   assert.equal(paginate(items, 0, 10).page, 1);
   assert.deepEqual(paginate([], 4, 10), { items: [], page: 1, pageCount: 1, total: 0 });
+});
+
+test('the page bar keeps first, last and the neighbours of the current page', () => {
+  assert.deepEqual(pageRange(1, 1), [1]);
+  assert.deepEqual(pageRange(3, 7), [1, 2, 3, 4, 5, 6, 7]);
+  assert.deepEqual(pageRange(1, 10), [1, 2, 3, 4, '…', 10]);
+  assert.deepEqual(pageRange(3, 10), [1, 2, 3, 4, '…', 10]);
+  assert.deepEqual(pageRange(5, 10), [1, '…', 4, 5, 6, '…', 10]);
+  assert.deepEqual(pageRange(8, 10), [1, '…', 7, 8, 9, 10]);
+  assert.deepEqual(pageRange(10, 10), [1, '…', 7, 8, 9, 10]);
+  // A gap of exactly one page shows that page rather than an ellipsis.
+  assert.deepEqual(pageRange(4, 20), [1, 2, 3, 4, 5, '…', 20]);
+  assert.deepEqual(pageRange(99, 10), [1, '…', 7, 8, 9, 10]);
 });

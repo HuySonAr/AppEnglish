@@ -1,0 +1,260 @@
+{
+  "number": 34,
+  "title": "Cooking as a Career",
+  "vocabulary": [
+    {
+      "word": "accustom to",
+      "partOfSpeech": "verb",
+      "meaning": "làm cho quen với; (be accustomed to) quen với",
+      "example": "New cooks must accustom themselves to twelve-hour shifts during the holiday season.",
+      "exampleMeaning": "Đầu bếp mới phải tự làm quen với các ca làm mười hai tiếng trong mùa lễ."
+    },
+    {
+      "word": "apprentice",
+      "partOfSpeech": "noun",
+      "meaning": "người học nghề, người học việc",
+      "example": "The hotel kitchen takes on two apprentices every September.",
+      "exampleMeaning": "Bếp khách sạn nhận hai người học việc vào mỗi tháng Chín."
+    },
+    {
+      "word": "culinary",
+      "partOfSpeech": "adjective",
+      "meaning": "thuộc về nấu ăn, thuộc về ẩm thực",
+      "example": "She completed a two-year culinary program before joining the restaurant.",
+      "exampleMeaning": "Cô ấy hoàn thành chương trình ẩm thực hai năm trước khi vào làm ở nhà hàng."
+    },
+    {
+      "word": "demand",
+      "partOfSpeech": "noun",
+      "meaning": "nhu cầu; yêu cầu, đòi hỏi",
+      "example": "The demand for pastry chefs has grown as more cafes open downtown.",
+      "exampleMeaning": "Nhu cầu về thợ làm bánh ngọt đã tăng khi ngày càng nhiều quán cà phê mở ở trung tâm."
+    },
+    {
+      "word": "draw",
+      "partOfSpeech": "verb",
+      "meaning": "thu hút, lôi kéo; vẽ",
+      "example": "The cooking school's open day always draws more than three hundred visitors.",
+      "exampleMeaning": "Ngày hội mở cửa của trường dạy nấu ăn luôn thu hút hơn ba trăm khách tham quan."
+    },
+    {
+      "word": "incorporate",
+      "partOfSpeech": "verb",
+      "meaning": "kết hợp, đưa vào (thành một phần)",
+      "example": "The chef incorporated local seaweed into several dishes on the spring menu.",
+      "exampleMeaning": "Bếp trưởng đã đưa rong biển địa phương vào nhiều món trong thực đơn mùa xuân."
+    },
+    {
+      "word": "influx",
+      "partOfSpeech": "noun",
+      "meaning": "sự đổ vào, dòng người hoặc vật tràn vào",
+      "example": "The influx of tourists in July means the kitchen needs extra staff.",
+      "exampleMeaning": "Dòng khách du lịch đổ về vào tháng Bảy khiến bếp cần thêm nhân viên."
+    },
+    {
+      "word": "method",
+      "partOfSpeech": "noun",
+      "meaning": "phương pháp, cách thức",
+      "example": "Our head chef teaches apprentices a different cooking method each week.",
+      "exampleMeaning": "Bếp trưởng của chúng tôi dạy người học việc một phương pháp nấu khác nhau mỗi tuần."
+    },
+    {
+      "word": "outlet",
+      "partOfSpeech": "noun",
+      "meaning": "cửa hàng, điểm bán; lối thoát (cho cảm xúc)",
+      "example": "The bakery plans to open a second outlet near the train station.",
+      "exampleMeaning": "Tiệm bánh dự định mở cửa hàng thứ hai gần nhà ga."
+    },
+    {
+      "word": "profession",
+      "partOfSpeech": "noun",
+      "meaning": "nghề nghiệp (đòi hỏi đào tạo chuyên môn)",
+      "example": "Cooking is a demanding profession that rewards patience and discipline.",
+      "exampleMeaning": "Nấu ăn là một nghề đòi hỏi cao, đền đáp cho sự kiên nhẫn và kỷ luật."
+    },
+    {
+      "word": "relinquish",
+      "partOfSpeech": "verb",
+      "meaning": "từ bỏ, nhường lại (quyền, trách nhiệm)",
+      "example": "After thirty years, the chef relinquished control of the kitchen to his former apprentice.",
+      "exampleMeaning": "Sau ba mươi năm, bếp trưởng đã nhường quyền điều hành bếp cho người học việc cũ của mình."
+    },
+    {
+      "word": "theme",
+      "partOfSpeech": "noun",
+      "meaning": "chủ đề",
+      "example": "Each month the restaurant chooses a theme, such as street food or seasonal vegetables.",
+      "exampleMeaning": "Mỗi tháng nhà hàng chọn một chủ đề, chẳng hạn ẩm thực đường phố hoặc rau củ theo mùa."
+    }
+  ],
+  "fillIn": {
+    "passage": "Three years ago, Lin Hao left her job in accounting to train as a cook. Friends warned her that cooking is a hard ___, with long hours and low pay at the start, but the ___ for trained chefs in her city was rising, and she wanted work she truly enjoyed. She finished a one-year ___ program and then joined a small bistro as an ___.\n\nThe first months were difficult. She had to ___ herself to standing for ten hours and to the noise of a busy kitchen. The head chef, Mr. Barros, taught her one ___ at a time: how to make stock, how to bake bread, how to fillet fish. He also showed her how to ___ seasonal vegetables into classic dishes without changing their character.\n\nLast summer, an ___ of tourists filled the town, and every evening the bistro would ___ long lines. Mr. Barros decided to open a second ___ near the harbor and asked Lin to run it. He chose a ___ for the new menu, Portuguese home cooking, and ___ most of the daily decisions to her. Lin now leads a team of six and says she has never worked harder or been happier.",
+    "answers": ["profession", "demand", "culinary", "apprentice", "accustom", "method", "incorporate", "influx", "draw", "outlet", "theme", "relinquished"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một đầu bếp đứng cạnh bàn bếp bằng thép đang hướng dẫn một người học việc trẻ cách thái rau.",
+      "options": [
+        "A chef is showing a trainee how to cut vegetables.",
+        "The cooks are washing dishes in a large sink.",
+        "A waiter is taking an order from a customer.",
+        "The men are carrying boxes into the kitchen."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy đầu bếp hướng dẫn người học việc thái rau. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How many apprentices will the kitchen hire this year?",
+        "options": ["Three, starting in September.", "The kitchen is on the ground floor.", "Yes, they are very talented."],
+        "answer": "A",
+        "explanation": "Câu hỏi How many cần một con số. (B) lặp từ 'kitchen' nhưng nói về vị trí, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Isn't the new outlet opening next month?",
+        "options": ["It was delayed until March because of the permits.", "The outlet is behind the desk, next to the lamp.", "I prefer the fish."],
+        "answer": "A",
+        "explanation": "Câu hỏi phủ định về việc khai trương; (A) cho biết đã hoãn tới tháng Ba. (B) nhầm 'outlet' là ổ cắm điện, (C) không liên quan."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Mr. Novak, thanks for meeting me. I'm writing an article about culinary careers for the regional business magazine. Your restaurant trains more apprentices than any other in the city. Why is that?\nMan: Honestly, because of demand. We opened a second location last year, and we couldn't find enough trained cooks. Training our own was the only way.\nWoman: How does the program work?\nMan: Each apprentice spends four months in a different section: pastry, grill, cold kitchen. They learn one method at a time and are tested before they move on.\nWoman: Does the program draw many applicants?\nMan: Last year we had ninety applications for six places. Most were career changers, like former office workers.\nWoman: That's interesting. Could I speak with one of your current apprentices for the article?\nMan: Of course. Come back Thursday afternoon; the kitchen is quiet between three and five.",
+      "questions": [
+        {
+          "prompt": "Why is the woman meeting the man?",
+          "options": ["To apply for a job", "To write a magazine article", "To review his restaurant", "To sell kitchen equipment"],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'I'm writing an article about culinary careers for the regional business magazine'."
+        },
+        {
+          "prompt": "Why did the man start training apprentices?",
+          "options": ["He could not find enough trained cooks", "The city required it", "He wanted to open a cooking school", "His staff asked for it"],
+          "answer": "A",
+          "explanation": "'We opened a second location last year, and we couldn't find enough trained cooks. Training our own was the only way.'"
+        },
+        {
+          "prompt": "What does the man suggest the woman do?",
+          "options": ["Return on Thursday afternoon", "Visit the second location", "Apply to the program", "Taste the pastry"],
+          "answer": "A",
+          "explanation": "Anh ấy nói 'Come back Thursday afternoon; the kitchen is quiet between three and five'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good evening, graduates, families and friends. Tonight, forty-two students complete the Harborview Culinary Institute's professional program, and I could not be prouder. Two years ago, many of you were not accustomed to a kitchen at all; some had never held a chef's knife. Since then you have learned to incorporate classic techniques into your own style, and you have survived the influx of summer visitors in our training restaurant, when we served four hundred meals a night. Our profession is changing fast. Several of our partner restaurants are opening smaller outlets in train stations and office towers, and they need cooks who can lead a team from day one. Whatever path you choose, remember one theme from your time here: never relinquish your curiosity. Keep tasting, keep asking questions, and keep learning. Congratulations to all of you. Now please join us in the dining hall, where your classmates in the pastry program have prepared dessert.",
+      "questions": [
+        {
+          "prompt": "Where is the talk most likely taking place?",
+          "options": ["At a restaurant opening", "At a culinary school graduation", "At a food festival", "At a hotel staff meeting"],
+          "answer": "B",
+          "explanation": "Người nói chào 'graduates' và nói bốn mươi hai học viên hoàn thành chương trình của Harborview Culinary Institute."
+        },
+        {
+          "prompt": "What does the speaker say about partner restaurants?",
+          "options": ["They are closing their main branches", "They are opening small outlets in new locations", "They are hiring only experienced chefs", "They have raised their prices"],
+          "answer": "B",
+          "explanation": "'Several of our partner restaurants are opening smaller outlets in train stations and office towers.'"
+        },
+        {
+          "prompt": "What are listeners invited to do next?",
+          "options": ["Visit a partner restaurant", "Have dessert in the dining hall", "Sign up for a pastry course", "Meet the summer visitors"],
+          "answer": "B",
+          "explanation": "Cuối bài: 'please join us in the dining hall, where your classmates in the pastry program have prepared dessert'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "After six months on the night shift, Tomas finally became _____ to sleeping during the day.",
+        "options": ["accustom", "accustomed", "accustoming", "accustoms"],
+        "answer": "B",
+        "explanation": "'become accustomed to' là cách nói cố định với quá khứ phân từ dùng như tính từ."
+      },
+      {
+        "prompt": "The new chef hopes to _____ more local seafood into the dinner menu.",
+        "options": ["incorporate", "incorporation", "incorporated", "incorporating"],
+        "answer": "A",
+        "explanation": "Sau 'hopes to' cần động từ nguyên mẫu: 'incorporate ... into'."
+      },
+      {
+        "prompt": "Baking bread is a _____ skill that every apprentice must master in the first month.",
+        "options": ["culinary", "cuisine", "cook", "culinarily"],
+        "answer": "A",
+        "explanation": "Trước danh từ 'skill' cần tính từ: 'culinary' (thuộc về nấu ăn). 'cuisine' và 'cook' là danh từ, không bổ nghĩa đúng."
+      },
+      {
+        "prompt": "The _____ for experienced pastry chefs has doubled in the last five years.",
+        "options": ["demand", "demanding", "demanded", "demands"],
+        "answer": "A",
+        "explanation": "Sau 'The' cần danh từ làm chủ ngữ; động từ 'has' số ít nên chọn 'demand', không phải 'demands'."
+      },
+      {
+        "prompt": "The owner refused to _____ control of the menu, even after he retired from daily service.",
+        "options": ["relinquishment", "relinquished", "relinquish", "relinquishing"],
+        "answer": "C",
+        "explanation": "Sau 'refused to' cần động từ nguyên mẫu: 'relinquish' (từ bỏ)."
+      },
+      {
+        "prompt": "An _____ of new residents has created a market for small neighborhood restaurants.",
+        "options": ["influx", "outlet", "theme", "method"],
+        "answer": "A",
+        "explanation": "Cần danh từ chỉ dòng người đổ về: 'influx of new residents'. Các từ còn lại không hợp nghĩa."
+      }
+    ],
+    "part6": {
+      "passage": "NOTICE TO ALL KITCHEN STAFF\n\nStarting in October, Linden House will take on two ___ for a twelve-month training program. Both will rotate through every section of the kitchen, spending three months with each team leader. We expect the opening to ___ many applicants, so interviews will be held over two days, September 8 and 9. Team leaders are asked to prepare a short practical test for their section. Please remember that for most applicants this is a first step into the ___, and your patience during the test will shape how they see our kitchen.\n\nDana Kowalski, Head Chef",
+      "questions": [
+        {
+          "options": ["apprentice", "apprentices", "apprenticed", "apprenticeship"],
+          "answer": "B",
+          "explanation": "Sau 'two' cần danh từ số nhiều chỉ người: 'apprentices'."
+        },
+        {
+          "options": ["draw", "drawn", "drew", "drawing"],
+          "answer": "A",
+          "explanation": "'expect the opening to ___' cần động từ nguyên mẫu sau 'to': 'draw' (thu hút)."
+        },
+        {
+          "options": ["profession", "professional", "professionally", "professed"],
+          "answer": "A",
+          "explanation": "Sau 'the' và là tân ngữ của 'a first step into' cần danh từ: 'profession' (nghề)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "SOUS CHEF WANTED\nMarigold Kitchens, Eastbridge\n\nMarigold Kitchens runs three outlets in Eastbridge: a 60-seat restaurant on Market Square, a lunch counter in an office tower, and a catering kitchen. Because of growing demand from corporate clients, we are opening a fourth outlet in the new Central Station hall in January and need a sous chef to help lead it.\n\nThe role\n- Run the station kitchen with a team of eight, including two apprentices\n- Develop a monthly menu theme with the head chef (recent themes: coastal Portugal, spring vegetables)\n- Incorporate the group's standard cooking methods and food safety rules into daily service\n- Order supplies and manage the budget\n\nWhat we are looking for\n- At least four years in a professional kitchen, two of them leading a team\n- A culinary diploma or equivalent experience\n- Someone accustomed to fast lunch service: the station hall is expected to draw 1,500 visitors an hour at peak times\n\nWe offer a salary of $52,000 to $58,000 and 25 days of paid leave.\n\nTo apply, send a resume and a one-page letter describing a dish you created to Ms. Farida Haddad, Human Resources, 41 Market Square, by November 15. Interviews, including a cooking test, will be held in early December.",
+      "questions": [
+        {
+          "prompt": "Why is Marigold Kitchens hiring a sous chef?",
+          "options": ["A chef is retiring", "It is opening a new outlet", "Its catering kitchen is expanding", "Its restaurant is moving"],
+          "answer": "B",
+          "explanation": "'we are opening a fourth outlet in the new Central Station hall in January and need a sous chef to help lead it'."
+        },
+        {
+          "prompt": "What will the sous chef do each month?",
+          "options": ["Hire new apprentices", "Plan a menu theme with the head chef", "Visit the three other outlets", "Review the training budget"],
+          "answer": "B",
+          "explanation": "Phần 'The role': 'Develop a monthly menu theme with the head chef'."
+        },
+        {
+          "prompt": "What is NOT mentioned as a requirement?",
+          "options": ["Four years of kitchen experience", "Experience leading a team", "A culinary diploma or equivalent", "Knowledge of Portuguese cooking"],
+          "answer": "D",
+          "explanation": "Portugal chỉ được nhắc đến như một chủ đề thực đơn gần đây, không phải yêu cầu. Ba mục còn lại đều nằm trong 'What we are looking for'."
+        },
+        {
+          "prompt": "What is indicated about the Central Station hall?",
+          "options": ["It will have 1,500 seats", "It is expected to be very busy at peak times", "It opens in November", "It will serve only breakfast"],
+          "answer": "B",
+          "explanation": "'the station hall is expected to draw 1,500 visitors an hour at peak times'; đó là số khách, không phải số chỗ ngồi."
+        },
+        {
+          "prompt": "What should applicants include with their resume?",
+          "options": ["A list of references", "A copy of their diploma", "A letter about a dish they created", "A sample menu"],
+          "answer": "C",
+          "explanation": "'send a resume and a one-page letter describing a dish you created'."
+        }
+      ]
+    }
+  }
+}

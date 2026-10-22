@@ -1,90 +1,83 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  blankCount,
   courseIssueLabel,
-  focusWordsFromText,
-  newFocus,
-  newLesson,
+  gapProblem,
+  keepSentenceExtras,
+  newIdea,
   newQuestion,
   newSection,
-  placementLevelCounts,
+  newTopicSegment,
+  newWord,
   sectionQuestionCount,
-  toggleClose,
-  withBlankAnswers,
   withCorrect,
-  withKind,
   withOption,
   workingCourse,
 } from './course-draft.js';
 
-test('a detail question completed with words heard keeps one answer per blank; so does Focus on (D109)', () => {
-  const sentence = withKind({ ...newQuestion(), prompt: 'Where are you ___ ___?' }, 'complete');
-  assert.deepEqual([sentence.kind, sentence.answers], ['complete', ['', '']]);
-  const filled = withBlankAnswers({ ...sentence, prompt: 'Where are you ___?', answers: ['from', 'now'] });
-  assert.deepEqual(filled.answers, ['from']);
-  // Back to a choice: the options stay, the answers go.
-  assert.deepEqual([withKind(filled, 'choice').answers, withKind(filled, 'choice').options.length], [[], 3]);
-  const focus = withBlankAnswers({ ...newFocus(), passage: "A: How's it ___?\nB: Not too ___, thanks." });
-  assert.deepEqual(focus.answers, ['', '']);
-  assert.deepEqual(focusWordsFromText(' going, well,, bad\nwell '), ['going', 'well', 'bad']);
-  assert.equal(courseIssueLabel('lessons[0].focus.answers'), 'Lesson 1 · Focus on · answers');
-  assert.equal(courseIssueLabel('lessons[1].detail[0].kind'), 'Lesson 2 · detail question 1 · kind');
+test('the editor starts from the draft, else the published version; a topic gets every part (D143, D147)', () => {
+  const topic = workingCourse({ item: { type: 'topic' }, draft: null, published: { content: { audioMediaId: 'a', segments: [{ id: 's1', text: 'Hi.', start: 0, end: 1 }], vocabulary: [newWord()] } } });
+  assert.equal(topic.audioMediaId, 'a');
+  assert.deepEqual(topic.segments, [{ id: 's1', speaker: '', text: 'Hi.', start: 0, end: 1, translation: '', gap: '' }]);
+  assert.equal(topic.vocabulary.length, 1);
+  assert.deepEqual([topic.questions, topic.ordering], [[], { enabled: false, prompt: '', items: [] }]);
+  const levelTest = workingCourse({ item: { type: 'level_test' }, draft: { content: { sections: [{ id: 'x', questions: [] }] } } });
+  assert.deepEqual(levelTest.sections, [{ id: 'x', audioMediaId: null, transcript: '', questions: [] }]);
+  assert.deepEqual(workingCourse({ item: { type: 'level_test' } }), { sections: [] });
+  assert.deepEqual(Object.keys(newSection()).sort(), ['audioMediaId', 'id', 'questions', 'transcript']);
+  assert.deepEqual(Object.keys(newWord()).sort(), ['audioMediaId', 'id', 'meaning', 'phonetic', 'word']);
+  assert.equal(newIdea().text, '');
 });
 
-test('a new lesson has a gist question and two detail questions of three options', () => {
-  const lesson = newLesson();
-  assert.equal(lesson.gist.skill, 'gist');
-  assert.deepEqual([lesson.detail.length, lesson.detail[0].options.length, lesson.closeSegmentIds], [2, 3, []]);
-  const question = withCorrect(newQuestion(), lesson.gist.options[0].id);
-  assert.deepEqual(
-    question.options.map((option) => option.isCorrect),
-    [false, false, false],
-  );
-  const chosen = withCorrect(question, question.options[1].id);
-  assert.deepEqual(
-    chosen.options.map((option) => option.isCorrect),
-    [false, true, false],
-  );
-  // At most four options.
-  assert.equal(withOption(withOption(withOption(chosen))).options.length, 4);
-});
-
-test('sentences to write down are chosen up to six', () => {
-  let lesson = newLesson();
-  for (const id of ['a', 'b', 'c', 'd', 'e', 'f', 'g']) lesson = toggleClose(lesson, id);
-  assert.deepEqual(lesson.closeSegmentIds, ['a', 'b', 'c', 'd', 'e', 'f']);
-  assert.deepEqual(toggleClose(lesson, 'b').closeSegmentIds, ['a', 'c', 'd', 'e', 'f']);
-});
-
-test('the editor starts from the draft and names publish issues', () => {
-  assert.deepEqual(workingCourse({ item: { type: 'unit' }, draft: null, published: null }), { lessons: [], check: { sections: [] } });
-  assert.deepEqual(workingCourse({ item: { type: 'level_test' }, draft: { content: { sections: [{ id: 's' }] } } }), { sections: [{ id: 's' }] });
+test('questions: one right option, at most four options', () => {
+  const question = newQuestion();
+  const right = withCorrect(question, question.options[1].id);
+  assert.deepEqual(right.options.map((option) => option.isCorrect), [false, true, false]);
+  const four = withOption(question);
+  assert.equal(four.options.length, 4);
+  assert.equal(withOption(four).options.length, 4);
   assert.equal(sectionQuestionCount([{ questions: [1, 2] }, { questions: [3] }]), 3);
-  assert.equal(courseIssueLabel('lessons[1].detail[0].options'), 'Lesson 2 · detail question 1 · options');
-  assert.equal(courseIssueLabel('lessons[0].gist.prompt'), 'Lesson 1 · gist question · question');
-  assert.equal(courseIssueLabel('check.sections[1].questions[2].options'), 'Unit check · Recording 2 · question 3 · options');
-  assert.equal(courseIssueLabel('lessons[2].closeSegmentIds'), 'Lesson 3 · sentences to write down');
-  assert.equal(courseIssueLabel('check.sections'), 'Unit check');
-  assert.equal(courseIssueLabel('sections'), 'Level test');
 });
 
-test('the placement: recordings with their level, questions counted by level', () => {
-  assert.deepEqual(workingCourse({ item: { type: 'placement' }, draft: null, published: { content: { sections: [{ id: 's', level: 'B1' }] } } }), {
-    sections: [{ id: 's', level: 'B1' }],
-  });
-  assert.equal(newSection(null).level, null);
-  assert.equal('level' in newSection(), false);
-  const counts = placementLevelCounts([
-    { level: 'A1', questions: [1, 2] },
-    { level: 'A1', questions: [3] },
-    { level: null, questions: [4] },
-    { level: 'C1', questions: [5] },
-  ]);
-  assert.deepEqual(
-    counts.map((entry) => entry.count),
-    [3, 0, 0, 0, 1],
-  );
-  assert.equal(courseIssueLabel('sections', 'placement'), 'Placement');
+test('replaced sentences keep their translation and blanks by id, or by place when the words are the same', () => {
+  const previous = [
+    newTopicSegment({ id: 's1', text: 'Hello there.', translation: 'Xin chào.', gap: 'Hello [there].' }),
+    newTopicSegment({ id: 's2', text: 'Nice to meet you.', translation: 'Rất vui.', gap: '' }),
+  ];
+  // Pasted again: new ids, the first sentence unchanged, the second corrected.
+  const pasted = [
+    { id: 'p1', speaker: '', text: 'Hello  there.', start: null, end: null },
+    { id: 'p2', speaker: '', text: 'Nice to see you.', start: null, end: null },
+  ];
+  const kept = keepSentenceExtras(previous, pasted);
+  assert.deepEqual(kept.map((segment) => [segment.id, segment.translation, segment.gap]), [['p1', 'Xin chào.', 'Hello [there].'], ['p2', '', '']]);
+  // Times found by Auto-time keep everything (same objects, same ids).
+  const timed = keepSentenceExtras(previous, previous.map((segment) => ({ ...segment, start: 1 })));
+  assert.equal(timed[0].translation, 'Xin chào.');
+  assert.equal(blankCount([{ gap: 'a [b] c [d]' }, { gap: '' }, { gap: '[x]' }]), 3);
+});
+
+test('blanks must mark words and keep the sentence', () => {
+  assert.equal(gapProblem('', 'Hello there.'), '');
+  assert.equal(gapProblem('Hello [there].', 'Hello there.'), '');
+  assert.equal(gapProblem('Hello  [there] .', 'Hello there .'), '');
+  assert.match(gapProblem('Hello there.', 'Hello there.'), /brackets/);
+  assert.match(gapProblem('Hello [here].', 'Hello there.'), /Keep the words/);
+});
+
+test('publish issues read as places in the editor', () => {
+  assert.equal(courseIssueLabel('vocabulary[1].phonetic'), 'Word 2 · IPA');
+  assert.equal(courseIssueLabel('vocabulary[0].audioMediaId'), 'Word 1 · pronunciation');
+  assert.equal(courseIssueLabel('questions[2].options'), 'Question 3 · options');
+  assert.equal(courseIssueLabel('segments[0].translation'), 'Sentence 1 · translation');
+  assert.equal(courseIssueLabel('segments[3].gap'), 'Sentence 4 · blanks');
+  assert.equal(courseIssueLabel('segments[1].start'), 'Sentence 2 · times');
+  assert.equal(courseIssueLabel('sections[0].audioMediaId'), 'Recording 1 · audio file');
+  assert.equal(courseIssueLabel('sections[0].transcript'), 'Recording 1 · transcript');
+  assert.equal(courseIssueLabel('ordering.items'), 'Ordering · ideas');
+  assert.equal(courseIssueLabel('sections[1].questions[0].prompt'), 'Recording 2 · question 1 · question');
+  assert.equal(courseIssueLabel('audioMediaId'), 'Recording');
+  assert.equal(courseIssueLabel('segments'), 'Sentences');
   assert.equal(courseIssueLabel('sections'), 'Level test');
-  assert.equal(courseIssueLabel('sections[1].level', 'placement'), 'Recording 2 · level');
 });

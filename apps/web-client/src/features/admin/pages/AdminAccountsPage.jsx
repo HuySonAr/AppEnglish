@@ -1,69 +1,235 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight, Users } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { AccountRole, AccountStatus, AdminAccountSort } from '@appenglish/auth-contracts';
+import { CheckCircle2, ChevronDown, Clock3, Eye, KeyRound, Lock, LogOut, MailPlus, MoreHorizontal, PauseCircle, RotateCcw, ShieldCheck, UserPlus, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { AccountRole, AccountStatus, AdminAccountAction, AdminAccountSort, displayNameOf } from '@appenglish/auth-contracts';
 import { RoleLabels } from '../../../constants/auth.js';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { cn } from '../../../lib/utils.js';
-import { Button, Skeleton, Switch } from '../../../components/ui';
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Skeleton,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../../components/ui';
 import { Avatar } from '../../../components/shared/Avatar.jsx';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
 import { FilterSelect, SearchField } from '../../../components/shared/ListFilter.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { Pagination } from '../../../components/shared/Pagination.jsx';
-import { getAdminAccountStats, listAdminAccounts } from '../../auth/api/auth-api.js';
-import { AccountStats, AccountStatsSkeleton } from '../components/AccountStats.jsx';
-import { RoleBadge, StatusBadge } from '../components/AccountBadges.jsx';
-import { sortOptions, statusLabels, timeAgo } from '../lib/accounts.js';
+import { useListState } from '../../../hooks/use-list-state.js';
+import { useAuth } from '../../auth/context/AuthContext.jsx';
+import { listAdminAccounts } from '../../auth/api/auth-api.js';
+import { AccountActionDialog, actionCopy } from '../components/AccountActionDialog.jsx';
+import { AccountStatusDialog } from '../components/AccountStatusDialog.jsx';
+import { InviteAccountDialog } from '../components/InviteAccountDialog.jsx';
+import { availableActions, isInvitedPending, sortOptions, statusChoices, statusLabels, timeAgo } from '../lib/accounts.js';
 
-const PAGE_SIZE = 20;
-const initialFilters = { search: '', role: '', status: '', stale: false, sort: AdminAccountSort.NEWEST, page: 1 };
+// Search, filters, sort, page and rows per page live in the URL (D130).
+const defaults = { search: '', role: '', status: '', stale: false, sort: AdminAccountSort.NEWEST, pageSize: '20' };
+
+// How each status looks in its pill (D131): colour, icon and label together,
+// never colour alone.
+const statusLook = {
+  [AccountStatus.ACTIVE]: { icon: CheckCircle2, className: 'bg-success/15 text-success hover:bg-success/25' },
+  [AccountStatus.PENDING_VERIFICATION]: { icon: Clock3, className: 'bg-info/15 text-info hover:bg-info/25' },
+  [AccountStatus.SUSPENDED]: { icon: PauseCircle, className: 'bg-warning/15 text-warning hover:bg-warning/25' },
+  [AccountStatus.DISABLED]: { icon: Lock, className: 'bg-destructive/15 text-destructive hover:bg-destructive/25' },
+};
+
+const actionIcons = {
+  [AdminAccountAction.REVOKE_SESSIONS]: LogOut,
+  [AdminAccountAction.SEND_PASSWORD_RESET]: KeyRound,
+  [AdminAccountAction.RESEND_VERIFICATION]: MailPlus,
+  [AdminAccountAction.RESEND_INVITE]: MailPlus,
+  [AdminAccountAction.ACTIVATE]: ShieldCheck,
+  [AdminAccountAction.RESET_PLACEMENT]: RotateCcw,
+};
+
+const columns = 'grid-cols-[minmax(14rem,1fr)_10rem_11rem_8rem_8rem_5.5rem]';
 
 function RowsSkeleton() {
   return (
-    <ul className="divide-y">
-      {[...Array(6)].map((_, index) => (
-        <li key={index} className="flex items-center gap-3 px-4 py-3">
-          <Skeleton className="h-10 w-10 rounded-full" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-3 w-64" />
+    <div className="divide-y">
+      {[...Array(8)].map((_, index) => (
+        <div key={index} className={cn('grid items-center gap-3 px-4 py-3', columns)}>
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-36" />
+              <Skeleton className="h-3 w-48" />
+            </div>
           </div>
-          <Skeleton className="hidden h-5 w-20 md:block" />
-          <Skeleton className="hidden h-5 w-24 md:block" />
-        </li>
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-7 w-28 rounded-full" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="ml-auto h-8 w-16" />
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }
 
-// Admin account management (F01B, D114): the numbers, then the list with
-// search, filters, sort and server paging; each row opens the account page.
-// Filters the dashboard links to: ?status=SUSPENDED, ?stale=true, ?role=…
-function filtersFromUrl(params) {
-  return {
-    ...initialFilters,
-    role: Object.values(AccountRole).includes(params.get('role')) ? params.get('role') : '',
-    status: Object.values(AccountStatus).includes(params.get('status')) ? params.get('status') : '',
-    stale: params.get('stale') === 'true',
-  };
+// The status pill: what the account is now, and where it can go (D131). A
+// pending account offers its way to Active: the code again, or activation.
+function StatusPill({ account, onStatus, onAction }) {
+  const look = statusLook[account.status] || statusLook[AccountStatus.ACTIVE];
+  const Icon = look.icon;
+  const invited = isInvitedPending(account);
+  const pending = account.status === AccountStatus.PENDING_VERIFICATION;
+  const choices = statusChoices(account);
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={cn('inline-flex h-7 max-w-full items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring', look.className)}
+          aria-label={`Status: ${statusLabels[account.status]}. Change`}
+        >
+          <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          <span className="truncate">{pending ? (invited ? 'Invited' : 'Pending') : statusLabels[account.status]}</span>
+          <ChevronDown className="h-3 w-3 shrink-0 opacity-70" aria-hidden="true" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-60">
+        <DropdownMenuLabel className="font-normal text-muted-foreground">
+          {pending ? (invited ? `Invited ${timeAgo(account.invitedAt)}, not accepted yet` : 'Registered, email not verified') : account.statusReason ? `“${account.statusReason}”` : statusLabels[account.status]}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {pending ? (
+          <>
+            <DropdownMenuItem onSelect={() => onAction(account, invited ? AdminAccountAction.RESEND_INVITE : AdminAccountAction.RESEND_VERIFICATION)}>
+              <MailPlus className="mr-2 h-4 w-4" />
+              {invited ? 'Resend the invitation' : 'Send a new code'}
+            </DropdownMenuItem>
+            {invited ? null : (
+              <DropdownMenuItem onSelect={() => onAction(account, AdminAccountAction.ACTIVATE)}>
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                Activate without the code…
+              </DropdownMenuItem>
+            )}
+          </>
+        ) : (
+          choices.map((status) => {
+            const Next = statusLook[status].icon;
+            return (
+              <DropdownMenuItem key={status} onSelect={() => onStatus(account, status)}>
+                <Next className="mr-2 h-4 w-4" />
+                {status === AccountStatus.ACTIVE ? 'Restore to Active' : `${statusLabels[status]}…`}
+              </DropdownMenuItem>
+            );
+          })
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
-export function AdminAccountsPage() {
-  const [searchParams] = useSearchParams();
-  const [filters, setFilters] = useState(() => filtersFromUrl(searchParams));
-  const [list, setList] = useState({ state: 'loading', items: [], pagination: null });
-  const [stats, setStats] = useState({ state: 'loading', data: null });
+function AccountRow({ account, isMe, onRole, onStatus, onAction }) {
+  const actions = availableActions(account);
+  return (
+    <TableRow className="group">
+      <TableCell className="min-w-[14rem]">
+        <div className="flex items-center gap-3">
+          <Avatar account={account} size="md" />
+          <div className="min-w-0">
+            <Link to={`/admin/accounts/${account.id}`} className="block truncate font-medium hover:underline focus-visible:outline-none focus-visible:underline">
+              {displayNameOf(account)}
+              {isMe ? <span className="ml-2 text-xs font-normal text-muted-foreground">you</span> : null}
+            </Link>
+            <p className="truncate text-xs text-muted-foreground">{account.email}</p>
+          </div>
+        </div>
+      </TableCell>
+      <TableCell>
+        <Select value={account.role} onValueChange={(role) => role !== account.role && onRole(account, role)} disabled={isMe}>
+          <SelectTrigger aria-label={`Role of ${account.email}`} className="h-8 w-36 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.values(AccountRole).map((role) => (
+              <SelectItem key={role} value={role}>
+                {RoleLabels[role]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </TableCell>
+      <TableCell>
+        <StatusPill account={account} onStatus={onStatus} onAction={onAction} />
+      </TableCell>
+      <TableCell className="hidden text-sm text-muted-foreground lg:table-cell" title={new Date(account.createdAt).toLocaleString()}>
+        {new Date(account.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+      </TableCell>
+      <TableCell className="hidden text-sm text-muted-foreground md:table-cell" title={account.lastLoginAt ? new Date(account.lastLoginAt).toLocaleString() : undefined}>
+        {account.lastLoginAt ? timeAgo(account.lastLoginAt) : 'Never'}
+      </TableCell>
+      <TableCell className="text-right">
+        <div className="inline-flex items-center gap-1">
+          <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+            <Link to={`/admin/accounts/${account.id}`} aria-label={`Open ${account.email}`}>
+              <Eye className="h-4 w-4" />
+            </Link>
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Actions for ${account.email}`}>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-60">
+              <DropdownMenuItem asChild>
+                <Link to={`/admin/accounts/${account.id}`}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  Open the account page
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {actions.map((action) => {
+                const Icon = actionIcons[action];
+                return (
+                  <DropdownMenuItem key={action} onSelect={() => onAction(account, action)}>
+                    <Icon className="mr-2 h-4 w-4" />
+                    {actionCopy[action].title}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
 
-  async function loadStats() {
-    setStats({ state: 'loading', data: null });
-    try {
-      setStats({ state: 'ready', data: (await getAdminAccountStats()).data });
-    } catch {
-      setStats({ state: 'error', data: null });
-    }
-  }
+// Admin account management (F01B, D114, D131): every account in one table
+// with search, filters, sort and server paging. Role and status change in the
+// row; the ⋯ menu holds the one-off actions; "Add account" invites someone.
+// The numbers and charts live on the admin dashboard (D115).
+export function AdminAccountsPage() {
+  const { account: me } = useAuth();
+  const { filters, setFilter, setFilters, page, setPage } = useListState(defaults);
+  const [list, setList] = useState({ state: 'loading', items: [], pagination: null });
+  // The open dialog: { kind: 'invite' } | { kind: 'status', account, preset } | { kind: 'action', account, action }.
+  const [dialog, setDialog] = useState(null);
+  const pageSize = Number(filters.pageSize) || 20;
 
   async function loadList() {
     setList((current) => ({ ...current, state: 'loading' }));
@@ -74,8 +240,8 @@ export function AdminAccountsPage() {
         status: filters.status,
         sort: filters.sort,
         stale: filters.stale ? 'true' : '',
-        page: filters.page,
-        pageSize: PAGE_SIZE,
+        page,
+        pageSize,
       });
       setList({ state: 'ready', items: result.data.items, pagination: result.data.pagination });
     } catch (error) {
@@ -85,31 +251,36 @@ export function AdminAccountsPage() {
   }
 
   useEffect(() => {
-    loadStats();
-  }, []);
-  useEffect(() => {
     loadList();
-  }, [filters.search, filters.role, filters.status, filters.stale, filters.sort, filters.page]);
+  }, [filters.search, filters.role, filters.status, filters.stale, filters.sort, page, pageSize]);
 
-  const setFilter = (key) => (value) => setFilters({ ...filters, [key]: value, page: 1 });
+  // A changed account replaces its row; nothing else moves.
+  const replaceRow = (account) => {
+    if (!account) return;
+    setList((current) => ({ ...current, items: current.items.map((item) => (item.id === account.id ? { ...item, ...account } : item)) }));
+  };
+  const close = (open) => !open && setDialog(null);
   const filtered = filters.search || filters.role || filters.status || filters.stale;
+  const total = list.pagination?.total;
 
   return (
     <section className="space-y-6">
-      <PageHeader eyebrow="Admin" title="Accounts" description="Who uses AppEnglish: numbers, the full list, and each account's page with its history and actions." />
-
-      {stats.state === 'loading' ? (
-        <AccountStatsSkeleton />
-      ) : stats.state === 'error' ? (
-        <div className="flex items-center justify-between gap-3 rounded-xl border bg-card p-4 text-sm shadow-sm">
-          <span className="text-muted-foreground">The statistics could not be loaded.</span>
-          <Button variant="outline" size="sm" onClick={loadStats}>
-            Try again
+      <PageHeader
+        eyebrow="Admin"
+        title={
+          <>
+            Accounts
+            {total !== undefined ? <span className="ml-2 text-xl font-normal text-muted-foreground">({total})</span> : null}
+          </>
+        }
+        description="Everyone who uses AppEnglish. Change a role or status in the row, open ⋯ for the other actions, or invite someone new."
+        actions={
+          <Button onClick={() => setDialog({ kind: 'invite' })}>
+            <UserPlus className="h-4 w-4" />
+            Add account
           </Button>
-        </div>
-      ) : (
-        <AccountStats stats={stats.data} />
-      )}
+        }
+      />
 
       <div className="space-y-3">
         <div className="flex flex-col gap-3 rounded-xl border bg-card p-3 shadow-sm lg:flex-row lg:items-center">
@@ -130,19 +301,12 @@ export function AdminAccountsPage() {
           />
           <FilterSelect label="Sort" value={filters.sort} onChange={setFilter('sort')} options={sortOptions} className="w-full lg:w-40" />
           <label className="flex h-10 items-center gap-2 rounded-md border px-3 text-sm lg:ml-auto">
-            <Switch checked={filters.stale} onCheckedChange={setFilter('stale')} aria-label="Only stale sign-ups" />
-            <span className="whitespace-nowrap">Stale sign-ups only</span>
+            <Switch checked={filters.stale} onCheckedChange={setFilter('stale')} aria-label="Only pending for over a week" />
+            <span className="whitespace-nowrap">Pending over a week</span>
           </label>
         </div>
 
         <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-          <div className="hidden grid-cols-[1fr_9rem_9rem_8rem_2rem] gap-3 border-b bg-muted/40 px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground md:grid">
-            <span>Account</span>
-            <span>Role</span>
-            <span>Status</span>
-            <span>Last sign-in</span>
-            <span />
-          </div>
           {list.state === 'loading' ? (
             <RowsSkeleton />
           ) : list.state === 'error' ? (
@@ -156,47 +320,56 @@ export function AdminAccountsPage() {
               <EmptyState
                 icon={Users}
                 title={filtered ? 'No account matches' : 'No accounts yet'}
-                description={filtered ? 'Try another search or filter.' : 'Accounts appear here as people register.'}
-                action={filtered ? <Button variant="outline" onClick={() => setFilters(initialFilters)}>Clear filters</Button> : null}
+                description={filtered ? 'Try another search or filter.' : 'Accounts appear here as people register or are invited.'}
+                action={filtered ? <Button variant="outline" onClick={() => setFilters({ ...defaults, pageSize: filters.pageSize })}>Clear filters</Button> : null}
               />
             </div>
           ) : (
-            <ul className="divide-y">
-              {list.items.map((account) => (
-                <li key={account.id}>
-                  <Link
-                    to={`/admin/accounts/${account.id}`}
-                    className={cn(
-                      'grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
-                      'md:grid-cols-[1fr_9rem_9rem_8rem_2rem]',
-                    )}
-                  >
-                    <span className="flex min-w-0 items-center gap-3 md:col-span-1">
-                      <Avatar account={account} size="md" />
-                      <span className="min-w-0">
-                        <span className="block truncate font-medium">{account.displayName || account.email.split('@')[0]}</span>
-                        <span className="block truncate text-xs text-muted-foreground">{account.email}</span>
-                      </span>
-                    </span>
-                    <span className="flex flex-wrap items-center gap-1.5 md:contents">
-                      <RoleBadge role={account.role} />
-                      <StatusBadge status={account.status} />
-                      <span className="hidden text-sm text-muted-foreground md:block" title={account.lastLoginAt ? new Date(account.lastLoginAt).toLocaleString() : undefined}>
-                        {account.lastLoginAt ? timeAgo(account.lastLoginAt) : 'Never'}
-                      </span>
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/40 hover:bg-muted/40">
+                    <TableHead>Account</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="hidden lg:table-cell">Joined</TableHead>
+                    <TableHead className="hidden md:table-cell">Last sign-in</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {list.items.map((account) => (
+                    <AccountRow
+                      key={account.id}
+                      account={account}
+                      isMe={me?.id === account.id}
+                      onRole={(target, role) => setDialog({ kind: 'status', account: target, preset: { role } })}
+                      onStatus={(target, status) => setDialog({ kind: 'status', account: target, preset: { status } })}
+                      onAction={(target, action) => setDialog({ kind: 'action', account: target, action })}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </div>
 
         {list.pagination ? (
-          <Pagination page={list.pagination.page} pageCount={list.pagination.totalPages} total={list.pagination.total} noun="account" onChange={(page) => setFilters({ ...filters, page })} />
+          <Pagination
+            page={list.pagination.page}
+            pageCount={list.pagination.totalPages}
+            total={list.pagination.total}
+            noun="account"
+            onChange={setPage}
+            pageSize={pageSize}
+            onPageSizeChange={(size) => setFilter('pageSize')(String(size))}
+          />
         ) : null}
       </div>
+
+      <InviteAccountDialog open={dialog?.kind === 'invite'} onOpenChange={close} onInvited={loadList} />
+      <AccountStatusDialog account={dialog?.kind === 'status' ? dialog.account : null} preset={dialog?.kind === 'status' ? dialog.preset : null} open={dialog?.kind === 'status'} onOpenChange={close} onSaved={replaceRow} />
+      <AccountActionDialog account={dialog?.kind === 'action' ? dialog.account : null} action={dialog?.kind === 'action' ? dialog.action : null} onOpenChange={close} onDone={replaceRow} />
     </section>
   );
 }

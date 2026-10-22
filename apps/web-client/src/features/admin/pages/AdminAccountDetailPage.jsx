@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, BookOpen, CalendarDays, Headphones, History, KeyRound, LogOut, Mail, MonitorSmartphone, Shield, Trash2, Trophy, UserCog, UserRoundX } from 'lucide-react';
+import { ArrowLeft, BookOpen, CalendarDays, Headphones, History, KeyRound, LogOut, Mail, MailPlus, MonitorSmartphone, RotateCcw, Shield, ShieldCheck, Trash2, Trophy, UserCog, UserRoundX } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { AccountRole, AccountStatus, AdminAccountAction, displayNameOf } from '@appenglish/auth-contracts';
 import { RoleLabels } from '../../../constants/auth.js';
@@ -17,7 +17,7 @@ import { getLearnerSummary } from '../api/learner-api.js';
 import { RoleBadge, StatusBadge } from '../components/AccountBadges.jsx';
 import { AccountActionDialog } from '../components/AccountActionDialog.jsx';
 import { AccountStatusDialog } from '../components/AccountStatusDialog.jsx';
-import { auditDescription, statusLabels, timeAgo } from '../lib/accounts.js';
+import { auditDescription, isInvitedPending, statusLabels, timeAgo } from '../lib/accounts.js';
 
 const dateTime = (iso) => (iso ? new Date(iso).toLocaleString() : '—');
 const date = (iso) => (iso ? new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) : '—');
@@ -49,8 +49,9 @@ function Metric({ icon: Icon, label, value, detail }) {
   );
 }
 
-// A learner's progress and XP, read-only (D114); the admin never acts on it.
-function LearnerSummary({ accountId }) {
+// A learner's progress and XP, read-only (D114); the one thing the admin can
+// do is let the learner take the placement test again (D131).
+function LearnerSummary({ accountId, onResetPlacement }) {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
   useEffect(() => {
@@ -85,6 +86,13 @@ function LearnerSummary({ accountId }) {
             <Metric icon={BookOpen} label="Reading" value={data.progress.skills.reading.percent === null ? 'No data' : `${data.progress.skills.reading.percent}%`} detail={`${data.progress.skills.reading.testCount} test${data.progress.skills.reading.testCount === 1 ? '' : 's'}`} />
           </div>
         )}
+        <div className="mt-4 flex flex-col gap-2 rounded-lg border px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">The placement test is taken once. Reset it to let the learner take or skip it again; lessons and results are kept.</p>
+          <Button variant="outline" size="sm" className="shrink-0 gap-2" onClick={onResetPlacement}>
+            <RotateCcw className="h-4 w-4" />
+            Reset placement
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
@@ -164,6 +172,7 @@ export function AdminAccountDetailPage() {
   const name = displayNameOf(account);
   const isMe = me?.id === account.id;
   const locked = account.status === AccountStatus.DISABLED || account.status === AccountStatus.SUSPENDED;
+  const invited = isInvitedPending(account);
   const refresh = () => load({ quiet: true });
 
   return (
@@ -179,10 +188,30 @@ export function AdminAccountDetailPage() {
               <UserCog className="h-4 w-4" />
               Role and status
             </Button>
-            <Button variant="outline" disabled={account.status !== AccountStatus.ACTIVE} onClick={() => setAction(AdminAccountAction.SEND_PASSWORD_RESET)}>
-              <KeyRound className="h-4 w-4" />
-              Send reset email
-            </Button>
+            {account.status === AccountStatus.ACTIVE ? (
+              <Button variant="outline" onClick={() => setAction(AdminAccountAction.SEND_PASSWORD_RESET)}>
+                <KeyRound className="h-4 w-4" />
+                Send reset email
+              </Button>
+            ) : null}
+            {invited ? (
+              <Button variant="outline" onClick={() => setAction(AdminAccountAction.RESEND_INVITE)}>
+                <MailPlus className="h-4 w-4" />
+                Resend invitation
+              </Button>
+            ) : null}
+            {account.status === AccountStatus.PENDING_VERIFICATION && !invited ? (
+              <>
+                <Button variant="outline" onClick={() => setAction(AdminAccountAction.RESEND_VERIFICATION)}>
+                  <MailPlus className="h-4 w-4" />
+                  Resend code
+                </Button>
+                <Button variant="outline" onClick={() => setAction(AdminAccountAction.ACTIVATE)}>
+                  <ShieldCheck className="h-4 w-4" />
+                  Activate
+                </Button>
+              </>
+            ) : null}
           </>
         }
       />
@@ -204,14 +233,18 @@ export function AdminAccountDetailPage() {
                     Reason shown at sign-in: <span className="font-medium text-foreground">“{account.statusReason}”</span>
                   </p>
                 ) : null}
-                {account.status === AccountStatus.PENDING_VERIFICATION ? <p className="text-sm text-muted-foreground">Has not verified the email yet. The person can request a new code from the sign-in page.</p> : null}
+                {invited ? (
+                  <p className="text-sm text-muted-foreground">Invited {timeAgo(account.invitedAt)}; has not accepted yet. The invitation code lasts 72 hours: send it again if it expired.</p>
+                ) : account.status === AccountStatus.PENDING_VERIFICATION ? (
+                  <p className="text-sm text-muted-foreground">Has not verified the email yet. The person can request a new code from the sign-in page; you can send one, or activate the account with a reason.</p>
+                ) : null}
               </div>
             </div>
           </div>
 
           <dl className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Fact icon={Mail} label="Email" value={account.email} />
-            <Fact icon={CalendarDays} label="Registered" value={date(account.createdAt)} hint={dateTime(account.createdAt)} />
+            <Fact icon={CalendarDays} label={account.invitedAt ? 'Invited' : 'Registered'} value={date(account.createdAt)} hint={dateTime(account.createdAt)} />
             <Fact icon={Shield} label="Email verified" value={account.emailVerifiedAt ? date(account.emailVerifiedAt) : 'Not yet'} hint={dateTime(account.emailVerifiedAt)} />
             <Fact icon={MonitorSmartphone} label="Last sign-in" value={account.lastLoginAt ? timeAgo(account.lastLoginAt) : 'Never'} hint={dateTime(account.lastLoginAt)} />
           </dl>
@@ -220,7 +253,7 @@ export function AdminAccountDetailPage() {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <div className="space-y-6">
-          {account.role === AccountRole.STUDENT ? <LearnerSummary accountId={account.id} /> : null}
+          {account.role === AccountRole.STUDENT ? <LearnerSummary accountId={account.id} onResetPlacement={() => setAction(AdminAccountAction.RESET_PLACEMENT)} /> : null}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">

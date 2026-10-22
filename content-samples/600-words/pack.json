@@ -1,0 +1,1025 @@
+{
+  "source": "Word lists and lesson titles follow Barron's 600 Essential Words for the TOEIC; every passage, example, test question and explanation is original AppEnglish content.",
+  "units": [
+    {
+      "title": "General Business",
+      "description": "Contracts, marketing, warranties, business planning and conferences.",
+      "review": "reviews/01-general-business.json",
+      "lessons": [
+        {
+          "number": 1,
+          "title": "Contracts",
+          "file": "lessons/01-contracts.json",
+          "words": [
+            "abide by",
+            "agreement",
+            "assurance",
+            "cancellation",
+            "determine",
+            "engage",
+            "establish",
+            "obligate",
+            "party",
+            "provision",
+            "resolve",
+            "specific"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Marketing",
+          "file": "lessons/02-marketing.json",
+          "words": [
+            "attract",
+            "compare",
+            "competition",
+            "consume",
+            "convince",
+            "currently",
+            "fad",
+            "inspiration",
+            "market",
+            "persuasion",
+            "productive",
+            "satisfaction"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Warranties",
+          "file": "lessons/03-warranties.json",
+          "words": [
+            "characteristic",
+            "consequence",
+            "consider",
+            "cover",
+            "expiration",
+            "frequently",
+            "imply",
+            "promise",
+            "protect",
+            "reputation",
+            "require",
+            "variety"
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Business Planning",
+          "file": "lessons/04-business-planning.json",
+          "words": [
+            "address",
+            "avoid",
+            "demonstrate",
+            "develop",
+            "evaluate",
+            "gather",
+            "offer",
+            "primarily",
+            "risk",
+            "strategy",
+            "strong",
+            "substitution"
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Conferences",
+          "file": "lessons/05-conferences.json",
+          "words": [
+            "accommodate",
+            "arrangement",
+            "association",
+            "attend",
+            "get in touch",
+            "hold",
+            "location",
+            "overcrowded",
+            "register",
+            "select",
+            "session",
+            "take part in"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Office Issues",
+      "description": "Computers, office technology, office procedures, electronics and correspondence.",
+      "review": "reviews/02-office-issues.json",
+      "lessons": [
+        {
+          "number": 6,
+          "title": "Computers",
+          "file": "lessons/06-computers.json",
+          "words": [
+            "access",
+            "allocate",
+            "compatible",
+            "delete",
+            "display",
+            "duplicate",
+            "fail",
+            "figure out",
+            "ignore",
+            "search",
+            "shut down",
+            "warning"
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Office Technology",
+          "file": "lessons/07-office-technology.json",
+          "words": [
+            "affordable",
+            "as needed",
+            "be in charge of",
+            "capacity",
+            "durable",
+            "initiative",
+            "physically",
+            "provider",
+            "recur",
+            "reduction",
+            "stay on top of",
+            "stock"
+          ]
+        },
+        {
+          "number": 8,
+          "title": "Office Procedures",
+          "file": "lessons/08-office-procedures.json",
+          "words": [
+            "appreciation",
+            "be made of",
+            "bring in",
+            "casually",
+            "code",
+            "glimpse",
+            "out of",
+            "outdated",
+            "practice",
+            "reinforce",
+            "verbally",
+            "verify"
+          ]
+        },
+        {
+          "number": 9,
+          "title": "Electronics",
+          "file": "lessons/09-electronics.json",
+          "words": [
+            "disk",
+            "facilitate",
+            "network",
+            "popularity",
+            "process",
+            "replace",
+            "revolution",
+            "sharp",
+            "skill",
+            "software",
+            "store",
+            "technically"
+          ]
+        },
+        {
+          "number": 10,
+          "title": "Correspondence",
+          "file": "lessons/10-correspondence.json",
+          "words": [
+            "assemble",
+            "beforehand",
+            "complication",
+            "courier",
+            "express",
+            "fold",
+            "layout",
+            "mention",
+            "petition",
+            "proof",
+            "register",
+            "revise"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Personnel",
+      "description": "Recruiting, applying and interviewing, hiring and training, salaries and benefits, promotions and awards.",
+      "review": "reviews/03-personnel.json",
+      "lessons": [
+        {
+          "number": 11,
+          "title": "Job Advertising and Recruiting",
+          "file": "lessons/11-job-advertising-and-recruiting.json",
+          "words": [
+            "abundant",
+            "accomplishment",
+            "bring together",
+            "candidate",
+            "come up with",
+            "commensurate",
+            "match",
+            "profile",
+            "qualifications",
+            "recruit",
+            "submit",
+            "time-consuming"
+          ]
+        },
+        {
+          "number": 12,
+          "title": "Applying and Interviewing",
+          "file": "lessons/12-applying-and-interviewing.json",
+          "words": [
+            "ability",
+            "apply",
+            "background",
+            "be ready for",
+            "call in",
+            "confidence",
+            "constantly",
+            "expert",
+            "follow up",
+            "hesitant",
+            "present",
+            "weakly"
+          ]
+        },
+        {
+          "number": 13,
+          "title": "Hiring and Training",
+          "file": "lessons/13-hiring-and-training.json",
+          "words": [
+            "conduct",
+            "generate",
+            "hire",
+            "keep up with",
+            "look up to",
+            "mentor",
+            "on track",
+            "reject",
+            "set up",
+            "success",
+            "training",
+            "update"
+          ]
+        },
+        {
+          "number": 14,
+          "title": "Salaries and Benefits",
+          "file": "lessons/14-salaries-and-benefits.json",
+          "words": [
+            "basis",
+            "be aware of",
+            "benefit",
+            "compensate",
+            "delicately",
+            "eligible",
+            "flexibly",
+            "negotiate",
+            "raise",
+            "retire",
+            "vested",
+            "wage"
+          ]
+        },
+        {
+          "number": 15,
+          "title": "Promotions, Pensions, and Awards",
+          "file": "lessons/15-promotions-pensions-and-awards.json",
+          "words": [
+            "achievement",
+            "contribute",
+            "dedication",
+            "look forward to",
+            "look to",
+            "loyal",
+            "merit",
+            "obviously",
+            "productive",
+            "promote",
+            "recognition",
+            "value"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Purchasing",
+      "description": "Shopping, ordering supplies, shipping, invoices and inventory.",
+      "review": "reviews/04-purchasing.json",
+      "lessons": [
+        {
+          "number": 16,
+          "title": "Shopping",
+          "file": "lessons/16-shopping.json",
+          "words": [
+            "bargain",
+            "bear",
+            "behavior",
+            "checkout",
+            "comfort",
+            "expand",
+            "explore",
+            "item",
+            "mandatory",
+            "merchandise",
+            "strictly",
+            "trend"
+          ]
+        },
+        {
+          "number": 17,
+          "title": "Ordering Supplies",
+          "file": "lessons/17-ordering-supplies.json",
+          "words": [
+            "diversify",
+            "enterprise",
+            "essentially",
+            "everyday",
+            "function",
+            "maintain",
+            "obtain",
+            "prerequisite",
+            "quality",
+            "smooth",
+            "source",
+            "stationery"
+          ]
+        },
+        {
+          "number": 18,
+          "title": "Shipping",
+          "file": "lessons/18-shipping.json",
+          "words": [
+            "accurately",
+            "carrier",
+            "catalog",
+            "fulfill",
+            "integral",
+            "inventory",
+            "minimize",
+            "on hand",
+            "remember",
+            "ship",
+            "sufficiently",
+            "supply"
+          ]
+        },
+        {
+          "number": 19,
+          "title": "Invoices",
+          "file": "lessons/19-invoices.json",
+          "words": [
+            "charge",
+            "compile",
+            "customer",
+            "discount",
+            "efficient",
+            "estimate",
+            "impose",
+            "mistake",
+            "promptly",
+            "rectify",
+            "reflect",
+            "terms"
+          ]
+        },
+        {
+          "number": 20,
+          "title": "Inventory",
+          "file": "lessons/20-inventory.json",
+          "words": [
+            "adjustment",
+            "automatically",
+            "crucial",
+            "discrepancy",
+            "disturb",
+            "liability",
+            "reflection",
+            "run",
+            "scan",
+            "subtract",
+            "tedious",
+            "verify"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Financing and Budgeting",
+      "description": "Banking, accounting, investments, taxes and financial statements.",
+      "review": "reviews/05-financing-and-budgeting.json",
+      "lessons": [
+        {
+          "number": 21,
+          "title": "Banking",
+          "file": "lessons/21-banking.json",
+          "words": [
+            "accept",
+            "balance",
+            "borrow",
+            "cautiously",
+            "deduct",
+            "dividend",
+            "down payment",
+            "mortgage",
+            "restricted",
+            "signature",
+            "take out",
+            "transaction"
+          ]
+        },
+        {
+          "number": 22,
+          "title": "Accounting",
+          "file": "lessons/22-accounting.json",
+          "words": [
+            "accounting",
+            "accumulate",
+            "asset",
+            "audit",
+            "budget",
+            "build up",
+            "client",
+            "debt",
+            "outstanding",
+            "profitably",
+            "reconcile",
+            "turnover"
+          ]
+        },
+        {
+          "number": 23,
+          "title": "Investments",
+          "file": "lessons/23-investments.json",
+          "words": [
+            "aggressively",
+            "attitude",
+            "commit",
+            "conservative",
+            "fund",
+            "invest",
+            "long-term",
+            "portfolio",
+            "pull out",
+            "resource",
+            "return",
+            "wisely"
+          ]
+        },
+        {
+          "number": 24,
+          "title": "Taxes",
+          "file": "lessons/24-taxes.json",
+          "words": [
+            "calculation",
+            "deadline",
+            "file",
+            "fill out",
+            "give up",
+            "joint",
+            "owe",
+            "penalty",
+            "preparation",
+            "refund",
+            "spouse",
+            "withhold"
+          ]
+        },
+        {
+          "number": 25,
+          "title": "Financial Statements",
+          "file": "lessons/25-financial-statements.json",
+          "words": [
+            "desire",
+            "detail",
+            "forecast",
+            "level",
+            "overall",
+            "perspective",
+            "project",
+            "realistic",
+            "target",
+            "translation",
+            "typically",
+            "yield"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Management Issues",
+      "description": "Property and departments, board meetings, quality control, product development, renting and leasing.",
+      "review": "reviews/06-management-issues.json",
+      "lessons": [
+        {
+          "number": 26,
+          "title": "Property and Departments",
+          "file": "lessons/26-property-and-departments.json",
+          "words": [
+            "adjacent",
+            "collaboration",
+            "concentrate",
+            "conducive",
+            "disruption",
+            "hamper",
+            "inconsiderately",
+            "lobby",
+            "move up",
+            "open to",
+            "opt",
+            "scrutiny"
+          ]
+        },
+        {
+          "number": 27,
+          "title": "Board Meetings and Committees",
+          "file": "lessons/27-board-meetings-and-committees.json",
+          "words": [
+            "adhere to",
+            "agenda",
+            "bring up",
+            "conclude",
+            "go ahead",
+            "goal",
+            "lengthy",
+            "matter",
+            "periodically",
+            "priority",
+            "progress",
+            "waste"
+          ]
+        },
+        {
+          "number": 28,
+          "title": "Quality Control",
+          "file": "lessons/28-quality-control.json",
+          "words": [
+            "brand",
+            "conform",
+            "defect",
+            "enhance",
+            "garment",
+            "inspect",
+            "perceptive",
+            "repel",
+            "take back",
+            "throw out",
+            "uniformly",
+            "wrinkle"
+          ]
+        },
+        {
+          "number": 29,
+          "title": "Product Development",
+          "file": "lessons/29-product-development.json",
+          "words": [
+            "anxious",
+            "ascertain",
+            "assume",
+            "decade",
+            "examine",
+            "experiment",
+            "logical",
+            "research",
+            "responsibility",
+            "solve",
+            "supervisor",
+            "systematically"
+          ]
+        },
+        {
+          "number": 30,
+          "title": "Renting and Leasing",
+          "file": "lessons/30-renting-and-leasing.json",
+          "words": [
+            "apprehensive",
+            "circumstance",
+            "condition",
+            "due to",
+            "fluctuate",
+            "get out of",
+            "indicator",
+            "lease",
+            "lock into",
+            "occupy",
+            "option",
+            "subject to"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Restaurants and Events",
+      "description": "Selecting a restaurant, eating out, ordering lunch, cooking as a career and events.",
+      "review": "reviews/07-restaurants-and-events.json",
+      "lessons": [
+        {
+          "number": 31,
+          "title": "Selecting a Restaurant",
+          "file": "lessons/31-selecting-a-restaurant.json",
+          "words": [
+            "appeal",
+            "arrive",
+            "compromise",
+            "daringly",
+            "familiar",
+            "guide",
+            "majority",
+            "mix",
+            "rely",
+            "secure",
+            "subjective",
+            "suggestion"
+          ]
+        },
+        {
+          "number": 32,
+          "title": "Eating Out",
+          "file": "lessons/32-eating-out.json",
+          "words": [
+            "basic",
+            "complete",
+            "excite",
+            "flavor",
+            "forget",
+            "ingredient",
+            "judge",
+            "mix-up",
+            "patron",
+            "predict",
+            "randomly",
+            "remind"
+          ]
+        },
+        {
+          "number": 33,
+          "title": "Ordering Lunch",
+          "file": "lessons/33-ordering-lunch.json",
+          "words": [
+            "burden",
+            "commonly",
+            "delivery",
+            "elegance",
+            "fall to",
+            "impress",
+            "individual",
+            "list",
+            "multiple",
+            "narrow",
+            "pick up",
+            "settle"
+          ]
+        },
+        {
+          "number": 34,
+          "title": "Cooking as a Career",
+          "file": "lessons/34-cooking-as-a-career.json",
+          "words": [
+            "accustom to",
+            "apprentice",
+            "culinary",
+            "demand",
+            "draw",
+            "incorporate",
+            "influx",
+            "method",
+            "outlet",
+            "profession",
+            "relinquish",
+            "theme"
+          ]
+        },
+        {
+          "number": 35,
+          "title": "Events",
+          "file": "lessons/35-events.json",
+          "words": [
+            "assist",
+            "coordinate",
+            "dimension",
+            "exact",
+            "general",
+            "ideally",
+            "lead time",
+            "plan",
+            "proximity",
+            "regulate",
+            "site",
+            "stage"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Travel",
+      "description": "General travel, airlines, trains, hotels and car rentals.",
+      "review": "reviews/08-travel.json",
+      "lessons": [
+        {
+          "number": 36,
+          "title": "General Travel",
+          "file": "lessons/36-general-travel.json",
+          "words": [
+            "agent",
+            "announcement",
+            "beverage",
+            "blanket",
+            "board",
+            "claim",
+            "delay",
+            "depart",
+            "embarkation",
+            "itinerary",
+            "prohibit",
+            "valid"
+          ]
+        },
+        {
+          "number": 37,
+          "title": "Airlines",
+          "file": "lessons/37-airlines.json",
+          "words": [
+            "deal with",
+            "destination",
+            "distinguish",
+            "economize",
+            "equivalent",
+            "excursion",
+            "expense",
+            "extend",
+            "prospective",
+            "situation",
+            "substantially",
+            "system"
+          ]
+        },
+        {
+          "number": 38,
+          "title": "Trains",
+          "file": "lessons/38-trains.json",
+          "words": [
+            "comprehensive",
+            "deluxe",
+            "directory",
+            "duration",
+            "entitle",
+            "fare",
+            "offset",
+            "operate",
+            "punctually",
+            "relatively",
+            "remainder",
+            "remote"
+          ]
+        },
+        {
+          "number": 39,
+          "title": "Hotels",
+          "file": "lessons/39-hotels.json",
+          "words": [
+            "advanced",
+            "chain",
+            "check in",
+            "confirm",
+            "expect",
+            "housekeeper",
+            "notify",
+            "preclude",
+            "quote",
+            "rate",
+            "reservation",
+            "service"
+          ]
+        },
+        {
+          "number": 40,
+          "title": "Car Rentals",
+          "file": "lessons/40-car-rentals.json",
+          "words": [
+            "busy",
+            "coincide",
+            "confusion",
+            "contact",
+            "disappoint",
+            "intend",
+            "license",
+            "nervously",
+            "optional",
+            "tempt",
+            "thrill",
+            "tier"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Entertainment",
+      "description": "Movies, theater, music, museums and media.",
+      "review": "reviews/09-entertainment.json",
+      "lessons": [
+        {
+          "number": 41,
+          "title": "Movies",
+          "file": "lessons/41-movies.json",
+          "words": [
+            "attainment",
+            "combine",
+            "continue",
+            "description",
+            "disperse",
+            "entertainment",
+            "influence",
+            "range",
+            "release",
+            "representation",
+            "separately",
+            "successive"
+          ]
+        },
+        {
+          "number": 42,
+          "title": "Theater",
+          "file": "lessons/42-theater.json",
+          "words": [
+            "action",
+            "approach",
+            "audience",
+            "creative",
+            "dialogue",
+            "element",
+            "experience",
+            "occur",
+            "perform",
+            "rehearse",
+            "review",
+            "sell out"
+          ]
+        },
+        {
+          "number": 43,
+          "title": "Music",
+          "file": "lessons/43-music.json",
+          "words": [
+            "available",
+            "broaden",
+            "category",
+            "disparate",
+            "divide",
+            "favor",
+            "instinct",
+            "prefer",
+            "reason",
+            "relaxation",
+            "taste",
+            "urge"
+          ]
+        },
+        {
+          "number": 44,
+          "title": "Museums",
+          "file": "lessons/44-museums.json",
+          "words": [
+            "acquire",
+            "admire",
+            "collection",
+            "criticism",
+            "express",
+            "fashion",
+            "leisure",
+            "respond",
+            "schedule",
+            "significant",
+            "specialize",
+            "spectrum"
+          ]
+        },
+        {
+          "number": 45,
+          "title": "Media",
+          "file": "lessons/45-media.json",
+          "words": [
+            "assignment",
+            "choose",
+            "constant",
+            "constitute",
+            "decision",
+            "disseminate",
+            "impact",
+            "in-depth",
+            "investigate",
+            "link",
+            "subscribe",
+            "thorough"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Health",
+      "description": "Doctor's office, dentist's office, health insurance, hospitals and pharmacy.",
+      "review": "reviews/10-health.json",
+      "lessons": [
+        {
+          "number": 46,
+          "title": "Doctor's Office",
+          "file": "lessons/46-doctors-office.json",
+          "words": [
+            "annually",
+            "appointment",
+            "assess",
+            "diagnose",
+            "effective",
+            "instrument",
+            "manage",
+            "prevent",
+            "recommendation",
+            "record",
+            "refer",
+            "serious"
+          ]
+        },
+        {
+          "number": 47,
+          "title": "Dentist's Office",
+          "file": "lessons/47-dentists-office.json",
+          "words": [
+            "aware",
+            "catch up",
+            "distraction",
+            "encouragement",
+            "evident",
+            "habit",
+            "illuminate",
+            "irritate",
+            "overview",
+            "position",
+            "regularly",
+            "restore"
+          ]
+        },
+        {
+          "number": 48,
+          "title": "Health Insurance",
+          "file": "lessons/48-health-insurance.json",
+          "words": [
+            "allow",
+            "alternative",
+            "aspect",
+            "concern",
+            "emphasize",
+            "incur",
+            "personnel",
+            "policy",
+            "portion",
+            "regardless",
+            "salary",
+            "suit"
+          ]
+        },
+        {
+          "number": 49,
+          "title": "Hospitals",
+          "file": "lessons/49-hospitals.json",
+          "words": [
+            "admit",
+            "authorize",
+            "designate",
+            "escort",
+            "identify",
+            "mission",
+            "permit",
+            "pertinent",
+            "procedure",
+            "result",
+            "statement",
+            "usually"
+          ]
+        },
+        {
+          "number": 50,
+          "title": "Pharmacy",
+          "file": "lessons/50-pharmacy.json",
+          "words": [
+            "consult",
+            "control",
+            "convenient",
+            "detect",
+            "factor",
+            "interaction",
+            "limit",
+            "monitor",
+            "potential",
+            "sample",
+            "sense",
+            "volunteer"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -117,6 +117,16 @@ export class PlacementService {
     return this.getPlacementSettings(actor);
   }
 
+  // An admin lets a learner take the placement again (D131): the single
+  // attempt is removed, so the lessons lock until the test is taken or
+  // skipped again and the starting unit is decided anew. Lesson progress and
+  // results are untouched. The gateway writes the audit row in auth-service.
+  async adminResetPlacement(actor, accountId) {
+    this.assertRole(actor, AccountRole.ADMIN);
+    const reset = await this.repository.deleteAttempt(accountId);
+    return { reset };
+  }
+
   // The stored attempt; one whose time ran out is completed first with the
   // answers saved so far.
   async currentAttempt(accountId) {

@@ -1,0 +1,260 @@
+{
+  "number": 50,
+  "title": "Pharmacy",
+  "vocabulary": [
+    {
+      "word": "consult",
+      "partOfSpeech": "verb",
+      "meaning": "hỏi ý kiến, tham khảo (chuyên gia, tài liệu)",
+      "example": "Always consult the pharmacist before taking two kinds of medicine at the same time.",
+      "exampleMeaning": "Hãy luôn hỏi ý kiến dược sĩ trước khi dùng hai loại thuốc cùng lúc."
+    },
+    {
+      "word": "control",
+      "partOfSpeech": "verb",
+      "meaning": "kiểm soát, khống chế (bệnh, tình hình)",
+      "example": "This tablet helps control blood pressure when taken every morning.",
+      "exampleMeaning": "Viên thuốc này giúp kiểm soát huyết áp khi uống mỗi sáng."
+    },
+    {
+      "word": "convenient",
+      "partOfSpeech": "adjective",
+      "meaning": "thuận tiện, tiện lợi",
+      "example": "The pharmacy's late opening hours are convenient for people who work until six.",
+      "exampleMeaning": "Giờ mở cửa muộn của hiệu thuốc rất thuận tiện cho những người làm việc đến sáu giờ."
+    },
+    {
+      "word": "detect",
+      "partOfSpeech": "verb",
+      "meaning": "phát hiện, dò ra",
+      "example": "The pharmacist detected an error in the dosage written on the prescription.",
+      "exampleMeaning": "Dược sĩ phát hiện một lỗi về liều lượng ghi trên đơn thuốc."
+    },
+    {
+      "word": "factor",
+      "partOfSpeech": "noun",
+      "meaning": "yếu tố, nhân tố",
+      "example": "Age and weight are two factors that decide the correct dose for a child.",
+      "exampleMeaning": "Tuổi và cân nặng là hai yếu tố quyết định liều đúng cho trẻ em."
+    },
+    {
+      "word": "interaction",
+      "partOfSpeech": "noun",
+      "meaning": "sự tương tác (giữa các loại thuốc); sự giao tiếp qua lại",
+      "example": "The label warns about a possible interaction between this medicine and grapefruit juice.",
+      "exampleMeaning": "Nhãn thuốc cảnh báo về khả năng tương tác giữa thuốc này và nước ép bưởi."
+    },
+    {
+      "word": "limit",
+      "partOfSpeech": "verb",
+      "meaning": "giới hạn, hạn chế",
+      "example": "Please limit the use of this spray to three times a day.",
+      "exampleMeaning": "Vui lòng hạn chế dùng loại xịt này ở mức ba lần mỗi ngày."
+    },
+    {
+      "word": "monitor",
+      "partOfSpeech": "verb",
+      "meaning": "theo dõi, giám sát (liên tục)",
+      "example": "Patients on this medicine should monitor their blood sugar twice a day.",
+      "exampleMeaning": "Bệnh nhân dùng thuốc này nên theo dõi đường huyết hai lần mỗi ngày."
+    },
+    {
+      "word": "potential",
+      "partOfSpeech": "adjective",
+      "meaning": "tiềm ẩn, có thể xảy ra",
+      "example": "The leaflet lists every potential side effect, even the very rare ones.",
+      "exampleMeaning": "Tờ hướng dẫn liệt kê mọi tác dụng phụ có thể xảy ra, kể cả những tác dụng rất hiếm."
+    },
+    {
+      "word": "sample",
+      "partOfSpeech": "noun",
+      "meaning": "mẫu, hàng mẫu (dùng thử)",
+      "example": "The sales representative left a few samples of the new vitamin for customers to try.",
+      "exampleMeaning": "Đại diện bán hàng để lại vài mẫu vitamin mới cho khách hàng dùng thử."
+    },
+    {
+      "word": "sense",
+      "partOfSpeech": "noun",
+      "meaning": "ý thức, cảm giác (về điều gì); giác quan",
+      "example": "A good pharmacist has a strong sense of when a customer needs more explanation.",
+      "exampleMeaning": "Một dược sĩ giỏi có cảm nhận tốt về lúc nào khách hàng cần được giải thích thêm."
+    },
+    {
+      "word": "volunteer",
+      "partOfSpeech": "verb",
+      "meaning": "tình nguyện, tự nguyện (làm gì)",
+      "example": "Two staff members volunteered to work on the holiday so the pharmacy could stay open.",
+      "exampleMeaning": "Hai nhân viên tình nguyện làm việc ngày lễ để hiệu thuốc có thể mở cửa."
+    }
+  ],
+  "fillIn": {
+    "passage": "Maple Corner Pharmacy opened a second counter last month, and the manager, Ms. Adeyemi, wants the service to be as ___ as possible for working customers. The counter stays open until nine in the evening, and two pharmacists ___ to work the late shift each week.\n\nThe pharmacists do more than hand out medicine. Before filling a new prescription, they check the customer's file to ___ any possible ___ between the new drug and medicines the customer already takes. Last Tuesday, a pharmacist noticed a ___ problem in an order for an older customer and called the doctor to ___ her before preparing it. Age, weight and other medical conditions are all ___ in how a medicine works, so the pharmacy keeps careful notes.\n\nCustomers with high blood pressure can use a small machine near the door to ___ their readings between doctor visits. The staff explain how a daily tablet helps ___ the condition and remind customers to ___ salty food. Suppliers sometimes leave a free ___ of a new product at the counter. Ms. Adeyemi says that a strong ___ of responsibility is the most important quality in this work.",
+    "answers": ["convenient", "volunteered", "detect", "interaction", "potential", "consult", "factors", "monitor", "control", "limit", "sample", "sense"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một dược sĩ nam mặc áo khoác trắng đứng sau quầy, đang đưa túi thuốc cho một khách hàng nữ.",
+      "options": [
+        "The pharmacist is handing a bag to the customer.",
+        "The customer is reading a newspaper.",
+        "The man is stacking boxes on a shelf.",
+        "The woman is paying at a cash machine."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy dược sĩ đưa túi thuốc cho khách. (B), (C) và (D) mô tả hành động hoặc đồ vật không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Where can I find the pharmacist on duty?",
+        "options": ["She's at the back counter.", "The duty fee is ten dollars.", "No, I haven't seen the doctor."],
+        "answer": "A",
+        "explanation": "Câu hỏi Where cần câu trả lời về nơi chốn. (B) nhầm 'duty' với thuế/phí, (C) trả lời No cho câu hỏi Wh."
+      },
+      {
+        "question": "Did you consult the doctor before changing the dose?",
+        "options": ["The office is quite convenient.", "Yes, I called her this morning.", "It's a sample of the new cream."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về việc đã hỏi ý kiến bác sĩ chưa; (B) trả lời Yes và nói cách đã liên hệ. (A) và (C) không trả lời câu hỏi."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Good evening. I'm here to pick up a prescription for Ana Costa.\nWoman: Let me check. Yes, it's ready. Before I hand it over, I need to ask: is the patient taking any other medicine at the moment?\nMan: It's for my mother, actually. She takes a tablet for blood pressure every morning.\nWoman: Thank you for telling me. There is a potential interaction between the two, so she should take this new one in the evening, at least eight hours apart.\nMan: I didn't know that. Should she do anything else?\nWoman: It would be a good idea to monitor her blood pressure for the first week and write down the readings. If they change a lot, she should consult her doctor.\nMan: All right. Can I buy a blood pressure monitor here?\nWoman: Yes, we have two models on aisle three. The smaller one is more convenient to carry and costs about forty dollars.",
+      "questions": [
+        {
+          "prompt": "Why is the man at the pharmacy?",
+          "options": ["To buy vitamins", "To collect medicine for his mother", "To ask about a job", "To return a product"],
+          "answer": "B",
+          "explanation": "Anh ấy đến lấy đơn thuốc cho Ana Costa và nói 'It's for my mother, actually'."
+        },
+        {
+          "prompt": "What does the woman advise?",
+          "options": ["Taking the two medicines at different times", "Stopping the morning tablet", "Visiting the doctor today", "Taking a smaller dose"],
+          "answer": "A",
+          "explanation": "Vì có thể có tương tác thuốc, cô ấy khuyên uống thuốc mới vào buổi tối, 'at least eight hours apart'."
+        },
+        {
+          "prompt": "What will the man most likely do next?",
+          "options": ["Call his mother's doctor", "Go to another pharmacy", "Look at blood pressure monitors", "Pay for the prescription online"],
+          "answer": "C",
+          "explanation": "Anh ấy hỏi 'Can I buy a blood pressure monitor here?' và được chỉ đến dãy số ba."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Attention, shoppers. This Saturday from ten to four, Riverside Pharmacy is holding its annual Community Health Day. Our pharmacists will offer free blood pressure and blood sugar checks, which can help detect problems early, before they become serious. You can also bring in all the medicines you take, including vitamins, and a pharmacist will review them for potential interactions and explain how each one works. No appointment is needed, and most checks take less than ten minutes. For your convenience, we have set up a waiting area with free coffee near the front entrance. Several local nurses have volunteered to answer general health questions during the event. Please note that we will limit the number of people in the screening area to ten at a time for safety, so there may be a short wait during the busiest hours. We look forward to seeing you on Saturday.",
+      "questions": [
+        {
+          "prompt": "What is the announcement mainly about?",
+          "options": ["A sale on vitamins", "A free health event", "New opening hours", "A change of location"],
+          "answer": "B",
+          "explanation": "Thông báo giới thiệu Community Health Day với các dịch vụ kiểm tra sức khỏe miễn phí vào thứ Bảy."
+        },
+        {
+          "prompt": "What can customers bring to the event?",
+          "options": ["Their insurance cards", "Old prescriptions to recycle", "The medicines they take", "Their medical records"],
+          "answer": "C",
+          "explanation": "'You can also bring in all the medicines you take, including vitamins, and a pharmacist will review them.'"
+        },
+        {
+          "prompt": "Why might customers have to wait?",
+          "options": ["The nurses arrive late", "Appointments are required", "Only ten people may enter the screening area at once", "The pharmacy closes early"],
+          "answer": "C",
+          "explanation": "'we will limit the number of people in the screening area to ten at a time', nên có thể phải chờ vào giờ đông."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Customers should _____ a pharmacist before taking this medicine with alcohol.",
+        "options": ["consult", "consultant", "consultation", "consulting"],
+        "answer": "A",
+        "explanation": "Sau 'should' cần động từ nguyên mẫu: 'consult' (hỏi ý kiến)."
+      },
+      {
+        "prompt": "The new system makes it more _____ for patients to refill their prescriptions online.",
+        "options": ["convenience", "convenient", "conveniently", "convene"],
+        "answer": "B",
+        "explanation": "Cấu trúc 'make it + tính từ + for someone to do' cần tính từ: 'convenient'."
+      },
+      {
+        "prompt": "Regular testing can _____ changes in blood sugar before symptoms appear.",
+        "options": ["detection", "detective", "detect", "detected"],
+        "answer": "C",
+        "explanation": "Sau 'can' cần động từ nguyên mẫu: 'detect' (phát hiện)."
+      },
+      {
+        "prompt": "Nurses will _____ the patient's heart rate during the first hour after the injection.",
+        "options": ["monitor", "monitored", "monitoring", "monitors"],
+        "answer": "A",
+        "explanation": "Sau 'will' cần động từ nguyên mẫu: 'monitor' (theo dõi)."
+      },
+      {
+        "prompt": "The label describes several _____ side effects of the new tablet.",
+        "options": ["potent", "potential", "potentially", "potentiality"],
+        "answer": "B",
+        "explanation": "Trước cụm danh từ 'side effects' cần tính từ: 'potential' (có thể xảy ra). 'potent' nghĩa là mạnh, không hợp nghĩa."
+      },
+      {
+        "prompt": "Stress is one _____ that can make a headache last longer.",
+        "options": ["fact", "factor", "factual", "factory"],
+        "answer": "B",
+        "explanation": "Sau 'one' cần danh từ chỉ yếu tố: 'factor'. 'fact' (sự thật) và 'factory' (nhà máy) không hợp nghĩa."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Pharmacy Staff\nFrom: Grace Lindell, Store Manager\nSubject: Free samples at the front counter\n\nStarting Monday, the supplier of our new hand cream will provide free ___ for customers. Please keep them in the drawer below the register, not on the counter, so that we can ___ the quantity given out each day. Each customer may take one, and we will ___ the offer to the first fifty customers per day. If a customer asks about ingredients, direct them to the printed leaflet beside the display. Thank you for your help with this promotion.",
+      "questions": [
+        {
+          "options": ["sample", "samples", "sampled", "sampling"],
+          "answer": "B",
+          "explanation": "Sau 'free' không có mạo từ và đại từ 'them' ở câu sau cho thấy cần danh từ số nhiều: 'samples'."
+        },
+        {
+          "options": ["control", "controller", "controlled", "controlling"],
+          "answer": "A",
+          "explanation": "Sau 'can' cần động từ nguyên mẫu: 'control' (kiểm soát số lượng)."
+        },
+        {
+          "options": ["limit", "limited", "limitation", "limiting"],
+          "answer": "A",
+          "explanation": "Sau 'will' cần động từ nguyên mẫu: 'limit ... to' (giới hạn ở mức)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "HILLTOP PHARMACY NEWSLETTER - Autumn Issue\nNew: Free Medication Review Service\n\nMany of our customers take three or more medicines every day, often prescribed by different doctors. Our new Medication Review Service helps you make sense of them all. In a private 20-minute meeting, a pharmacist will go through every medicine you take, check for possible interactions, and explain the best time of day to take each one. The pharmacist can also show you how to monitor conditions such as blood pressure at home and will contact your doctor if any problem is detected.\n\n| Day | Review hours |\n| Monday and Wednesday | 9:00 a.m. to 12:00 p.m. |\n| Thursday | 2:00 p.m. to 6:00 p.m. |\n| Saturday | 10:00 a.m. to 1:00 p.m. |\n\nReviews are free for customers over 60 and for anyone taking five or more medicines; others pay $15. Please book in advance at the counter or by phone, as we can see a limited number of customers each day. Bring all your medicines, including vitamins and anything you buy without a prescription.\n\nWe are also looking for retired nurses who would like to volunteer at our Saturday health talks. If you are interested, please ask for the store manager, Omar Haddad.",
+      "questions": [
+        {
+          "prompt": "What is the main purpose of the article?",
+          "options": ["To advertise a sale on vitamins", "To introduce a new service", "To announce new store hours", "To explain a price increase"],
+          "answer": "B",
+          "explanation": "Bài viết giới thiệu dịch vụ mới 'Medication Review Service' và cách đăng ký."
+        },
+        {
+          "prompt": "What will the pharmacist do during a review?",
+          "options": ["Prescribe new medicine", "Give a free blood test", "Check how the customer's medicines work together", "Deliver medicine to the customer's home"],
+          "answer": "C",
+          "explanation": "Dược sĩ sẽ 'go through every medicine you take, check for possible interactions', tức kiểm tra tương tác giữa các thuốc."
+        },
+        {
+          "prompt": "When are reviews available on Thursdays?",
+          "options": ["In the morning", "In the afternoon", "All day", "Thursdays are not available"],
+          "answer": "B",
+          "explanation": "Bảng ghi 'Thursday: 2:00 p.m. to 6:00 p.m.', tức buổi chiều."
+        },
+        {
+          "prompt": "Who must pay for a review?",
+          "options": ["Customers over 60", "People taking five or more medicines", "A customer under 60 who takes three medicines", "Retired nurses"],
+          "answer": "C",
+          "explanation": "Miễn phí cho khách trên 60 tuổi và người dùng từ năm loại thuốc trở lên; 'others pay $15', nên khách dưới 60 dùng ba loại thuốc phải trả phí."
+        },
+        {
+          "prompt": "Why should customers book in advance?",
+          "options": ["The service is only available on Saturdays", "The pharmacy can see only a limited number of people each day", "The pharmacist needs to contact their doctor first", "The fee must be paid before the visit"],
+          "answer": "B",
+          "explanation": "'Please book in advance ..., as we can see a limited number of customers each day.'"
+        }
+      ]
+    }
+  }
+}

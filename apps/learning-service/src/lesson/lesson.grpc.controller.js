@@ -60,6 +60,13 @@ const rpcs = {
     id: true,
     run: (service, { actor, id }) => service.getLessonRanking(actor, id),
   },
+  // Unit review (D121); id is the unit id.
+  GetUnitReview: { id: true, run: (service, { actor, id }) => service.getUnitReview(actor, id) },
+  SubmitUnitReview: {
+    id: true,
+    payload: answersSchema,
+    run: (service, { actor, id, payload }) => service.submitUnitReview(actor, id, payload),
+  },
 };
 
 function parseJson(text) {

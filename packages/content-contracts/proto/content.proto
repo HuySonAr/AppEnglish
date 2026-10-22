@@ -10,14 +10,31 @@ service ContentService {
   rpc CreateUnit(ContentRequest) returns (ContentReply);
   rpc UpdateUnit(ContentRequest) returns (ContentReply);
   rpc PublishUnit(ContentRequest) returns (ContentReply);
+  // Taking content away (D118): unpublish hides it from learners, delete removes it.
+  rpc UnpublishUnit(ContentRequest) returns (ContentReply);
+  rpc DeleteUnit(ContentRequest) returns (ContentReply);
+  // Unit review (D121): the 30-question Reading test that closes a unit,
+  // written and published by a Content Manager; id is the unit id.
+  rpc GetUnitReview(ContentRequest) returns (ContentReply);
+  rpc SaveUnitReviewDraft(ContentRequest) returns (ContentReply);
+  rpc PublishUnitReview(ContentRequest) returns (ContentReply);
+  rpc UnpublishUnitReview(ContentRequest) returns (ContentReply);
+  // Service-to-service only (learning-service): a unit's published review
+  // version with its answers. Takes no actor.
+  rpc GetUnitReviewPaper(ContentRequest) returns (ContentReply);
   rpc CreateLesson(ContentRequest) returns (ContentReply);
   rpc UpdateLesson(ContentRequest) returns (ContentReply);
   rpc GetLesson(ContentRequest) returns (ContentReply);
   rpc SaveLessonDraft(ContentRequest) returns (ContentReply);
   rpc PublishLesson(ContentRequest) returns (ContentReply);
+  rpc UnpublishLesson(ContentRequest) returns (ContentReply);
+  rpc DeleteLesson(ContentRequest) returns (ContentReply);
   rpc UploadMedia(UploadMediaRequest) returns (ContentReply);
   rpc AutofillPronunciation(ContentRequest) returns (ContentReply);
   rpc DeleteMedia(ContentRequest) returns (ContentReply);
+  // Files no saved version refers to (D118).
+  rpc ListOrphanMedia(ContentRequest) returns (ContentReply);
+  rpc DeleteOrphanMedia(ContentRequest) returns (ContentReply);
   // The single placement test (F03), edited and published by a Content Manager.
   rpc GetPlacement(ContentRequest) returns (ContentReply);
   rpc SavePlacementDraft(ContentRequest) returns (ContentReply);
@@ -40,6 +57,8 @@ service ContentService {
   rpc GetMockTest(ContentRequest) returns (ContentReply);
   rpc SaveMockTestDraft(ContentRequest) returns (ContentReply);
   rpc PublishMockTest(ContentRequest) returns (ContentReply);
+  rpc UnpublishMockTest(ContentRequest) returns (ContentReply);
+  rpc DeleteMockTest(ContentRequest) returns (ContentReply);
   // Service-to-service only (learning-service): published mock tests, and
   // one of them with its answers.
   rpc ListPublishedMockTests(ContentRequest) returns (ContentReply);
@@ -56,6 +75,8 @@ service ContentService {
   rpc GetListeningExercise(ContentRequest) returns (ContentReply);
   rpc SaveListeningExerciseDraft(ContentRequest) returns (ContentReply);
   rpc PublishListeningExercise(ContentRequest) returns (ContentReply);
+  rpc UnpublishListeningExercise(ContentRequest) returns (ContentReply);
+  rpc DeleteListeningExercise(ContentRequest) returns (ContentReply);
   // Service-to-service only (learning-service, F05B-3): the topics with the
   // published exercises, and one exercise's published version with its
   // transcript.
@@ -67,7 +88,7 @@ service ContentService {
   rpc GetListeningAutoTime(ContentRequest) returns (ContentReply);
   // Transcribe (D98): the lines and their times from the recording alone.
   rpc RequestListeningTranscribe(ContentRequest) returns (ContentReply);
-  // Listening course (F05C, D100): units and level tests of each CEFR level,
+  // Listening course (F05C, D143–D147): topics and level tests of each level,
   // written and published by a Content Manager.
   rpc ListListeningCourse(ContentRequest) returns (ContentReply);
   rpc CreateCourseItem(ContentRequest) returns (ContentReply);
@@ -75,10 +96,29 @@ service ContentService {
   rpc GetCourseItem(ContentRequest) returns (ContentReply);
   rpc SaveCourseItemDraft(ContentRequest) returns (ContentReply);
   rpc PublishCourseItem(ContentRequest) returns (ContentReply);
+  rpc UnpublishCourseItem(ContentRequest) returns (ContentReply);
+  rpc DeleteCourseItem(ContentRequest) returns (ContentReply);
+  // D147: a topic's own recording timed (Auto-time) or written (Transcribe)
+  // by speech-service, and the latest such job of the topic.
+  rpc RequestCourseAutoTime(ContentRequest) returns (ContentReply);
+  rpc RequestCourseTranscribe(ContentRequest) returns (ContentReply);
+  rpc GetCourseAutoTime(ContentRequest) returns (ContentReply);
   // Service-to-service only (learning-service): the published course, and one
   // published unit or level test with its answers and recordings.
   rpc ListPublishedCourse(ContentRequest) returns (ContentReply);
   rpc GetCoursePaper(ContentRequest) returns (ContentReply);
+  // Version history (D122): id is the owner (lesson, mock test, exercise,
+  // course item or unit), payload_json = { kind, versionId? } with kind in
+  // ContentVersionKind. Restoring copies a version into the draft.
+  rpc ListContentVersions(ContentRequest) returns (ContentReply);
+  rpc GetContentVersion(ContentRequest) returns (ContentReply);
+  rpc RestoreContentVersion(ContentRequest) returns (ContentReply);
+  // Throws the draft of the owner away with the files only it used (D127).
+  rpc DiscardContentDraft(ContentRequest) returns (ContentReply);
+  // Removes an old version (neither the draft nor the one learners get) with
+  // the files only it used (D128); the gateway refuses it first while any
+  // learner attempt refers to the version.
+  rpc DeleteContentVersion(ContentRequest) returns (ContentReply);
 }
 
 // The authenticated account as verified by auth-service.

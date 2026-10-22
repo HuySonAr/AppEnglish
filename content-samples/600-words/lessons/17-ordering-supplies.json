@@ -1,0 +1,260 @@
+{
+  "number": 17,
+  "title": "Ordering Supplies",
+  "vocabulary": [
+    {
+      "word": "diversify",
+      "partOfSpeech": "verb",
+      "meaning": "đa dạng hóa (sản phẩm, nhà cung cấp, nguồn thu)",
+      "example": "To avoid shortages, the purchasing team decided to diversify its list of paper suppliers.",
+      "exampleMeaning": "Để tránh thiếu hàng, nhóm mua hàng quyết định đa dạng hóa danh sách nhà cung cấp giấy."
+    },
+    {
+      "word": "enterprise",
+      "partOfSpeech": "noun",
+      "meaning": "doanh nghiệp, công ty; dự án kinh doanh",
+      "example": "A small enterprise with ten employees still needs a clear system for ordering supplies.",
+      "exampleMeaning": "Một doanh nghiệp nhỏ với mười nhân viên vẫn cần một hệ thống rõ ràng để đặt vật tư."
+    },
+    {
+      "word": "essentially",
+      "partOfSpeech": "adverb",
+      "meaning": "về cơ bản, thực chất là",
+      "example": "The two printer models are essentially the same, but one uses cheaper ink.",
+      "exampleMeaning": "Hai mẫu máy in về cơ bản giống nhau, nhưng một mẫu dùng mực rẻ hơn."
+    },
+    {
+      "word": "everyday",
+      "partOfSpeech": "adjective",
+      "meaning": "hằng ngày, thường ngày, thông thường",
+      "example": "Pens, folders and toner are everyday items that we reorder every month.",
+      "exampleMeaning": "Bút, bìa hồ sơ và mực in là những vật dụng hằng ngày mà chúng tôi đặt lại mỗi tháng."
+    },
+    {
+      "word": "function",
+      "partOfSpeech": "verb",
+      "meaning": "hoạt động, vận hành; (danh từ) chức năng, công dụng",
+      "example": "The new copier will not function properly unless the correct paper size is loaded.",
+      "exampleMeaning": "Máy photocopy mới sẽ không hoạt động đúng nếu không nạp đúng khổ giấy."
+    },
+    {
+      "word": "maintain",
+      "partOfSpeech": "verb",
+      "meaning": "duy trì, giữ vững; bảo dưỡng",
+      "example": "We maintain a two-week stock of printer paper so that no department runs out.",
+      "exampleMeaning": "Chúng tôi duy trì lượng giấy in đủ dùng hai tuần để không phòng ban nào bị hết."
+    },
+    {
+      "word": "obtain",
+      "partOfSpeech": "verb",
+      "meaning": "có được, nhận được, lấy được",
+      "example": "Staff must obtain approval from their manager before ordering anything over fifty dollars.",
+      "exampleMeaning": "Nhân viên phải có được sự chấp thuận của quản lý trước khi đặt mua bất kỳ thứ gì trên năm mươi đô la."
+    },
+    {
+      "word": "prerequisite",
+      "partOfSpeech": "noun",
+      "meaning": "điều kiện tiên quyết, yêu cầu phải có trước",
+      "example": "A signed purchase request is a prerequisite for any order placed with a new vendor.",
+      "exampleMeaning": "Phiếu yêu cầu mua đã ký là điều kiện tiên quyết cho mọi đơn hàng đặt với nhà cung cấp mới."
+    },
+    {
+      "word": "quality",
+      "partOfSpeech": "noun",
+      "meaning": "chất lượng; phẩm chất",
+      "example": "The quality of the envelopes dropped after the supplier changed its paper mill.",
+      "exampleMeaning": "Chất lượng phong bì đã giảm sau khi nhà cung cấp đổi nhà máy giấy."
+    },
+    {
+      "word": "smooth",
+      "partOfSpeech": "adjective",
+      "meaning": "trôi chảy, suôn sẻ; nhẵn, mịn",
+      "example": "Ordering online has made the whole process smooth and much faster for the office.",
+      "exampleMeaning": "Đặt hàng trực tuyến đã giúp cả quy trình trở nên suôn sẻ và nhanh hơn nhiều cho văn phòng."
+    },
+    {
+      "word": "source",
+      "partOfSpeech": "noun",
+      "meaning": "nguồn (cung cấp, thông tin); (động từ) tìm nguồn hàng",
+      "example": "The purchasing manager found a cheaper source of recycled paper in the next town.",
+      "exampleMeaning": "Trưởng phòng mua hàng đã tìm được một nguồn giấy tái chế rẻ hơn ở thị trấn kế bên."
+    },
+    {
+      "word": "stationery",
+      "partOfSpeech": "noun",
+      "meaning": "văn phòng phẩm (giấy, bút, phong bì)",
+      "example": "Please order the stationery for the branch office before the end of the month.",
+      "exampleMeaning": "Vui lòng đặt văn phòng phẩm cho văn phòng chi nhánh trước cuối tháng."
+    }
+  ],
+  "fillIn": {
+    "passage": "When Tomasz Bielski became office coordinator at Kestrel Design Studio, he found that the ___ cupboard was almost empty and nobody knew who had placed the last order. The studio is a small ___ with twenty staff, but it uses a surprising amount of paper, ink and ___ supplies such as tape and envelopes.\n\nTomasz began by listing what each team needed to ___ well, and then he contacted three suppliers to compare prices and ___. He learned that two of them were ___ the same company trading under different names, so he looked for an independent ___ of recycled paper to ___ the list and reduce the risk of shortages. He also wrote a simple rule: a signed request form is a ___ for any purchase over one hundred dollars, and staff must ___ a quote first.\n\nSix months later, the process is ___ and quick. The studio ___ a stock of common items for two weeks, orders arrive on Fridays, and nobody has run out of paper since Tomasz took over.",
+    "answers": ["stationery", "enterprise", "everyday", "function", "quality", "essentially", "source", "diversify", "prerequisite", "obtain", "smooth", "maintains"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người đàn ông đang xếp các hộp giấy in lên kệ trong phòng chứa văn phòng phẩm.",
+      "options": [
+        "The man is stacking boxes on a shelf.",
+        "The man is printing a document.",
+        "The man is signing for a delivery.",
+        "The boxes are being loaded onto a truck."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người đàn ông đang xếp hộp lên kệ. (B) và (C) là hành động khác, (D) nói về xe tải không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How often do you order stationery for the office?",
+        "options": ["Once a month, usually on the first Monday.", "The stationery store is on Elm Street.", "Yes, we ordered some pens."],
+        "answer": "A",
+        "explanation": "Câu hỏi How often cần câu trả lời về tần suất. (B) nhầm sang địa điểm, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Have you obtained a quote from the new supplier yet?",
+        "options": ["It's on your desk, with two others.", "The supply room is locked.", "I'll quote you in my report."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về việc đã lấy báo giá chưa; (A) ngụ ý đã có và nói nó ở đâu. (B) nhầm âm 'supply', (C) dùng 'quote' với nghĩa khác."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Lena, the copier on the third floor isn't functioning again. It keeps showing a toner error.\nWoman: That's the second time this month. I think the problem is the toner itself. The cartridges from the new supplier are poor quality.\nMan: Should we go back to the old supplier? They were more expensive, but the toner lasted longer.\nWoman: Maybe. I'd rather find a second source and compare. We shouldn't depend on one company for everyday supplies.\nMan: Okay. Could you obtain samples from two or three vendors this week? I'll test them on the third-floor machine.\nWoman: Sure. In the meantime, I'll ask the technician to clean the copier. Can you put up a sign so people use the one on the second floor?\nMan: I'll do that right now.",
+      "questions": [
+        {
+          "prompt": "What problem does the man mention?",
+          "options": ["A copier is not working.", "A supplier raised its prices.", "A delivery arrived late.", "The toner has been stolen."],
+          "answer": "A",
+          "explanation": "Người đàn ông nói 'the copier on the third floor isn't functioning again', tức máy photocopy không hoạt động."
+        },
+        {
+          "prompt": "What does the woman think is causing the problem?",
+          "options": ["Old paper", "Low-quality toner", "A broken power cable", "Too many users"],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'The cartridges from the new supplier are poor quality', tức mực in kém chất lượng."
+        },
+        {
+          "prompt": "What will the man do next?",
+          "options": ["Call the old supplier", "Clean the copier", "Put up a sign", "Order new cartridges"],
+          "answer": "C",
+          "explanation": "Người phụ nữ nhờ anh ấy 'put up a sign' và anh ấy trả lời 'I'll do that right now'. Việc vệ sinh máy là của kỹ thuật viên."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hello, this is Renata Kowal from Brightline Office Supply calling for Mr. Adeyemi. Thank you for your order last week; everything is scheduled to arrive on Tuesday morning. I'm also calling about our new program for small enterprises. Starting next month, customers who order at least once a month can join our automatic restocking plan. Essentially, you tell us the minimum number of each item you want to maintain, and we deliver more whenever your stock falls below that level. The only prerequisite is a short online form that lists your regular items and the person who approves orders. We have also diversified our paper range this year, so you can now choose from three recycled brands. If you would like to join the plan, call me back at 555-0192 and I will make the setup as smooth as possible. Thanks again, and have a good day.",
+      "questions": [
+        {
+          "prompt": "Why is the speaker calling?",
+          "options": ["To report a delay", "To describe a new service", "To correct an invoice", "To ask for payment"],
+          "answer": "B",
+          "explanation": "Ngoài việc xác nhận đơn hàng, người gọi giới thiệu 'our new program for small enterprises', tức dịch vụ bổ sung hàng tự động."
+        },
+        {
+          "prompt": "What must the customer do to join the plan?",
+          "options": ["Pay a monthly fee", "Visit the supplier's warehouse", "Complete an online form", "Order every week"],
+          "answer": "C",
+          "explanation": "'The only prerequisite is a short online form', tức điều kiện duy nhất là điền một biểu mẫu trực tuyến."
+        },
+        {
+          "prompt": "What has the supplier changed this year?",
+          "options": ["Its delivery days", "Its telephone number", "Its range of paper", "Its office address"],
+          "answer": "C",
+          "explanation": "'We have also diversified our paper range this year', tức đã mở rộng các loại giấy."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The purchasing department wants to _____ its suppliers so that one late shipment does not stop production.",
+        "options": ["diversify", "diversity", "diverse", "diversely"],
+        "answer": "A",
+        "explanation": "Sau 'wants to' cần động từ nguyên mẫu: 'diversify' (đa dạng hóa)."
+      },
+      {
+        "prompt": "Clean filters are necessary if the air conditioners are to _____ efficiently in summer.",
+        "options": ["function", "functional", "functionally", "functioned"],
+        "answer": "A",
+        "explanation": "Cấu trúc 'are to' + động từ nguyên mẫu; 'function efficiently' là hoạt động hiệu quả."
+      },
+      {
+        "prompt": "Ink, paper and envelopes are _____ supplies that every office needs.",
+        "options": ["everyday", "every day", "everywhere", "everything"],
+        "answer": "A",
+        "explanation": "Trước danh từ 'supplies' cần tính từ 'everyday' (thường ngày). 'every day' viết rời là trạng ngữ chỉ thời gian."
+      },
+      {
+        "prompt": "The new filing system is _____ a copy of the one used at the head office.",
+        "options": ["essential", "essentially", "essence", "essentials"],
+        "answer": "B",
+        "explanation": "Cần trạng từ đứng giữa 'is' và cụm danh từ để bổ nghĩa cho cả mệnh đề: 'essentially' (về cơ bản)."
+      },
+      {
+        "prompt": "Applicants must _____ a tax number before they can register as a supplier.",
+        "options": ["obtain", "obtainable", "obtaining", "obtained"],
+        "answer": "A",
+        "explanation": "Sau 'must' cần động từ nguyên mẫu: 'obtain a tax number'."
+      },
+      {
+        "prompt": "The transition to the new vendor was _____, with no missed deliveries.",
+        "options": ["smooth", "smoothly", "smoothness", "smoothed"],
+        "answer": "A",
+        "explanation": "Sau 'was' cần tính từ mô tả chủ ngữ 'The transition': 'smooth' (suôn sẻ)."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Department Heads\nFrom: Victor Salazar, Office Manager\nSubject: Ordering office supplies\n\nFrom May 1, all requests for stationery and other office supplies must go through the online order form. A manager's electronic signature is a ___ for any request over eighty dollars; smaller requests will be approved automatically. The supply room will ___ a basic stock of paper, pens and toner, so please check the shelves before placing an order. Finally, if you notice a drop in the ___ of any product, let me know so that I can raise the matter with the vendor.",
+      "questions": [
+        {
+          "options": ["prerequisite", "prerequisites", "required", "requiring"],
+          "answer": "A",
+          "explanation": "Sau 'a' cần danh từ số ít: 'a prerequisite for' (điều kiện tiên quyết cho)."
+        },
+        {
+          "options": ["maintain", "maintenance", "maintained", "maintaining"],
+          "answer": "A",
+          "explanation": "Sau trợ động từ 'will' cần động từ nguyên mẫu: 'maintain a basic stock'."
+        },
+        {
+          "options": ["quality", "qualify", "qualified", "qualification"],
+          "answer": "A",
+          "explanation": "Sau 'a drop in the' cần danh từ; 'quality' (chất lượng) hợp nghĩa với việc báo cho nhà cung cấp."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "NORTHGATE BUSINESS SUPPLIES\nCorporate Account Guide\n\nNorthgate has supplied stationery and everyday office products to enterprises across the region for twenty-two years. A corporate account gives your company the following:\n\n| Benefit | Details |\n| Monthly invoicing | One invoice per month instead of a payment for each order |\n| Volume pricing | 8% off orders above $300, 12% off orders above $800 |\n| Dedicated contact | One account manager who knows your order history |\n| Next-day delivery | Free on orders placed before 3 p.m. |\n\nTo open an account, complete the form on page 4 and attach a copy of your business registration. Once approved, you can obtain a login for our ordering website, where your frequent items are saved for quick reordering.\n\nOur range has grown this year. We now source paper from three mills and have diversified into office furniture and cleaning products. Every product carries our quality promise: if an item does not meet your expectations, return it within thirty days for a full refund.\n\nFor a smooth start, your account manager will call within two working days of approval to review your first order.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the guide?",
+          "options": ["To announce a price increase", "To explain the benefits of a corporate account", "To introduce a new account manager", "To recall a faulty product"],
+          "answer": "B",
+          "explanation": "Tài liệu giới thiệu việc mở tài khoản doanh nghiệp và liệt kê các lợi ích trong bảng."
+        },
+        {
+          "prompt": "What discount applies to a $500 order?",
+          "options": ["5%", "8%", "12%", "No discount"],
+          "answer": "B",
+          "explanation": "Bảng ghi '8% off orders above $300, 12% off orders above $800'; $500 nằm trong mức trên $300 nhưng dưới $800."
+        },
+        {
+          "prompt": "What must a company send with the account form?",
+          "options": ["A copy of its business registration", "A list of frequent items", "A payment for the first order", "A letter from its bank"],
+          "answer": "A",
+          "explanation": "'complete the form on page 4 and attach a copy of your business registration'."
+        },
+        {
+          "prompt": "What has Northgate added this year?",
+          "options": ["A second warehouse", "Weekend delivery", "Furniture and cleaning products", "A printed catalog"],
+          "answer": "C",
+          "explanation": "'have diversified into office furniture and cleaning products' cho thấy hai nhóm hàng mới được thêm."
+        },
+        {
+          "prompt": "What will happen within two working days of approval?",
+          "options": ["The first order will be delivered.", "An account manager will call.", "A refund will be paid.", "The login will expire."],
+          "answer": "B",
+          "explanation": "Câu cuối: 'your account manager will call within two working days of approval to review your first order'."
+        }
+      ]
+    }
+  }
+}

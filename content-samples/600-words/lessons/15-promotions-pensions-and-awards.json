@@ -1,0 +1,260 @@
+{
+  "number": 15,
+  "title": "Promotions, Pensions, and Awards",
+  "vocabulary": [
+    {
+      "word": "achievement",
+      "partOfSpeech": "noun",
+      "meaning": "thành tích, thành tựu đạt được",
+      "example": "Winning the regional sales contest was the team's biggest achievement this year.",
+      "exampleMeaning": "Thắng cuộc thi bán hàng khu vực là thành tích lớn nhất của nhóm trong năm nay."
+    },
+    {
+      "word": "contribute",
+      "partOfSpeech": "verb",
+      "meaning": "đóng góp, góp phần",
+      "example": "Every member of the team contributed ideas to the new delivery plan.",
+      "exampleMeaning": "Mọi thành viên trong nhóm đều đóng góp ý tưởng cho kế hoạch giao hàng mới."
+    },
+    {
+      "word": "dedication",
+      "partOfSpeech": "noun",
+      "meaning": "sự tận tâm, cống hiến",
+      "example": "The award honors her dedication to the customers she has served for twenty years.",
+      "exampleMeaning": "Giải thưởng tôn vinh sự tận tâm của cô ấy với những khách hàng cô đã phục vụ suốt hai mươi năm."
+    },
+    {
+      "word": "look forward to",
+      "partOfSpeech": "verb",
+      "meaning": "mong đợi, trông chờ (điều gì sắp tới)",
+      "example": "We look forward to welcoming you to the management team in January.",
+      "exampleMeaning": "Chúng tôi mong được chào đón bạn gia nhập đội ngũ quản lý vào tháng Một."
+    },
+    {
+      "word": "look to",
+      "partOfSpeech": "verb",
+      "meaning": "trông cậy vào, hướng về (ai) để được giúp đỡ hoặc dẫn dắt",
+      "example": "Junior staff look to their supervisor for guidance when a customer complains.",
+      "exampleMeaning": "Nhân viên trẻ trông cậy vào người giám sát để được hướng dẫn khi khách hàng phàn nàn."
+    },
+    {
+      "word": "loyal",
+      "partOfSpeech": "adjective",
+      "meaning": "trung thành",
+      "example": "Loyal employees who stay more than ten years receive an extra week of vacation.",
+      "exampleMeaning": "Những nhân viên trung thành gắn bó hơn mười năm được thêm một tuần nghỉ phép."
+    },
+    {
+      "word": "merit",
+      "partOfSpeech": "noun",
+      "meaning": "công lao, giá trị xứng đáng; năng lực thực sự",
+      "example": "Promotions in this department are based on merit, not on years of service.",
+      "exampleMeaning": "Việc thăng chức ở phòng này dựa trên công lao thực sự, không phải số năm làm việc."
+    },
+    {
+      "word": "obviously",
+      "partOfSpeech": "adverb",
+      "meaning": "rõ ràng là, hiển nhiên là",
+      "example": "She was obviously the best choice for the position after leading three successful projects.",
+      "exampleMeaning": "Cô ấy rõ ràng là lựa chọn tốt nhất cho vị trí này sau khi dẫn dắt ba dự án thành công."
+    },
+    {
+      "word": "productive",
+      "partOfSpeech": "adjective",
+      "meaning": "có năng suất cao, làm việc hiệu quả",
+      "example": "The new scheduling system made the warehouse team far more productive.",
+      "exampleMeaning": "Hệ thống xếp lịch mới giúp nhóm kho làm việc hiệu quả hơn nhiều."
+    },
+    {
+      "word": "promote",
+      "partOfSpeech": "verb",
+      "meaning": "thăng chức; quảng bá, thúc đẩy",
+      "example": "Mr. Ortega was promoted to regional manager after five years as a store supervisor.",
+      "exampleMeaning": "Ông Ortega được thăng chức quản lý khu vực sau năm năm làm giám sát cửa hàng."
+    },
+    {
+      "word": "recognition",
+      "partOfSpeech": "noun",
+      "meaning": "sự công nhận, ghi nhận (công lao, thành tích)",
+      "example": "The company gives public recognition to employees who suggest useful improvements.",
+      "exampleMeaning": "Công ty ghi nhận công khai những nhân viên đề xuất các cải tiến hữu ích."
+    },
+    {
+      "word": "value",
+      "partOfSpeech": "verb",
+      "meaning": "coi trọng, đánh giá cao; (danh từ) giá trị",
+      "example": "We value honesty and teamwork above individual sales figures.",
+      "exampleMeaning": "Chúng tôi coi trọng sự trung thực và tinh thần đồng đội hơn doanh số cá nhân."
+    }
+  ],
+  "fillIn": {
+    "passage": "Every December, Fairmont Insurance holds a dinner to give ___ to the employees who have done the most for the company during the year. This year the ceremony was special, because the director of claims, Marguerite Dubois, was retiring after twenty-eight years. The president praised her ___ to her team and the way she had ___ to the growth of the regional offices. He said the company would always ___ her honesty, and that younger managers would continue to ___ her example whenever they faced a hard decision.\n\nThe main award for ___ went to Jamal Osei of the customer service team. His ___ included cutting the average waiting time for callers by half, which made the whole department more ___. Jamal, who was ___ pleased, thanked his colleagues and the ___ customers who had stayed with the company through a difficult year. The president then announced that Jamal would be ___ to supervisor in January. \"I ___ working with all of you in my new role,\" Jamal said, and the room applauded.",
+    "answers": ["recognition", "dedication", "contributed", "value", "look to", "merit", "achievements", "productive", "obviously", "loyal", "promoted", "look forward to"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người phụ nữ đứng trên sân khấu nhỏ nhận bằng khen từ người đàn ông mặc vest, khán giả phía dưới đang vỗ tay.",
+      "options": [
+        "A woman is receiving an award on stage.",
+        "A man is repairing a microphone.",
+        "The audience is leaving the hall.",
+        "A woman is hanging a certificate on the wall."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ đang nhận giải thưởng trên sân khấu. (D) nhắc đến tấm bằng nhưng hành động treo lên tường không có trong ảnh; (B) và (C) cũng sai hành động."
+    },
+    "part2": [
+      {
+        "question": "Who was promoted to head of the design team?",
+        "options": ["Lena Marsh, as of Monday.", "The promotion is on the fourth floor.", "Yes, the team is very productive."],
+        "answer": "A",
+        "explanation": "Câu hỏi 'Who' cần câu trả lời chỉ người. (B) nhầm 'promotion' thành một địa điểm; (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Are you looking forward to the awards dinner on Friday?",
+        "options": ["I look at the menu every day.", "Very much; my whole team is going.", "The dinner cost forty dollars."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về sự mong đợi; (B) xác nhận và thêm chi tiết. (A) lặp từ 'look' với nghĩa khác; (C) lặp từ 'dinner' nhưng trả lời về giá."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Priya, I've finished the list of nominees for the Employee of the Year award. Could you look it over?\nWoman: Sure. I see you've put Carlos Mendes at the top. He's obviously a strong choice; his team has been the most productive in the warehouse for two years running.\nMan: Yes, and he's been loyal to the company for fifteen years. But the award is supposed to be based on this year's merit, not on long service.\nWoman: That's a fair point. Then what about Anita Chen? Her new scheduling tool saved the company about forty thousand dollars this year alone.\nMan: I agree she deserves recognition. Could you add a paragraph about her achievement to the nomination form?\nWoman: I'll write it this afternoon and send it to you before the committee meets tomorrow.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["A warehouse schedule", "Candidates for an award", "A new scheduling tool", "The cost of a company dinner"],
+          "answer": "B",
+          "explanation": "Người đàn ông đã lập 'the list of nominees for the Employee of the Year award' và hai người bàn về ai xứng đáng."
+        },
+        {
+          "prompt": "What does the man say about the award?",
+          "options": ["It should be based on this year's performance", "It is given every two years", "It includes a cash prize", "It is only for warehouse staff"],
+          "answer": "A",
+          "explanation": "Anh ấy nói giải thưởng 'is supposed to be based on this year's merit, not on long service'."
+        },
+        {
+          "prompt": "What will the woman do this afternoon?",
+          "options": ["Meet with the committee", "Call Carlos Mendes", "Write about another employee's achievement", "Test the scheduling tool"],
+          "answer": "C",
+          "explanation": "Cô ấy sẽ viết đoạn về thành tích của Anita Chen: 'I'll write it this afternoon'. Hội đồng họp vào ngày mai."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good evening, and thank you all for coming to our annual recognition dinner. Tonight we honor colleagues whose dedication has made this a remarkable year for Hollis Transport. Before the awards, I have an announcement. After thirty-two years with us, our operations director, Edward Nkemelu, will retire at the end of March. Edward joined the company as a dispatcher and was promoted five times, and for the past decade every one of us has looked to him when a problem seemed too big to solve. We value his honesty as much as his results, and we will obviously miss him. I am pleased to announce that Edward will be succeeded by Lucia Ferrante, who has contributed so much to our safety record as fleet manager. Lucia, we look forward to working with you in your new role. Now, please welcome our first award winner of the evening.",
+      "questions": [
+        {
+          "prompt": "Where is the talk most likely taking place?",
+          "options": ["At a company dinner", "At a job interview", "At a safety training session", "At a customer's office"],
+          "answer": "A",
+          "explanation": "Người nói cảm ơn mọi người đã đến 'our annual recognition dinner' và sắp trao giải thưởng."
+        },
+        {
+          "prompt": "What is mentioned about Edward Nkemelu?",
+          "options": ["He will move to another company", "He started as a dispatcher", "He founded Hollis Transport", "He will receive an award tonight"],
+          "answer": "B",
+          "explanation": "'Edward joined the company as a dispatcher and was promoted five times'. Ông sẽ nghỉ hưu chứ không chuyển sang công ty khác."
+        },
+        {
+          "prompt": "Who is Lucia Ferrante?",
+          "options": ["The first award winner", "A new dispatcher", "The next operations director", "The owner of the company"],
+          "answer": "C",
+          "explanation": "'Edward will be succeeded by Lucia Ferrante', tức cô sẽ thay ông làm giám đốc vận hành."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Ms. Haddad was _____ to senior analyst after only two years in the department.",
+        "options": ["promote", "promoted", "promotion", "promoting"],
+        "answer": "B",
+        "explanation": "'Was' + quá khứ phân từ tạo thể bị động: 'was promoted to' (được thăng chức lên)."
+      },
+      {
+        "prompt": "The sales team's _____ this quarter earned them a bonus and a weekend trip.",
+        "options": ["achieve", "achievable", "achievement", "achieved"],
+        "answer": "C",
+        "explanation": "Sau sở hữu cách 'The sales team's' cần danh từ làm chủ ngữ: 'achievement'."
+      },
+      {
+        "prompt": "Each regional manager _____ one idea to the new customer loyalty program.",
+        "options": ["contribution", "contributor", "contributed", "contributive"],
+        "answer": "C",
+        "explanation": "Câu cần động từ chính; 'contributed ... to' nghĩa là đóng góp vào."
+      },
+      {
+        "prompt": "The committee chose the winner on the basis of _____ rather than length of service.",
+        "options": ["merit", "merited", "meritorious", "meritoriously"],
+        "answer": "A",
+        "explanation": "Sau 'on the basis of' cần danh từ: 'merit' (công lao, năng lực thực sự)."
+      },
+      {
+        "prompt": "Our _____ customers receive a ten percent discount after their fifth order.",
+        "options": ["loyally", "loyalty", "loyal", "loyalist"],
+        "answer": "C",
+        "explanation": "Trước danh từ 'customers' cần tính từ: 'loyal'. 'Loyalty' là danh từ, không đứng trực tiếp bổ nghĩa ở đây."
+      },
+      {
+        "prompt": "Flexible hours have made the design team noticeably more _____.",
+        "options": ["product", "productive", "productively", "production"],
+        "answer": "B",
+        "explanation": "Cấu trúc 'make + tân ngữ + tính từ'; sau 'more' cần tính từ 'productive'."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Staff\nFrom: Office of the Managing Director\nSubject: Quarterly Excellence Award\n\nWe are pleased to introduce a new award to give ___ to employees whose work goes beyond their normal duties. Each quarter, any staff member may nominate a colleague by describing one specific ___ that helped a customer or saved the company time or money. Nominations will be reviewed by a committee of five managers, and the winner will receive a certificate, a bonus of five hundred dollars and lunch with the managing director. The first nominations are due on March 31. We ___ reading about the many ways you make this company better.",
+      "questions": [
+        {
+          "options": ["recognize", "recognition", "recognized", "recognizable"],
+          "answer": "B",
+          "explanation": "Sau 'to give' cần danh từ làm tân ngữ: 'give recognition to' (ghi nhận công lao của ai)."
+        },
+        {
+          "options": ["achieve", "achiever", "achievement", "achieving"],
+          "answer": "C",
+          "explanation": "Sau 'one specific' cần danh từ chỉ việc đã làm được: 'achievement'. 'Achiever' chỉ người, không hợp nghĩa."
+        },
+        {
+          "options": ["look forward to", "look up to", "look to", "look into"],
+          "answer": "A",
+          "explanation": "'Look forward to + V-ing' nghĩa là mong đợi; 'look up to' là kính trọng, 'look into' là điều tra, không hợp với 'reading about'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "BRIDGEWATER FOODS - STAFF NEWSLETTER\nPeople News: April\n\nTwo promotions in Customer Care\nWe are delighted to announce that Nadia Rahman has been promoted to Customer Care Manager. Nadia joined Bridgewater six years ago as a part-time call handler and has contributed to almost every improvement in the department since then, including the online chat service that now handles a third of all customer questions. Taking her former position as team leader is Felix Brandt, whose team recorded the highest customer satisfaction scores of last year. Both appointments take effect on May 1.\n\nLong-service recognition\nAt the spring staff meeting, Managing Director Helen Moreau presented a gold pin and a travel voucher to warehouse supervisor Tomas Vidal, who has completed twenty-five years with the company. \"Tomas is the person everyone in the warehouse looks to when something goes wrong,\" Ms. Moreau said. \"His loyal service and quiet dedication are exactly what we value here.\"\n\nPension plan reminder\nEmployees over fifty-five who wish to attend the retirement planning workshop on May 14 should register with Human Resources by May 7. Places are limited to twenty.",
+      "questions": [
+        {
+          "prompt": "What is the main purpose of the newsletter page?",
+          "options": ["To advertise a new product", "To share news about employees", "To explain the pension plan", "To announce a change in opening hours"],
+          "answer": "B",
+          "explanation": "Trang 'People News' đưa tin về thăng chức, ghi nhận thâm niên và một buổi hội thảo cho nhân viên."
+        },
+        {
+          "prompt": "What did Nadia Rahman help create?",
+          "options": ["A customer survey", "An online chat service", "A staff newsletter", "A training workshop"],
+          "answer": "B",
+          "explanation": "Bài viết nêu Nadia đã góp phần vào 'the online chat service that now handles a third of all customer questions'."
+        },
+        {
+          "prompt": "When will Felix Brandt start his new position?",
+          "options": ["On April 1", "On May 1", "On May 7", "On May 14"],
+          "answer": "B",
+          "explanation": "'Both appointments take effect on May 1', áp dụng cho cả Nadia và Felix."
+        },
+        {
+          "prompt": "What did Tomas Vidal receive?",
+          "options": ["A promotion to manager", "A cash bonus", "A pin and a travel voucher", "An extra week of vacation"],
+          "answer": "C",
+          "explanation": "Giám đốc điều hành 'presented a gold pin and a travel voucher to warehouse supervisor Tomas Vidal'."
+        },
+        {
+          "prompt": "What should employees do if they want to attend the workshop?",
+          "options": ["Sign up with Human Resources by May 7", "Email Helen Moreau", "Pay a registration fee", "Attend the spring staff meeting"],
+          "answer": "A",
+          "explanation": "'Employees ... should register with Human Resources by May 7', và số chỗ chỉ có hai mươi."
+        }
+      ]
+    }
+  }
+}

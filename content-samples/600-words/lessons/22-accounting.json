@@ -1,0 +1,260 @@
+{
+  "number": 22,
+  "title": "Accounting",
+  "vocabulary": [
+    {
+      "word": "accounting",
+      "partOfSpeech": "noun",
+      "meaning": "kế toán, công việc kế toán",
+      "example": "Our accounting department closes the books on the last working day of each month.",
+      "exampleMeaning": "Phòng kế toán của chúng tôi khóa sổ vào ngày làm việc cuối cùng của mỗi tháng."
+    },
+    {
+      "word": "accumulate",
+      "partOfSpeech": "verb",
+      "meaning": "tích lũy, dồn lại, chất đống",
+      "example": "Unpaid invoices accumulated over the summer while the office manager was on leave.",
+      "exampleMeaning": "Các hóa đơn chưa thanh toán dồn lại suốt mùa hè trong khi quản lý văn phòng nghỉ phép."
+    },
+    {
+      "word": "asset",
+      "partOfSpeech": "noun",
+      "meaning": "tài sản; người hoặc vật có giá trị",
+      "example": "The delivery trucks are listed as assets on the company's balance sheet.",
+      "exampleMeaning": "Các xe tải giao hàng được ghi nhận là tài sản trên bảng cân đối kế toán của công ty."
+    },
+    {
+      "word": "audit",
+      "partOfSpeech": "noun",
+      "meaning": "cuộc kiểm toán, việc kiểm tra sổ sách",
+      "example": "An outside firm will conduct the annual audit of our financial records in April.",
+      "exampleMeaning": "Một công ty bên ngoài sẽ thực hiện cuộc kiểm toán hằng năm hồ sơ tài chính của chúng tôi vào tháng Tư."
+    },
+    {
+      "word": "budget",
+      "partOfSpeech": "noun",
+      "meaning": "ngân sách, khoản tiền dự trù",
+      "example": "The marketing team spent less than its budget for the second year in a row.",
+      "exampleMeaning": "Đội marketing đã chi ít hơn ngân sách trong năm thứ hai liên tiếp."
+    },
+    {
+      "word": "build up",
+      "partOfSpeech": "verb",
+      "meaning": "tích lũy dần, gây dựng, phát triển dần",
+      "example": "The bakery has built up a cash reserve that can cover three months of expenses.",
+      "exampleMeaning": "Tiệm bánh đã gây dựng được một khoản dự trữ tiền mặt đủ trang trải ba tháng chi phí."
+    },
+    {
+      "word": "client",
+      "partOfSpeech": "noun",
+      "meaning": "khách hàng (sử dụng dịch vụ chuyên môn)",
+      "example": "The accountant meets each client in January to plan the year's tax payments.",
+      "exampleMeaning": "Kế toán viên gặp từng khách hàng vào tháng Một để lên kế hoạch nộp thuế cho cả năm."
+    },
+    {
+      "word": "debt",
+      "partOfSpeech": "noun",
+      "meaning": "nợ, khoản nợ",
+      "example": "The company paid off its last bank debt in March and now owns the factory outright.",
+      "exampleMeaning": "Công ty đã trả hết khoản nợ ngân hàng cuối cùng vào tháng Ba và hiện sở hữu hoàn toàn nhà máy."
+    },
+    {
+      "word": "outstanding",
+      "partOfSpeech": "adjective",
+      "meaning": "chưa thanh toán, còn tồn đọng; xuất sắc",
+      "example": "Please settle the outstanding balance of 640 dollars within ten days of receiving this notice.",
+      "exampleMeaning": "Vui lòng thanh toán số dư còn nợ 640 đô la trong vòng mười ngày kể từ khi nhận thông báo này."
+    },
+    {
+      "word": "profitably",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách có lãi, sinh lợi",
+      "example": "The cafe has operated profitably since it started selling lunch boxes to nearby offices.",
+      "exampleMeaning": "Quán cà phê đã hoạt động có lãi kể từ khi bắt đầu bán hộp cơm trưa cho các văn phòng gần đó."
+    },
+    {
+      "word": "reconcile",
+      "partOfSpeech": "verb",
+      "meaning": "đối chiếu, làm khớp (sổ sách, tài khoản); hòa giải",
+      "example": "Each Friday the bookkeeper reconciles the cash register totals with the bank deposits.",
+      "exampleMeaning": "Mỗi thứ Sáu, nhân viên kế toán đối chiếu tổng tiền trên máy tính tiền với các khoản gửi ngân hàng."
+    },
+    {
+      "word": "turnover",
+      "partOfSpeech": "noun",
+      "meaning": "doanh thu; tốc độ luân chuyển (hàng hóa, nhân sự)",
+      "example": "Annual turnover rose to two million dollars after the store opened its online shop.",
+      "exampleMeaning": "Doanh thu hằng năm tăng lên hai triệu đô la sau khi cửa hàng mở gian hàng trực tuyến."
+    }
+  ],
+  "fillIn": {
+    "passage": "When Jonas Weber opened his design studio, he handled the ___ himself and kept every receipt in a shoebox. Business grew quickly, and within two years the studio had ___ more than forty regular ___. Unfortunately, the paperwork grew just as fast. Unpaid invoices began to ___ in a drawer, and several ___ bills were more than ninety days late.\n\nLast spring Jonas hired Maria Santos, a financial adviser, to bring order to the records. Her first task was to ___ the studio's bank statements with its sales records for the whole year. She then listed every ___, from the computers to the studio's van, and every ___, including a loan from Jonas's brother. The numbers showed that the studio was running ___, with a ___ of nearly 600,000 dollars, but that Jonas was spending too much on software. Maria prepared a monthly ___ for each part of the business and warned Jonas that an outside ___ could be required if the studio applied for a bank loan next year.",
+    "answers": ["accounting", "built up", "clients", "accumulate", "outstanding", "reconcile", "asset", "debt", "profitably", "turnover", "budget", "audit"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người phụ nữ ngồi tại bàn làm việc, tay bấm máy tính bỏ túi và xem một chồng hóa đơn; bên cạnh là màn hình máy tính hiển thị bảng số liệu.",
+      "options": [
+        "She is typing a letter.",
+        "She is checking some figures.",
+        "She is stacking boxes on a shelf.",
+        "She is hanging a picture on the wall."
+      ],
+      "answer": "B",
+      "explanation": "Ảnh cho thấy người phụ nữ đang kiểm tra các con số với máy tính và hóa đơn. (A), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "When is the audit scheduled to begin?",
+        "options": ["In the first week of April.", "The auditor is from Leeds.", "No, it hasn't been paid yet."],
+        "answer": "A",
+        "explanation": "Câu hỏi When cần một mốc thời gian. (B) lặp âm 'audit' nhưng trả lời về nơi chốn, (C) trả lời No cho câu hỏi Wh."
+      },
+      {
+        "question": "Who's going to reconcile the accounts this month?",
+        "options": ["The bank is around the corner.", "Yes, the accounts are open.", "Priya said she would do it."],
+        "answer": "C",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người: 'Priya said she would do it'. (A) lạc đề, (B) trả lời Yes cho câu hỏi Wh."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Sophie, do you have a minute? I'm preparing the quarterly report and I noticed that three clients still have outstanding invoices from June.\nWoman: Yes, I know. Two of them have promised to pay by the end of this week. The third one, Hartley Interiors, hasn't answered my emails at all.\nMan: That's a problem. Their debt is nearly eight thousand dollars, and we can't close the quarter profitably with that amount missing.\nWoman: Should I call their office directly?\nMan: Please do, and offer them a payment plan if they need one. We've built up a good relationship with them over five years, so I'd rather not involve a collection agency.\nWoman: Understood. I'll call them this afternoon and let you know what they say.\nMan: Thanks. And add a note to the report explaining the delay.",
+      "questions": [
+        {
+          "prompt": "What is the man preparing?",
+          "options": ["A sales presentation", "A quarterly report", "A new price list", "A client contract"],
+          "answer": "B",
+          "explanation": "Người đàn ông nói ngay đầu: 'I'm preparing the quarterly report'."
+        },
+        {
+          "prompt": "What problem does the woman mention?",
+          "options": ["A client has not replied to her", "A payment was sent twice", "An invoice was lost", "The report is late"],
+          "answer": "A",
+          "explanation": "Cô ấy nói Hartley Interiors 'hasn't answered my emails at all', tức khách hàng không trả lời."
+        },
+        {
+          "prompt": "What does the man suggest?",
+          "options": ["Hiring a collection agency", "Closing the client's account", "Offering a payment plan", "Raising prices"],
+          "answer": "C",
+          "explanation": "Người đàn ông nói 'offer them a payment plan if they need one' và không muốn dùng công ty đòi nợ."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good morning, and welcome to the first meeting of the new financial year. I'm Rebecca Olsen, head of the accounting department, and I'd like to share three points before we look at the figures. First, last year's turnover reached four point two million dollars, eight percent more than the year before, and every department stayed within its budget. Thank you for that. Second, the external audit will take place from the fourteenth to the eighteenth of this month. The auditors will need to see purchase records for every asset bought in the last twelve months, so please make sure your files are complete by Friday. Third, we noticed that small receipts tend to accumulate in desk drawers until the end of the quarter. From now on, please submit them within one week. That will make everyone's work easier, including mine. Now, let's turn to the figures on the screen.",
+      "questions": [
+        {
+          "prompt": "Who is the speaker?",
+          "options": ["A bank manager", "An external auditor", "The head of accounting", "A sales director"],
+          "answer": "C",
+          "explanation": "Người nói tự giới thiệu: 'I'm Rebecca Olsen, head of the accounting department'."
+        },
+        {
+          "prompt": "What will happen from the fourteenth to the eighteenth of the month?",
+          "options": ["A training course", "An audit", "A sales conference", "A company holiday"],
+          "answer": "B",
+          "explanation": "'the external audit will take place from the fourteenth to the eighteenth of this month'."
+        },
+        {
+          "prompt": "What are listeners asked to do with small receipts?",
+          "options": ["Keep them in their desks", "Send them to the auditors", "Submit them within a week", "Throw them away after a quarter"],
+          "answer": "C",
+          "explanation": "Người nói yêu cầu 'please submit them within one week' thay vì để dồn lại trong ngăn bàn."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The company has _____ a large stock of spare parts over the past three years.",
+        "options": ["accumulate", "accumulated", "accumulation", "accumulating"],
+        "answer": "B",
+        "explanation": "Sau 'has' cần quá khứ phân từ để tạo thì hiện tại hoàn thành: 'has accumulated'."
+      },
+      {
+        "prompt": "Every _____ receives a detailed statement at the end of the quarter.",
+        "options": ["client", "asset", "debt", "audit"],
+        "answer": "A",
+        "explanation": "Chỉ có 'client' (khách hàng) là người có thể nhận bản sao kê; các từ còn lại là vật hoặc hoạt động."
+      },
+      {
+        "prompt": "The new store has operated _____ since its first month.",
+        "options": ["profit", "profitable", "profitably", "profits"],
+        "answer": "C",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'operated': 'profitably' (một cách có lãi)."
+      },
+      {
+        "prompt": "The bookkeeper must _____ the petty cash records before the end of each week.",
+        "options": ["reconcile", "reconciled", "reconciliation", "reconciling"],
+        "answer": "A",
+        "explanation": "Sau 'must' cần động từ nguyên mẫu: 'reconcile'."
+      },
+      {
+        "prompt": "The _____ for staff training was cut by ten percent this year.",
+        "options": ["budget", "budgeted", "budgeting", "budgetary"],
+        "answer": "A",
+        "explanation": "Sau 'The' và trước 'for staff training' cần danh từ làm chủ ngữ: 'budget' (ngân sách)."
+      },
+      {
+        "prompt": "Several _____ invoices from last quarter were finally paid in July.",
+        "options": ["outstand", "outstanding", "outstandingly", "outstood"],
+        "answer": "B",
+        "explanation": "Trước danh từ 'invoices' cần tính từ: 'outstanding' (chưa thanh toán)."
+      }
+    ],
+    "part6": {
+      "passage": "To: Finance Team\nFrom: Daniel Reyes, Chief Financial Officer\nSubject: Preparation for the annual review\n\nDear colleagues,\n\nOur external ___ begins on October 6, and the reviewers have already sent a list of documents they expect to see. Please prepare the purchase records for all ___ bought this year, including vehicles, computers and office furniture. They will also check that every ___ owed to suppliers is recorded with its due date. Send your files to my assistant, Lucy, by October 2 so that we have time to fix any gaps.\n\nThank you for your help.\nDaniel",
+      "questions": [
+        {
+          "options": ["auditor", "audit", "audited", "auditing"],
+          "answer": "B",
+          "explanation": "Sau 'Our external' cần danh từ chỉ sự kiện bắt đầu vào ngày 6 tháng Mười: 'audit' (cuộc kiểm toán). 'auditor' là người nên không 'begins'."
+        },
+        {
+          "options": ["clients", "budgets", "assets", "debts"],
+          "answer": "C",
+          "explanation": "Những thứ được mua như xe, máy tính và nội thất là 'assets' (tài sản)."
+        },
+        {
+          "options": ["debtor", "indebted", "debts", "debt"],
+          "answer": "D",
+          "explanation": "Sau 'every' cần danh từ số ít: 'debt' (khoản nợ) còn phải trả cho nhà cung cấp."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "RIDGEWAY ACCOUNTING SERVICES\nHelping small businesses stay profitable since 2009\n\nRunning a shop, a workshop or a studio leaves little time for paperwork. Ridgeway Accounting Services takes care of your records so that you can take care of your customers. Our team of twelve certified accountants currently serves more than 300 clients across the region.\n\n| Package | Monthly fee | Includes |\n| Starter | 90 dollars | Bookkeeping, bank reconciliation, quarterly reports |\n| Growth | 180 dollars | Starter services plus budget planning and debt management |\n| Complete | 320 dollars | Growth services plus preparation for external audits |\n\nAll packages include a free review of your assets and outstanding invoices during the first month. Clients with an annual turnover above one million dollars receive a personal account manager at no extra cost.\n\nTo celebrate our fifteenth anniversary, new clients who sign up before November 30 will pay no fee for the first two months. Call 555-0147 or visit our office at 8 Station Road, Monday to Friday, 9 a.m. to 5 p.m. Our advisers will be glad to find the package that suits your business.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the advertisement?",
+          "options": ["To recruit new accountants", "To promote accounting services", "To announce a change of address", "To explain new tax rules"],
+          "answer": "B",
+          "explanation": "Quảng cáo giới thiệu các gói dịch vụ kế toán của Ridgeway cho doanh nghiệp nhỏ."
+        },
+        {
+          "prompt": "What is included in the Growth package but not in the Starter package?",
+          "options": ["Bank reconciliation", "Quarterly reports", "Budget planning", "Audit preparation"],
+          "answer": "C",
+          "explanation": "Gói Growth gồm dịch vụ Starter 'plus budget planning and debt management'; chuẩn bị kiểm toán chỉ có ở gói Complete."
+        },
+        {
+          "prompt": "Who receives a personal account manager?",
+          "options": ["Clients who pay 320 dollars per month", "Clients with a turnover above one million dollars", "Clients who sign up in November", "Clients with outstanding invoices"],
+          "answer": "B",
+          "explanation": "'Clients with an annual turnover above one million dollars receive a personal account manager at no extra cost.'"
+        },
+        {
+          "prompt": "What is offered to new clients who sign up before November 30?",
+          "options": ["A lower fee for the first year", "A free training course", "Two months without a fee", "A second account manager"],
+          "answer": "C",
+          "explanation": "Khách hàng mới đăng ký trước 30 tháng Mười Một 'will pay no fee for the first two months'."
+        },
+        {
+          "prompt": "How can readers contact the company?",
+          "options": ["By email", "By visiting on Saturday", "By telephone", "By mail"],
+          "answer": "C",
+          "explanation": "Quảng cáo ghi 'Call 555-0147' hoặc đến văn phòng từ thứ Hai đến thứ Sáu; không có email và không mở cửa thứ Bảy."
+        }
+      ]
+    }
+  }
+}

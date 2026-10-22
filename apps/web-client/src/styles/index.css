@@ -73,7 +73,35 @@
     @apply bg-background font-sans text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  /* Password fields ship their own eye button (PasswordInput); hide the one Edge adds. */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
   h1, h2, h3 {
     @apply tracking-tight;
   }
+}
+
+/* The publish button (D126): an arrow rising into a cloud while publishing,
+   a tick popping in when done. */
+@keyframes publish-arrow {
+  0% { transform: translateY(7px); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translateY(-9px); opacity: 0; }
+}
+@keyframes publish-cloud {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+@keyframes publish-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.publish-arrow { animation: publish-arrow 0.9s ease-in-out infinite; }
+.publish-cloud { animation: publish-cloud 1.8s ease-in-out infinite; }
+.publish-pop { animation: publish-pop 0.35s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .publish-arrow, .publish-cloud, .publish-pop { animation: none; }
 }

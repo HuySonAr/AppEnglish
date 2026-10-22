@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { auditDescription, lockReasonRequired, signupSeries, statusBreakdown, timeAgo } from './accounts.js';
+import { auditDescription, availableActions, isInvitedPending, lockReasonRequired, signupSeries, statusBreakdown, statusChoices, timeAgo } from './accounts.js';
 
 test('a reason is needed only when an account is locked', () => {
   assert.equal(lockReasonRequired('ACTIVE', 'SUSPENDED'), true);
@@ -49,4 +49,25 @@ test('relative time', () => {
   assert.equal(timeAgo('2026-10-19T09:00:00Z', now), '3 hours ago');
   assert.equal(timeAgo('2026-10-18T09:00:00Z', now), '1 day ago');
   assert.equal(timeAgo('2026-08-01T09:00:00Z', now), '2 months ago');
+});
+
+test('the actions offered follow the account state (D131)', () => {
+  const invited = { role: 'CONTENT_MANAGER', status: 'PENDING_VERIFICATION', invitedAt: '2026-10-21T00:00:00Z' };
+  const registered = { role: 'STUDENT', status: 'PENDING_VERIFICATION', invitedAt: null };
+  const active = { role: 'STUDENT', status: 'ACTIVE' };
+  const lockedAdmin = { role: 'ADMIN', status: 'SUSPENDED' };
+  assert.equal(isInvitedPending(invited), true);
+  assert.equal(isInvitedPending(registered), false);
+  assert.equal(isInvitedPending({ ...invited, status: 'ACTIVE' }), false);
+  assert.deepEqual(availableActions(invited), ['RESEND_INVITE', 'REVOKE_SESSIONS']);
+  assert.deepEqual(availableActions(registered), ['RESEND_VERIFICATION', 'ACTIVATE', 'REVOKE_SESSIONS', 'RESET_PLACEMENT']);
+  assert.deepEqual(availableActions(active), ['SEND_PASSWORD_RESET', 'REVOKE_SESSIONS', 'RESET_PLACEMENT']);
+  assert.deepEqual(availableActions(lockedAdmin), ['REVOKE_SESSIONS']);
+  assert.deepEqual(availableActions(null), []);
+  assert.deepEqual(statusChoices(active), ['SUSPENDED', 'DISABLED']);
+  assert.deepEqual(statusChoices(lockedAdmin), ['ACTIVE', 'DISABLED']);
+  assert.deepEqual(statusChoices({ status: 'DISABLED' }), ['ACTIVE', 'SUSPENDED']);
+  assert.deepEqual(statusChoices(registered), []);
+  assert.equal(auditDescription({ action: 'ACCOUNT_INVITED', nextRole: 'ADMIN' }, { status: {}, role: { ADMIN: 'Admin' } }), 'Invited as Admin');
+  assert.equal(auditDescription({ action: 'PLACEMENT_RESET' }), 'Placement test reset');
 });

@@ -1,0 +1,260 @@
+{
+  "number": 19,
+  "title": "Invoices",
+  "vocabulary": [
+    {
+      "word": "charge",
+      "partOfSpeech": "verb",
+      "meaning": "tính tiền, thu phí; (danh từ) khoản phí phải trả",
+      "example": "The printer charged us an extra fee for the rush delivery.",
+      "exampleMeaning": "Xưởng in đã tính thêm phí cho việc giao hàng gấp."
+    },
+    {
+      "word": "compile",
+      "partOfSpeech": "verb",
+      "meaning": "tổng hợp, biên soạn (từ nhiều nguồn)",
+      "example": "At the end of each month, the accountant compiles all delivery notes into a single invoice.",
+      "exampleMeaning": "Cuối mỗi tháng, kế toán tổng hợp tất cả phiếu giao hàng vào một hóa đơn duy nhất."
+    },
+    {
+      "word": "customer",
+      "partOfSpeech": "noun",
+      "meaning": "khách hàng",
+      "example": "A customer called to ask why the invoice total did not match the quote.",
+      "exampleMeaning": "Một khách hàng gọi điện hỏi vì sao tổng hóa đơn không khớp với báo giá."
+    },
+    {
+      "word": "discount",
+      "partOfSpeech": "noun",
+      "meaning": "khoản giảm giá, chiết khấu",
+      "example": "We offer a two percent discount to customers who pay within ten days.",
+      "exampleMeaning": "Chúng tôi giảm hai phần trăm cho khách hàng thanh toán trong vòng mười ngày."
+    },
+    {
+      "word": "efficient",
+      "partOfSpeech": "adjective",
+      "meaning": "hiệu quả, không lãng phí thời gian hay nguồn lực",
+      "example": "Sending invoices by email is more efficient than mailing paper copies.",
+      "exampleMeaning": "Gửi hóa đơn qua email hiệu quả hơn gửi bản giấy qua bưu điện."
+    },
+    {
+      "word": "estimate",
+      "partOfSpeech": "noun",
+      "meaning": "bản dự toán, con số ước tính; (động từ) ước lượng",
+      "example": "The repair shop gave us a written estimate before starting the work.",
+      "exampleMeaning": "Xưởng sửa chữa đã đưa bản dự toán bằng văn bản trước khi bắt đầu công việc."
+    },
+    {
+      "word": "impose",
+      "partOfSpeech": "verb",
+      "meaning": "áp đặt, áp (phí, thuế, quy định)",
+      "example": "The supplier imposes a late fee of five percent on invoices unpaid after sixty days.",
+      "exampleMeaning": "Nhà cung cấp áp phí trễ hạn năm phần trăm với hóa đơn chưa thanh toán sau sáu mươi ngày."
+    },
+    {
+      "word": "mistake",
+      "partOfSpeech": "noun",
+      "meaning": "lỗi, sai sót",
+      "example": "There was a mistake in the invoice: we were billed for twelve chairs instead of ten.",
+      "exampleMeaning": "Hóa đơn có một sai sót: chúng tôi bị tính tiền mười hai chiếc ghế thay vì mười."
+    },
+    {
+      "word": "promptly",
+      "partOfSpeech": "adverb",
+      "meaning": "nhanh chóng, kịp thời, đúng giờ",
+      "example": "Please pay the attached invoice promptly to keep your account in good standing.",
+      "exampleMeaning": "Vui lòng thanh toán hóa đơn đính kèm kịp thời để giữ tài khoản của bạn ở trạng thái tốt."
+    },
+    {
+      "word": "rectify",
+      "partOfSpeech": "verb",
+      "meaning": "sửa chữa, khắc phục (sai sót)",
+      "example": "The billing department rectified the error and sent a corrected invoice the same day.",
+      "exampleMeaning": "Bộ phận lập hóa đơn đã sửa lỗi và gửi hóa đơn đã chỉnh trong ngày."
+    },
+    {
+      "word": "reflect",
+      "partOfSpeech": "verb",
+      "meaning": "phản ánh, thể hiện; phản chiếu",
+      "example": "The new invoice reflects the discount we agreed on during the meeting.",
+      "exampleMeaning": "Hóa đơn mới phản ánh mức giảm giá chúng ta đã thống nhất trong cuộc họp."
+    },
+    {
+      "word": "terms",
+      "partOfSpeech": "noun",
+      "meaning": "điều khoản (thanh toán, hợp đồng)",
+      "example": "Our standard terms require payment within thirty days of the invoice date.",
+      "exampleMeaning": "Điều khoản tiêu chuẩn của chúng tôi yêu cầu thanh toán trong vòng ba mươi ngày kể từ ngày hóa đơn."
+    }
+  ],
+  "fillIn": {
+    "passage": "Every Friday, Hassan Qureshi, the bookkeeper at Bluebell Landscaping, ___ the week's job sheets and turns them into invoices. Each invoice lists the hours worked, the plants supplied and the amount the company will ___ for travel. The payment ___ are printed at the bottom: thirty days to pay, with a three percent ___ for anyone who pays within a week.\n\nLast month a long-standing ___, Mrs. Delgado, phoned to say that her invoice did not ___ the written ___ she had received before the work began. The total was almost two hundred dollars higher. Hassan checked the job sheet and found the ___: a crew member had entered the hours for two gardens on one form. He apologized, ___ the error that afternoon, and emailed a corrected invoice. Because the fault was Bluebell's, he did not ___ the usual late fee even though the original due date had passed.\n\nMrs. Delgado paid ___ and thanked him for the quick response. Hassan has since built a spreadsheet that flags any invoice more than ten percent above the quoted price, which has made the whole process more ___.",
+    "answers": ["compiles", "charge", "terms", "discount", "customer", "reflect", "estimate", "mistake", "rectified", "impose", "promptly", "efficient"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người đàn ông ngồi ở bàn làm việc, đang dùng máy tính bỏ túi kiểm tra một chồng hóa đơn.",
+      "options": [
+        "The man is checking some documents with a calculator.",
+        "The man is handing cash to a customer.",
+        "The man is hanging a picture on the wall.",
+        "The documents are being printed."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người đàn ông dùng máy tính bỏ túi để kiểm tra giấy tờ. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "When is payment due on this invoice?",
+        "options": ["Within thirty days of the date at the top.", "I paid by credit card.", "The invoice is two pages long."],
+        "answer": "A",
+        "explanation": "Câu hỏi When cần câu trả lời về thời hạn. (B) nói về cách thanh toán, (C) nói về độ dài hóa đơn."
+      },
+      {
+        "question": "Who should I contact to rectify the mistake on my bill?",
+        "options": ["Yes, the bill was correct.", "Ms. Farouk in accounts handles corrections.", "The mistake was very small."],
+        "answer": "B",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người. (A) trả lời Yes cho câu hỏi Wh, (C) lặp từ 'mistake' nhưng không trả lời."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Accounts department, this is Julian.\nWoman: Hi, Julian. This is Sophie Laurent from Greenfield Dental. I've just received invoice 2286, and I think there's a mistake. We were promised a ten percent discount on the new chairs, but the invoice shows the full price.\nMan: I'm sorry about that. Let me look. Yes, I see the discount in your contract, but it wasn't applied when the invoice was compiled.\nWoman: Can you rectify it today? Our payment run is tomorrow morning, and I'd like to pay promptly.\nMan: Of course. I'll cancel this invoice and email a corrected one within the hour. The payment terms stay the same, thirty days from today.\nWoman: Thank you. Could you also copy our office manager, Mr. Reyes, on the email?\nMan: Certainly. You'll both have it before noon.",
+      "questions": [
+        {
+          "prompt": "Why is the woman calling?",
+          "options": ["To order more chairs", "To report an error on an invoice", "To ask for new payment terms", "To cancel a contract"],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'I think there's a mistake' về hóa đơn 2286 không áp dụng mức giảm giá đã hứa."
+        },
+        {
+          "prompt": "What does the man say about the discount?",
+          "options": ["It has expired.", "It applies only to cash payments.", "It was not applied to the invoice.", "It was never agreed on."],
+          "answer": "C",
+          "explanation": "Anh ấy xác nhận giảm giá có trong hợp đồng nhưng 'it wasn't applied when the invoice was compiled'."
+        },
+        {
+          "prompt": "What does the woman ask the man to do?",
+          "options": ["Send a copy to her colleague", "Extend the due date", "Visit the clinic", "Call her tomorrow"],
+          "answer": "A",
+          "explanation": "Cô ấy hỏi 'Could you also copy our office manager, Mr. Reyes, on the email?', tức gửi bản sao cho đồng nghiệp."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good afternoon, everyone. Starting on the first of next month, our billing team will move to the new invoicing software. There are three changes. First, every invoice will be generated directly from the job record, so the amount we charge will always reflect the hours and materials that were actually entered. Please make sure your job records are complete before Friday each week. Second, customers will receive their invoices by email the day after a job is finished, which is far more efficient than our current monthly batch. Third, the system will automatically impose a two percent late fee on accounts that are more than forty-five days overdue, so customers will no longer need a reminder letter from us. If a customer questions an invoice because it is higher than the original estimate, send the case to me and do not change the invoice yourself. Thank you.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the talk?",
+          "options": ["To introduce a new team member", "To explain changes to the billing process", "To announce a price increase", "To review last month's sales"],
+          "answer": "B",
+          "explanation": "Người nói trình bày ba thay đổi khi chuyển sang phần mềm lập hóa đơn mới."
+        },
+        {
+          "prompt": "According to the speaker, what should employees do each week?",
+          "options": ["Print the invoices", "Call overdue customers", "Complete their job records", "Send reminder letters"],
+          "answer": "C",
+          "explanation": "'Please make sure your job records are complete before Friday each week.'"
+        },
+        {
+          "prompt": "What should employees do if a customer disputes an invoice?",
+          "options": ["Offer a discount", "Change the invoice", "Refer the case to the speaker", "Cancel the job record"],
+          "answer": "C",
+          "explanation": "Người nói yêu cầu 'send the case to me and do not change the invoice yourself'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The clerk will _____ the sales figures from all five branches into one report.",
+        "options": ["compile", "compilation", "compiled", "compiler"],
+        "answer": "A",
+        "explanation": "Sau 'will' cần động từ nguyên mẫu: 'compile' (tổng hợp)."
+      },
+      {
+        "prompt": "The invoice total should _____ the price agreed in the original quote.",
+        "options": ["reflect", "reflection", "reflective", "reflectively"],
+        "answer": "A",
+        "explanation": "Sau 'should' cần động từ nguyên mẫu: 'reflect' (phản ánh đúng)."
+      },
+      {
+        "prompt": "The new online billing system is far more _____ than filling in paper forms.",
+        "options": ["efficient", "efficiency", "efficiently", "efficiencies"],
+        "answer": "A",
+        "explanation": "Sau 'is far more' cần tính từ ở dạng so sánh hơn: 'more efficient'."
+      },
+      {
+        "prompt": "Payment must be made _____ to qualify for the early-payment discount.",
+        "options": ["prompt", "promptly", "promptness", "prompted"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho 'be made': 'made promptly' (thanh toán kịp thời)."
+      },
+      {
+        "prompt": "The late fee listed in the payment _____ is five percent per month.",
+        "options": ["terms", "terminal", "termly", "termed"],
+        "answer": "A",
+        "explanation": "'payment terms' là cụm danh từ cố định chỉ điều khoản thanh toán."
+      },
+      {
+        "prompt": "The city plans to _____ a new fee on deliveries made during rush hour.",
+        "options": ["impose", "imposition", "imposing", "imposed"],
+        "answer": "A",
+        "explanation": "Sau 'plans to' cần động từ nguyên mẫu: 'impose a fee on' (áp một khoản phí lên)."
+      }
+    ],
+    "part6": {
+      "passage": "To: Billing Department, Oakhurst Office Furniture\nFrom: Nadia Petrov, Purchasing, Linden Insurance\nSubject: Invoice 5120\n\nDear Billing Team,\n\nThank you for the fast delivery of our six desks last week. However, I believe there is a ___ on invoice 5120. We were quoted $340 per desk, but the invoice shows $370. In addition, we were ___ a delivery fee even though the quote stated that delivery was free for orders over $1,500. Could you please ___ both points and send a corrected invoice? We would like to pay within your early-payment period and receive the two percent discount.\n\nKind regards,\nNadia Petrov",
+      "questions": [
+        {
+          "options": ["mistake", "mistaken", "mistakenly", "mistook"],
+          "answer": "A",
+          "explanation": "Sau 'there is a' cần danh từ số ít: 'a mistake' (một sai sót)."
+        },
+        {
+          "options": ["charged", "charge", "charging", "charges"],
+          "answer": "A",
+          "explanation": "'we were charged a delivery fee' là câu bị động, cần quá khứ phân từ 'charged'."
+        },
+        {
+          "options": ["rectify", "rectification", "rectified", "rectifying"],
+          "answer": "A",
+          "explanation": "Sau 'Could you please' cần động từ nguyên mẫu: 'rectify both points' (sửa cả hai điểm)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "SUMMIT PRINT AND DESIGN\nInvoice No. 7731\nDate: March 3\nCustomer: Meadowbrook Yoga Studio, 18 Ferry Road\nReference: Estimate E-412 (February 10)\n\n| Description | Quantity | Unit price | Amount |\n| Full-color brochures, tri-fold | 2,000 | $0.42 | $840.00 |\n| Window posters, A1 size | 6 | $38.00 | $228.00 |\n| Design revisions (2 rounds) | 3 hours | $60.00 | $180.00 |\n| Delivery | 1 | $25.00 | $25.00 |\n| Subtotal | | | $1,273.00 |\n| Early-payment discount (3%, if paid by March 13) | | | -$38.19 |\n\nPayment terms: Payment is due within 30 days of the invoice date. A late fee of 1.5% per month is imposed on balances unpaid after April 2. The 3% discount applies only if the full amount is received by March 13.\n\nNotes: This invoice reflects the quantities confirmed by email on February 24. The design revisions are charged at the hourly rate shown in the estimate; the first round of revisions was free. Please quote the invoice number when paying by bank transfer. Questions about this invoice should be sent to our accounts office within ten days so that we can rectify any problem promptly.\n\nThank you for your business.",
+      "questions": [
+        {
+          "prompt": "What is the main purpose of the document?",
+          "options": ["To request payment for printing services", "To provide an estimate for a new project", "To advertise design services", "To confirm a delivery date"],
+          "answer": "A",
+          "explanation": "Đây là hóa đơn (Invoice No. 7731) liệt kê các dịch vụ in ấn, thiết kế và số tiền phải trả."
+        },
+        {
+          "prompt": "How much does the customer save by paying before March 13?",
+          "options": ["$25.00", "$38.19", "$60.00", "$180.00"],
+          "answer": "B",
+          "explanation": "Dòng 'Early-payment discount (3%, if paid by March 13)' ghi mức giảm -$38.19."
+        },
+        {
+          "prompt": "What is indicated about the design revisions?",
+          "options": ["They were completed in one round.", "They were not included in the estimate.", "The first round was free of charge.", "They cost $38 per hour."],
+          "answer": "C",
+          "explanation": "Phần ghi chú: 'the first round of revisions was free'. Giá theo giờ là $60, và có hai vòng sửa."
+        },
+        {
+          "prompt": "What will happen if the balance is not paid by April 2?",
+          "options": ["The order will be canceled.", "A monthly late fee will be added.", "The discount will be doubled.", "The brochures will be collected."],
+          "answer": "B",
+          "explanation": "'A late fee of 1.5% per month is imposed on balances unpaid after April 2.'"
+        },
+        {
+          "prompt": "What is the customer asked to do when paying by bank transfer?",
+          "options": ["Call the accounts office", "Pay in two installments", "Include the invoice number", "Send a copy of the estimate"],
+          "answer": "C",
+          "explanation": "'Please quote the invoice number when paying by bank transfer', tức ghi số hóa đơn khi chuyển khoản."
+        }
+      ]
+    }
+  }
+}

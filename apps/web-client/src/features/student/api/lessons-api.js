@@ -50,3 +50,11 @@ export async function getLessonTestReview(id, attemptNumber) {
 export async function getLessonRanking(id) {
   return (await httpClient.get(`${lesson(id)}/ranking`)).data;
 }
+// The review that closes a unit (D121): its state, the learner's attempts
+// and the paper; and the answers scored.
+export async function getUnitReview(unitId) {
+  return (await httpClient.get(`/learning/units/${unitId}/review`)).data;
+}
+export async function submitUnitReview(unitId, answers) {
+  return (await httpClient.post(`/learning/units/${unitId}/review/submit`, { answers })).data;
+}

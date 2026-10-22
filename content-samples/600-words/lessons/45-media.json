@@ -1,0 +1,260 @@
+{
+  "number": 45,
+  "title": "Media",
+  "vocabulary": [
+    {
+      "word": "assignment",
+      "partOfSpeech": "noun",
+      "meaning": "nhiệm vụ được giao, bài viết được giao",
+      "example": "The editor gave the new reporter her first assignment: a story about the harbor renovation.",
+      "exampleMeaning": "Biên tập viên giao cho phóng viên mới nhiệm vụ đầu tiên: một bài về việc cải tạo bến cảng."
+    },
+    {
+      "word": "choose",
+      "partOfSpeech": "verb",
+      "meaning": "chọn, lựa chọn",
+      "example": "Readers can choose to receive the newsletter every day or once a week.",
+      "exampleMeaning": "Độc giả có thể chọn nhận bản tin hằng ngày hoặc mỗi tuần một lần."
+    },
+    {
+      "word": "constant",
+      "partOfSpeech": "adjective",
+      "meaning": "liên tục, không ngừng; không đổi",
+      "example": "A news website needs a constant flow of fresh stories to keep readers coming back.",
+      "exampleMeaning": "Một trang tin cần dòng bài mới liên tục để giữ độc giả quay lại."
+    },
+    {
+      "word": "constitute",
+      "partOfSpeech": "verb",
+      "meaning": "tạo thành, cấu thành; được coi là",
+      "example": "Local news stories constitute more than half of the paper's content.",
+      "exampleMeaning": "Tin địa phương chiếm hơn một nửa nội dung của tờ báo."
+    },
+    {
+      "word": "decision",
+      "partOfSpeech": "noun",
+      "meaning": "quyết định",
+      "example": "The decision to stop the print edition was announced to the staff on Monday.",
+      "exampleMeaning": "Quyết định ngừng bản in được thông báo cho nhân viên vào thứ Hai."
+    },
+    {
+      "word": "disseminate",
+      "partOfSpeech": "verb",
+      "meaning": "phổ biến, truyền bá rộng rãi (thông tin)",
+      "example": "The company uses its intranet to disseminate safety notices to all branches.",
+      "exampleMeaning": "Công ty dùng mạng nội bộ để phổ biến các thông báo an toàn đến mọi chi nhánh."
+    },
+    {
+      "word": "impact",
+      "partOfSpeech": "noun",
+      "meaning": "tác động, ảnh hưởng mạnh; (động từ) tác động đến",
+      "example": "The documentary had a strong impact on public opinion about the new highway.",
+      "exampleMeaning": "Bộ phim tài liệu đã tác động mạnh đến dư luận về tuyến đường cao tốc mới."
+    },
+    {
+      "word": "in-depth",
+      "partOfSpeech": "adjective",
+      "meaning": "sâu, kỹ lưỡng, chi tiết",
+      "example": "The magazine is known for in-depth reports that take months to research.",
+      "exampleMeaning": "Tạp chí nổi tiếng với những phóng sự chuyên sâu mất nhiều tháng để tìm hiểu."
+    },
+    {
+      "word": "investigate",
+      "partOfSpeech": "verb",
+      "meaning": "điều tra, tìm hiểu kỹ",
+      "example": "Two reporters spent six weeks investigating the delays at the city hospital.",
+      "exampleMeaning": "Hai phóng viên đã dành sáu tuần điều tra tình trạng chậm trễ ở bệnh viện thành phố."
+    },
+    {
+      "word": "link",
+      "partOfSpeech": "noun",
+      "meaning": "đường dẫn, liên kết; mối liên hệ; (động từ) kết nối",
+      "example": "The email includes a link to the full article on our website.",
+      "exampleMeaning": "Email có kèm đường dẫn đến bài viết đầy đủ trên trang web của chúng tôi."
+    },
+    {
+      "word": "subscribe",
+      "partOfSpeech": "verb",
+      "meaning": "đăng ký (mua dài hạn, nhận thông tin định kỳ)",
+      "example": "More than five thousand readers subscribed to the digital edition in its first month.",
+      "exampleMeaning": "Hơn năm nghìn độc giả đã đăng ký bản điện tử trong tháng đầu tiên."
+    },
+    {
+      "word": "thorough",
+      "partOfSpeech": "adjective",
+      "meaning": "kỹ lưỡng, cẩn thận, toàn diện",
+      "example": "Every article goes through a thorough fact check before it is published.",
+      "exampleMeaning": "Mỗi bài viết đều trải qua một vòng kiểm chứng kỹ lưỡng trước khi đăng."
+    }
+  ],
+  "fillIn": {
+    "passage": "When Mr. Rahman became editor of the Westbrook Courier, the paper was losing readers every month. The owners gave him one year to make it worth paying for. He began with a ___ review of what the paper printed. Short reports copied from other sources ___ nearly half of each issue, and readers said these stories had little ___ on their daily lives.\n\nMr. Rahman made a difficult ___: the Courier would print fewer stories but ___ the topics that mattered locally. Each reporter received one ___ a month to produce an ___ report on a subject such as school funding or bus routes. To ___ these reports more widely, the paper built a free email letter. Every message contained a ___ to the full article, and readers could ___ to receive it daily or weekly.\n\nThe change brought a ___ stream of comments from readers, and by the end of the year, four thousand people had ___ to the digital edition. The owners extended his contract for three more years.",
+    "answers": ["thorough", "constituted", "impact", "decision", "investigate", "assignment", "in-depth", "disseminate", "link", "choose", "constant", "subscribed"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người đàn ông ngồi ở bàn làm việc trong văn phòng tòa soạn, đang gõ trên máy tính xách tay; bên cạnh có một chồng báo và một chiếc điện thoại bàn.",
+      "options": [
+        "A man is typing on a laptop.",
+        "A man is reading a newspaper aloud.",
+        "Some newspapers are being delivered to a shop.",
+        "A woman is answering the telephone."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy một người đàn ông đang gõ máy tính xách tay. (B) nhầm chồng báo với hành động đọc, (C) và (D) không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Who will investigate the complaint about the article?",
+        "options": ["The senior editor, starting tomorrow.", "It was published last week.", "Yes, the complaint was serious."],
+        "answer": "A",
+        "explanation": "Câu hỏi Who cần câu trả lời chỉ người. (B) trả lời về thời gian đăng bài, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Would you like to subscribe to the weekly edition or the daily one?",
+        "options": ["The weekly one is enough for me.", "I read it on the train.", "Yes, I would."],
+        "answer": "A",
+        "explanation": "Câu hỏi lựa chọn (or) cần chọn một trong hai; (A) chọn bản tuần. (C) trả lời Yes cho câu hỏi lựa chọn, (B) không liên quan."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Jamal, I've got a new assignment for you. The editor wants an in-depth piece on the shortage of bus drivers in the region.\nMan: Sounds interesting. How long do I have?\nWoman: Three weeks. She'd like interviews with at least two transport companies and some drivers.\nMan: Okay. Should I choose the companies myself, or do you have a list?\nWoman: You can choose, but keep one of them outside the city. The decision to focus only on urban routes last time drew a lot of complaints.\nMan: Understood. Is there any earlier coverage I should read first?\nWoman: Yes, I'll send you a link to the two articles we ran in March. Read them before you call anyone.\nMan: Great. I'll have an outline for you by Friday.",
+      "questions": [
+        {
+          "prompt": "What is the man asked to write about?",
+          "options": ["A rise in bus fares", "A lack of bus drivers", "A new transport company", "Complaints about a city road"],
+          "answer": "B",
+          "explanation": "Người phụ nữ nói biên tập viên muốn 'an in-depth piece on the shortage of bus drivers'; 'lack' đồng nghĩa với 'shortage'."
+        },
+        {
+          "prompt": "What does the woman want the man to include?",
+          "options": ["A company outside the city", "Photographs of buses", "A survey of passengers", "An interview with the editor"],
+          "answer": "A",
+          "explanation": "Cô ấy nói 'keep one of them outside the city' vì lần trước chỉ tập trung vào tuyến nội thành đã bị phàn nàn."
+        },
+        {
+          "prompt": "What will the woman send the man?",
+          "options": ["A list of companies", "A deadline schedule", "A link to earlier articles", "A train ticket"],
+          "answer": "C",
+          "explanation": "'I'll send you a link to the two articles we ran in March.'"
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good afternoon, and thank you for joining this short briefing. As of next month, the Harbor Daily will change how it disseminates breaking news. Instead of sending a separate alert for every update, which many of you described as a constant interruption, we will send one morning summary and one evening summary. Important stories will still be reported as soon as they are confirmed, but only after a thorough check by two editors. Readers told us in last year's survey that accuracy had the biggest impact on their trust in us, and errors in fast alerts constitute the most common complaint we receive. Subscribers to the digital edition will see the new summaries automatically. If you have not yet subscribed, you can do so on our website for six dollars a month, with the first month free. Thank you for your continued support.",
+      "questions": [
+        {
+          "prompt": "What is the briefing mainly about?",
+          "options": ["A new subscription price", "A change in how news alerts are sent", "The closing of the print edition", "A survey of editors"],
+          "answer": "B",
+          "explanation": "Người nói giải thích tờ báo sẽ thay đổi cách gửi tin nóng: hai bản tóm tắt mỗi ngày thay vì nhiều cảnh báo riêng lẻ."
+        },
+        {
+          "prompt": "According to the speaker, what do readers care about most?",
+          "options": ["The speed of alerts", "Accuracy of reports", "The number of photographs", "The price of the paper"],
+          "answer": "B",
+          "explanation": "'accuracy had the biggest impact on their trust in us'."
+        },
+        {
+          "prompt": "What is offered to new subscribers?",
+          "options": ["A free first month", "A printed copy every day", "A discount for students", "A meeting with the editors"],
+          "answer": "A",
+          "explanation": "Cuối bài: 'six dollars a month, with the first month free'."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Each reporter must complete two _____ a week for the local news section.",
+        "options": ["assign", "assigned", "assignments", "assigning"],
+        "answer": "C",
+        "explanation": "Sau 'two' cần danh từ số nhiều: 'assignments' (bài được giao)."
+      },
+      {
+        "prompt": "Advertising revenue now _____ about forty percent of the station's income.",
+        "options": ["constitute", "constitutes", "constitution", "constituted"],
+        "answer": "B",
+        "explanation": "Chủ ngữ 'Advertising revenue' số ít, thì hiện tại với 'now', nên cần 'constitutes' (chiếm, tạo thành)."
+      },
+      {
+        "prompt": "The series had a measurable _____ on how residents sorted their household waste.",
+        "options": ["impact", "impacted", "impactful", "impacting"],
+        "answer": "A",
+        "explanation": "Sau 'a measurable' cần danh từ: 'impact on' (tác động đến)."
+      },
+      {
+        "prompt": "The reporter was praised for her _____ coverage of the election results.",
+        "options": ["thorough", "thoroughly", "thoroughness", "through"],
+        "answer": "A",
+        "explanation": "Trước danh từ 'coverage' cần tính từ: 'thorough' (kỹ lưỡng). 'through' là giới từ có cách viết gần giống."
+      },
+      {
+        "prompt": "The editor's _____ to publish the story was supported by the legal team.",
+        "options": ["decide", "decisive", "decision", "decisively"],
+        "answer": "C",
+        "explanation": "Sau sở hữu 'The editor's' cần danh từ làm chủ ngữ: 'decision' (quyết định)."
+      },
+      {
+        "prompt": "The podcast is sent to everyone who _____ to the station's weekly newsletter.",
+        "options": ["subscribe", "subscribes", "subscriber", "subscription"],
+        "answer": "B",
+        "explanation": "Mệnh đề quan hệ với 'everyone who' dùng động từ số ít: 'subscribes to' (đăng ký nhận)."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Department Heads\nFrom: Corporate Communications\nSubject: Company newsletter\n\nStarting in March, the monthly staff newsletter will be published online only. This will allow us to ___ company news faster and at a lower cost. Each issue will be announced by email, and the message will contain a ___ to the newsletter page on the intranet. Department heads are asked to send one short update per month; please avoid long reports, as the newsletter is meant to be a quick read. Our goal is a ___ flow of clear information rather than occasional long documents. Send your updates to the Communications mailbox by the 20th of each month.",
+      "questions": [
+        {
+          "options": ["disseminate", "dissemination", "disseminated", "disseminating"],
+          "answer": "A",
+          "explanation": "Cấu trúc 'allow us to' cần động từ nguyên mẫu: 'disseminate' (phổ biến tin tức)."
+        },
+        {
+          "options": ["link", "linked", "linking", "linkage"],
+          "answer": "A",
+          "explanation": "Sau 'a' cần danh từ: 'a link to' (đường dẫn đến trang bản tin)."
+        },
+        {
+          "options": ["constant", "constantly", "constancy", "constants"],
+          "answer": "A",
+          "explanation": "Trước danh từ 'flow' cần tính từ: 'constant' (liên tục)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "THE NORTHGATE REVIEW\n\nDear Reader,\n\nTwelve months ago, the Northgate Review made a bold decision: we stopped printing short daily updates and chose to focus on in-depth reporting.\n\nOur new investigative team, led by senior reporter Amara Osei, published fourteen major reports this year. Their series on water quality in the northern suburbs led the city council to test every public fountain, and their investigation of parking contracts saved taxpayers an estimated 1.2 million dollars. Reports of this kind take months of thorough research, and your subscriptions make that work possible.\n\n| Subscription | Price | Includes |\n| Digital | 7 dollars a month | Website, app and morning email |\n| Digital plus weekend print | 12 dollars a month | Digital access and the Saturday paper |\n| Supporter | 20 dollars a month | All of the above and two tickets to our annual readers' evening |\n\nFrom January, every subscriber will also receive one long report by email each Sunday, with links to the documents behind the story.\n\nIf you already subscribe, thank you. If not, please join us through the subscription page on our website.\n\nWith gratitude,\nThomas Berglund\nEditor",
+      "questions": [
+        {
+          "prompt": "What is the main purpose of the letter?",
+          "options": ["To announce a change of editor", "To report the results of a new approach and invite subscriptions", "To apologize for an error in a report", "To advertise a job on the investigative team"],
+          "answer": "B",
+          "explanation": "Bức thư kể lại kết quả sau một năm chuyển sang phóng sự chuyên sâu và mời độc giả đăng ký."
+        },
+        {
+          "prompt": "What did the series on water quality lead to?",
+          "options": ["A new water tax", "Testing of public fountains", "The closing of a factory", "A change in parking contracts"],
+          "answer": "B",
+          "explanation": "'Their series on water quality ... led the city council to test every public fountain.'"
+        },
+        {
+          "prompt": "How much does the subscription that includes the Saturday paper cost?",
+          "options": ["7 dollars a month", "12 dollars a month", "20 dollars a month", "24 dollars a month"],
+          "answer": "B",
+          "explanation": "Bảng ghi gói 'Digital plus weekend print' giá 12 đô la một tháng, gồm bản điện tử và báo thứ Bảy."
+        },
+        {
+          "prompt": "What will subscribers receive from January?",
+          "options": ["A daily printed paper", "A weekly long report by email", "Free tickets to a concert", "A phone call from the editor"],
+          "answer": "B",
+          "explanation": "'From January, every subscriber will also receive one long report by email each Sunday'."
+        },
+        {
+          "prompt": "Who is Amara Osei?",
+          "options": ["The editor of the Review", "A city council member", "The head of the investigative team", "A new subscriber"],
+          "answer": "C",
+          "explanation": "'Our new investigative team, led by senior reporter Amara Osei'. Biên tập viên ký tên cuối thư là Thomas Berglund."
+        }
+      ]
+    }
+  }
+}

@@ -21,6 +21,8 @@ export const contentErrors = Object.freeze({
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Unit was not found', 404),
   lessonNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Lesson was not found', 404),
+  unitReviewNotFound: () =>
+    new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'The unit has no published review', 404),
   mediaNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Media was not found', 404),
   examTypeNotFound: () =>
@@ -51,10 +53,22 @@ export const contentErrors = Object.freeze({
     new ContentError(ContentResponseCode.CONTENT_INVALID_STATE, message, 409, { reason }),
   listeningExerciseNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Listening exercise was not found', 404),
+  // Deleting is refused (D118): a listening exercise still used by the course
+  // (reason COURSE_REFERENCE), or a published listening placement.
+  inUse: (reason, message) =>
+    new ContentError(ContentResponseCode.CONTENT_IN_USE, message, 409, { reason }),
   mockNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Mock test was not found', 404),
   placementNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Placement test is not published', 404),
+  // Restoring (D122) copies a published or taken-down version; the draft
+  // itself is what the editor already holds.
+  versionIsDraft: () =>
+    new ContentError(ContentResponseCode.CONTENT_INVALID_STATE, 'This version is the current draft', 409),
+  // Deleting a version (D128): the one learners get stays until another is
+  // published or it is taken down.
+  versionIsCurrent: () =>
+    new ContentError(ContentResponseCode.CONTENT_INVALID_STATE, 'This version is the one learners get; unpublish it or publish another first', 409, { reason: 'CURRENT' }),
   noDraft: () =>
     new ContentError(
       ContentResponseCode.CONTENT_INVALID_STATE,
@@ -71,7 +85,7 @@ export const contentErrors = Object.freeze({
   pronunciationUnavailable: () =>
     new ContentError(
       ContentResponseCode.PRONUNCIATION_UNAVAILABLE,
-      'The dictionary service is not answering; try again or enter the pronunciation manually',
+      'The pronunciation service is not answering; try again or enter the pronunciation manually',
       503,
     ),
   mediaInvalid: (reason, message) =>

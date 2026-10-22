@@ -31,3 +31,13 @@ export function weeklyTrend(points = []) {
   const lastWeek = points.slice(-14, -7).reduce((sum, point) => sum + point.count, 0);
   return { thisWeek, lastWeek, delta: thisWeek - lastWeek };
 }
+
+// The figures beside the sign-ups chart: total over the window, the busiest
+// day (the latest one on a tie; null when nobody signed up) and the daily
+// average to one decimal.
+export function signupSummary(points = []) {
+  const total = points.reduce((sum, point) => sum + point.count, 0);
+  const peak = points.reduce((best, point) => (point.count > 0 && (!best || point.count >= best.count) ? point : best), null);
+  const average = points.length ? Math.round((total * 10) / points.length) / 10 : 0;
+  return { total, peak, average };
+}

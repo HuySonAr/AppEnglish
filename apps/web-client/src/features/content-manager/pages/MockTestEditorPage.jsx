@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ContentResponseCode,
   LESSON_TEST_PARTS,
@@ -9,6 +9,9 @@ import {
   MediaSection,
 } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
+import { ContentDangerActions } from '../components/ContentDangerActions.jsx';
+import { DiscardDraftButton } from '../components/DiscardDraftButton.jsx';
+import { deleteMockTest, unpublishMockTest } from '../api/content-api.js';
 import { notify } from '../../../lib/notify.js';
 import {
   getMockTest,
@@ -42,6 +45,8 @@ import {
   TabsTrigger,
 } from '../../../components/ui';
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { VersionHistory } from '../components/VersionHistory.jsx';
+import { PublishButton, usePublishAction } from '../../../components/shared/PublishButton.jsx';
 
 const saveErrorMessage = (error) =>
   `${error?.fileName ? `${error.fileName}: ` : ''}${getApiErrorMessage(error)}`;
@@ -54,10 +59,12 @@ export function MockTestEditorPage() {
   const [state, setState] = useState('loading');
   const [mockTest, setMockTest] = useState(null);
   const [details, setDetails] = useState({ title: '', level: '1', durationMinutes: '' });
+  const navigate = useNavigate();
   const [status, setStatus] = useState(lessonState(null));
   const [content, setContent] = useState(null);
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
+  const publish = usePublishAction();
   const [issues, setIssues] = useState([]);
   const [partTab, setPartTab] = useState(LESSON_TEST_PARTS[0].key);
 
@@ -136,6 +143,7 @@ export function MockTestEditorPage() {
       apply(data);
       setIssues([]);
       notify({ title: `Published version ${data.published.versionNumber}` });
+      return true;
     } catch (error) {
       const found = error?.response?.data?.data?.issues;
       if (errorCode(error) === ContentResponseCode.CONTENT_NOT_PUBLISHABLE && found?.length) {
@@ -248,9 +256,20 @@ export function MockTestEditorPage() {
           <Button loading={busy} variant="outline" disabled={busy || !dirty} onClick={onSave}>
             {busy ? 'Working…' : 'Save draft'}
           </Button>
-          <Button disabled={busy || !(dirty || status.hasDraft)} onClick={onPublish}>
-            Publish
-          </Button>
+          <PublishButton state={publish.state} disabled={busy || !(dirty || status.hasDraft)} onClick={() => publish.run(onPublish)} />
+          {status.hasDraft ? (
+            <DiscardDraftButton kind="mockTest" id={mockTestId} noun="mock test" disabled={busy} onDiscarded={load} />
+          ) : null}
+          <ContentDangerActions
+            noun="mock test"
+            published={Boolean(status.publishedVersion)}
+            busy={busy}
+            onUnpublish={async () => setStatus(lessonState((await unpublishMockTest(mockTestId)).data))}
+            onDelete={async () => {
+              await deleteMockTest(mockTestId);
+              navigate('/content-manager/mock-tests', { replace: true });
+            }}
+          />
         </div>
       </div>
 
@@ -305,6 +324,8 @@ export function MockTestEditorPage() {
           </TabsContent>
         ))}
       </Tabs>
+
+      <VersionHistory kind="mockTest" id={mockTestId} noun="mock test" refreshKey={`${status.publishedVersion}-${status.draftVersion}`} onRestored={load} />
     </section>
   );
 }

@@ -43,6 +43,8 @@ const rpcs = {
     run: (service, { actor, id, payload }) => service.saveDraft(actor, id, payload),
   },
   PublishListeningExercise: { id: true, run: (service, { actor, id }) => service.publish(actor, id) },
+  UnpublishListeningExercise: { id: true, run: (service, { actor, id }) => service.unpublish(actor, id) },
+  DeleteListeningExercise: { id: true, run: (service, { actor, id }) => service.delete(actor, id) },
   RequestListeningAutoTime: { id: true, run: (service, { actor, id }) => service.requestAutoTime(actor, id) },
   GetListeningAutoTime: { id: true, run: (service, { actor, id }) => service.getAutoTime(actor, id) },
   RequestListeningTranscribe: { id: true, run: (service, { actor, id }) => service.requestTranscribe(actor, id) },

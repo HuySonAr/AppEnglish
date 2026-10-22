@@ -95,19 +95,25 @@ function QuestionCard({ spec, question, number, path, edit, media, onRemove, gra
 // Questions carry the number they have in a full test (1-200 across the
 // parts). A part cannot hold more questions than a full test has there, and
 // a conversation or talk no more than three.
-export function MockPartEditor({ spec, part, edit, updatePart, media }) {
+// A unit review (D121) reuses the editor for Parts 5 and 6 with its own
+// limits: target (questions of the part), firstNumber (of its first
+// question), maxSets and setQuestionLimit (passages and their questions),
+// hint (the sentence after the badges) and paste false (no paste dialog).
+export function MockPartEditor({ spec, part, edit, updatePart, media, target: targetProp, firstNumber: firstNumberProp, maxSets: maxSetsProp, setQuestionLimit, hint, paste = true }) {
   const base = ['test', spec.key];
   const grouped = MOCK_GROUPED_PARTS.includes(spec.key);
   const groupAudio = MOCK_GROUP_AUDIO_PARTS.includes(spec.key);
   // What a set of this part is called.
   const setName = groupAudio ? (spec.key === 'part3' ? 'Conversation' : 'Talk') : 'Passage';
-  const target = MOCK_TEST_PART_COUNTS[spec.key];
+  const target = targetProp ?? MOCK_TEST_PART_COUNTS[spec.key];
   // Sets that come with a graphic: conversations 11-13, talks 9-10.
   const graphicSets = MOCK_GRAPHIC_SET_INDEXES[spec.key] || [];
-  const firstNumber = MOCK_FIRST_QUESTION_NUMBERS[spec.key];
-  const numberOf = (question) => mockQuestionNumber(spec, part, part.questions.indexOf(question));
+  const firstNumber = firstNumberProp ?? MOCK_FIRST_QUESTION_NUMBERS[spec.key];
+  const numberOf = (question) =>
+    firstNumberProp === undefined ? mockQuestionNumber(spec, part, part.questions.indexOf(question)) : firstNumber + part.questions.indexOf(question);
   const partFull = part.questions.length >= target;
-  const maxSets = groupAudio ? target / MOCK_SET_QUESTION_COUNT : Infinity;
+  const maxSets = maxSetsProp ?? (groupAudio ? target / MOCK_SET_QUESTION_COUNT : Infinity);
+  const setLimit = setQuestionLimit ?? (groupAudio ? MOCK_SET_QUESTION_COUNT : Infinity);
   // graphic is the question holding the graphic of the card's set, if any.
   const card = (question, graphic = null) => (
     <QuestionCard
@@ -143,11 +149,15 @@ export function MockPartEditor({ spec, part, edit, updatePart, media }) {
           Questions {firstNumber}–{firstNumber + target - 1}
         </Badge>
         <span className="text-sm text-muted-foreground">
-          {skillLabels[spec.skill]} · a full TOEIC test has {target} here, the most this part can hold
-          {spec.option.text ? '' : ' · each recording reads its options; learners see only the letters'}
-          {groupAudio ? ` · one recording per ${setName.toLowerCase()}, with up to ${MOCK_SET_QUESTION_COUNT} questions · ${setName.toLowerCase()}s ${graphicSets[0] + 1}–${graphicSets.at(-1) + 1} each have a graphic on one question, usually the middle one` : ''}
+          {hint ?? (
+            <>
+              {skillLabels[spec.skill]} · a full TOEIC test has {target} here, the most this part can hold
+              {spec.option.text ? '' : ' · each recording reads its options; learners see only the letters'}
+              {groupAudio ? ` · one recording per ${setName.toLowerCase()}, with up to ${MOCK_SET_QUESTION_COUNT} questions · ${setName.toLowerCase()}s ${graphicSets[0] + 1}–${graphicSets.at(-1) + 1} each have a graphic on one question, usually the middle one` : ''}
+            </>
+          )}
         </span>
-        {MOCK_PASTE_PARTS.includes(spec.key) ? (
+        {paste && MOCK_PASTE_PARTS.includes(spec.key) ? (
           <PasteQuestionsDialog spec={spec} part={part} setName={groupAudio ? setName : null} onApply={(pasted) => updatePart(() => pasted)} />
         ) : null}
       </div>
@@ -162,7 +172,7 @@ export function MockPartEditor({ spec, part, edit, updatePart, media }) {
             const graphic = groupAudio ? graphicQuestion(part, group.id) : null;
             const showGraphic = graphic && (graphicSet || graphic.imageMediaId);
             const setQuestions = part.questions.filter((question) => question.groupId === group.id);
-            const setFull = groupAudio && setQuestions.length >= MOCK_SET_QUESTION_COUNT;
+            const setFull = setQuestions.length >= setLimit;
             return (
               <div key={group.id} className="space-y-3 rounded-xl border border-dashed p-4">
                 <div className="flex items-center justify-between gap-3">

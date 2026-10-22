@@ -1,4 +1,4 @@
-import { COURSE_LEVELS, LISTENING_LEVELS, UnitStatus } from '@appenglish/content-contracts';
+import { COURSE_LEVELS, COURSE_TEST_LEVELS, LISTENING_LEVELS, UnitStatus } from '@appenglish/content-contracts';
 
 // Pure rules of the Content Manager dashboard (D116): what exists, what is
 // published, what still waits in a draft and what blocks learners.
@@ -15,7 +15,7 @@ function tally(items) {
 // The items of the listening course (units and level tests) across levels.
 export function courseItems(course) {
   return (course?.levels || []).flatMap((entry) => [
-    ...entry.units.map((unit) => ({ ...unit, level: entry.level, kind: 'unit' })),
+    ...(entry.topics || []).map((topic) => ({ ...topic, level: entry.level, kind: 'topic' })),
     ...(entry.levelTest ? [{ ...entry.levelTest, level: entry.level, kind: 'level_test' }] : []),
   ]);
 }
@@ -29,7 +29,7 @@ export function contentSummary({ units = [], mockTests = [], exercises = [], cou
     lessons: tally(lessons),
     mockTests: tally(mockTests),
     exercises: tally(exercises),
-    courseUnits: tally(items.filter((item) => item.kind === 'unit')),
+    courseTopics: tally(items.filter((item) => item.kind === 'topic')),
     levelTests: tally(items.filter((item) => item.kind === 'level_test')),
   };
 }
@@ -46,9 +46,7 @@ export function pendingDrafts({ units = [], mockTests = [], exercises = [], cour
   for (const exercise of exercises)
     if (drafting(exercise)) rows.push({ id: exercise.id, kind: 'Listening exercise', title: exercise.title, context: [exercise.level, exercise.topic?.name].filter(Boolean).join(' · '), published: published(exercise), to: `/content-manager/listening/${exercise.id}` });
   for (const item of courseItems(course))
-    if (drafting(item)) rows.push({ id: item.id, kind: item.kind === 'unit' ? 'Course unit' : 'Level test', title: item.title, context: item.level, published: published(item), to: `/content-manager/listening-course/${item.id}` });
-  if (course?.placement && drafting(course.placement))
-    rows.push({ id: course.placement.id, kind: 'Listening placement', title: course.placement.title, context: 'Listening course', published: published(course.placement), to: `/content-manager/listening-course/${course.placement.id}` });
+    if (drafting(item)) rows.push({ id: item.id, kind: item.kind === 'topic' ? 'Course topic' : 'Level test', title: item.title, context: item.level, published: published(item), to: `/content-manager/listening-course/${item.id}` });
   return rows.sort((a, b) => Number(a.published) - Number(b.published) || a.kind.localeCompare(b.kind) || a.title.localeCompare(b.title));
 }
 
@@ -57,16 +55,15 @@ export function readinessChecks({ units = [], mockTests = [], exercises = [], co
   const lessons = units.flatMap((unit) => unit.lessons || []);
   const items = courseItems(course);
   const emptyUnits = units.filter((unit) => unit.status === UnitStatus.PUBLISHED && !(unit.lessons || []).some(published));
-  const levelsWithoutUnits = COURSE_LEVELS.filter((level) => !items.some((item) => item.kind === 'unit' && item.level === level && published(item)));
-  const levelsWithoutTest = COURSE_LEVELS.filter((level) => !items.some((item) => item.kind === 'level_test' && item.level === level && published(item)));
+  const levelsWithoutTopics = COURSE_LEVELS.filter((level) => !items.some((item) => item.kind === 'topic' && item.level === level && published(item)));
+  const levelsWithoutTest = COURSE_TEST_LEVELS.filter((level) => !items.some((item) => item.kind === 'level_test' && item.level === level && published(item)));
   return [
     { key: 'placement', ok: Boolean(placement?.publishedVersion), label: 'Placement test published', detail: placement?.publishedVersion ? `Version ${placement.publishedVersion}` : 'New learners cannot be placed yet', to: '/content-manager/placement' },
     { key: 'lessons', ok: lessons.some(published), label: 'At least one lesson published', detail: `${count(lessons, published)} of ${lessons.length} lessons`, to: '/content-manager/units' },
     { key: 'emptyUnits', ok: emptyUnits.length === 0, label: 'Every published unit has a published lesson', detail: emptyUnits.length ? `${emptyUnits.length} unit${emptyUnits.length === 1 ? '' : 's'} with none: ${emptyUnits.map((unit) => unit.title).join(', ')}` : 'No empty unit', to: '/content-manager/units' },
     { key: 'mock', ok: mockTests.some(published), label: 'At least one mock test published', detail: `${count(mockTests, published)} of ${mockTests.length} tests`, to: '/content-manager/mock-tests' },
-    { key: 'coursePlacement', ok: published(course?.placement), label: 'Listening placement published', detail: course?.placement ? (published(course.placement) ? `Version ${course.placement.publishedVersionNumber}` : 'Written but not published') : 'Not created yet', to: '/content-manager/listening-placement' },
-    { key: 'courseLevels', ok: levelsWithoutUnits.length === 0, label: 'Every listening level has a published unit', detail: levelsWithoutUnits.length ? `Missing: ${levelsWithoutUnits.join(', ')}` : 'All levels covered', to: '/content-manager/listening-course' },
-    { key: 'levelTests', ok: levelsWithoutTest.length === 0, label: 'Every listening level has a published level test', detail: levelsWithoutTest.length ? `Missing: ${levelsWithoutTest.join(', ')}` : 'All levels covered', to: '/content-manager/listening-course' },
+    { key: 'courseLevels', ok: levelsWithoutTopics.length === 0, label: 'Every listening level has a published topic', detail: levelsWithoutTopics.length ? `Missing: ${levelsWithoutTopics.join(', ')}` : 'All levels covered', to: '/content-manager/listening-course' },
+    { key: 'levelTests', ok: levelsWithoutTest.length === 0, label: 'Every listening level but the last has a published level test', detail: levelsWithoutTest.length ? `Missing: ${levelsWithoutTest.join(', ')}` : 'All levels covered', to: '/content-manager/listening-course' },
     { key: 'exercises', ok: exercises.some(published), label: 'Listening practice has published exercises', detail: `${count(exercises, published)} of ${exercises.length} exercises`, to: '/content-manager/listening' },
   ];
 }
@@ -89,16 +86,17 @@ export function exercisesByLevel(exercises = []) {
   });
 }
 
-// The listening course per level: units and level test, with what is live.
+// The listening course per level: topics and level test, with what is live.
+// The last level has no level test ('none').
 export function courseCoverage(course) {
   return COURSE_LEVELS.map((level) => {
     const entry = (course?.levels || []).find((item) => item.level === level);
-    const units = entry?.units || [];
+    const topics = entry?.topics || [];
     return {
       level,
-      units: units.length,
-      publishedUnits: count(units, published),
-      levelTest: entry?.levelTest ? (published(entry.levelTest) ? 'published' : 'draft') : 'missing',
+      topics: topics.length,
+      publishedTopics: count(topics, published),
+      levelTest: !COURSE_TEST_LEVELS.includes(level) ? 'none' : entry?.levelTest ? (published(entry.levelTest) ? 'published' : 'draft') : 'missing',
     };
   });
 }

@@ -31,6 +31,7 @@ Code: `apps/speech-service/` (Python 3.12).
 | Queue | Producer → consumer | Body (JSON) |
 |---|---|---|
 | `speech.autotime.requests` | content-service → speech-service | `{ jobId, task, audioUrl, language: "en", kind, lines }`: task `align` (Auto-time) with `lines: [{ id, text }]` (song lines without their brackets); task `transcribe` (D98) with no lines |
+| `speech.pronounce.requests` | content-service → speech-service (D123) | `{ word, accents?: ["uk", "us"] }` with `reply_to` and `correlation_id` set; the answer goes to `reply_to` with the same `correlation_id`: `{ status: "DONE", word, phonetic: { uk, us }, audio: { uk, us } }` (IPA with slashes; MP3 as base64) or `{ status: "FAILED", error }` |
 | `speech.autotime.results` | speech-service → content-service | `{ jobId, status: "RUNNING" \| "DONE" \| "FAILED", lines?, error? }`. align: `lines: [{ id, start, end, matched }]`, times in seconds (one decimal) or null when the line was not heard, `matched` the share (0–1) of the line's words heard. transcribe: `lines: [{ text, start, end }]` |
 
 Queue names and statuses are in `@appenglish/content-contracts` (`SpeechQueue`,
@@ -46,9 +47,21 @@ Queue names and statuses are in `@appenglish/content-contracts` (`SpeechQueue`,
 | `WHISPER_COMPUTE_TYPE` | `int8` | CTranslate2 compute type |
 | `WHISPER_VAD_FILTER` | `false` | Skip non-speech parts before transcribing |
 | `SPEECH_CACHE_DIR` | `apps/speech-service/.cache/words` | Words heard by recording (D99); delete it to make the service listen again |
+| `PIPER_VOICE_UK`, `PIPER_VOICE_US` | `en_GB-cori-medium`, `en_US-lessac-medium` | Piper voices for pronunciation (D123) |
+| `PIPER_VOICES_DIR` | `apps/speech-service/.cache/voices` | Where the voices are kept; a missing voice is downloaded from Hugging Face on first use (about 60 MB each) |
 
 The model is downloaded from Hugging Face on first use (about 480 MB for
 `small.en`) and cached in the user's profile.
+
+Pronunciation (D123) runs in `speech_service/pronounce.py` on its own thread
+and connection: `Pronouncer` loads one Piper voice per accent, `format_ipa`
+turns espeak phonemes into dictionary-style IPA (D148): espeak's own symbols
+become the dictionaries' ones (ɐ→ə, ɹ→r, ɛ→e, ᵻ→ɪ, ɾ→t, British a→æ but not
+in aɪ/aʊ), the stress mark goes to the start of the stressed syllable (only
+consonants that can begin an English syllable move with it, so "enjoy" is
+/enˈdʒɔɪ/), and one-syllable words carry no mark, `wav_to_mp3` encodes with
+PyAV (libmp3lame, 64 kbit/s mono), `process_pronounce` answers one request.
+A word takes well under a second after the first load.
 
 ## Commands
 

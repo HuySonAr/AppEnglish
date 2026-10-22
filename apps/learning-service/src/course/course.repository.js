@@ -1,4 +1,4 @@
-import { CourseLessonResultEntity, CourseMistakeEntity, CoursePlacementEntity, CourseTestResultEntity } from '../database/learning.entities.js';
+import { CourseLessonResultEntity, CourseTestResultEntity } from '../database/learning.entities.js';
 
 export class CourseRepository {
   constructor(dataSource) {
@@ -38,7 +38,8 @@ export class CourseRepository {
     return this.findResult(accountId, lessonId);
   }
 
-  // Unit checks and level tests (D102), by item id.
+  // Level tests (D145), by item id. A topic done is kept as a lesson result
+  // whose unitId and lessonId are the topic id.
   async listTestResults(accountId) {
     return (await this.repo(CourseTestResultEntity)).find({ where: { accountId } });
   }
@@ -64,67 +65,4 @@ export class CourseRepository {
     return this.findTestResult(accountId, itemId);
   }
 
-  // The listening placement (D103): one row per learner once taken or skipped.
-  async findPlacement(accountId) {
-    return (await this.repo(CoursePlacementEntity)).findOne({ where: { accountId } });
-  }
-
-  // Returns null when the learner already has one (taken or skipped).
-  async createPlacement(placement) {
-    const repository = await this.repo(CoursePlacementEntity);
-    const inserted = await repository
-      .createQueryBuilder()
-      .insert()
-      .values(placement)
-      .orIgnore()
-      .returning('*')
-      .execute();
-    return inserted.raw.length ? this.findPlacement(placement.accountId) : null;
-  }
-
-  // The sentences written down wrong (D104), the latest first.
-  async listMistakes(accountId) {
-    return (await this.repo(CourseMistakeEntity)).find({ where: { accountId }, order: { lastMissedAt: 'DESC' } });
-  }
-
-  async findMistake(accountId, id) {
-    return (await this.repo(CourseMistakeEntity)).findOne({ where: { accountId, id } });
-  }
-
-  // A sentence written wrong again counts once more, with the words missed
-  // this time.
-  async recordMistake(mistake) {
-    const repository = await this.repo(CourseMistakeEntity);
-    await repository.query(
-      `INSERT INTO "course_mistakes" ("accountId", "unitId", "lessonId", "segmentId", "level", "unitTitle", "lessonTitle", "text", "speaker", "missedWords", "timesMissed", "lastMissedAt")
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 1, $11)
-       ON CONFLICT ("accountId", "lessonId", "segmentId") DO UPDATE SET
-         "unitTitle" = EXCLUDED."unitTitle",
-         "lessonTitle" = EXCLUDED."lessonTitle",
-         "text" = EXCLUDED."text",
-         "speaker" = EXCLUDED."speaker",
-         "missedWords" = EXCLUDED."missedWords",
-         "timesMissed" = "course_mistakes"."timesMissed" + 1,
-         "lastMissedAt" = EXCLUDED."lastMissedAt",
-         "updatedAt" = now()`,
-      [
-        mistake.accountId,
-        mistake.unitId,
-        mistake.lessonId,
-        mistake.segmentId,
-        mistake.level,
-        mistake.unitTitle,
-        mistake.lessonTitle,
-        mistake.text,
-        mistake.speaker,
-        JSON.stringify(mistake.missedWords),
-        mistake.lastMissedAt,
-      ],
-    );
-  }
-
-  // A sentence written right leaves the notebook.
-  async deleteMistake(accountId, lessonId, segmentId) {
-    await (await this.repo(CourseMistakeEntity)).delete({ accountId, lessonId, segmentId });
-  }
 }

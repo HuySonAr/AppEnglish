@@ -1,0 +1,260 @@
+{
+  "number": 48,
+  "title": "Health Insurance",
+  "vocabulary": [
+    {
+      "word": "allow",
+      "partOfSpeech": "verb",
+      "meaning": "cho phép; cấp cho (một khoản)",
+      "example": "The plan allows employees to add a spouse or child for a small extra fee.",
+      "exampleMeaning": "Gói bảo hiểm cho phép nhân viên thêm vợ/chồng hoặc con với một khoản phí nhỏ."
+    },
+    {
+      "word": "alternative",
+      "partOfSpeech": "noun",
+      "meaning": "phương án thay thế, lựa chọn khác",
+      "example": "If the standard plan is too costly, the HR office can suggest an alternative with a higher deductible.",
+      "exampleMeaning": "Nếu gói tiêu chuẩn quá đắt, phòng nhân sự có thể gợi ý một phương án khác với mức khấu trừ cao hơn."
+    },
+    {
+      "word": "aspect",
+      "partOfSpeech": "noun",
+      "meaning": "khía cạnh, mặt (của vấn đề)",
+      "example": "Dental coverage is the aspect of the new plan that staff asked about most.",
+      "exampleMeaning": "Quyền lợi nha khoa là khía cạnh của gói mới mà nhân viên hỏi nhiều nhất."
+    },
+    {
+      "word": "concern",
+      "partOfSpeech": "noun",
+      "meaning": "mối lo ngại, điều băn khoăn; sự quan tâm",
+      "example": "Several employees raised a concern about the rising monthly premium.",
+      "exampleMeaning": "Một số nhân viên nêu mối lo ngại về phí bảo hiểm hằng tháng tăng."
+    },
+    {
+      "word": "emphasize",
+      "partOfSpeech": "verb",
+      "meaning": "nhấn mạnh",
+      "example": "The benefits manager emphasized that enrollment closes on the last day of November.",
+      "exampleMeaning": "Quản lý phúc lợi nhấn mạnh rằng thời hạn đăng ký kết thúc vào ngày cuối tháng Mười Một."
+    },
+    {
+      "word": "incur",
+      "partOfSpeech": "verb",
+      "meaning": "gánh chịu, phải trả (chi phí, nợ, tổn thất)",
+      "example": "Any medical costs you incur while traveling abroad must be claimed within 30 days.",
+      "exampleMeaning": "Mọi chi phí y tế bạn phải trả khi đi nước ngoài phải được yêu cầu bồi hoàn trong 30 ngày."
+    },
+    {
+      "word": "personnel",
+      "partOfSpeech": "noun",
+      "meaning": "nhân sự, toàn thể nhân viên; phòng nhân sự",
+      "example": "All full-time personnel are eligible for the company health plan after three months.",
+      "exampleMeaning": "Toàn bộ nhân viên toàn thời gian đủ điều kiện tham gia gói bảo hiểm của công ty sau ba tháng."
+    },
+    {
+      "word": "policy",
+      "partOfSpeech": "noun",
+      "meaning": "hợp đồng bảo hiểm; chính sách",
+      "example": "Please read your policy carefully to see which treatments are covered.",
+      "exampleMeaning": "Hãy đọc kỹ hợp đồng bảo hiểm để biết những điều trị nào được chi trả."
+    },
+    {
+      "word": "portion",
+      "partOfSpeech": "noun",
+      "meaning": "phần, một phần (của tổng thể)",
+      "example": "The company pays a large portion of the premium, and the employee pays the rest.",
+      "exampleMeaning": "Công ty trả phần lớn phí bảo hiểm, còn nhân viên trả phần còn lại."
+    },
+    {
+      "word": "regardless",
+      "partOfSpeech": "adverb",
+      "meaning": "bất kể, không phân biệt (thường đi với 'of')",
+      "example": "Every worker receives basic coverage regardless of position or length of service.",
+      "exampleMeaning": "Mọi người lao động đều được bảo hiểm cơ bản bất kể chức vụ hay thâm niên."
+    },
+    {
+      "word": "salary",
+      "partOfSpeech": "noun",
+      "meaning": "tiền lương (trả theo tháng hoặc năm)",
+      "example": "The insurance premium is deducted from each monthly salary payment.",
+      "exampleMeaning": "Phí bảo hiểm được khấu trừ từ mỗi kỳ trả lương hằng tháng."
+    },
+    {
+      "word": "suit",
+      "partOfSpeech": "verb",
+      "meaning": "phù hợp với, thích hợp với (ai, nhu cầu nào)",
+      "example": "A plan with low monthly payments may suit younger employees who rarely visit the doctor.",
+      "exampleMeaning": "Gói có phí hằng tháng thấp có thể phù hợp với nhân viên trẻ ít đi khám bệnh."
+    }
+  ],
+  "fillIn": {
+    "passage": "Every November, the staff at Greenfield Logistics choose their health plan for the next year. This year the company offered two options, and Rosa, the benefits coordinator, held a short meeting to explain them to all ___.\n\nShe began with the cost. The company pays about seventy percent of the premium, and the employee's ___ is taken out of each monthly ___ payment. Rosa ___ that the deduction is the same for every worker, ___ of job title. The basic plan ___ each employee to see any doctor on the approved list. For families, there is an ___ plan with a higher premium but lower payments at the time of treatment.\n\nOne ___ of the plan that drew many questions was dental care. An employee asked whether the plan covers a crown, and Rosa explained that the ___ pays sixty percent of the cost, so the patient still ___ the remaining forty percent. Another ___ was about travel; medical care abroad is covered only in emergencies. Rosa closed by saying that no single plan will ___ everyone, so staff should compare both carefully before the deadline.",
+    "answers": ["personnel", "portion", "salary", "emphasized", "regardless", "allows", "alternative", "aspect", "policy", "incurs", "concern", "suit"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nhân viên nhân sự nữ đang giải thích một tờ tài liệu bảo hiểm cho một nhân viên nam ngồi đối diện tại bàn, cả hai cùng nhìn vào tờ giấy.",
+      "options": [
+        "The woman is handing the man a cup of coffee.",
+        "They are looking at a document together.",
+        "The man is typing on a laptop.",
+        "They are standing by the window."
+      ],
+      "answer": "B",
+      "explanation": "Ảnh cho thấy hai người cùng xem một tờ tài liệu tại bàn. (A), (C) và (D) mô tả hành động hoặc vị trí không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How much of the premium does the company pay?",
+        "options": ["About seventy percent.", "The premium is due on Friday.", "Yes, the company pays it."],
+        "answer": "A",
+        "explanation": "Câu hỏi How much cần câu trả lời về số lượng. (B) nhắc lại từ 'premium' nhưng nói về thời hạn, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Does the policy cover eye examinations?",
+        "options": ["I'll check the document and let you know.", "My salary increased last year.", "The exam is at three o'clock."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về phạm vi bảo hiểm; (A) là câu trả lời gián tiếp hợp lý. (B) không liên quan, (C) nhầm 'examination' với kỳ thi."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Hi, Rosa. Do you have a minute? I have a question about the new health plan.\nWoman: Of course, Tomas. What would you like to know?\nMan: My wife is starting a new job in January, and her company offers its own insurance. If I keep her on my plan, will I still pay the family rate?\nWoman: Yes, the rate is the same regardless of whether she has other coverage. But there is an alternative: you could switch to the individual plan and pay about a hundred dollars less each month.\nMan: That sounds better. Is there anything I should be concerned about?\nWoman: Only one aspect. Her new plan may not cover the dentist you both see now, so check that before you change.\nMan: Good point. I'll ask her to look at the provider list tonight.\nWoman: Fine. Just let me know before November 28 so I can update the enrollment form.",
+      "questions": [
+        {
+          "prompt": "What does the man want to know?",
+          "options": ["When the enrollment period ends", "How his wife's new job affects his plan", "Where to find the provider list", "Why his salary changed"],
+          "answer": "B",
+          "explanation": "Anh ấy hỏi nếu vợ có bảo hiểm ở công ty mới thì anh có còn phải trả mức phí gia đình không."
+        },
+        {
+          "prompt": "What does the woman suggest?",
+          "options": ["Adding a dental plan", "Keeping the family plan", "Switching to an individual plan", "Calling the insurance company"],
+          "answer": "C",
+          "explanation": "Cô ấy nói 'there is an alternative: you could switch to the individual plan and pay about a hundred dollars less each month'."
+        },
+        {
+          "prompt": "What does the woman ask the man to do?",
+          "options": ["Inform her before a certain date", "Visit a new dentist", "Send his wife's contract", "Pay the premium early"],
+          "answer": "A",
+          "explanation": "Cuối hội thoại: 'Just let me know before November 28 so I can update the enrollment form.'"
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good afternoon, everyone. This short briefing covers the health plan for next year, and I want to emphasize three points. First, all personnel who work at least twenty hours a week are eligible, including new staff who joined after June. Second, the company will continue to pay a large portion of the premium, and your share will be deducted from your salary in twelve equal payments rather than ten, so the monthly amount will be lower. Third, we have added an alternative plan for employees who rarely use medical services. It has a lower premium but a higher amount that you pay yourself before the insurance starts to cover costs. Enrollment forms are on the HR website, and the deadline is Friday, December 5. If you have any concern about a specific treatment, contact me directly, and I will check the policy details for you.",
+      "questions": [
+        {
+          "prompt": "Who is eligible for the health plan?",
+          "options": ["Only staff who joined before June", "Employees working at least twenty hours a week", "Managers only", "Staff with more than one year of service"],
+          "answer": "B",
+          "explanation": "'all personnel who work at least twenty hours a week are eligible, including new staff who joined after June.'"
+        },
+        {
+          "prompt": "What change is being made to payments?",
+          "options": ["The premium will be paid once a year", "The company will stop paying its share", "Deductions will be spread over twelve months", "Payments will be made in cash"],
+          "answer": "C",
+          "explanation": "Phần đóng góp của nhân viên sẽ được trừ 'in twelve equal payments rather than ten', nên số tiền mỗi tháng thấp hơn."
+        },
+        {
+          "prompt": "What should listeners do if they have a question about a treatment?",
+          "options": ["Call the insurance company", "Ask their doctor", "Contact the speaker", "Submit a form online"],
+          "answer": "C",
+          "explanation": "'If you have any concern about a specific treatment, contact me directly', tức liên hệ người nói."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The new plan _____ employees to add family members at any time during the year.",
+        "options": ["allow", "allows", "allowing", "allowance"],
+        "answer": "B",
+        "explanation": "Chủ ngữ 'The new plan' số ít ở thì hiện tại đơn nên động từ thêm -s: 'allows ... to'."
+      },
+      {
+        "prompt": "Staff who travel often may prefer an _____ plan with worldwide coverage.",
+        "options": ["alternatively", "alternative", "alternation", "alternating"],
+        "answer": "B",
+        "explanation": "Trước danh từ 'plan' cần tính từ: 'alternative' (thay thế, khác). 'alternatively' là trạng từ."
+      },
+      {
+        "prompt": "Medical expenses _____ outside the country must be reported within thirty days.",
+        "options": ["incur", "incurred", "incurring", "incurs"],
+        "answer": "B",
+        "explanation": "Mệnh đề quan hệ rút gọn dạng bị động: 'expenses (that are) incurred outside the country'; cần quá khứ phân từ."
+      },
+      {
+        "prompt": "The HR director _____ the importance of reading the policy before signing.",
+        "options": ["emphasis", "emphatic", "emphasized", "emphasizing"],
+        "answer": "C",
+        "explanation": "Câu cần động từ chính; 'emphasized' là động từ ở quá khứ. 'emphasis' là danh từ, 'emphatic' là tính từ."
+      },
+      {
+        "prompt": "Only a small _____ of the premium is paid by the employee.",
+        "options": ["portion", "potion", "proportional", "portioned"],
+        "answer": "A",
+        "explanation": "Sau 'a small' và trước 'of' cần danh từ chỉ phần: 'portion'. 'potion' nghĩa là thuốc nước, không hợp nghĩa."
+      },
+      {
+        "prompt": "All employees receive the same basic coverage _____ of their job level.",
+        "options": ["regard", "regarding", "regardless", "regardful"],
+        "answer": "C",
+        "explanation": "'regardless of' là cụm cố định nghĩa là bất kể. 'regarding' nghĩa là về, liên quan đến, không hợp nghĩa."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Staff\nFrom: Benefits Office\nSubject: Open enrollment reminder\n\nOpen enrollment for next year's health plan ends on Friday, November 28. If you take no action, your current ___ will continue unchanged. Employees who wish to switch plans should complete the online form by that date. Please note that the monthly deduction from each ___ will rise by four dollars in January because of higher medical costs across the region. Several members of our ___ have asked whether part-time staff are eligible; the answer is yes, provided they work at least twenty hours a week. Questions may be sent to the Benefits Office at extension 340.",
+      "questions": [
+        {
+          "options": ["policy", "portion", "salary", "aspect"],
+          "answer": "A",
+          "explanation": "Thứ 'sẽ tiếp tục không đổi' nếu nhân viên không làm gì là hợp đồng bảo hiểm hiện tại: 'policy'."
+        },
+        {
+          "options": ["salary", "salaries", "salaried", "sale"],
+          "answer": "A",
+          "explanation": "Sau 'each' cần danh từ số ít: 'salary'. 'salaries' là số nhiều, 'salaried' là tính từ."
+        },
+        {
+          "options": ["personnel", "personal", "personality", "personally"],
+          "answer": "A",
+          "explanation": "'members of our personnel' nghĩa là các thành viên trong đội ngũ nhân sự; 'personal' là tính từ, không đứng sau 'our' làm danh từ."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "HARLOW MANUFACTURING\nEmployee Health Plan Options for Next Year\n\nDear Colleagues,\n\nThe table below compares the two health plans available to all full-time personnel. The company pays 75 percent of the premium for either plan; the figures shown are the employee's monthly share, deducted from salary.\n\n| Feature | Standard Plan | Saver Plan |\n| Employee's monthly share | $120 | $65 |\n| Amount paid by employee before coverage begins | $500 per year | $2,000 per year |\n| Doctor visit | $20 per visit | Full cost until the yearly amount is reached |\n| Dental cleaning | Covered twice a year | Not covered |\n| Family members | $90 each per month | $45 each per month |\n\nThe Standard Plan suits employees who visit the doctor regularly or have children. The Saver Plan may be a better choice for those who rarely incur medical costs and prefer a lower monthly payment. Regardless of the plan you choose, emergency care is covered at 90 percent after the yearly amount is reached.\n\nSelections must be made on the HR portal by Wednesday, December 3. Employees who do not make a selection will remain on their current plan. For a one-to-one meeting about which plan suits your situation, email the Benefits Office.\n\nMarianne Kowalski\nBenefits Manager",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the notice?",
+          "options": ["To announce a salary increase", "To compare two health plan options", "To introduce a new benefits manager", "To report a change in working hours"],
+          "answer": "B",
+          "explanation": "Thông báo đưa ra bảng so sánh hai gói bảo hiểm sức khỏe để nhân viên lựa chọn cho năm tới."
+        },
+        {
+          "prompt": "How much does an employee pay each month for the Standard Plan?",
+          "options": ["$20", "$65", "$90", "$120"],
+          "answer": "D",
+          "explanation": "Bảng ghi 'Employee's monthly share: $120' cho Standard Plan; $65 là của Saver Plan."
+        },
+        {
+          "prompt": "What is NOT covered by the Saver Plan?",
+          "options": ["Emergency care", "Doctor visits", "Dental cleaning", "Family members"],
+          "answer": "C",
+          "explanation": "Dòng 'Dental cleaning' ghi 'Not covered' ở cột Saver Plan. Cấp cứu vẫn được chi trả 90% ở cả hai gói."
+        },
+        {
+          "prompt": "Who would most likely benefit from the Saver Plan?",
+          "options": ["Employees with several children", "Employees who seldom need medical care", "Employees who need dental work", "Employees who work part-time"],
+          "answer": "B",
+          "explanation": "'The Saver Plan may be a better choice for those who rarely incur medical costs'; 'seldom' đồng nghĩa với 'rarely'."
+        },
+        {
+          "prompt": "What happens if an employee does not make a choice by December 3?",
+          "options": ["Coverage will end", "The employee is moved to the Saver Plan", "The current plan continues", "A fee is charged"],
+          "answer": "C",
+          "explanation": "'Employees who do not make a selection will remain on their current plan.'"
+        }
+      ]
+    }
+  }
+}

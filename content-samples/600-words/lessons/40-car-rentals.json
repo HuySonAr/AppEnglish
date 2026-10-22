@@ -1,0 +1,260 @@
+{
+  "number": 40,
+  "title": "Car Rentals",
+  "vocabulary": [
+    {
+      "word": "busy",
+      "partOfSpeech": "adjective",
+      "meaning": "bận rộn; đông đúc, nhộn nhịp",
+      "example": "The rental counter is very busy on Friday afternoons, so please book ahead.",
+      "exampleMeaning": "Quầy cho thuê xe rất đông vào các chiều thứ Sáu, vì vậy hãy đặt trước."
+    },
+    {
+      "word": "coincide",
+      "partOfSpeech": "verb",
+      "meaning": "trùng thời điểm, xảy ra đồng thời; trùng khớp",
+      "example": "Our trade show coincides with a music festival, so rental cars will be hard to find.",
+      "exampleMeaning": "Hội chợ của chúng ta trùng với một lễ hội âm nhạc, nên xe thuê sẽ khó tìm."
+    },
+    {
+      "word": "confusion",
+      "partOfSpeech": "noun",
+      "meaning": "sự nhầm lẫn, sự lộn xộn, sự bối rối",
+      "example": "To avoid confusion, the agency writes the return time on the key tag.",
+      "exampleMeaning": "Để tránh nhầm lẫn, đại lý ghi giờ trả xe lên thẻ chìa khóa."
+    },
+    {
+      "word": "contact",
+      "partOfSpeech": "verb",
+      "meaning": "liên hệ, liên lạc; (n) sự liên hệ, người liên hệ",
+      "example": "Please contact the rental office immediately if the car has any problem.",
+      "exampleMeaning": "Vui lòng liên hệ ngay với văn phòng cho thuê nếu xe gặp bất kỳ vấn đề nào."
+    },
+    {
+      "word": "disappoint",
+      "partOfSpeech": "verb",
+      "meaning": "làm thất vọng",
+      "example": "The small car disappointed the sales team, who had asked for a van.",
+      "exampleMeaning": "Chiếc xe nhỏ làm đội bán hàng thất vọng, vì họ đã yêu cầu một chiếc xe van."
+    },
+    {
+      "word": "intend",
+      "partOfSpeech": "verb",
+      "meaning": "dự định, có ý định",
+      "example": "We intend to return the car at the airport branch rather than downtown.",
+      "exampleMeaning": "Chúng tôi dự định trả xe ở chi nhánh sân bay thay vì ở trung tâm thành phố."
+    },
+    {
+      "word": "license",
+      "partOfSpeech": "noun",
+      "meaning": "giấy phép; bằng lái xe",
+      "example": "Each driver must show a valid license before the keys are handed over.",
+      "exampleMeaning": "Mỗi người lái phải xuất trình bằng lái hợp lệ trước khi được giao chìa khóa."
+    },
+    {
+      "word": "nervously",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách lo lắng, hồi hộp",
+      "example": "Mr. Kim looked nervously at the fuel gauge as he searched for a gas station.",
+      "exampleMeaning": "Ông Kim lo lắng nhìn đồng hồ xăng trong lúc tìm trạm xăng."
+    },
+    {
+      "word": "optional",
+      "partOfSpeech": "adjective",
+      "meaning": "tùy chọn, không bắt buộc",
+      "example": "A navigation device is optional and costs eight dollars a day.",
+      "exampleMeaning": "Thiết bị dẫn đường là tùy chọn và có giá tám đô la mỗi ngày."
+    },
+    {
+      "word": "tempt",
+      "partOfSpeech": "verb",
+      "meaning": "cám dỗ, lôi cuốn, khiến ai muốn làm gì",
+      "example": "The low weekend price tempted us to rent a larger car than we needed.",
+      "exampleMeaning": "Giá cuối tuần thấp đã cám dỗ chúng tôi thuê một chiếc xe lớn hơn mức cần thiết."
+    },
+    {
+      "word": "thrill",
+      "partOfSpeech": "noun",
+      "meaning": "cảm giác phấn khích, hồi hộp; (v) làm phấn khích",
+      "example": "For many customers, the thrill of driving a sports car is worth the extra cost.",
+      "exampleMeaning": "Với nhiều khách hàng, cảm giác phấn khích khi lái xe thể thao đáng với chi phí thêm."
+    },
+    {
+      "word": "tier",
+      "partOfSpeech": "noun",
+      "meaning": "hạng, cấp, bậc (trong hệ thống phân hạng)",
+      "example": "Cars in the top tier come with leather seats and unlimited mileage.",
+      "exampleMeaning": "Xe ở hạng cao nhất có ghế da và không giới hạn số kilômét."
+    }
+  ],
+  "fillIn": {
+    "passage": "When Amara Osei arrived at Greenway Car Hire to pick up a car for a three-day sales trip, the office was unusually ___. Her visit happened to ___ with a regional football final, and it seemed that everyone in town needed a vehicle. She waited ___ in line, worried that her 10 a.m. meeting would start without her.\n\nAt the counter, the clerk asked for her driver's ___ and a credit card. There was some ___ at first, because the booking had been made under her company's name rather than her own. Once that was settled, the clerk explained the three price ___ of cars available: economy, standard and premium. Amara had ___ to take the economy model, but a premium sedan at only ten dollars more per day ___ her. In the end she kept to her plan, since the ___ of a fast car was not important for visiting clients. Insurance for a second driver was ___, and she declined it.\n\nThe economy car did not ___ her; it was clean and comfortable. Before leaving, she saved the office number so she could ___ the staff if any problem came up.",
+    "answers": ["busy", "coincide", "nervously", "license", "confusion", "tiers", "intended", "tempted", "thrill", "optional", "disappoint", "contact"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nhân viên cho thuê xe đang đưa chìa khóa cho khách hàng trước một chiếc ô tô trong bãi đỗ của đại lý.",
+      "options": [
+        "A man is handing keys to a customer.",
+        "A man is washing a car.",
+        "Two people are pushing a car.",
+        "A customer is filling the tank with fuel."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy nhân viên đưa chìa khóa cho khách. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Do you intend to return the car to the same office?",
+        "options": ["No, we'll drop it off at the airport branch.", "The office is busy today.", "It's a ten-day rental."],
+        "answer": "A",
+        "explanation": "Câu hỏi Yes/No về nơi trả xe; (A) trả lời No và nêu nơi trả xe khác. (B) lặp từ 'office' nhưng không trả lời, (C) trả lời cho How long."
+      },
+      {
+        "question": "Why was there so much confusion at the rental desk this morning?",
+        "options": ["The desk is made of wood.", "Two customers had the same last name.", "Yes, it was very confusing."],
+        "answer": "B",
+        "explanation": "Câu hỏi Why cần nêu lý do; (B) giải thích nguyên nhân nhầm lẫn. (A) lặp từ 'desk' với nghĩa khác, (C) trả lời Yes cho câu hỏi Wh."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Welcome to Roadway Rentals. Do you have a reservation?\nMan: Yes, under the name Ferreira, for a mid-size car. I need to be at a client's office by nine, so I'm a little nervous about the time.\nWoman: I understand, sir. It's a busy morning because the airport conference coincides with the start of the school holidays, but your car is ready. May I see your license and the card you booked with?\nMan: Here you are. I was tempted to upgrade to the premium tier when I saw the price online. Is it still available?\nWoman: It is, for fifteen dollars more a day. The premium cars have a navigation system, and the extra insurance is optional.\nMan: I'll take the upgrade, but not the insurance. My company covers that.\nWoman: Perfect. If you have any problem with the car, contact the number on the key tag, and we'll send help within an hour.\nMan: Thanks. That's reassuring.",
+      "questions": [
+        {
+          "prompt": "Why is the man worried?",
+          "options": ["He lost his reservation.", "He has an early meeting.", "He forgot his license.", "The car is not ready."],
+          "answer": "B",
+          "explanation": "Anh ấy nói 'I need to be at a client's office by nine, so I'm a little nervous about the time'."
+        },
+        {
+          "prompt": "Why is the rental office busy?",
+          "options": ["A new branch has opened.", "Two events are happening at the same time.", "Many cars are being repaired.", "Staff are on holiday."],
+          "answer": "B",
+          "explanation": "Người phụ nữ giải thích 'the airport conference coincides with the start of the school holidays', tức hai sự kiện trùng thời điểm."
+        },
+        {
+          "prompt": "What does the man decide to do?",
+          "options": ["Buy extra insurance", "Rent a smaller car", "Upgrade to a premium car", "Cancel his booking"],
+          "answer": "C",
+          "explanation": "Anh ấy nói 'I'll take the upgrade, but not the insurance', tức chọn nâng lên xe hạng premium."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Hi, this is Jonah Reyes from Summit Auto Rentals, calling for Ms. Priyanka Rao. I'm contacting you about your booking for next Monday. Unfortunately, the economy car you reserved is no longer available, because your rental dates coincide with a large trade fair and the city is very busy that week. I don't want to disappoint you, so I have moved your booking to the next tier at no extra charge: a standard sedan with automatic transmission. The navigation device you added is still included, and the child seat remains optional, so just tell us at pickup if you still need it. Please remember to bring your driver's license and the credit card used for the booking. If you intend to pick up the car before eight in the morning, call me back at 555-0193 so I can arrange an early opening. Thank you, and sorry for any confusion.",
+      "questions": [
+        {
+          "prompt": "Why is the speaker calling?",
+          "options": ["To cancel a reservation", "To explain a change to a booking", "To ask for a payment", "To offer a job"],
+          "answer": "B",
+          "explanation": "Người nói cho biết xe đã đặt không còn và giải thích việc chuyển sang xe hạng cao hơn; đặt chỗ không bị hủy."
+        },
+        {
+          "prompt": "What has the speaker done for the customer?",
+          "options": ["Given her a larger car for free", "Refunded her deposit", "Added a second driver", "Removed the navigation device"],
+          "answer": "A",
+          "explanation": "'I have moved your booking to the next tier at no extra charge: a standard sedan', tức nâng hạng xe miễn phí."
+        },
+        {
+          "prompt": "Why should Ms. Rao call back?",
+          "options": ["To choose a different color", "To confirm her license number", "To arrange an early pickup", "To cancel the child seat"],
+          "answer": "C",
+          "explanation": "'If you intend to pick up the car before eight in the morning, call me back ... so I can arrange an early opening.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The trade fair _____ with a national holiday, so most hotels in the city were full.",
+        "options": ["coincide", "coincided", "coincidence", "coinciding"],
+        "answer": "B",
+        "explanation": "Mệnh đề sau dùng 'were', nên câu kể ở quá khứ và cần động từ quá khứ: 'coincided with'. Chủ ngữ số ít cũng loại 'coincide'."
+      },
+      {
+        "prompt": "Please _____ the rental office before you return the car late.",
+        "options": ["contact", "contacts", "contacting", "contacted"],
+        "answer": "A",
+        "explanation": "Câu mệnh lệnh bắt đầu bằng 'Please' cần động từ nguyên mẫu: 'contact'."
+      },
+      {
+        "prompt": "The driver waited _____ while the clerk checked his documents.",
+        "options": ["nervous", "nervously", "nervousness", "nerve"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'waited': 'nervously' (một cách lo lắng)."
+      },
+      {
+        "prompt": "An extra driver is _____; you may add one for ten dollars a day.",
+        "options": ["option", "optional", "optionally", "options"],
+        "answer": "B",
+        "explanation": "Sau động từ 'is' cần tính từ làm vị ngữ: 'optional' (tùy chọn)."
+      },
+      {
+        "prompt": "Customers who rent often are moved to a higher _____ with better discounts.",
+        "options": ["tier", "tie", "tired", "tiers"],
+        "answer": "A",
+        "explanation": "Sau 'a higher' cần danh từ số ít chỉ hạng, cấp: 'tier'. 'tiers' số nhiều không đi với 'a'."
+      },
+      {
+        "prompt": "Last summer, the low weekend price _____ many customers to rent a convertible.",
+        "options": ["tempt", "tempts", "tempted", "temptation"],
+        "answer": "C",
+        "explanation": "'Last summer' cho biết câu ở quá khứ, nên động từ là 'tempted'. 'tempt' không có -s cũng sai với chủ ngữ số ít."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Rental Agents\nFrom: Lucia Moreno, Branch Manager\nSubject: Weekend of the Harbor Marathon\n\nNext weekend the marathon ___ with the regional business fair, so we expect the branch to be extremely busy from Friday morning. To avoid ___ at the counter, please check each customer's license and payment card before printing the contract, and write the return time clearly on the key tag. Remember that cars in our top ___, the sports cars and large SUVs, must be reserved at least one day in advance; do not promise them to walk-in customers, however tempting the sale may be. Thank you for your hard work.",
+      "questions": [
+        {
+          "options": ["coincides", "coincide", "coincidence", "coincidental"],
+          "answer": "A",
+          "explanation": "Chủ ngữ 'the marathon' số ít, nói về lịch tuần tới ở hiện tại đơn: 'coincides with'."
+        },
+        {
+          "options": ["confusion", "confuse", "confused", "confusing"],
+          "answer": "A",
+          "explanation": "Sau 'To avoid' cần danh từ làm tân ngữ: 'confusion' (sự nhầm lẫn)."
+        },
+        {
+          "options": ["tier", "tired", "tie", "tying"],
+          "answer": "A",
+          "explanation": "Sau 'our top' cần danh từ chỉ hạng xe cao nhất: 'tier'. Các lựa chọn khác không có nghĩa phân hạng."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "COASTLINE CAR RENTALS\nBusiness Traveler Program - Autumn Offer\n\nWhether you intend to visit one client or ten, Coastline makes getting there simple. Our three tiers of vehicles let you choose the right car for every trip:\n\n| Tier | Vehicles | Daily rate |\n| Economy | Compact hatchbacks | $39 |\n| Business | Mid-size sedans with navigation | $55 |\n| Premium | Luxury sedans and SUVs | $89 |\n\nWhy business travelers choose Coastline\n- No waiting. Members of our program skip the counter, even on the busiest holiday weekends, and pick up their keys from a locker.\n- Clear pricing. Fuel, insurance and a second driver are all included. Only the child seat and the roof box are optional extras.\n- Help when you need it. Contact our 24-hour line and a replacement car reaches you within ninety minutes anywhere in the region.\n\nFrom October 1 to November 30, members who rent a Business car for three days or more receive a free upgrade to Premium, if a car is available. Feel the thrill of a luxury drive at no extra cost. We promise you will not be disappointed.\n\nTo join, bring your driver's license and a company email address to any Coastline office. Membership is free and takes five minutes.",
+      "questions": [
+        {
+          "prompt": "What is the advertisement mainly promoting?",
+          "options": ["A new airport branch", "A rental program for business customers", "A sale of used cars", "A driving school"],
+          "answer": "B",
+          "explanation": "Tiêu đề là 'Business Traveler Program' và nội dung nói về lợi ích dành cho thành viên là khách doanh nghiệp."
+        },
+        {
+          "prompt": "How much does a mid-size sedan cost per day?",
+          "options": ["$39", "$55", "$89", "$144"],
+          "answer": "B",
+          "explanation": "Bảng ghi hạng Business, 'Mid-size sedans with navigation', có giá $55 mỗi ngày."
+        },
+        {
+          "prompt": "Which item costs extra?",
+          "options": ["Fuel", "Insurance", "A child seat", "A second driver"],
+          "answer": "C",
+          "explanation": "'Fuel, insurance and a second driver are all included. Only the child seat and the roof box are optional extras.'"
+        },
+        {
+          "prompt": "What must a customer do to receive a free upgrade?",
+          "options": ["Rent a Business car for at least three days", "Book a Premium car online", "Pay for an extra driver", "Return the car with a full tank"],
+          "answer": "A",
+          "explanation": "'members who rent a Business car for three days or more receive a free upgrade to Premium, if a car is available'."
+        },
+        {
+          "prompt": "What is required to become a member?",
+          "options": ["A membership fee", "A driver's license and a company email", "A reservation of five days", "A credit card deposit"],
+          "answer": "B",
+          "explanation": "Đoạn cuối: 'bring your driver's license and a company email address to any Coastline office. Membership is free.'"
+        }
+      ]
+    }
+  }
+}

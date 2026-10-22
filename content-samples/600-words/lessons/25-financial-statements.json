@@ -1,0 +1,260 @@
+{
+  "number": 25,
+  "title": "Financial Statements",
+  "vocabulary": [
+    {
+      "word": "desire",
+      "partOfSpeech": "noun",
+      "meaning": "mong muốn, khát khao, nguyện vọng",
+      "example": "The report reflects the board's desire to reduce costs without cutting jobs.",
+      "exampleMeaning": "Báo cáo phản ánh mong muốn của hội đồng quản trị là giảm chi phí mà không cắt giảm việc làm."
+    },
+    {
+      "word": "detail",
+      "partOfSpeech": "noun",
+      "meaning": "chi tiết, điểm cụ thể",
+      "example": "The statement gives full details of every expense over five hundred dollars.",
+      "exampleMeaning": "Bản báo cáo nêu đầy đủ chi tiết của mọi khoản chi trên năm trăm đô la."
+    },
+    {
+      "word": "forecast",
+      "partOfSpeech": "noun",
+      "meaning": "dự báo, dự đoán (doanh số, chi phí)",
+      "example": "The sales forecast for next year was revised after the new store opened early.",
+      "exampleMeaning": "Dự báo doanh số cho năm sau đã được điều chỉnh sau khi cửa hàng mới khai trương sớm."
+    },
+    {
+      "word": "level",
+      "partOfSpeech": "noun",
+      "meaning": "mức, mức độ; cấp bậc",
+      "example": "Stock levels in the warehouse fell to their lowest point in three years.",
+      "exampleMeaning": "Mức tồn kho trong nhà kho giảm xuống thấp nhất trong ba năm."
+    },
+    {
+      "word": "overall",
+      "partOfSpeech": "adjective",
+      "meaning": "tổng thể, toàn bộ, chung",
+      "example": "Overall costs rose by four percent, mainly because of higher fuel prices.",
+      "exampleMeaning": "Tổng chi phí tăng bốn phần trăm, chủ yếu do giá nhiên liệu tăng."
+    },
+    {
+      "word": "perspective",
+      "partOfSpeech": "noun",
+      "meaning": "góc nhìn, quan điểm; cách nhìn toàn cảnh",
+      "example": "From an investor's perspective, steady profits matter more than rapid growth.",
+      "exampleMeaning": "Từ góc nhìn của nhà đầu tư, lợi nhuận ổn định quan trọng hơn tăng trưởng nhanh."
+    },
+    {
+      "word": "project",
+      "partOfSpeech": "verb",
+      "meaning": "dự tính, ước tính (dựa trên số liệu hiện có)",
+      "example": "The finance team projects a profit of 1.2 million dollars for the coming year.",
+      "exampleMeaning": "Đội tài chính dự tính lợi nhuận 1,2 triệu đô la cho năm tới."
+    },
+    {
+      "word": "realistic",
+      "partOfSpeech": "adjective",
+      "meaning": "thực tế, khả thi, sát với thực tế",
+      "example": "A realistic budget leaves room for unexpected repairs and price increases.",
+      "exampleMeaning": "Một ngân sách thực tế chừa chỗ cho các khoản sửa chữa bất ngờ và việc tăng giá."
+    },
+    {
+      "word": "target",
+      "partOfSpeech": "noun",
+      "meaning": "mục tiêu, chỉ tiêu",
+      "example": "The sales team reached its quarterly target two weeks before the end of June.",
+      "exampleMeaning": "Đội bán hàng đã đạt chỉ tiêu quý hai tuần trước cuối tháng Sáu."
+    },
+    {
+      "word": "translation",
+      "partOfSpeech": "noun",
+      "meaning": "sự chuyển đổi, diễn giải (số liệu thành kế hoạch); bản dịch",
+      "example": "The translation of the raw figures into a clear chart helped the board understand the loss.",
+      "exampleMeaning": "Việc chuyển các con số thô thành một biểu đồ rõ ràng đã giúp hội đồng quản trị hiểu được khoản lỗ."
+    },
+    {
+      "word": "typically",
+      "partOfSpeech": "adverb",
+      "meaning": "thường, thông thường, điển hình là",
+      "example": "Our busiest month is typically December, when gift orders double.",
+      "exampleMeaning": "Tháng bận nhất của chúng tôi thường là tháng Mười Hai, khi đơn hàng quà tặng tăng gấp đôi."
+    },
+    {
+      "word": "yield",
+      "partOfSpeech": "verb",
+      "meaning": "mang lại, sinh ra (lợi nhuận, kết quả)",
+      "example": "The new pricing plan yielded an extra 80,000 dollars in the first quarter.",
+      "exampleMeaning": "Kế hoạch giá mới đã mang lại thêm 80.000 đô la trong quý đầu tiên."
+    }
+  ],
+  "fillIn": {
+    "passage": "At the end of each year, Hana Sato, who owns three coffee shops, prepares a financial statement for her two partners. This year she asked an adviser, Mr. Brennan, to help her present the figures. His first piece of advice was to show the ___ picture before the ___, because the partners ___ look at the total profit first and ask questions about individual shops later.\n\nHana's statement reported that the shops had ___ a profit of 96,000 dollars, slightly above the ___ of 90,000 set in January. Sales at the newest shop, however, stayed at a low ___ for most of the year. Mr. Brennan suggested that she add a ___ for the next twelve months. Hana expressed her ___ to open a fourth shop, but Mr. Brennan warned her to be ___: the figures ___ a slower year, since rents in the city were rising. From his ___, the best plan was to improve the weakest shop first. Hana agreed, and his clear ___ of the numbers into a short action plan convinced the partners to wait.",
+    "answers": ["overall", "details", "typically", "yielded", "target", "level", "forecast", "desire", "realistic", "projected", "perspective", "translation"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người đàn ông đứng cạnh màn hình chiếu trong phòng họp, trình bày biểu đồ cột cho ba đồng nghiệp ngồi quanh bàn.",
+      "options": [
+        "The man is presenting a chart to his colleagues.",
+        "The man is cleaning the screen.",
+        "The people are leaving the meeting room.",
+        "The chairs are being stacked in the corner."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người đàn ông đang trình bày biểu đồ cho đồng nghiệp. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "What's the sales target for the third quarter?",
+        "options": ["Two million dollars, the same as last year.", "The target is in the city center.", "Yes, we sold it last week."],
+        "answer": "A",
+        "explanation": "Câu hỏi What về chỉ tiêu doanh số cần một con số. (B) lặp từ 'target' với nghĩa khác, (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Is the forecast for next year ready yet?",
+        "options": ["The weather should be fine tomorrow.", "Almost; I'm checking the last figures now.", "He typically arrives at nine."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về bản dự báo; (B) trả lời gần xong và đang kiểm tra số liệu. (A) nhầm 'forecast' là dự báo thời tiết, (C) lạc đề."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Hi, Nathan. I'm reviewing the draft financial statement before it goes to the board, and I have a question about page four.\nMan: The section on next year's income?\nWoman: Yes. You project a thirty percent increase in sales, but our current level of orders doesn't support that. Is that figure realistic?\nMan: I based it on the new contract with the hotel chain. If it starts in March as planned, it should yield at least 400,000 dollars in the first year.\nWoman: But the contract hasn't been signed yet. I'd feel better if we showed two figures: one with the contract and one without.\nMan: That's fair. I'll add a second column and put the details of the contract in a note.\nWoman: Perfect. Can you have the new version to me by Wednesday? The board meets on Friday.\nMan: No problem.",
+      "questions": [
+        {
+          "prompt": "What are the speakers discussing?",
+          "options": ["A hotel booking", "A financial statement", "A job interview", "A delivery schedule"],
+          "answer": "B",
+          "explanation": "Người phụ nữ nói 'I'm reviewing the draft financial statement before it goes to the board'."
+        },
+        {
+          "prompt": "What is the woman concerned about?",
+          "options": ["A missing signature", "The cost of a contract", "A sales estimate that may be too high", "The date of the board meeting"],
+          "answer": "C",
+          "explanation": "Cô ấy nói mức đơn hàng hiện tại không đủ để tin vào mức tăng ba mươi phần trăm và hỏi 'Is that figure realistic?'."
+        },
+        {
+          "prompt": "What will the man do?",
+          "options": ["Cancel the contract", "Add a second set of figures", "Visit the hotel chain", "Postpone the meeting"],
+          "answer": "B",
+          "explanation": "Người đàn ông đồng ý 'I'll add a second column' với số liệu không có hợp đồng."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Good morning, and thank you for joining our annual presentation of the financial statements. I will give you the overall picture first, and our finance director will take you through the figures in detail afterwards. Revenue reached twenty-four million dollars, three percent above our target, and net profit was two point one million. From a long-term perspective, the most important change is that online sales now make up forty percent of revenue, compared with twenty-five percent two years ago. Costs typically rise when a company grows this quickly, but ours stayed almost flat thanks to the new warehouse. For next year, our desire is to open in two more countries, and the plan you will receive today shows the translation of that goal into concrete numbers. Printed copies of the statements are available at the back of the room. Now, let me hand over to Ms. Fontaine.",
+      "questions": [
+        {
+          "prompt": "Who is the speaker most likely addressing?",
+          "options": ["New employees", "Shareholders", "Job applicants", "Warehouse staff"],
+          "answer": "B",
+          "explanation": "Đây là buổi trình bày báo cáo tài chính hằng năm với doanh thu, lợi nhuận và kế hoạch, dành cho cổ đông."
+        },
+        {
+          "prompt": "What change does the speaker describe as most important?",
+          "options": ["A new finance director", "Lower prices", "The growth of online sales", "A move to a new office"],
+          "answer": "C",
+          "explanation": "'the most important change is that online sales now make up forty percent of revenue'."
+        },
+        {
+          "prompt": "What does the speaker plan for next year?",
+          "options": ["Opening in two new countries", "Closing the warehouse", "Reducing staff", "Printing fewer reports"],
+          "answer": "A",
+          "explanation": "'For next year, our desire is to open in two more countries.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The company _____ a ten percent increase in revenue for the coming year.",
+        "options": ["project", "projects", "projection", "projective"],
+        "answer": "B",
+        "explanation": "Chủ ngữ 'The company' số ít ở thì hiện tại đơn nên cần động từ thêm -s: 'projects' (dự tính)."
+      },
+      {
+        "prompt": "The report gives a _____ view of costs, including the price of raw materials.",
+        "options": ["real", "realism", "realistic", "realistically"],
+        "answer": "C",
+        "explanation": "Trước danh từ 'view' cần tính từ, và nghĩa phù hợp là 'realistic' (thực tế)."
+      },
+      {
+        "prompt": "The new savings account _____ an interest rate of three percent.",
+        "options": ["yield", "yields", "yielding", "yielded"],
+        "answer": "B",
+        "explanation": "Chủ ngữ số ít 'The new savings account' ở thì hiện tại đơn nên động từ thêm -s: 'yields'."
+      },
+      {
+        "prompt": "The quarterly figures are _____ released on the first Monday of the month.",
+        "options": ["typical", "type", "typically", "typify"],
+        "answer": "C",
+        "explanation": "Giữa 'are' và quá khứ phân từ 'released' cần trạng từ: 'typically' (thường)."
+      },
+      {
+        "prompt": "_____ profits were lower than expected because of higher shipping costs.",
+        "options": ["Overall", "Overalls", "Over", "Overly"],
+        "answer": "A",
+        "explanation": "Trước danh từ 'profits' cần tính từ: 'Overall' (tổng thể). 'Overalls' là quần yếm, 'Overly' là trạng từ."
+      },
+      {
+        "prompt": "The finance manager explained every _____ of the budget during the meeting.",
+        "options": ["detail", "detailed", "detailing", "details"],
+        "answer": "A",
+        "explanation": "Sau 'every' cần danh từ số ít: 'detail'; 'details' số nhiều không đi với 'every'."
+      }
+    ],
+    "part6": {
+      "passage": "To: Regional Sales Managers\nFrom: Olivia Grant, Finance Director\nSubject: Figures for the annual statement\n\nDear managers,\n\nWe are preparing the annual financial statement and need your input by November 10. Please send me your sales ___ for the next twelve months, based on current orders and any contracts you expect to sign. Be careful not to set a ___ that your team cannot reach; the board prefers numbers that are slightly cautious. It would also help to add a short comment from your ___, explaining the main risks in your region. Thank you for your cooperation.",
+      "questions": [
+        {
+          "options": ["forecast", "forecaster", "forecasting", "forecasted"],
+          "answer": "A",
+          "explanation": "Sau 'your sales' cần danh từ chỉ bản dự báo cho mười hai tháng tới: 'forecast'. 'forecaster' là người dự báo."
+        },
+        {
+          "options": ["targeted", "target", "targeting", "targets"],
+          "answer": "B",
+          "explanation": "Sau 'a' cần danh từ số ít: 'target' (chỉ tiêu) mà đội có thể đạt được."
+        },
+        {
+          "options": ["prospective", "perceptive", "perspective", "perspectives"],
+          "answer": "C",
+          "explanation": "'from your perspective' nghĩa là từ góc nhìn của bạn; cần danh từ số ít sau 'your' trong cụm này. 'prospective' và 'perceptive' là tính từ."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "BRIGHTWATER TOOLS LTD.\nSummary of Financial Results for Shareholders\n\nThe table compares the main figures of this year's financial statements with the forecast made in January.\n\n| Item | Forecast | Actual |\n| Revenue | 8.5 million dollars | 9.1 million dollars |\n| Operating costs | 6.8 million dollars | 7.0 million dollars |\n| Net profit | 1.1 million dollars | 1.4 million dollars |\n\nOverall, the company performed better than expected. Revenue exceeded the target by seven percent, mainly because the new cordless drills yielded strong sales in the second half. Operating costs were slightly higher than forecast because eleven extra staff were hired in September.\n\nFrom a shareholder's perspective, the most important figure is net profit, which was 300,000 dollars above the forecast. The board therefore proposes a dividend of 40 cents per share, payable on March 15.\n\nFor next year, the board projects revenue of 9.8 million dollars, a realistic target. Full details, including the translation of these figures into each regional budget, will be presented at the annual meeting on February 20. Shareholders who cannot attend may request a printed copy of the complete statements from the company secretary.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the document?",
+          "options": ["To announce a new product", "To summarize the year's financial results", "To invite shareholders to a factory tour", "To explain a change in management"],
+          "answer": "B",
+          "explanation": "Tài liệu là 'Summary of Financial Results for Shareholders', so sánh số dự báo với số thực tế của cả năm."
+        },
+        {
+          "prompt": "By how much did revenue exceed the forecast?",
+          "options": ["200,000 dollars", "300,000 dollars", "600,000 dollars", "1.3 million dollars"],
+          "answer": "C",
+          "explanation": "Bảng ghi dự báo 8.5 triệu và thực tế 9.1 triệu, chênh lệch 600.000 đô la. 300.000 là chênh lệch của lợi nhuận ròng."
+        },
+        {
+          "prompt": "Why were operating costs higher than forecast?",
+          "options": ["Material prices rose", "New staff were hired", "A new factory was opened", "Shipping costs increased"],
+          "answer": "B",
+          "explanation": "'Operating costs were slightly higher than forecast because eleven extra staff were hired in September.'"
+        },
+        {
+          "prompt": "What will happen on March 15?",
+          "options": ["The annual meeting will be held", "A dividend will be paid", "The new budget will be published", "The forecast will be revised"],
+          "answer": "B",
+          "explanation": "Hội đồng đề xuất 'a dividend of 40 cents per share, payable on March 15'; cuộc họp thường niên diễn ra ngày 20 tháng Hai."
+        },
+        {
+          "prompt": "What can shareholders who miss the meeting do?",
+          "options": ["Watch a video online", "Vote by email", "Request a printed copy of the statements", "Attend a later meeting"],
+          "answer": "C",
+          "explanation": "Câu cuối: 'Shareholders who cannot attend may request a printed copy of the complete statements from the company secretary'."
+        }
+      ]
+    }
+  }
+}

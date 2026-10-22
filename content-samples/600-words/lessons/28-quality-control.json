@@ -1,0 +1,260 @@
+{
+  "number": 28,
+  "title": "Quality Control",
+  "vocabulary": [
+    {
+      "word": "brand",
+      "partOfSpeech": "noun",
+      "meaning": "nhãn hiệu, thương hiệu; (động từ) gắn nhãn hiệu",
+      "example": "Customers trust the brand because every jacket is checked twice before it leaves the factory.",
+      "exampleMeaning": "Khách hàng tin tưởng thương hiệu này vì mỗi chiếc áo khoác đều được kiểm tra hai lần trước khi rời nhà máy."
+    },
+    {
+      "word": "conform",
+      "partOfSpeech": "verb",
+      "meaning": "tuân theo, phù hợp với (tiêu chuẩn, quy định)",
+      "example": "Every shipment must conform to the safety standards listed in the buyer's handbook.",
+      "exampleMeaning": "Mỗi lô hàng phải tuân theo các tiêu chuẩn an toàn ghi trong sổ tay của bên mua."
+    },
+    {
+      "word": "defect",
+      "partOfSpeech": "noun",
+      "meaning": "lỗi, khiếm khuyết (của sản phẩm)",
+      "example": "The inspector found a small defect in the zipper of three coats.",
+      "exampleMeaning": "Người kiểm tra phát hiện một lỗi nhỏ ở khóa kéo của ba chiếc áo khoác."
+    },
+    {
+      "word": "enhance",
+      "partOfSpeech": "verb",
+      "meaning": "nâng cao, cải thiện, làm tăng thêm",
+      "example": "The new stitching machine has enhanced the quality of our shirts noticeably.",
+      "exampleMeaning": "Máy may mới đã nâng cao rõ rệt chất lượng áo sơ mi của chúng tôi."
+    },
+    {
+      "word": "garment",
+      "partOfSpeech": "noun",
+      "meaning": "món quần áo, trang phục (một sản phẩm may mặc)",
+      "example": "Each garment is washed and pressed before it is packed for shipping.",
+      "exampleMeaning": "Mỗi món quần áo đều được giặt và ép trước khi đóng gói để gửi đi."
+    },
+    {
+      "word": "inspect",
+      "partOfSpeech": "verb",
+      "meaning": "kiểm tra, xem xét kỹ",
+      "example": "Two staff members inspect every box of sweaters before it is sealed.",
+      "exampleMeaning": "Hai nhân viên kiểm tra kỹ mỗi thùng áo len trước khi niêm phong."
+    },
+    {
+      "word": "perceptive",
+      "partOfSpeech": "adjective",
+      "meaning": "tinh ý, nhận biết nhanh và sâu sắc",
+      "example": "A perceptive inspector noticed that the thread color was slightly different on the sleeves.",
+      "exampleMeaning": "Một người kiểm tra tinh ý nhận ra màu chỉ ở tay áo hơi khác."
+    },
+    {
+      "word": "repel",
+      "partOfSpeech": "verb",
+      "meaning": "chống thấm, đẩy lùi (nước, bụi); làm cho tránh xa",
+      "example": "The coating on the raincoat repels water for at least two years of normal use.",
+      "exampleMeaning": "Lớp phủ trên áo mưa chống thấm nước trong ít nhất hai năm sử dụng bình thường."
+    },
+    {
+      "word": "take back",
+      "partOfSpeech": "verb",
+      "meaning": "nhận lại (hàng trả), thu hồi; rút lại (lời nói)",
+      "example": "The store will take back any sweater that loses its shape after the first wash.",
+      "exampleMeaning": "Cửa hàng sẽ nhận lại bất kỳ áo len nào bị mất dáng sau lần giặt đầu tiên."
+    },
+    {
+      "word": "throw out",
+      "partOfSpeech": "verb",
+      "meaning": "vứt bỏ, loại bỏ",
+      "example": "We throw out any fabric that has stains or holes before cutting begins.",
+      "exampleMeaning": "Chúng tôi vứt bỏ mọi tấm vải có vết bẩn hoặc lỗ thủng trước khi bắt đầu cắt."
+    },
+    {
+      "word": "uniformly",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách đồng đều, nhất quán",
+      "example": "The dye must be applied uniformly so that every shirt in the batch is the same shade.",
+      "exampleMeaning": "Thuốc nhuộm phải được phủ đều để mọi chiếc áo trong lô có cùng một sắc độ."
+    },
+    {
+      "word": "wrinkle",
+      "partOfSpeech": "noun",
+      "meaning": "vết nhăn, nếp nhăn (trên vải); (động từ) làm nhăn",
+      "example": "The linen trousers arrived with deep wrinkles because the boxes were packed too tightly.",
+      "exampleMeaning": "Quần vải lanh đến nơi với nhiều vết nhăn sâu vì các thùng được đóng quá chặt."
+    }
+  ],
+  "fillIn": {
+    "passage": "Meadowline Apparel makes raincoats for several large clothing chains, and its reputation as a reliable ___ depends on what happens in the final room of the factory. There, a team of six workers ___ every finished ___ before it is folded. They check that the seams are stitched ___, that the buttons match, and that the fabric still ___ water after it has been through the wash test.\n\nThe team leader, Benjamin Osei, is known for being unusually ___. Last spring he noticed that one shade of blue did not ___ to the color sample the customer had approved. The coats were not ruined, so instead of ___ them, the factory sold them at a discount through its outlet store. Any coat with a real ___, such as a broken zipper, is set aside, and the supplier of the faulty part is asked to ___ the whole batch.\n\nBenjamin also introduced steam pressing for every coat, which removed the ___ caused by the long trip from the sewing floor. This small change has ___ the look of the product in stores.",
+    "answers": ["brand", "inspects", "garment", "uniformly", "repels", "perceptive", "conform", "throwing out", "defect", "take back", "wrinkles", "enhanced"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một người phụ nữ trong xưởng may đang giơ chiếc áo sơ mi lên soi dưới đèn để kiểm tra đường may.",
+      "options": [
+        "The woman is examining a shirt.",
+        "The woman is folding a tablecloth.",
+        "The woman is turning off the lights.",
+        "The woman is sewing a button onto a coat."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ đang xem xét kỹ chiếc áo sơ mi dưới đèn. (B), (C) và (D) mô tả hành động không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "How many garments did the inspectors reject this week?",
+        "options": ["Only twelve, mostly for loose threads.", "The inspection is on Thursday.", "Yes, they were rejected."],
+        "answer": "A",
+        "explanation": "Câu hỏi How many cần câu trả lời nêu số lượng; (A) trả lời 'twelve'. (B) nhầm với từ 'inspectors', (C) trả lời Yes cho câu hỏi Wh."
+      },
+      {
+        "question": "Why was this batch of trousers thrown out?",
+        "options": ["Throw it to me, please.", "Because the dye wasn't applied uniformly.", "They're in the warehouse."],
+        "answer": "B",
+        "explanation": "Câu hỏi Why cần lý do; (B) nêu lý do thuốc nhuộm không đều. (A) nhầm nghĩa 'throw' là ném, (C) trả lời về địa điểm."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Lena, the buyer from Cedar Street Fashion called about the shipment of blouses we sent last week.\nWoman: Was there a problem? Every blouse was inspected before it left.\nMan: She says about one in ten arrived with deep wrinkles across the front, and the store doesn't have time to press them before they go on the rack.\nWoman: That's strange. The garments were pressed here. Maybe the boxes were packed too tightly for the long truck ride.\nMan: That's what I think. She's asking whether we'll take back the wrinkled ones.\nWoman: Yes, of course, and we'll replace them within a week. Could you ask her to photograph a few so I can show the packing team?\nMan: Sure. I'll also suggest we use larger boxes with tissue paper for the next order.\nWoman: Good. Anything that enhances how the product looks on arrival is worth the extra cost.",
+      "questions": [
+        {
+          "prompt": "What problem does the man report?",
+          "options": ["Some blouses arrived wrinkled.", "The shipment was late.", "The buyer canceled her order.", "The blouses were the wrong color."],
+          "answer": "A",
+          "explanation": "Người đàn ông nói khoảng một phần mười số áo 'arrived with deep wrinkles across the front'."
+        },
+        {
+          "prompt": "What does the woman think caused the problem?",
+          "options": ["Poor-quality fabric", "Tight packing in the boxes", "A broken pressing machine", "Rain during delivery"],
+          "answer": "B",
+          "explanation": "Cô ấy đoán 'the boxes were packed too tightly for the long truck ride', tức đóng thùng quá chặt."
+        },
+        {
+          "prompt": "What does the woman ask the man to do?",
+          "options": ["Press the blouses again", "Request photographs from the buyer", "Order larger trucks", "Call the packing team"],
+          "answer": "B",
+          "explanation": "Cô ấy nói 'Could you ask her to photograph a few so I can show the packing team?', tức nhờ xin ảnh từ người mua."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Welcome to your first day in the quality control department. Before you begin, I want to explain how we work here. Every garment that reaches this room has already passed through three sewing stations, but mistakes still happen, and our brand depends on catching them before the customer does. You will inspect each item under the bright lamps at your station. Look first for defects in the seams and zippers, then check that the color is uniform across the whole piece. Anything that does not conform to the specification sheet goes into the red bin, and nothing from the red bin is ever thrown out without a supervisor's signature, because many items can be repaired. The best inspectors are perceptive; they notice a loose thread or a faint stain that everyone else has missed. At the end of this week, each of you will shadow a senior inspector, and after that you will work at your own station.",
+      "questions": [
+        {
+          "prompt": "Who is the talk most likely intended for?",
+          "options": ["Customers of the store", "New quality control staff", "Sewing machine suppliers", "The company's directors"],
+          "answer": "B",
+          "explanation": "Người nói mở đầu bằng 'Welcome to your first day in the quality control department', tức nói với nhân viên kiểm tra chất lượng mới."
+        },
+        {
+          "prompt": "What should inspectors check first?",
+          "options": ["The price label", "The color of the fabric", "The seams and zippers", "The size of the box"],
+          "answer": "C",
+          "explanation": "'Look first for defects in the seams and zippers, then check that the color is uniform', tức đường may và khóa kéo được kiểm tra trước."
+        },
+        {
+          "prompt": "What is required before an item in the red bin is thrown away?",
+          "options": ["A customer complaint", "A supervisor's signature", "A second inspection", "A photograph of the defect"],
+          "answer": "B",
+          "explanation": "'nothing from the red bin is ever thrown out without a supervisor's signature', tức cần chữ ký của người giám sát."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "All children's clothing sold in the store must _____ to national safety rules.",
+        "options": ["conform", "conformity", "conformed", "conforming"],
+        "answer": "A",
+        "explanation": "Sau 'must' cần động từ nguyên mẫu; 'conform to' nghĩa là tuân theo, phù hợp với."
+      },
+      {
+        "prompt": "The _____ inspector noticed a tiny tear that everyone else had missed.",
+        "options": ["perceive", "perception", "perceptive", "perceptively"],
+        "answer": "C",
+        "explanation": "Trước danh từ 'inspector' cần tính từ: 'perceptive' (tinh ý)."
+      },
+      {
+        "prompt": "The fabric was dyed _____, so no two shirts in the batch differ in shade.",
+        "options": ["uniform", "uniformity", "uniformly", "uniforms"],
+        "answer": "C",
+        "explanation": "Cần trạng từ bổ nghĩa cho động từ 'was dyed': 'uniformly' (đồng đều)."
+      },
+      {
+        "prompt": "Regular training has greatly _____ the accuracy of our inspection team.",
+        "options": ["enhance", "enhanced", "enhancement", "enhancing"],
+        "answer": "B",
+        "explanation": "Sau 'has' cần quá khứ phân từ để tạo thì hiện tại hoàn thành: 'has greatly enhanced'."
+      },
+      {
+        "prompt": "The new coating _____ both water and dust, which makes the jackets easier to clean.",
+        "options": ["repel", "repels", "repelled", "repelling"],
+        "answer": "B",
+        "explanation": "Chủ ngữ 'The new coating' số ít và câu nói về đặc tính hiện tại, nên động từ chia hiện tại đơn: 'repels'."
+      },
+      {
+        "prompt": "Any coat with a visible _____ is removed from the line immediately.",
+        "options": ["defect", "defective", "defectively", "defected"],
+        "answer": "A",
+        "explanation": "Sau 'a visible' cần danh từ: 'defect' (lỗi). 'defective' là tính từ."
+      }
+    ],
+    "part6": {
+      "passage": "NOTICE TO CUSTOMERS\nReturns of faulty clothing\n\nAt Larkspur Clothing, every item is checked before it is shipped. If you nevertheless receive a ___ with a fault, you may return it to any of our stores within 60 days. Please bring your receipt with you. We will ___ the item and offer a replacement or a full refund, whichever you prefer. Items that have simply been ___ in the parcel are not considered faulty; a light steam iron will restore them. Thank you for choosing Larkspur.",
+      "questions": [
+        {
+          "options": ["garment", "wrinkle", "brand", "defect"],
+          "answer": "A",
+          "explanation": "Cần danh từ chỉ món đồ nhận được có lỗi: 'a garment with a fault'. 'defect' là bản thân cái lỗi, không phải món hàng."
+        },
+        {
+          "options": ["take back", "throw out", "repel", "wrinkle"],
+          "answer": "A",
+          "explanation": "Cửa hàng 'take back the item' nghĩa là nhận lại món hàng rồi đổi hoặc hoàn tiền. 'throw out' là vứt bỏ, không hợp với việc đổi hàng."
+        },
+        {
+          "options": ["wrinkle", "wrinkled", "wrinkling", "wrinkles"],
+          "answer": "B",
+          "explanation": "'have been + quá khứ phân từ' là dạng bị động: 'have been wrinkled in the parcel' (bị nhăn trong gói hàng)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "WILLOWBROOK TEXTILES\nQuality Inspection Report\nOrder: 4471 - 1,200 men's cotton shirts for Harbor Outfitters\nInspection date: 3 May\nInspector: Nadia Petrova\n\n| Check | Items examined | Items failed | Note |\n| Seams and stitching | 1,200 | 9 | Loose thread at collar |\n| Buttons and buttonholes | 1,200 | 4 | Missing button |\n| Color match to sample | 1,200 | 31 | Cuffs slightly darker |\n| Pressing and folding | 1,200 | 0 | None |\n\nSummary\nThe order conforms to the buyer's specification except for the color of the cuffs on 31 shirts, which came from a single roll of fabric. The nine shirts with loose threads were repaired on site; the four shirts with missing buttons were returned to the sewing floor. No wrinkles were found, confirming that the new folding tables have enhanced the pressing stage.\n\nRecommendation\nThe 31 shirts with darker cuffs should not be shipped under the Harbor Outfitters brand. I suggest offering them to the buyer at a 40 percent discount for its outlet store; if the buyer declines, they will be sold as unlabeled seconds. The remaining 1,169 shirts are approved for shipping on 6 May.\n\nSigned: N. Petrova",
+      "questions": [
+        {
+          "prompt": "What is the purpose of this report?",
+          "options": ["To order new fabric", "To record the results of a quality check", "To announce a new folding table", "To request a discount from a supplier"],
+          "answer": "B",
+          "explanation": "Tiêu đề 'Quality Inspection Report' và bảng kết quả cho thấy tài liệu ghi lại kết quả kiểm tra chất lượng một đơn hàng."
+        },
+        {
+          "prompt": "What was the most common problem found?",
+          "options": ["Loose threads", "Missing buttons", "Color differences on the cuffs", "Wrinkles from folding"],
+          "answer": "C",
+          "explanation": "Bảng ghi 31 áo không đạt ở mục 'Color match to sample', nhiều hơn hẳn 9 áo chỉ lỏng và 4 áo thiếu nút."
+        },
+        {
+          "prompt": "What happened to the shirts with missing buttons?",
+          "options": ["They were shipped with a discount.", "They were sent back to the sewing floor.", "They were thrown out.", "They were repaired by the inspector."],
+          "answer": "B",
+          "explanation": "Phần Summary ghi 'the four shirts with missing buttons were returned to the sewing floor'."
+        },
+        {
+          "prompt": "What does the inspector say about the new folding tables?",
+          "options": ["They are too small.", "They have improved the pressing stage.", "They caused the color problem.", "They need to be replaced."],
+          "answer": "B",
+          "explanation": "'the new folding tables have enhanced the pressing stage'; 'enhance' nghĩa là cải thiện, nâng cao."
+        },
+        {
+          "prompt": "What will happen if the buyer does not want the 31 shirts?",
+          "options": ["They will be destroyed.", "They will be shipped on 6 May anyway.", "They will be sold without the brand label.", "They will be dyed again."],
+          "answer": "C",
+          "explanation": "'if the buyer declines, they will be sold as unlabeled seconds', tức bán như hàng loại hai không gắn nhãn hiệu."
+        }
+      ]
+    }
+  }
+}

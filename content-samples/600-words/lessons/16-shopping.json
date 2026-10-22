@@ -1,0 +1,260 @@
+{
+  "number": 16,
+  "title": "Shopping",
+  "vocabulary": [
+    {
+      "word": "bargain",
+      "partOfSpeech": "noun",
+      "meaning": "món hàng giá rẻ, món hời; sự mặc cả",
+      "example": "The winter coats on the back rack are a real bargain at half the usual price.",
+      "exampleMeaning": "Những chiếc áo khoác mùa đông ở giá treo phía sau thực sự là món hời khi chỉ bằng nửa giá thường."
+    },
+    {
+      "word": "bear",
+      "partOfSpeech": "verb",
+      "meaning": "chịu, gánh (chi phí, trách nhiệm); chịu đựng",
+      "example": "The store will bear the cost of shipping if a customer returns a faulty product.",
+      "exampleMeaning": "Cửa hàng sẽ chịu phí vận chuyển nếu khách trả lại sản phẩm bị lỗi."
+    },
+    {
+      "word": "behavior",
+      "partOfSpeech": "noun",
+      "meaning": "hành vi, cách cư xử (của khách hàng, nhân viên)",
+      "example": "Our survey tracks customer behavior in the store, such as which aisles people visit first.",
+      "exampleMeaning": "Khảo sát của chúng tôi theo dõi hành vi khách hàng trong cửa hàng, chẳng hạn họ ghé lối đi nào trước."
+    },
+    {
+      "word": "checkout",
+      "partOfSpeech": "noun",
+      "meaning": "quầy thanh toán, khu thu ngân; việc thanh toán",
+      "example": "Please open a second checkout when more than five customers are waiting in line.",
+      "exampleMeaning": "Vui lòng mở thêm quầy thanh toán thứ hai khi có hơn năm khách đang xếp hàng."
+    },
+    {
+      "word": "comfort",
+      "partOfSpeech": "noun",
+      "meaning": "sự thoải mái, tiện nghi; sự an ủi",
+      "example": "Shoppers often choose this brand of shoes for comfort rather than style.",
+      "exampleMeaning": "Người mua thường chọn hãng giày này vì sự thoải mái hơn là kiểu dáng."
+    },
+    {
+      "word": "expand",
+      "partOfSpeech": "verb",
+      "meaning": "mở rộng, phát triển (quy mô, phạm vi)",
+      "example": "The bookstore plans to expand into the empty unit next door this spring.",
+      "exampleMeaning": "Hiệu sách dự định mở rộng sang gian trống kế bên vào mùa xuân này."
+    },
+    {
+      "word": "explore",
+      "partOfSpeech": "verb",
+      "meaning": "khám phá, tìm hiểu kỹ (lựa chọn, khu vực)",
+      "example": "Customers like to explore the new section before they decide what to buy.",
+      "exampleMeaning": "Khách hàng thích đi xem khu mới trước khi quyết định mua gì."
+    },
+    {
+      "word": "item",
+      "partOfSpeech": "noun",
+      "meaning": "món hàng, mặt hàng; mục, khoản",
+      "example": "Every item in the clearance corner is marked with a yellow price tag.",
+      "exampleMeaning": "Mọi món hàng ở góc xả kho đều được gắn nhãn giá màu vàng."
+    },
+    {
+      "word": "mandatory",
+      "partOfSpeech": "adjective",
+      "meaning": "bắt buộc, có tính cưỡng chế",
+      "example": "A receipt is mandatory for any exchange made after the first week.",
+      "exampleMeaning": "Hóa đơn là bắt buộc đối với mọi trường hợp đổi hàng sau tuần đầu tiên."
+    },
+    {
+      "word": "merchandise",
+      "partOfSpeech": "noun",
+      "meaning": "hàng hóa (bày bán trong cửa hàng)",
+      "example": "The new merchandise arrived on Thursday and was on the shelves by Friday morning.",
+      "exampleMeaning": "Lô hàng mới đến vào thứ Năm và đã lên kệ vào sáng thứ Sáu."
+    },
+    {
+      "word": "strictly",
+      "partOfSpeech": "adverb",
+      "meaning": "một cách nghiêm ngặt, chặt chẽ; hoàn toàn chỉ",
+      "example": "Sale prices apply strictly to items bought between June 1 and June 7.",
+      "exampleMeaning": "Giá khuyến mãi chỉ áp dụng nghiêm ngặt cho các món mua từ ngày 1 đến ngày 7 tháng Sáu."
+    },
+    {
+      "word": "trend",
+      "partOfSpeech": "noun",
+      "meaning": "xu hướng, chiều hướng",
+      "example": "The latest trend in home furnishings is light wood and soft gray fabric.",
+      "exampleMeaning": "Xu hướng mới nhất trong đồ nội thất gia đình là gỗ sáng màu và vải xám nhạt."
+    }
+  ],
+  "fillIn": {
+    "passage": "Sales at Harbor Lane Outdoor Store fell during the summer, so the manager, Priya Nandal, asked her team to study customer ___ for two weeks. Staff noticed that most visitors ___ the camping section first, picked up one or two ___, and then left without buying. The problem was not price. Several tents were a genuine ___, yet shoppers still walked past them.\n\nPriya decided to ___ the fitting area and add two benches, because people who sit down to try boots stay longer and care about ___. She also moved the sale ___ closer to the entrance and placed a single ___ counter near the exit, so nobody had to search for a place to pay. One new rule was ___: every staff member must greet a customer within one minute, and the rule is ___ enforced.\n\nPriya knew the store would ___ a small loss for a month while the changes were made. By October, however, sales were up twelve percent, and a national magazine mentioned the store's bright, open layout as a growing ___ in retail.",
+    "answers": ["behavior", "explored", "items", "bargain", "expand", "comfort", "merchandise", "checkout", "mandatory", "strictly", "bear", "trend"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một nhân viên thu ngân đang quét mã một món hàng tại quầy thanh toán, một khách hàng đứng chờ với giỏ hàng.",
+      "options": [
+        "A cashier is scanning an item at the checkout.",
+        "A customer is pushing a cart into the parking lot.",
+        "A woman is folding clothes on a table.",
+        "The shelves are being filled with merchandise."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy thu ngân đang quét món hàng ở quầy thanh toán. (B), (C) và (D) mô tả hành động hoặc đồ vật không có trong ảnh."
+    },
+    "part2": [
+      {
+        "question": "Where can I find the discounted merchandise?",
+        "options": ["It's on the racks near the back wall.", "Yes, the prices are very low.", "I usually shop on weekends."],
+        "answer": "A",
+        "explanation": "Câu hỏi Where cần câu trả lời chỉ vị trí. (B) trả lời Yes cho câu hỏi Wh, (C) nói về thời gian đi mua sắm."
+      },
+      {
+        "question": "Is a receipt mandatory for returns?",
+        "options": ["The manager is at lunch.", "Only if you paid in cash.", "It was a real bargain."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về việc có bắt buộc hóa đơn không; (B) trả lời có điều kiện, hợp lý. (A) và (C) không liên quan đến câu hỏi."
+      }
+    ],
+    "part3": {
+      "transcript": "Woman: Marco, have you seen the sales figures for the children's clothing section? They've doubled since March.\nMan: I have. It seems parents are following the trend of buying matching outfits for the whole family.\nWoman: That's exactly why I want to expand that section into the space where the stationery used to be.\nMan: I like the idea, but the store will have to bear the cost of new shelving and lighting. That's at least four thousand dollars.\nWoman: We can take it from the marketing budget. Could you explore a few shelving suppliers and get quotes by Thursday?\nMan: Sure. And while we're changing the layout, let's add a second checkout near that section. Customers complain about the line on Saturdays.\nWoman: Good point. Put that in the proposal too.\nMan: I'll have a draft ready for you tomorrow afternoon.",
+      "questions": [
+        {
+          "prompt": "What are the speakers mainly discussing?",
+          "options": ["Hiring more cashiers", "Enlarging a store section", "Ordering stationery", "Closing on Saturdays"],
+          "answer": "B",
+          "explanation": "Người phụ nữ muốn 'expand that section', tức mở rộng khu quần áo trẻ em; 'enlarge' đồng nghĩa với 'expand'."
+        },
+        {
+          "prompt": "What does the man say about the project?",
+          "options": ["It will cost at least four thousand dollars.", "It will take until March.", "It needs approval from head office.", "It will reduce sales of other items."],
+          "answer": "A",
+          "explanation": "Người đàn ông nói cửa hàng phải 'bear the cost ... at least four thousand dollars'."
+        },
+        {
+          "prompt": "What does the woman ask the man to do?",
+          "options": ["Rewrite the marketing budget", "Get quotes from suppliers", "Train the new cashiers", "Move the stationery"],
+          "answer": "B",
+          "explanation": "Cô ấy yêu cầu 'explore a few shelving suppliers and get quotes by Thursday'."
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Attention, shoppers. Thank you for visiting Cedar Point Home Goods today. For the next two hours, every item in our kitchen department is twenty percent off, and selected cookware sets are an even bigger bargain at half price. Please note that these prices apply strictly to purchases made before six o'clock this evening. To make your visit easier, we have opened all eight checkout counters, and a staff member is standing at the end of each line to help you with large boxes. If you would like to try one of our new recliner chairs, the comfort testing area is on the second floor beside the escalator. Finally, a friendly reminder: our store policy requires all children under twelve to stay with an adult while in the store. Enjoy your shopping, and thank you for choosing Cedar Point.",
+      "questions": [
+        {
+          "prompt": "Where is the announcement being made?",
+          "options": ["At an airport", "In a department store", "At a restaurant", "In a hotel lobby"],
+          "answer": "B",
+          "explanation": "Người nói chào 'shoppers', nhắc đến 'kitchen department', 'checkout counters' và 'recliner chairs', tức một cửa hàng bách hóa."
+        },
+        {
+          "prompt": "When does the discount end?",
+          "options": ["At noon", "At six o'clock", "At closing time tomorrow", "At the end of the month"],
+          "answer": "B",
+          "explanation": "Giá khuyến mãi áp dụng 'strictly to purchases made before six o'clock this evening'."
+        },
+        {
+          "prompt": "What can shoppers do on the second floor?",
+          "options": ["Pay for their purchases", "Return damaged goods", "Try out chairs", "Pick up free samples"],
+          "answer": "C",
+          "explanation": "Khu 'comfort testing area' để thử ghế nằm ở tầng hai, cạnh thang cuốn."
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "The company decided to _____ its online store to include garden furniture.",
+        "options": ["expand", "expansion", "expanded", "expansive"],
+        "answer": "A",
+        "explanation": "Sau 'decided to' cần động từ nguyên mẫu: 'expand'."
+      },
+      {
+        "prompt": "Customers who take their time to _____ the store usually buy more than those who hurry.",
+        "options": ["explore", "exploration", "explorer", "exploring"],
+        "answer": "A",
+        "explanation": "Cấu trúc 'take time to' + động từ nguyên mẫu; 'explore the store' là đi xem khắp cửa hàng."
+      },
+      {
+        "prompt": "Wearing a name badge is _____ for all sales staff during store hours.",
+        "options": ["mandate", "mandatory", "mandatorily", "mandating"],
+        "answer": "B",
+        "explanation": "Sau 'is' cần tính từ làm vị ngữ: 'mandatory' (bắt buộc). 'mandate' là danh từ hoặc động từ."
+      },
+      {
+        "prompt": "Our researchers study shopping _____ to understand why some displays attract more attention.",
+        "options": ["behave", "behavior", "behavioral", "behaved"],
+        "answer": "B",
+        "explanation": "Sau 'shopping' cần danh từ làm tân ngữ của 'study': 'shopping behavior' (hành vi mua sắm)."
+      },
+      {
+        "prompt": "The return policy is _____ enforced, so refunds are not given without a receipt.",
+        "options": ["strict", "strictly", "strictness", "stricter"],
+        "answer": "B",
+        "explanation": "Cần trạng từ bổ nghĩa cho quá khứ phân từ 'enforced': 'strictly enforced'."
+      },
+      {
+        "prompt": "Each _____ on the receipt must match a product in the shopping basket.",
+        "options": ["item", "trend", "bargain", "comfort"],
+        "answer": "A",
+        "explanation": "Từng dòng trên hóa đơn là một 'item' (mặt hàng) phải khớp với sản phẩm trong giỏ; các từ khác không hợp nghĩa."
+      }
+    ],
+    "part6": {
+      "passage": "To: All Floor Staff\nFrom: Dana Whitfield, Store Manager\nSubject: Weekend sale preparations\n\nOur spring sale begins this Saturday, and we expect a large number of shoppers. New ___ will arrive on Friday afternoon, so please clear the front tables by five o'clock to make room for it. During the sale, all six ___ counters must be open from nine until closing; Mr. Okafor will prepare the schedule. Finally, a reminder that the staff discount applies ___ to purchases made after your shift, not during working hours. Thank you for your help in making this sale a success.",
+      "questions": [
+        {
+          "options": ["merchandise", "merchant", "merchandising", "merchants"],
+          "answer": "A",
+          "explanation": "Cần danh từ chỉ hàng hóa sẽ được chuyển đến và xếp lên bàn; 'merchandise' không đếm được, hợp với 'it' ở sau."
+        },
+        {
+          "options": ["checkout", "check", "checking", "checked"],
+          "answer": "A",
+          "explanation": "'checkout counters' là quầy thanh toán; danh từ 'checkout' đứng trước 'counters' như một từ bổ nghĩa."
+        },
+        {
+          "options": ["strictly", "strict", "strictness", "stricter"],
+          "answer": "A",
+          "explanation": "Cần trạng từ bổ nghĩa cho động từ 'applies': 'applies strictly to' (chỉ áp dụng nghiêm ngặt cho)."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "MAPLE ROW MARKET\nGrand Reopening Weekend, October 24-25\n\nAfter three months of building work, Maple Row Market has expanded from one floor to two. The new upper floor holds our home and garden department, a children's corner, and a quiet seating area where you can rest in comfort between purchases.\n\nReopening offers:\n| Department | Offer |\n| Clothing | 30% off every item marked with a green tag |\n| Kitchen | Buy two pans, get the third free |\n| Home and garden | Free delivery within 15 kilometers on orders over $150 |\n\nExplore the new floor with one of our guides, who will be giving short tours every hour from 10 a.m. Our buyers have followed this year's trends closely, so you will find natural fabrics and recycled wood everywhere. Maple Row Market will bear the delivery cost for any order over $150; smaller orders are charged a flat fee of $12.\n\nOpening hours during the weekend are 9 a.m. to 9 p.m. Members of our loyalty program receive an extra 5% discount at the checkout; please show your card before paying.\n\nQuestions? Visit the information desk on the ground floor.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the notice?",
+          "options": ["To announce the opening of a new branch", "To advertise the reopening of an enlarged store", "To recruit tour guides", "To explain a change in opening hours"],
+          "answer": "B",
+          "explanation": "Thông báo về 'Grand Reopening Weekend' sau khi cửa hàng 'has expanded from one floor to two', kèm các ưu đãi."
+        },
+        {
+          "prompt": "What is found on the upper floor?",
+          "options": ["The clothing department", "The information desk", "A seating area", "The checkout counters"],
+          "answer": "C",
+          "explanation": "Tầng trên có 'a quiet seating area where you can rest in comfort'. Bàn thông tin ở tầng trệt."
+        },
+        {
+          "prompt": "How often will tours be given?",
+          "options": ["Every hour", "Twice a day", "Every thirty minutes", "Once each weekend day"],
+          "answer": "A",
+          "explanation": "Hướng dẫn viên 'will be giving short tours every hour from 10 a.m.'."
+        },
+        {
+          "prompt": "What is indicated about delivery?",
+          "options": ["It is free for all orders.", "It costs $12 for orders under $150.", "It is available only on Sunday.", "It takes three months."],
+          "answer": "B",
+          "explanation": "Cửa hàng chịu phí giao hàng cho đơn trên $150; 'smaller orders are charged a flat fee of $12'."
+        },
+        {
+          "prompt": "What should loyalty members do to get their extra discount?",
+          "options": ["Join a tour", "Buy two pans", "Present their card before paying", "Order online"],
+          "answer": "C",
+          "explanation": "Thành viên được giảm thêm 5% tại quầy thanh toán và 'please show your card before paying'."
+        }
+      ]
+    }
+  }
+}

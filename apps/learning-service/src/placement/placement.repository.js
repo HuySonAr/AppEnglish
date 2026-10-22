@@ -29,6 +29,12 @@ export class PlacementRepository {
     }
   }
 
+  // Removes the learner's attempt (D131). Returns whether one existed.
+  async deleteAttempt(accountId) {
+    const result = await (await this.repo(PlacementAttemptEntity)).delete({ accountId });
+    return (result.affected || 0) > 0;
+  }
+
   async findSettings() {
     return (await this.repo(PlacementSettingsEntity)).findOne({ where: { id: 1 } });
   }

@@ -1,0 +1,260 @@
+{
+  "number": 3,
+  "title": "Warranties",
+  "vocabulary": [
+    {
+      "word": "characteristic",
+      "partOfSpeech": "noun",
+      "meaning": "đặc điểm, đặc tính; (tính từ) đặc trưng",
+      "example": "Long battery life is the main characteristic that customers look for in this laptop.",
+      "exampleMeaning": "Thời lượng pin dài là đặc điểm chính mà khách hàng tìm kiếm ở chiếc laptop này."
+    },
+    {
+      "word": "consequence",
+      "partOfSpeech": "noun",
+      "meaning": "hậu quả, kết quả (thường là xấu)",
+      "example": "Opening the case yourself has one serious consequence: the warranty becomes invalid.",
+      "exampleMeaning": "Tự mở vỏ máy có một hậu quả nghiêm trọng: bảo hành sẽ mất hiệu lực."
+    },
+    {
+      "word": "consider",
+      "partOfSpeech": "verb",
+      "meaning": "cân nhắc, xem xét; coi là",
+      "example": "Please consider the extended warranty before you complete your purchase.",
+      "exampleMeaning": "Vui lòng cân nhắc gói bảo hành mở rộng trước khi hoàn tất mua hàng."
+    },
+    {
+      "word": "cover",
+      "partOfSpeech": "verb",
+      "meaning": "bao gồm, chi trả (trong bảo hành, bảo hiểm); che phủ",
+      "example": "The standard warranty covers parts and labor for twelve months.",
+      "exampleMeaning": "Bảo hành tiêu chuẩn chi trả linh kiện và công sửa trong mười hai tháng."
+    },
+    {
+      "word": "expiration",
+      "partOfSpeech": "noun",
+      "meaning": "sự hết hạn, ngày hết hạn",
+      "example": "Check the expiration date on your service plan before requesting a repair.",
+      "exampleMeaning": "Hãy kiểm tra ngày hết hạn của gói dịch vụ trước khi yêu cầu sửa chữa."
+    },
+    {
+      "word": "frequently",
+      "partOfSpeech": "adverb",
+      "meaning": "thường xuyên, hay",
+      "example": "Customers frequently ask whether water damage is included in the warranty.",
+      "exampleMeaning": "Khách hàng thường xuyên hỏi liệu hư hỏng do nước có được bảo hành không."
+    },
+    {
+      "word": "imply",
+      "partOfSpeech": "verb",
+      "meaning": "ngụ ý, hàm ý",
+      "example": "The advertisement implies that the printer never needs repairs, which is not true.",
+      "exampleMeaning": "Quảng cáo ngụ ý rằng máy in không bao giờ cần sửa, điều này không đúng."
+    },
+    {
+      "word": "promise",
+      "partOfSpeech": "noun",
+      "meaning": "lời hứa, lời cam kết; (động từ) hứa",
+      "example": "A warranty is a written promise that the maker will repair or replace a faulty product.",
+      "exampleMeaning": "Bảo hành là lời cam kết bằng văn bản rằng nhà sản xuất sẽ sửa hoặc thay sản phẩm lỗi."
+    },
+    {
+      "word": "protect",
+      "partOfSpeech": "verb",
+      "meaning": "bảo vệ, che chở",
+      "example": "A plastic case protects the phone from scratches and small drops.",
+      "exampleMeaning": "Ốp nhựa bảo vệ điện thoại khỏi trầy xước và những cú rơi nhẹ."
+    },
+    {
+      "word": "reputation",
+      "partOfSpeech": "noun",
+      "meaning": "danh tiếng, uy tín",
+      "example": "The repair shop built its reputation on quick service and honest prices.",
+      "exampleMeaning": "Tiệm sửa chữa xây dựng uy tín nhờ phục vụ nhanh và giá cả trung thực."
+    },
+    {
+      "word": "require",
+      "partOfSpeech": "verb",
+      "meaning": "yêu cầu, đòi hỏi; cần có",
+      "example": "The manufacturer requires a copy of the receipt with every warranty claim.",
+      "exampleMeaning": "Nhà sản xuất yêu cầu bản sao hóa đơn kèm theo mỗi yêu cầu bảo hành."
+    },
+    {
+      "word": "variety",
+      "partOfSpeech": "noun",
+      "meaning": "sự đa dạng; nhiều loại khác nhau",
+      "example": "The store offers a variety of service plans, from six months to five years.",
+      "exampleMeaning": "Cửa hàng cung cấp nhiều loại gói dịch vụ khác nhau, từ sáu tháng đến năm năm."
+    }
+  ],
+  "fillIn": {
+    "passage": "Last spring the Ravenhill Hotel replaced the washing machines in its laundry room. The hotel's manager, Ms. Dubois, ___ several brands before choosing one. The machines are used ___, sometimes twenty hours a day, so she wanted a model whose main ___ was durability rather than low price. She also looked at the ___ of each maker, reading reviews from other hotels.\n\nThe brand she chose offers a ___ of warranty plans. The basic plan ___ parts for two years, while the extended plan also includes labor. The seller's brochure seemed to ___ that repairs were free in every case, but the fine print ___ the hotel to use only approved technicians. Ms. Dubois knew that ignoring this rule would have a costly ___: the warranty would be canceled.\n\nShe marked the ___ date of the warranty on the office calendar and bought rubber mats to ___ the floor from leaks. The maker's written ___ to replace any machine that fails twice in a year gave her peace of mind.",
+    "answers": ["considered", "frequently", "characteristic", "reputation", "variety", "covers", "imply", "requires", "consequence", "expiration", "protect", "promise"]
+  },
+  "test": {
+    "part1": {
+      "photoHint": "Một kỹ thuật viên nữ quỳ bên chiếc máy giặt trong phòng giặt, tay cầm tuốc-nơ-vít.",
+      "options": [
+        "The woman is repairing a machine.",
+        "The woman is folding towels.",
+        "The woman is washing the floor.",
+        "The woman is carrying a box."
+      ],
+      "answer": "A",
+      "explanation": "Ảnh cho thấy người phụ nữ cầm dụng cụ sửa máy giặt. (B), (C) và (D) mô tả hành động không có trong ảnh; (C) nhầm với 'washing machine'."
+    },
+    "part2": [
+      {
+        "question": "When does the warranty on the copier expire?",
+        "options": ["At the end of next month.", "It copies forty pages a minute.", "No, we didn't buy an extension."],
+        "answer": "A",
+        "explanation": "Câu hỏi When cần câu trả lời chỉ thời gian. (B) nhầm với từ 'copier', (C) trả lời No cho câu hỏi Wh."
+      },
+      {
+        "question": "Does the service plan cover accidental damage?",
+        "options": ["The cover is made of leather.", "Only if you chose the premium plan.", "It was damaged during shipping."],
+        "answer": "B",
+        "explanation": "Câu hỏi Yes/No về phạm vi bảo hành; (B) trả lời có điều kiện. (A) nhầm nghĩa 'cover' là vỏ bọc, (C) lặp từ 'damage' nhưng không trả lời."
+      }
+    ],
+    "part3": {
+      "transcript": "Man: Good afternoon, I'd like to make a claim on my laptop warranty. The screen stopped working this morning.\nWoman: I'm sorry to hear that. Could you give me the serial number, please? I need to check the expiration date.\nMan: It's R-K-four-seven-nine-two. I bought it about fourteen months ago.\nWoman: Thank you. Your standard warranty ended after twelve months, but I can see that you purchased the extended plan, which covers you for three years.\nMan: That's a relief. Do I need to bring the laptop to a store?\nWoman: No, we require you to send it to our repair center. I'll e-mail you a prepaid shipping label and a form to fill out. Please pack the laptop carefully to protect the screen during transport.\nMan: Great. How long will the repair take?\nWoman: Usually about seven working days from the day we receive it.",
+      "questions": [
+        {
+          "prompt": "Why is the man calling?",
+          "options": ["To buy an extended warranty", "To report a broken product", "To change a shipping address", "To cancel an order"],
+          "answer": "B",
+          "explanation": "Anh ấy muốn 'make a claim on my laptop warranty' vì màn hình ngừng hoạt động, tức báo sản phẩm bị hỏng."
+        },
+        {
+          "prompt": "What does the woman say about the extended plan?",
+          "options": ["It expired two months ago.", "It must be renewed every year.", "It lasts for three years.", "It covers only the battery."],
+          "answer": "C",
+          "explanation": "'the extended plan, which covers you for three years'. Gói tiêu chuẩn mới là gói đã hết hạn sau mười hai tháng."
+        },
+        {
+          "prompt": "What will the woman send the man?",
+          "options": ["A new laptop", "A refund", "A shipping label and a form", "A store address"],
+          "answer": "C",
+          "explanation": "'I'll e-mail you a prepaid shipping label and a form to fill out.'"
+        }
+      ]
+    },
+    "part4": {
+      "transcript": "Attention, shoppers. Thank you for visiting Harbor Electronics. For the rest of this month, every television and refrigerator in the store comes with a free two-year warranty. We offer a variety of brands, and each one has been tested by our own technicians. Our reputation has been built on a simple promise: if a product fails during the warranty period, we repair it or replace it within ten days. Customers frequently ask whether the warranty includes damage from power cuts. It does, as long as you use the surge protector supplied in the box. Please keep your receipt, because it is required for every claim. If you would like to learn about the main characteristics of our top models, our staff members in the blue shirts will be happy to help you. Enjoy your shopping.",
+      "questions": [
+        {
+          "prompt": "Where is the announcement being made?",
+          "options": ["At a repair center", "At an electronics store", "At an airport", "At a hotel"],
+          "answer": "B",
+          "explanation": "Người nói chào 'shoppers' tại 'Harbor Electronics' và nói về tivi, tủ lạnh, nên đây là cửa hàng điện tử."
+        },
+        {
+          "prompt": "What does the store promise to do if a product fails?",
+          "options": ["Refund the full price", "Repair or replace it within ten days", "Send a technician to the customer's home", "Extend the warranty by one year"],
+          "answer": "B",
+          "explanation": "'if a product fails during the warranty period, we repair it or replace it within ten days'."
+        },
+        {
+          "prompt": "What should customers keep?",
+          "options": ["The shopping bag", "The surge protector box", "The receipt", "A blue shirt"],
+          "answer": "C",
+          "explanation": "'Please keep your receipt, because it is required for every claim.'"
+        }
+      ]
+    },
+    "part5": [
+      {
+        "prompt": "Damage caused by improper use is not _____ by the manufacturer's warranty.",
+        "options": ["cover", "covered", "covering", "coverage"],
+        "answer": "B",
+        "explanation": "Câu bị động 'is not ... by' cần quá khứ phân từ: 'covered'."
+      },
+      {
+        "prompt": "The guarantee _____ on the last day of the twenty-fourth month after purchase.",
+        "options": ["expiration", "expire", "expires", "expired"],
+        "answer": "C",
+        "explanation": "Chủ ngữ 'The guarantee' số ít, câu nói về quy định chung nên dùng hiện tại đơn: 'expires'. 'expiration' là danh từ."
+      },
+      {
+        "prompt": "Customers _____ ask whether the repair service is free.",
+        "options": ["frequent", "frequency", "frequently", "frequented"],
+        "answer": "C",
+        "explanation": "Giữa chủ ngữ và động từ 'ask' cần trạng từ chỉ tần suất: 'frequently'."
+      },
+      {
+        "prompt": "The salesperson's words _____ that the extended plan was unnecessary.",
+        "options": ["implied", "implication", "implying", "implicit"],
+        "answer": "A",
+        "explanation": "Câu cần động từ chính cho chủ ngữ 'words'; 'implied that' nghĩa là ngụ ý rằng."
+      },
+      {
+        "prompt": "Each model has its own _____, such as a longer battery or a brighter screen.",
+        "options": ["character", "characteristics", "characteristically", "characterize"],
+        "answer": "B",
+        "explanation": "Sau 'its own' cần danh từ chỉ các đặc điểm; ví dụ liệt kê pin và màn hình nên 'characteristics' là phù hợp."
+      },
+      {
+        "prompt": "A good warranty helps a brand _____ its reputation for quality.",
+        "options": ["protection", "protective", "protect", "protectively"],
+        "answer": "C",
+        "explanation": "Cấu trúc 'help + tân ngữ + động từ nguyên mẫu': 'helps a brand protect'."
+      }
+    ],
+    "part6": {
+      "passage": "Dear Ms. Alvarez,\n\nThank you for contacting Northgate Appliances about your dishwasher. We have reviewed your claim. According to our records, the warranty on your model reached its ___ date on June 30, three weeks before the problem appeared. For this reason, we are unable to offer a free repair. However, because you have been a loyal customer, we would like to ___ a discounted service visit at half the usual price. Our technician can also install a water filter, which ___ the machine from damage caused by hard water. Please call us at 555-0142 to arrange an appointment.\n\nSincerely,\nBen Carter\nCustomer Service",
+      "questions": [
+        {
+          "options": ["expire", "expiration", "expired", "expiring"],
+          "answer": "B",
+          "explanation": "Sau 'its' và trước 'date' cần danh từ ghép: 'expiration date' (ngày hết hạn)."
+        },
+        {
+          "options": ["offer", "require", "imply", "consider"],
+          "answer": "A",
+          "explanation": "Công ty muốn đề nghị một dịch vụ giảm giá cho khách; 'offer' đúng nghĩa. 'require' (yêu cầu) và 'imply' (ngụ ý) không hợp ngữ cảnh."
+        },
+        {
+          "options": ["protect", "protects", "protected", "protection"],
+          "answer": "B",
+          "explanation": "Mệnh đề quan hệ 'which ___ the machine' có chủ ngữ là 'a water filter' số ít, nên động từ thêm -s: 'protects'."
+        }
+      ]
+    },
+    "part7": {
+      "passage": "SILVERPINE OUTDOOR GEAR\nLimited Warranty - Backpacks and Tents\n\nWe have spent twenty years building a reputation for equipment that lasts, and this warranty is our promise to you.\n\nWhat is covered\nEvery Silverpine backpack and tent is protected against defects in materials and workmanship for five years from the date of purchase. If a defect appears, we will repair the item free of charge or replace it with a product of equal value. Spare buckles and tent pegs are supplied free during this period.\n\nWhat is not covered\nNormal wear, fading of colors, and damage caused by accidents, animals or improper storage are not covered. Repairs made by anyone other than Silverpine will cancel this warranty, so please consider the consequences before attempting to fix an item yourself.\n\nHow to make a claim\n1. Complete the claim form on our website.\n2. Attach a photograph of the defect and a copy of your receipt.\n3. Wait for our e-mail with a return label. Do not send items without it.\n\nClaims are usually processed within fourteen days. This warranty does not imply that a product is suitable for every climate; please read the care guide.",
+      "questions": [
+        {
+          "prompt": "What is the purpose of the document?",
+          "options": ["To advertise a new tent", "To explain the terms of a warranty", "To announce a store opening", "To request payment for a repair"],
+          "answer": "B",
+          "explanation": "Tài liệu có tiêu đề 'Limited Warranty' và trình bày những gì được và không được bảo hành cùng cách yêu cầu bảo hành."
+        },
+        {
+          "prompt": "How long does the warranty last?",
+          "options": ["Fourteen days", "One year", "Five years", "Twenty years"],
+          "answer": "C",
+          "explanation": "'protected ... for five years from the date of purchase'. Mười bốn ngày là thời gian xử lý yêu cầu, hai mươi năm là tuổi của công ty."
+        },
+        {
+          "prompt": "Which of the following is NOT covered by the warranty?",
+          "options": ["A defect in the material", "A seam that was sewn incorrectly", "Fading of colors", "A broken buckle"],
+          "answer": "C",
+          "explanation": "Mục 'What is not covered' liệt kê 'fading of colors'. Lỗi vật liệu và lỗi may là lỗi 'materials and workmanship' được bảo hành, khóa cài được cấp miễn phí."
+        },
+        {
+          "prompt": "What will happen if a customer repairs a backpack at a local shop?",
+          "options": ["The warranty will be canceled.", "Silverpine will refund the repair cost.", "The warranty will be extended.", "The customer must pay a fee to Silverpine."],
+          "answer": "A",
+          "explanation": "'Repairs made by anyone other than Silverpine will cancel this warranty.'"
+        },
+        {
+          "prompt": "What should customers do before sending an item back?",
+          "options": ["Buy a new receipt", "Wait for a return label by e-mail", "Call the nearest store", "Clean the item carefully"],
+          "answer": "B",
+          "explanation": "Bước 3: 'Wait for our e-mail with a return label. Do not send items without it.'"
+        }
+      ]
+    }
+  }
+}

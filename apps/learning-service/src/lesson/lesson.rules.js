@@ -5,6 +5,7 @@ import {
   PracticeDirection,
   StepStatus,
   TestTrend,
+  UnitReviewState,
   VOCABULARY_PRACTICE_SIZE,
 } from '@appenglish/learning-contracts';
 
@@ -23,22 +24,28 @@ export function shuffled(items, random = Math.random) {
 // Where each lesson stands for one learner. curriculum is the published units
 // (in order) with their published lessons; startUnit is the unit number the
 // placement gave, or null while the placement is neither taken nor skipped
-// (then every lesson is locked); completed is the set of completed lesson ids.
+// (then every lesson is locked); completed is the set of completed lesson ids;
+// passedReviews the ids of the units whose review the learner passed (D121).
 // Returns a Map: lesson id -> { state, unitNumber, lessonNumber, unit,
 // lesson, previousLessonId, reviewRequired }.
-export function lessonAccess(curriculum, startUnit, completed) {
+export function lessonAccess(curriculum, startUnit, completed, passedReviews = new Set()) {
   const access = new Map();
   let previous = null;
   curriculum.units.forEach((unit, unitIndex) => {
     const unitNumber = unitIndex + 1;
+    // The unit before closes with its review (D121): until it is passed, the
+    // first lesson here stays locked even though the last lesson there is done.
+    const before = unitIndex > 0 ? curriculum.units[unitIndex - 1] : null;
+    const reviewBlocks = Boolean(before?.reviewVersionId && before.lessons.length && !passedReviews.has(before.id));
     unit.lessons.forEach((lesson, lessonIndex) => {
       const firstOfStartUnit = unitNumber === startUnit && lessonIndex === 0;
+      const afterPrevious = Boolean(previous) && completed.has(previous) && !(lessonIndex === 0 && reviewBlocks);
       const state = completed.has(lesson.id)
         ? LessonState.COMPLETED
         : startUnit === null
           ? LessonState.LOCKED
           : // Units before the starting unit are open freely (D35).
-            unitNumber < startUnit || firstOfStartUnit || (previous && completed.has(previous))
+            unitNumber < startUnit || firstOfStartUnit || afterPrevious
             ? LessonState.OPEN
             : LessonState.LOCKED;
       access.set(lesson.id, {
@@ -55,6 +62,30 @@ export function lessonAccess(curriculum, startUnit, completed) {
       });
       previous = lesson.id;
     });
+  });
+  return access;
+}
+
+// Where the review of each unit stands for one learner (D121). A unit without
+// a published review is NONE. Otherwise the review is PASSED once passed,
+// OPEN when every lesson of the unit is completed (or the unit lies before
+// the starting unit, whose lessons are open freely), and LOCKED until then.
+// Returns a Map: unit id -> { state, unitNumber, unit, lessonsLeft }.
+export function unitReviewAccess(curriculum, startUnit, completed, passedReviews) {
+  const access = new Map();
+  curriculum.units.forEach((unit, unitIndex) => {
+    const unitNumber = unitIndex + 1;
+    const left = unit.lessons.filter((lesson) => !completed.has(lesson.id)).length;
+    let state = UnitReviewState.NONE;
+    if (unit.reviewVersionId)
+      state = passedReviews.has(unit.id)
+        ? UnitReviewState.PASSED
+        : startUnit === null
+          ? UnitReviewState.LOCKED
+          : unitNumber < startUnit || (unit.lessons.length > 0 && left === 0)
+            ? UnitReviewState.OPEN
+            : UnitReviewState.LOCKED;
+    access.set(unit.id, { state, unitNumber, unit, lessonsLeft: left });
   });
   return access;
 }
