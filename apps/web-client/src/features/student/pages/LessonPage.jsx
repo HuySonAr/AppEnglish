@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Check, Lock } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { StepNav, StepState } from '../../../components/shared/StepNav.jsx';
 import {
   LessonState,
   LessonStep,
@@ -10,7 +11,6 @@ import {
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { Badge, Button, Skeleton } from '../../../components/ui';
-import { cn } from '../../../lib/utils.js';
 import { getLesson, markVocabularyStudied } from '../api/lessons-api.js';
 import { FillInExercise } from '../components/FillInExercise.jsx';
 import { VocabularyQuiz } from '../components/VocabularyQuiz.jsx';
@@ -113,40 +113,16 @@ export function LessonPage() {
         </div>
       </div>
 
-      <ol aria-label="Lesson steps" className="flex flex-wrap gap-2">
-        {steps.map((step, index) => {
-          const locked = step.status === StepStatus.LOCKED;
-          return (
-            <li key={step.key}>
-              <button
-                type="button"
-                disabled={locked}
-                aria-current={active === step.key ? 'step' : undefined}
-                onClick={() => setActive(step.key)}
-                className={cn(
-                  'flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                  active === step.key
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : step.status === StepStatus.DONE
-                      ? 'border-success/40 bg-success/10 text-success'
-                      : locked
-                        ? 'cursor-not-allowed text-muted-foreground opacity-60'
-                        : 'hover:bg-accent',
-                )}
-              >
-                {step.status === StepStatus.DONE ? (
-                  <Check className="h-4 w-4" />
-                ) : locked ? (
-                  <Lock className="h-3.5 w-3.5" />
-                ) : (
-                  <span className="tabular-nums">{index + 1}</span>
-                )}
-                {stepLabels[step.key]}
-              </button>
-            </li>
-          );
-        })}
-      </ol>
+      <StepNav
+        label="Lesson steps"
+        active={active}
+        onSelect={setActive}
+        steps={steps.map((step) => ({
+          key: step.key,
+          label: stepLabels[step.key],
+          state: step.status === StepStatus.DONE ? StepState.DONE : step.status === StepStatus.LOCKED ? StepState.LOCKED : StepState.TODO,
+        }))}
+      />
 
       <div className="space-y-4">
         {active === LessonStep.REVIEW ? (

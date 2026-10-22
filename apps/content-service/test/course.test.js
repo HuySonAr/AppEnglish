@@ -113,7 +113,7 @@ test('a topic is published when its recording, words, questions, ordering and se
     assert.ok(messages.includes('vocabulary: 4 to 6 words are needed'), messages.join('\n'));
     assert.ok(messages.includes('vocabulary[0].phonetic: Add the IPA'));
     assert.ok(messages.includes('vocabulary[0].audioMediaId: Add the pronunciation'));
-    assert.ok(messages.includes('ordering.items: Ideas must be different'));
+    assert.ok(messages.includes('ordering.items: Items must be different'));
     assert.ok(messages.includes('segments[0].translation: Translate sentence 1'));
     assert.ok(messages.includes('segments[2].gap: Sentence 3 with its blanks must keep the words of the sentence'));
     assert.ok(messages.includes('segments[3].gap: Mark the words to write in sentence 4 with [brackets], or leave it empty'));

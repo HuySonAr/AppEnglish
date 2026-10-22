@@ -75,7 +75,7 @@ test('publish issues read as places in the editor', () => {
   assert.equal(courseIssueLabel('segments[1].start'), 'Sentence 2 · times');
   assert.equal(courseIssueLabel('sections[0].audioMediaId'), 'Recording 1 · audio file');
   assert.equal(courseIssueLabel('sections[0].transcript'), 'Recording 1 · transcript');
-  assert.equal(courseIssueLabel('ordering.items'), 'Ordering · ideas');
+  assert.equal(courseIssueLabel('ordering.items'), 'Ordering · items');
   assert.equal(courseIssueLabel('sections[1].questions[0].prompt'), 'Recording 2 · question 1 · question');
   assert.equal(courseIssueLabel('audioMediaId'), 'Recording');
   assert.equal(courseIssueLabel('segments'), 'Sentences');

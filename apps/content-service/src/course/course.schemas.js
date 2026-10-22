@@ -164,9 +164,9 @@ function topicIssues(issue, content, mediaById) {
   if (content.ordering.enabled) {
     const items = content.ordering.items.map((item) => item.text);
     const { min: least, max: most } = COURSE_LIMITS.ordering;
-    if (items.length < least || items.length > most) issue('ordering.items', `${least} to ${most} ideas are needed`);
-    else if (items.some((item) => !item)) issue('ordering.items', 'Every idea needs text');
-    else if (new Set(items.map((item) => item.toLowerCase())).size !== items.length) issue('ordering.items', 'Ideas must be different');
+    if (items.length < least || items.length > most) issue('ordering.items', `${least} to ${most} items are needed`);
+    else if (items.some((item) => !item)) issue('ordering.items', 'Every item needs text');
+    else if (new Set(items.map((item) => item.toLowerCase())).size !== items.length) issue('ordering.items', 'Items must be different');
   }
 
   // Every sentence is written down alone, so each needs its place in the

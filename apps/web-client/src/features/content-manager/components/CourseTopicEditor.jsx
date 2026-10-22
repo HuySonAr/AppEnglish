@@ -172,18 +172,18 @@ function QuestionsSection({ questions, onChange }) {
   );
 }
 
-// Ideas in the order they are heard; learners get them shuffled (D143).
 function OrderingSection({ ordering, onChange }) {
   const { min, max } = COURSE_LIMITS.ordering;
   const setItems = (items) => onChange({ ...ordering, items });
+  const turnOn = () => onChange({ ...ordering, enabled: true, items: ordering.items.length ? ordering.items : [newIdea(), newIdea(), newIdea()] });
   return (
     <Section
       number={4}
       title="Put in order"
-      description="Write the ideas in the order they are heard."
+      description="Optional. Write the items in the correct order."
       aside={
         <label className="flex items-center gap-2 text-sm">
-          <Switch checked={ordering.enabled} onCheckedChange={(enabled) => onChange({ ...ordering, enabled, items: enabled && !ordering.items.length ? [newIdea(), newIdea(), newIdea()] : ordering.items })} aria-label="Use the ordering task" />
+          <Switch checked={ordering.enabled} onCheckedChange={(enabled) => (enabled ? turnOn() : onChange({ ...ordering, enabled: false }))} aria-label="Use the ordering task" />
           {ordering.enabled ? 'On' : 'Off'}
         </label>
       }
@@ -191,21 +191,27 @@ function OrderingSection({ ordering, onChange }) {
       {ordering.enabled ? (
         <>
           <div className="space-y-1">
-            <Label htmlFor="ordering-prompt">Instruction (optional)</Label>
-            <Input id="ordering-prompt" maxLength={300} placeholder="Put the events in the order you hear them." value={ordering.prompt} onChange={(event) => onChange({ ...ordering, prompt: event.target.value })} />
+            <Label htmlFor="ordering-prompt">Instruction</Label>
+            <Input
+              id="ordering-prompt"
+              maxLength={300}
+              placeholder="Write a number (1–4) to put the tasks in order of priority."
+              value={ordering.prompt}
+              onChange={(event) => onChange({ ...ordering, prompt: event.target.value })}
+            />
           </div>
           <ol className="space-y-2">
             {ordering.items.map((item, index) => (
               <li key={item.id} className="flex items-center gap-2">
                 <span className="w-6 text-sm font-semibold text-muted-foreground">{index + 1}</span>
-                <Input aria-label={`Idea ${index + 1}`} maxLength={300} value={item.text} onChange={(event) => setItems(ordering.items.map((other) => (other.id === item.id ? { ...other, text: event.target.value } : other)))} />
-                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Move idea ${index + 1} up`} disabled={index === 0} onClick={() => setItems(move(ordering.items, index, -1))}>
+                <Input aria-label={`Item ${index + 1}`} maxLength={300} value={item.text} onChange={(event) => setItems(ordering.items.map((other) => (other.id === item.id ? { ...other, text: event.target.value } : other)))} />
+                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Move item ${index + 1} up`} disabled={index === 0} onClick={() => setItems(move(ordering.items, index, -1))}>
                   <ArrowUp className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Move idea ${index + 1} down`} disabled={index === ordering.items.length - 1} onClick={() => setItems(move(ordering.items, index, 1))}>
+                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Move item ${index + 1} down`} disabled={index === ordering.items.length - 1} onClick={() => setItems(move(ordering.items, index, 1))}>
                   <ArrowDown className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Remove idea ${index + 1}`} onClick={() => setItems(ordering.items.filter((other) => other.id !== item.id))}>
+                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Remove item ${index + 1}`} onClick={() => setItems(ordering.items.filter((other) => other.id !== item.id))}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </li>
@@ -214,15 +220,18 @@ function OrderingSection({ ordering, onChange }) {
           <div className="flex flex-wrap items-center gap-3">
             <Button variant="outline" size="sm" className="gap-1.5" disabled={ordering.items.length >= max} onClick={() => setItems([...ordering.items, newIdea()])}>
               <Plus className="h-4 w-4" />
-              Add an idea
+              Add an item
             </Button>
             <span className="text-sm text-muted-foreground">
-              {min} to {max} ideas.
+              {min} to {max} items.
             </span>
           </div>
         </>
       ) : (
-        <p className="text-sm text-muted-foreground">Off: learners do not see this task for this topic.</p>
+        <Button variant="outline" size="sm" className="gap-1.5" onClick={turnOn}>
+          <Plus className="h-4 w-4" />
+          Add an ordering task
+        </Button>
       )}
     </Section>
   );

@@ -76,7 +76,7 @@ const fields = {
   phonetic: 'IPA',
   translation: 'translation',
   gap: 'blanks',
-  items: 'ideas',
+  items: 'items',
   text: 'text',
   start: 'times',
   end: 'times',
@@ -85,7 +85,7 @@ const fields = {
 
 // "Word 2 · IPA" for the publish issue path "vocabulary[1].phonetic".
 export function courseIssueLabel(path) {
-  const whole = { audioMediaId: 'Recording', segments: 'Sentences', vocabulary: 'Vocabulary', questions: 'Questions', sections: 'Level test', 'ordering.items': 'Ordering · ideas' };
+  const whole = { audioMediaId: 'Recording', segments: 'Sentences', vocabulary: 'Vocabulary', questions: 'Questions', sections: 'Level test', 'ordering.items': 'Ordering · items' };
   if (whole[path]) return whole[path];
   const names = { vocabulary: 'Word', questions: 'Question', segments: 'Sentence', sections: 'Recording' };
   const parts = [];

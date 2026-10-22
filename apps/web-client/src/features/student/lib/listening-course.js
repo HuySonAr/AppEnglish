@@ -65,3 +65,63 @@ export const unanswered = (questions, answers) => questions.filter((question) =>
 // The pieces of a sentence in the blanks mode as text, with ___ for each
 // blank (for the hint and for screen readers).
 export const blankedText = (pieces) => pieces.map((piece) => ('blank' in piece ? '___' : piece.text)).join('');
+
+const NUMBER_WORDS = {
+  zero: '0', one: '1', two: '2', three: '3', four: '4', five: '5', six: '6', seven: '7', eight: '8', nine: '9', ten: '10',
+  eleven: '11', twelve: '12', thirteen: '13', fourteen: '14', fifteen: '15', sixteen: '16', seventeen: '17', eighteen: '18', nineteen: '19',
+  twenty: '20', thirty: '30', forty: '40', fifty: '50', sixty: '60', seventy: '70', eighty: '80', ninety: '90', hundred: '100',
+};
+
+const plainWord = (word) =>
+  word
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[\u2018\u2019\u02bc]/g, "'")
+    .replace(/(\d),(?=\d{3}\b)/g, '$1')
+    .replace(/[^\p{L}\p{N}'.]/gu, '')
+    .replace(/\.(?!\d)/g, '')
+    .replace(/^'+|'+$/g, '');
+
+const wordKey = (word) => {
+  const plain = plainWord(word).replace(/'/g, '');
+  return NUMBER_WORDS[plain] || plain;
+};
+
+export const splitWords = (text) =>
+  String(text || '')
+    .split(/[\s\-\u2013\u2014/]+/)
+    .map((display) => ({ display, key: wordKey(display) }))
+    .filter((word) => word.key);
+
+export function typingMarks(expectedText, typedText) {
+  const expected = splitWords(expectedText);
+  const typed = splitWords(typedText);
+  const open = typed.length > 0 && !/[\s\-\u2013\u2014/]$/.test(typedText);
+  const marks = typed.map((word, index) => {
+    const target = expected[index];
+    if (!target) return { text: word.display, status: 'extra' };
+    if (word.key === target.key) return { text: word.display, status: 'right' };
+    if (open && index === typed.length - 1 && target.key.startsWith(word.key)) return { text: word.display, status: 'typing' };
+    return { text: word.display, status: 'wrong' };
+  });
+  const right = marks.filter((mark) => mark.status === 'right').length;
+  return { marks, right, total: expected.length, done: typed.length === expected.length && right === expected.length };
+}
+
+export function blankMark(answer, typedText) {
+  const typed = splitWords(typedText).map((word) => word.key).join(' ');
+  if (!typed) return 'empty';
+  const expected = splitWords(answer).map((word) => word.key).join(' ');
+  if (typed === expected) return 'right';
+  if (/\S$/.test(typedText) && expected.startsWith(typed)) return 'typing';
+  return 'wrong';
+}
+
+export function activeSentence(sentences, time) {
+  let found = -1;
+  sentences.forEach((sentence, index) => {
+    if (sentence.start !== null && sentence.start <= time + 0.05) found = index;
+  });
+  return found;
+}

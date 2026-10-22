@@ -5,7 +5,7 @@ Tạo/sửa unit, thứ tự lesson, vocabulary, fill-in exercise, review exerci
 ### Listening course (D143–D147)
 - Content Manager tạo chủ đề cho từng cấp A1–C2 (mỗi chủ đề một bài nghe, đổi thứ tự trong cấp) và bài test cho các cấp A1–C1 (bài test của một cấp mở cấp sau).
 - Bản ghi (D147): Content Manager tải audio giọng người thật ngay trong trang soạn chủ đề, không lấy từ Listening library. Dán transcript (hoặc Transcribe), Auto-time gắn thời gian từng câu, nghe thử và chỉnh Start/End từng câu.
-- Trang soạn chủ đề: bản ghi và các câu (dưới mỗi câu: chỗ trống viết bằng [ngoặc vuông], bản dịch tiếng Việt); 4–6 từ vựng (nút "Pronounce" tạo IPA và audio bằng giọng máy); câu trắc nghiệm; sắp xếp ý (bật/tắt, 3–8 ý theo thứ tự nghe). Xuất bản bị chặn kèm danh sách lý do khi thiếu (audio, thời gian hoặc bản dịch của câu, chưa có chỗ trống nào…).
+- Trang soạn chủ đề: bản ghi và các câu (dưới mỗi câu: chỗ trống viết bằng [ngoặc vuông], bản dịch tiếng Việt); 4–6 từ vựng (nút "Pronounce" tạo IPA và audio bằng giọng máy); câu trắc nghiệm; sắp xếp ý (tùy chọn, nút "Add an ordering task"; lời dặn và 3–8 mục viết theo thứ tự đúng, ví dụ theo thứ tự nghe hoặc theo mức ưu tiên). Xuất bản bị chặn kèm danh sách lý do khi thiếu (audio, thời gian hoặc bản dịch của câu, chưa có chỗ trống nào…).
 - Bài test của cấp: mỗi bản ghi tải lên tại chỗ, kèm transcript (mỗi dòng một câu) và các câu trắc nghiệm.
 
 ### Version (D40)

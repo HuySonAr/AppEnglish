@@ -27,7 +27,7 @@ apps/web-client/src/
     content-manager/     # api, lib, components, pages
   components/
     ui/                  # shadcn/ui (Radix) primitives
-    shared/              # PageHeader, FeatureCard, EmptyState, PageSkeleton, ListFilter, Pagination, FileDropzone, FileRow, PublishButton
+    shared/              # PageHeader, FeatureCard, EmptyState, PageSkeleton, ListFilter, Pagination, FileDropzone, FileRow, PublishButton, StepNav
   hooks/                 # use-theme, use-list-state, use-return-to
   lib/                   # api/ (HTTP client, response), utils.js (cn), notify.js (Sonner notifications), list.js (search, sort, paging), leave-guard.js
   constants/
@@ -172,6 +172,7 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
   định, `destructive` cho lỗi, `info`, `warning`, `loading`.
 - Tiêu đề trang dùng `PageHeader`; danh sách rỗng dùng `EmptyState`; ô dashboard
   dùng `FeatureCard`.
+- Trang có nhiều bước (lesson, chủ đề Listening course) dùng `StepNav` cho dải bước.
 - Ô mật khẩu dùng `PasswordInput` (`components/shared/PasswordInput.jsx`): nút
   con mắt hiện/ẩn chỉ xuất hiện khi ô đã có chữ; nút reveal mặc định của trình
   duyệt (Edge `::-ms-reveal`) bị ẩn trong `styles/index.css` để không có hai con

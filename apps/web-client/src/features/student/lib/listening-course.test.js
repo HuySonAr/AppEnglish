@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  activeSentence,
+  blankMark,
+  typingMarks,
   CourseTopicFilter,
   blankedText,
   courseTestPath,
@@ -57,3 +60,38 @@ test('questions left and blanked sentences', () => {
   assert.deepEqual(unanswered([{ id: 'q1' }, { id: 'q2' }], { q1: 'o1' }).map((question) => question.id), ['q2']);
   assert.equal(blankedText([{ text: 'Yes, a ' }, { blank: 0, answer: 'coffee' }, { text: ' please.' }]), 'Yes, a ___ please.');
 });
+
+test('each word is marked as it is typed: right, still being typed, or wrong at once', () => {
+  const sentence = "I'd like a coffee, please.";
+  assert.deepEqual(typingMarks(sentence, ''), { marks: [], right: 0, total: 5, done: false });
+  assert.deepEqual(typingMarks(sentence, 'i’d li').marks.map((mark) => mark.status), ['right', 'typing']);
+  assert.deepEqual(typingMarks(sentence, 'Id lake').marks.map((mark) => mark.status), ['right', 'wrong']);
+  assert.deepEqual(typingMarks(sentence, 'Id like ').marks.map((mark) => mark.status), ['right', 'right']);
+  const wrongEarly = typingMarks(sentence, 'I would like a coffee please');
+  assert.equal(wrongEarly.marks[1].status, 'wrong');
+  assert.equal(wrongEarly.marks[5].status, 'extra');
+  const done = typingMarks(sentence, "I'd like a COFFEE please");
+  assert.deepEqual([done.right, done.total, done.done], [5, 5, true]);
+  assert.equal(typingMarks('It costs twenty pounds.', 'it costs 20 pounds').done, true);
+  assert.equal(typingMarks('A well-known café.', 'a well known cafe').done, true);
+  assert.equal(typingMarks('It was 2,500 dollars.', 'it was 2500 dollars').done, true);
+});
+
+test('a blank is right, still being typed, wrong or empty', () => {
+  assert.equal(blankMark('coffee', ''), 'empty');
+  assert.equal(blankMark('coffee', 'cof'), 'typing');
+  assert.equal(blankMark('coffee', 'Coffee'), 'right');
+  assert.equal(blankMark('coffee', 'cafe'), 'wrong');
+  assert.equal(blankMark('coffee', 'cof '), 'wrong');
+  assert.equal(blankMark('get in touch', 'get in'), 'typing');
+});
+
+test('the transcript follows the sentence being played', () => {
+  const sentences = [{ start: 0 }, { start: 2.5 }, { start: null }, { start: 6 }];
+  assert.equal(activeSentence(sentences, 0), 0);
+  assert.equal(activeSentence(sentences, 2.46), 1);
+  assert.equal(activeSentence(sentences, 5.9), 1);
+  assert.equal(activeSentence(sentences, 7), 3);
+  assert.equal(activeSentence([], 3), -1);
+});
+
