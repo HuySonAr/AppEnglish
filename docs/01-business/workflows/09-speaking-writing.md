@@ -1,6 +1,6 @@
 # Speaking, Writing và giáo viên
 
-Nghiệp vụ chốt ngày 2026-10-23 (D169–D174). Ngân hàng đề và duyệt đề đã triển khai ở F11 (D176), Speaking đọc to ở F12 (D177), key Gemini và Writing ở F13 (D178), Speaking nói mở ở F14 (D179); phần còn lại xem `docs/04-implementation/implementation-order.md` (F15–F16).
+Nghiệp vụ chốt ngày 2026-10-23 (D169–D174). Ngân hàng đề và duyệt đề đã triển khai ở F11 (D176), Speaking đọc to ở F12 (D177), key Gemini và Writing ở F13 (D178), Speaking nói mở ở F14 (D179), giáo viên chấm ở F15 (D180), hồ sơ CEFR và công cụ đánh giá AI ở F16 (D181).
 
 ## Vai trò
 
@@ -78,12 +78,12 @@ Trạng thái một bản đề: `DRAFT` → `PENDING_REVIEW` → `PUBLISHED` ho
 ## Giáo viên chấm
 
 - Mỗi học viên có 3 lượt giáo viên chấm mỗi tuần, tính chung cho Speaking và Writing; tuần từ thứ 2 đến chủ nhật theo giờ Việt Nam; lượt không dùng không cộng dồn. Trang làm bài hiện "Còn n/3 lượt tuần này".
-- Học viên chọn "Gửi giáo viên chấm" cho một bài đã nộp (mỗi bài gửi một lần). Lượt chỉ bị trừ khi giáo viên chấm xong.
+- Học viên chọn "Gửi giáo viên chấm" cho một bài đã nộp (mỗi bài gửi một lần; bài bị trả lại được gửi lại). Gửi là giữ một chỗ trong 3 lượt của tuần; chỗ chỉ mất hẳn khi giáo viên chấm xong, bài bị trả thì hoàn chỗ (D180). Bài còn chờ và chưa giáo viên nào nhận thì học viên rút lại được, lượt được hoàn (D182).
 - Hàng chờ chung cho mọi giáo viên, cũ trước; giáo viên nhận một bài thì bài bị khóa cho người đó (2 giờ); hết giờ chưa chấm thì bài trở lại hàng chờ.
 - Bài chờ quá 48 giờ mà chưa giáo viên nào chấm: rút khỏi hàng chờ, trả lại lượt và báo học viên.
 - Giáo viên thấy bản chụp đề, bài mẫu, ý chính, bài của học viên (nghe bản ghi hoặc đọc bài) và điểm AI nếu có. Việc có thể làm:
   - Xác nhận điểm AI.
-  - Sửa điểm từng tiêu chí và ghi nhận xét.
+  - Sửa điểm từng tiêu chí và ghi nhận xét (Writing chấm theo 4 nhóm hiển thị, D180).
   - Chấm từ đầu khi chưa có điểm AI.
 - Nhận xét của giáo viên là bắt buộc khi sửa điểm hoặc chấm từ đầu.
 - Kết quả: nhãn "AI score" đổi thành "Reviewed by teacher"; điểm giáo viên thay điểm AI trong hồ sơ năng lực; học viên nhận thông báo.
@@ -93,8 +93,8 @@ Trạng thái một bản đề: `DRAFT` → `PENDING_REVIEW` → `PUBLISHED` ho
 
 Hồ sơ hiện cấp CEFR riêng cho bốn kỹ năng trên trang Progress và trang chủ học viên; không có bài placement CEFR mới, placement TOEIC giữ nguyên.
 
-- Listening và Reading: quy đổi điểm TOEIC ước tính của lượt full mock gần nhất theo bảng quy đổi TOEIC–CEFR của ETS (mốc cần đối chiếu nguồn trước khi code: Listening A1 60, A2 110, B1 275, B2 400, C1 490; Reading A1 60, A2 115, B1 275, B2 385, C1 455). Chưa có full mock thì chưa có cấp.
-- Speaking và Writing: cấp cao nhất mà học viên có ít nhất 3 bài gần đây ở đề cấp đó đạt mức đạt (Speaking Total ≥ 7/10; Writing tổng ≥ 3,5/5). Điểm giáo viên được dùng thay điểm AI khi có. Chưa đủ bài thì chưa có cấp. Ngưỡng là đề xuất, có thể đổi.
+- Listening và Reading: quy đổi điểm TOEIC ước tính của lượt full mock gần nhất theo bảng quy đổi TOEIC–CEFR của ETS (đã đối chiếu tài liệu ETS bản 2025, D181: Listening A1 60, A2 110, B1 275, B2 400, C1 490; Reading A1 60, A2 115, B1 275, B2 385, C1 455; dưới A1 hiện "Below A1"). Chưa có full mock thì chưa có cấp.
+- Speaking (chỉ bài Nói mở) và Writing: cấp cao nhất mà trong 5 bài có điểm mới nhất ở đề cấp đó có ít nhất 3 bài đạt mức đạt (D181) (Speaking Total ≥ 7/10; Writing tổng ≥ 3,5/5). Điểm giáo viên được dùng thay điểm AI khi có. Chưa đủ bài thì chưa có cấp. Ngưỡng là đề xuất, có thể đổi.
 - Thang CEFR là thang năng lực chung để hiển thị; mục tiêu điểm, kế hoạch học và dự báo (D165, D166) vẫn theo TOEIC.
 
 ## Luồng bất đồng bộ và thông báo

@@ -432,3 +432,28 @@ Migration `1730000016000-create-ai-keys-and-writing.js`: `ai_keys` (`accountId` 
 ## Speaking open answers (F14, D179)
 
 `SpeakingService` now serves `read_aloud` and `open_speaking`. Open prompts show the instructions, image and `maxSeconds` (≤ 120; the upload is refused above it plus 1 s) and `hasKey`; submissions keep the instructions, sample answer and key points in the snapshot and show them after submitting; `stage` is `listening` or `grading` while `SCORING`. `applyResult` (Whisper) validates `openWhisperSchema`; with a key it stores the transcript and Whisper scores with `stage: "grading"` and writes the `speaking.grading.requested` outbox row (queue `writing.grading.requests`) in the same transaction; without a key, or with an empty transcript, it finishes `DONE` with `total: null`. `applyGrading` (consumer of `writing.open-speaking.results`) validates `openGradingSchema`, computes the total with `openSpeakingScores` (learning-contracts) and writes `speaking.scored`; a FAILED answer keeps the transcript and Whisper scores. Repeated answers at either step are no-ops. Tests: `test/open-speaking.test.js`.
+
+## Teacher reviews (F15, D180)
+
+### Data (`app_learning`)
+Migration `1730000017000-create-review-requests.js`: `review_requests` (`id`, `submissionId` unique, `accountId`, `kind`, `weekStart` date in Vietnam time, `status` `WAITING`/`DONE`/`EXPIRED`, `requestedAt`, `expiresAt` (+48 h), `teacherId`, `claimedAt`, `lockedUntil` (+2 h), `completedAt`, `action` `CONFIRM`/`EDIT`/`FROM_SCRATCH`, `before`, `after`, `note`, timestamps); `practice_submissions.teacherReview` jsonb `{ action, scores, note, reviewedAt }`.
+
+### API
+| Method | Path | RPC | Who | Notes |
+|---|---|---|---|---|
+| GET | `/learning/reviews/quota` | `GetReviewQuota` | Student | `{ quota: { limit, used, left, weekStart } }` |
+| POST | `/learning/reviews` | `RequestReview` | Student | `{ submissionId }`; 72 when the week is used, 73 not ready / no recording / already sent, 74 not found |
+| GET | `/learning/reviews/queue` | `ListReviewQueue` | Teacher | Waiting answers oldest first, without the learner; another teacher's held answers hidden; `doneThisWeek` |
+| POST | `/learning/reviews/:id/claim` | `ClaimReview` | Teacher | Holds it 2 h (taking it again renews); 75 when someone else holds it |
+| GET | `/learning/reviews/:id` | `GetReview` | Teacher (holder) | Prompt snapshot, sample answer, key points, the answer or recording, the AI result and scores, criteria, `maxScore` |
+| POST | `/learning/reviews/:id/release` | `ReleaseReview` | Teacher (holder) | Back to the queue |
+| POST | `/learning/reviews/:id/complete` | `CompleteReview` | Teacher (holder) | `{ action, scores, note }`; checks the action against the AI score, the comment rule and each criterion's range; rounds to the step; total from `reviewScores` |
+
+Speaking and writing prompt pages add `reviewQuota`; submissions add `review` (`WAITING`, `IN_REVIEW`, `DONE`, `EXPIRED`), `teacherReview` and `reviewed`, and their `total` prefers the teacher's. `ReviewService.expireDue` runs 30 s after start and then every 5 minutes. Events: `review.completed` `{ accountId, submissionId, promptId, kind, title, total, reviewedAt }`, `review.expired` `{ accountId, submissionId, promptId, kind, title, expiredAt }`. Tests: `test/review.test.js`.
+
+## CEFR profile (F16, D181)
+
+`GET /learning/cefr-profile` → `GetCefrProfile` (students): `{ profile: { listening, reading: { level, score, at, mockTestId }, speaking, writing: { level, levels: [{ level, considered, passed }], pass, max, recent, needed } } }`. `CefrService` reads the finished mock attempts (latest FULL with estimated scores, `toeicCefr`) and `practice_submissions` of `open_speaking` and `writing` (`listScored`), using the teacher total when present (`productiveCefr`). Rules and thresholds live in learning-contracts (`TOEIC_CEFR_MINIMUMS`, `PRODUCTIVE_CEFR_RULES`). Tests: `test/cefr.test.js`.
+
+### Withdraw (D182)
+`POST /learning/reviews/withdraw` → `WithdrawReview` (student) `{ submissionId }`: deletes a `WAITING` request no teacher holds and answers `{ review: null, quota }`; 75 while a teacher holds it, 74 when there is nothing waiting. Declared before `reviews/:id`.

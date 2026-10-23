@@ -38,7 +38,8 @@ import {
   createPracticeMachineAudio,
   withdrawPracticePrompt,
 } from '../../../lib/api/practice-prompts-api.js';
-import { countWords, fieldLabel, kindLabels, statusInfo, taskTypeLabels } from '../../../lib/practice-prompts.js';
+import { countWords, fieldLabel, kindFromSlug, kindLabels, statusInfo, taskTypeLabels, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
+import { kindPages } from './TeacherPromptsPage.jsx';
 
 const EDITABLE = new Set([PracticePromptStatus.DRAFT, PracticePromptStatus.RETURNED, PracticePromptStatus.PUBLISHED, PracticePromptStatus.ARCHIVED, PracticePromptStatus.UNPUBLISHED]);
 
@@ -106,7 +107,7 @@ function MediaInput({ id, label, kind, mediaId, media, onChange }) {
 }
 
 export function PromptEditorPage() {
-  const { promptId } = useParams();
+  const { promptId, kindSlug } = useParams();
   const navigate = useNavigate();
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
@@ -128,7 +129,9 @@ export function PromptEditorPage() {
   async function load() {
     setState('loading');
     try {
-      apply((await getPracticePrompt(promptId)).data);
+      const result = (await getPracticePrompt(promptId)).data;
+      if (kindFromSlug(kindSlug) !== result.prompt.kind) return navigate(teacherPromptPath(result.prompt.kind, promptId), { replace: true });
+      apply(result);
       setState('ready');
     } catch (error) {
       setState('error');
@@ -199,7 +202,7 @@ export function PromptEditorPage() {
         <Button variant="outline" onClick={load}>
           Try again
         </Button>
-        <Link className="block text-sm text-primary underline-offset-4 hover:underline" to="/teacher/prompts">
+        <Link className="block text-sm text-primary underline-offset-4 hover:underline" to={kindFromSlug(kindSlug) ? teacherListPath(kindFromSlug(kindSlug)) : '/teacher'}>
           Back to prompts
         </Link>
       </div>
@@ -215,7 +218,7 @@ export function PromptEditorPage() {
 
   return (
     <section className="space-y-5">
-      <PageBreadcrumb items={[{ label: 'Prompts', to: '/teacher/prompts' }, { label: content.title || 'Untitled prompt' }]} />
+      <PageBreadcrumb items={[{ label: kindPages[kind].title, to: teacherListPath(kind) }, { label: content.title || 'Untitled prompt' }]} />
 
       <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
         <div className="min-w-0 flex-1">
@@ -435,7 +438,7 @@ export function PromptEditorPage() {
               disabled={Boolean(busy)}
               onClick={async (event) => {
                 event.preventDefault();
-                if (await run('delete', () => deletePracticePrompt(promptId), 'Prompt deleted')) navigate('/teacher/prompts', { replace: true });
+                if (await run('delete', () => deletePracticePrompt(promptId), 'Prompt deleted')) navigate(teacherListPath(kind), { replace: true });
               }}
             >
               {busy === 'delete' ? 'Deleting…' : 'Delete prompt'}

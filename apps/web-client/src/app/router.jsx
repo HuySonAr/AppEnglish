@@ -63,6 +63,8 @@ import { UnitReviewPage } from '../features/student/pages/UnitReviewPage.jsx';
 import { TeacherDashboardPage } from '../features/teacher/pages/TeacherDashboardPage.jsx';
 import { TeacherPromptsPage } from '../features/teacher/pages/TeacherPromptsPage.jsx';
 import { PromptEditorPage } from '../features/teacher/pages/PromptEditorPage.jsx';
+import { TeacherReviewQueuePage } from '../features/teacher/pages/TeacherReviewQueuePage.jsx';
+import { TeacherReviewPage } from '../features/teacher/pages/TeacherReviewPage.jsx';
 import { PracticeReviewPage } from '../features/content-manager/pages/PracticeReviewPage.jsx';
 import { PracticeReviewDetailPage } from '../features/content-manager/pages/PracticeReviewDetailPage.jsx';
 import { Roles } from '../constants/auth.js';
@@ -167,8 +169,14 @@ export function AppRouter() {
         <Route path="/teacher" element={<RoleRoute allowedRole={Roles.TEACHER} />}>
           <Route element={<SidebarLayout role={Roles.TEACHER} />}>
             <Route index element={<TeacherDashboardPage />} />
-            <Route path="prompts" element={<TeacherPromptsPage />} />
+            <Route path="read-aloud" element={<TeacherPromptsPage key="read_aloud" kind="read_aloud" />} />
+            <Route path="open-speaking" element={<TeacherPromptsPage key="open_speaking" kind="open_speaking" />} />
+            <Route path="writing" element={<TeacherPromptsPage key="writing" kind="writing" />} />
+            <Route path=":kindSlug/:promptId" element={<PromptEditorPage />} />
+            <Route path="prompts" element={<Navigate to="/teacher" replace />} />
             <Route path="prompts/:promptId" element={<PromptEditorPage />} />
+            <Route path="reviews" element={<TeacherReviewQueuePage />} />
+            <Route path="reviews/:reviewId" element={<TeacherReviewPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>
         </Route>

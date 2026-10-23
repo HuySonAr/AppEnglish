@@ -8,8 +8,10 @@
     "build": "node --check src/main.js",
     "dev": "node --env-file=../../.env --watch src/main.js",
     "start": "node --env-file=../../.env src/main.js",
-    "lint": "node ../../scripts/check-syntax.mjs src test",
-    "test": "node --test test/*.test.js"
+    "lint": "node ../../scripts/check-syntax.mjs src test scripts",
+    "test": "node --test test/*.test.js",
+    "load-test": "node --env-file=../../.env scripts/load-test.mjs",
+    "evaluate:ellipse": "node --env-file=../../.env scripts/evaluate-ellipse.mjs"
   },
   "dependencies": {
     "@appenglish/backend-common": "workspace:*",

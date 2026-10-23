@@ -37,7 +37,7 @@ export class SpeechBroker {
       await channel.assertQueue(SpeechQueue.AUTOTIME_REQUESTS, { durable: true });
       await channel.assertQueue(SpeechQueue.AUTOTIME_RESULTS, { durable: true });
       await assertRetryTopology(channel, SpeechQueue.AUTOTIME_RESULTS);
-      await channel.consume(SpeechQueue.AUTOTIME_RESULTS, (message) => this.handleResult(channel, message));
+      await channel.consume(SpeechQueue.AUTOTIME_RESULTS, (message) => this.handleResult(channel, message).catch((error) => logger.warn(`Speech answer left for redelivery: ${error.message}`)));
       await channel.assertQueue(SpeechQueue.PRONOUNCE_REQUESTS, { durable: true });
       const { queue: replyQueue } = await channel.assertQueue('', { exclusive: true });
       await channel.consume(

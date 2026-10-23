@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { BookOpenText, ChevronRight, Mic, PenLine, Plus, X } from 'lucide-react';
+import { AudioLines, ChevronRight, Mic, PenLine, Plus, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PracticePromptKind } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { paginate } from '../../../lib/list.js';
-import { cn } from '../../../lib/utils.js';
-import { Badge, Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../../components/ui';
+import { Badge, Button } from '../../../components/ui';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
 import { FilterSelect, SearchField } from '../../../components/shared/ListFilter.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
@@ -14,10 +13,10 @@ import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
 import { createPracticePrompt, listPracticePrompts } from '../../../lib/api/practice-prompts-api.js';
-import { filterPrompts, kindLabels, kindOptions, levelOptions, statusInfo } from '../../../lib/practice-prompts.js';
+import { filterPrompts, levelOptions, statusInfo, teacherPromptPath } from '../../../lib/practice-prompts.js';
 
 const PAGE_SIZE = 10;
-const DEFAULTS = { search: '', kind: 'all', level: 'all', status: 'all' };
+const DEFAULTS = { search: '', level: 'all', status: 'all' };
 const statusOptions = [
   { value: 'all', label: 'All states' },
   { value: 'DRAFT', label: 'Draft' },
@@ -26,24 +25,25 @@ const statusOptions = [
   { value: 'PUBLISHED', label: 'Published' },
   { value: 'UNPUBLISHED', label: 'Taken down' },
 ];
-const kindChoices = [
-  { kind: PracticePromptKind.READ_ALOUD, icon: Mic, detail: 'A sentence or short passage to read.' },
-  { kind: PracticePromptKind.OPEN_SPEAKING, icon: Mic, detail: 'A question or picture to talk about.' },
-  { kind: PracticePromptKind.WRITING, icon: PenLine, detail: 'An email, paragraph or short essay.' },
-];
 
-export function TeacherPromptsPage() {
+export const kindPages = {
+  [PracticePromptKind.READ_ALOUD]: { title: 'Read-aloud prompts', description: 'Write a sentence or short passage for learners to read.', create: 'New read-aloud prompt', empty: 'No read-aloud prompts yet', icon: AudioLines },
+  [PracticePromptKind.OPEN_SPEAKING]: { title: 'Open speaking prompts', description: 'Ask a question or show a picture for learners to talk about.', create: 'New open speaking prompt', empty: 'No open speaking prompts yet', icon: Mic },
+  [PracticePromptKind.WRITING]: { title: 'Writing prompts', description: 'Set an email, paragraph or short essay with a sample answer.', create: 'New writing prompt', empty: 'No writing prompts yet', icon: PenLine },
+};
+
+export function TeacherPromptsPage({ kind }) {
+  const page = kindPages[kind];
   const navigate = useNavigate();
   const [state, setState] = useState('loading');
   const [prompts, setPrompts] = useState([]);
-  const [choosing, setChoosing] = useState(false);
-  const [busy, setBusy] = useState(null);
-  const { filters, setFilters, setFilter, page, setPage } = useListState(DEFAULTS);
+  const [creating, setCreating] = useState(false);
+  const { filters, setFilters, setFilter, page: pageNumber, setPage } = useListState(DEFAULTS);
 
   async function load() {
     setState('loading');
     try {
-      setPrompts((await listPracticePrompts()).data.prompts);
+      setPrompts((await listPracticePrompts()).data.prompts.filter((prompt) => prompt.kind === kind));
       setState('ready');
     } catch (error) {
       setState('error');
@@ -53,31 +53,31 @@ export function TeacherPromptsPage() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [kind]);
 
-  async function create(kind) {
-    setBusy(kind);
+  async function create() {
+    setCreating(true);
     try {
       const result = await createPracticePrompt(kind);
-      navigate(`/teacher/prompts/${result.data.prompt.id}`);
+      navigate(teacherPromptPath(kind, result.data.prompt.id));
     } catch (error) {
       notify({ title: 'Could not create the prompt', description: getApiErrorMessage(error), variant: 'destructive' });
-      setBusy(null);
+      setCreating(false);
     }
   }
 
-  const shown = paginate(filterPrompts(prompts, filters), page, PAGE_SIZE);
+  const shown = paginate(filterPrompts(prompts, filters), pageNumber, PAGE_SIZE);
   const narrowed = Object.entries(DEFAULTS).some(([key, value]) => filters[key] !== value);
   const newButton = (
-    <Button className="gap-2" onClick={() => setChoosing(true)}>
+    <Button className="gap-2" loading={creating} onClick={create}>
       <Plus className="h-4 w-4" />
-      New prompt
+      {page.create}
     </Button>
   );
 
   return (
     <section className="space-y-6">
-      <PageHeader eyebrow="Teacher" title="Speaking and writing prompts" description="Write prompts by CEFR level and send them for review." actions={newButton} />
+      <PageHeader eyebrow="Teacher" title={page.title} description={page.description} actions={newButton} />
 
       {state === 'loading' ? (
         <RowsSkeleton rows={5} />
@@ -86,7 +86,7 @@ export function TeacherPromptsPage() {
           Try again
         </Button>
       ) : prompts.length === 0 ? (
-        <EmptyState icon={BookOpenText} title="No prompts yet" description="Write your first prompt." action={newButton} />
+        <EmptyState icon={page.icon} title={page.empty} description="Write your first one." action={newButton} />
       ) : (
         <div className="space-y-4">
           <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
@@ -94,7 +94,6 @@ export function TeacherPromptsPage() {
               <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
                 <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search by title or topic" />
                 <div className="grid grid-cols-2 gap-2 sm:flex">
-                  <FilterSelect label="Kind" value={filters.kind} onChange={setFilter('kind')} options={kindOptions} className="w-full sm:w-40" />
                   <FilterSelect label="Level" value={filters.level} onChange={setFilter('level')} options={levelOptions} className="w-full sm:w-32" />
                   <FilterSelect label="State" value={filters.status} onChange={setFilter('status')} options={statusOptions} className="w-full sm:w-36" />
                 </div>
@@ -113,23 +112,20 @@ export function TeacherPromptsPage() {
             </div>
             {shown.total === 0 ? (
               <div className="p-6">
-                <EmptyState icon={BookOpenText} title="No prompt matches" description="Try another search or filter." />
+                <EmptyState icon={page.icon} title="No prompt matches" description="Try another search or filter." />
               </div>
             ) : (
               <ul className="divide-y">
                 {shown.items.map((prompt) => (
                   <li key={prompt.id}>
                     <Link
-                      to={`/teacher/prompts/${prompt.id}`}
+                      to={teacherPromptPath(kind, prompt.id)}
                       className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                     >
                       <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-md bg-muted text-sm font-semibold">{prompt.level || '—'}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-medium">{prompt.title || 'Untitled prompt'}</span>
-                        <span className="block truncate text-xs text-muted-foreground">
-                          {kindLabels[prompt.kind]}
-                          {prompt.topic ? ` · ${prompt.topic}` : ''}
-                        </span>
+                        <span className="block truncate text-xs text-muted-foreground">{prompt.topic || 'No topic yet'}</span>
                       </span>
                       <span className="flex shrink-0 flex-wrap justify-end gap-1.5">
                         {prompt.publishedVersionNumber && prompt.status !== 'PUBLISHED' ? <Badge variant="success">Live v{prompt.publishedVersionNumber}</Badge> : null}
@@ -145,34 +141,6 @@ export function TeacherPromptsPage() {
           <Pagination page={shown.page} pageCount={shown.pageCount} total={shown.total} noun="prompt" onChange={setPage} />
         </div>
       )}
-
-      <Dialog open={choosing} onOpenChange={(open) => !busy && setChoosing(open)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>New prompt</DialogTitle>
-            <DialogDescription>Choose what learners will do.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-2">
-            {kindChoices.map((choice) => (
-              <button
-                key={choice.kind}
-                type="button"
-                disabled={Boolean(busy)}
-                onClick={() => create(choice.kind)}
-                className={cn('flex items-center gap-3 rounded-xl border p-3 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring', busy === choice.kind && 'border-primary')}
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <choice.icon className="h-4 w-4" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block font-medium">{kindLabels[choice.kind]}</span>
-                  <span className="block text-xs text-muted-foreground">{choice.detail}</span>
-                </span>
-              </button>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
     </section>
   );
 }

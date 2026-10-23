@@ -264,3 +264,17 @@ speech-service has no database.
 
 - RabbitMQ: `speech.speaking.requests` with `kind: open_speaking` and empty `text`; `writing.grading.requests` also carries `speaking.grading.requested` jobs; `writing.open-speaking.results` (writing-service → learning-service, retry and `.dead`).
 - `speaking.scored` may have `total: null` (open answer without a key); progress-service shows "Your speaking answer is ready".
+
+## Teacher reviews (F15, D180)
+
+- HTTP: `/learning/reviews/quota`, `POST /learning/reviews`, `/learning/reviews/queue`, `/learning/reviews/:id` with `claim`, `release`, `complete` (fixed paths are declared before `:id`).
+- `learning.results` events `review.completed` and `review.expired`; progress-service notifications `TEACHER_REVIEWED` and `REVIEW_RETURNED`.
+
+## CEFR profile (F16, D181)
+
+- HTTP: `GET /learning/cefr-profile` (students); computed in learning-service from its own mock attempts and practice submissions, no new table or event.
+
+## Follow-ups (D182)
+
+- HTTP: `POST /learning/reviews/withdraw`.
+- writing-service `GET /metrics` and `/health` on port 3005 (local only); the System overview lists it and the `writing.*` queues.

@@ -271,6 +271,7 @@ export const PracticeSubmissionEntity = new EntitySchema({
     kind: { type: 'varchar', length: 20 },
     prompt: { type: 'jsonb' },
     answer: { type: 'text', nullable: true },
+    teacherReview: { type: 'jsonb', nullable: true },
     recording: { type: 'jsonb', nullable: true },
     recordingDeletedAt: { type: 'timestamptz', nullable: true },
     status: { type: 'varchar', length: 12 },
@@ -299,4 +300,34 @@ export const AiKeyEntity = new EntitySchema({
     createdAt: { type: 'timestamptz', createDate: true },
     updatedAt: { type: 'timestamptz', updateDate: true },
   },
+});
+
+export const ReviewRequestEntity = new EntitySchema({
+  name: 'ReviewRequest',
+  tableName: 'review_requests',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    submissionId: { type: 'uuid' },
+    accountId: { type: 'uuid' },
+    kind: { type: 'varchar', length: 20 },
+    weekStart: { type: 'date' },
+    status: { type: 'varchar', length: 10 },
+    requestedAt: { type: 'timestamptz' },
+    expiresAt: { type: 'timestamptz' },
+    teacherId: { type: 'uuid', nullable: true },
+    claimedAt: { type: 'timestamptz', nullable: true },
+    lockedUntil: { type: 'timestamptz', nullable: true },
+    completedAt: { type: 'timestamptz', nullable: true },
+    action: { type: 'varchar', length: 14, nullable: true },
+    before: { type: 'jsonb', nullable: true },
+    after: { type: 'jsonb', nullable: true },
+    note: { type: 'text', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [
+    { name: 'UQ_review_requests_submission', columns: ['submissionId'], unique: true },
+    { name: 'IDX_review_requests_queue', columns: ['status', 'requestedAt'] },
+    { name: 'IDX_review_requests_week', columns: ['accountId', 'weekStart'] },
+  ],
 });

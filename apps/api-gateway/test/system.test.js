@@ -35,13 +35,29 @@ test('the overview marks a silent service down and lists only the app queues', a
         { name: 'learning.results', messages_ready: 0, messages_unacknowledged: 1, consumers: 1 },
         { name: 'learning.results.dead', messages_ready: 2, messages_unacknowledged: 0, consumers: 0 },
         { name: 'speech.autotime.results.retry.1', messages_ready: 1, messages_unacknowledged: 0, consumers: 0 },
+        { name: 'writing.grading.requests', messages_ready: 3, messages_unacknowledged: 0, consumers: 1 },
         { name: 'other.queue', messages_ready: 9 },
       ] };
     if (url.includes(':3004')) throw new Error('connect ECONNREFUSED');
     return { ok: true, text: async () => TEXT };
   };
   const overview = await systemOverview({ env: {}, fetchImpl });
-  assert.deepEqual(overview.services.map((service) => [service.name, service.status]), [['api-gateway', 'ok'], ['auth-service', 'ok'], ['content-service', 'ok'], ['learning-service', 'ok'], ['progress-service', 'down']]);
-  assert.deepEqual(overview.queues.map((queue) => [queue.name, queue.kind, queue.ready]), [['learning.results', 'main', 0], ['learning.results.dead', 'dead', 2], ['speech.autotime.results.retry.1', 'retry', 1]]);
+  assert.deepEqual(overview.services.map((service) => [service.name, service.status]), [['api-gateway', 'ok'], ['auth-service', 'ok'], ['content-service', 'ok'], ['learning-service', 'ok'], ['progress-service', 'down'], ['writing-service', 'ok']]);
+  assert.deepEqual(overview.queues.map((queue) => [queue.name, queue.kind, queue.ready]), [['learning.results', 'main', 0], ['learning.results.dead', 'dead', 2], ['speech.autotime.results.retry.1', 'retry', 1], ['writing.grading.requests', 'main', 3]]);
   assert.equal(managementUrl({ RABBITMQ_URL: 'amqp://user:pw@broker:5672' }), 'http://broker:15672');
+});
+
+test('writing-service grading counters are summarised (F16 follow-up)', () => {
+  const text = [
+    'process_uptime_seconds 12',
+    'grading_jobs_total{task="writing",status="DONE"} 4',
+    'grading_jobs_total{task="open_speaking",status="FAILED"} 1',
+    'grading_job_seconds_bucket{task="writing",le="5"} 4',
+    'grading_job_seconds_bucket{task="writing",le="+Inf"} 5',
+    'grading_job_seconds_count{task="writing"} 5',
+    'key_checks_total{status="VALID"} 2',
+  ].join('\n');
+  const summary = summarizeService('writing-service', parsePrometheus(text));
+  assert.deepEqual([summary.grading.finished, summary.grading.failed, summary.grading.keyChecks], [5, 1, 2]);
+  assert.equal(summarizeService('auth-service', parsePrometheus('process_uptime_seconds 1')).grading, null);
 });

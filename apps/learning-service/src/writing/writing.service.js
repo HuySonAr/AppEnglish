@@ -22,7 +22,7 @@ import { writingResultSchema } from './writing.schemas.js';
 const iso = (value) => (value ? new Date(value).toISOString() : null);
 
 export class WritingService {
-  constructor(repository, keys, contentClient, { checker, secret = '', now = () => new Date(), events = noEvents } = {}) {
+  constructor(repository, keys, contentClient, { checker, secret = '', now = () => new Date(), events = noEvents, reviews = null } = {}) {
     this.repository = repository;
     this.keys = keys;
     this.contentClient = contentClient;
@@ -30,6 +30,7 @@ export class WritingService {
     this.secret = secret;
     this.now = now;
     this.events = events;
+    this.reviews = reviews;
   }
 
   assertStudent(actor) {
@@ -63,7 +64,8 @@ export class WritingService {
     return {
       id: submission.id,
       status: submission.status,
-      total: submission.result?.scores?.total ?? null,
+      total: submission.teacherReview?.scores?.total ?? submission.result?.scores?.total ?? null,
+      reviewed: Boolean(submission.teacherReview),
       versionNumber: submission.prompt?.versionNumber ?? null,
       submittedAt: iso(submission.submittedAt),
     };
@@ -85,7 +87,12 @@ export class WritingService {
         keyPoints: submission.prompt.keyPoints || [],
       },
       result: submission.result || null,
+      teacherReview: submission.teacherReview || null,
     };
+  }
+
+  async withReview(submission) {
+    return { ...this.view(submission), review: this.reviews ? await this.reviews.reviewFor(submission.id) : null };
   }
 
   async keyView(accountId) {
@@ -148,7 +155,7 @@ export class WritingService {
     this.assertStudent(actor);
     const prompt = await this.paperOf(promptId);
     const history = await this.repository.listSubmissions(actor.id, promptId, SUBMISSION_HISTORY_SIZE);
-    return { prompt: this.learnerPrompt(prompt), submissions: history.map((submission) => this.summary(submission)), hasKey: Boolean(await this.keys.findKey(actor.id)) };
+    return { prompt: this.learnerPrompt(prompt), submissions: history.map((submission) => this.summary(submission)), hasKey: Boolean(await this.keys.findKey(actor.id)), reviewQuota: this.reviews ? await this.reviews.quotaOf(actor.id) : null };
   }
 
   async submit(actor, promptId, { text }) {
@@ -208,14 +215,14 @@ export class WritingService {
     );
     this.events.flush?.().catch(() => {});
     await recordActivity(this.events, actor.id, StudyActivity.WRITING, at);
-    return { submission: this.view(saved) };
+    return { submission: await this.withReview(saved) };
   }
 
   async getSubmission(actor, submissionId) {
     this.assertStudent(actor);
     const submission = await this.repository.findSubmission(submissionId);
     if (!submission || submission.accountId !== actor.id || submission.kind !== PracticePromptKind.WRITING) throw writingErrors.submissionNotFound();
-    return { submission: this.view(submission) };
+    return { submission: await this.withReview(submission) };
   }
 
   async applyResult(answer) {

@@ -15,6 +15,7 @@ import { getPlacement } from '../api/placement-api.js';
 import { getProgress, getStreak } from '../api/progress-api.js';
 import { getStudyGoal } from '../api/goal-api.js';
 import { GoalPlanCard } from '../components/GoalPlanCard.jsx';
+import { CefrProfileCard } from '../components/CefrProfileCard.jsx';
 import { ScoreForecastCard } from '../components/ScoreForecastCard.jsx';
 import { dailyPlan } from '../lib/study-plan.js';
 import { ScoreRing } from '../components/ScoreRing.jsx';
@@ -187,6 +188,7 @@ export function StudentDashboardPage() {
       {data.goal?.goal ? <ScoreForecastCard data={data.goal} /> : null}
 
       {streak ? <StreakStrip streak={streak} /> : null}
+      <CefrProfileCard />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Tile icon={BookOpen} label="Lessons" value={`${lessons.completed}/${lessons.total}`} detail={lessons.currentUnit ? `Unit ${lessons.currentUnit.number}: ${lessons.currentUnit.title}` : 'completed'}>

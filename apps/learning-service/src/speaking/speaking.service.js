@@ -24,12 +24,13 @@ const iso = (value) => (value ? new Date(value).toISOString() : null);
 const mimeOf = (value) => String(value || '').split(';')[0].trim().toLowerCase();
 
 export class SpeakingService {
-  constructor(repository, contentClient, { now = () => new Date(), events = noEvents, keys = null } = {}) {
+  constructor(repository, contentClient, { now = () => new Date(), events = noEvents, keys = null, reviews = null } = {}) {
     this.repository = repository;
     this.contentClient = contentClient;
     this.now = now;
     this.events = events;
     this.keys = keys;
+    this.reviews = reviews;
   }
 
   async keyOf(accountId) {
@@ -68,7 +69,8 @@ export class SpeakingService {
     return {
       id: submission.id,
       status: submission.status,
-      total: submission.result?.scores?.total ?? null,
+      total: submission.teacherReview?.scores?.total ?? submission.result?.scores?.total ?? null,
+      reviewed: Boolean(submission.teacherReview),
       versionNumber: submission.prompt?.versionNumber ?? null,
       submittedAt: iso(submission.submittedAt),
     };
@@ -95,7 +97,12 @@ export class SpeakingService {
           }
         : { title: submission.prompt.title, level: submission.prompt.level, text: submission.prompt.text },
       result: submission.result || null,
+      teacherReview: submission.teacherReview || null,
     };
+  }
+
+  async withReview(submission) {
+    return { ...this.view(submission), review: this.reviews ? await this.reviews.reviewFor(submission.id) : null };
   }
 
   async listPrompts(actor) {
@@ -125,7 +132,7 @@ export class SpeakingService {
     this.assertStudent(actor);
     const prompt = await this.paperOf(promptId);
     const history = await this.repository.listSubmissions(actor.id, promptId, SUBMISSION_HISTORY_SIZE);
-    return { prompt: this.learnerPrompt(prompt), submissions: history.map((submission) => this.summary(submission)), hasKey: Boolean(await this.keyOf(actor.id)) };
+    return { prompt: this.learnerPrompt(prompt), submissions: history.map((submission) => this.summary(submission)), hasKey: Boolean(await this.keyOf(actor.id)), reviewQuota: this.reviews ? await this.reviews.quotaOf(actor.id) : null };
   }
 
   checkRecording(mimeType, data, durationSeconds, maxSeconds) {
@@ -172,14 +179,14 @@ export class SpeakingService {
     );
     this.events.flush?.().catch(() => {});
     await recordActivity(this.events, actor.id, StudyActivity.SPEAKING, at);
-    return { submission: this.view(saved) };
+    return { submission: await this.withReview(saved) };
   }
 
   async getSubmission(actor, submissionId) {
     this.assertStudent(actor);
     const submission = await this.repository.findSubmission(submissionId);
     if (!submission || submission.accountId !== actor.id || !READY_KINDS.has(submission.kind)) throw speakingErrors.submissionNotFound();
-    return { submission: this.view(submission) };
+    return { submission: await this.withReview(submission) };
   }
 
   async finish(submission, { status, result, error }) {

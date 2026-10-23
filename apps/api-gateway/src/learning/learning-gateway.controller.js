@@ -216,6 +216,33 @@ export class LessonGatewayController extends LearningRelay {
   deleteAiKey(request) {
     return this.forward('DeleteAiKey', request);
   }
+  getCefrProfile(request) {
+    return this.forward('GetCefrProfile', request);
+  }
+  getReviewQuota(request) {
+    return this.forward('GetReviewQuota', request);
+  }
+  requestReview(body, request) {
+    return this.forward('RequestReview', request, { body });
+  }
+  withdrawReview(body, request) {
+    return this.forward('WithdrawReview', request, { body });
+  }
+  listReviewQueue(request) {
+    return this.forward('ListReviewQueue', request);
+  }
+  claimReview(id, request) {
+    return this.forward('ClaimReview', request, { id });
+  }
+  getReview(id, request) {
+    return this.forward('GetReview', request, { id });
+  }
+  releaseReview(id, request) {
+    return this.forward('ReleaseReview', request, { id });
+  }
+  completeReview(id, body, request) {
+    return this.forward('CompleteReview', request, { id, body });
+  }
   async submitSpeaking(id, file, body, request) {
     const { id: accountId, role, email } = await resolveSession(this.auth, request);
     const durationSeconds = Number(body?.durationSeconds);
@@ -280,6 +307,15 @@ const lessonRoutes = [
   [Get, 'ai-key', 'getAiKey', [Req()]],
   [Put, 'ai-key', 'saveAiKey', [Body(), Req()]],
   [Delete, 'ai-key', 'deleteAiKey', [Req()]],
+  [Get, 'cefr-profile', 'getCefrProfile', [Req()]],
+  [Get, 'reviews/quota', 'getReviewQuota', [Req()]],
+  [Get, 'reviews/queue', 'listReviewQueue', [Req()]],
+  [Post, 'reviews', 'requestReview', [Body(), Req()]],
+  [Post, 'reviews/withdraw', 'withdrawReview', [Body(), Req()]],
+  [Get, 'reviews/:id', 'getReview', [Param('id'), Req()]],
+  [Post, 'reviews/:id/claim', 'claimReview', [Param('id'), Req()]],
+  [Post, 'reviews/:id/release', 'releaseReview', [Param('id'), Req()]],
+  [Post, 'reviews/:id/complete', 'completeReview', [Param('id'), Body(), Req()]],
   [Post, 'listening-course/tests/:itemId/submit', 'submitCourseTest', [Param('itemId'), Body(), Req()]],
 ];
 for (const [verb, path, method, params] of lessonRoutes) {

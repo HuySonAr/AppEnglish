@@ -108,6 +108,10 @@ export const LearningResponseCode = Object.freeze({
   AI_KEY_INVALID: 69,
   AI_KEY_UNAVAILABLE: 70,
   ANSWER_INVALID: 71,
+  REVIEW_LIMIT_REACHED: 72,
+  REVIEW_NOT_ALLOWED: 73,
+  REVIEW_NOT_FOUND: 74,
+  REVIEW_LOCKED: 75,
 });
 
 export const LearningQueue = Object.freeze({
@@ -132,6 +136,8 @@ export const LearningEventType = Object.freeze({
   WRITING_REQUESTED: 'writing.requested',
   WRITING_SCORED: 'writing.scored',
   SPEAKING_GRADING_REQUESTED: 'speaking.grading.requested',
+  REVIEW_COMPLETED: 'review.completed',
+  REVIEW_EXPIRED: 'review.expired',
 });
 
 export const StudyActivity = Object.freeze({
@@ -202,4 +208,87 @@ export function openSpeakingScores({ criteria, fluency, pronunciation }) {
   const gemini = (OPEN_SPEAKING_CRITERIA.reduce((sum, key) => sum + criteria[key], 0) / OPEN_SPEAKING_CRITERIA.length) * 2;
   scores.total = tenth(OPEN_SPEAKING_WEIGHTS.gemini * gemini + OPEN_SPEAKING_WEIGHTS.fluency * fluency + OPEN_SPEAKING_WEIGHTS.pronunciation * pronunciation);
   return scores;
+}
+
+export const TEACHER_REVIEW_LIMITS = Object.freeze({ weekly: 3, lockHours: 2, expireHours: 48, note: 2000 });
+export const ReviewStatus = Object.freeze({ WAITING: 'WAITING', DONE: 'DONE', EXPIRED: 'EXPIRED' });
+export const ReviewAction = Object.freeze({ CONFIRM: 'CONFIRM', EDIT: 'EDIT', FROM_SCRATCH: 'FROM_SCRATCH' });
+
+const band = Object.freeze({ min: 1, max: 5, step: 0.5 });
+const ten = Object.freeze({ min: 0, max: 10, step: 0.1 });
+
+export const REVIEW_CRITERIA = Object.freeze({
+  read_aloud: Object.freeze([
+    Object.freeze({ key: 'accuracy', label: 'Accuracy', ...ten }),
+    Object.freeze({ key: 'completeness', label: 'Completeness', ...ten }),
+    Object.freeze({ key: 'fluency', label: 'Fluency', ...ten }),
+  ]),
+  open_speaking: Object.freeze([
+    Object.freeze({ key: 'task', label: 'Task', ...band }),
+    Object.freeze({ key: 'vocabulary', label: 'Vocabulary', ...band }),
+    Object.freeze({ key: 'grammar', label: 'Grammar', ...band }),
+    Object.freeze({ key: 'coherence', label: 'Coherence', ...band }),
+    Object.freeze({ key: 'fluency', label: 'Fluency', ...ten }),
+    Object.freeze({ key: 'pronunciation', label: 'Pronunciation', ...ten }),
+  ]),
+  writing: Object.freeze([
+    Object.freeze({ key: 'vocabulary', label: 'Vocabulary', ...band }),
+    Object.freeze({ key: 'grammar', label: 'Grammar', ...band }),
+    Object.freeze({ key: 'coherence', label: 'Coherence', ...band }),
+    Object.freeze({ key: 'task', label: 'Task', ...band }),
+  ]),
+});
+
+export const reviewMaxScore = (kind) => (kind === 'writing' ? 5 : 10);
+
+export function reviewScores(kind, input) {
+  const scores = Object.fromEntries(REVIEW_CRITERIA[kind].map(({ key }) => [key, input[key]]));
+  if (kind === 'read_aloud') {
+    const { weights } = READ_ALOUD_SCORING;
+    return { ...scores, total: tenth(weights.accuracy * scores.accuracy + weights.completeness * scores.completeness + weights.fluency * scores.fluency) };
+  }
+  if (kind === 'open_speaking') return openSpeakingScores({ criteria: scores, fluency: scores.fluency, pronunciation: scores.pronunciation });
+  return { ...scores, total: tenth((scores.vocabulary + scores.grammar + scores.coherence + scores.task) / 4) };
+}
+
+const VIETNAM_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+export function vietnamWeekStart(date = new Date()) {
+  const local = new Date(new Date(date).getTime() + VIETNAM_OFFSET_MS);
+  const day = (local.getUTCDay() + 6) % 7;
+  local.setUTCDate(local.getUTCDate() - day);
+  return local.toISOString().slice(0, 10);
+}
+
+export const CEFR_ORDER = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+export const BELOW_A1 = 'BELOW_A1';
+export const TOEIC_CEFR_MINIMUMS = Object.freeze({
+  listening: Object.freeze({ A1: 60, A2: 110, B1: 275, B2: 400, C1: 490 }),
+  reading: Object.freeze({ A1: 60, A2: 115, B1: 275, B2: 385, C1: 455 }),
+});
+export const PRODUCTIVE_CEFR_RULES = Object.freeze({
+  speaking: Object.freeze({ kinds: Object.freeze(['open_speaking']), pass: 7, max: 10 }),
+  writing: Object.freeze({ kinds: Object.freeze(['writing']), pass: 3.5, max: 5 }),
+  recent: 5,
+  needed: 3,
+});
+
+export function toeicCefr(skill, score) {
+  if (!Number.isFinite(score)) return null;
+  const minimums = TOEIC_CEFR_MINIMUMS[skill];
+  let level = BELOW_A1;
+  for (const [name, minimum] of Object.entries(minimums)) if (score >= minimum) level = name;
+  return level;
+}
+
+export function productiveCefr(results, rule, { recent = PRODUCTIVE_CEFR_RULES.recent, needed = PRODUCTIVE_CEFR_RULES.needed } = {}) {
+  const levels = CEFR_ORDER.map((level) => {
+    const latest = results
+      .filter((result) => result.level === level && Number.isFinite(result.total))
+      .sort((a, b) => String(b.at).localeCompare(String(a.at)))
+      .slice(0, recent);
+    return { level, considered: latest.length, passed: latest.filter((result) => result.total >= rule.pass).length };
+  }).filter((entry) => entry.considered > 0);
+  const reached = levels.filter((entry) => entry.passed >= needed).map((entry) => entry.level);
+  return { level: reached.length ? reached.at(-1) : null, levels };
 }

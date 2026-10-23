@@ -90,3 +90,12 @@ test('a scored writing becomes a WRITING_RESULT notification (F13)', async () =>
   const listed = await service.listNotifications(student);
   assert.deepEqual(listed.notifications.map((item) => item.kind).sort(), ['SPEAKING_RESULT', 'WRITING_RESULT']);
 });
+
+test('a teacher review and a returned review become notifications (F15)', async () => {
+  const { service } = progressHarness([1], { now: () => new Date('2026-10-23T03:00:00Z') });
+  const base = { accountId: student.id, submissionId: randomUUID(), promptId: randomUUID(), kind: 'writing', title: 'Day off' };
+  await service.applyResult(message('review.completed', { ...base, total: 3.6, reviewedAt: '2026-10-23T02:00:00.000Z' }));
+  await service.applyResult(message('review.expired', { ...base, submissionId: randomUUID(), expiredAt: '2026-10-23T02:30:00.000Z' }));
+  const listed = await service.listNotifications(student);
+  assert.deepEqual(listed.notifications.map((item) => [item.kind, item.data.total]), [['REVIEW_RETURNED', null], ['TEACHER_REVIEWED', 3.6]]);
+});

@@ -9,5 +9,6 @@ export function loadConfig(source = process.env) {
     timeoutMs: Number(source.GEMINI_TIMEOUT_MS || 90_000),
     secret: source.GEMINI_KEY_SECRET || '',
     concurrency: Math.max(1, Number(source.WRITING_CONCURRENCY || 2)),
+    port: Number(source.WRITING_SERVICE_PORT || 3005),
   };
 }

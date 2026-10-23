@@ -37,7 +37,7 @@ export class ResultsConsumer {
       await channel.assertQueue(QUEUE, { durable: true });
       await assertRetryTopology(channel, QUEUE);
       await channel.prefetch(PREFETCH);
-      await channel.consume(QUEUE, (message) => this.handle(channel, message));
+      await channel.consume(QUEUE, (message) => this.handle(channel, message).catch((error) => logger.warn(`Learning result left for redelivery: ${error.message}`)));
       this.connection = connection;
       this.channel = channel;
       logger.log('Connected to RabbitMQ for learning results');

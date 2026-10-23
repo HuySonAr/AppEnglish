@@ -1,4 +1,4 @@
-import { Activity, BookOpen, Calculator, ClipboardCheck, Dumbbell, FileText, GraduationCap, MessageSquareText, Headphones, Home, Layers, LayoutDashboard, Library, Tags, Timer, TrendingUp, Trophy, Users } from 'lucide-react';
+import { Activity, AudioLines, BookOpen, Calculator, ClipboardCheck, Dumbbell, FileText, GraduationCap, Headphones, Home, Layers, LayoutDashboard, Library, MessageSquareText, Mic, PenLine, Tags, Timer, TrendingUp, Trophy, Users } from 'lucide-react';
 import { Roles } from '../constants/auth.js';
 
 export const navigation = Object.freeze({
@@ -37,7 +37,10 @@ export const navigation = Object.freeze({
     home: '/teacher',
     items: [
       { to: '/teacher', label: 'Dashboard', icon: LayoutDashboard, end: true },
-      { to: '/teacher/prompts', label: 'Prompts', icon: MessageSquareText },
+      { to: '/teacher/read-aloud', label: 'Read aloud', icon: AudioLines },
+      { to: '/teacher/open-speaking', label: 'Open speaking', icon: Mic },
+      { to: '/teacher/writing', label: 'Writing', icon: PenLine },
+      { to: '/teacher/reviews', label: 'Grading', icon: ClipboardCheck },
     ],
   },
   [Roles.ADMIN]: {

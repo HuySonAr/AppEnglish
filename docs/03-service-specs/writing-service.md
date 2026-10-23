@@ -38,3 +38,14 @@ pnpm --filter @appenglish/writing-service test   # không gọi Gemini thật, k
 ## Speaking open answers (F14, D179)
 
 A job with `type: "speaking.grading.requested"` on `writing.grading.requests` carries `{ submissionId, accountId, prompt: { title, level, instructions, maxSeconds, sampleAnswer, keyPoints }, answer: <transcript>, durationSeconds, key }`. It is graded with `OPEN_SYSTEM` (a transcript, not audio: ignore punctuation and fillers, do not judge pronunciation), `OPEN_SCHEMA` and `buildOpenSpeakingPrompt` on four criteria (task, vocabulary, grammar, coherence); `parseOpenSpeakingResult` returns `{ criteria, feedback, errors, rewrite }` without a total. Results, including the final FAILED after the last retry, go to `writing.open-speaking.results`. Tests: `test/open-speaking.test.js`.
+
+## Evaluation and load test (F16, D181)
+
+- `src/metrics.js` (Pearson, Spearman, MAE, QWK on half points), `src/ellipse.js` (CSV reader, seeded sample, evaluation job without a sample answer, overall from six criteria), `scripts/evaluate-ellipse.mjs` (`evaluate:ellipse`, needs `GEMINI_EVAL_KEY`).
+- `scripts/load-test.mjs` (`load-test`): the real broker on temporary queues with a local fake Gemini and a worker restart. `WritingBroker` now takes `config.queues` and `config.retryDelays` (defaults: the shared queues and D168 delays).
+- Consumer callbacks catch errors from a closed channel; the unacknowledged job is redelivered.
+- Results: `docs/05-operations/ai-evaluation.md`. Tests: `test/evaluate.test.js`.
+
+## Status port (D182)
+
+`src/status-server.js` listens on `127.0.0.1:${WRITING_SERVICE_PORT}` (default 3005) with `GET /metrics` (Prometheus text from the shared registry: `grading_jobs_total{task,status}`, `grading_job_seconds`, `key_checks_total{status}`, `messages_handled_total`, process figures) and `GET /health`. The gateway's System overview reads it. Tests: `test/status-server.test.js`.

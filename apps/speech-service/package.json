@@ -10,6 +10,7 @@
     "dev": "node run.mjs -m speech_service",
     "start": "node run.mjs -m speech_service",
     "lint": "node run.mjs -m compileall -q speech_service tests",
-    "test": "node run.mjs -m unittest discover -s tests -t ."
+    "test": "node run.mjs -m unittest discover -s tests -t .",
+    "evaluate": "node run.mjs -m speech_service.evaluate"
   }
 }

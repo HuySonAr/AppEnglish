@@ -15,6 +15,7 @@ import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx'
 import { getWritingPrompt, getWritingSubmission, submitWriting } from '../api/writing-api.js';
 import { PracticeAttempts } from '../components/PracticeAttempts.jsx';
 import { WritingResult } from '../components/WritingResult.jsx';
+import { TeacherReviewPanel } from '../components/TeacherReviewPanel.jsx';
 import { SCORING_POLL_LIMIT, SCORING_POLL_MS, isScoring } from '../lib/practice.js';
 import { wordRangeState } from '../lib/writing.js';
 
@@ -203,11 +204,21 @@ export function WritingPromptPage() {
           {current ? (
             <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Result</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{current.teacherReview ? 'AI score' : 'Result'}</p>
                 <span className="text-xs text-muted-foreground">{timeAgo(current.submittedAt)}</span>
               </div>
               <WritingResult submission={current} />
             </div>
+          ) : null}
+          {current ? (
+            <TeacherReviewPanel
+              submission={current}
+              quota={data.reviewQuota}
+              onRequested={({ review, quota }) => {
+                setCurrent((value) => ({ ...value, review }));
+                setData((value) => ({ ...value, reviewQuota: quota }));
+              }}
+            />
           ) : null}
         </div>
 

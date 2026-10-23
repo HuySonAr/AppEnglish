@@ -522,7 +522,7 @@ Code: `src/practice/` (`practice.schemas.js`, `practice.repository.js`, `practic
 
 Content limits come from `PRACTICE_LIMITS` in content-contracts. Required to submit: title and topic; read aloud needs the text (500 characters); open speaking and writing need instructions and a sample answer; writing needs `minWords <= maxWords` and a sample answer within that range. Open speaking time is 15–120 seconds. Media upload with `section=practice` is allowed for the `TEACHER` role only and stored under `<kind>/practice`; `isMediaReferenced` scans `practice_prompt_versions`. Errors: `PRACTICE_PROMPT_NOT_FOUND` 40/404, state conflicts 41/409.
 
-Web: teacher area `/teacher` (dashboard, `/teacher/prompts`, editor `/teacher/prompts/:id` with preview), CM review `/content-manager/practice-prompts` (waiting first) and `/content-manager/practice-prompts/:id` (new version vs live version, approve, return with note, take down). Shared `PracticePromptView` renders a prompt read-only.
+Web: teacher area `/teacher` (dashboard with one card per kind; one list per kind: `/teacher/read-aloud`, `/teacher/open-speaking`, `/teacher/writing`, each creating its own kind; editor `/teacher/<kind>/:id` with preview; the old `/teacher/prompts` links redirect), CM review `/content-manager/practice-prompts` (waiting first) and `/content-manager/practice-prompts/:id` (new version vs live version, approve, return with note, take down). Shared `PracticePromptView` renders a prompt read-only.
 
 ### Learner side of the prompt bank (F12, D177)
 

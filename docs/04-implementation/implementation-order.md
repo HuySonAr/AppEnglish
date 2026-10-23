@@ -19,8 +19,8 @@
 | F12 | Speaking đọc to | Ghi âm, nộp qua outbox → speech-service (Whisper) → điểm 0–10 và trạng thái từng từ; thông báo chấm xong tạm ở progress-service (D171, D175, D177); nút tạo audio mẫu bằng giọng máy |
 | F13 | Key Gemini và Writing | Học viên lưu key Gemini; worker Gemini (`apps/writing-service`) chấm Writing theo rubric, bài mẫu, ý chính (D172, D175, D178) |
 | F14 | Speaking nói mở | Whisper chuyển chữ + Gemini chấm, Fluency/Pronunciation từ Whisper (D171, D172, D179) |
-| F15 | Giáo viên chấm | 3 lượt/tuần, hàng chờ chung, khóa 2 giờ, trả lượt sau 48 giờ, ghi lại mỗi lần chấm (D173) |
-| F16 | Hồ sơ năng lực CEFR và đánh giá AI | Hồ sơ bốn kỹ năng (D174); script đánh giá trên Speechocean762 và ELLIPSE; kiểm thử tải và chịu lỗi luồng chấm |
+| F15 | Giáo viên chấm | 3 lượt/tuần (giữ chỗ khi gửi), hàng chờ chung, khóa 2 giờ, trả lượt sau 48 giờ, ghi lại mỗi lần chấm (D173, D180) |
+| F16 | Hồ sơ năng lực CEFR và đánh giá AI | Hồ sơ bốn kỹ năng (D174, D181); script đánh giá trên Speechocean762 và ELLIPSE; kiểm thử tải và chịu lỗi luồng chấm |
 
 ## Đối chiếu ID và file prompt
 

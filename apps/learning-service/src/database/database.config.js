@@ -13,6 +13,7 @@ import {
   PlacementAttemptEntity,
   PlacementSettingsEntity,
   PracticeSubmissionEntity,
+  ReviewRequestEntity,
   ScoreConversionEntity,
   UnitReviewAttemptEntity,
 } from './learning.entities.js';
@@ -41,6 +42,7 @@ export function createLearningDataSource() {
       LearningEventEntity,
       PracticeSubmissionEntity,
       AiKeyEntity,
+      ReviewRequestEntity,
     ],
     migrations: ['src/database/migrations/*.js'],
   });

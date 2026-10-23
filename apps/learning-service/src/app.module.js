@@ -16,6 +16,7 @@ import {
   PLACEMENT_REPOSITORY,
   SPEAKING_REPOSITORY,
   AI_KEY_REPOSITORY,
+  REVIEW_REPOSITORY,
 } from './database/database.tokens.js';
 import { CourseGrpcController } from './course/course.grpc.controller.js';
 import { CourseRepository } from './course/course.repository.js';
@@ -43,6 +44,13 @@ import { AiKeyChecker } from './writing/ai-key.checker.js';
 import { AiKeyRepository } from './writing/ai-key.repository.js';
 import { WritingGrpcController } from './writing/writing.grpc.controller.js';
 import { WritingService } from './writing/writing.service.js';
+import { ReviewGrpcController } from './review/review.grpc.controller.js';
+import { ReviewRepository } from './review/review.repository.js';
+import { ReviewService } from './review/review.service.js';
+import { CefrGrpcController } from './cefr/cefr.grpc.controller.js';
+import { CefrService } from './cefr/cefr.service.js';
+
+const EXPIRE_EVERY_MS = 5 * 60 * 1000;
 import { SpeakingService } from './speaking/speaking.service.js';
 import { USAGE_REPOSITORY, UsageGrpcController, UsageRepository } from './usage/usage.grpc.controller.js';
 
@@ -55,7 +63,7 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [MetricsController, HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, CourseGrpcController, UsageGrpcController, SpeakingGrpcController, WritingGrpcController],
+  controllers: [MetricsController, HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, CourseGrpcController, UsageGrpcController, SpeakingGrpcController, WritingGrpcController, ReviewGrpcController, CefrGrpcController],
   providers: [
     { provide: LEARNING_DATA_SOURCE, useFactory: createLearningDataSource },
     {
@@ -129,15 +137,36 @@ Module({
       inject: [COURSE_REPOSITORY, CONTENT_CLIENT, LearningEvents],
     },
     {
+      provide: CefrService,
+      useFactory: (mockRepository, submissions) => new CefrService(mockRepository, submissions),
+      inject: [MOCK_REPOSITORY, SPEAKING_REPOSITORY],
+    },
+    {
+      provide: REVIEW_REPOSITORY,
+      useFactory: (dataSource) => new ReviewRepository(dataSource),
+      inject: [LEARNING_DATA_SOURCE],
+    },
+    {
+      provide: ReviewService,
+      useFactory: (repository, events) => {
+        const service = new ReviewService(repository, { events });
+        const expire = () => service.expireDue().catch(() => {});
+        setTimeout(expire, 30_000).unref?.();
+        setInterval(expire, EXPIRE_EVERY_MS).unref?.();
+        return service;
+      },
+      inject: [REVIEW_REPOSITORY, LearningEvents],
+    },
+    {
       provide: SPEAKING_REPOSITORY,
       useFactory: (dataSource) => new SpeakingRepository(dataSource),
       inject: [LEARNING_DATA_SOURCE],
     },
     {
       provide: SpeakingService,
-      useFactory: (repository, contentClient, events, keys) => {
+      useFactory: (repository, contentClient, events, keys, reviews) => {
         const url = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
-        const service = new SpeakingService(repository, contentClient, { events, keys });
+        const service = new SpeakingService(repository, contentClient, { events, keys, reviews });
         new PracticeResults(url, (answer) => service.applyResult(answer)).start();
         new PracticeResults(url, (answer) => service.applyGrading(answer), { queue: LearningQueue.OPEN_SPEAKING_RESULTS, requests: LearningQueue.WRITING_REQUESTS }).start();
         const purge = () => service.purgeRecordings().catch(() => {});
@@ -145,7 +174,7 @@ Module({
         setInterval(purge, PURGE_EVERY_MS).unref?.();
         return service;
       },
-      inject: [SPEAKING_REPOSITORY, CONTENT_CLIENT, LearningEvents, AI_KEY_REPOSITORY],
+      inject: [SPEAKING_REPOSITORY, CONTENT_CLIENT, LearningEvents, AI_KEY_REPOSITORY, ReviewService],
     },
     {
       provide: AI_KEY_REPOSITORY,
@@ -154,15 +183,15 @@ Module({
     },
     {
       provide: WritingService,
-      useFactory: (repository, keys, contentClient, events) => {
+      useFactory: (repository, keys, contentClient, events, reviews) => {
         const url = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
         const checker = new AiKeyChecker(url);
         checker.start();
-        const service = new WritingService(repository, keys, contentClient, { checker, secret: process.env.GEMINI_KEY_SECRET || '', events });
+        const service = new WritingService(repository, keys, contentClient, { checker, secret: process.env.GEMINI_KEY_SECRET || '', events, reviews });
         new PracticeResults(url, (answer) => service.applyResult(answer), { queue: LearningQueue.WRITING_RESULTS, requests: LearningQueue.WRITING_REQUESTS }).start();
         return service;
       },
-      inject: [SPEAKING_REPOSITORY, AI_KEY_REPOSITORY, CONTENT_CLIENT, LearningEvents],
+      inject: [SPEAKING_REPOSITORY, AI_KEY_REPOSITORY, CONTENT_CLIENT, LearningEvents, ReviewService],
     },
     {
       provide: MockService,

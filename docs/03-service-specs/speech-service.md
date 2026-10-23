@@ -111,3 +111,7 @@ The speaking loop runs on its own thread and connection, one recording at a time
 ## Speaking open answers (F14, D179)
 
 `score_open_speaking(words)` in `speech_service/speaking.py` (no prompt text): the transcript, `fillers` (words made only of `OPEN_SPEAKING_SCORING.fillers`), `words` (the rest), Pronunciation = 10 × mean probability of the non-filler words, Fluency from `fluency()` with `OPEN_SPEAKING_SCORING` (pause from 1.0 s, rate 70–170 words per minute counting fillers) minus 0.2 per filler (at most 2). A recording with only fillers fails. `process_speaking` picks it when `payload.kind` is `open_speaking`; the answer goes on `speech.speaking.results` as `{ submissionId, status: "DONE", result: { transcript, scores: { fluency, pronunciation }, wordsPerMinute, pauses, fillers, words } }`.
+
+## Accuracy evaluation (F16, D181)
+
+`speech_service/evaluate.py` (`pnpm --filter @appenglish/speech-service evaluate -- --root <speechocean762>`): `load_speechocean` (resource/scores.json, `test/text`, WAVE files), seeded `sample`, `run` with the real transcriber and `score_read_aloud`, `compare` (Pearson, Spearman, MAE). See `docs/05-operations/ai-evaluation.md`. Tests: `tests/test_evaluate.py`.

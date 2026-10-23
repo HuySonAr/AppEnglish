@@ -78,3 +78,12 @@ export function statusCounts(prompts) {
   }
   return counts;
 }
+
+export const kindSlugs = {
+  [PracticePromptKind.READ_ALOUD]: 'read-aloud',
+  [PracticePromptKind.OPEN_SPEAKING]: 'open-speaking',
+  [PracticePromptKind.WRITING]: 'writing',
+};
+export const kindFromSlug = (slug) => Object.keys(kindSlugs).find((kind) => kindSlugs[kind] === slug) || null;
+export const teacherListPath = (kind) => `/teacher/${kindSlugs[kind]}`;
+export const teacherPromptPath = (kind, id) => `${teacherListPath(kind)}/${id}`;

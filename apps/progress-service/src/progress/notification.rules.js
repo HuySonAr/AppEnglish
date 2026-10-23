@@ -64,6 +64,17 @@ export function practiceResultNotification(data, kind = NotificationKind.SPEAKIN
   };
 }
 
+export function reviewNotification(data, kind) {
+  const returned = kind === NotificationKind.REVIEW_RETURNED;
+  return {
+    accountId: data.accountId,
+    kind,
+    key: `${returned ? 'review-returned' : 'review'}:${data.submissionId}:${returned ? data.expiredAt : 'done'}`,
+    data: { submissionId: data.submissionId, promptId: data.promptId, kind: data.kind, title: data.title, total: returned ? null : data.total },
+    createdAt: new Date(returned ? data.expiredAt : data.reviewedAt),
+  };
+}
+
 export function notificationView(row) {
   return { id: row.id, kind: row.kind, data: row.data, createdAt: new Date(row.createdAt).toISOString(), read: Boolean(row.readAt) };
 }

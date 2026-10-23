@@ -6,8 +6,9 @@ const SERVICES = Object.freeze([
   { name: 'content-service', port: 'CONTENT_SERVICE_PORT', fallback: 3002 },
   { name: 'learning-service', port: 'LEARNING_SERVICE_PORT', fallback: 3003 },
   { name: 'progress-service', port: 'PROGRESS_SERVICE_PORT', fallback: 3004 },
+  { name: 'writing-service', port: 'WRITING_SERVICE_PORT', fallback: 3005 },
 ]);
-const QUEUE_PREFIXES = ['learning.results', 'speech.'];
+const QUEUE_PREFIXES = ['learning.results', 'speech.', 'writing.'];
 const TIMEOUT_MS = 2000;
 
 const sum = (samples, name, match = () => true) => samples.filter((sample) => sample.name === name && match(sample.labels)).reduce((total, sample) => total + sample.value, 0);
@@ -23,6 +24,7 @@ export function summarizeService(name, samples) {
   const sessions = {};
   for (const sample of samples.filter((item) => item.name === 'session_lookups_total')) sessions[sample.labels.source] = sample.value;
   const speechCount = sum(samples, 'speech_jobs_total');
+  const gradingCount = sum(samples, 'grading_jobs_total');
   return {
     name,
     status: 'ok',
@@ -43,6 +45,14 @@ export function summarizeService(name, samples) {
           failed: sum(samples, 'speech_jobs_total', (labels) => labels.status === 'FAILED'),
           waitP95Seconds: quantileFromBuckets(samples, 'speech_job_wait_seconds', 0.95),
           workP95Seconds: quantileFromBuckets(samples, 'speech_job_work_seconds', 0.95),
+        }
+      : null,
+    grading: samples.some((sample) => sample.name === 'grading_jobs_total' || sample.name === 'key_checks_total')
+      ? {
+          finished: gradingCount,
+          failed: sum(samples, 'grading_jobs_total', (labels) => labels.status === 'FAILED'),
+          workP95Seconds: quantileFromBuckets(samples, 'grading_job_seconds', 0.95),
+          keyChecks: sum(samples, 'key_checks_total'),
         }
       : null,
   };

@@ -13,6 +13,7 @@ import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx'
 import { getSpeakingPrompt, getSpeakingSubmission, submitSpeaking } from '../api/speaking-api.js';
 import { SpeakingRecorder } from '../components/SpeakingRecorder.jsx';
 import { SpeakingResult } from '../components/SpeakingResult.jsx';
+import { TeacherReviewPanel } from '../components/TeacherReviewPanel.jsx';
 import { SCORING_POLL_LIMIT, SCORING_POLL_MS, isScoring } from '../lib/practice.js';
 import { PracticeAttempts } from '../components/PracticeAttempts.jsx';
 
@@ -172,11 +173,21 @@ export function SpeakingPromptPage() {
           {current ? (
             <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Result</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{current.teacherReview ? 'AI score' : 'Result'}</p>
                 <span className="text-xs text-muted-foreground">{timeAgo(current.submittedAt)}</span>
               </div>
               <SpeakingResult submission={current} />
             </div>
+          ) : null}
+          {current ? (
+            <TeacherReviewPanel
+              submission={current}
+              quota={data.reviewQuota}
+              onRequested={({ review, quota }) => {
+                setCurrent((value) => ({ ...value, review }));
+                setData((value) => ({ ...value, reviewQuota: quota }));
+              }}
+            />
           ) : null}
         </div>
 

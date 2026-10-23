@@ -58,6 +58,12 @@ export function describeNotification({ kind, data }) {
       detail: data.title || 'Writing',
       to: `/student/practice/writing/${data.promptId}?submission=${data.submissionId}`,
     };
+  if (kind === NotificationKind.TEACHER_REVIEWED || kind === NotificationKind.REVIEW_RETURNED) {
+    const area = data.kind === 'writing' ? 'writing' : 'speaking';
+    const to = `/student/practice/${area}/${data.promptId}?submission=${data.submissionId}`;
+    if (kind === NotificationKind.REVIEW_RETURNED) return { tone: 'warning', title: 'No teacher was free; your review turn is back', detail: data.title || 'Practice', to };
+    return { tone: 'success', title: `A teacher reviewed your answer: ${Number(data.total).toFixed(1)} / ${area === 'writing' ? 5 : 10}`, detail: data.title || 'Practice', to };
+  }
   if (kind === NotificationKind.STREAK_REMINDER)
     return { tone: 'warning', title: `Study today to keep your ${data.streak}-day streak`, detail: 'One short lesson is enough.', to: '/student' };
   if (kind === 'SPEECH_JOB') {

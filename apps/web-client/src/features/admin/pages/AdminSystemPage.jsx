@@ -43,7 +43,7 @@ function ServiceCard({ service }) {
             <Figure label="Errors" value={service.errors} />
             <Figure label="p95" value={formatSeconds(service.p95Seconds)} />
           </div>
-          {service.outbox || service.messages || service.sessions || service.speech ? (
+          {service.outbox || service.messages || service.sessions || service.speech || service.grading ? (
             <div className="space-y-1.5 border-t pt-3 text-xs text-muted-foreground">
               {service.outbox ? (
                 <p>
@@ -71,6 +71,11 @@ function ServiceCard({ service }) {
                 <p>
                   Speech jobs: {service.speech.finished} finished, {service.speech.failed} failed · wait p95 {formatSeconds(service.speech.waitP95Seconds)} · work p95{' '}
                   {formatSeconds(service.speech.workP95Seconds)}
+                </p>
+              ) : null}
+              {service.grading ? (
+                <p>
+                  Gemini grading: {service.grading.finished} finished, {service.grading.failed} failed · work p95 {formatSeconds(service.grading.workP95Seconds)} · {service.grading.keyChecks} key checks
                 </p>
               ) : null}
             </div>

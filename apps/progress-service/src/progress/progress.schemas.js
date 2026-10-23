@@ -102,6 +102,29 @@ export const practiceScoredSchema = z
   })
   .passthrough();
 
+export const reviewCompletedSchema = z
+  .object({
+    accountId: z.string().uuid(),
+    submissionId: z.string().uuid(),
+    promptId: z.string().uuid(),
+    kind: z.string().min(1).max(20),
+    title: z.string().max(200).optional().default(''),
+    total: z.number().min(0).max(10),
+    reviewedAt: isoDate,
+  })
+  .passthrough();
+
+export const reviewExpiredSchema = z
+  .object({
+    accountId: z.string().uuid(),
+    submissionId: z.string().uuid(),
+    promptId: z.string().uuid(),
+    kind: z.string().min(1).max(20),
+    title: z.string().max(200).optional().default(''),
+    expiredAt: isoDate,
+  })
+  .passthrough();
+
 export const markReadSchema = z.object({ ids: z.array(z.string().uuid()).max(100).optional() }).strict();
 
 export const payloadSchemas = Object.freeze({
@@ -113,4 +136,6 @@ export const payloadSchemas = Object.freeze({
   [LearningEventType.COURSE_LEVEL_UP]: courseLevelUpSchema,
   [LearningEventType.SPEAKING_SCORED]: practiceScoredSchema,
   [LearningEventType.WRITING_SCORED]: practiceScoredSchema,
+  [LearningEventType.REVIEW_COMPLETED]: reviewCompletedSchema,
+  [LearningEventType.REVIEW_EXPIRED]: reviewExpiredSchema,
 });

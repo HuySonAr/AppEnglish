@@ -49,6 +49,10 @@ const messages = Object.freeze({
   [LearningResponseCode.AI_KEY_INVALID]: 'Gemini rejected this key. Check that you copied all of it.',
   [LearningResponseCode.AI_KEY_UNAVAILABLE]: 'The key cannot be checked right now. Try again in a minute.',
   [LearningResponseCode.ANSWER_INVALID]: 'Keep your text within the word limits.',
+  [LearningResponseCode.REVIEW_LIMIT_REACHED]: 'You have used your three teacher reviews this week.',
+  [LearningResponseCode.REVIEW_NOT_ALLOWED]: 'This answer cannot be sent to a teacher.',
+  [LearningResponseCode.REVIEW_NOT_FOUND]: 'This answer is no longer waiting for a review.',
+  [LearningResponseCode.REVIEW_LOCKED]: 'Another teacher is reviewing this answer, or your two hours ended.',
 });
 
 const mediaReasons = Object.freeze({

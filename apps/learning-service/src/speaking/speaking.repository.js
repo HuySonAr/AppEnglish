@@ -17,7 +17,7 @@ export class SpeakingRepository {
 
   async statsByPrompt(accountId) {
     const rows = await (await this.repo()).query(
-      `SELECT "promptId", count(*)::int AS "attempts", max(("result"->'scores'->>'total')::float) AS "bestTotal", max("submittedAt") AS "lastSubmittedAt"
+      `SELECT "promptId", count(*)::int AS "attempts", max(COALESCE(("teacherReview"->'scores'->>'total')::float, ("result"->'scores'->>'total')::float)) AS "bestTotal", max("submittedAt") AS "lastSubmittedAt"
        FROM "practice_submissions" WHERE "accountId" = $1 GROUP BY "promptId"`,
       [accountId],
     );
@@ -26,6 +26,14 @@ export class SpeakingRepository {
 
   async listSubmissions(accountId, promptId, limit) {
     return (await this.repo()).find({ where: { accountId, promptId }, order: { submittedAt: 'DESC' }, take: limit });
+  }
+
+  async listScored(accountId, kinds) {
+    return (await this.repo()).find({
+      where: { accountId, kind: In(kinds), status: In(['DONE', 'FAILED', 'SAVED']) },
+      select: { id: true, kind: true, prompt: true, result: true, teacherReview: true, submittedAt: true, status: true },
+      order: { submittedAt: 'DESC' },
+    });
   }
 
   async findSubmission(id) {

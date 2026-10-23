@@ -36,7 +36,7 @@ export class PracticeResults {
       await channel.assertQueue(this.queue, { durable: true });
       await assertRetryTopology(channel, this.queue);
       await channel.prefetch(10);
-      await channel.consume(this.queue, (message) => this.handle(channel, message));
+      await channel.consume(this.queue, (message) => this.handle(channel, message).catch((error) => logger.warn(`Result left for redelivery: ${error.message}`)));
       this.connection = connection;
       logger.log(`Connected to RabbitMQ for ${this.queue}`);
     } catch (error) {

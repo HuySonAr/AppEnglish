@@ -178,3 +178,7 @@ content-service over gRPC and never another database.
 ## Gemini keys and writing (F13, D178)
 
 `learning-service` adds `ai_keys` to `app_learning`, the `answer` column and the `SAVED` status to `practice_submissions` (migration `1730000016000-create-ai-keys-and-writing.js`, applied locally 2026-10-23). Keys are stored only sealed with `GEMINI_KEY_SECRET`; writing-service has no database.
+
+## Teacher reviews (F15, D180)
+
+`learning-service` adds `review_requests` and `practice_submissions.teacherReview` to `app_learning` (migration `1730000017000-create-review-requests.js`, applied locally 2026-10-23). `teacherId` is an auth account id without a foreign key.
