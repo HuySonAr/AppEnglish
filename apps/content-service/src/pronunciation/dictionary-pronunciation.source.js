@@ -9,10 +9,6 @@ export class PronunciationUnavailableError extends Error {
 
 const accentPatterns = { uk: /-uk\.mp3$/i, us: /-us\.mp3$/i };
 
-// Looks up IPA and British/American audio in the free dictionary API
-// (dictionaryapi.dev). The service intermittently answers with an HTML error
-// page or a gateway timeout for words it does have, so lookups are retried.
-// Many entries have only one accent; missing parts come back as null.
 export class DictionaryPronunciationSource {
   constructor({
     baseUrl = 'https://api.dictionaryapi.dev/api/v2/entries/en',
@@ -34,7 +30,6 @@ export class DictionaryPronunciationSource {
     this.maxAudioBytes = maxAudioBytes;
   }
 
-  // Returns { found, phonetic, audio: { uk, us } } with URLs or null.
   async lookup(word) {
     const url = `${this.baseUrl}/${encodeURIComponent(word)}`;
     const deadline = Date.now() + this.lookupBudgetMs;
@@ -47,9 +42,8 @@ export class DictionaryPronunciationSource {
         });
         body = JSON.parse(await response.text());
       } catch {
-        continue; // timeout, network error or a non-JSON error page
+        continue;
       }
-      // A real miss is a JSON object; entries come as an array.
       if (!Array.isArray(body)) return { found: false, phonetic: '', audio: { uk: null, us: null } };
       const phonetics = body.flatMap((entry) => entry.phonetics || []);
       const audioUrls = phonetics.map((item) => item.audio).filter(Boolean);
@@ -68,8 +62,6 @@ export class DictionaryPronunciationSource {
     throw new PronunciationUnavailableError('Dictionary service did not answer');
   }
 
-  // Downloads one audio file the lookup returned. Only HTTPS URLs on the
-  // dictionary's own host are fetched.
   async download(audioUrl) {
     const target = new URL(audioUrl);
     if (target.protocol !== 'https:' || target.host !== new URL(this.baseUrl).host)
@@ -85,8 +77,6 @@ export class DictionaryPronunciationSource {
   }
 }
 
-// The dictionary source is kept for PRONUNCIATION_SOURCE=dictionary; the
-// default since D123 is speech-service (see app.module).
 export function createPronunciationSource(source = process.env) {
   return new DictionaryPronunciationSource(
     source.DICTIONARY_API_URL ? { baseUrl: source.DICTIONARY_API_URL } : {},

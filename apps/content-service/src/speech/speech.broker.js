@@ -1,20 +1,17 @@
 import amqp from 'amqplib';
 import { Logger } from '@nestjs/common';
 import { SpeechQueue } from '@appenglish/content-contracts';
+import { assertRetryTopology, countMessage, retryOrDead } from '@appenglish/backend-common/messaging';
+import { REQUEST_ID_HEADER, runWithRequestId } from '@appenglish/backend-common/observability';
 
 const logger = new Logger('SpeechBroker');
 const RETRY_MS = 10_000;
 
-// RabbitMQ link to speech-service for auto-time (D97): publishes requests to
-// speech.autotime.requests and hands every answer read from
-// speech.autotime.results to onResult. The service starts without the
-// broker and keeps trying to reach it; a request while it is away fails.
 export class SpeechBroker {
   constructor(url) {
     this.url = url;
     this.channel = null;
     this.stopped = false;
-    // Requests waiting for their reply (D123), by correlation id.
     this.pending = new Map();
     this.nextCorrelation = 0;
   }
@@ -36,19 +33,11 @@ export class SpeechBroker {
           setTimeout(() => this.connect(), RETRY_MS);
         }
       });
-      const channel = await connection.createChannel();
+      const channel = await connection.createConfirmChannel();
       await channel.assertQueue(SpeechQueue.AUTOTIME_REQUESTS, { durable: true });
       await channel.assertQueue(SpeechQueue.AUTOTIME_RESULTS, { durable: true });
-      await channel.consume(SpeechQueue.AUTOTIME_RESULTS, async (message) => {
-        if (!message) return;
-        try {
-          await this.onResult?.(JSON.parse(message.content.toString()));
-        } catch (error) {
-          logger.warn(`Auto-time answer not applied: ${error.message}`);
-        }
-        channel.ack(message);
-      });
-      // Replies to this service's own requests (D123) arrive on a private queue.
+      await assertRetryTopology(channel, SpeechQueue.AUTOTIME_RESULTS);
+      await channel.consume(SpeechQueue.AUTOTIME_RESULTS, (message) => this.handleResult(channel, message));
       await channel.assertQueue(SpeechQueue.PRONOUNCE_REQUESTS, { durable: true });
       const { queue: replyQueue } = await channel.assertQueue('', { exclusive: true });
       await channel.consume(
@@ -69,15 +58,55 @@ export class SpeechBroker {
       this.connection = connection;
       this.channel = channel;
       logger.log('Connected to RabbitMQ for auto-time and pronunciation');
+      this.onConnected?.();
     } catch (error) {
       logger.warn(`RabbitMQ not reachable (${error.message}); retrying in ${RETRY_MS / 1000} s`);
       setTimeout(() => this.connect(), RETRY_MS);
     }
   }
 
-  // Whether a speech-service worker listens (System health, D133): the
-  // number of consumers on the two request queues. A worker started before
-  // D123 serves auto-time only.
+  async handleResult(channel, message) {
+    if (!message) return 'none';
+    let answer;
+    try {
+      answer = JSON.parse(message.content.toString());
+    } catch {
+      channel.ack(message);
+      countMessage(SpeechQueue.AUTOTIME_RESULTS, 'dropped');
+      return 'dropped';
+    }
+    const requestId = answer?.requestId || message.properties?.headers?.[REQUEST_ID_HEADER];
+    return runWithRequestId(requestId, async () => {
+      try {
+        const outcome = await this.onResult?.(answer, { messageId: message.properties?.messageId || null });
+        channel.ack(message);
+        countMessage(SpeechQueue.AUTOTIME_RESULTS, outcome === 'duplicate' ? 'duplicate' : 'applied');
+        return outcome === 'duplicate' ? 'duplicate' : 'applied';
+      } catch (error) {
+        const outcome = retryOrDead(channel, SpeechQueue.AUTOTIME_RESULTS, message, error.message);
+        logger.warn(`Speech answer for job ${answer?.jobId} not applied (${error.message}); ${outcome === 'dead' ? 'moved to the dead queue' : 'retried later'}`);
+        return outcome;
+      }
+    });
+  }
+
+  send(queue, message, { messageId } = {}) {
+    if (!this.channel) return Promise.reject(new Error('RabbitMQ is not connected'));
+    return new Promise((resolve, reject) => {
+      this.channel.sendToQueue(
+        queue,
+        Buffer.from(JSON.stringify(message)),
+        {
+          persistent: true,
+          contentType: 'application/json',
+          ...(messageId ? { messageId } : {}),
+          ...(message.requestId ? { headers: { [REQUEST_ID_HEADER]: message.requestId } } : {}),
+        },
+        (error) => (error ? reject(error) : resolve()),
+      );
+    });
+  }
+
   async workerStatus() {
     if (!this.channel) return { status: 'down', detail: 'RabbitMQ not connected' };
     const [autotime, pronounce] = await Promise.all([
@@ -90,23 +119,10 @@ export class SpeechBroker {
     return { status: 'down', detail: workers.pronounce ? 'auto-time not served' : 'pronunciation not served: restart the worker', workers };
   }
 
-  // True when a request can be sent now.
   get ready() {
     return Boolean(this.channel);
   }
 
-  // Sends one auto-time request; false when the broker cannot be reached.
-  publish(message) {
-    if (!this.channel) return false;
-    this.channel.sendToQueue(SpeechQueue.AUTOTIME_REQUESTS, Buffer.from(JSON.stringify(message)), {
-      persistent: true,
-      contentType: 'application/json',
-    });
-    return true;
-  }
-
-  // Sends a request on `queue` and resolves with the answer speech-service
-  // sends back (D123); rejects after timeoutMs or when the broker is away.
   request(queue, message, timeoutMs = 30_000) {
     if (!this.channel) return Promise.reject(new Error('RabbitMQ is not connected'));
     const correlationId = `${Date.now()}-${++this.nextCorrelation}`;

@@ -4,9 +4,6 @@ import { AccountStatus } from '@appenglish/auth-contracts';
 import { ChartContainer, ChartTooltip } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 
-// The account numbers of the admin dashboard (D114, D115): tiles, the daily
-// sign-ups line and the status breakdown. Colours: --chart-1 for the single
-// series; status colours always come with their label and count.
 const series = 'hsl(var(--chart-1))';
 export const statusTone = {
   [AccountStatus.ACTIVE]: 'bg-success',
@@ -34,9 +31,6 @@ const utcDate = (day) => new Date(`${day}T00:00:00Z`);
 export const shortDay = (day) => utcDate(day).toLocaleDateString(undefined, { day: 'numeric', month: 'short', timeZone: 'UTC' });
 const longDay = (day) => utcDate(day).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
 
-// Sign-ups per day as a line over the window (user's choice, 2026-10-21): a
-// 2px line on a faint fill, a crosshair and a dot under the pointer with the
-// day and its count. One series, so the card title names it and no legend.
 export function SignupsChart({ points }) {
   const total = points.reduce((sum, point) => sum + point.count, 0);
   return (
@@ -87,9 +81,6 @@ export function SignupsChart({ points }) {
   );
 }
 
-// Accounts by status (D115): one bar split by status with a 2px gap between
-// parts, then a row per status with its count and share, each opening the
-// filtered list.
 export function StatusBreakdown({ rows }) {
   const shown = rows.filter((row) => row.count > 0);
   return (

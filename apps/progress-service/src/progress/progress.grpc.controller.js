@@ -1,4 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
+import { withGrpcContext } from '@appenglish/backend-common/grpc-context';
 import { GrpcMethod } from '@nestjs/microservices';
 import { ProgressResponseCode } from '@appenglish/progress-contracts';
 import { PROGRESS_GRPC_SERVICE } from '@appenglish/progress-contracts/grpc';
@@ -6,7 +7,6 @@ import { ProgressError } from './progress.errors.js';
 import { actorSchema, markReadSchema } from './progress.schemas.js';
 import { ProgressService } from './progress.service.js';
 
-// Each RPC and the service call it makes.
 const rpcs = {
   GetProgress: { run: (service, { actor }) => service.getProgress(actor) },
   GetXp: { run: (service, { actor }) => service.getXp(actor) },
@@ -30,8 +30,6 @@ export class ProgressGrpcController {
     this.progressService = progressService;
   }
 
-  // Shapes the { code, msg, data } envelope. Unexpected errors propagate as a
-  // gRPC error and the gateway answers 500.
   async handle(spec, request) {
     try {
       const payload = spec.payload ? spec.payload.parse(parseJson(request.payloadJson)) : undefined;
@@ -56,5 +54,6 @@ for (const [rpc, spec] of Object.entries(rpcs)) {
   ProgressGrpcController.prototype[method] = function (request) {
     return this.handle(spec, request);
   };
+  withGrpcContext(ProgressGrpcController.prototype, method, rpc);
   GrpcMethod(PROGRESS_GRPC_SERVICE, rpc)(ProgressGrpcController.prototype, method, Object.getOwnPropertyDescriptor(ProgressGrpcController.prototype, method));
 }

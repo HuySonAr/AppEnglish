@@ -1,4 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
+import { withGrpcContext } from '@appenglish/backend-common/grpc-context';
 import { GrpcMethod } from '@nestjs/microservices';
 import { LearningResponseCode } from '@appenglish/learning-contracts';
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
@@ -7,8 +8,6 @@ import { actorSchema } from '../placement/placement.schemas.js';
 import { ListeningPracticeService } from './listening.service.js';
 import { dictationAnswersSchema, exerciseIdSchema, lineAnswersSchema, listeningOpenSchema } from './listening.schemas.js';
 
-// Each RPC: whether it targets an exercise id, the schema of its JSON payload
-// (if any) and the service call.
 const rpcs = {
   ListListeningPractice: { run: (service, { actor }) => service.listPractice(actor) },
   GetListeningPractice: {
@@ -44,8 +43,6 @@ export class ListeningGrpcController {
     this.listeningService = listeningService;
   }
 
-  // Shapes the { code, msg, data } envelope. Unexpected errors propagate as a
-  // gRPC error and the gateway answers 500.
   async handle(spec, request) {
     try {
       const data = await spec.run(this.listeningService, {
@@ -74,6 +71,7 @@ for (const [rpc, spec] of Object.entries(rpcs)) {
   ListeningGrpcController.prototype[method] = function (request) {
     return this.handle(spec, request);
   };
+  withGrpcContext(ListeningGrpcController.prototype, method, rpc);
   GrpcMethod(LEARNING_GRPC_SERVICE, rpc)(
     ListeningGrpcController.prototype,
     method,

@@ -2,12 +2,11 @@ import { Body, Controller, Get, HttpException, Inject, Param, Post, Req } from '
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { PROGRESS_GRPC_SERVICE } from '@appenglish/progress-contracts/grpc';
 import { AUTH_GRPC_CLIENT, attachProfiles, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
+import { resolveSession } from '../auth/session-cache.js';
 import { callService } from '../grpc/grpc-call.js';
 
 export const PROGRESS_GRPC_CLIENT = 'PROGRESS_GRPC_CLIENT';
 
-// Public /progress routes (F06): authenticates the session and relays the
-// call to progress-service over gRPC.
 export class ProgressGatewayController {
   constructor(authClient, progressClient) {
     this.authClient = authClient;
@@ -20,11 +19,7 @@ export class ProgressGatewayController {
   }
 
   async forward(rpc, request, { id = '', body } = {}) {
-    const session = await callAuth(this.auth, 'Me', {
-      accessToken: sessionTokens(request).accessToken,
-    });
-    if (session.status >= 400) throw new HttpException(session.payload, session.status);
-    const { id: accountId, role, email } = session.payload.data.account;
+    const { id: accountId, role, email } = await resolveSession(this.auth, request);
     const { status, payload } = await callService(
       this.progress,
       rpc,
@@ -48,7 +43,6 @@ export class ProgressGatewayController {
   getStreak(request) {
     return this.forward('GetStreak', request);
   }
-  // Admin: a learner's progress and XP, read-only (D114).
   listNotifications(request) {
     return this.forward('ListNotifications', request);
   }
@@ -58,7 +52,6 @@ export class ProgressGatewayController {
   getLearnerSummary(id, request) {
     return this.forward('GetLearnerSummary', request, { id });
   }
-  // Ranked learners are shown by display name and avatar (D113).
   async getLeaderboard(request) {
     const payload = await this.forward('GetLeaderboard', request);
     await attachProfiles(this.auth, [...(payload.data.entries || []), payload.data.you]);

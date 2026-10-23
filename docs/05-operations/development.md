@@ -214,3 +214,10 @@ pnpm --filter @appenglish/content-service seed:600-words -- --manager-id <id tà
 Lesson đã có đủ 12 từ được giữ nguyên (`--force` để ghi đè); `--only 6,7`
 chỉ nhập các lesson đó. Xem README trong thư mục.
 
+## Observability and reliable messaging (D168)
+
+- Logs are JSON lines with `requestId`; send `x-request-id` to follow one request through the services, the broker and speech-service.
+- `GET http://localhost:<port>/metrics` on every Node service (3000–3004); the Admin page **System** (`/admin/system`) shows them with the RabbitMQ queues.
+- RabbitMQ management stays at `http://localhost:15672` (guest/guest in Docker); retry queues end in `.retry.N`, dead letters in `.dead`. To replay a dead letter, move it back to its main queue from the management UI.
+- Restart speech-service after updating it so it declares `speech.autotime.requests.dead` and handles redelivered jobs.
+- `AUTH_JWT_SECRET` must be the same for auth-service and the gateway (one root `.env`).

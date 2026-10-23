@@ -1,6 +1,3 @@
-// Unit review attempts (D121): one row per finished attempt at the review
-// that closes a unit. accountId, unitId and reviewVersionId refer to other
-// services' data, so they have no foreign key.
 export class CreateUnitReviewAttempts1730000010000 {
   name = 'CreateUnitReviewAttempts1730000010000';
 

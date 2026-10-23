@@ -50,7 +50,6 @@ class ProcessTest(unittest.TestCase):
         answer = process(request, lambda *args: words, fetch=lambda url: "x")
         self.assertEqual(answer["status"], "DONE")
         self.assertEqual([line["text"] for line in answer["lines"]], ["Hello there.", "Good morning."])
-        # Aligning needs lines.
         self.assertEqual(process({**REQUEST, "lines": []}, lambda *args: words, fetch=lambda url: "x")["error"], "ValueError: No lines to time")
 
 
@@ -69,12 +68,10 @@ class ProcessTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             cache = WordCache(directory, "small.en")
             first = process({**REQUEST, "task": "transcribe", "lines": []}, transcribe, fetch=lambda url: "x", cache=cache)
-            # Auto-time on the same recording: no download, no Whisper.
             second = process(REQUEST, transcribe, fetch=lambda url: self.fail("downloaded again"), cache=cache)
             self.assertEqual(calls, ["x"])
             self.assertEqual((first["status"], second["status"]), ("DONE", "DONE"))
             self.assertEqual(second["lines"][0]["start"], 0.9)
-            # Another model, another entry.
             self.assertIsNone(WordCache(directory, "base.en").get(REQUEST["audioUrl"]))
 
 

@@ -1,5 +1,3 @@
-// Transcribe (D98): a speech job either times the lines there are (align) or
-// writes them from the recording (transcribe). Existing jobs are align.
 export class ListeningTimingJobTask1720000007000 {
   name = 'ListeningTimingJobTask1720000007000';
 

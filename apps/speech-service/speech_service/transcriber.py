@@ -1,5 +1,3 @@
-"""Words heard in a recording, with their times, by faster-whisper (D97).
-The model is loaded once, on the first request."""
 
 from __future__ import annotations
 
@@ -13,7 +11,7 @@ class Transcriber:
 
     def __call__(self, path: str, language: str, prompt: str) -> list[dict]:
         if self.model is None:
-            from faster_whisper import WhisperModel  # heavy: imported only when used
+            from faster_whisper import WhisperModel
 
             self.model = WhisperModel(
                 self.settings.whisper_model,

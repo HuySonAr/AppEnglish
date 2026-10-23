@@ -5,8 +5,6 @@ import { ContentService } from '../src/content/content.service.js';
 import { SpeechPronunciationSource } from '../src/pronunciation/speech-pronunciation.source.js';
 import { createMemoryRepository, manager } from './memory-repository.js';
 
-// Pronunciation from speech-service (D123): one request, the reply carries
-// IPA and MP3 per accent.
 const mp3 = (accent) => Buffer.from(`mp3-${accent}`);
 function brokerAnswering(reply) {
   const calls = [];
@@ -33,11 +31,9 @@ test('lookup asks speech-service for both accents and returns the audio bytes', 
   assert.equal(entry.found, true);
   assert.equal(entry.phonetic, '/əˈbaɪd baɪ/');
   assert.deepEqual(await source.download(entry.audio.uk), mp3('uk'));
-  // The IPA accent is a choice; a missing one falls back to the other.
   const uk = new SpeechPronunciationSource(brokerAnswering({ status: 'DONE', phonetic: { us: '/us/' }, audio: {} }), { ipaAccent: 'uk' });
   assert.equal((await uk.lookup('x')).phonetic, '/us/');
   assert.equal((await uk.lookup('x')).audio.uk, null);
-  // British IPA unless the US one is asked for (D148).
   const both = { status: 'DONE', phonetic: { uk: '/uk/', us: '/us/' }, audio: {} };
   assert.equal((await new SpeechPronunciationSource(brokerAnswering(both)).lookup('x')).phonetic, '/uk/');
   assert.equal((await new SpeechPronunciationSource(brokerAnswering(both), { ipaAccent: 'us' }).lookup('x')).phonetic, '/us/');
@@ -70,12 +66,10 @@ test('the editor call stores the generated audio as lesson media and reports it'
   const { lesson } = await service.createLesson(manager, unit.id, { title: 'Lesson' });
   const result = await service.autofillPronunciation(manager, { word: 'schedule', accents: ['uk', 'us'], lessonId: lesson.id });
   assert.equal(result.found, true);
-  // The British IPA by default (D148).
   assert.equal(result.phonetic, '/ˈskɛdjuːl/');
   assert.deepEqual([result.audio.uk.fileName, result.audio.us.fileName], ['schedule-uk.mp3', 'schedule-us.mp3']);
   assert.equal(repository.tables.media.length, 2);
   assert.equal(repository.tables.media[0].sizeBytes, 6);
-  // Only the asked accent is made into a file.
   const one = await service.autofillPronunciation(manager, { word: 'get in touch', accents: ['us'], lessonId: lesson.id });
   assert.deepEqual(Object.keys(one.audio), ['us']);
   assert.equal(one.audio.us.fileName, 'get-in-touch-us.mp3');

@@ -2,8 +2,6 @@ import { randomUUID } from 'node:crypto';
 import { MockService } from '../src/mock/mock.service.js';
 import { createMemoryRepository, student } from './helpers.js';
 
-// A mock paper as content-service returns it: 2+1+2+1 listening and 2+2+3
-// reading questions (13); the first option of every question is correct.
 export function mockPaper(mockTest, versionNumber = 1) {
   const audio = randomUUID();
   const question = (fields = {}) => ({
@@ -20,7 +18,6 @@ export function mockPaper(mockTest, versionNumber = 1) {
     versionId: randomUUID(),
     versionNumber,
     test: {
-      // Parts 1-2: a recording per question; Parts 3-4: a recording per set.
       part1: { ...part(0), questions: [question(spoken), question(spoken)] },
       part2: { ...part(0), questions: [question(spoken)] },
       part3: { ...part(0), groups: [set(group3, spoken)], questions: [question({ groupId: group3 }), question({ groupId: group3 })] },
@@ -127,7 +124,6 @@ export async function harness({ startUnit = null } = {}) {
   const advance = (minutes) => {
     clock.now = new Date(clock.now.getTime() + minutes * 60 * 1000);
   };
-  // Answers with the first `correct` questions (of the given parts) right.
   const answers = (id, correct, partKeys) => {
     const paper = content.paperOf(id);
     const questions = Object.entries(paper.test).filter(([key]) => !partKeys || partKeys.includes(key)).flatMap(([, part]) => part.questions);

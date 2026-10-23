@@ -34,7 +34,6 @@ async function harness({ shape = [2, 2], startUnit = 1 } = {}) {
   const advance = (minutes) => {
     clock.now = new Date(clock.now.getTime() + minutes * 60 * 1000);
   };
-  // Goes through the steps before the test.
   const study = async (actor, lesson) => {
     const paper = content.paperOf(lesson.id);
     await service.markVocabularyStudied(actor, lesson.id);
@@ -61,16 +60,12 @@ const statesOf = (shape, startUnit, completed = []) =>
   [...lessonAccess(curriculumOf(shape), startUnit, new Set(completed)).values()].map((entry) => entry.state[0]).join('');
 
 test('lessons unlock in order from the starting unit', () => {
-  // L locked, O open, C completed.
   assert.equal(statesOf([2, 2], 1), 'OLLL');
   assert.equal(statesOf([2, 2], 1, ['l1']), 'COLL');
-  // The next unit opens after the last lesson of the unit before.
   assert.equal(statesOf([2, 2], 1, ['l1', 'l2']), 'CCOL');
-  // Units before the starting unit are open freely; opening is not completing.
   assert.equal(statesOf([2, 2, 2], 2), 'OOOLLL');
   assert.equal(statesOf([2, 2, 2], 3), 'OOOOOL');
   assert.equal(statesOf([2, 2, 2], 2, ['l3']), 'OOCOLL');
-  // Until the placement test is taken or skipped nothing is open.
   assert.equal(statesOf([2, 2], null), 'LLLL');
   assert.equal(statesOf([2, 2], null, ['l1']), 'CLLL');
 });
@@ -79,9 +74,7 @@ test('the previous lesson is reviewed only when the learner studied it', () => {
   const review = (shape, startUnit, completed) =>
     [...lessonAccess(curriculumOf(shape), startUnit, new Set(completed)).values()].map((entry) => entry.reviewRequired);
   assert.deepEqual(review([2, 2], 1, ['l1', 'l2']), [false, true, true, false]);
-  // The first lesson of the starting unit is exempt, even after free lessons.
   assert.deepEqual(review([2, 2], 2, ['l1', 'l2', 'l3']), [false, true, false, true]);
-  // Free lessons whose predecessor was not studied need no review.
   assert.deepEqual(review([3], 1, []), [false, false, false]);
 });
 
@@ -90,7 +83,6 @@ test('steps are done in order and a late review is not imposed', () => {
   assert.equal(keys(lessonSteps({ reviewRequired: false }, {})), 'vocabulary:C quiz:L fillIn:L test:L');
   assert.equal(keys(lessonSteps({ reviewRequired: true }, {})), 'review:C vocabulary:L quiz:L fillIn:L test:L');
   assert.equal(keys(lessonSteps({ reviewRequired: true }, { reviewPassedAt: 1, vocabularyStudiedAt: 1 })), 'review:D vocabulary:D quiz:C fillIn:L test:L');
-  // The learner had started before the review became required.
   assert.equal(keys(lessonSteps({ reviewRequired: true }, { vocabularyStudiedAt: 1, vocabularyQuizPassedAt: 1 })), 'vocabulary:D quiz:D fillIn:C test:L');
   assert.equal(keys(lessonSteps({ reviewRequired: false }, { vocabularyStudiedAt: 1, vocabularyQuizPassedAt: 1, fillInPassedAt: 1, completedAt: 1 })), 'vocabulary:D quiz:D fillIn:D test:D');
 });
@@ -107,10 +99,8 @@ test('the vocabulary quiz asks every word once with four distinct meanings', () 
     assert.ok(question.options.includes(item.meaning));
     assert.deepEqual(Object.keys(question), ['id', 'word', 'partOfSpeech', 'options']);
   }
-  // The order changes between quizzes.
   const orders = new Set(Array.from({ length: 20 }, () => vocabularyQuiz(vocabulary).map((question) => question.id).join('')));
   assert.ok(orders.size > 1);
-  // A short list gives fewer options.
   assert.equal(vocabularyQuiz(vocabulary.slice(0, 2))[0].options.length, 2);
 });
 
@@ -138,7 +128,6 @@ test('options are shuffled in Parts 3-7 only and the paper hides the answers', a
   for (const secret of ['isCorrect', 'explanation', 'transcript', 'Secret'])
     assert.equal(JSON.stringify(parts).includes(secret), false, secret);
 
-  // The review of a finished attempt shows everything.
   const review = testParts(source, { optionOrder: order, answers: { [reading.id]: reading.options[1].id } });
   assert.equal(review[0].transcript, 'Secret transcript');
   assert.equal(review[4].questions[0].explanation, 'Secret explanation');
@@ -173,18 +162,15 @@ test('a lesson is studied step by step', async () => {
   assert.deepEqual(view.steps.map((step) => step.status), ['CURRENT', 'LOCKED', 'LOCKED', 'LOCKED']);
   assert.equal(view.review, null);
   assert.equal(view.vocabulary.length, 5);
-  // The word bank holds exactly the answers, shuffled (D111).
   assert.deepEqual({ ...view.fillIn, wordBank: [...view.fillIn.wordBank].sort() }, { passage: 'The ___ left from the ___.', blankCount: 2, wordBank: [...paper.content.fillIn.answers].sort() });
   assert.deepEqual(view.test, { durationMinutes: 25, passPercent: 80, attemptCount: 0, bestPercent: null });
   assert.equal(JSON.stringify(view).includes('isCorrect'), false);
   assert.equal('answers' in view.fillIn, false);
 
-  // Each step waits for the one before it.
   await assert.rejects(() => service.getVocabularyQuiz(learner, first.id, { kind: 'vocabulary' }), (error) => error.code === 55 && error.data.step === 'vocabulary');
   await assert.rejects(() => service.submitFillIn(learner, first.id, { answers: [] }), (error) => error.code === 55 && error.data.step === 'vocabulary');
   await assert.rejects(() => service.startLessonTest(learner, first.id), (error) => error.code === 55 && error.data.step === 'vocabulary');
   assert.equal((await service.getLessonTest(learner, first.id)).status, 'LOCKED');
-  // There is no review for the first lesson.
   await assert.rejects(() => service.getVocabularyQuiz(learner, first.id, { kind: 'review' }), { code: 53 });
 
   assert.deepEqual(await service.markVocabularyStudied(learner, first.id), { studied: true });
@@ -192,7 +178,6 @@ test('a lesson is studied step by step', async () => {
   assert.equal(quiz.questions.length, 5);
   assert.equal(quiz.questions[0].options.length, 4);
 
-  // Every word must be right; the wrong ones are named and tries are unlimited.
   const failed = await service.submitVocabularyQuiz(learner, first.id, { kind: 'vocabulary', answers: quizAnswers(paper, { wrong: 2 }) });
   assert.deepEqual(failed, { kind: 'vocabulary', passed: false, total: 5, wrongIds: paper.content.vocabulary.slice(0, 2).map((item) => item.id) });
   assert.equal((await service.submitVocabularyQuiz(learner, first.id, { kind: 'vocabulary', answers: {} })).wrongIds.length, 5);
@@ -219,7 +204,6 @@ test('passing the lesson test with 80 percent completes the lesson and opens the
   assert.equal(started.expiresAt, '2026-10-11T08:25:00.000Z');
   assert.equal(started.parts.flatMap((part) => part.questions).length, 23);
   assert.equal(JSON.stringify(started).includes('isCorrect'), false);
-  // Starting again returns the attempt in progress with its saved answers.
   const answers = testAnswers(content.paperOf(first.id), 3);
   assert.deepEqual(await service.saveLessonTestAnswers(learner, first.id, { answers }), { saved: true });
   const resumed = await service.startLessonTest(learner, first.id);
@@ -227,10 +211,8 @@ test('passing the lesson test with 80 percent completes the lesson and opens the
   assert.deepEqual(resumed.answers, answers);
   assert.deepEqual(resumed.parts, started.parts);
 
-  // 18 of 23 is 78%: not passed, the next lesson stays locked.
   const failed = await service.submitLessonTest(learner, first.id, { answers: testAnswers(content.paperOf(first.id), 18) });
   assert.deepEqual({ ...failed.attempt, submittedAt: null }, { attemptNumber: 1, correctCount: 18, totalCount: 23, scorePercent: 78, listeningCorrect: 9, listeningTotal: 9, readingCorrect: 9, readingTotal: 14, passed: false, durationSeconds: 0, submittedAt: null });
-  // The result comes with every answer, explanation and transcript.
   assert.equal(failed.parts[0].transcript, 'Secret transcript');
   assert.equal(failed.parts[4].questions[0].explanation, 'Secret explanation');
   assert.equal(failed.parts.flatMap((part) => part.questions).every((question) => question.options.filter((option) => option.isCorrect).length === 1), true);
@@ -238,7 +220,6 @@ test('passing the lesson test with 80 percent completes the lesson and opens the
   await assert.rejects(() => service.submitLessonTest(learner, first.id, { answers: {} }), { code: 56, status: 409 });
   await assert.rejects(() => service.saveLessonTestAnswers(learner, first.id, { answers: {} }), { code: 56 });
 
-  // Retake: 19 of 23 is 83%.
   const passed = await takeTest(learner, first, 19);
   assert.equal(passed.attempt.attemptNumber, 2);
   assert.equal(passed.attempt.passed, true);
@@ -252,17 +233,14 @@ test('passing the lesson test with 80 percent completes the lesson and opens the
   const curriculum = await service.getCurriculum(learner);
   assert.equal(curriculum.units[0].lessons[0].bestPercent, 83);
   assert.equal(curriculum.units[0].lessons[1].bestPercent, null);
-  // The review shows the latest attempt, or any earlier one by number.
   assert.equal((await service.getLessonTestReview(learner, first.id)).attempt.attemptNumber, 2);
   const earlier = await service.getLessonTestReview(learner, first.id, { attemptNumber: 1 });
   assert.equal(earlier.attempt.scorePercent, 78);
   assert.equal(earlier.parts.flatMap((part) => part.questions).filter((question) => question.options.find((option) => option.isCorrect).id === question.chosenOptionId).length, 18);
   assert.deepEqual(await service.getLessonTestReview(learner, first.id, { attemptNumber: 9 }), { attempt: null, parts: [] });
-  // From the second attempt on the learner sees how the results develop.
   assert.deepEqual(test.progression, { trend: 'IMPROVED', changeFromPrevious: 1, changeFromFirst: 1, listeningChange: 0, readingChange: 1, bestCorrectCount: 19 });
   assert.deepEqual(await service.getLessonTestReview(learner, second.id), { attempt: null, parts: [] });
 
-  // A completed lesson can be retaken; a worse score does not undo it.
   await takeTest(learner, first, 5);
   assert.deepEqual((await service.getLessonTest(learner, first.id)).progression, { trend: 'DECLINED', changeFromPrevious: -14, changeFromFirst: -13, listeningChange: -4, readingChange: -10, bestCorrectCount: 19 });
   assert.deepEqual(await states(), [['COMPLETED', 'OPEN'], ['LOCKED', 'LOCKED']]);
@@ -279,7 +257,6 @@ test('a new lesson starts with a review of the previous vocabulary', async () =>
   assert.deepEqual(view.review, { lessonId: first.id, lessonTitle: 'U1L1' });
   await assert.rejects(() => service.markVocabularyStudied(learner, second.id), (error) => error.code === 55 && error.data.step === 'review');
 
-  // The review asks the words of the previous lesson.
   const previous = content.paperOf(first.id);
   const quiz = await service.getVocabularyQuiz(learner, second.id, { kind: 'review' });
   assert.deepEqual(quiz.questions.map((question) => question.id).sort(), previous.content.vocabulary.map((item) => item.id).sort());
@@ -294,9 +271,7 @@ test('lessons before the starting unit are open but not completed', async () => 
   const { service, lessons, states, study, takeTest } = await harness({ shape: [2, 2, 1], startUnit: 2 });
   assert.equal((await service.getCurriculum(learner)).startUnit, 2);
   assert.deepEqual(await states(), [['OPEN', 'OPEN'], ['OPEN', 'LOCKED'], ['LOCKED']]);
-  // The first lesson of the starting unit has no review.
   assert.equal((await service.getLesson(learner, lessons[2].id)).review, null);
-  // A free lesson whose predecessor was not studied has no review either.
   assert.equal((await service.getLesson(learner, lessons[1].id)).review, null);
   await study(learner, lessons[2]);
   await takeTest(learner, lessons[2], 23);
@@ -304,7 +279,6 @@ test('lessons before the starting unit are open but not completed', async () => 
 });
 
 test('the lesson test clock is kept by the server', async () => {
-  // A submit just after the deadline counts; the time counted stops at the limit.
   let context = await harness();
   let [first] = context.lessons;
   await context.study(learner, first);
@@ -312,7 +286,6 @@ test('the lesson test clock is kept by the server', async () => {
   assert.equal(result.attempt.correctCount, 23);
   assert.equal(result.attempt.durationSeconds, 1500);
 
-  // A late submit is scored with the answers saved in time.
   context = await harness();
   [first] = context.lessons;
   await context.study(learner, first);
@@ -322,7 +295,6 @@ test('the lesson test clock is kept by the server', async () => {
   result = await context.service.submitLessonTest(learner, first.id, { answers: testAnswers(context.content.paperOf(first.id), 23) });
   assert.equal(result.attempt.correctCount, 10);
 
-  // An attempt left open is finished when its time is over.
   context = await harness();
   [first] = context.lessons;
   await context.study(learner, first);
@@ -346,11 +318,9 @@ test('a lesson test left without submitting is removed (D82)', async () => {
   assert.deepEqual(await service.discardLessonTest(learner, first.id), { discarded: true });
   const view = await service.getLessonTest(learner, first.id);
   assert.deepEqual([view.status, view.attempts], ['READY', []]);
-  // The next attempt is number 1 again, with a full clock and no answers.
   const again = await service.startLessonTest(learner, first.id);
   assert.deepEqual([again.attemptNumber, again.answers, again.expiresAt], [1, {}, new Date(Date.parse(again.startedAt) + 25 * 60 * 1000).toISOString()]);
 
-  // An attempt whose time ran out is scored instead.
   advance(30);
   await assert.rejects(() => service.discardLessonTest(learner, first.id), { code: 56 });
   assert.equal((await service.getLessonTest(learner, first.id)).attempts.length, 1);
@@ -366,7 +336,6 @@ test('an attempt finishes on the lesson version it started', async () => {
   assert.equal((await service.getLessonTest(learner, first.id)).parts[0].questions[0].id, started.parts[0].questions[0].id);
   const result = await service.submitLessonTest(learner, first.id, { answers: testAnswers(original, 23) });
   assert.equal(result.attempt.correctCount, 23);
-  // The next attempt uses the new version; the steps stay done.
   const next = await service.startLessonTest(learner, first.id);
   assert.equal(next.attemptNumber, 2);
   assert.notEqual(next.parts[0].questions[0].id, started.parts[0].questions[0].id);
@@ -381,7 +350,6 @@ test('the lesson ranking uses first attempts: score, then time, then earlier sub
 
   await study(learner, first);
   await takeTest(learner, first, 20, 10);
-  // A better retake does not change the ranking.
   await takeTest(learner, first, 23, 1);
   await study(rival, first);
   await takeTest(rival, first, 20, 6);
@@ -393,7 +361,6 @@ test('the lesson ranking uses first attempts: score, then time, then earlier sub
     [2, 'learner@appenglish.test', 87, 600, true],
   ]);
   assert.equal(ranking.me.rank, 2);
-  // Every student can see it, also one who has not taken the test.
   const seenByOther = await service.getLessonRanking(third, first.id);
   assert.equal(seenByOther.total, 2);
   assert.equal(seenByOther.me, null);
@@ -408,14 +375,11 @@ test('progression compares the latest attempt with the previous and the first', 
   assert.deepEqual(testProgression([attempt(10, 4), attempt(20, 8), attempt(15, 9)]), { trend: 'DECLINED', changeFromPrevious: -5, changeFromFirst: 5, listeningChange: 1, readingChange: -6, bestCorrectCount: 20 });
 });
 
-
 test('a vocabulary practice asks 20 words both ways with four distinct options (D84)', () => {
   const pool = Array.from({ length: 30 }, (_, index) => ({
     id: `w${index}`, word: `word${index}`, partOfSpeech: index % 2 ? 'verb' : 'noun', meaning: `meaning${index}`,
   }));
-  // The same word and part of speech in two lessons counts once.
   assert.equal(practiceWords([...pool, { ...pool[0], id: 'again', word: ' WORD0 ' }]).length, 30);
-  // A synonym (same meaning) is never offered as a wrong option.
   pool.push({ id: 'syn', word: 'synonym', partOfSpeech: 'noun', meaning: 'meaning0' });
   const questions = vocabularyPractice(pool);
   assert.equal(questions.length, 20);
@@ -428,7 +392,6 @@ test('a vocabulary practice asks 20 words both ways with four distinct options (
     assert.equal(new Set(question.options).size, 4);
     assert.ok(question.options.includes(question.answer));
     const wrong = question.options.filter((option) => option !== question.answer);
-    // Wrong options share the part of speech, there being enough such words.
     assert.ok(wrong.every((option) => pool.find((item) => item[field] === option).partOfSpeech === question.partOfSpeech));
     if (question.id === 'w0' || question.id === 'syn') assert.ok(!wrong.some((option) => ['w0', 'syn'].includes(pool.find((item) => item[field] === option).id)));
   }
@@ -438,7 +401,6 @@ test('vocabulary practice opens with 20 words of completed lessons', async () =>
   const { service, repository, lessons, content } = await harness({ shape: [2, 2, 1] });
   await assert.rejects(() => service.getVocabularyPractice(manager), { code: 26 });
   const complete = (lesson) => repository.saveProgress({ accountId: learner.id, lessonId: lesson.id, completedAt: new Date() });
-  // Three completed lessons of five words: 15 words, still locked.
   for (const lesson of lessons.slice(0, 3)) await complete(lesson);
   const locked = await service.getVocabularyPractice(learner);
   assert.deepEqual([locked.available, locked.wordCount, locked.completedLessonCount, locked.questions], [false, 15, 3, []]);
@@ -448,9 +410,7 @@ test('vocabulary practice opens with 20 words of completed lessons', async () =>
   const first = content.paperOf(lessons[0].id).content.vocabulary[0];
   const question = open.questions.find((item) => item.id === first.id);
   assert.deepEqual([question.word.word, question.word.lessonTitle, question.word.audioUkUrl], [first.word, 'U1L1', null]);
-  // Words of a lesson not completed are never asked.
   const notDone = new Set(content.paperOf(lessons[4].id).content.vocabulary.map((item) => item.id));
   assert.ok(open.questions.every((item) => !notDone.has(item.id)));
-  // Another learner has completed nothing.
   assert.equal((await service.getVocabularyPractice(rival)).wordCount, 0);
 });

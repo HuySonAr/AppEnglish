@@ -10,8 +10,6 @@ export class ListeningRepository {
     return this.dataSource.getRepository(ListeningResultEntity);
   }
 
-  // Every result of the learner; with exerciseId, those of one exercise (one
-  // per mode).
   async listResults(accountId, exerciseId) {
     return (await this.repo()).find({ where: exerciseId ? { accountId, exerciseId } : { accountId } });
   }
@@ -20,8 +18,6 @@ export class ListeningRepository {
     return (await this.repo()).findOne({ where: { accountId, exerciseId, mode } });
   }
 
-  // Records one check in a single statement, so two checks at once both
-  // count and the best accuracy is never lowered.
   async recordCheck(accountId, exerciseId, mode, accuracy, checkedAt) {
     const repository = await this.repo();
     await repository.query(

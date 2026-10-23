@@ -1,11 +1,5 @@
 import { Input } from '../../../components/ui';
 
-// How a checked dictation is shown (F05B-3, D86, D88): word by word for a
-// written sentence, blank by blank for a song line.
-
-// One checked sentence, word by word: right words as they are, wrong ones in
-// red with what was written, missing ones in red and underlined, extra words
-// crossed out.
 export function CheckedWords({ words }) {
   return (
     <p className="leading-8">
@@ -35,9 +29,6 @@ export function CheckedWords({ words }) {
   );
 }
 
-// A song line with its blanks: boxes to type in, or once checked the right
-// words in green and the missed ones in red with what was typed.
-// onEnter is called when Enter is pressed in a box.
 export function BlankLine({ pieces = [], answers, onAnswer, label, onEnter }) {
   return (
     <p className="leading-10">

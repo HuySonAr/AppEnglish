@@ -50,8 +50,6 @@ function Metric({ icon: Icon, label, value, detail }) {
   );
 }
 
-// A learner's progress and XP, read-only (D114); the one thing the admin can
-// do is let the learner take the placement test again (D131).
 function LearnerSummary({ accountId, onResetPlacement }) {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
@@ -117,8 +115,6 @@ function AuditTrail({ audits }) {
   );
 }
 
-// One account for the admin (F01B, D114): who they are, what they can do,
-// their devices, their learning, their history, and the actions.
 export function AdminAccountDetailPage() {
   const { accountId } = useParams();
   const { account: me } = useAuth();

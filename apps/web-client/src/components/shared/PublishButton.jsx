@@ -3,11 +3,6 @@ import { ArrowUp, Check, Cloud, CloudUpload } from 'lucide-react';
 import { cn } from '../../lib/utils.js';
 import { Button } from '../ui/button.jsx';
 
-// The publish action of an editor (D126): "Publish" with a cloud, then
-// "Publishing…" with an arrow rising into the cloud while the request runs,
-// then "Done" with a tick for a moment, then "Publish" again. run(action)
-// drives it: action resolves to true on success (then Done), anything else
-// goes straight back to idle (the caller already told the user what failed).
 export function usePublishAction({ doneMs = 1800 } = {}) {
   const [state, setState] = useState('idle');
   const timer = useRef(null);

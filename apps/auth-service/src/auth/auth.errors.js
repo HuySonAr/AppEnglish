@@ -15,7 +15,6 @@ export const authErrors = Object.freeze({
   accountNotFound: () => new AuthError(12, 'Account was not found', 404),
   emailNotVerified: () =>
     new AuthError(13, 'Email verification is required', 403, 'VERIFY_EMAIL'),
-  // reason: why an admin locked the account, shown to the person (D114).
   accountDisabled: (reason) =>
     Object.assign(new AuthError(14, 'Account is disabled', 403), { reason: reason || undefined }),
   otpInvalid: () => new AuthError(15, 'OTP is invalid', 400),
@@ -32,7 +31,6 @@ export const authErrors = Object.freeze({
     new AuthError(23, 'The last active administrator cannot be demoted or disabled', 409),
   emailVerificationRequired: () =>
     new AuthError(25, 'Email verification is required before activation', 409),
-  // D131: what the account's state allows.
   notPending: () =>
     new AuthError(25, 'The account is not waiting for verification', 409),
   notInvited: () =>

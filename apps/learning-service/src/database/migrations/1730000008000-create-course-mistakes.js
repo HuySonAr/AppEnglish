@@ -1,8 +1,3 @@
-// Listening course mistakes (F05C, D104): each sentence a learner wrote down
-// wrong when finishing a lesson, with the words missed, until it is written
-// right. The sentence, lesson and unit titles are kept as they were, so the
-// notebook still reads when the content changes; the ids are content-service
-// ids without a foreign key.
 export class CreateCourseMistakes1730000008000 {
   name = 'CreateCourseMistakes1730000008000';
 

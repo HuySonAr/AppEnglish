@@ -25,7 +25,6 @@ function freePort() {
   });
 }
 
-// Stand-in for auth-service: the access token is the role name.
 const accounts = { manager, student: { ...student, email: 'learner@appenglish.test' } };
 class FakeAuthController {
   me({ accessToken }) {
@@ -34,7 +33,6 @@ class FakeAuthController {
       ? { httpStatus: 200, code: 0, msg: 'success', dataJson: JSON.stringify({ account }), setCookies: [] }
       : { httpStatus: 401, code: 21, msg: 'fail', dataJson: '{}', setCookies: [] };
   }
-  // Public profiles for the board (D113): the learner has a display name.
   getProfiles({ accountIds }) {
     const profiles = accountIds.filter((id) => id === student.id).map((id) => ({ id, displayName: 'Learner One', avatarUrl: null }));
     return { httpStatus: 200, code: 0, msg: 'success', dataJson: JSON.stringify({ profiles }), setCookies: [] };
@@ -85,7 +83,6 @@ test('Gateway HTTP to progress-service gRPC contract', async (t) => {
     assert.deepEqual(ok.body.code, 0);
     assert.deepEqual([ok.body.data.completion.completedLessons, ok.body.data.completion.totalLessons, ok.body.data.completion.percent], [1, 2, 50]);
     assert.deepEqual(ok.body.data.skills, {
-      // Lesson test 9/9 and mock 70/100 → 85; lesson 12/14 and mock 50/100 → 68.
       listening: { percent: 85, testCount: 2, lessonTests: 1, mockTests: 1 },
       reading: { percent: 68, testCount: 2, lessonTests: 1, mockTests: 1 },
     });
@@ -94,7 +91,6 @@ test('Gateway HTTP to progress-service gRPC contract', async (t) => {
     assert.equal(xp.status, 200);
     assert.deepEqual([xp.body.data.totalXp, xp.body.data.rank, xp.body.data.entries.map((entry) => [entry.mockTestTitle, entry.xp])], [60, 1, [['Level 2 test', 60]]]);
     const board = await call('student', '/leaderboard');
-    // The gateway swaps the email for the learner's profile (D113).
     assert.deepEqual(board.body.data.entries.map((entry) => [entry.rank, entry.displayName, entry.avatarUrl, entry.email, entry.totalXp, entry.isYou]), [[1, 'Learner One', null, undefined, 60, true]]);
     assert.deepEqual([board.body.data.learnerCount, board.body.data.you.rank, board.body.data.you.displayName], [1, 1, 'Learner One']);
     assert.deepEqual([(await call('manager', '/xp')).status, (await call('manager', '/leaderboard')).status], [403, 403]);

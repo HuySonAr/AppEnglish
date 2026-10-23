@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { MetricsController } from './metrics/metrics.controller.js';
 import { HealthController } from './health/health.controller.js';
 import { AuthController } from './auth/auth.controller.js';
 import { AuthGrpcController } from './auth/auth.grpc.controller.js';
@@ -20,7 +21,7 @@ export { AUTH_DATA_SOURCE, AUTH_REPOSITORY };
 
 export class AppModule {}
 Module({
-  controllers: [HealthController, AuthGrpcController, AvatarFilesController],
+  controllers: [MetricsController, HealthController, AuthGrpcController, AvatarFilesController],
   providers: [
     PasswordService,
     TokenService,

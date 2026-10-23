@@ -1,5 +1,3 @@
-// Listening course (F05C, D100): units and level tests of the CEFR levels A1
-// to C1 and their versions. One level test per level; one draft per item.
 export class CreateListeningCourse1720000008000 {
   name = 'CreateListeningCourse1720000008000';
 

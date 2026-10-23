@@ -1,6 +1,3 @@
-// Listening course placement (F05C, D103): a course item of type 'placement'
-// without a level, at most one. Existing units and level tests keep their
-// level; the constraints only widen.
 export class ListeningCoursePlacement1720000009000 {
   name = 'ListeningCoursePlacement1720000009000';
 

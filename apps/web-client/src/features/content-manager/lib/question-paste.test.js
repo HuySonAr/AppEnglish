@@ -62,14 +62,12 @@ test('pasted questions go to the place of their number in Part 3', () => {
     [2, 2, false, 0, 0],
   ]);
 
-  // Conversations 1 and 2 are added empty so that 38-40 is conversation 3.
   const part = withPastedQuestions(empty, part3, rows);
   assert.equal(part.groups.length, 3);
   assert.deepEqual(part.questions.map((question) => question.groupId), Array(3).fill(part.groups[2].id));
   assert.equal(part.questions[1].prompt, 'What is the reason for a delay?');
   assert.deepEqual(part.questions[1].options.map((option) => [option.text, option.isCorrect])[2], ['Weather conditions are poor.', true]);
 
-  // Pasting again replaces the text and keeps the question and what else it holds.
   part.questions[0].explanation = 'They talk about cargo.';
   const again = withPastedQuestions(part, part3, parsePastedQuestions('Question 38\nWho are they?\n(A) Sailors\nAnswer: A'));
   assert.equal(again.questions.length, 3);
@@ -112,14 +110,12 @@ Correct Answer: D
   const rows = pastePreview(empty, part5, parsePastedQuestions(text));
   assert.deepEqual(rows.map((row) => [row.set, row.place, row.errors.length, row.warnings.length]), [[null, 0, 0, 0], [null, 2, 0, 0]]);
 
-  // 102 was not pasted: its place is kept by a blank question.
   const part = withPastedQuestions(empty, part5, rows);
   assert.deepEqual(part.groups, []);
   assert.deepEqual(part.questions.map((question) => question.prompt.slice(0, 10)), ['Former Sen', '', 'Passengers']);
   assert.equal(part.questions[0].prompt, 'Former Sendai Company CEO Ken Nakata spoke about ------- career experiences.');
   assert.deepEqual(part.questions[2].options.map((option) => option.isCorrect), [false, false, false, true]);
 
-  // Pasting 102 later fills the blank place without adding a question.
   const filled = withPastedQuestions(part, part5, parsePastedQuestions('Question 102\nThe ------- is open.\n(A) store\nAnswer: A'));
   assert.deepEqual([filled.questions.length, filled.questions[1].id, filled.questions[1].prompt], [3, part.questions[1].id, 'The ------- is open.']);
   assert.deepEqual(pastePreview(empty, part5, parsePastedQuestions('Question 131\nWho?'))[0].errors, ['Part 5 holds questions 101–130']);

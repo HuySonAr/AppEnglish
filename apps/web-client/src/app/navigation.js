@@ -1,26 +1,6 @@
-import {
-  BookOpen,
-  Calculator,
-  ClipboardCheck,
-  Dumbbell,
-  GraduationCap,
-  FileText,
-  Headphones,
-  Home,
-  Layers,
-  LayoutDashboard,
-  Library,
-  Tags,
-  Timer,
-  TrendingUp,
-  Trophy,
-  Users,
-} from 'lucide-react';
+import { Activity, BookOpen, Calculator, ClipboardCheck, Dumbbell, FileText, GraduationCap, Headphones, Home, Layers, LayoutDashboard, Library, Tags, Timer, TrendingUp, Trophy, Users } from 'lucide-react';
 import { Roles } from '../constants/auth.js';
 
-// The menu of each role. To add a page: add its route in router.jsx and one
-// entry here. `end` matches the path exactly; `match` lists other path
-// prefixes that should also highlight the entry.
 export const navigation = Object.freeze({
   [Roles.STUDENT]: {
     home: '/student',
@@ -61,6 +41,7 @@ export const navigation = Object.freeze({
       { to: '/admin/exam-types', label: 'Exam types', icon: Layers },
       { to: '/admin/listening-topics', label: 'Listening topics', icon: Tags },
       { to: '/admin/score-conversion', label: 'Score table', icon: Calculator },
+      { to: '/admin/system', label: 'System', icon: Activity },
     ],
   },
 });

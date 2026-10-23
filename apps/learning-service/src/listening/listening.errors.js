@@ -8,7 +8,6 @@ export const listeningErrors = Object.freeze({
     new LearningError(LearningResponseCode.VALIDATION_ERROR, 'This line is not part of the exercise', 400, {
       issues: [{ path: ['segmentId'], message: 'This line is not part of the exercise' }],
     }),
-  // Only a song with words in brackets can be practised by filling in blanks.
   noBlanks: () =>
     new LearningError(LearningResponseCode.VALIDATION_ERROR, 'This exercise has no blanks to fill in', 400, {
       issues: [{ path: ['mode'], message: 'This exercise has no blanks to fill in' }],

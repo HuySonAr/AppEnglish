@@ -1,8 +1,3 @@
-// D147: a Listening course topic or level test holds its own recording
-// instead of pointing at a listening-library exercise. Speech jobs (Auto-time,
-// Transcribe) can belong to a course item; existing course contents move to
-// the new shape (a topic: audioMediaId and segments carrying translation and
-// gap; a level-test section: audioMediaId and transcript).
 export class CourseOwnRecordings1720000013000 {
   name = 'CourseOwnRecordings1720000013000';
 

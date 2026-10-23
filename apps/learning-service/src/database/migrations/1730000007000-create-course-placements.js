@@ -1,7 +1,3 @@
-// Listening course placement (F05C, D103): one row per learner once the
-// placement is taken (COMPLETED, with the score of each level and the
-// answers) or skipped (SKIPPED, start A1). The placement lives in
-// content-service, so versionId is not a foreign key.
 export class CreateCoursePlacements1730000007000 {
   name = 'CreateCoursePlacements1730000007000';
 

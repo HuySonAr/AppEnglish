@@ -1,7 +1,5 @@
 import { cn } from '../../../lib/utils.js';
 
-// How much of a test is answered, shown large before submitting: the count, a
-// bar, and the numbers of the questions still open.
 export function AnswerProgress({ answered, total, unanswered }) {
   const complete = answered === total;
   return (

@@ -18,7 +18,6 @@ export class LessonRepository {
     return (await this.repo(LessonProgressEntity)).findOne({ where: { accountId, lessonId } });
   }
 
-  // Inserts or updates the learner's single row for a lesson.
   async saveProgress(progress) {
     const repository = await this.repo(LessonProgressEntity);
     if (progress.id) return repository.save(progress);
@@ -32,7 +31,6 @@ export class LessonRepository {
     return repository.save({ ...stored, ...progress, id: stored.id });
   }
 
-  // The learner's attempts at one lesson test, oldest first.
   async listAttempts(accountId, lessonId) {
     return (await this.repo(LessonTestAttemptEntity)).find({
       where: { accountId, lessonId },
@@ -40,7 +38,6 @@ export class LessonRepository {
     });
   }
 
-  // Every finished attempt of the learner, for the best score per lesson.
   async listCompletedAttempts(accountId) {
     return (await this.repo(LessonTestAttemptEntity)).find({
       where: { accountId, status: 'COMPLETED' },
@@ -48,12 +45,11 @@ export class LessonRepository {
     });
   }
 
-  // Returns null when the attempt already exists, e.g. two starts racing.
   async createAttempt(attempt) {
     try {
       return await (await this.repo(LessonTestAttemptEntity)).save(attempt);
     } catch (error) {
-      if (error?.code === '23505') return null; // unique violation
+      if (error?.code === '23505') return null;
       throw error;
     }
   }
@@ -62,16 +58,10 @@ export class LessonRepository {
     return (await this.repo(LessonTestAttemptEntity)).save(attempt);
   }
 
-  // Removes an attempt the learner left without submitting (D82). Only an
-  // attempt still in progress goes, so a submit racing it is kept.
   async deleteOpenAttempt(id) {
     await (await this.repo(LessonTestAttemptEntity)).delete({ id, status: 'IN_PROGRESS' });
   }
 
-  // ----- Unit reviews (D121)
-
-  // The learner's finished review attempts, oldest first: of one unit, or of
-  // every unit when unitId is omitted.
   async listReviewAttempts(accountId, unitId) {
     return (await this.repo(UnitReviewAttemptEntity)).find({
       where: unitId ? { accountId, unitId } : { accountId },
@@ -79,21 +69,17 @@ export class LessonRepository {
     });
   }
 
-  // Keeps a finished attempt; two submits racing for the same number both
-  // get kept, the second with the next number.
   async createReviewAttempt(attempt) {
     const repository = await this.repo(UnitReviewAttemptEntity);
     for (let tries = 0; ; tries++) {
       try {
         return await repository.save({ ...attempt, attemptNumber: attempt.attemptNumber + tries });
       } catch (error) {
-        if (error?.code !== '23505' || tries >= 5) throw error; // unique violation
+        if (error?.code !== '23505' || tries >= 5) throw error;
       }
     }
   }
 
-  // First attempts of a lesson, best first: more right answers, then less
-  // time, then the earlier submit (D30, D36).
   async listRanking(lessonId) {
     return (await this.repo(LessonTestAttemptEntity)).find({
       where: { lessonId, attemptNumber: 1, status: 'COMPLETED' },

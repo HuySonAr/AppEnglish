@@ -35,7 +35,6 @@ function freePort() {
   });
 }
 
-// Stand-in for auth-service: the access token is the role name.
 const accounts = { manager, student, admin };
 class FakeAuthController {
   me({ accessToken }) {
@@ -73,7 +72,6 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
     imports: [ClientsModule.register([
       { name: AUTH_GRPC_CLIENT, transport: Transport.GRPC, options: authGrpcOptions(authUrl) },
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions(contentUrl) },
-      // Only deletes consult learning-service; nothing listens here.
       { name: LEARNING_GRPC_CLIENT, transport: Transport.GRPC, options: learningGrpcOptions('127.0.0.1:1') },
     ])],
     controllers: [ContentGatewayController],
@@ -165,14 +163,12 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
       assert.ok(refused.json.data.issues.some((issue) => issue.path === 'test.part6.groups'));
       assert.equal((await call('POST', `${url}/unpublish`, { as: 'manager' })).json.data.published, null);
       assert.equal((await call('GET', '/content/units', { as: 'manager' })).json.data.units[0].review.hasDraft, true);
-      // Version history (D122) by kind and owner.
       const history = await call('GET', `/content/versions/unitReview/${unitId}`, { as: 'manager' });
       assert.equal(history.status, 200);
       assert.deepEqual(history.json.data.versions.map((version) => [version.versionNumber, version.status, version.current]), [[1, 'DRAFT', false]]);
       assert.equal((await call('GET', `/content/versions/lesson/${unitId}`, { as: 'manager' })).json.code, 40);
       assert.equal((await call('GET', `/content/versions/other/${unitId}`, { as: 'manager' })).status, 400);
       assert.equal((await call('POST', `/content/versions/unitReview/${unitId}/${history.json.data.versions[0].id}/restore`, { as: 'manager' })).json.code, 41);
-      // Discarding the draft (D127) leaves no version behind.
       const discarded = await call('DELETE', `/content/versions/unitReview/${unitId}/draft`, { as: 'manager' });
       assert.equal(discarded.status, 200);
       assert.deepEqual([discarded.json.data.discarded.versionNumber, discarded.json.data.removedMedia], [1, 0]);

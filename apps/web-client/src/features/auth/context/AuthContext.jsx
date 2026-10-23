@@ -52,7 +52,6 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // A profile change (name, avatar) replaces the account without a reload.
   const updateAccount = useCallback((account) => {
     if (account) setState({ status: 'authenticated', account });
   }, []);

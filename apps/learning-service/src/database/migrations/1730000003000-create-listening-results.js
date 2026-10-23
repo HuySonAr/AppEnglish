@@ -1,6 +1,3 @@
-// Listening practice (F05B-3, D86): the best and latest accuracy of each
-// learner on each dictation exercise. Exercises live in content-service, so
-// exerciseId is not a foreign key.
 export class CreateListeningResults1730000003000 {
   name = 'CreateListeningResults1730000003000';
 

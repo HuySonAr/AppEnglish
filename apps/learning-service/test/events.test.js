@@ -24,7 +24,6 @@ test('an event is written to the outbox and relayed in order once the broker con
   transport.ready = false;
   await events.record('a', { n: 1 });
   await events.record('b', { n: 2 });
-  // Without the broker the events wait in the outbox.
   assert.deepEqual(transport.sent, []);
   assert.deepEqual(repository.tables.events.map((row) => [row.type, row.publishedAt]), [['a', null], ['b', null]]);
 
@@ -36,7 +35,6 @@ test('an event is written to the outbox and relayed in order once the broker con
   );
   assert.deepEqual(transport.sent.map((message) => message.id), repository.tables.events.map((row) => row.id));
   assert.equal(repository.tables.events.every((row) => row.publishedAt === at), true);
-  // Nothing is sent twice.
   await events.flush();
   assert.equal(transport.sent.length, 2);
 });
@@ -73,7 +71,6 @@ test('a finished lesson test is reported; the lesson is reported completed once'
   await service.submitVocabularyQuiz(learner, first.id, { kind: 'vocabulary', answers: quizAnswers(paper) });
   await service.submitFillIn(learner, first.id, { answers: paper.content.fillIn.answers });
 
-  // 18 of 23 fails: the attempt is reported, the lesson is not completed.
   await service.startLessonTest(learner, first.id);
   await service.submitLessonTest(learner, first.id, { answers: testAnswers(paper, 18) });
   assert.deepEqual(reported().map((row) => row.type), [LearningEventType.LESSON_TEST_SUBMITTED]);
@@ -97,7 +94,6 @@ test('a finished lesson test is reported; the lesson is reported completed once'
     submittedAt: at.toISOString(),
   });
 
-  // Passing twice reports two attempts but one completion.
   for (const correct of [19, 23]) {
     await service.startLessonTest(learner, first.id);
     await service.submitLessonTest(learner, first.id, { answers: testAnswers(paper, correct) });

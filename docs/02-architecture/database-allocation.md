@@ -151,7 +151,11 @@ to `app_learning` (migration `1730000013000-create-mock-review-answers.js`):
 one row per answer in the mistake review (`accountId`, `mockTestId`,
 `mockVersionId`, `partKey`, `questionId`, `optionId`, `correct`, `answeredAt`);
 the review list itself is computed from these rows and the finished mock
-attempts, not stored. `learning-service` adds the outbox `learning_events` to
+attempts, not stored. D168 adds `requestId` to
+`learning_events` (migration `1730000014000-add-event-request-id.js`), the outbox
+`content_events` and `processed_messages` to `app_content` (migration
+`1720000017000-create-content-events.js`) and `processed_messages` to
+`app_progress` (migration `1740000004000-create-processed-messages.js`). `learning-service` adds the outbox `learning_events` to
 `app_learning` (migration `1730000009000-create-learning-events.js`): each
 result is written there with the attempt and relayed to RabbitMQ afterwards
 (D110). `accountId`, `lessonId` and `sourceId` are other services' ids without

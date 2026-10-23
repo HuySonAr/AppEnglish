@@ -3,8 +3,6 @@ import { passageBlocks } from '../../lib/passage.js';
 
 const cellClass = 'border-r px-3 py-2 align-top last:border-r-0';
 
-// The text of a reading passage with its tables drawn: lines written
-// "| cell | cell |" become a table whose first row is the headings.
 export function PassageText({ text }) {
   return (
     <div className="space-y-3">

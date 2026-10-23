@@ -1,7 +1,4 @@
-// Pure data of the charts on the student's profile (D113), from the answers
-// of /progress, /progress/xp and the listening course progress.
 
-// The two skills as bars: percent or null while there is no test yet.
 export function skillBars(progress) {
   const skills = progress?.skills || {};
   return [
@@ -10,7 +7,6 @@ export function skillBars(progress) {
   ];
 }
 
-// The lessons ring: completed lessons over the published ones.
 export function lessonRing(progress) {
   const completion = progress?.completion || {};
   const total = completion.totalLessons || 0;
@@ -23,8 +19,6 @@ export function lessonRing(progress) {
   };
 }
 
-// XP earned per mock test, in the order it was earned (oldest first); the
-// title is shortened for the axis.
 export function xpBars(xp, { maxTitle = 18 } = {}) {
   const entries = [...(xp?.entries || [])].sort((a, b) => new Date(a.earnedAt) - new Date(b.earnedAt));
   return entries.map((entry) => {
@@ -41,10 +35,6 @@ export function xpBars(xp, { maxTitle = 18 } = {}) {
   });
 }
 
-// The listening course levels as steps (D145), from GET
-// /learning/listening-course/progress: DONE when its level test is passed,
-// CURRENT for the learner's level, OPEN or LOCKED otherwise, with the topics
-// done out of all.
 export const LevelStep = Object.freeze({ DONE: 'DONE', CURRENT: 'CURRENT', OPEN: 'OPEN', LOCKED: 'LOCKED' });
 export function levelSteps(course) {
   return (course?.levels || []).map((level) => ({
@@ -54,7 +44,6 @@ export function levelSteps(course) {
   }));
 }
 
-// How long someone has been a member, in whole months or days.
 export function memberFor(createdAt, now = new Date()) {
   const start = new Date(createdAt);
   if (Number.isNaN(start.getTime())) return '';

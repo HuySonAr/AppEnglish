@@ -20,7 +20,6 @@ test('plays of a test recording are counted per version and recording (D141)', (
   assert.equal(playsLeft(1, 2), 1);
   assert.equal(playsLeft(3, 2), 0);
   assert.equal(playsLeft(undefined, 2), 2);
-  // Broken or missing storage never throws.
   assert.equal(readPlays(key, { getItem: () => '{not json' }), 0);
   assert.doesNotThrow(() => writePlays(key, 1, { getItem: () => null, setItem: () => { throw new Error('full'); } }));
   assert.equal(readPlays(key, undefined), 0);

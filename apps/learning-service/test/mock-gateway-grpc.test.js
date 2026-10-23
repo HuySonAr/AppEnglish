@@ -25,7 +25,6 @@ function freePort() {
   });
 }
 
-// Stand-in for auth-service: the access token is the role name.
 const accounts = { manager, admin, student };
 class FakeAuthController {
   me({ accessToken }) {
@@ -77,19 +76,16 @@ test('Gateway HTTP to learning-service gRPC contract for mock tests', async () =
     };
     const mock = `/mock-tests/${first.id}`;
 
-    // Sessions, roles and ids.
     assert.equal((await call('GET', '/mock-tests', { as: null })).status, 401);
     assert.equal((await call('GET', '/mock-tests', { as: 'manager' })).status, 403);
     assert.equal((await call('GET', '/mock-tests/not-a-uuid')).status, 400);
     assert.equal((await call('GET', '/mock-tests/00000000-0000-4000-8000-000000000000')).json.code, 57);
-    // "score-conversion" is its own route, not a mock test id.
     assert.equal((await call('GET', '/mock-tests/score-conversion')).status, 403);
     const conversion = await call('GET', '/mock-tests/score-conversion', { as: 'admin' });
     assert.equal(conversion.json.data.conversion.listening.length, 101);
     assert.equal((await call('PUT', '/mock-tests/score-conversion', { as: 'admin', body: { listening: [5], reading: [5] } })).status, 400);
     assert.equal((await call('PUT', '/mock-tests/score-conversion', { as: 'admin', body: conversion.json.data.conversion })).json.data.isDefault, false);
 
-    // A full attempt over HTTP.
     assert.equal((await call('GET', '/mock-tests')).json.data.mockTests.length, 2);
     assert.deepEqual((await call('GET', `${mock}/attempt?kind=FULL`)).json.data, { status: 'NONE' });
     for (const url of [`${mock}/attempt`, `${mock}/attempt?kind=MINI`, `${mock}/attempt?kind=FULL&partKey=part5`, `${mock}/attempt?kind=MINI&partKey=part9`])
@@ -105,7 +101,6 @@ test('Gateway HTTP to learning-service gRPC contract for mock tests', async () =
     assert.equal((await call('GET', `${mock}/review?kind=FULL&attemptNumber=1`)).json.data.attempt.attemptNumber, 1);
     assert.deepEqual((await call('GET', `${mock}/review?kind=FULL&attemptNumber=4`)).json.data, { attempt: null, parts: [] });
 
-    // "goal" and "mistakes" are their own routes, not mock test ids (D165, D167).
     assert.equal((await call('GET', '/mock-tests/goal')).json.data.estimate.total, 990);
     assert.deepEqual((await call('PUT', '/mock-tests/goal', { body: { targetScore: 700 } })).json.data.goal, { targetScore: 700, examDate: null });
     assert.equal((await call('GET', '/mock-tests/mistakes')).json.data.total, 0);
@@ -113,12 +108,10 @@ test('Gateway HTTP to learning-service gRPC contract for mock tests', async () =
     assert.equal((await call('POST', '/mock-tests/mistakes/answer', { body: { questionId: '00000000-0000-4000-8000-000000000000', optionId: null } })).json.code, 57);
     assert.equal((await call('DELETE', '/mock-tests/goal')).json.data.goal, null);
 
-    // A mini test over HTTP.
     const miniStart = await call('POST', `${mock}/attempt/start`, { body: { kind: 'MINI', partKey: 'part5' } });
     assert.deepEqual(miniStart.json.data.parts.map((part) => part.key), ['part5']);
     assert.equal(miniStart.json.data.expiresAt, null);
     assert.equal((await call('GET', `${mock}/attempt?kind=MINI&partKey=part5`)).json.data.status, 'IN_PROGRESS');
-    // Leaving without submitting removes the attempt (D82).
     assert.equal((await call('POST', `${mock}/attempt/discard`, { body: { kind: 'MINI' } })).status, 400);
     assert.deepEqual((await call('POST', `${mock}/attempt/discard`, { body: { kind: 'MINI', partKey: 'part5' } })).json.data, { discarded: true });
     assert.equal((await call('POST', `${mock}/attempt/discard`, { body: { kind: 'MINI', partKey: 'part5' } })).status, 409);

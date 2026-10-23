@@ -11,8 +11,6 @@ import {
   verifyOtpAndRestoreSession
 } from './auth-flow.js';
 
-// Mirrors the envelope returned by auth-service through the gateway:
-// httpClient.post(...).data === { code, msg, data }.
 function envelope(data, code = ResponseCode.SUCCESS) {
   return { code, msg: code === ResponseCode.SUCCESS ? 'success' : 'fail', data };
 }

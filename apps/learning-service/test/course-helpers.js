@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { CourseLessonService } from '../src/course/course.service.js';
 
-// In-memory stand-in for CourseRepository.
 export function createCourseRepository() {
   const tables = { results: [], tests: [] };
   const copy = (row) => (row ? structuredClone(row) : null);
@@ -52,9 +51,6 @@ export const question = (prompt, right = 'A coffee', wrong = 'A tea') => ({
   explanation: `Because: ${right}.`,
 });
 
-// Content-service stand-in (D145). A1: topics "Ordering" and "Paying" and a
-// level test of 4 questions; A2: topic "Meetings" and a level test; B1–C2
-// empty. Every topic holds the same recording of four sentences (D147).
 export function courseHarness() {
   const segment = (text, start, end, speaker = '', index = 0) => ({
     id: randomUUID(),
@@ -126,7 +122,6 @@ export function courseHarness() {
   return { service, repository, course, segments: paying.content.segments, ordering, paying, a1Test, meetings, a2Test, recorded };
 }
 
-// The answers of a level test with the first `right` questions right.
 export function testAnswers(paper, right) {
   const questions = paper.content.sections.flatMap((section) => section.questions);
   return Object.fromEntries(

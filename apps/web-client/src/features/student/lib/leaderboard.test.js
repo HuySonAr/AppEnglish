@@ -10,7 +10,6 @@ test('the leaderboard is narrowed by display name without changing ranks', () =>
   ];
   assert.deepEqual(filterLeaderboard(entries).map((entry) => entry.rank), [1, 2, 3]);
   assert.deepEqual(filterLeaderboard(entries, { search: 'binh' }).map((entry) => entry.rank), [2]);
-  // Case and accents do not matter.
   assert.deepEqual(filterLeaderboard(entries, { search: 'CHI' }).map((entry) => entry.rank), [3]);
   assert.deepEqual(filterLeaderboard(entries, { search: 'nobody' }), []);
 });

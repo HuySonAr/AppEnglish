@@ -3,9 +3,9 @@ import { NestFactory } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
 import { contentGrpcOptions, contentGrpcUrl } from '@appenglish/content-contracts/grpc';
 import { AppModule } from './app.module.js';
+import { JsonLogger } from '@appenglish/backend-common/observability';
 
-const app = await NestFactory.create(AppModule);
-// gRPC serves the content contract to the gateway; HTTP keeps health only.
+const app = await NestFactory.create(AppModule, { logger: new JsonLogger('content-service') });
 app.connectMicroservice({
   transport: Transport.GRPC,
   options: contentGrpcOptions(),

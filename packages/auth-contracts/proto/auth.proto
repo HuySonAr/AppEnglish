@@ -2,9 +2,6 @@ syntax = "proto3";
 
 package appenglish.auth.v1;
 
-// Internal contract between api-gateway and auth-service. The gateway owns the
-// HTTP surface (routes, cookies); auth-service owns validation and business
-// rules and answers every call with the shared { code, msg, data } envelope.
 service AuthService {
   rpc Register(RegisterRequest) returns (AuthReply);
   rpc Login(CredentialsRequest) returns (AuthReply);
@@ -18,29 +15,21 @@ service AuthService {
   rpc AdminListAccounts(AdminListAccountsRequest) returns (AuthReply);
   rpc AdminGetAccount(AdminGetAccountRequest) returns (AuthReply);
   rpc AdminUpdateAccount(AdminUpdateAccountRequest) returns (AuthReply);
-  // Admin account management (D114): one-off actions on an account, and the
-  // numbers behind the accounts page.
   rpc AdminAccountAction(AdminAccountActionRequest) returns (AuthReply);
   rpc AdminAccountStats(AccessRequest) returns (AuthReply);
   rpc AdminListNotifications(AccessRequest) returns (AuthReply);
   rpc AdminMarkNotificationsRead(AdminMarkNotificationsReadRequest) returns (AuthReply);
-  // D131: an admin creates an account by invitation; the person sets the
-  // password with the emailed code.
   rpc AdminInviteAccount(AdminInviteAccountRequest) returns (AuthReply);
   rpc AcceptInvite(ResetPasswordRequest) returns (AuthReply);
-  // Profile of the signed-in account (F09, D113).
   rpc UpdateProfile(UpdateProfileRequest) returns (AuthReply);
   rpc VerifyPassword(ChangePasswordRequest) returns (AuthReply);
   rpc ChangePassword(ChangePasswordRequest) returns (AuthReply);
   rpc UploadAvatar(UploadAvatarRequest) returns (AuthReply);
   rpc RemoveAvatar(AccessRequest) returns (AuthReply);
-  // Gateway-internal: the public profile (name, avatar) of several accounts,
-  // for rankings. Takes no session and is not exposed as a route.
   rpc GetProfiles(GetProfilesRequest) returns (AuthReply);
   rpc Ready(ReadyRequest) returns (AuthReply);
 }
 
-// Empty strings mean "not provided"; auth-service validates every field.
 message RegisterRequest {
   string email = 1;
   string password = 2;
@@ -77,8 +66,6 @@ message RefreshRequest {
 
 message AdminListAccountsRequest {
   string access_token = 1;
-  // Raw HTTP query. A map keeps "filter omitted" distinct from "filter sent
-  // empty", which adminAccountQuerySchema treats differently (D25).
   map<string, string> query = 2;
 }
 
@@ -92,7 +79,6 @@ message AdminUpdateAccountRequest {
   string account_id = 2;
   string role = 3;
   string status = 4;
-  // Why the status changes; required when an account is disabled or suspended (D114).
   string reason = 5;
 }
 
@@ -104,7 +90,6 @@ message AdminMarkNotificationsReadRequest {
 message AdminAccountActionRequest {
   string access_token = 1;
   string account_id = 2;
-  // One of AdminAccountAction in @appenglish/auth-contracts.
   string action = 3;
   string reason = 4;
 }
@@ -118,12 +103,9 @@ message AdminInviteAccountRequest {
 
 message UpdateProfileRequest {
   string access_token = 1;
-  // The payload as JSON ({ displayName }), so an empty name (clear it) stays
-  // distinct from a name not sent.
   string payload_json = 2;
 }
 
-// VerifyPassword sends only current_password.
 message ChangePasswordRequest {
   string access_token = 1;
   string current_password = 2;
@@ -144,13 +126,9 @@ message GetProfilesRequest {
 message ReadyRequest {}
 
 message AuthReply {
-  // HTTP status the gateway answers with when it is an error (>= 400).
   int32 http_status = 1;
-  // Envelope code and msg from @appenglish/auth-contracts.
   int32 code = 2;
   string msg = 3;
-  // JSON object for the envelope's data; its shape depends on the call.
   string data_json = 4;
-  // Set-Cookie header values the gateway must emit unchanged.
   repeated string set_cookies = 5;
 }

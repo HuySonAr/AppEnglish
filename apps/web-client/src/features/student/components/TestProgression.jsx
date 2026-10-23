@@ -23,8 +23,6 @@ const trends = {
 
 const signed = (value) => (value > 0 ? `+${value}` : String(value));
 
-// One change in right answers: what is compared (with its icon), then the
-// change with an arrow, green when up and red when down.
 function Change({ icon: Icon, label, value }) {
   const Direction = value > 0 ? ArrowUp : value < 0 ? ArrowDown : Minus;
   const tone = value > 0 ? 'text-success' : value < 0 ? 'text-destructive' : 'text-muted-foreground';
@@ -44,11 +42,6 @@ function Change({ icon: Icon, label, value }) {
   );
 }
 
-// How the learner's results on one test develop over the retakes: the latest
-// attempt against the one before it, per skill, and against the first one,
-// then the score of each attempt as a line chart.
-// attempts are the finished attempts (oldest first); progression comes from
-// the API and is null with fewer than two attempts.
 export function TestProgression({ attempts, progression, passPercent }) {
   if (!progression) return null;
   const trend = trends[progression.trend];

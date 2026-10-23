@@ -1,16 +1,11 @@
 import { LISTENING_MAX_SEGMENTS, LISTENING_SEGMENT_MAX_LENGTH, listeningKind } from '@appenglish/content-contracts';
 
-// The editor of a listening exercise (F05B-2, D85): one recording and the
-// sentences of its transcript, each with its place in the recording.
-
 export const listeningKindOf = listeningKind;
 
 export function newSegment(fields = {}) {
   return { id: crypto.randomUUID(), speaker: '', text: '', start: null, end: null, ...fields };
 }
 
-// The content the editor starts from: the draft, else the published version,
-// else nothing. Parts 1 and 2 always show their four sentences.
 export function workingListening(data, kindKey) {
   const content = data.draft?.content || data.published?.content || {};
   const segments = (content.segments || []).map((segment) => newSegment(segment));
@@ -19,13 +14,10 @@ export function workingListening(data, kindKey) {
   return { audioMediaId: content.audioMediaId ?? null, segments, source: { name: '', url: '', ...(content.source || {}) } };
 }
 
-// What a sentence is called in the editor and in issues: its fixed label in
-// Parts 1 and 2 ("(B)", "Question"), "Line 3" in a song, else "Sentence 3".
 export function segmentLabel(kind, index) {
   return kind.labels?.[index] ?? `${kind.key === 'song' ? 'Line' : 'Sentence'} ${index + 1}`;
 }
 
-// "1:02.5" for 62.5 seconds; '' for none.
 export function formatSeconds(value) {
   if (value === null || value === undefined) return '';
   const tenths = Math.round(value * 10);
@@ -34,8 +26,6 @@ export function formatSeconds(value) {
   return `${minutes}:${rest < 10 ? '0' : ''}${rest.toFixed(1)}`;
 }
 
-// Seconds from "62.5", "1:02.5" or "1:02"; null when empty; NaN when it is
-// not a time.
 export function parseSeconds(text) {
   const value = text.trim();
   if (!value) return null;
@@ -46,14 +36,10 @@ export function parseSeconds(text) {
   return Math.round(((match[1] ? Number(match[1]) * 60 : 0) + seconds) * 10) / 10;
 }
 
-// Sentences from a pasted transcript, one per non-empty line. In Parts 1 and
-// 2 a leading "(A)" or "A." is dropped, the label being fixed; elsewhere a
-// leading "Man:" or "W:" becomes the speaker.
 const LETTER = /^\(?[A-D][).]\s*/;
 const SPEAKER = /^([A-Za-z][A-Za-z .'-]{0,38}):\s+(.+)$/;
 export function segmentFromLine(line, kind, fields = {}) {
   if (kind.labels) return newSegment({ ...fields, text: line.replace(LETTER, '').replace(/^Question\s*[:.]\s*/i, '') });
-  // Song lines are kept as they are: "Chorus:" is not a speaker.
   if (kind.key === 'song') return newSegment({ ...fields, text: line });
   const spoken = SPEAKER.exec(line);
   return spoken ? newSegment({ ...fields, speaker: spoken[1].trim(), text: spoken[2] }) : newSegment({ ...fields, text: line });
@@ -67,10 +53,6 @@ export function segmentsFromText(text, kind) {
     .map((line) => segmentFromLine(line, kind));
 }
 
-// What pasting a transcript does (PasteDialog): the sentences afterwards,
-// their number and the lines to check. The pasted sentences replace the ones
-// there; a sentence keeps the times of the one it replaces, so a corrected
-// text can be pasted again without cutting the recording anew.
 export function listeningPastePlan(segments, text, kind) {
   const pasted = segmentsFromText(text, kind);
   const max = kind.segmentCount || LISTENING_MAX_SEGMENTS;
@@ -96,8 +78,6 @@ export function listeningPastePlan(segments, text, kind) {
   return { segments: usable ? next : segments, count: pasted.length, lines };
 }
 
-// Sets the end of a sentence; the next sentence starts there if it has no
-// start yet, so a recording is cut in one pass.
 export function withEnd(segments, index, seconds) {
   return segments.map((segment, at) => {
     if (at === index) return { ...segment, end: seconds };
@@ -106,7 +86,6 @@ export function withEnd(segments, index, seconds) {
   });
 }
 
-// "Sentence 3 · start" for the publish issue path "segments[2].start".
 export function listeningIssueLabel(path, kind) {
   if (path === 'audioMediaId') return 'Recording';
   if (path === 'segments') return 'Sentences';
@@ -115,16 +94,9 @@ export function listeningIssueLabel(path, kind) {
   return `${segmentLabel(kind, Number(match[1]))} · ${match[2]}`;
 }
 
-// A line whose words were found less than this much (0-1) is marked to check,
-// and so is a line timed longer than AUTO_TIME_CHECK_LONGER seconds: in songs
-// Whisper may stretch the last word over the music that follows.
 export const AUTO_TIME_CHECK_BELOW = 0.8;
 export const AUTO_TIME_CHECK_LONGER = 12;
 
-// The times found by auto-time (D97) written into the lines, by line id.
-// Lines the answer did not time keep theirs. Returns the lines, how many got
-// times, and the ids of the lines to check (not found, found poorly, or
-// unusually long).
 export function applyAutoTime(segments, answer) {
   const byId = new Map(answer.map((line) => [line.id, line]));
   let timed = 0;
@@ -143,9 +115,6 @@ export function applyAutoTime(segments, answer) {
   return { segments: next, timed, check };
 }
 
-// The lines heard by Transcribe (D98) as the exercise's lines, with their
-// times. Parts 1 and 2 keep their four places: fewer lines are padded with
-// empty ones, more stay for the editor to merge or remove.
 export function transcribedSegments(lines, kind) {
   const segments = lines.map((line) => newSegment({ text: line.text, start: line.start, end: line.end }));
   if (kind.segmentCount) while (segments.length < kind.segmentCount) segments.push(newSegment());

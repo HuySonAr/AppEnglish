@@ -22,7 +22,6 @@ test('contractions count as their full form', () => {
   assert.equal(checkSentence('I do not think it has gone.', "I don't think it's gone").errors, 0);
   assert.equal(checkSentence("She'd like a cup.", 'She would like a cup').errors, 0);
   assert.equal(checkSentence('We cannot stay.', "We can't stay").errors, 0);
-  // Accents and curly apostrophes do not matter.
   assert.equal(checkSentence('A café in Montréal.', 'a cafe in montreal').errors, 0);
   assert.equal(checkSentence('I’m here.', "I am here").errors, 0);
 });
@@ -33,7 +32,6 @@ test('numbers in words count as digits', () => {
   ]);
   assert.equal(checkSentence('The meeting is at 5.', 'the meeting is at five').errors, 0);
   assert.equal(checkSentence('It costs 2,500 dollars.', 'it costs two thousand five hundred dollars').errors, 0);
-  // A number written in two words is one word to get right.
   assert.deepEqual(statuses('Room twenty-one.', 'room 21'), ['Room:correct', 'twenty-one.:correct']);
 });
 
@@ -44,9 +42,7 @@ test('wrong, missing and extra words are marked in place', () => {
   const missing = checkSentence('Please take your seats now.', 'please your seats');
   assert.deepEqual(missing.words.map((word) => word.status), ['correct', 'missing', 'correct', 'correct', 'missing']);
   assert.deepEqual([missing.total, missing.errors, accuracyOf(missing.total, missing.errors)], [5, 2, 60]);
-  // "don't" written "do" is wrong (half of it), not missing.
   assert.deepEqual(statuses("I don't know.", 'I do know'), ['I:correct', "don't:wrong", 'know.:correct']);
-  // Nothing typed: every word is missing; too many extras never go below 0.
   assert.deepEqual(checkSentence('Hello there.', '').words.map((word) => word.status), ['missing', 'missing']);
   const noisy = checkSentence('Hi.', 'oh hi there you all');
   assert.deepEqual([noisy.errors, accuracyOf(noisy.total, noisy.errors)], [4, 0]);

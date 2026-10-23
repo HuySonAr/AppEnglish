@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
   content: ['./index.html', './src/**/*.{js,jsx}'],
@@ -57,7 +56,6 @@ export default {
           '5': 'hsl(var(--chart-5))',
         },
       },
-      // Add border, input, ring as utility colors
       borderColor: {
         DEFAULT: 'hsl(var(--border))',
       },

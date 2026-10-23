@@ -1,6 +1,3 @@
-// Exam types (D69): the kinds of exam the content is written for. TOEIC is
-// created here and is the only one with an editor; an Admin can add others.
-// Every mock test belongs to one; the existing ones become TOEIC.
 export class CreateExamTypes1720000004000 {
   name = 'CreateExamTypes1720000004000';
 

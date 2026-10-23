@@ -18,7 +18,6 @@ test('a review starts empty with both parts and fills up to 10 + 3 × 3 question
   assert.equal(unitReviewQuestionCount(content), 19);
   assert.equal(unitReviewComplete(content), true);
   assert.equal(part5.questions[0].options.length, 4);
-  // A saved draft comes back with its questions and four options each.
   const reloaded = workingUnitReview({ draft: { content: { test: { part5: { questions: [{ id: 'q', prompt: 'x', options: [{ id: 'o', text: 'a', isCorrect: true }] }] } } } } });
   assert.equal(reloaded.test.part5.questions[0].options.length, 4);
   assert.equal(reloaded.test.part5.questions[0].options[0].text, 'a');

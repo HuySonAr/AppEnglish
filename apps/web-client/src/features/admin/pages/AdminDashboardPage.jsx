@@ -30,7 +30,6 @@ const healthCopy = {
   unknown: { label: 'Not checked yet', variant: 'secondary', icon: Activity },
 };
 
-// Services and whether they answer (D115); refreshed on demand.
 function SystemHealth() {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
@@ -40,7 +39,6 @@ function SystemHealth() {
       setData((await getServicesHealth()).data ?? (await getServicesHealth()));
       setState('ready');
     } catch (error) {
-      // The gateway itself did not answer: everything is down from here.
       setData({ services: [], checkedAt: new Date().toISOString(), gatewayError: getApiErrorMessage(error) });
       setState('ready');
     }
@@ -147,8 +145,6 @@ function AccountRows({ title, description, icon: Icon, items, state, empty, meta
   );
 }
 
-// The admin's overview (D115): where the accounts stand, what needs a look,
-// whether the backend answers, who joined and who is active, and the tools.
 export function AdminDashboardPage() {
   const [stats, setStats] = useState({ state: 'loading', data: null });
   const [recent, setRecent] = useState({ state: 'loading', newest: [], active: [] });
@@ -283,7 +279,6 @@ export function AdminDashboardPage() {
         </Card>
         <SystemHealth />
       </div>
-
 
       <div className="grid gap-6 lg:grid-cols-3">
         <AccountRows title="Just joined" description="The newest accounts" icon={UserPlus} state={recent.state} items={recent.newest} empty="Nobody has registered yet." meta={(account) => timeAgo(account.createdAt)} to="/admin/accounts" />

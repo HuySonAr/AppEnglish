@@ -3,15 +3,12 @@ import { cn } from '../../../lib/utils.js';
 import { Avatar } from '../../../components/shared/Avatar.jsx';
 import { formatRemaining } from '../lib/placement.js';
 
-// Gold, silver, bronze for the first three places.
 const medals = {
   1: 'bg-amber-400 text-amber-950',
   2: 'bg-slate-300 text-slate-900',
   3: 'bg-orange-400 text-orange-950',
 };
 
-// Learners of one lesson ranked by their first attempt at its test, shown by
-// display name and avatar (D113). ranking is { total, entries, me } from the API.
 export function LessonRanking({ ranking }) {
   const rows = ranking.me && !ranking.entries.some((entry) => entry.isMe)
     ? [...ranking.entries, ranking.me]

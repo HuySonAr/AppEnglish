@@ -6,19 +6,24 @@ import {
   LISTENING_KINDS,
   LISTENING_MAX_SEGMENTS,
   LISTENING_SEGMENT_MAX_LENGTH,
+  SpeechQueue,
   SpeechTask,
   LessonVersionStatus,
   listeningKind,
   lyricBlankCount,
   lyricText,
 } from '@appenglish/content-contracts';
+import { metrics } from '@appenglish/backend-common/metrics';
+import { currentRequestId } from '@appenglish/backend-common/observability';
 import { contentErrors } from '../content/content.errors.js';
+import { SPEECH_JOB_REQUESTED } from '../speech/content-events.js';
 import { autoTimeResultSchema, listeningContentSchema, listeningIssues, listeningMediaIds } from './listening.schemas.js';
 
 const logger = new Logger('ListeningService');
-// A job with no answer after this long is shown as failed (speech-service
-// down or the request lost); a new request can then be made.
 const AUTOTIME_TIMEOUT_MS = 30 * 60 * 1000;
+const speechJobs = metrics.counter('speech_jobs_total', 'Speech jobs finished, by task and status.');
+const speechWait = metrics.histogram('speech_job_wait_seconds', 'Time a speech job waited before a worker took it.');
+const speechWork = metrics.histogram('speech_job_work_seconds', 'Time a worker spent on a speech job.');
 const SPEECH_NOTICE_DAYS = 7;
 const ADMIN_NOTICE_DAYS = 30;
 const dayFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -28,21 +33,17 @@ const active = (job) => job.status === AutoTimeStatus.QUEUED || job.status === A
 
 const iso = (date) => (date ? new Date(date).toISOString() : null);
 
-// Sentences keep the id the editor sent; new ones get one here.
 const withIds = (content) => ({
   ...content,
   segments: content.segments.map((segment) => ({ ...segment, id: segment.id || randomUUID() })),
 });
 
-// Listening practice content (F05B-2, D85): topics, and exercises written and
-// published by a Content Manager like mock tests. Files go through the
-// content module (upload, clean-up). broker (SpeechBroker) sends auto-time
-// requests to speech-service (D97); now() is replaceable in tests.
 export class ListeningService {
-  constructor(repository, contentService, { broker = null, now = () => new Date() } = {}) {
+  constructor(repository, contentService, { broker = null, relay = null, now = () => new Date() } = {}) {
     this.repository = repository;
     this.contentService = contentService;
     this.broker = broker;
+    this.relay = relay;
     this.now = now;
   }
 
@@ -50,12 +51,9 @@ export class ListeningService {
     this.contentService.assertManager(actor);
   }
 
-  // Topics are kept by an Admin or a Content Manager.
   assertTopicEditor(actor) {
     if (![AccountRole.ADMIN, AccountRole.CONTENT_MANAGER].includes(actor.role)) throw contentErrors.forbiddenRole();
   }
-
-  // ----- Topics
 
   topicView(topic) {
     return {
@@ -63,12 +61,10 @@ export class ListeningService {
       code: topic.code,
       name: topic.name,
       format: topic.format,
-      // Exercises can be written only for a topic with a format (D88).
       hasEditor: Boolean(LISTENING_KINDS[topic.format]),
     };
   }
 
-  // Every role may read the list: it names and filters exercises.
   async listTopics() {
     return { topics: (await this.repository.listTopics()).map((topic) => this.topicView(topic)) };
   }
@@ -82,16 +78,12 @@ export class ListeningService {
     return code;
   }
 
-  // format says how its exercises are written (TOEIC parts or songs); a topic
-  // without one cannot have exercises yet.
   async createTopic(actor, { name, format = null }) {
     this.assertTopicEditor(actor);
     const code = await this.assertTopicNameFree(name);
     return { topic: this.topicView(await this.repository.saveTopic({ code, name, format, createdBy: actor.id })) };
   }
 
-  // Renames a topic or changes its format; the code stays. The format is
-  // fixed once the topic has exercises, which are written for it.
   async updateTopic(actor, topicId, { name, format }) {
     this.assertTopicEditor(actor);
     const topic = await this.repository.findTopic(topicId);
@@ -118,8 +110,6 @@ export class ListeningService {
     await this.repository.deleteTopic(topicId);
     return { deleted: { id: topicId } };
   }
-
-  // ----- Exercises
 
   async exerciseView(exercise, topics) {
     const topic = topics
@@ -181,8 +171,6 @@ export class ListeningService {
     return exercise;
   }
 
-  // Title and level apply at once, also to the published exercise. The topic
-  // and the kind stay: the sentences are written for them.
   async updateExercise(actor, exerciseId, changes) {
     this.assertManager(actor);
     const exercise = await this.findExerciseOrThrow(exerciseId);
@@ -217,13 +205,11 @@ export class ListeningService {
         createdBy: actor.id,
       };
     draft = await this.repository.saveVersion(draft);
-    // A recording this save dropped is removed from storage.
     const kept = new Set(listeningMediaIds(draft.content));
     await this.contentService.removeUnusedMedia(previousMediaIds.filter((id) => !kept.has(id)));
     return this.managedView(exercise, draft, await this.publishedVersion(exercise));
   }
 
-  // Publishing freezes the draft as the next immutable version.
   async publish(actor, exerciseId) {
     this.assertManager(actor);
     const exercise = await this.findExerciseOrThrow(exerciseId);
@@ -242,9 +228,6 @@ export class ListeningService {
     return this.managedView(exercise, null, draft);
   }
 
-  // ----- Speech jobs: Auto-time (D97) finds the times of the lines,
-  // Transcribe (D98) writes the lines from the recording.
-
   async unpublish(actor, exerciseId) {
     this.assertManager(actor);
     const exercise = await this.findExerciseOrThrow(exerciseId);
@@ -255,7 +238,6 @@ export class ListeningService {
       await this.contentService.noteUnpublished(actor, { type: 'exercise', id: exercise.id, title: exercise.title });
     }
     let draft = await this.repository.findDraft(exerciseId);
-    // The version taken down becomes the draft when there is none (D122).
     if (!draft && published)
       draft = await this.repository.saveVersion({
         exerciseId,
@@ -267,8 +249,6 @@ export class ListeningService {
     return this.managedView(exercise, draft, null);
   }
 
-  // Removes an exercise with its versions, timing jobs and the recording only
-  // it used; the gateway refuses it first when learners have results (D118).
   async delete(actor, exerciseId) {
     this.assertManager(actor);
     await this.findExerciseOrThrow(exerciseId);
@@ -299,9 +279,6 @@ export class ListeningService {
     };
   }
 
-  // Sends a speech job for the saved draft (the published version when there
-  // is no draft). One job at a time per exercise: a job still waiting or
-  // running is returned instead of a new one.
   async startSpeechJob(actor, exerciseId, task) {
     this.assertManager(actor);
     const exercise = await this.findExerciseOrThrow(exerciseId);
@@ -317,8 +294,6 @@ export class ListeningService {
     });
   }
 
-  // A speech job for one owner ({ exerciseId }, or { courseItemId } for a
-  // course topic, D147) on the given recording and lines.
   async queueSpeechJob(actor, { owner, task, kind, audioMediaId, segments, lineText = (segment) => segment.text }) {
     if (!audioMediaId) throw contentErrors.autoTimeInvalid('NO_AUDIO', 'Add the recording and save the draft first');
     const [asset] = await this.contentService.repository.findMediaByIds([audioMediaId]);
@@ -333,16 +308,15 @@ export class ListeningService {
     const latest = await this.repository.findLatestTimingJob(owner);
     if (latest && active(latest) && this.timingJobView(latest).status !== AutoTimeStatus.FAILED)
       return { job: this.timingJobView(latest) };
-    if (!this.broker?.ready) throw contentErrors.speechUnavailable();
-    const job = await this.repository.saveTimingJob({ ...owner, task, status: AutoTimeStatus.QUEUED, lines, requestedBy: actor.id });
-    if (!this.broker.publish({ jobId: job.id, task, audioUrl: asset.url, language: 'en', kind, lines })) {
-      await this.repository.saveTimingJob({ ...job, status: AutoTimeStatus.FAILED, error: 'The message broker could not be reached.' });
-      throw contentErrors.speechUnavailable();
-    }
+    const job = await this.repository.saveTimingJobWithEvent({ ...owner, task, status: AutoTimeStatus.QUEUED, lines, requestedBy: actor.id }, (saved) => ({
+      type: SPEECH_JOB_REQUESTED,
+      payload: { jobId: saved.id, task, audioUrl: asset.url, language: 'en', kind, lines },
+      requestId: currentRequestId(),
+    }));
+    this.relay?.flush().catch(() => {});
     return { job: this.timingJobView(job) };
   }
 
-  // The latest speech job of an owner, or null.
   async latestSpeechJob(owner) {
     const job = await this.repository.findLatestTimingJob(owner);
     return { job: job ? this.timingJobView(job) : null };
@@ -440,34 +414,42 @@ export class ListeningService {
     return { jobs: [...latest.values()].map((job) => ({ audioMediaId: job.audioMediaId, ...this.timingJobView(job) })) };
   }
 
-  // Auto-time (D97): the times of the saved lines.
   requestAutoTime(actor, exerciseId) {
     return this.startSpeechJob(actor, exerciseId, SpeechTask.ALIGN);
   }
 
-  // Transcribe (D98): the lines and their times from the recording alone.
   requestTranscribe(actor, exerciseId) {
     return this.startSpeechJob(actor, exerciseId, SpeechTask.TRANSCRIBE);
   }
 
-  // The latest auto-time job of the exercise, or null.
   async getAutoTime(actor, exerciseId) {
     this.assertManager(actor);
     await this.findExerciseOrThrow(exerciseId);
     return this.latestSpeechJob({ exerciseId });
   }
 
-  // An answer of speech-service: RUNNING, then DONE with the times or FAILED.
-  // Answers to unknown or finished jobs are ignored.
-  async onAutoTimeResult(message) {
+  async onAutoTimeResult(message, { messageId = null } = {}) {
+    if (messageId && (await this.repository.isProcessed(messageId))) return 'duplicate';
+    const outcome = await this.applyAutoTimeResult(message);
+    if (messageId) await this.repository.markProcessed(messageId, SpeechQueue.AUTOTIME_RESULTS, this.now());
+    return outcome;
+  }
+
+  async applyAutoTimeResult(message) {
     const parsed = autoTimeResultSchema.safeParse(message);
     if (!parsed.success) {
       logger.warn('Ignored an auto-time answer that does not match the contract');
-      return;
+      return 'ignored';
     }
     const answer = parsed.data;
     const job = await this.repository.findTimingJob(answer.jobId);
-    if (!job || !active(job)) return;
+    if (!job || !active(job)) return 'ignored';
+    const seconds = (from) => Math.max(0, (this.now().getTime() - new Date(from).getTime()) / 1000);
+    if (answer.status === AutoTimeStatus.RUNNING && job.status === AutoTimeStatus.QUEUED) speechWait.observe({ task: job.task || SpeechTask.ALIGN }, seconds(job.createdAt));
+    if (answer.status === AutoTimeStatus.DONE || answer.status === AutoTimeStatus.FAILED) {
+      speechWork.observe({ task: job.task || SpeechTask.ALIGN }, seconds(job.updatedAt || job.createdAt));
+      speechJobs.inc({ task: job.task || SpeechTask.ALIGN, status: answer.status });
+    }
     job.status = answer.status;
     if (answer.status === AutoTimeStatus.DONE && (job.task || SpeechTask.ALIGN) === SpeechTask.ALIGN) {
       const asked = new Set(job.lines.map((line) => line.id));
@@ -476,7 +458,6 @@ export class ListeningService {
         .map(({ id, start, end, matched }) => ({ id, start, end, matched: matched ?? 0 }));
     }
     if (answer.status === AutoTimeStatus.DONE && job.task === SpeechTask.TRANSCRIBE) {
-      // New lines, as many as an exercise can hold and as long as a line can be.
       job.result = (answer.lines || [])
         .map(({ text, start, end }) => ({ text: (text || '').trim().slice(0, LISTENING_SEGMENT_MAX_LENGTH), start, end }))
         .filter((line) => line.text)
@@ -484,11 +465,9 @@ export class ListeningService {
     }
     if (answer.status === AutoTimeStatus.FAILED) job.error = answer.error || 'The speech service could not time the lines.';
     await this.repository.saveTimingJob(job);
+    return 'applied';
   }
 
-  // ----- Reads for learning-service (F05B-3). No actor: not exposed by the gateway.
-
-  // Every topic, and the published exercises with their number of sentences.
   async listPublished() {
     const [exercises, topics] = await Promise.all([this.repository.listExercises(), this.repository.listTopics()]);
     const published = exercises.filter((exercise) => exercise.publishedVersionId);
@@ -501,7 +480,6 @@ export class ListeningService {
           return {
             ...(await this.exerciseView(exercise, topics)),
             segmentCount: segments.length,
-            // Words to fill in, for songs (D88).
             blankCount: exercise.kind === 'song' ? segments.reduce((sum, segment) => sum + lyricBlankCount(segment.text), 0) : 0,
           };
         }),
@@ -509,8 +487,6 @@ export class ListeningService {
     };
   }
 
-  // An exercise's published version (the current one, or the given earlier
-  // one) with its transcript and the URL of its recording.
   async getPaper(exerciseId, { versionId } = {}) {
     const exercise = await this.repository.findExercise(exerciseId);
     if (!exercise?.publishedVersionId) throw contentErrors.listeningExerciseNotFound();
@@ -526,8 +502,6 @@ export class ListeningService {
     };
   }
 
-  // The recordings the given versions use, by media id, so the editor can
-  // play them. Locally stored files have no delivery URL.
   async mediaOf(versions) {
     const mediaIds = versions.flatMap((version) => {
       const parsed = version ? listeningContentSchema.safeParse(version.content) : null;

@@ -1,7 +1,5 @@
 import { ContentVersionKind, LESSON_TEST_PARTS } from '@appenglish/content-contracts';
 
-// A read-only outline of one stored version (D122): sections of short lines
-// that let a Content Manager tell versions apart without the editor. Pure.
 const count = (list) => (Array.isArray(list) ? list.length : 0);
 const plural = (number, noun) => `${number} ${noun}${number === 1 ? '' : 's'}`;
 const excerpt = (text, max = 160) => {
@@ -52,7 +50,6 @@ export function versionOutline(kind, content) {
       ];
     case ContentVersionKind.COURSE_ITEM: {
       const sections = (list) => (list || []).map((section, index) => `Recording ${index + 1}: ${plural(count(section.questions), 'question')}`);
-      // A topic (D143): its recording, words, questions, ordering and sentences.
       if (content.vocabulary)
         return [
           { title: content.audioMediaId ? 'Recording: yes' : 'Recording: none', lines: [] },

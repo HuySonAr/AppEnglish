@@ -14,6 +14,7 @@ import { NotFoundPage } from '../features/auth/pages/NotFoundPage.jsx';
 import { StudentDashboardPage } from '../features/student/pages/StudentDashboardPage.jsx';
 import { AdminDashboardPage } from '../features/admin/pages/AdminDashboardPage.jsx';
 import { AcceptInvitePage } from '../features/auth/pages/AcceptInvitePage.jsx';
+import { AdminSystemPage } from '../features/admin/pages/AdminSystemPage.jsx';
 import { AdminAccountsPage } from '../features/admin/pages/AdminAccountsPage.jsx';
 import { AdminAccountDetailPage } from '../features/admin/pages/AdminAccountDetailPage.jsx';
 import { ContentManagerDashboardPage } from '../features/content-manager/pages/ContentManagerDashboardPage.jsx';
@@ -119,6 +120,7 @@ export function AppRouter() {
             <Route path="accounts/:accountId" element={<AdminAccountDetailPage />} />
             <Route path="placement" element={<PlacementSettingsPage />} />
             <Route path="score-conversion" element={<ScoreConversionPage />} />
+            <Route path="system" element={<AdminSystemPage />} />
             <Route path="exam-types" element={<ExamTypesPage />} />
             <Route path="listening-topics" element={<ListeningTopicsPage eyebrow="Admin" />} />
             <Route path="profile" element={<ProfilePage />} />

@@ -41,7 +41,6 @@ test('subtitle files give their cues with start and end', () => {
   assert.equal(timedFormat(vtt), 'srt');
   assert.equal(timedFormat(lrc), 'lrc');
   assert.equal(timedFormat('just text'), null);
-  // Tags, sound notes and music-only cues are left out; lines are joined.
   assert.deepEqual(parseSubtitles(srt), [
     { start: 12.5, end: 16.9, text: 'First line of the song' },
     { start: 18.25, end: 22.849, text: 'Second line continues here' },
@@ -71,16 +70,13 @@ test('an import replaces the sentences with timed ones and is checked first', ()
     ['And thought of you', 16.8, 22.6],
   ]);
   assert.equal(plan.lines[0].note, ' · 0:12.0–0:16.8');
-  // Without the recording's length the last line has no end yet.
   assert.deepEqual(timedImportPlan([], lrc, song).lines.at(-1).warnings, ['no end time: set it in the editor']);
 
-  // A conversation keeps its speakers; times are rounded to tenths.
   const part3 = timedImportPlan([], vtt, listeningKindOf('part3'));
   assert.deepEqual(part3.segments.map((item) => [item.speaker, item.text, item.start, item.end]), [
     ['Man', 'Where is gate 5?', 1, 3.5],
     ['', "It's next to the café", 3.6, 5],
   ]);
-  // Part 1 has four sentences: more cues are refused and nothing changes.
   const before = [{ id: 'kept' }];
   const tooMany = timedImportPlan(before, `${srt}\n4\n00:00:30,000 --> 00:00:31,000\nThree\n\n5\n00:00:32,000 --> 00:00:33,000\nFour\n\n6\n00:00:34,000 --> 00:00:35,000\nFive\n`, listeningKindOf('part1'));
   assert.deepEqual([tooMany.segments, tooMany.lines[4].errors], [before, ['Part 1 has 4 sentences']]);
@@ -104,7 +100,6 @@ test('the sentences are written as .srt and come back the same', () => {
   assert.deepEqual([file.count, file.skipped], [2, 1]);
   assert.deepEqual(parseSubtitles(file.text).map((cue) => [cue.start, cue.end, cue.text]), [[12, 16.8, 'I walked along the road'], [16.8, 22.6, 'And thought of you']]);
 
-  // Labels and speakers are written and read back.
   const part2 = toSrt([{ text: 'Where is it?', speaker: '', start: 1, end: 2 }, { text: 'In room 3.', speaker: '', start: 2, end: 3 }], listeningKindOf('part2'));
   assert.match(part2.text, /Question: Where is it\?\n\n2\n.*\n\(A\) In room 3\./);
   assert.deepEqual(timedImportPlan([], part2.text, listeningKindOf('part2')).segments.slice(0, 2).map((item) => item.text), ['Where is it?', 'In room 3.']);
@@ -122,7 +117,6 @@ test('the sentences are written as .lrc with their blanks and come back the same
     { text: 'Not timed', speaker: '', start: null, end: null },
   ];
   const file = toLrc(segments, song, { title: 'Proud of You' });
-  // An end is written alone only where the next line does not start then.
   assert.equal(file.text, '[ti:Proud of You]\n[00:12.00]I [walked] along the road\n[00:16.80]And thought of [you]\n[00:22.60]\n[00:31.30]A chorus line\n[01:44.70]\n');
   assert.deepEqual([file.count, file.skipped], [3, 1]);
   assert.deepEqual(

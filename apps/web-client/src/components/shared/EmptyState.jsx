@@ -1,4 +1,3 @@
-// Placeholder for a list with nothing in it yet.
 export function EmptyState({ icon: Icon, title, description, action }) {
   return (
     <div className="flex flex-col items-center rounded-xl border border-dashed bg-card px-6 py-12 text-center">

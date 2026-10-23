@@ -25,14 +25,10 @@ const failure = (error) =>
     ? 'An exam type with this name already exists.'
     : getApiErrorMessage(error);
 
-// The kinds of exam the content is written for. TOEIC is built in; others can
-// be listed here ahead of time, but tests can only be written for a type once
-// the app has an editor for it.
 export function ExamTypesPage() {
   const [state, setState] = useState('loading');
   const [examTypes, setExamTypes] = useState([]);
   const [name, setName] = useState('');
-  // { id, name } of the type being renamed.
   const [editing, setEditing] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -51,7 +47,6 @@ export function ExamTypesPage() {
     load();
   }, []);
 
-  // Runs one change, then reloads the list. Returns whether it worked.
   async function run(action, success, title) {
     setBusy(true);
     try {

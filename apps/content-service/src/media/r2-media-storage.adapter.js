@@ -4,12 +4,7 @@ import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client
 import { mediaObjectSchema } from './media.schemas.js';
 import { validateMediaUpload } from './media.validator.js';
 
-// Stores media in a Cloudflare R2 bucket through its S3-compatible API. Files
-// are served from the bucket's public URL as they were uploaded, without any
-// processing.
 export class R2MediaStorageAdapter {
-  // otherStorages: { local, imagekit } adapters that can delete files stored
-  // before R2 was enabled.
   constructor({ client, accountId, accessKeyId, secretAccessKey, bucket, publicBaseUrl, maxFileSizeBytes, otherStorages = {} } = {}) {
     if (!bucket || !publicBaseUrl || (!client && (!accountId || !accessKeyId || !secretAccessKey)))
       throw new Error('R2 credentials, bucket and public URL are required when the R2 adapter is enabled');
@@ -29,7 +24,6 @@ export class R2MediaStorageAdapter {
   async upload(input) {
     validateMediaUpload(input, this.maxFileSizeBytes);
     const safeFileName = path.basename(input.fileName).replace(/[^a-zA-Z0-9._-]/g, '_').slice(-100);
-    // input.folder is the lesson, placement or mock folder; else by kind.
     const key = `appenglish/${input.folder || input.kind}/${randomUUID()}-${safeFileName}`;
     await this.client.send(
       new PutObjectCommand({
@@ -50,7 +44,6 @@ export class R2MediaStorageAdapter {
     });
   }
 
-  // Deleting an object that is already gone succeeds in S3/R2.
   async delete(asset) {
     if (asset.storage !== 'r2') {
       const other = this.otherStorages[asset.storage];

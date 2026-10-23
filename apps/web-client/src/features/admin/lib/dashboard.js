@@ -1,9 +1,5 @@
 import { AccountStatus } from '@appenglish/auth-contracts';
 
-// Pure rules of the admin dashboard (D115).
-
-// What needs the admin's eye, from the account statistics: locked accounts
-// and stale sign-ups, each with the filter that lists them. Empty when all is well.
 export function attentionItems(stats) {
   const byStatus = stats?.byStatus || {};
   const items = [];
@@ -16,7 +12,6 @@ export function attentionItems(stats) {
   return items;
 }
 
-// Overall health from the service probes: ok, degraded (some down) or down (all down).
 export function overallHealth(services = []) {
   if (!services.length) return 'unknown';
   const down = services.filter((service) => service.status !== 'ok').length;
@@ -24,17 +19,12 @@ export function overallHealth(services = []) {
   return down === services.length ? 'down' : 'degraded';
 }
 
-// Sign-ups this week against the week before, from the daily series (oldest
-// first): { thisWeek, lastWeek, delta } where delta is the change in count.
 export function weeklyTrend(points = []) {
   const thisWeek = points.slice(-7).reduce((sum, point) => sum + point.count, 0);
   const lastWeek = points.slice(-14, -7).reduce((sum, point) => sum + point.count, 0);
   return { thisWeek, lastWeek, delta: thisWeek - lastWeek };
 }
 
-// The figures beside the sign-ups chart: total over the window, the busiest
-// day (the latest one on a tie; null when nobody signed up) and the daily
-// average to one decimal.
 export function signupSummary(points = []) {
   const total = points.reduce((sum, point) => sum + point.count, 0);
   const peak = points.reduce((best, point) => (point.count > 0 && (!best || point.count >= best.count) ? point : best), null);

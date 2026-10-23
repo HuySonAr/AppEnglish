@@ -8,13 +8,9 @@ import { FileRow } from '../../../components/shared/FileRow.jsx';
 
 const MAX_JSON_BYTES = 5 * 1024 * 1024;
 
-// Import and export of a draft as the authoring JSON (D124). plan(text)
-// returns { errors, warnings, summary, content }; onImport(content) replaces
-// what the editor holds (the editor marks it unsaved). exportData() returns
-// the object to download as fileName. noun names the thing ("lesson").
 export function ImportExportJson({ noun, plan, onImport, exportData, fileName, disabled = false }) {
   const [open, setOpen] = useState(false);
-  const [file, setFile] = useState(null); // { name, plan }
+  const [file, setFile] = useState(null);
 
   async function choose(chosen) {
     try {

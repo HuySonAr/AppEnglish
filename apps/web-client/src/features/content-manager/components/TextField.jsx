@@ -1,7 +1,6 @@
 import { Input, Label } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 
-// A labelled text input; multiline switches to a textarea.
 export function TextField({ id, label, value, onChange, multiline = false, ...props }) {
   const Field = multiline ? Textarea : Input;
   return (

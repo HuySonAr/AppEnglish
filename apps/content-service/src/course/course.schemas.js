@@ -16,8 +16,6 @@ const text = (max) => z.string().trim().max(max);
 const requiredText = (max) => text(max).min(1);
 const id = z.string().uuid().optional();
 
-// A topic or a level test of a level (D143–D145); level tests exist for
-// every level but the last.
 export const courseItemCreateSchema = z
   .object({
     level: z.enum(COURSE_LEVELS),
@@ -40,7 +38,6 @@ export const courseItemUpdateSchema = z
   .strict()
   .refine((value) => Object.values(value).some((field) => field !== undefined), { message: 'At least one field is required' });
 
-// A multiple-choice question about a recording.
 const questionSchema = z
   .object({
     id,
@@ -54,8 +51,6 @@ const questionSchema = z
   })
   .strict();
 
-// A word to learn before listening (D143): IPA, meaning and a pronunciation
-// made by the speech service (D144).
 const vocabularySchema = z
   .object({
     id,
@@ -66,7 +61,6 @@ const vocabularySchema = z
   })
   .strict();
 
-// The ideas in the order they are heard; the learner gets them shuffled.
 const orderingSchema = z
   .object({
     enabled: z.boolean().default(false),
@@ -75,13 +69,8 @@ const orderingSchema = z
   })
   .strict();
 
-// A time in the recording, in seconds.
 const seconds = z.number().min(0).max(3 * 60 * 60).nullable().default(null);
 
-// A sentence of a topic's own recording (D147): its text and speaker, its
-// place in the recording (Auto-time), the Vietnamese translation, and the
-// sentence with the words to write in [brackets] for the blanks mode of the
-// dictation ('' = no blank).
 const segmentSchema = z
   .object({
     id,
@@ -96,7 +85,6 @@ const segmentSchema = z
 
 const audioMediaId = z.string().uuid().nullable().default(null);
 
-// One topic: one lesson on its own recording (D144, D147).
 export const topicContentSchema = z
   .object({
     audioMediaId,
@@ -107,8 +95,6 @@ export const topicContentSchema = z
   })
   .strict();
 
-// A recording of a level test with its transcript (shown after the test) and
-// the questions about it (D147).
 const sectionSchema = z
   .object({
     id,
@@ -124,10 +110,8 @@ export const levelTestContentSchema = z
 
 export const contentSchemaOf = (type) => (type === CourseItemType.TOPIC ? topicContentSchema : levelTestContentSchema);
 
-// The recordings of a content: the topic's, or each level-test section's.
 export const courseAudioIds = (content) => [content.audioMediaId, ...(content.sections || []).map((section) => section.audioMediaId)].filter(Boolean);
 
-// Every media a content refers to: its recordings and the words' pronunciations.
 export const courseMediaIds = (content) => [...courseAudioIds(content), ...(content.vocabulary || []).map((item) => item.audioMediaId).filter(Boolean)];
 
 const normalize = (value) => String(value || '').replace(/\s+/g, ' ').trim();
@@ -146,7 +130,6 @@ function audioIssues(issue, path, mediaId, mediaById) {
   else if (mediaById.get(mediaId)?.kind !== MediaKind.AUDIO) issue(path, 'The recording is missing or is not audio');
 }
 
-// mediaById maps existing media ids to their rows.
 function topicIssues(issue, content, mediaById) {
   audioIssues(issue, 'audioMediaId', content.audioMediaId, mediaById);
 
@@ -169,8 +152,6 @@ function topicIssues(issue, content, mediaById) {
     else if (new Set(items.map((item) => item.toLowerCase())).size !== items.length) issue('ordering.items', 'Items must be different');
   }
 
-  // Every sentence is written down alone, so each needs its place in the
-  // recording, and its translation for the transcript.
   if (!content.segments.length) issue('segments', 'Add the transcript of the recording');
   let blanks = 0;
   let previousStart = -1;
@@ -196,7 +177,6 @@ function topicIssues(issue, content, mediaById) {
   if (new Set(ids).size !== ids.length) issue('segments', 'Sentence ids must be unique');
 }
 
-// Returns the reasons a course item draft cannot be published; empty when it can.
 export function courseIssues(type, content, mediaById) {
   const issues = [];
   const issue = (path, message) => issues.push({ path, message });

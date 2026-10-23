@@ -1,5 +1,3 @@
-// Invitations (D131): when an admin created the account; null for
-// self-registered accounts. Append-only.
 export class AddAccountInvitedAt1710000006000 {
   name = 'AddAccountInvitedAt1710000006000';
 

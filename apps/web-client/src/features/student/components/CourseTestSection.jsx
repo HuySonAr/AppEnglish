@@ -3,12 +3,6 @@ import { CourseQuestion } from './CourseQuestion.jsx';
 import { TestRecordingPlayer } from './TestRecordingPlayer.jsx';
 import { playKeyOf } from '../lib/test-plays.js';
 
-// One recording of a unit check, level test or the listening placement with
-// its questions, numbered across the test (D102, D103). While the test is
-// taken `answers` holds the chosen options; in the review (answers null) the
-// questions come marked, with the transcript and, for the placement, the
-// level the recording tests. While the test is taken the recording plays as
-// in an exam (D141: normal speed, limited plays); the review has the normal player.
 export function CourseTestSection({ index, section, first, versionId, answers, onChoose }) {
   return (
     <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
@@ -54,5 +48,4 @@ export function CourseTestSection({ index, section, first, versionId, answers, o
   );
 }
 
-// The number of the first question of each section.
 export const firstNumbers = (sections) => sections.map((_, index) => sections.slice(0, index).reduce((sum, section) => sum + section.questions.length, 0) + 1);

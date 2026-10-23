@@ -15,7 +15,6 @@ import {
   Button,
 } from '../../../components/ui';
 
-// Why a delete was refused (D118), in words the Content Manager can act on.
 export function deleteRefusalMessage(error) {
   if (errorCode(error) !== ContentResponseCode.CONTENT_IN_USE) return getApiErrorMessage(error);
   const data = error?.response?.data?.data || {};
@@ -24,12 +23,8 @@ export function deleteRefusalMessage(error) {
   return `Learners already have ${results} for this. It cannot be deleted; unpublish it instead so nobody new can open it.`;
 }
 
-// Taking content away (D118, D126): an "Unpublish" button shown only while
-// the content is published, and a trash icon for Delete; each asks first.
-// noun names the thing ("lesson"); busy blocks both while the page works;
-// deletable false leaves the trash out (a unit review).
 export function ContentDangerActions({ noun, published, busy = false, onUnpublish, onDelete, deleteNote, deletable = true }) {
-  const [confirm, setConfirm] = useState(null); // 'unpublish' | 'delete'
+  const [confirm, setConfirm] = useState(null);
   const [pending, setPending] = useState(false);
   const capitalized = `${noun[0].toUpperCase()}${noun.slice(1)}`;
 

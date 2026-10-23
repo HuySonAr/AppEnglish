@@ -1,4 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
+import { withGrpcContext } from '@appenglish/backend-common/grpc-context';
 import { GrpcMethod } from '@nestjs/microservices';
 import { z } from 'zod';
 import { ContentUsageKind } from '@appenglish/content-contracts';
@@ -8,8 +9,6 @@ import { UsageRepository } from './usage.repository.js';
 
 export const USAGE_REPOSITORY = Symbol('USAGE_REPOSITORY');
 
-// Gateway-internal (D118): how many learner results name each piece of
-// content, so the gateway refuses to delete what learners already used.
 export const usageQuerySchema = z.object({
   kind: z.enum(Object.values(ContentUsageKind)),
   ids: z.array(z.string().uuid()).min(1).max(500),
@@ -40,6 +39,7 @@ export class UsageGrpcController {
 
 Controller()(UsageGrpcController);
 Inject(USAGE_REPOSITORY)(UsageGrpcController, undefined, 0);
+withGrpcContext(UsageGrpcController.prototype, 'getContentUsage', 'GetContentUsage');
 GrpcMethod(LEARNING_GRPC_SERVICE, 'GetContentUsage')(
   UsageGrpcController.prototype,
   'getContentUsage',

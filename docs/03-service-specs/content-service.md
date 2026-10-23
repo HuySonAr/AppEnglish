@@ -403,7 +403,7 @@ version with its transcript and recording URL; 404 when not published).
 
 | Method | Path | RPC | Who |
 |---|---|---|---|
-| POST | `/content/listening-exercises/:id/auto-time` | `RequestListeningAutoTime` | Content Manager. Reads the saved draft (or the published version), needs a recording with a public address (409 `NO_AUDIO`) and lines (409 `NO_LINES`), records a job in `listening_timing_jobs` and publishes it to `speech.autotime.requests`; 47 `SPEECH_UNAVAILABLE` (503) without the broker. A job still waiting or running is returned instead of a new one |
+| POST | `/content/listening-exercises/:id/auto-time` | `RequestListeningAutoTime` | Content Manager. Reads the saved draft (or the published version), needs a recording with a public address (409 `NO_AUDIO`) and lines (409 `NO_LINES`), records a job in `listening_timing_jobs` with its request in the outbox `content_events` (one transaction; relayed to `speech.autotime.requests`, D168), also while RabbitMQ is away. A job still waiting or running is returned instead of a new one |
 | GET | `/content/listening-exercises/:id/auto-time` | `GetListeningAutoTime` | Content Manager. `{ job: { id, status, error, lineCount, lines: [{ id, start, end, matched }], createdAt, updatedAt } \| null }`; a job without an answer for 30 minutes shows as FAILED |
 
 `SpeechBroker` (`src/speech/speech.broker.js`, amqplib) connects at start and
@@ -456,7 +456,7 @@ with `courseItemId` and answered like the library's:
 
 | Method | Gateway route | RPC | Purpose |
 |---|---|---|---|
-| POST | `/content/listening-course/items/:id/auto-time` | `RequestCourseAutoTime` | Times the saved sentences (kind `part3`); 409 `NO_AUDIO` / `NO_LINES`, 409 `NOT_A_TOPIC` for a level test, 503 without the broker. A job still waiting or running is returned |
+| POST | `/content/listening-course/items/:id/auto-time` | `RequestCourseAutoTime` | Times the saved sentences (kind `part3`); 409 `NO_AUDIO` / `NO_LINES`, 409 `NOT_A_TOPIC` for a level test; queued through the outbox (D168). A job still waiting or running is returned |
 | POST | `/content/listening-course/items/:id/transcribe` | `RequestCourseTranscribe` | Writes the sentences from the recording alone |
 | GET | `/content/listening-course/items/:id/auto-time` | `GetCourseAutoTime` | The latest job of the topic, or null |
 
@@ -464,7 +464,7 @@ Transcribe on a mock test recording (D161), stored in `listening_timing_jobs` wi
 
 | Method | Gateway route | RPC | Purpose |
 |---|---|---|---|
-| POST | `/content/mock-tests/:id/transcribe` | `RequestMockTranscribe` | Content Manager; body `{ audioMediaId }`, a recording of Part 1–4 in the saved draft (or the published version); kind sent is the part key; 409 `NO_AUDIO` when the recording is not in the test or not downloadable, 503 without the broker. A job still waiting or running for that recording is returned |
+| POST | `/content/mock-tests/:id/transcribe` | `RequestMockTranscribe` | Content Manager; body `{ audioMediaId }`, a recording of Part 1–4 in the saved draft (or the published version); kind sent is the part key; 409 `NO_AUDIO` when the recording is not in the test or not downloadable; queued through the outbox (D168). A job still waiting or running for that recording is returned |
 | GET | `/content/mock-tests/:id/transcribe` | `ListMockTranscribe` | `{ jobs }`: the latest job of each recording of the test, each with `audioMediaId` |
 
 Speech-job notices for the Content Manager (D163), read from `listening_timing_jobs` requested by the caller in the last 7 days that are done or failed (a job past the timeout counts as failed):

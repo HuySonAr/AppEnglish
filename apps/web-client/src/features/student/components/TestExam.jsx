@@ -74,22 +74,16 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
   const [answers, setAnswers] = useState(attempt.answers || {});
   const [partIndex, setPartIndex] = useState(0);
   const [confirming, setConfirming] = useState(false);
-  // { number } of the question to scroll to after showing its part.
   const [target, setTarget] = useState(null);
-  // True after the learner tried to leave the page during the test.
   const [leaving, setLeaving] = useState(false);
-  // True while the Exit dialog is open; discarding while the attempt goes.
   const [exiting, setExiting] = useState(false);
   const [discarding, setDiscarding] = useState(false);
-  // Server time minus browser time at load.
   const [offset] = useState(() => new Date(attempt.serverNow).getTime() - Date.now());
   const [remaining, setRemaining] = useState(() => remainingTime(attempt.expiresAt, offset));
   const answersRef = useRef(answers);
   answersRef.current = answers;
   const submitted = useRef(false);
 
-  // The clock; when it runs out the test is handed in as it is. A test
-  // without a time limit (expiresAt null) has none.
   useEffect(() => {
     if (!attempt.expiresAt) return undefined;
     const timer = setInterval(() => {
@@ -103,16 +97,12 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
     return () => clearInterval(timer);
   }, [attempt.expiresAt, offset]);
 
-  // Answers are saved shortly after each change so they survive a reload and
-  // count if the time runs out.
   useEffect(() => {
     if (answers === attempt.answers) return undefined;
     const timer = setTimeout(() => saveAnswers(answers).catch(() => {}), 800);
     return () => clearTimeout(timer);
   }, [answers]);
 
-  // A new part starts at the top of the page; a question picked from the
-  // list is scrolled into view.
   useEffect(() => {
     if (target === null) window.scrollTo({ top: 0 });
     else document.getElementById(`question-${target.number}`)?.scrollIntoView({ block: 'start' });
@@ -124,13 +114,9 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
   }
   function showQuestion(index, number) {
     setPartIndex(index);
-    // A new object each time, so picking the same question again scrolls again.
     setTarget({ number });
   }
 
-  // The test cannot be left for another page: links, the back button and
-  // logging out bring up a warning, and closing or reloading the tab asks
-  // the browser to confirm.
   useEffect(() => {
     const removeGuard = setLeaveGuard(() => setLeaving(true));
     const onClick = (event) => {
@@ -140,7 +126,6 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
       event.stopPropagation();
       setLeaving(true);
     };
-    // An extra history entry absorbs the back button.
     window.history.pushState(null, '', window.location.href);
     const onBack = () => {
       window.history.pushState(null, '', window.location.href);
@@ -159,7 +144,6 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
   }, []);
 
   async function discard() {
-    // The clock must not hand the attempt in while it is being removed.
     submitted.current = true;
     setDiscarding(true);
     const done = await onDiscard();
@@ -169,7 +153,6 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
     }
   }
 
-  // The ways out of the test without submitting, for both dialogs.
   const leaveButtons = (
     <>
       {onLeaveForLater ? (
@@ -190,7 +173,6 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
   const part = attempt.parts[partIndex];
   const total = attempt.parts.reduce((sum, item) => sum + item.questions.length, 0);
   const answered = answeredCount(attempt.parts, answers);
-  // Numbers of the questions still without an answer.
   const unanswered = attempt.parts
     .flatMap((item) => item.questions)
     .filter((question) => !answers[question.id])

@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design tokens (HSL). Components only use these names, so the whole look is
-   changed here. */
 @layer base {
   :root {
     --background: 220 33% 98%;
@@ -73,7 +71,6 @@
     @apply bg-background font-sans text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  /* Password fields ship their own eye button (PasswordInput); hide the one Edge adds. */
   input::-ms-reveal,
   input::-ms-clear {
     display: none;
@@ -83,8 +80,6 @@
   }
 }
 
-/* The publish button (D126): an arrow rising into a cloud while publishing,
-   a tick popping in when done. */
 @keyframes publish-arrow {
   0% { transform: translateY(7px); opacity: 0; }
   25% { opacity: 1; }

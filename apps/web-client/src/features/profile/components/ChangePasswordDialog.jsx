@@ -22,7 +22,6 @@ const steps = [
   { id: 2, label: 'New password', icon: KeyRound },
 ];
 
-// The two steps as a bar: done, current, ahead.
 function StepBar({ current }) {
   return (
     <ol className="flex items-center gap-2" aria-label={`Step ${current} of ${steps.length}`}>
@@ -55,7 +54,6 @@ function StepBar({ current }) {
   );
 }
 
-// Password strength as a hint, not a rule: the backend only asks for 8+ characters.
 function strengthOf(value) {
   if (!value) return null;
   let score = 0;
@@ -69,9 +67,6 @@ function strengthOf(value) {
   return { level: 3, label: 'Strong', tone: 'bg-success' };
 }
 
-// Opened on purpose from the profile (D113). Step 1 checks the current
-// password with the server before anything else is asked; step 2 takes the
-// new password twice. Other devices are signed out; this one gets fresh cookies.
 export function ChangePasswordDialog({ open, onOpenChange, onChanged }) {
   const [step, setStep] = useState(1);
   const [current, setCurrent] = useState('');
@@ -126,7 +121,6 @@ export function ChangePasswordDialog({ open, onOpenChange, onChanged }) {
       notify({ title: 'Password changed', description: 'Your other devices were signed out.' });
       onOpenChange(false);
     } catch (error) {
-      // The current password changed elsewhere in between: back to step 1.
       if (errorCode(error) === ResponseCode.AUTH_CURRENT_PASSWORD_INVALID) {
         setStep(1);
         setCurrentIssue('Your current password no longer matched. Enter it again.');

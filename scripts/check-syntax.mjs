@@ -1,5 +1,3 @@
-// Syntax-checks every .js/.mjs file under the given directories with
-// `node --check`. Usage: node scripts/check-syntax.mjs src test
 import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';

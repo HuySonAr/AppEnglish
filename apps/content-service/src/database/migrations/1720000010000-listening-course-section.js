@@ -1,6 +1,3 @@
-// Listening course sections (F05C, D107): every unit belongs to one of the two
-// sections of its level, Social and Travel or Work and Study; level tests and
-// the placement have none. Existing units go to Social and Travel.
 export class ListeningCourseSection1720000010000 {
   name = 'ListeningCourseSection1720000010000';
 

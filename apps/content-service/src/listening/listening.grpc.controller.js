@@ -1,4 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
+import { withGrpcContext } from '@appenglish/backend-common/grpc-context';
 import { GrpcMethod } from '@nestjs/microservices';
 import { ContentResponseCode } from '@appenglish/content-contracts';
 import { CONTENT_GRPC_SERVICE } from '@appenglish/content-contracts/grpc';
@@ -16,8 +17,6 @@ import {
   mockTranscribeSchema,
 } from './listening.schemas.js';
 
-// Each RPC: whether it targets an id, the schema of its JSON payload (if any)
-// and the service call.
 const rpcs = {
   ListListeningTopics: { run: (service) => service.listTopics() },
   CreateListeningTopic: {
@@ -62,7 +61,6 @@ const rpcs = {
   RequestListeningAutoTime: { id: true, run: (service, { actor, id }) => service.requestAutoTime(actor, id) },
   GetListeningAutoTime: { id: true, run: (service, { actor, id }) => service.getAutoTime(actor, id) },
   RequestListeningTranscribe: { id: true, run: (service, { actor, id }) => service.requestTranscribe(actor, id) },
-  // Called by learning-service, not by the gateway: there is no actor.
   ListPublishedListeningExercises: { internal: true, run: (service) => service.listPublished() },
   GetListeningPaper: {
     internal: true,
@@ -87,8 +85,6 @@ export class ListeningGrpcController {
     this.listeningService = listeningService;
   }
 
-  // Shapes the { code, msg, data } envelope. Unexpected errors propagate as a
-  // gRPC error and the gateway answers 500.
   async handle(spec, request) {
     try {
       const data = await spec.run(this.listeningService, {
@@ -117,6 +113,7 @@ for (const [rpc, spec] of Object.entries(rpcs)) {
   ListeningGrpcController.prototype[method] = function (request) {
     return this.handle(spec, request);
   };
+  withGrpcContext(ListeningGrpcController.prototype, method, rpc);
   GrpcMethod(CONTENT_GRPC_SERVICE, rpc)(
     ListeningGrpcController.prototype,
     method,

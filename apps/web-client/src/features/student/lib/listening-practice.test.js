@@ -46,10 +46,8 @@ test('a song topic is practised in two modes, each with its own exercises and re
   ];
   const base = { topic: 's', search: '', level: 'all', kind: 'all', done: 'all', sort: 'title' };
   const titles = (options) => filterListeningPractice(songs, { ...base, ...options }).map((item) => item.title);
-  // A song without blanks is left out of filling in.
   assert.deepEqual(titles({ mode: 'blanks' }), ['Home', 'Road']);
   assert.deepEqual(titles({ mode: 'full' }), ['Away', 'Home', 'Road']);
-  // Tried and the best score are those of the mode.
   assert.deepEqual(titles({ mode: 'blanks', done: 'new' }), ['Road']);
   assert.deepEqual(titles({ mode: 'full', sort: 'best' }), ['Home', 'Road', 'Away']);
   assert.equal(resultOf(songs[0], 'blanks').bestAccuracy, 90);

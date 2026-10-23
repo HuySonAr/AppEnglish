@@ -20,7 +20,6 @@ test('text without table rows stays one block', () => {
 
 test('lines copied from a table become table rows', () => {
   assert.equal(tableRowFromTabs('Room\tTime\tEvent'), '| Room | Time | Event |');
-  // An empty first cell is kept; indentation and labels are not tables.
   assert.equal(tableRowFromTabs('\tMon\tTue  '), '|  | Mon | Tue |');
   assert.equal(tableRowFromTabs('\tDear Mr. Hughes, '), 'Dear Mr. Hughes,');
   assert.equal(tableRowFromTabs('Subject:\tCard expiration'), 'Subject: Card expiration');

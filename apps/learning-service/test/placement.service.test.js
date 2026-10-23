@@ -27,7 +27,6 @@ test('scoring counts right answers in total and per skill', () => {
   const paper = placementPaper();
   assert.deepEqual(scorePlacement(paper.test, answersFor(paper, 23)), { totalCount: 23, correctCount: 23, listeningCorrect: 9, readingCorrect: 14 });
   assert.deepEqual(scorePlacement(paper.test, answersFor(paper, 10)), { totalCount: 23, correctCount: 10, listeningCorrect: 9, readingCorrect: 1 });
-  // Unanswered questions, unknown questions and options of another question count as wrong.
   const first = paper.test.part1.questions[0];
   const second = paper.test.part2.questions[0];
   assert.equal(scorePlacement(paper.test, { [first.id]: second.options[0].id, unknown: 'x' }).correctCount, 0);
@@ -61,7 +60,6 @@ test('a learner starts once, gets the paper without answers and resumes it', asy
     assert.equal(serialized.includes(secret), false, secret);
   assert.equal(repository.tables.attempts[0].placementVersionId, paper.versionId);
 
-  // Answers saved so far come back when the page is reloaded; the clock keeps running.
   const answers = answersFor(paper, 5);
   await service.savePlacementAnswers(student, { answers });
   advance(10);
@@ -78,7 +76,6 @@ test('submitting scores the attempt and decides the starting unit', async () => 
     const { service, paper, repository } = harness();
     await service.startPlacement(student);
     const result = await service.submitPlacement(student, { answers: answersFor(paper, correct) });
-    // The result shows the score and the starting unit only.
     assert.deepEqual(result, { status: 'COMPLETED', startUnit, correctCount: correct, totalCount: 23, scorePercent: percent });
     assert.deepEqual(await service.getPlacement(student), result);
     assert.equal(repository.tables.attempts[0].listeningCorrect + repository.tables.attempts[0].readingCorrect, correct);
@@ -93,7 +90,6 @@ test('the placement test is taken only once', async () => {
   await assert.rejects(() => service.skipPlacement(student), { code: 51 });
   await assert.rejects(() => service.submitPlacement(student, { answers: {} }), { code: 52, status: 409 });
   await assert.rejects(() => service.savePlacementAnswers(student, { answers: {} }), { code: 52 });
-  // Another learner is not affected.
   assert.equal((await service.getPlacement(otherStudent)).status, 'NOT_STARTED');
 });
 
@@ -104,20 +100,17 @@ test('skipping starts at unit 1 and uses up the attempt', async () => {
   await assert.rejects(() => service.startPlacement(student), { code: 51 });
   await assert.rejects(() => service.skipPlacement(student), { code: 51 });
 
-  // Skipping is not possible once the test has started.
   const second = harness();
   await second.service.startPlacement(student);
   await assert.rejects(() => second.service.skipPlacement(student), { code: 51 });
 });
 
 test('the clock is kept by the server', async () => {
-  // Submitting just after the deadline still counts.
   let context = harness();
   await context.service.startPlacement(student);
   context.advance(25.4);
   assert.equal((await context.service.submitPlacement(student, { answers: answersFor(context.paper, 23) })).correctCount, 23);
 
-  // A late submit is scored with the answers saved in time.
   context = harness();
   await context.service.startPlacement(student);
   await context.service.savePlacementAnswers(student, { answers: answersFor(context.paper, 14) });
@@ -126,7 +119,6 @@ test('the clock is kept by the server', async () => {
   assert.equal(late.correctCount, 14);
   assert.equal(late.startUnit, 2);
 
-  // An attempt left open is completed when its time is over.
   context = harness();
   await context.service.startPlacement(student);
   await context.service.savePlacementAnswers(student, { answers: answersFor(context.paper, 19) });
@@ -140,7 +132,6 @@ test('without a published test nothing can start, and the start unit never excee
   context.content.publish(null);
   assert.equal((await context.service.getPlacement(student)).available, false);
   await assert.rejects(() => context.service.startPlacement(student), { code: 50, status: 409 });
-  // Skipping stays possible.
   assert.equal((await context.service.skipPlacement(student)).startUnit, 1);
 
   context = harness(placementPaper({ publishedUnitCount: 2 }));
@@ -156,7 +147,6 @@ test('an attempt finishes on the version it started when the test is republished
   const resumed = await service.getPlacement(student);
   assert.equal(resumed.parts[0].questions[0].id, paper.test.part1.questions[0].id);
   assert.equal((await service.submitPlacement(student, { answers: answersFor(paper, 23) })).correctCount, 23);
-  // A new learner gets the new version.
   assert.equal((await service.startPlacement(otherStudent)).parts[0].questions[0].id, next.test.part1.questions[0].id);
 });
 
@@ -174,7 +164,6 @@ test('an admin changes the thresholds for later attempts', async () => {
   assert.deepEqual((await service.updatePlacementSettings(admin, { unit2Threshold: 70, unit3Threshold: 90 })).settings, { unit2Threshold: 70, unit3Threshold: 90 });
   await service.startPlacement(otherStudent);
   assert.equal((await service.submitPlacement(otherStudent, { answers: answersFor(paper, 14) })).startUnit, 1);
-  // The earlier result keeps its starting unit.
   assert.equal((await service.getPlacement(student)).startUnit, 2);
 });
 
@@ -187,7 +176,6 @@ test('an admin resets a learner\'s placement so they take it again (D131)', asyn
   assert.deepEqual(await service.adminResetPlacement(admin, student.id), { reset: true });
   assert.equal(repository.tables.attempts.length, 0);
   assert.equal((await service.getPlacement(student)).status, 'NOT_STARTED');
-  // Nothing to remove the second time; the learner may start again.
   assert.deepEqual(await service.adminResetPlacement(admin, student.id), { reset: false });
   assert.equal((await service.startPlacement(student)).status, 'IN_PROGRESS');
 });

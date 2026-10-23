@@ -1,5 +1,3 @@
-// Songs (F05B-4, D88): a learner's best score is kept per mode, writing every
-// line ('full') or filling in the blanks ('blanks'). Existing rows are full.
 export class ListeningResultModes1730000004000 {
   name = 'ListeningResultModes1730000004000';
 

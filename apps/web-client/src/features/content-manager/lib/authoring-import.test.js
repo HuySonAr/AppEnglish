@@ -23,7 +23,6 @@ test('a lesson file is checked, converted and merged with the media the draft al
   assert.equal(plan.content.test.part1.questions[0].imageMediaId, 'p1-image');
   assert.ok(plan.content.vocabulary[0].id, 'editor ids are assigned');
   assert.equal(plan.content.test.part5.questions.length, 6);
-  // A word that left the lesson takes its audio with it.
   const smaller = JSON.parse(text);
   smaller.vocabulary = smaller.vocabulary.slice(0, 1);
   assert.equal(mergeImportedLesson(current, lessonFromAuthoring(smaller)).vocabulary.length, 1);
@@ -53,7 +52,6 @@ test('export gives the authoring format back, and a typed transcript survives th
   assert.equal(exported.test.part3.transcript, data.test.part3.transcript);
   assert.deepEqual(exported.test.part6.questions[2].options, data.test.part6.questions[2].options);
   assert.deepEqual(exported.fillIn.answers, data.fillIn.answers);
-  // A transcript typed in the editor is exported as such and imported back as it is.
   content.test.part1.transcript = 'Number 1.\n(A) Hand-typed.\n(B) Two.\n(C) Three.\n(D) Four.\nEnd.';
   const typed = exportLesson(content);
   assert.equal(typed.test.part1.transcript, content.test.part1.transcript);

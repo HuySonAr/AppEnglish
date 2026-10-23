@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { MetricsController } from './metrics/metrics.controller.js';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { contentGrpcOptions } from '@appenglish/content-contracts/grpc';
 import { HealthController } from './health/health.controller.js';
@@ -17,7 +18,7 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [HealthController, ProgressGrpcController],
+  controllers: [MetricsController, HealthController, ProgressGrpcController],
   providers: [
     { provide: PROGRESS_DATA_SOURCE, useFactory: createProgressDataSource },
     {
@@ -31,7 +32,6 @@ Module({
       inject: [CONTENT_GRPC_CLIENT],
     },
     {
-      // Results from learning-service arrive over RabbitMQ (F06, D110).
       provide: ProgressService,
       useFactory: (repository, contentClient) => {
         const service = new ProgressService(repository, contentClient);

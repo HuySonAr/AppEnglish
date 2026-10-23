@@ -1,8 +1,3 @@
-// XP (F07, D10, D63, D112): one row per mock test a learner earned XP on,
-// from the first full attempt only. The row id is the attempt id in
-// learning-service; the unique (accountId, mockTestId) pair keeps one row per
-// test whatever is redelivered. accountEmail and mockTestTitle are snapshots
-// for the leaderboard and the learner's own list.
 export class CreateXpLedger1740000001000 {
   name = 'CreateXpLedger1740000001000';
 

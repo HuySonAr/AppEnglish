@@ -32,8 +32,6 @@ export const resetPasswordSchema = z
   .strict();
 export const adminAccountQuerySchema = z.object({
   email: z.string().trim().max(320).optional(),
-  // D114: search matches the email or the display name; stale keeps only
-  // PENDING_VERIFICATION accounts older than STALE_PENDING_DAYS.
   search: z.string().trim().max(320).optional(),
   role: z.enum(Object.values(AccountRole)).optional(),
   status: z.enum(['PENDING_VERIFICATION', 'ACTIVE', 'DISABLED', 'SUSPENDED']).optional(),
@@ -55,8 +53,6 @@ export const adminAccountActionSchema = z.object({
   action: z.enum(Object.values(AdminAccountAction)),
   reason,
 }).strict();
-// Invitation (D131): the admin gives the email, an optional display name and
-// the role; the person chooses the password with the emailed code.
 export const adminInviteSchema = z.object({
   email,
   displayName: z
@@ -70,8 +66,6 @@ export const adminInviteSchema = z.object({
 }).strict();
 export const acceptInviteSchema = resetPasswordSchema;
 
-// Profile (F09, D113). An empty display name clears it; whitespace-only
-// names count as empty.
 export const updateProfileSchema = z
   .object({
     displayName: z

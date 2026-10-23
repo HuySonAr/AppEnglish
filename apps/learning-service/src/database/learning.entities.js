@@ -1,7 +1,5 @@
 import { EntitySchema } from 'typeorm';
 
-// One row per account: a learner takes or skips the placement test once
-// (D35). answers maps question id to the chosen option id.
 export const PlacementAttemptEntity = new EntitySchema({
   name: 'PlacementAttempt',
   tableName: 'placement_attempts',
@@ -26,7 +24,6 @@ export const PlacementAttemptEntity = new EntitySchema({
   indices: [{ name: 'UQ_placement_attempts_account', columns: ['accountId'], unique: true }],
 });
 
-// Single row (id 1): the score thresholds that decide the starting unit.
 export const PlacementSettingsEntity = new EntitySchema({
   name: 'PlacementSettings',
   tableName: 'placement_settings',
@@ -39,8 +36,6 @@ export const PlacementSettingsEntity = new EntitySchema({
   },
 });
 
-// The learner's way through one lesson: when each step was finished. One row
-// per account and lesson; it belongs to the lesson, not to a lesson version.
 export const LessonProgressEntity = new EntitySchema({
   name: 'LessonProgress',
   tableName: 'lesson_progress',
@@ -61,9 +56,6 @@ export const LessonProgressEntity = new EntitySchema({
   ],
 });
 
-// One attempt at a lesson test. optionOrder is the shuffled option order of
-// this attempt; answers maps question id to the chosen option id.
-// accountEmail is kept for the lesson ranking.
 export const LessonTestAttemptEntity = new EntitySchema({
   name: 'LessonTestAttempt',
   tableName: 'lesson_test_attempts',
@@ -98,9 +90,6 @@ export const LessonTestAttemptEntity = new EntitySchema({
   ],
 });
 
-// One finished attempt at a unit review (D121): untimed, scored on submit.
-// answers maps question id to the chosen option id; reviewVersionId is the
-// content-service version it was scored against.
 export const UnitReviewAttemptEntity = new EntitySchema({
   name: 'UnitReviewAttempt',
   tableName: 'unit_review_attempts',
@@ -120,9 +109,6 @@ export const UnitReviewAttemptEntity = new EntitySchema({
   indices: [{ name: 'UQ_unit_review_attempts_number', columns: ['accountId', 'unitId', 'attemptNumber'], unique: true }],
 });
 
-// One attempt at a mock test: the full test (kind FULL, partKey '') or the
-// mini test of one part (kind MINI, partKey e.g. 'part5'). listeningScore and
-// readingScore are the estimated TOEIC section scores of a full attempt.
 export const MockAttemptEntity = new EntitySchema({
   name: 'MockAttempt',
   tableName: 'mock_attempts',
@@ -190,7 +176,6 @@ export const LearnerGoalEntity = new EntitySchema({
   },
 });
 
-// Single row (id 1): estimated section score for 0-100 right answers.
 export const ScoreConversionEntity = new EntitySchema({
   name: 'ScoreConversion',
   tableName: 'score_conversion',
@@ -203,10 +188,6 @@ export const ScoreConversionEntity = new EntitySchema({
   },
 });
 
-
-// Listening practice (F05B-3, D86): one row per learner, dictation exercise
-// and mode (full, or the blanks of a song, D88) with the best and the latest
-// accuracy (percent) of their checks.
 export const CourseLessonResultEntity = new EntitySchema({
   name: 'CourseLessonResult',
   tableName: 'course_lesson_results',
@@ -264,9 +245,6 @@ export const ListeningResultEntity = new EntitySchema({
   indices: [{ name: 'UQ_listening_results_account_exercise_mode', columns: ['accountId', 'exerciseId', 'mode'], unique: true }],
 });
 
-// Outbox of the results sent to progress-service (F06, D110): each row is one
-// event written together with the result it reports and relayed to RabbitMQ
-// afterwards; publishedAt is set once the broker confirmed it.
 export const LearningEventEntity = new EntitySchema({
   name: 'LearningEvent',
   tableName: 'learning_events',
@@ -274,6 +252,7 @@ export const LearningEventEntity = new EntitySchema({
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     type: { type: 'varchar', length: 40 },
     payload: { type: 'jsonb' },
+    requestId: { type: 'varchar', length: 64, nullable: true },
     createdAt: { type: 'timestamptz', createDate: true },
     publishedAt: { type: 'timestamptz', nullable: true },
   },

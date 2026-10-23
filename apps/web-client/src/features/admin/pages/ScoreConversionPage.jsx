@@ -12,7 +12,6 @@ const sections = [
   { key: 'reading', label: 'Reading' },
 ];
 
-// "5, 5, 10, …" -> the 101 scores, or a message saying what is wrong.
 function parseTable(text) {
   const values = text.split(/[\s,;]+/).filter(Boolean).map(Number);
   if (values.length !== 101) return { error: `Needs 101 scores (for 0 to 100 right answers); it has ${values.length}.` };
@@ -23,8 +22,6 @@ function parseTable(text) {
   return { values };
 }
 
-// The table that turns right answers of a full mock test into an estimated
-// TOEIC section score.
 export function ScoreConversionPage() {
   const [state, setState] = useState('loading');
   const [saved, setSaved] = useState(null);

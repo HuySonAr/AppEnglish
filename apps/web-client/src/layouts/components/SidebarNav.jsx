@@ -2,7 +2,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { isNavItemActive } from '../../app/navigation.js';
 import { cn } from '../../lib/utils.js';
 
-// Vertical menu used by the desktop sidebar and the phone drawer.
 export function SidebarNav({ items, label, onNavigate }) {
   const { pathname } = useLocation();
   return (

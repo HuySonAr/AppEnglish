@@ -1,7 +1,5 @@
 import { LESSON_TEST_PARTS, countBlanks } from '@appenglish/content-contracts';
 
-// New items get a client id: the API keeps ids it is sent, so the same id
-// serves as the React key before and after saving.
 const newId = () => crypto.randomUUID();
 
 export function newVocabulary() {
@@ -34,13 +32,10 @@ function newQuestion() {
   };
 }
 
-// Resizes a list to exactly count items, keeping the existing ones.
 function sized(list, count, make) {
   return Array.from({ length: count }, (_, index) => list[index] ?? make());
 }
 
-// A part always shows its fixed number of questions and options (D45), so the
-// editor only ever fills them in.
 function normalizePart(spec, part = {}) {
   return {
     audioMediaId: part.audioMediaId ?? null,
@@ -58,7 +53,6 @@ function normalizePart(spec, part = {}) {
   };
 }
 
-// Keeps one answer per blank of the passage.
 export function withFillInPassage(fillIn, passage) {
   return { passage, answers: sized(fillIn.answers || [], countBlanks(passage), () => '') };
 }
@@ -77,16 +71,12 @@ export function emptyContent() {
   return normalizeContent();
 }
 
-// The editor starts from the draft, or from the published version when there
-// is no draft yet (saving then creates the next version).
 export function workingContent(lessonData) {
   return normalizeContent(
     structuredClone(lessonData?.draft?.content || lessonData?.published?.content || {}),
   );
 }
 
-// The placement test is edited like a lesson test: the draft, else a copy of
-// the published version, with every part and question slot present.
 export function workingPlacement(placementData) {
   const source = placementData?.draft?.content || placementData?.published?.content || {};
   return { test: normalizeContent(structuredClone(source)).test };
@@ -100,7 +90,6 @@ export function lessonState(lessonData) {
   };
 }
 
-// Marks one option as the single correct answer of its question.
 export function withCorrectOption(question, optionId) {
   return {
     ...question,
@@ -111,8 +100,6 @@ export function withCorrectOption(question, optionId) {
   };
 }
 
-// Returns a copy of value with the item at path replaced, e.g.
-// setIn(content, ['test', 'part1', 'questions', 0, 'prompt'], 'Hi').
 export function setIn(value, path, next) {
   if (!path.length) return next;
   const [key, ...rest] = path;
@@ -131,9 +118,6 @@ const fieldLabels = {
 };
 const optionLetters = ['A', 'B', 'C', 'D'];
 
-// Turns a publish issue path such as "test.part1.questions[0].options[1].audioMediaId"
-// into "Part 1 · question 1 · option B · audio". Questions carry their number
-// in the whole test (1-23).
 export function issueLabel(path) {
   let firstQuestionNumber = 1;
   return path
@@ -158,7 +142,6 @@ export function issueLabel(path) {
     .join(' · ');
 }
 
-// Where a publish issue is edited: the editor tab and, for the test, the part.
 export function issueLocation(path) {
   if (path.startsWith('fillIn')) return { tab: 'fillIn' };
   const part = /^test\.(part\d)/.exec(path)?.[1];
@@ -166,12 +149,6 @@ export function issueLocation(path) {
   return { tab: 'vocabulary' };
 }
 
-// Files chosen in the editor stay in the browser until the lesson is saved:
-// the content refers to them by a temporary id (the key of `pending`, whose
-// values are { kind, file, section }). This uploads the ones the content still uses and
-// swaps in the real media ids. On a failed upload it stops and returns the
-// error together with the content and the uploads done so far, so a retry does
-// not upload those again.
 export async function uploadPending(content, pending, upload) {
   let text = JSON.stringify(content);
   const uploaded = {};

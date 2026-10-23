@@ -1,18 +1,13 @@
 import { COURSE_LEVELS, COURSE_TEST_LEVELS, LISTENING_LEVELS, UnitStatus } from '@appenglish/content-contracts';
 
-// Pure rules of the Content Manager dashboard (D116): what exists, what is
-// published, what still waits in a draft and what blocks learners.
-
 const published = (item) => Boolean(item?.publishedVersionNumber);
 const drafting = (item) => Boolean(item?.hasDraft);
 const count = (items, test) => items.filter(test).length;
 
-// Everything the course has, as counts: { total, published, drafts }.
 function tally(items) {
   return { total: items.length, published: count(items, published), drafts: count(items, drafting) };
 }
 
-// The items of the listening course (units and level tests) across levels.
 export function courseItems(course) {
   return (course?.levels || []).flatMap((entry) => [
     ...(entry.topics || []).map((topic) => ({ ...topic, level: entry.level, kind: 'topic' })),
@@ -20,7 +15,6 @@ export function courseItems(course) {
   ]);
 }
 
-// The headline numbers of each content area.
 export function contentSummary({ units = [], mockTests = [], exercises = [], course = null } = {}) {
   const lessons = units.flatMap((unit) => unit.lessons || []);
   const items = courseItems(course);
@@ -34,8 +28,6 @@ export function contentSummary({ units = [], mockTests = [], exercises = [], cou
   };
 }
 
-// Every draft that waits to be published, with where to open it. Sorted so
-// that unpublished items (learners cannot see them at all) come first.
 export function pendingDrafts({ units = [], mockTests = [], exercises = [], course = null } = {}) {
   const rows = [];
   for (const unit of units)
@@ -50,7 +42,6 @@ export function pendingDrafts({ units = [], mockTests = [], exercises = [], cour
   return rows.sort((a, b) => Number(a.published) - Number(b.published) || a.kind.localeCompare(b.kind) || a.title.localeCompare(b.title));
 }
 
-// What learners are missing right now. Each check: { key, ok, label, detail, to }.
 export function readinessChecks({ units = [], mockTests = [], exercises = [], course = null, placement = null } = {}) {
   const lessons = units.flatMap((unit) => unit.lessons || []);
   const items = courseItems(course);
@@ -68,7 +59,6 @@ export function readinessChecks({ units = [], mockTests = [], exercises = [], co
   ];
 }
 
-// Lessons per unit for the bars: published, draft-only and empty slots.
 export function lessonsByUnit(units = []) {
   return units.map((unit) => {
     const lessons = unit.lessons || [];
@@ -77,7 +67,6 @@ export function lessonsByUnit(units = []) {
   });
 }
 
-// Published and unpublished listening exercises per level, in level order.
 export function exercisesByLevel(exercises = []) {
   return LISTENING_LEVELS.map((level) => {
     const own = exercises.filter((exercise) => exercise.level === level);
@@ -86,8 +75,6 @@ export function exercisesByLevel(exercises = []) {
   });
 }
 
-// The listening course per level: topics and level test, with what is live.
-// The last level has no level test ('none').
 export function courseCoverage(course) {
   return COURSE_LEVELS.map((level) => {
     const entry = (course?.levels || []).find((item) => item.level === level);

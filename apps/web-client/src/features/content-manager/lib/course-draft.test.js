@@ -45,14 +45,12 @@ test('replaced sentences keep their translation and blanks by id, or by place wh
     newTopicSegment({ id: 's1', text: 'Hello there.', translation: 'Xin chào.', gap: 'Hello [there].' }),
     newTopicSegment({ id: 's2', text: 'Nice to meet you.', translation: 'Rất vui.', gap: '' }),
   ];
-  // Pasted again: new ids, the first sentence unchanged, the second corrected.
   const pasted = [
     { id: 'p1', speaker: '', text: 'Hello  there.', start: null, end: null },
     { id: 'p2', speaker: '', text: 'Nice to see you.', start: null, end: null },
   ];
   const kept = keepSentenceExtras(previous, pasted);
   assert.deepEqual(kept.map((segment) => [segment.id, segment.translation, segment.gap]), [['p1', 'Xin chào.', 'Hello [there].'], ['p2', '', '']]);
-  // Times found by Auto-time keep everything (same objects, same ids).
   const timed = keepSentenceExtras(previous, previous.map((segment) => ({ ...segment, start: 1 })));
   assert.equal(timed[0].translation, 'Xin chào.');
   const onlyTranslation = keepSentenceExtras(previous, pasted, ['translation']);

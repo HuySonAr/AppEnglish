@@ -1,11 +1,3 @@
-// Writes what the running content-service holds back into the authoring
-// files of content-samples/600-words (D124): the unit reviews, and with
-// --lessons the lessons too. The published version is taken when there is
-// one, else the draft. Media ids are not part of the format.
-//
-//   node --env-file=../../.env scripts/export-600-words.mjs [--manager-id <uuid>] [--lessons] [--only 1,2]
-//
-// --only names unit numbers for reviews, lesson numbers with --lessons.
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

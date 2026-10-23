@@ -25,9 +25,6 @@ import {
 } from '../../../components/ui';
 import { deleteOrphanMedia, listOrphanMedia } from '../api/content-api.js';
 
-
-// Files in storage that no saved version refers to (D118, closes D49): shown
-// for review, deleted only when the Content Manager confirms.
 export function OrphanMediaPanel() {
   const [state, setState] = useState('loading');
   const [data, setData] = useState({ media: [], totalBytes: 0 });

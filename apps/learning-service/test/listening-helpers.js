@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { ListeningPracticeService } from '../src/listening/listening.service.js';
 
-// In-memory stand-in for ListeningRepository.
 export function createListeningRepository() {
   const tables = { results: [] };
   const copy = (row) => (row ? structuredClone(row) : null);
@@ -23,9 +22,6 @@ export function createListeningRepository() {
   return repository;
 }
 
-// Content-service stand-in: TOEIC with a Part 1 of four statements and a
-// Part 3 conversation, a Songs topic with one song, and a News topic without
-// exercises.
 export function listeningHarness() {
   const toeic = { id: randomUUID(), code: 'toeic', name: 'TOEIC', format: 'toeic', hasEditor: true };
   const songs = { id: randomUUID(), code: 'songs', name: 'Songs', format: 'song', hasEditor: true };

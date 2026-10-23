@@ -6,9 +6,6 @@ import {
   withPastedText,
 } from './question-paste.js';
 
-// Parts of a lesson test or placement test that can be filled from pasted
-// text (D79). Parts 1 and 2 show learners only letters: what is pasted there
-// becomes the transcript of the part recording and the answers (D81).
 export const LESSON_PASTE_PARTS = Object.freeze(['part1', 'part2', 'part3', 'part4', 'part5', 'part6', 'part7']);
 const TRANSCRIPT_MAX_LENGTH = 10000;
 
@@ -30,8 +27,6 @@ export function lessonPasteDescription(spec) {
     : `Paste the document with its questions. Rows copied from a table are written | cell | cell | and drawn as a table for learners. ${numbers}`;
 }
 
-// A part with the pasted questions written over the questions at `places`
-// (place → pasted question); a question keeps its id, explanation and image.
 function withQuestionsAt(part, places) {
   return {
     ...part,
@@ -39,10 +34,6 @@ function withQuestionsAt(part, places) {
   };
 }
 
-// The transcript of a Part 1 or 2 recording from the pasted questions
-// (place → pasted question), in the order of the part:
-//   2. Where is the meeting?
-//   (A) In room 3.
 function transcriptOf(spec, places) {
   return [...places.keys()]
     .sort((a, b) => a - b)
@@ -54,8 +45,6 @@ function transcriptOf(spec, places) {
     .join('\n\n');
 }
 
-// Parts 1 and 2: the pasted questions set the correct answers and replace the
-// transcript of the part; the options stay letters only.
 function withSpokenQuestions(part, spec, places) {
   return {
     ...part,
@@ -68,11 +57,9 @@ function withSpokenQuestions(part, spec, places) {
   };
 }
 
-// Parts 1-5: each pasted question takes one of the fixed questions of the part.
 function questionsPlan(part, spec, pasted) {
   const spoken = !spec.option.text;
   const first = spec.firstQuestionNumber;
-  // Numbers of this test are places; any other numbering is read in order.
   const byNumber = pasted.every((item) => item.number >= first && item.number < first + spec.questionCount);
   const places = new Map();
   const lines = pasted.map((item, index) => {
@@ -103,7 +90,6 @@ function questionsPlan(part, spec, pasted) {
   return { part: usable ? filled : part, count: pasted.length, lines };
 }
 
-// Parts 6-7: the part has one passage, whose questions fill the part in order.
 function passagePlan(part, spec, passages) {
   const first = spec.firstQuestionNumber;
   const lines = passages.map((item, index) => {
@@ -141,9 +127,6 @@ function passagePlan(part, spec, passages) {
   };
 }
 
-// What pasting the text into a lesson-test part does: the part afterwards,
-// the number of questions read and the lines of the list to check. The part
-// keeps its fixed number of questions (D45); only their content changes.
 export function lessonPastePlan(part, spec, setName, text) {
   return spec.group.passage
     ? passagePlan(part, spec, parsePastedPassages(text, { blanks: Boolean(spec.group.blanks) }))

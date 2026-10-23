@@ -1,6 +1,3 @@
-// The Listening course has no placement and no mistakes notebook (D145), so
-// their tables go (D146). Both were empty when dropped; down() recreates them
-// as migrations 1730000007000 and 1730000008000 made them.
 export class DropCoursePlacementsAndMistakes1730000011000 {
   name = 'DropCoursePlacementsAndMistakes1730000011000';
 

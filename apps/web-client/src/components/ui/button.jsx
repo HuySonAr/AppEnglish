@@ -31,7 +31,6 @@ const buttonVariants = cva(
   }
 );
 
-// loading shows a spinner and blocks the button while its action runs.
 export function Button({ className, variant, size, asChild = false, loading = false, disabled, children, ...props }) {
   const Comp = asChild ? Slot : 'button';
   if (asChild)

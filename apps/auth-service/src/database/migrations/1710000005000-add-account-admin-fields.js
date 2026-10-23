@@ -1,5 +1,3 @@
-// F01B admin management (D114): last sign-in and the reason an account is
-// locked on accounts; the reason of each audit row. Append-only.
 export class AddAccountAdminFields1710000005000 {
   name = 'AddAccountAdminFields1710000005000';
 

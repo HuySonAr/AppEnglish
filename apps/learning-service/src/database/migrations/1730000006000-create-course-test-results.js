@@ -1,7 +1,3 @@
-// Listening course (F05C, D102): each learner's best and latest score on each
-// unit check (itemId = the unit id) and level test, and when it was first
-// passed. Passing a level test moves the learner up. Items live in
-// content-service, so itemId is not a foreign key.
 export class CreateCourseTestResults1730000006000 {
   name = 'CreateCourseTestResults1730000006000';
 

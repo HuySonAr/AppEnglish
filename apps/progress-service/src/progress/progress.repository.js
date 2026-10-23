@@ -1,5 +1,5 @@
 import { IsNull, LessThan } from 'typeorm';
-import { LessonCompletionEntity, NotificationEntity, SkillResultEntity, StudyDayEntity, XpLedgerEntity } from '../database/progress.entities.js';
+import { LessonCompletionEntity, NotificationEntity, ProcessedMessageEntity, SkillResultEntity, StudyDayEntity, XpLedgerEntity } from '../database/progress.entities.js';
 
 export class ProgressRepository {
   constructor(dataSource) {
@@ -11,7 +11,6 @@ export class ProgressRepository {
     return this.dataSource.getRepository(entity);
   }
 
-  // Keeps one finished test; the same attempt reported again changes nothing.
   async saveResult(result) {
     await (await this.repo(SkillResultEntity)).createQueryBuilder().insert().values(result).orIgnore().execute();
   }
@@ -20,7 +19,6 @@ export class ProgressRepository {
     return (await this.repo(SkillResultEntity)).find({ where: { accountId }, order: { submittedAt: 'ASC' } });
   }
 
-  // Keeps the first completion of a lesson; a later report changes nothing.
   async saveCompletion(completion) {
     await (await this.repo(LessonCompletionEntity)).createQueryBuilder().insert().values(completion).orIgnore().execute();
   }
@@ -29,10 +27,16 @@ export class ProgressRepository {
     return (await this.repo(LessonCompletionEntity)).find({ where: { accountId } });
   }
 
-  // Keeps the XP of a mock test; a second row for the same learner and test
-  // (or the same attempt) changes nothing.
   async saveXp(entry) {
     await (await this.repo(XpLedgerEntity)).createQueryBuilder().insert().values(entry).orIgnore().execute();
+  }
+
+  async isProcessed(messageId) {
+    return Boolean(await (await this.repo(ProcessedMessageEntity)).findOne({ where: { messageId } }));
+  }
+
+  async markProcessed(messageId, queue, at) {
+    await (await this.repo(ProcessedMessageEntity)).createQueryBuilder().insert().values({ messageId, queue, processedAt: at }).orIgnore().execute();
   }
 
   async addNotification(notification) {
@@ -91,8 +95,6 @@ export class ProgressRepository {
     return (await this.repo(XpLedgerEntity)).find({ where: { accountId }, order: { earnedAt: 'DESC' } });
   }
 
-  // Every learner's total XP, when they reached it (their last gain) and the
-  // email of that gain, unranked.
   async listXpTotals() {
     const repository = await this.repo(XpLedgerEntity);
     const rows = await repository.query(`

@@ -21,9 +21,6 @@ import {
 } from '../../../components/ui';
 import { inviteAdminAccount } from '../../auth/api/auth-api.js';
 
-// Adds an account by invitation (D131): the admin gives the email, an optional
-// name and the role; the person receives a code valid for 72 hours and chooses
-// their own password. The admin never sets or sees a password.
 export function InviteAccountDialog({ open, onOpenChange, onInvited }) {
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');

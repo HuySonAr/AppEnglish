@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import axios from 'axios';
 import { installSessionRefresh } from './session-refresh.js';
 
-// Fake gateway: protected routes answer 401 until /auth/refresh has succeeded.
 function createClient({ refreshStatus = 200 } = {}) {
   const calls = [];
   let refreshed = false;

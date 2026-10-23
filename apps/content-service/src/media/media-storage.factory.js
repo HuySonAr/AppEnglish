@@ -5,12 +5,8 @@ import { ImageKitMediaStorageAdapter } from './imagekit-media-storage.adapter.js
 import { LocalMediaStorageAdapter } from './local-media-storage.adapter.js';
 import { R2MediaStorageAdapter } from './r2-media-storage.adapter.js';
 
-// Relative MEDIA_LOCAL_ROOT values are resolved from the repository root so the
-// ignored storage/media directory is used whatever the working directory is.
 const repositoryRoot = fileURLToPath(new URL('../../../../', import.meta.url));
 
-// MEDIA_STORAGE_ADAPTER chooses where new files go: local, imagekit or r2.
-// Files stored earlier in another storage can still be deleted.
 export function createMediaStorage(source = process.env) {
   const adapter = source.MEDIA_STORAGE_ADAPTER || 'local';
   const maxFileSizeBytes = Number(source.MEDIA_MAX_FILE_SIZE_BYTES || defaultMaxFileSizeBytes);
@@ -32,7 +28,6 @@ export function createMediaStorage(source = process.env) {
   };
   if (adapter === 'imagekit') return new ImageKitMediaStorageAdapter(imageKitSettings);
   if (adapter === 'r2') {
-    // With the ImageKit keys still set, files left there can be deleted too.
     const hasImageKit = source.IMAGEKIT_PRIVATE_KEY && source.IMAGEKIT_PUBLIC_KEY && source.IMAGEKIT_URL_ENDPOINT;
     return new R2MediaStorageAdapter({
       accountId: source.R2_ACCOUNT_ID,

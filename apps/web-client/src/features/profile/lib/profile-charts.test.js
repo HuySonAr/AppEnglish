@@ -11,7 +11,6 @@ test('skill bars keep null while a skill has no test', () => {
 test('the lessons ring is completed over published, with no percent without lessons', () => {
   assert.deepEqual(lessonRing({ completion: { completedLessons: 3, totalLessons: 8 } }), { completed: 3, total: 8, remaining: 5, percent: 38 });
   assert.deepEqual(lessonRing({ completion: { completedLessons: 0, totalLessons: 0 } }), { completed: 0, total: 0, remaining: 0, percent: null });
-  // Never more than published.
   assert.equal(lessonRing({ completion: { completedLessons: 9, totalLessons: 8 } }).remaining, 0);
 });
 

@@ -20,6 +20,9 @@ importers:
       '@appenglish/auth-contracts':
         specifier: workspace:*
         version: link:../../packages/auth-contracts
+      '@appenglish/backend-common':
+        specifier: workspace:*
+        version: link:../../packages/backend-common
       '@appenglish/content-contracts':
         specifier: workspace:*
         version: link:../../packages/content-contracts
@@ -62,6 +65,9 @@ importers:
       '@appenglish/auth-contracts':
         specifier: workspace:*
         version: link:../../packages/auth-contracts
+      '@appenglish/backend-common':
+        specifier: workspace:*
+        version: link:../../packages/backend-common
       '@grpc/grpc-js':
         specifier: ^1.14.0
         version: 1.14.6
@@ -110,6 +116,9 @@ importers:
       '@appenglish/auth-contracts':
         specifier: workspace:*
         version: link:../../packages/auth-contracts
+      '@appenglish/backend-common':
+        specifier: workspace:*
+        version: link:../../packages/backend-common
       '@appenglish/content-contracts':
         specifier: workspace:*
         version: link:../../packages/content-contracts
@@ -164,6 +173,9 @@ importers:
       '@appenglish/auth-contracts':
         specifier: workspace:*
         version: link:../../packages/auth-contracts
+      '@appenglish/backend-common':
+        specifier: workspace:*
+        version: link:../../packages/backend-common
       '@appenglish/content-contracts':
         specifier: workspace:*
         version: link:../../packages/content-contracts
@@ -212,6 +224,9 @@ importers:
       '@appenglish/auth-contracts':
         specifier: workspace:*
         version: link:../../packages/auth-contracts
+      '@appenglish/backend-common':
+        specifier: workspace:*
+        version: link:../../packages/backend-common
       '@appenglish/content-contracts':
         specifier: workspace:*
         version: link:../../packages/content-contracts

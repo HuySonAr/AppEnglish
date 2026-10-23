@@ -10,7 +10,6 @@ const attempt = (attemptNumber, day, scorePercent, passed) => ({
 });
 
 test('each attempt is a point, with the change of month marked', () => {
-  // Days 10 and 20 are in September, day 45 is October 15.
   const points = scoreChartPoints([attempt(1, 10, 40, false), attempt(2, 20, 65), attempt(3, 45, 85, true)]);
   assert.deepEqual(
     points.map((point) => [point.attemptNumber, point.scorePercent, point.passed, point.latest, point.newMonth]),

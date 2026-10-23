@@ -9,33 +9,19 @@ import { courseMap, courseProgress, itemPlace, levelAfter, shuffledOrder } from 
 
 const hideAnswer = ({ id, skill, prompt, options }) => ({ id, skill, prompt, options: options.map(({ id: optionId, text }) => ({ id: optionId, text })) });
 
-// A level-test question with the learner's answer and the right one.
 function markQuestion(question, answers) {
   const chosenOptionId = answers[question.id] || null;
   const correctOptionId = question.options.find((option) => option.isCorrect)?.id ?? null;
   return { ...hideAnswer(question), chosenOptionId, correctOptionId, correct: chosenOptionId === correctOptionId, explanation: question.explanation || '' };
 }
 
-// The pieces of a sentence in the blanks mode: text, and blanks numbered
-// from 0 with their answer (the same notation as songs, D88).
 const gapPieces = (gap) => {
   let next = 0;
   return lyricPieces(gap).map((piece) => ('blank' in piece ? { blank: next++, answer: piece.blank } : piece));
 };
 
-// The Listening course for learners (F05C, D143–D145). Each level has topics,
-// each topic one listening lesson: vocabulary, comprehension questions, an
-// optional ordering task, dictation (blanks or full sentences) and the
-// transcript with its translation. Questions, ordering and dictation are
-// checked to help the learner but nothing is scored or kept; a topic is
-// marked done for progress. Topics of an open level are all open; the level
-// test of a level, passed, opens the next level. Topics, tests and answers
-// live in content-service.
-// The URL of a level-test section's own recording (D147).
 const audioOf = (paper, section) => (section.audioMediaId && paper.media?.[section.audioMediaId]) || null;
 
-// A level-test transcript as lines; "Man: …" at the start of a line is the
-// speaker, as when a Content Manager pastes a transcript.
 const SPEAKER = /^([A-Za-z][A-Za-z .'-]{0,38}):\s+(.+)$/;
 export function transcriptLines(transcript) {
   return String(transcript || '')
@@ -49,7 +35,6 @@ export function transcriptLines(transcript) {
 }
 
 export class CourseLessonService {
-  // now() is replaceable in tests.
   constructor(repository, contentClient, { now = () => new Date(), events = noEvents } = {}) {
     this.repository = repository;
     this.contentClient = contentClient;
@@ -67,7 +52,6 @@ export class CourseLessonService {
       : { bestScore: null, lastScore: null, attemptCount: 0, passed: false };
   }
 
-  // The learner's place in the published course, with their results.
   async mapOf(accountId) {
     const [course, topicResults, testResults] = await Promise.all([
       this.contentClient.listPublishedCourse(),
@@ -81,8 +65,6 @@ export class CourseLessonService {
     return { map, topicResults, testResults };
   }
 
-  // The published course by level: what is open, the topics done and the
-  // level tests with the learner's results.
   async getCourse(actor) {
     this.assertStudent(actor);
     const { map, testResults } = await this.mapOf(actor.id);
@@ -108,7 +90,6 @@ export class CourseLessonService {
     };
   }
 
-  // A published topic of an open level, with its paper.
   async topicOf(accountId, topicId, versionId) {
     const [{ map }, paper] = await Promise.all([this.mapOf(accountId), this.contentClient.getCoursePaper(topicId, versionId)]);
     if (!paper || paper.item.type !== CourseItemType.TOPIC) throw courseErrors.notFound();
@@ -118,9 +99,6 @@ export class CourseLessonService {
     return { paper, map };
   }
 
-  // Everything to study a topic (D143): nothing is scored, so the answers,
-  // the transcript and the translation come with it and the page checks the
-  // questions and the ordering itself. The ordering ideas come shuffled.
   async getTopic(actor, topicId) {
     this.assertStudent(actor);
     const [{ paper, map }, result] = await Promise.all([this.topicOf(actor.id, topicId), this.repository.findResult(actor.id, topicId)]);
@@ -166,8 +144,6 @@ export class CourseLessonService {
     };
   }
 
-  // One dictation sentence checked (D145): word by word in the full mode
-  // (D86), blank by blank in the blanks mode. Nothing is kept.
   async checkSentence(actor, topicId, { versionId, segmentId, mode, text, blanks }) {
     this.assertStudent(actor);
     const { paper } = await this.topicOf(actor.id, topicId, versionId);
@@ -189,7 +165,6 @@ export class CourseLessonService {
     return { segmentId, mode: CourseDictationMode.FULL, words: checked.words, correct: accuracy === 100, accuracy };
   }
 
-  // The topic marked done (for progress); doing it again keeps it done.
   async completeTopic(actor, topicId) {
     this.assertStudent(actor);
     await this.topicOf(actor.id, topicId);
@@ -198,8 +173,6 @@ export class CourseLessonService {
     const { map } = await this.mapOf(actor.id);
     return { done: Boolean(result.passedAt), progress: courseProgress(map, await this.repository.listTestResults(actor.id)) };
   }
-
-  // ----- Level tests (D145).
 
   async testOf(accountId, itemId, versionId) {
     const [paper, { map }] = await Promise.all([this.contentClient.getCoursePaper(itemId, versionId), this.mapOf(accountId)]);
@@ -214,8 +187,6 @@ export class CourseLessonService {
     return { id: paper.item.id, kind: 'level_test', title: paper.item.title, level: paper.item.level, nextLevel: levelAfter(paper.item.level) };
   }
 
-  // A level test to take: each section's recording and its questions without
-  // their answers.
   async getTest(actor, itemId) {
     this.assertStudent(actor);
     const [{ paper }, result] = await Promise.all([this.testOf(actor.id, itemId), this.repository.findTestResult(actor.id, itemId)]);
@@ -232,7 +203,6 @@ export class CourseLessonService {
     };
   }
 
-  // The answers scored and kept; passing opens the next level (`levelUp`).
   async submitTest(actor, itemId, { versionId, answers }) {
     this.assertStudent(actor);
     const { paper, map: before } = await this.testOf(actor.id, itemId, versionId);

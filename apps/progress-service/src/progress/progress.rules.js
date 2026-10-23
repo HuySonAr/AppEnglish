@@ -2,11 +2,6 @@ import { ProgressSkill, ProgressSource, wholePercent } from '@appenglish/progres
 
 const SKILLS = Object.values(ProgressSkill);
 
-// Pure rules of progress (D33, D39).
-
-// The best share of right answers per skill of every test the learner took:
-// a lesson test or a mock test counts once, at its best attempt for that
-// skill. A skill a test has no questions of is left out for that test.
 export function bestBySkill(results) {
   const tests = new Map();
   for (const result of results) {
@@ -23,9 +18,6 @@ export function bestBySkill(results) {
   return [...tests.values()];
 }
 
-// Mastery of one skill: the average of the best shares of the tests that have
-// questions of it, as a whole percent, with how many tests and of what kind
-// it rests on. null percent (not 0) before any such test (D39).
 export function skillMastery(results, skill) {
   const bests = bestBySkill(results).filter((best) => best[skill] !== null);
   const count = (source) => bests.filter((best) => best.source === source).length;
@@ -41,9 +33,6 @@ export function skillMastery(results, skill) {
   };
 }
 
-// Lessons completed over the published lessons (D33). Only lessons still in
-// the published curriculum count, so a completed lesson that was taken down
-// neither counts nor blocks 100%. Each unit is listed with its own count.
 export function completion(completions, curriculum) {
   const completed = new Set(completions.map((row) => row.lessonId));
   const units = curriculum.units.map((unit) => ({

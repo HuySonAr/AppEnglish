@@ -1,10 +1,6 @@
 import { Skeleton } from '../ui/skeleton.jsx';
 import { cn } from '../../lib/utils.js';
 
-// Loading placeholders shaped like the page they stand in for, so the layout
-// does not jump when the data arrives. Pick the one closest to the page; see
-// docs/02-architecture/frontend-architecture.md ("Loading states").
-
 function Frame({ label = 'Loading', className, children }) {
   return (
     <div role="status" aria-busy="true" aria-label={label} className={cn('space-y-6', className)}>
@@ -14,7 +10,6 @@ function Frame({ label = 'Loading', className, children }) {
   );
 }
 
-// The title block of a page: section label, title, one line of description.
 function HeaderSkeleton() {
   return (
     <div className="space-y-2">
@@ -35,8 +30,6 @@ function ToolbarSkeleton() {
   );
 }
 
-// Rows of a list inside a page that is already showing (no header).
-// tall: rows the height of a card instead of a line.
 export function RowsSkeleton({ rows = 4, tall = false }) {
   return (
     <Frame className="space-y-0 divide-y overflow-hidden rounded-xl border bg-card">
@@ -54,7 +47,6 @@ export function RowsSkeleton({ rows = 4, tall = false }) {
   );
 }
 
-// A page that is a searchable list: header, toolbar, rows.
 export function ListPageSkeleton({ rows = 5, toolbar = true }) {
   return (
     <Frame>
@@ -65,7 +57,6 @@ export function ListPageSkeleton({ rows = 5, toolbar = true }) {
   );
 }
 
-// A page that is a grid of cards: header, toolbar, cards.
 export function CardGridPageSkeleton({ cards = 4, toolbar = true }) {
   return (
     <Frame>
@@ -85,8 +76,6 @@ export function CardGridPageSkeleton({ cards = 4, toolbar = true }) {
   );
 }
 
-// A page about one thing: a summary card, then sections. aside adds the right
-// column used on wide screens (e.g. a ranking).
 export function DetailPageSkeleton({ aside = false }) {
   const main = (
     <div className="min-w-0 space-y-6">
@@ -119,7 +108,6 @@ export function DetailPageSkeleton({ aside = false }) {
   );
 }
 
-// An editor: header fields, the save bar, tabs and two blocks of fields.
 export function EditorPageSkeleton() {
   return (
     <Frame>
@@ -148,7 +136,6 @@ export function EditorPageSkeleton() {
   );
 }
 
-// A settings form: header and one card of fields.
 export function FormPageSkeleton({ fields = 2 }) {
   return (
     <Frame>

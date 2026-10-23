@@ -1,6 +1,3 @@
-// Listening practice (F05B-2, D85): topics (TOEIC created here, the only one
-// with an editor), exercises with a CEFR level label and a TOEIC part kind,
-// and their versions, versioned like mock tests.
 export class CreateListening1720000005000 {
   name = 'CreateListening1720000005000';
 
@@ -49,7 +46,6 @@ export class CreateListening1720000005000 {
         CONSTRAINT "UQ_listening_exercise_versions_number" UNIQUE ("exerciseId", "versionNumber")
       )
     `);
-    // At most one editable draft per exercise.
     await queryRunner.query(`CREATE UNIQUE INDEX IF NOT EXISTS "UQ_listening_exercise_versions_one_draft" ON "listening_exercise_versions" ("exerciseId") WHERE "status" = 'DRAFT'`);
   }
 

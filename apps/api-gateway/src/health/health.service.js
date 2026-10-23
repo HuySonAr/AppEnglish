@@ -1,7 +1,5 @@
 import { HealthResponseDto } from './health.dto.js';
 
-// The backend services the admin dashboard watches (D115): each one's HTTP
-// health port comes from the environment, like the gateway's own.
 const serviceSpecs = Object.freeze([
   { name: 'content-service', port: 'CONTENT_SERVICE_PORT', fallback: 3002 },
   { name: 'learning-service', port: 'LEARNING_SERVICE_PORT', fallback: 3003 },
@@ -19,10 +17,6 @@ export class HealthService {
     });
   }
 
-  // Asks every service whether it is up (D115). auth-service answers over
-  // gRPC (`Ready`, with its database); the others over their HTTP /health.
-  // A service that does not answer within the timeout is 'down'; the
-  // dashboard shows the list, never fails because of one service.
   async probeServices({ authReady, env = process.env, fetchImpl = fetch } = {}) {
     const probes = [
       this.probe('auth-service', async () => {
@@ -45,7 +39,6 @@ export class HealthService {
           }
         }),
       ),
-      // The Python worker answers through content-service (D133).
       this.probe('speech-service', async () => {
         const port = env.CONTENT_SERVICE_PORT || 3002;
         const controller = new AbortController();

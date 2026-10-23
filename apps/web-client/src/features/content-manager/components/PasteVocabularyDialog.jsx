@@ -4,8 +4,6 @@ import { PasteDialog } from './PasteDialog.jsx';
 const example = `contract | noun | hợp đồng | We signed the contract yesterday. | Chúng tôi đã ký hợp đồng hôm qua. | /ˈkɒntrækt/
 negotiate | v | đàm phán | They negotiated a better price.`;
 
-// Fills the vocabulary of a lesson from pasted lines, one word per line
-// (PasteDialog). onApply receives the vocabulary with the pasted words in it.
 export function PasteVocabularyDialog({ vocabulary, onApply }) {
   return (
     <PasteDialog

@@ -1,7 +1,5 @@
 import { cn } from '../../lib/utils.js';
 
-// Title block at the top of every page: small section label, title,
-// description and, on the right, the page's main actions.
 export function PageHeader({
   eyebrow,
   title,

@@ -10,7 +10,6 @@ export class MockRepository {
     return this.dataSource.getRepository(entity);
   }
 
-  // The learner's finished attempts at every mock test, without the answers.
   async listFinishedAttempts(accountId) {
     return (await this.repo(MockAttemptEntity)).find({
       where: { accountId, status: 'COMPLETED' },
@@ -22,7 +21,6 @@ export class MockRepository {
     });
   }
 
-  // The learner's attempts at one mock test (full and mini), oldest first.
   async listTestAttempts(accountId, mockTestId) {
     return (await this.repo(MockAttemptEntity)).find({
       where: { accountId, mockTestId },
@@ -74,12 +72,11 @@ export class MockRepository {
     });
   }
 
-  // Returns null when the attempt already exists, e.g. two starts racing.
   async createAttempt(attempt) {
     try {
       return await (await this.repo(MockAttemptEntity)).save(attempt);
     } catch (error) {
-      if (error?.code === '23505') return null; // unique violation
+      if (error?.code === '23505') return null;
       throw error;
     }
   }
@@ -88,8 +85,6 @@ export class MockRepository {
     return (await this.repo(MockAttemptEntity)).save(attempt);
   }
 
-  // Removes an attempt the learner left without submitting (D82). Only an
-  // attempt still in progress goes, so a submit racing it is kept.
   async deleteOpenAttempt(id) {
     await (await this.repo(MockAttemptEntity)).delete({ id, status: 'IN_PROGRESS' });
   }

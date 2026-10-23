@@ -2,20 +2,17 @@ import { z } from 'zod';
 import { AccountRole } from '@appenglish/auth-contracts';
 import { LearningEventType, StudyActivity } from '@appenglish/learning-contracts';
 
-// The learner an admin asks about (D114).
 export const learnerIdSchema = z.string().uuid();
 
 export const actorSchema = z.object({
   id: z.string().uuid(),
   role: z.enum(Object.values(AccountRole)),
-  // gRPC sends '' when the gateway passed none.
   email: z.string().max(320).optional(),
 });
 
 const count = z.number().int().min(0);
 const isoDate = z.string().datetime({ offset: true });
 
-// The per-skill counts every reported test carries.
 const skillCounts = {
   attemptNumber: z.number().int().min(1),
   correctCount: count,
@@ -27,8 +24,6 @@ const skillCounts = {
   submittedAt: isoDate,
 };
 
-// Payloads of the learning.results messages (LearningEventType). Fields
-// progress does not use are allowed and ignored.
 export const lessonTestSubmittedSchema = z
   .object({
     attemptId: z.string().uuid(),
@@ -58,10 +53,10 @@ export const mockSubmittedSchema = z
   })
   .passthrough();
 
-// The message envelope; the payload is checked by type in the service.
 export const resultMessageSchema = z.object({
   id: z.string().uuid(),
   type: z.string().min(1).max(40),
+  requestId: z.string().max(64).optional(),
   occurredAt: isoDate.optional(),
   payload: z.record(z.unknown()),
 });

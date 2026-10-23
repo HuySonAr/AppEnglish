@@ -15,8 +15,6 @@ import {
   DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu.jsx';
 
-// Account button in the top bar: the picture only (D113); the menu shows the
-// name and email, links to the profile and logs out.
 export function UserMenu() {
   const { account, signOut } = useAuth();
   const navigate = useNavigate();
@@ -49,7 +47,6 @@ export function UserMenu() {
         <DropdownMenuItem
           className="gap-2"
           onSelect={async () => {
-            // A page such as a test in progress may refuse to be left.
             if (!canLeave()) return;
             await signOut();
             navigate('/login', { replace: true });

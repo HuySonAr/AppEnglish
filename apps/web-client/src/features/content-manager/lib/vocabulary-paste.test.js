@@ -35,7 +35,6 @@ test('pasted words are added, and a word already there is updated', () => {
     ['negotiate', 'verb'],
     ['on behalf of', 'phrase'],
   ]);
-  // The updated word keeps its id and audio; the same word as a verb is untouched.
   assert.deepEqual(
     [vocabulary[0].id, vocabulary[0].meaning, vocabulary[0].phonetic, vocabulary[0].audioUkMediaId],
     [old.id, 'hợp đồng', '/ˈkɒntrækt/', 'audio-1'],
@@ -43,7 +42,6 @@ test('pasted words are added, and a word already there is updated', () => {
   assert.equal(vocabulary[1], verb);
   assert.ok(vocabulary[2].id);
 
-  // A line without the optional columns keeps what the word had.
   const kept = vocabularyPastePlan([old], 'contract | n | giao kèo | A new example.').vocabulary[0];
   assert.deepEqual([kept.meaning, kept.phonetic], ['giao kèo', '/old/']);
 });

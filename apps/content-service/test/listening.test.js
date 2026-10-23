@@ -39,7 +39,6 @@ test('topics: every role lists them, an Admin or a Content Manager adds and rena
   await assert.rejects(() => service.createTopic(manager, { name: 'SONGS' }), { code: 46, status: 409, data: { reason: 'NAME_TAKEN' } });
   await assert.rejects(() => service.updateTopic(admin, travel.id, { name: 'toeic' }), { code: 46 });
   assert.equal((await service.updateTopic(admin, travel.id, { name: 'Travel' })).topic.name, 'Travel');
-  // Exercises are written only for a topic with an editor.
   await assert.rejects(
     () => service.createExercise(manager, { topicId: songs.id, title: 'Song 1', level: 'A2', kind: 'part1' }),
     { code: 46, data: { reason: 'NO_EDITOR' } },
@@ -58,7 +57,6 @@ test('a Content Manager writes, saves and publishes a TOEIC dictation exercise',
   assert.deepEqual(created.draft, { versionNumber: 1, content: { audioMediaId: null, segments: [], source: { name: '', url: '' } } });
   const id = created.exercise.id;
 
-  // An empty draft cannot be published.
   await assert.rejects(() => service.publish(manager, id), (error) => {
     assert.equal(error.code, 42);
     assert.deepEqual(error.data.issues.map((issue) => issue.path), ['audioMediaId', 'segments']);
@@ -71,7 +69,6 @@ test('a Content Manager writes, saves and publishes a TOEIC dictation exercise',
   const saved = await service.saveDraft(manager, id, untimed);
   assert.ok(saved.draft.content.segments[0].id);
   assert.equal(saved.media[audioId].url, 'https://media.test/airport.mp3');
-  // Parts 3 and 4: every sentence needs its place in the recording.
   await assert.rejects(() => service.publish(manager, id), (error) => {
     assert.deepEqual(error.data.issues, [{ path: 'segments[0].start', message: 'Start and end in the recording are required' }]);
     return true;
@@ -83,11 +80,8 @@ test('a Content Manager writes, saves and publishes a TOEIC dictation exercise',
 
   const list = (await service.listExercises(manager)).exercises;
   assert.deepEqual(list.map((item) => [item.title, item.level, item.kind, item.publishedVersionNumber, item.hasDraft]), [['At the airport', 'B1', 'part3', 1, false]]);
-  // Title and level change at once; the kind does not.
   assert.equal((await service.updateExercise(manager, id, { level: 'B2' })).exercise.level, 'B2');
 
-  // A new draft that drops the recording deletes the file, unless the
-  // published version still uses it.
   const newAudio = await upload('audio', 'airport-2.mp3', 'audio/mpeg');
   await service.saveDraft(manager, id, listeningContentSchema.parse({ ...timed, audioMediaId: newAudio }));
   const third = await upload('audio', 'airport-3.mp3', 'audio/mpeg');
@@ -104,12 +98,10 @@ test('publishing rules of the four TOEIC parts', () => {
   const issues = (key, segments) =>
     listeningIssues(listeningContentSchema.parse({ audioMediaId: audioId, segments }), kind(key), media).map((issue) => `${issue.path}: ${issue.message}`);
   const four = ['A man is reading.', 'A man is running.', 'A man is cooking.', 'A man is sleeping.'].map((text) => sentence(text));
-  // Parts 1 and 2: four sentences, times optional.
   assert.deepEqual(issues('part1', four), []);
   assert.deepEqual(issues('part2', four.slice(0, 3)), ['segments: Part 2 has exactly 4 sentences to write down']);
   assert.deepEqual(issues('part1', [...four.slice(0, 3), sentence('')]), ['segments[3].text: Required']);
   assert.deepEqual(issues('part1', [sentence('One', 1, null), ...four.slice(1)]), ['segments[0].start: Give both the start and the end']);
-  // Parts 3 and 4: any number of sentences, each timed, in order.
   assert.deepEqual(issues('part4', [sentence('First.', 0, 2), sentence('Second.', 2, 5)]), []);
   assert.deepEqual(issues('part4', [sentence('First.', 3, 2)]), ['segments[0].end: The end must come after the start']);
   assert.deepEqual(issues('part4', [sentence('First.', 4, 6), sentence('Second.', 1, 3)]), ['segments[1].start: Sentences must follow the order of the recording']);
@@ -142,11 +134,9 @@ test('a topic gets a format, and songs are written with [blanks] (D88)', async (
   const later = (await service.createTopic(manager, { name: 'News' })).topic;
   assert.deepEqual([later.format, later.hasEditor], [null, false]);
   assert.equal((await service.updateTopic(manager, later.id, { format: 'toeic' })).topic.hasEditor, true);
-  // A song topic only has songs, a TOEIC topic only parts.
   await assert.rejects(() => service.createExercise(manager, { topicId: songs.id, title: 'X', level: 'A2', kind: 'part1' }), { code: 46, data: { reason: 'KIND_MISMATCH' } });
   await assert.rejects(() => service.createExercise(manager, { topicId: toeicTopicId, title: 'X', level: 'A2', kind: 'song' }), { code: 46, data: { reason: 'KIND_MISMATCH' } });
   const { exercise } = await service.createExercise(manager, { topicId: songs.id, title: 'Home', level: 'A2', kind: 'song' });
-  // The format is fixed once the topic has exercises; renaming still works.
   await assert.rejects(() => service.updateTopic(admin, songs.id, { format: 'toeic' }), { code: 46, data: { reason: 'HAS_EXERCISES' } });
   assert.equal((await service.updateTopic(admin, songs.id, { name: 'Music', format: 'song' })).topic.name, 'Music');
   await assert.rejects(() => service.deleteTopic(admin, songs.id), { code: 46, data: { reason: 'HAS_EXERCISES', exerciseCount: 1 } });
@@ -188,19 +178,15 @@ test('auto-time sends the saved lines to speech-service and keeps its answer (D9
   await assert.rejects(() => service.requestAutoTime(manager, exercise.id), { code: 41, data: { reason: 'NO_LINES' } });
   const saved = await service.saveDraft(manager, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [sentence('Attention, passengers.'), sentence('The train is late.')] }));
   const [first, second] = saved.draft.content.segments;
-  // Without the broker no job is made.
-  await assert.rejects(() => service.requestAutoTime(manager, exercise.id), { code: 47, status: 503 });
   await assert.rejects(() => service.requestAutoTime(student, exercise.id), { code: 26 });
 
-  broker.ready = true;
   const { job } = await service.requestAutoTime(manager, exercise.id);
   assert.deepEqual([job.task, job.status, job.lineCount, job.lines], ['align', 'QUEUED', 2, []]);
-  assert.deepEqual(sent, [{ jobId: job.id, task: 'align', audioUrl: 'https://media.test/t.mp3', language: 'en', kind: 'part4', lines: [{ id: first.id, text: 'Attention, passengers.' }, { id: second.id, text: 'The train is late.' }] }]);
-  // Asking again while it runs gives the same job.
+  assert.deepEqual(repository.tables.contentEvents.map((event) => event.payload), [{ jobId: job.id, task: 'align', audioUrl: 'https://media.test/t.mp3', language: 'en', kind: 'part4', lines: [{ id: first.id, text: 'Attention, passengers.' }, { id: second.id, text: 'The train is late.' }] }]);
   assert.equal((await service.requestAutoTime(manager, exercise.id)).job.id, job.id);
-  assert.equal(sent.length, 1);
+  assert.equal(repository.tables.contentEvents.length, 1);
+  assert.equal(repository.tables.contentEvents[0].type, 'speech.job.requested');
 
-  // Answers: running, then done; times of unknown lines are dropped, bad answers ignored.
   await service.onAutoTimeResult({ jobId: job.id, status: 'RUNNING' });
   assert.equal((await service.getAutoTime(manager, exercise.id)).job.status, 'RUNNING');
   await service.onAutoTimeResult({ jobId: job.id, status: 'DONE', lines: 'nope' });
@@ -211,11 +197,9 @@ test('auto-time sends the saved lines to speech-service and keeps its answer (D9
   });
   const done = (await service.getAutoTime(manager, exercise.id)).job;
   assert.deepEqual([done.status, done.lines.map((line) => [line.start, line.end, line.matched])], ['DONE', [[0.4, 1.9, 1], [2.1, 3.5, 0.75]]]);
-  // A finished job is not changed by a late answer.
   await service.onAutoTimeResult({ jobId: job.id, status: 'FAILED', error: 'late' });
   assert.equal((await service.getAutoTime(manager, exercise.id)).job.status, 'DONE');
 
-  // A job left without an answer for 30 minutes shows as failed, and a new one can be asked.
   const second2 = (await service.requestAutoTime(manager, exercise.id)).job;
   clock = new Date(Date.now() + 31 * 60 * 1000);
   const late = (await service.getAutoTime(manager, exercise.id)).job;
@@ -231,12 +215,10 @@ test('transcribe asks for the lines of the recording alone and keeps the lines h
   const songs = (await service.createTopic(admin, { name: 'Songs', format: 'song' })).topic;
   const { exercise } = await service.createExercise(manager, { topicId: songs.id, title: 'Home', level: 'A2', kind: 'song' });
   const audioId = (await content.uploadMedia(manager, { kind: 'audio', fileName: 's.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1]), section: 'listening' })).media.id;
-  // No lines are needed, only the recording.
   await service.saveDraft(manager, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [] }));
   const { job } = await service.requestTranscribe(manager, exercise.id);
   assert.deepEqual([job.task, job.status, job.lineCount], ['transcribe', 'QUEUED', 0]);
-  assert.deepEqual(sent, [{ jobId: job.id, task: 'transcribe', audioUrl: 'https://media.test/s.mp3', language: 'en', kind: 'song', lines: [] }]);
-  // While it runs, auto-time gives the same job back.
+  assert.deepEqual(repository.tables.contentEvents.map((event) => event.payload), [{ jobId: job.id, task: 'transcribe', audioUrl: 'https://media.test/s.mp3', language: 'en', kind: 'song', lines: [] }]);
   assert.equal((await service.requestAutoTime(manager, exercise.id).catch((error) => error)).code, 41);
 
   await service.onAutoTimeResult({

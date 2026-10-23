@@ -4,8 +4,6 @@ import { PasteDialog } from './PasteDialog.jsx';
 
 const optionLetters = ['A', 'B', 'C', 'D'];
 const answerOf = (question) => (question.correct === null ? '?' : optionLetters[question.correct]);
-// The layout to paste, shown with the first number of the part and as many
-// options as it has; a part of photographs has no question line.
 const optionNames = ['First', 'Second', 'Third', 'Fourth'];
 const questionExample = (number, spec) =>
   [
@@ -23,9 +21,6 @@ Question ${number}${blanks ? '' : '\nText of the question'}
 (D) Fourth option
 Correct Answer: B`;
 
-// What pasting the text into the part does: the part afterwards, the number
-// of questions written and the lines of the list to check. Parts 6 and 7 are
-// pasted passage by passage, the other parts question by question.
 function pastePlan(part, spec, setName, text) {
   if (spec.group.passage) {
     const plan = pastedPassagesPlan(part, spec, parsePastedPassages(text, { blanks: Boolean(spec.group.blanks) }));
@@ -55,12 +50,6 @@ function pastePlan(part, spec, setName, text) {
   };
 }
 
-// Fills the questions of a part from pasted text (PasteDialog).
-// setName is what a set of the part is called, null in a part without sets;
-// onApply receives the part with the pasted questions in it. The defaults are
-// those of the mock-test editor; another editor gives its own planFor (what
-// pasting does), firstNumber and exampleCount (the numbers of the example)
-// and description.
 export function PasteQuestionsDialog({ spec, part, setName, onApply, planFor = pastePlan, firstNumber = MOCK_FIRST_QUESTION_NUMBERS[spec.key], exampleCount, description: ownDescription }) {
   const byPassage = Boolean(spec.group.passage);
   const blanks = Boolean(spec.group.blanks);

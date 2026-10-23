@@ -7,7 +7,6 @@ import { lessonContentSchema } from '../src/content/content.schemas.js';
 import { listeningContentSchema } from '../src/listening/listening.schemas.js';
 import { createMemoryRepository, manager, publishableContent, student, toeicExamTypeId, toeicTopicId } from './memory-repository.js';
 
-// Taking content away (D118): unpublish hides, delete removes with its media.
 async function harness() {
   const repository = createMemoryRepository();
   const removed = [];
@@ -43,7 +42,6 @@ test('a lesson can be unpublished and published again; learners stop seeing it i
   const hidden = await h.content.unpublishLesson(manager, lesson.id);
   assert.equal(hidden.published, null);
   assert.equal((await h.content.getCurriculum()).units.find((item) => item.id === unit.id)?.lessons.length ?? 0, 0);
-  // The stored version is kept; a new draft publishes as the next version.
   const listed = (await h.content.listUnits(manager)).units[0].lessons[0];
   assert.equal(listed.publishedVersionNumber, null);
   await h.content.saveLessonDraft(manager, lesson.id, lessonContentSchema.parse(publishableContent({ audioId: (await h.upload('b.mp3')), imageId: (await h.upload('b.png', 'image')) })));
@@ -61,7 +59,6 @@ test('deleting a lesson removes its versions and the media only it used, and clo
   assert.deepEqual(result, { deleted: true, unitId: unit.id, removedMedia: 0 });
   const lessons = (await h.content.listUnits(manager)).units[0].lessons;
   assert.deepEqual(lessons.map((item) => [item.title, item.position]), [['Unit lesson', 1], ['Third', 2]]);
-  // The first lesson's media go with it; nothing else referred to them.
   const gone = await h.content.deleteLesson(manager, lesson.id);
   assert.equal(gone.removedMedia, 2);
   assert.deepEqual(h.removed.sort(), ['Unit-a.mp3', 'Unit-i.png']);
@@ -98,15 +95,12 @@ test('mock tests unpublish and delete the same way', async () => {
   await assert.rejects(() => h.content.deleteMockTest(manager, mockTest.id), { code: 40 });
 });
 
-// D147: the course holds its own recordings, so nothing in it keeps a
-// library exercise from being deleted.
 test('a listening exercise goes with its recording, whatever the course holds', async () => {
   const h = await harness();
   const audioId = await h.upload('talk.mp3');
   const { exercise } = await h.listening.createExercise(manager, { title: 'At the airport', level: 'A2', kind: 'part1', topicId: toeicTopicId });
   await h.listening.saveDraft(manager, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [{ text: 'Hello there.' }] }));
   await h.course.createItem(manager, { level: 'A2', type: 'topic', title: 'Topic', description: '' });
-  // Unpublishing is always allowed.
   assert.equal((await h.listening.unpublish(manager, exercise.id)).published, null);
   assert.deepEqual(await h.listening.delete(manager, exercise.id), { deleted: true, removedMedia: 1 });
   assert.deepEqual(h.removed, ['talk.mp3']);

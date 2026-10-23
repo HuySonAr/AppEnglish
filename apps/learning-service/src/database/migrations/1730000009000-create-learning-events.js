@@ -1,6 +1,3 @@
-// Outbox of the results sent to progress-service over RabbitMQ (F06, D110).
-// A row is written with the result it reports and relayed afterwards, so a
-// result is not lost while the broker is away.
 export class CreateLearningEvents1730000009000 {
   name = 'CreateLearningEvents1730000009000';
 

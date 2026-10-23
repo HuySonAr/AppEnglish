@@ -15,13 +15,6 @@ import {
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { FileDropzone } from '../../../components/shared/FileDropzone.jsx';
 
-// A button opening a dialog that fills part of a draft from pasted text. The
-// text is read as it is typed by planFor(text), which returns { count, lines,
-// … }: lines ({ title, note, text, errors, warnings }) are listed to check and
-// nothing changes until the confirm button, which hands the plan to onApply.
-// A line with errors blocks it. noun names what is counted ("question").
-// With fileAccept (e.g. ".srt,.lrc") a text file can be opened instead of
-// pasting; its text lands in the box. icon replaces the paste icon.
 export function PasteDialog({ id, button, title, description, label, placeholder, notFound, noun, done, planFor, onApply, fileAccept, icon: Icon = ClipboardPaste, triggerClassName = 'gap-1.5' }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');

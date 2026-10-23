@@ -1,5 +1,3 @@
-// Node-only gRPC contract helpers for api-gateway and learning-service. Keep
-// this out of src/index.js so the web client can import the constants.
 import { fileURLToPath } from 'node:url';
 
 export const LEARNING_GRPC_PACKAGE = 'appenglish.learning.v1';

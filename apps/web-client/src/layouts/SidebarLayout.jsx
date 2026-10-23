@@ -25,11 +25,6 @@ import { NotificationBell } from './components/NotificationBell.jsx';
 import { ThemeToggle } from './components/ThemeToggle.jsx';
 import { UserMenu } from './components/UserMenu.jsx';
 
-// The workspace of every role: a fixed sidebar with the role's menu on wide
-// screens, a slide-in drawer on phones, and a top bar. side puts the sidebar
-// on the left or the right; drawerSide (side by default) does the same for
-// the phone drawer and its menu button: the student has the sidebar on the
-// left like the other roles and the drawer on the right (D96).
 export function SidebarLayout({ role, side = 'left', drawerSide = side }) {
   const { home, items } = navigation[role];
   const label = RoleLabels[role];
@@ -41,7 +36,6 @@ export function SidebarLayout({ role, side = 'left', drawerSide = side }) {
   const dark = theme === 'dark';
   const navigate = useNavigate();
   async function logOut() {
-    // A page such as a test in progress may refuse to be left.
     if (!canLeave()) return;
     await signOut();
     navigate('/login', { replace: true });
@@ -57,7 +51,6 @@ export function SidebarLayout({ role, side = 'left', drawerSide = side }) {
         </p>
         <SidebarNav items={items} label={`${label} navigation`} onNavigate={onNavigate} />
       </div>
-      {/* The signed-in person (D113): picture and name link to the profile; Log out below. */}
       <div className="shrink-0 border-t p-3">
         <Link
           to={`${dashboardPathForRole(role)}/profile`}

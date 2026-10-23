@@ -84,7 +84,6 @@ export function MockTestPage() {
     } catch (error) {
       notify({ title: 'Could not submit the test', description: getApiErrorMessage(error), variant: 'destructive' });
     } finally {
-      // The attempt is over either way (submitted, or its time ran out).
       setExam(null);
       await load({ quiet: true });
       setBusy(false);
@@ -92,16 +91,12 @@ export function MockTestPage() {
     }
   }
 
-  // Leaving without submitting: the attempt is thrown away (D82), or a mini
-  // test is kept to resume. A mini test goes back to the history page of its
-  // part, the full test to this page. True when the learner left.
   async function onLeave(discard) {
     const reference = exam.partKey ? mini(exam.partKey) : FULL;
     try {
       if (discard) await discardMockAttempt(mockTestId, reference);
     } catch (error) {
       notify({ title: 'Could not leave the test', description: getApiErrorMessage(error), variant: 'destructive' });
-      // The attempt may be over already (its time ran out).
       setExam(null);
       await load({ quiet: true });
       return false;

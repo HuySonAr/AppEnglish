@@ -3,8 +3,6 @@ import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import { AVATAR_STORAGE } from './avatar-storage.js';
 
-// Serves locally stored avatars (AVATAR_STORAGE_ADAPTER=local) for development.
-// With ImageKit the URLs point at ImageKit and this route is never used.
 export class AvatarFilesController {
   constructor(storage) {
     this.storage = storage;

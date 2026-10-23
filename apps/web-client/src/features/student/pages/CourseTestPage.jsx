@@ -11,16 +11,10 @@ import { getCourseTest, submitCourseTest } from '../api/course-api.js';
 import { CourseTestSection, firstNumbers } from '../components/CourseTestSection.jsx';
 import { unanswered } from '../lib/listening-course.js';
 
-// The level test of a level of the Listening course (D145): recordings with
-// multiple-choice questions, untimed, each recording heard at its own speed
-// at most twice; every question answered, then the answers are scored and the
-// best score kept. Passing opens the next level; the review shows the
-// answers, the explanations and the transcripts.
 export function CourseTestPage() {
   const { itemId } = useParams();
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
-  // Option id by question id.
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -41,7 +35,6 @@ export function CourseTestPage() {
   useEffect(() => {
     load();
   }, [itemId]);
-
 
   async function submit() {
     setBusy(true);

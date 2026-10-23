@@ -4,11 +4,9 @@ import { AccountRole } from '@appenglish/auth-contracts';
 export const actorSchema = z.object({
   id: z.string().uuid(),
   role: z.enum(Object.values(AccountRole)),
-  // gRPC sends '' when the gateway passed none.
   email: z.string().max(320).optional(),
 });
 
-// Chosen option id by question id. Unknown ids are ignored when scoring.
 export const answersSchema = z
   .object({ answers: z.record(z.string().uuid(), z.string().uuid()).default({}) })
   .strict()
@@ -27,5 +25,4 @@ export const settingsSchema = z
     path: ['unit3Threshold'],
   });
 
-// The learner whose placement an admin resets (D131).
 export const accountIdSchema = z.string().uuid();

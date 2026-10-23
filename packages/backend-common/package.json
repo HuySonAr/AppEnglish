@@ -4,12 +4,16 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./zod-validation.pipe": "./src/zod-validation.pipe.js"
+    "./zod-validation.pipe": "./src/zod-validation.pipe.js",
+    "./observability": "./src/observability.js",
+    "./metrics": "./src/metrics.js",
+    "./messaging": "./src/messaging.js",
+    "./grpc-context": "./src/grpc-context.js"
   },
   "scripts": {
-    "build": "node --check src/zod-validation.pipe.js",
+    "build": "node ../../scripts/check-syntax.mjs src",
     "lint": "node ../../scripts/check-syntax.mjs src test",
-    "test": "node --check src/zod-validation.pipe.js"
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.0",

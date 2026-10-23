@@ -5,12 +5,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 
 const PAGE_SIZES = [10, 20, 50];
 
-// Pagination bar: "43 accounts · page 2 of 5" on the left and, on the right,
-// one joined block of Previous · 1 2 3 … 10 · Next (the user's chosen layout).
-// Narrow screens hide the page numbers and show "2 / 5" between the arrows.
-// Hidden when there is one page and nothing to count. noun names the items,
-// e.g. "mock test". Pass pageSize + onPageSizeChange to offer rows per page
-// (server-paged lists only).
 export function Pagination({ page, pageCount, total, noun = 'item', onChange, pageSize, onPageSizeChange, className }) {
   if (!total) return null;
   const cell = 'inline-flex h-9 min-w-9 items-center justify-center border-l px-2 text-sm transition first:border-l-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50';

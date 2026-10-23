@@ -1,4 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
+import { withGrpcContext } from '@appenglish/backend-common/grpc-context';
 import { GrpcMethod } from '@nestjs/microservices';
 import { ContentResponseCode } from '@appenglish/content-contracts';
 import { CONTENT_GRPC_SERVICE } from '@appenglish/content-contracts/grpc';
@@ -7,9 +8,6 @@ import { actorSchema, idSchema, placementPaperSchema } from '../content/content.
 import { CourseService } from './course.service.js';
 import { courseItemCreateSchema, courseItemUpdateSchema } from './course.schemas.js';
 
-// Each RPC: whether it targets an item id, the schema of its JSON payload (if
-// any) and the service call. Draft contents are validated by the service with
-// the schema of the item's type.
 const rpcs = {
   ListListeningCourse: { run: (service, { actor }) => service.listCourse(actor) },
   CreateCourseItem: { payload: courseItemCreateSchema, run: (service, { actor, payload }) => service.createItem(actor, payload) },
@@ -22,7 +20,6 @@ const rpcs = {
   RequestCourseAutoTime: { id: true, run: (service, { actor, id }) => service.requestAutoTime(actor, id) },
   RequestCourseTranscribe: { id: true, run: (service, { actor, id }) => service.requestTranscribe(actor, id) },
   GetCourseAutoTime: { id: true, run: (service, { actor, id }) => service.getAutoTime(actor, id) },
-  // Called by learning-service, not by the gateway: there is no actor.
   ListPublishedCourse: { internal: true, run: (service) => service.listPublished() },
   GetCoursePaper: { internal: true, id: true, payload: placementPaperSchema, run: (service, { id, payload }) => service.getPaper(id, payload) },
 };
@@ -42,8 +39,6 @@ export class CourseGrpcController {
     this.courseService = courseService;
   }
 
-  // Shapes the { code, msg, data } envelope. Unexpected errors propagate as a
-  // gRPC error and the gateway answers 500.
   async handle(spec, request) {
     try {
       const body = parseJson(request.payloadJson);
@@ -72,5 +67,6 @@ for (const [rpc, spec] of Object.entries(rpcs)) {
   CourseGrpcController.prototype[method] = function (request) {
     return this.handle(spec, request);
   };
+  withGrpcContext(CourseGrpcController.prototype, method, rpc);
   GrpcMethod(CONTENT_GRPC_SERVICE, rpc)(CourseGrpcController.prototype, method, Object.getOwnPropertyDescriptor(CourseGrpcController.prototype, method));
 }

@@ -32,7 +32,6 @@ import {
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
-// How a topic's exercises are written (D88); 'none' stands for no format yet.
 const formats = [
   { value: 'toeic', label: 'TOEIC parts' },
   { value: 'song', label: 'Songs' },
@@ -72,16 +71,11 @@ function FormatSelect({ id, value, onChange }) {
   );
 }
 
-// Topics of the listening practice (D85), kept by an Admin or a Content
-// Manager (eyebrow names the role). Each topic has an exercise type, TOEIC
-// parts or songs (D88); a topic without one cannot have exercises yet, and the
-// type is fixed once the topic has exercises.
 export function ListeningTopicsPage({ eyebrow }) {
   const [state, setState] = useState('loading');
   const [topics, setTopics] = useState([]);
   const [name, setName] = useState('');
   const [format, setFormat] = useState('song');
-  // { id, name, format } of the topic being edited.
   const [editing, setEditing] = useState(null);
   const [removing, setRemoving] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -101,7 +95,6 @@ export function ListeningTopicsPage({ eyebrow }) {
     load();
   }, []);
 
-  // Runs one change, then reloads the list. Returns whether it worked.
   async function run(action, success, title) {
     setBusy(true);
     try {

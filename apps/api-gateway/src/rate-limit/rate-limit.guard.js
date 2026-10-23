@@ -5,15 +5,12 @@ import { RATE_LIMIT_STORE } from './rate-limit.store.js';
 
 const logger = new Logger('RateLimit');
 
-// Decides one request from the counters it just incremented: the first key
-// over its limit wins. Pure, so the rule is testable without Nest.
 export function decide(hits) {
   const exceeded = hits.find((hit) => hit.count > hit.limit);
   if (!exceeded) return { allowed: true };
   return { allowed: false, scope: exceeded.scope, limit: exceeded.limit, retryAfterSeconds: retryAfterSeconds(exceeded.resetAt) };
 }
 
-// The 429 envelope (D117): the shared { code, msg, data } shape, Retry-After set.
 export function tooManyRequests(decision) {
   return new HttpException(
     { code: ResponseCode.RATE_LIMITED, msg: 'fail', data: { scope: decision.scope, limit: decision.limit, retryAfterSeconds: decision.retryAfterSeconds } },
@@ -21,9 +18,6 @@ export function tooManyRequests(decision) {
   );
 }
 
-// Global guard of the gateway (D117): counts every request under the policies
-// that apply to it and refuses with 429 once a limit is passed. Health routes
-// are never limited. If the store fails, the request passes (fail open).
 export class RateLimitGuard {
   constructor(store) {
     this.store = store;

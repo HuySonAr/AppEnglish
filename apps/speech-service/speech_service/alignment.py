@@ -1,11 +1,3 @@
-"""Times of transcript lines from the words heard in a recording (D97).
-
-Whisper gives the words it hears with their start and end. They are matched
-to the words of the transcript (case, punctuation, contractions and numbers
-written as words do not matter), and each line gets the time from its first
-to its last matched word. A misheard word next to matched ones still lends
-its time, so one wrong word does not lose a line. Pure functions, no I/O.
-"""
 
 from __future__ import annotations
 
@@ -25,8 +17,6 @@ _NUMBERS = {
 
 
 def tokens(text: str) -> list[str]:
-    """Comparable tokens of a text: lower case, no punctuation, contractions
-    written out, number words as digits."""
     out: list[str] = []
     text = text.replace("’", "'").replace("‘", "'").lower()
     for raw in re.split(r"[\s\-–—/]+", text):
@@ -64,19 +54,9 @@ def _round_up(value: float) -> float:
 
 
 def align_lines(lines: list[dict], words: list[dict], *, before: float = 0.1, after: float = 0.2) -> list[dict]:
-    """The start and end (seconds, one decimal) of every line.
-
-    lines: [{"id", "text"}] in the order of the recording.
-    words: [{"word", "start", "end"}] as heard, in order.
-    Returns [{"id", "start", "end", "matched"}]; matched is the share of the
-    line's tokens found in the recording, and start and end are None when
-    none was. A line starts a little before its first word and ends a little
-    after its last one, never over the next line.
-    """
     line_tokens: list[tuple[str, int]] = []
     for index, line in enumerate(lines):
         line_tokens.extend((token, index) for token in tokens(line["text"]))
-    # Whisper may split "We're" into "We" and "'re": join such pieces first.
     joined: list[dict] = []
     for word in words:
         text = word["word"].strip()
@@ -107,8 +87,6 @@ def align_lines(lines: list[dict], words: list[dict], *, before: float = 0.1, af
         end = max(t[1] for t in timed) if timed else None
         result.append({"id": line["id"], "start": start, "end": end, "matched": round(matched, 2)})
 
-    # Lines follow each other: a start is not before the previous line's,
-    # padding never runs into a neighbour.
     previous_end = 0.0
     for index, line in enumerate(result):
         if line["start"] is None:
@@ -124,17 +102,10 @@ def align_lines(lines: list[dict], words: list[dict], *, before: float = 0.1, af
     return result
 
 
-# Words after which a sung "I" goes on the same line ("proud that I can fly").
 _JOINING = {"that", "and", "but", "or", "if", "when", "because", "so", "as", "than", "where", "while"}
 
 
 def _song_phrases(words: list[dict], long_pause: float = 1.5) -> list[list[dict]]:
-    """Short phrases of a song. Whisper starts each phrase of the lyrics with a
-    capital, which is often the only sign of it (sung words follow each
-    other with no pause, and the pauses come after commas, inside lines). A
-    bare "I" starts a phrase after six words, unless a joining word comes
-    before it; "I'm", "I'll" never do. A sentence end or a long pause ends a
-    phrase too."""
     phrases: list[list[dict]] = []
     current: list[dict] = []
     for word in words:
@@ -159,9 +130,6 @@ def _song_phrases(words: list[dict], long_pause: float = 1.5) -> list[list[dict]
 
 
 def _song_lines(words: list[dict], short: int = 7, longest: int = 14) -> list[list[dict]]:
-    """Lines of a song: short phrases next to each other are put together, as
-    lyrics usually show two of them on a line ("Teaching me to love with
-    hands, helping me to open my mind"), up to `longest` words."""
     lines: list[list[dict]] = []
     current: list[dict] = []
     for phrase in _song_phrases(words):
@@ -178,8 +146,6 @@ def _song_lines(words: list[dict], short: int = 7, longest: int = 14) -> list[li
 
 
 def _speech_lines(words: list[dict], pause: float = 1.2, longest: int = 30) -> list[list[dict]]:
-    """Lines of speech: a sentence each, also cut at a long pause and before
-    it grows too long."""
     lines: list[list[dict]] = []
     current: list[dict] = []
     for word in words:
@@ -196,10 +162,6 @@ def _speech_lines(words: list[dict], pause: float = 1.2, longest: int = 30) -> l
 
 
 def split_lines(words: list[dict], *, song: bool = False, before: float = 0.1, after: float = 0.2) -> list[dict]:
-    """Lines of text with their times from the words heard (Transcribe, D98):
-    sentences for speech, lyric lines for a song (D99).
-    Returns [{"text", "start", "end"}], padded a little and never overlapping.
-    """
     heard = [
         {"word": word["word"].strip(), "start": float(word["start"]), "end": float(word["end"])}
         for word in words
@@ -210,7 +172,6 @@ def split_lines(words: list[dict], *, song: bool = False, before: float = 0.1, a
     result = []
     for index, line in enumerate(lines):
         text = " ".join(item["word"] for item in line)
-        # Whisper writes "We" "'re" apart at times.
         text = re.sub(r" (?=['\u2019][a-z])", "", text)
         start = max(line[0]["start"] - before, result[-1]["end"] if result else 0.0, 0.0)
         end = line[-1]["end"] + after

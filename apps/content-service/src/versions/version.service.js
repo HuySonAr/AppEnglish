@@ -11,25 +11,15 @@ import { contentErrors } from '../content/content.errors.js';
 import { contentMediaIds, lessonContentSchema, mockContentSchema, unitReviewContentSchema } from '../content/content.schemas.js';
 import { listeningContentSchema, listeningMediaIds } from '../listening/listening.schemas.js';
 
-// The media ids a stored version refers to, through its schema; none when
-// the content does not parse (an old shape) or the kind has no media.
 const mediaIdsBy = (schema, extract) => (content) => {
   const parsed = schema.safeParse(content);
   return parsed.success ? extract(parsed.data) : [];
 };
 
-// Version history of every versioned content (D122): a Content Manager lists
-// the versions of a lesson, mock test, listening exercise, course item or
-// unit review, reads one, and restores one as the draft. Published versions
-// stay immutable (D40): restoring copies, it never edits the old version.
 export class ContentVersionService {
   constructor(repository, contentService, listeningService, courseService) {
     this.repository = repository;
     this.contentService = contentService;
-    // What each kind is made of: its version entity and owner column, how to
-    // find the owner and its published version id, the media a version refers
-    // to (for discarding a draft), and the save-draft call that restoring
-    // goes through (so media clean-up and ids work as usual).
     this.kinds = {
       [ContentVersionKind.LESSON]: {
         entity: LessonVersionEntity,
@@ -64,7 +54,6 @@ export class ContentVersionService {
         find: (id) => courseService.repository.findItem(id),
         publishedId: (owner) => owner.publishedVersionId,
         notFound: contentErrors.courseItemNotFound,
-        // The course service parses by item type itself.
         restore: (actor, id, content) => courseService.saveDraft(actor, id, content),
       },
       [ContentVersionKind.UNIT_REVIEW]: {
@@ -90,7 +79,6 @@ export class ContentVersionService {
     return { spec, owner };
   }
 
-  // A version's facts: current marks the one learners get.
   versionView(spec, owner, version) {
     return {
       id: version.id,
@@ -122,8 +110,6 @@ export class ContentVersionService {
     return { kind, id, version: { ...this.versionView(spec, owner, version), content: version.content } };
   }
 
-  // Throws the draft away (D127): the draft row goes, and so do the files
-  // only it used; what a published or taken-down version still uses stays.
   async discardDraft(actor, { kind, id }) {
     const { spec, owner } = await this.owner(actor, { kind, id });
     const rows = await this.repository.listVersionsOf(spec.entity, spec.owner, owner.id);
@@ -132,14 +118,10 @@ export class ContentVersionService {
     const draft = await this.repository.findVersionOf(spec.entity, summary.id);
     const mediaIds = spec.mediaIds ? spec.mediaIds(draft.content) : [];
     await this.repository.deleteVersionOf(spec.entity, draft.id);
-    // Checked after the row is gone, so a file only the draft used is free.
     const removedMedia = await this.contentService.removeUnusedMedia(mediaIds);
     return { discarded: { versionId: draft.id, versionNumber: draft.versionNumber }, removedMedia: removedMedia.length };
   }
 
-  // Removes an old version (D128): not the draft (Discard does that), not the
-  // one learners get. The gateway refuses it first while learner attempts
-  // refer to it. The files only this version used go with it.
   async deleteVersion(actor, { kind, id, versionId }) {
     const { spec, owner } = await this.owner(actor, { kind, id });
     const version = await this.version(spec, owner, id, versionId);
@@ -151,8 +133,6 @@ export class ContentVersionService {
     return { deleted: { versionId: version.id, versionNumber: version.versionNumber }, removedMedia: removedMedia.length };
   }
 
-  // Copies the version into the draft (replacing what the draft held) and
-  // returns the editor's view of the content, as a save would.
   async restoreVersion(actor, { kind, id, versionId }) {
     const { spec, owner } = await this.owner(actor, { kind, id });
     const version = await this.version(spec, owner, id, versionId);

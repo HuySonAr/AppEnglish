@@ -8,11 +8,9 @@ const withId = (item) => ({ ...item, id: item.id || randomUUID() });
 const questionWithIds = (question) => ({ ...withId(question), options: question.options.map(withId) });
 const sectionWithIds = (section) => ({ ...withId(section), questions: section.questions.map(questionWithIds) });
 
-// The topics of a level in order.
 const topicsOf = (items, level) =>
   items.filter((item) => item.level === level && item.type === CourseItemType.TOPIC).sort((a, b) => a.position - b.position);
 
-// Items keep the ids the editor sent; new ones get one here.
 function withIds(type, content) {
   if (type !== CourseItemType.TOPIC) return { sections: content.sections.map(sectionWithIds) };
   return {
@@ -24,11 +22,6 @@ function withIds(type, content) {
   };
 }
 
-// The Listening course (F05C, D143–D145): each level A1–C2 has topics in
-// order, each topic one listening lesson, and every level but the last a level
-// test. Written and published by a Content Manager like mock tests. Each
-// topic and level-test section holds its own recording (D147); speech jobs on
-// a topic's recording go through ListeningService.
 export class CourseService {
   constructor(repository, contentService, listeningService) {
     this.repository = repository;
@@ -44,7 +37,6 @@ export class CourseService {
     return { id: item.id, level: item.level, type: item.type, title: item.title, description: item.description, position: item.position };
   }
 
-  // How much a content holds, for the course overview.
   counts(type, content) {
     if (!content) return { questions: 0, words: 0, hasRecording: false };
     const parsed = contentSchemaOf(type).parse(content);
@@ -57,7 +49,6 @@ export class CourseService {
     };
   }
 
-  // The course by level: its topics in order and its level test.
   async listCourse(actor) {
     this.assertManager(actor);
     const [items, versions] = await Promise.all([this.repository.listItems(), this.repository.listVersionSummaries()]);
@@ -86,7 +77,6 @@ export class CourseService {
     };
   }
 
-  // A topic is added at the end of its level.
   async createItem(actor, { level, type, title, description }) {
     this.assertManager(actor);
     const topics = type === CourseItemType.TOPIC ? topicsOf(await this.repository.listItems(), level) : [];
@@ -113,7 +103,6 @@ export class CourseService {
     return item;
   }
 
-  // Title and description apply at once; a topic can move within its level.
   async updateItem(actor, itemId, { title, description, position }) {
     this.assertManager(actor);
     const item = await this.findItemOrThrow(itemId);
@@ -158,14 +147,11 @@ export class CourseService {
         createdBy: actor.id,
       };
     draft = await this.repository.saveVersion(draft);
-    // A recording or pronunciation this save dropped is removed from storage
-    // when no other version uses it.
     const kept = new Set(courseMediaIds(draft.content));
     await this.contentService.removeUnusedMedia(previousMediaIds.filter((mediaId) => !kept.has(mediaId)));
     return this.managedView(item, draft, await this.publishedVersion(item));
   }
 
-  // Publishing freezes the draft as the next version.
   async publish(actor, itemId) {
     this.assertManager(actor);
     const item = await this.findItemOrThrow(itemId);
@@ -194,7 +180,6 @@ export class CourseService {
       await this.contentService.noteUnpublished(actor, { type: 'courseItem', id: item.id, title: item.title });
     }
     let draft = await this.repository.findDraft(itemId);
-    // The version taken down becomes the draft when there is none (D122).
     if (!draft && published)
       draft = await this.repository.saveVersion({
         itemId,
@@ -206,9 +191,6 @@ export class CourseService {
     return this.managedView(item, draft, null);
   }
 
-  // Removes a topic or a level test with its versions, its speech jobs and the
-  // recordings and pronunciations only it used. The gateway only calls this
-  // when no learner has results for the item.
   async delete(actor, itemId) {
     this.assertManager(actor);
     const item = await this.findItemOrThrow(itemId);
@@ -227,9 +209,6 @@ export class CourseService {
     const removedMedia = await this.contentService.removeUnusedMedia([...new Set(mediaIds)]);
     return { deleted: true, type: item.type, level: item.level, removedMedia: removedMedia.length };
   }
-
-  // ----- Speech jobs on a topic's recording (D147): Auto-time finds the times
-  // of the saved sentences, Transcribe writes them from the recording.
 
   async topicForSpeech(actor, itemId) {
     this.assertManager(actor);
@@ -265,10 +244,6 @@ export class CourseService {
     return this.listeningService.latestSpeechJob({ courseItemId: itemId });
   }
 
-  // ----- Reads for learning-service. No actor: not exposed by the gateway.
-
-  // The published course: by level, the published topics in order and the
-  // published level test.
   async listPublished() {
     const items = (await this.repository.listItems()).filter((item) => item.publishedVersionId);
     const summary = async (item) => {
@@ -291,8 +266,6 @@ export class CourseService {
     };
   }
 
-  // A published topic or level test (the current version, or the given one)
-  // with its answers and the URLs of its recordings and pronunciations.
   async getPaper(itemId, { versionId } = {}) {
     const item = await this.repository.findItem(itemId);
     if (!item?.publishedVersionId) throw contentErrors.courseItemNotFound();
@@ -308,15 +281,12 @@ export class CourseService {
     };
   }
 
-  // id → URL of the given media.
   async mediaUrls(ids) {
     if (!ids.length) return {};
     const assets = await this.contentService.repository.findMediaByIds(ids);
     return Object.fromEntries(assets.map((asset) => [asset.id, asset.url]));
   }
 
-  // The media the versions use, by id, for the editor: kind, file name and
-  // URL (none for a locally stored file, which cannot be played).
   async mediaOf(versions) {
     const ids = [...new Set(versions.filter(Boolean).flatMap((version) => {
       const parsed = contentSchemaOf(version.type).safeParse(version.content);

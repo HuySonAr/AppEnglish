@@ -22,7 +22,6 @@ export function UnitReviewPage() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [taking, setTaking] = useState(false);
-  // { attempt, parts } of the attempt just submitted.
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
 

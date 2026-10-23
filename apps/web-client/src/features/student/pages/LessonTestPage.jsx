@@ -27,9 +27,6 @@ import { formatRemaining } from '../lib/placement.js';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { useReturnTo } from '../../../hooks/use-return-to.js';
 
-// The lesson test: start, take it (same exam screen as the placement test),
-// then the score with every answer explained, the history of attempts with how
-// the results develop, and the lesson ranking.
 export function LessonTestPage() {
   const { lessonId } = useParams();
   const back = useReturnTo('/student/lessons');
@@ -37,7 +34,6 @@ export function LessonTestPage() {
   const [state, setState] = useState('loading');
   const [test, setTest] = useState(null);
   const [ranking, setRanking] = useState(null);
-  // { attempt, parts } of the attempt being reviewed.
   const [review, setReview] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -85,15 +81,12 @@ export function LessonTestPage() {
     } catch (error) {
       notify({ title: 'Could not submit the test', description: getApiErrorMessage(error), variant: 'destructive' });
     } finally {
-      // The attempt is over either way (submitted, or its time ran out).
       await load();
       setBusy(false);
       window.scrollTo({ top: 0 });
     }
   }
 
-  // Leaves the test without submitting: the attempt is thrown away (D82) and
-  // the learner is back on the lesson. True when it went.
   async function onDiscard() {
     try {
       await discardLessonTest(lessonId);
@@ -101,13 +94,11 @@ export function LessonTestPage() {
       return true;
     } catch (error) {
       notify({ title: 'Could not leave the test', description: getApiErrorMessage(error), variant: 'destructive' });
-      // The attempt may be over already (its time ran out).
       await load();
       return false;
     }
   }
 
-  // Shows the answers of one finished attempt.
   async function onReview(attemptNumber) {
     setBusy(true);
     try {
@@ -152,7 +143,6 @@ export function LessonTestPage() {
     <section className="space-y-6">
       <PageBreadcrumb items={[{ label: 'Lessons', to: back.to, state: back.state }, { label: 'Lesson', to: `/student/lessons/${lessonId}`, state: back.passThrough }, { label: 'Lesson test' }]} />
 
-      {/* Laptop: the ranking stays on the right; phone: everything in one column. */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-6">
           {review?.attempt ? (

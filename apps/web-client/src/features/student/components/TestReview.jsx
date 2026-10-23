@@ -16,8 +16,6 @@ function Transcript({ text }) {
   );
 }
 
-// One question of a finished test: the options with the right one and the
-// learner's choice marked, and the explanation.
 function ReviewedQuestion({ question, blank }) {
   const correct = question.options.find((option) => option.isCorrect);
   const right = question.chosenOptionId === correct?.id;
@@ -77,8 +75,6 @@ function ReviewedQuestion({ question, blank }) {
   );
 }
 
-// A finished lesson test with the right answers, the learner's answers, the
-// explanations and the transcripts. parts comes from the review API.
 export function TestReview({ parts }) {
   return (
     <div className="space-y-8">

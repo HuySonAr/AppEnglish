@@ -29,7 +29,6 @@ export class LocalMediaStorageAdapter {
     });
   }
 
-  // A file that is already gone counts as deleted.
   async delete(asset) {
     if (asset.storage !== 'local') throw new Error(`Cannot delete ${asset.storage} media: storage is not configured`);
     const names = await readdir(this.rootDirectory).catch(() => []);

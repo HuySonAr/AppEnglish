@@ -7,8 +7,6 @@ const sizes = {
   lg: 'h-24 w-24 text-3xl',
 };
 
-// A person's picture, or the first letter of their name while they have none
-// (D113). account is { displayName, email, avatarUrl }.
 export function Avatar({ account, size = 'sm', className }) {
   const name = account?.displayName || account?.email || '';
   if (account?.avatarUrl)

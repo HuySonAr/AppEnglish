@@ -1,15 +1,6 @@
-// Scoring of a dictation (F05B-3, D86). Pure functions, no I/O.
-//
-// A sentence and what the learner typed are compared word by word, ignoring
-// case, punctuation and accents ("café" = "cafe"). Contractions count as their full form ("don't" =
-// "do not", "she'd" = "she would" or "she had"), and numbers written in words
-// count as digits ("twenty-one" = "21", "2,500" = "2500").
 
-// "n't" forms whose first part is not the word itself.
 const IRREGULAR_NOT = { "won't": ['will', 'not'], "can't": ['can', 'not'], cannot: ['can', 'not'], "shan't": ['shall', 'not'] };
 const SUFFIXES = { "'m": 'am', "'re": 'are', "'ve": 'have', "'ll": 'will', "'d": "'d" };
-// Words whose "'s" means "is" or "has"; elsewhere "'s" is a possessive and
-// stays part of the word ("John's").
 const S_WORDS = new Set(['it', 'he', 'she', 'that', 'there', 'here', 'what', 'where', 'who', 'how', 'when', 'why', 'this']);
 
 const UNITS = {
@@ -20,12 +11,7 @@ const TENS = { twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy:
 const SCALES = { hundred: 100, thousand: 1000, million: 1000000 };
 const isNumberWord = (word) => word in UNITS || word in TENS || word in SCALES;
 
-// The words of a text, split at spaces: { display, plains }, display as
-// written (for showing) and plains its parts in lower case without
-// punctuation; hyphens, dashes and slashes split a word into parts
-// ("twenty-one", "well-known"). A word without a letter or digit is dropped.
 const plainOf = (part) =>
-  // Digits keep their decimal point and lose thousands separators.
   /^[^a-z0-9]*[0-9][0-9,.:]*[^a-z0-9]*$/.test(part)
     ? part.replace(/^[^0-9]+|[^0-9]+$/g, '').replace(/,(?=\d{3}\b)/g, '')
     : part.replace(/[^\p{L}\p{N}']/gu, '').replace(/^'+|'+$/g, '');
@@ -46,9 +32,6 @@ export function words(text) {
     .filter((word) => word.plains.length);
 }
 
-// The comparable tokens of a word list: { value, source }, source being the
-// index of the word they come from (a number written in several words gives
-// one token from several words: source is then the first and `sources` all).
 export function tokens(list) {
   const expanded = [];
   const parts = list.flatMap(({ plains }, index) => plains.map((plain) => ({ plain, index })));
@@ -62,7 +45,6 @@ export function tokens(list) {
     if (plain.endsWith("'s") && S_WORDS.has(plain.slice(0, -2))) return [plain.slice(0, -2), "'s"].forEach(push);
     return push(plain);
   });
-  // Runs of number words become one number: "two thousand five hundred".
   const result = [];
   for (let at = 0; at < expanded.length; ) {
     if (!isNumberWord(expanded[at].value)) {
@@ -74,7 +56,6 @@ export function tokens(list) {
     const sources = [];
     while (at < expanded.length) {
       const { value } = expanded[at];
-      // "and" belongs to a number between a scale and a smaller number.
       const joining = value === 'and' && sources.length && at + 1 < expanded.length && isNumberWord(expanded[at + 1].value) && !(expanded[at + 1].value in SCALES);
       if (!isNumberWord(value) && !joining) break;
       if (value in UNITS) current += UNITS[value];
@@ -92,12 +73,9 @@ export function tokens(list) {
   return result;
 }
 
-// "'d" stands for "would" or "had", "'s" for "is" or "has".
 const SHORT = { "'d": ['would', 'had'], "'s": ['is', 'has'] };
 const same = (a, b) => a === b || SHORT[a]?.includes(b) || SHORT[b]?.includes(a);
 
-// The cheapest way to turn the expected tokens into the typed ones: a list
-// of steps { type: 'match' | 'sub' | 'del' | 'ins', expected, typed }.
 function align(expected, typed) {
   const rows = expected.length + 1;
   const cols = typed.length + 1;
@@ -125,10 +103,6 @@ function align(expected, typed) {
   return steps.reverse();
 }
 
-// One sentence checked: its words as they should be written, each `correct`,
-// `wrong` (with what was typed instead) or `missing`, with the typed words
-// that do not belong (`extra`) in their place; `total` comparable tokens and
-// `errors` (wrong + missing + extra tokens).
 export function checkSentence(expectedText, typedText) {
   const expectedWords = words(expectedText);
   const typedWords = words(typedText || '');
@@ -174,14 +148,11 @@ export function checkSentence(expectedText, typedText) {
   return { words: result, total, errors };
 }
 
-// True when a blank was filled with its word, by the same rules as a
-// sentence (case, punctuation, accents, contractions, numbers).
 export function sameWords(expected, typed) {
   const checked = checkSentence(expected, typed || '');
   return checked.total > 0 && checked.errors === 0;
 }
 
-// Percent of the tokens written right, never below 0.
 export function accuracyOf(total, errors) {
   return total ? Math.max(0, Math.round(((total - errors) * 100) / total)) : 0;
 }

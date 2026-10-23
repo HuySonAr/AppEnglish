@@ -24,7 +24,6 @@ test('keys combine the address with a hashed email; without an email only the ad
   assert.equal(keys[0].key.includes('example.com'), false);
   assert.equal(keys[1].key, 'rl:login:ip:203.0.113.9');
   assert.deepEqual([keys[0].limit, keys[1].limit], [10, 30]);
-  // Same email, different case: the same key.
   assert.equal(keysFor(login, { ip: '203.0.113.9', body: { email: 'minh.anh@example.com' } })[0].key, keys[0].key);
   assert.equal(keysFor(login, { ip: '203.0.113.9', body: {} }).length, 1);
   assert.equal(emailOf({ body: { email: 42 } }), '');
@@ -96,11 +95,8 @@ test('over HTTP the guard answers 429 with the envelope and Retry-After, passes 
   assert.equal(body.msg, 'fail');
   assert.equal(body.data.scope, 'login');
   assert.equal(body.data.limit, 10);
-  // Another email from the same address is still allowed (the per-address limit is 30).
   assert.equal((await login('b@example.com')).status, 201);
-  // Health is never counted.
   for (let index = 0; index < 5; index += 1) assert.equal((await fetch(`${base}/health`)).status, 200);
-  // A failing store lets requests through.
   broken = true;
   assert.equal((await login('a@example.com')).status, 201);
 });

@@ -3,6 +3,9 @@ import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { HealthService } from './health.service.js';
 import { healthResponseSchema } from './health.schema.js';
 import { AUTH_GRPC_CLIENT, callAuth } from '../auth/auth-gateway.controller.js';
+import { resolveSession } from '../auth/session-cache.js';
+import { systemOverview } from './system.service.js';
+import { Req } from '@nestjs/common';
 
 export class HealthController {
   constructor(client) {
@@ -24,10 +27,14 @@ export class HealthController {
     return payload.data;
   }
 
-  // Every backend service's state for the admin dashboard (D115). Always 200:
-  // a service that is down is reported in the list, not as a failure.
   services() {
     return this.healthService.probeServices({ authReady: () => callAuth(this.auth, 'Ready') });
+  }
+
+  async system(request) {
+    const account = await resolveSession(this.auth, request);
+    if (account.role !== 'ADMIN') throw new HttpException({ code: 26, msg: 'fail', data: {} }, 403);
+    return { code: 0, msg: 'success', data: await systemOverview() };
   }
 }
 
@@ -36,3 +43,5 @@ Inject(AUTH_GRPC_CLIENT)(HealthController, undefined, 0);
 Get()(HealthController.prototype, 'check', Object.getOwnPropertyDescriptor(HealthController.prototype, 'check'));
 Get('ready')(HealthController.prototype, 'ready', Object.getOwnPropertyDescriptor(HealthController.prototype, 'ready'));
 Get('services')(HealthController.prototype, 'services', Object.getOwnPropertyDescriptor(HealthController.prototype, 'services'));
+Get('system')(HealthController.prototype, 'system', Object.getOwnPropertyDescriptor(HealthController.prototype, 'system'));
+Req()(HealthController.prototype, 'system', 0);

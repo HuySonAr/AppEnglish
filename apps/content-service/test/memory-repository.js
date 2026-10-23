@@ -1,13 +1,10 @@
 import { randomUUID } from 'node:crypto';
 
-// In-memory stand-in for ContentRepository; rows are copied on the way in and
-// out like a database would.
 export function createMemoryRepository() {
   const tables = {
     units: [], lessons: [], versions: [], reviewVersions: [], media: [], placement: [], mockTests: [], mockVersions: [],
-    listeningExercises: [], listeningVersions: [], timingJobs: [], courseItems: [], courseVersions: [], adminNotices: [], noticeReads: [],
+    listeningExercises: [], listeningVersions: [], timingJobs: [], courseItems: [], courseVersions: [], adminNotices: [], noticeReads: [], contentEvents: [], processed: [],
     listeningTopics: [{ id: toeicTopicId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
-    // The migration creates TOEIC.
     examTypes: [{ id: toeicExamTypeId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
   };
   const copy = (row) => (row ? structuredClone(row) : null);
@@ -27,7 +24,6 @@ export function createMemoryRepository() {
     Object.assign(row, { id: stored.id });
     return copy(stored);
   }
-  // In-memory stand-in for ListeningRepository, on the same tables.
   const listening = {
     async listTopics() { return tables.listeningTopics.map(copy); },
     async findTopic(id) { return copy(tables.listeningTopics.find((item) => item.id === id)); },
@@ -56,6 +52,15 @@ export function createMemoryRepository() {
       tables.listeningVersions = tables.listeningVersions.filter((version) => version.exerciseId !== exerciseId);
       tables.listeningExercises = tables.listeningExercises.filter((exercise) => exercise.id !== exerciseId);
     },
+    async saveTimingJobWithEvent(job, eventOf) {
+      const saved = await this.saveTimingJob(job);
+      tables.contentEvents.push({ id: randomUUID(), createdAt: new Date(), publishedAt: null, ...structuredClone(eventOf(saved)) });
+      return saved;
+    },
+    async listPendingEvents(limit) { return tables.contentEvents.filter((event) => !event.publishedAt).slice(0, limit).map(copy); },
+    async markEventPublished(id, at) { tables.contentEvents.find((event) => event.id === id).publishedAt = at; },
+    async isProcessed(messageId) { return tables.processed.includes(messageId); },
+    async markProcessed(messageId) { if (!tables.processed.includes(messageId)) tables.processed.push(messageId); },
     async saveTimingJob(job) {
       return save('timingJobs', { createdAt: new Date(), ...job, updatedAt: new Date() });
     },
@@ -80,7 +85,6 @@ export function createMemoryRepository() {
       return tables.timingJobs.filter((job) => Object.entries(owner).every(([field, value]) => job[field] === value)).map(copy);
     },
   };
-  // In-memory stand-in for CourseRepository.
   const course = {
     async listItems() {
       return tables.courseItems.map(copy).sort((a, b) => (a.level || '').localeCompare(b.level || '') || a.position - b.position);
@@ -95,7 +99,6 @@ export function createMemoryRepository() {
       return { item: saved, draft: save('courseVersions', { ...draft, itemId: saved.id }) };
     },
     async deleteItemWithVersions(itemId) {
-      // The speech jobs of the item go with it (ON DELETE CASCADE, D147).
       tables.timingJobs = tables.timingJobs.filter((job) => job.courseItemId !== itemId);
       tables.courseVersions = tables.courseVersions.filter((version) => version.itemId !== itemId);
       tables.courseItems = tables.courseItems.filter((item) => item.id !== itemId);
@@ -174,7 +177,6 @@ export function createMemoryRepository() {
       tables.reviewVersions = tables.reviewVersions.filter((version) => version.unitId !== unitId);
       tables.units = tables.units.filter((unit) => unit.id !== unitId);
     },
-    // Version history (D122): the table of a version entity, by its name.
     async listVersionsOf(entity, ownerColumn, ownerId) {
       const table = versionTables[entity.options.name];
       return tables[table]
@@ -256,9 +258,6 @@ export const manager = { id: '11111111-1111-4111-8111-111111111111', role: 'CONT
 export const student = { id: '22222222-2222-4222-8222-222222222222', role: 'STUDENT' };
 export const admin = { id: '33333333-3333-4333-8333-333333333333', role: 'ADMIN' };
 
-// A complete lesson draft (vocabulary, fill-in passage and the seven-part,
-// 23-question test) that satisfies every publishing requirement. audioId and
-// imageId must be existing media assets.
 export function publishableContent({ audioId, imageId }) {
   const textOptions = (correct) =>
     Array.from({ length: 4 }, (_, index) => ({ text: `Option ${index + 1}`, isCorrect: index === correct }));

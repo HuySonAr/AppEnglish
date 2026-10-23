@@ -13,7 +13,6 @@ test('remaining time is shown as minutes and seconds', () => {
 test('remaining time follows the server clock', () => {
   const expiresAt = '2026-10-10T08:25:00.000Z';
   const serverNow = Date.parse('2026-10-10T08:10:00.000Z');
-  // The browser clock is one hour ahead of the server.
   const browserNow = serverNow + 60 * 60 * 1000;
   const offset = serverNow - browserNow;
   assert.equal(remainingTime(expiresAt, offset, browserNow), 15 * 60 * 1000);
@@ -42,10 +41,8 @@ test('a part is shown as one section, or one per passage group', () => {
   const sections = partSections(mockPart);
   assert.deepEqual(sections.map((section) => [section.id, section.questions.map((question) => question.id), section.blanks]), [['g1', ['a', 'c'], false], ['g2', ['b'], true]]);
   assert.equal(sections[0].imageUrl, 'https://x/p.png');
-  // A set of Parts 3-4 carries a recording instead of a passage.
   const spoken = partSections({ key: 'part3', passage: '', groups: [{ id: 'g', audioUrl: 'https://x/a.mp3', transcript: 'T', passage: '' }], questions: [{ id: 'a', groupId: 'g', prompt: 'Why?' }] });
   assert.deepEqual([spoken[0].audioUrl, spoken[0].transcript, spoken[0].blanks], ['https://x/a.mp3', 'T', false]);
-  // Parts without a passage (Parts 1-5) are one plain section.
   assert.equal(partSections({ key: 'part5', passage: '', imageUrl: null, questions: [{ id: 'a', prompt: 'x' }] })[0].blanks, false);
 });
 

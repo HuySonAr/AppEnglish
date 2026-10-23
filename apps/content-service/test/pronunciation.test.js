@@ -102,12 +102,10 @@ test('auto-fill stores the audio it finds and reports what is missing', async ()
   assert.equal(result.audio.us, null);
   assert.equal(result.audio.uk.fileName, 'abide-by-uk.mp3');
   assert.equal(result.audio.uk.kind, 'audio');
-  // A locally stored file has no address to play from.
   assert.equal(result.audio.uk.url, null);
   assert.equal(repository.tables.media.length, 1);
   assert.equal(repository.tables.media[0].id, result.audio.uk.id);
 
-  // Only the requested accents are downloaded.
   downloads.length = 0;
   const onlyUs = await service.autofillPronunciation(manager, { word: 'ticket', accents: ['us'] });
   assert.deepEqual(downloads, []);
@@ -133,8 +131,6 @@ test('auto-fill survives a failed download and maps an unavailable dictionary to
   assert.deepEqual(await service.autofillPronunciation(manager, { word: 'zzzz', accents: ['uk', 'us'] }), { found: false, phonetic: '', audio: { uk: null, us: null } });
 });
 
-// The editor plays a new pronunciation at once (Listening course vocabulary),
-// so the answer carries the file's address when the storage gives one.
 test('auto-fill answers with the address of each stored pronunciation', async () => {
   const { service } = serviceWith(
     {

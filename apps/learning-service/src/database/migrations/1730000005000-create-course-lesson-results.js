@@ -1,6 +1,3 @@
-// Listening course (F05C, D100): each learner's best and latest score on each
-// course lesson, and when it was first passed. Units and lessons live in
-// content-service, so their ids are not foreign keys.
 export class CreateCourseLessonResults1730000005000 {
   name = 'CreateCourseLessonResults1730000005000';
 

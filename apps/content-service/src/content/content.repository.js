@@ -59,8 +59,6 @@ export class ContentRepository {
     return this.saveInOrder(UnitEntity, units);
   }
 
-  // Saves rows one by one in a transaction. TypeORM's save(array) issues the
-  // updates concurrently on one connection, which pg deprecates.
   async saveInOrder(entity, rows) {
     await this.repo(entity);
     return this.dataSource.transaction(async (manager) => {
@@ -102,7 +100,6 @@ export class ContentRepository {
     });
   }
 
-  // Version metadata without the content payload.
   async listVersionSummaries() {
     return (await this.repo(LessonVersionEntity)).find({
       select: { id: true, lessonId: true, versionNumber: true, status: true },
@@ -147,8 +144,6 @@ export class ContentRepository {
     await (await this.repo(MediaAssetEntity)).delete({ id });
   }
 
-  // True when any saved lesson, placement, mock-test or listening-exercise
-  // version, draft or published, refers to the media.
   async isMediaReferenced(id) {
     for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity, ListeningExerciseVersionEntity, ListeningCourseVersionEntity]) {
       const count = await (await this.repo(entity))
@@ -160,9 +155,6 @@ export class ContentRepository {
     return false;
   }
 
-  // Every media id any saved version refers to, read once across the version
-  // tables (one query each): the orphan listing checks hundreds of files
-  // against this set instead of querying per file.
   async listReferencedMediaIds() {
     const referenced = new Set();
     const uuid = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
@@ -173,13 +165,10 @@ export class ContentRepository {
     return referenced;
   }
 
-  // Every media row older than the given time; the service checks references.
   async listMediaBefore(before) {
     return (await this.repo(MediaAssetEntity)).createQueryBuilder('media').where('media."createdAt" < :before', { before }).orderBy('media."createdAt"', 'ASC').getMany();
   }
 
-  // Taking content away (D118). Versions go with their lesson, lessons with
-  // their unit, in one transaction.
   async deleteLessonWithVersions(lessonId) {
     await this.repo(LessonEntity);
     return this.dataSource.transaction(async (manager) => {
@@ -200,10 +189,6 @@ export class ContentRepository {
     });
   }
 
-  // ----- Version history (D122), for any versioned content.
-
-  // The versions of one owner (a lesson, mock test, exercise, course item or
-  // unit), newest first, without their content.
   async listVersionsOf(entity, ownerColumn, ownerId) {
     return (await this.repo(entity)).find({
       where: { [ownerColumn]: ownerId },
@@ -216,12 +201,9 @@ export class ContentRepository {
     return (await this.repo(entity)).findOne({ where: { id } });
   }
 
-  // Removes one version row (a discarded draft, D127).
   async deleteVersionOf(entity, id) {
     await (await this.repo(entity)).delete({ id });
   }
-
-  // ----- Unit reviews (D121), versioned like lessons.
 
   async listReviewVersionSummaries() {
     return (await this.repo(UnitReviewVersionEntity)).find({
@@ -285,7 +267,6 @@ export class ContentRepository {
     return (await this.repo(MockTestEntity)).save(mockTest);
   }
 
-  // Version metadata without the content payload.
   async listMockVersionSummaries() {
     return (await this.repo(MockTestVersionEntity)).find({
       select: { id: true, mockTestId: true, versionNumber: true, status: true },

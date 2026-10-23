@@ -24,7 +24,6 @@ function freePort() {
   });
 }
 
-// Stand-in for auth-service: the access token is the role name.
 const accounts = { manager, student, admin };
 class FakeAuthController {
   me({ accessToken }) {
@@ -36,7 +35,6 @@ class FakeAuthController {
 }
 Controller()(FakeAuthController);
 GrpcMethod(AUTH_GRPC_SERVICE, 'Me')(FakeAuthController.prototype, 'me', Object.getOwnPropertyDescriptor(FakeAuthController.prototype, 'me'));
-// The audit row of a placement reset (D131): remembers what the gateway sent.
 const audited = [];
 FakeAuthController.prototype.adminAccountAction = function ({ accessToken, accountId, action, reason }) {
   audited.push({ accessToken, accountId, action, reason });

@@ -1,10 +1,6 @@
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, PolarAngleAxis, RadialBar, RadialBarChart, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip } from '../../../components/ui';
 
-// Charts of the student's profile (D113, D78): shadcn chart + Recharts, colours
-// from --chart-1 and --chart-2 only (both pass the palette checks in light and
-// dark mode). Values are written beside the marks, so no value is colour-alone.
-
 const listening = 'hsl(var(--chart-1))';
 const reading = 'hsl(var(--chart-2))';
 const track = 'hsl(var(--muted))';
@@ -22,7 +18,6 @@ function TipBox({ title, lines }) {
   );
 }
 
-// Listening and Reading mastery as two horizontal bars out of 100.
 export function SkillsChart({ bars }) {
   const data = bars.map((bar) => ({ ...bar, value: bar.percent ?? 0, fill: bar.key === 'listening' ? listening : reading }));
   return (
@@ -55,7 +50,6 @@ export function SkillsChart({ bars }) {
   );
 }
 
-// Lessons completed over the published lessons, as a ring with the number inside.
 export function LessonsRing({ ring }) {
   const data = [{ name: 'Lessons', value: ring.percent ?? 0, fill: listening }];
   return (
@@ -79,7 +73,6 @@ export function LessonsRing({ ring }) {
   );
 }
 
-// XP earned per mock test, oldest first; each bar is labelled.
 export function XpChart({ bars }) {
   return (
     <div className="overflow-x-auto">

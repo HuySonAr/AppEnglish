@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { MetricsController } from './metrics/metrics.controller.js';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { contentGrpcOptions } from '@appenglish/content-contracts/grpc';
 import { HealthController } from './health/health.controller.js';
@@ -41,7 +42,7 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, CourseGrpcController, UsageGrpcController],
+  controllers: [MetricsController, HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, CourseGrpcController, UsageGrpcController],
   providers: [
     { provide: LEARNING_DATA_SOURCE, useFactory: createLearningDataSource },
     {
@@ -75,7 +76,6 @@ Module({
       inject: [LEARNING_DATA_SOURCE],
     },
     {
-      // Results for progress-service go through the outbox and RabbitMQ (F06, D110).
       provide: LearningEvents,
       useFactory: (repository) => {
         const events = new LearningEvents(repository, { url: process.env.RABBITMQ_URL || 'amqp://localhost:5672' });

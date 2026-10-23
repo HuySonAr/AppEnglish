@@ -34,8 +34,6 @@ function Bar({ done, total }) {
   );
 }
 
-// The learner's progress in the Listening course (D145): the highest open
-// level, the topics done and, by level, topics done and the level test.
 export function CourseProgressPage() {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);

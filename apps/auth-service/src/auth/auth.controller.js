@@ -21,19 +21,12 @@ import {
 import { RegisterAccountDto, LoginDto } from './auth.dto.js';
 import { AuthError } from './auth.errors.js';
 
-// Transport-agnostic auth request handlers: validate the payload, call the
-// service and shape the { code, msg, data } envelope. AuthGrpcController exposes
-// them over gRPC; HttpException only carries the HTTP status the gateway answers
-// with.
 export class AuthController {
   constructor(authService) {
     this.authService = authService;
   }
   async register(body) {
     try {
-      // register already returns the shared { code, msg, data } envelope
-      // (SUCCESS or ADDITIONAL); wrapping it again would nest data.data and
-      // hide the additional code from clients.
       return await this.authService.register(
         new RegisterAccountDto(registerSchema.parse(body)),
       );
@@ -43,9 +36,6 @@ export class AuthController {
   }
   async login(body, response) {
     try {
-      // The service already validates with authResponseSchema; parsing again
-      // here would strip the setCookies array and login would never emit
-      // session cookies.
       return this.withCookies(
         this.envelope(
           await this.authService.login(new LoginDto(loginSchema.parse(body))),
@@ -61,9 +51,6 @@ export class AuthController {
       const result = await this.authService.verifyEmail(
         verifyEmailSchema.parse(body),
       );
-      // The service returns a full envelope for an already verified account
-      // (LOGIN guidance, no session) and bare session data + setCookies after a
-      // successful verification; only the latter needs wrapping.
       if (this.isEnvelope(result)) return result;
       return this.withCookies(this.envelope(result), response);
     } catch (error) {
@@ -72,7 +59,6 @@ export class AuthController {
   }
   async resendVerification(body) {
     try {
-      // Already an ADDITIONAL envelope from the service; no re-wrap.
       return await this.authService.resendVerification(
         resendVerificationSchema.parse(body).email,
       );
@@ -82,7 +68,6 @@ export class AuthController {
   }
   async forgotPassword(body) {
     try {
-      // Already an ADDITIONAL envelope from the service; no re-wrap.
       return await this.authService.forgotPassword(
         forgotPasswordSchema.parse(body).email,
       );
@@ -92,7 +77,6 @@ export class AuthController {
   }
   async resetPassword(body) {
     try {
-      // Already a { code, msg, data } envelope from the service; no re-wrap.
       return await this.authService.resetPassword(resetPasswordSchema.parse(body));
     } catch (error) {
       throw this.normalizeError(error);
@@ -189,7 +173,6 @@ export class AuthController {
       throw this.normalizeError(error);
     }
   }
-  // Invitations (D131).
   async adminInvite(body, accessToken) {
     try {
       return this.envelope(await this.authService.adminInvite(accessToken, adminInviteSchema.parse(body)));
@@ -200,14 +183,12 @@ export class AuthController {
   async acceptInvite(body, response) {
     try {
       const result = await this.authService.acceptInvite(acceptInviteSchema.parse(body));
-      // An already accepted invitation answers LOGIN guidance without a session.
       if (this.isEnvelope(result)) return result;
       return this.withCookies(this.envelope(result), response);
     } catch (error) {
       throw this.normalizeError(error);
     }
   }
-  // Profile of the signed-in account (F09, D113).
   async updateProfile(body, accessToken) {
     try {
       return this.envelope(await this.authService.updateProfile(

@@ -101,7 +101,6 @@ test('a new lesson starts with an empty seven-part draft and drafts may be incom
     'fillIn.passage', 'test.part1.questions', 'test.part1.audioMediaId', 'test.part2.transcript', 'test.part3.audioMediaId', 'test.part3.transcript',
     'test.part6.passage', 'test.part7.questions',
   ]) assert.ok(paths.includes(path), path);
-  // Phonetic, pronunciation audio and the example translation are optional (D51).
   for (const path of ['vocabulary[0].phonetic', 'vocabulary[0].exampleMeaning', 'vocabulary[0].audioUkMediaId', 'vocabulary[0].audioUsMediaId'])
     assert.equal(paths.includes(path), false, path);
 });
@@ -117,7 +116,6 @@ test('a complete lesson has 23 questions and publishes', async () => {
   assert.equal(view.published.versionNumber, 1);
   assert.equal(view.draft, null);
   assert.equal(view.published.content.test.part2.questions[0].options.length, 3);
-  // The editor gets the files the content uses; local files have no URL.
   assert.deepEqual(Object.keys(view.media).sort(), [context.audioId, context.imageId].sort());
   assert.deepEqual(view.media[context.audioId], { kind: 'audio', fileName: 'a.mp3', url: null });
   context.repository.tables.media.find((asset) => asset.id === context.imageId).storage = 'imagekit';
@@ -134,7 +132,6 @@ test('vocabulary and fill-in publishing rules', async () => {
     value.vocabulary[0].audioUkMediaId = imageId;
     value.vocabulary[0].audioUsMediaId = '00000000-0000-4000-8000-000000000000';
     value.vocabulary.push({ ...value.vocabulary[1], word: 'PLATFORM' });
-    // Answers are free text (D119): the second one is blank, the third is missing.
     value.fillIn = { passage: 'One ___ and two ___ and three ___.', answers: ['ticket', '  '] };
     return value;
   }));
@@ -142,7 +139,6 @@ test('vocabulary and fill-in publishing rules', async () => {
   for (const path of ['vocabulary[0].partOfSpeech', 'vocabulary[0].audioUkMediaId', 'vocabulary[0].audioUsMediaId', 'vocabulary', 'fillIn.answers', 'fillIn.answers[1]'])
     assert.ok(paths.includes(path), path);
 
-  // The same word is allowed with a different part of speech.
   await service.saveLessonDraft(manager, lesson.id, content((value) => {
     value.vocabulary.push({ ...value.vocabulary[0], partOfSpeech: 'verb', meaning: 'phạt vé' });
     value.fillIn = { passage: 'No blank here.', answers: [] };
@@ -187,7 +183,6 @@ test('lesson test publishing rules per part', async () => {
     'test.part6.passage', 'test.part7.passage', 'test.part7.imageMediaId', 'test.part7.questions',
   ]) assert.ok(paths.includes(path), path);
 
-  // Part 7 may carry an optional image of the document.
   await service.saveLessonDraft(manager, lesson.id, content((value) => {
     value.test.part7.imageMediaId = imageId;
     return value;
@@ -203,7 +198,6 @@ test('a published version is immutable and edits create the next version', async
   const v1 = (await service.getLesson(manager, lesson.id)).published;
   await assert.rejects(() => service.publishLesson(manager, lesson.id), { code: 41, status: 409 });
 
-  // Editing starts from the published content and keeps item ids stable.
   const edited = structuredClone(v1.content);
   edited.vocabulary[0].meaning = 'vé tàu';
   const draft = await service.saveLessonDraft(manager, lesson.id, lessonContentSchema.parse(edited));
@@ -227,7 +221,6 @@ test('a unit needs a published lesson and learners only see published content', 
   const { service } = context;
   const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
   const draftOnly = (await service.createLesson(manager, unit.id, { title: 'Draft only' })).lesson;
-  // Draft lessons do not count.
   await assert.rejects(() => service.publishUnit(manager, unit.id), (error) => {
     assert.equal(error.code, 42);
     assert.match(error.data.issues[0].message, /at least 1 published lesson; it has 0/);
@@ -235,7 +228,6 @@ test('a unit needs a published lesson and learners only see published content', 
   });
   const lessons = [];
   for (let index = 1; index <= 4; index++) lessons.push(await publishedLesson(context, unit.id, `L${index}`));
-  // Published lessons of an unpublished unit stay hidden from learners.
   assert.deepEqual((await service.listUnits(student)).units, []);
   await assert.rejects(() => service.getLesson(student, lessons[0].id), { code: 40, status: 404 });
 
@@ -276,7 +268,6 @@ test('media upload stores the asset and maps storage validation errors', async (
   );
   assert.equal(repository.tables.media.length, before + 1);
 
-  // Files of a lesson go to its folder, vocabulary apart from the test.
   const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
   await service.createLesson(manager, unit.id, { title: 'First' });
   const { lesson } = await service.createLesson(manager, unit.id, { title: 'Second' });
@@ -296,7 +287,6 @@ test('removing media deletes the stored file only when no saved version uses it'
   const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
   const { lesson } = await service.createLesson(manager, unit.id, { title: 'Lesson' });
 
-  // An upload that was never saved goes at once.
   const unsaved = await upload('unsaved.mp3');
   const unsavedStorageId = storageIdOf(unsaved);
   await assert.rejects(() => service.deleteMedia(student, unsaved), { code: 26 });
@@ -305,7 +295,6 @@ test('removing media deletes the stored file only when no saved version uses it'
   assert.equal(storageIdOf(unsaved), undefined);
   await assert.rejects(() => service.deleteMedia(manager, unsaved), { code: 40, status: 404 });
 
-  // A file the saved draft uses stays until a save drops it.
   const british = await upload('uk.mp3');
   const britishStorageId = storageIdOf(british);
   await service.saveLessonDraft(manager, lesson.id, content((value) => {
@@ -317,7 +306,6 @@ test('removing media deletes the stored file only when no saved version uses it'
   assert.deepEqual(removed, [unsavedStorageId, britishStorageId]);
   assert.equal(storageIdOf(british), undefined);
 
-  // Published versions keep their files when a later draft drops them (D40).
   await service.publishLesson(manager, lesson.id);
   const replacement = await upload('new.mp3');
   await service.saveLessonDraft(manager, lesson.id, content((value) => {
@@ -332,7 +320,6 @@ test('removing media deletes the stored file only when no saved version uses it'
   assert.equal(removed[2], 'stored-5');
   assert.ok(storageIdOf(audioId) && storageIdOf(imageId));
 
-  // A storage failure keeps the row so it can be retried.
   const stuck = await upload('stuck.mp3');
   assert.deepEqual(await service.deleteMedia(manager, stuck), { deleted: false });
   assert.ok(storageIdOf(stuck));

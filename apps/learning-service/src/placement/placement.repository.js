@@ -18,18 +18,15 @@ export class PlacementRepository {
     return (await this.repo(PlacementAttemptEntity)).save(attempt);
   }
 
-  // Creates the account's single attempt. Returns null when one already
-  // exists, e.g. two start requests racing.
   async createAttempt(attempt) {
     try {
       return await (await this.repo(PlacementAttemptEntity)).save(attempt);
     } catch (error) {
-      if (error?.code === '23505') return null; // unique violation
+      if (error?.code === '23505') return null;
       throw error;
     }
   }
 
-  // Removes the learner's attempt (D131). Returns whether one existed.
   async deleteAttempt(accountId) {
     const result = await (await this.repo(PlacementAttemptEntity)).delete({ accountId });
     return (result.affected || 0) > 0;

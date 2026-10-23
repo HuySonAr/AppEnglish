@@ -25,8 +25,6 @@ async function harness() {
   return { service, repository, uploads, audioId, imageId, content };
 }
 
-// A small but complete mock test: every part has questions, Parts 6 and 7
-// have passage groups.
 export function publishableMock({ audioId, imageId }) {
   const question = (fields = {}) => ({
     explanation: 'Because.',
@@ -89,14 +87,12 @@ test('mock tests follow their own publishing rules', async () => {
       return error.data.issues.map((issue) => issue.path);
     }
   };
-  // An empty draft: every part needs a question; Parts 3, 4, 6 and 7 need a set.
   for (const path of ['test.part1.questions', 'test.part3.groups', 'test.part4.questions', 'test.part5.questions', 'test.part6.groups', 'test.part7.questions'])
     assert.ok((await paths()).includes(path), path);
 
   await service.saveMockTestDraft(manager, mockTest.id, content((value) => {
     const { part1, part2, part3, part4, part5, part6, part7 } = value.test;
     part1.questions[0].imageMediaId = audioId;
-    // Parts 1-2: a recording per question; Parts 3-4: a recording per set.
     part1.questions[1].audioMediaId = null;
     part2.questions[0].transcript = '';
     part3.groups[0].audioMediaId = null;
@@ -119,10 +115,8 @@ test('mock tests follow their own publishing rules', async () => {
     'test.part5.questions[1].explanation', 'test.part6.groups[0].passage', 'test.part7.groups[0].passage',
     'test.part7.questions[1]', 'test.part7.groups[2]',
   ]) assert.ok(found.includes(path), path);
-  // The part itself no longer carries a recording.
   assert.equal(found.some((path) => /^test\.part\d\.(audioMediaId|transcript)$/.test(path)), false);
 
-  // Any number of questions is fine once every part has some.
   const saved = await service.saveMockTestDraft(manager, mockTest.id, content());
   assert.match(saved.draft.content.test.part6.groups[0].id, /^[0-9a-f-]{36}$/);
   const published = await service.publishMockTest(manager, mockTest.id);
@@ -135,7 +129,6 @@ test('mock tests follow their own publishing rules', async () => {
 test('conversations 11-13 and talks 9-10 need a graphic on one question', async () => {
   const { service, content, audioId, imageId } = await harness();
   const { mockTest } = await service.createMockTest(manager, { title: 'Mock', level: 1, durationMinutes: 120, examTypeId: toeicExamTypeId });
-  // Fills a part with `count` sets of three questions, like its first set.
   const fill = (part, count) => {
     const [group] = part.groups;
     const [question] = part.questions;
@@ -145,7 +138,6 @@ test('conversations 11-13 and talks 9-10 need a graphic on one question', async 
   const draft = (change) => service.saveMockTestDraft(manager, mockTest.id, content((value) => {
     fill(value.test.part3, 13);
     fill(value.test.part4, 10);
-    // The middle question of each graphic set: 3 questions per set.
     for (const set of [10, 11, 12]) value.test.part3.questions[set * 3 + 1].imageMediaId = imageId;
     for (const set of [8, 9]) value.test.part4.questions[set * 3 + 1].imageMediaId = imageId;
     change?.(value.test);
@@ -161,10 +153,10 @@ test('conversations 11-13 and talks 9-10 need a graphic on one question', async 
   };
 
   await draft(({ part3, part4 }) => {
-    part3.questions[1].imageMediaId = imageId; // conversation 1 has no graphic
-    part3.questions[10 * 3 + 1].imageMediaId = null; // conversation 11 lost its graphic
-    part3.questions[12 * 3].imageMediaId = imageId; // conversation 13 has two
-    part4.questions[9 * 3 + 1].imageMediaId = audioId; // not an image
+    part3.questions[1].imageMediaId = imageId;
+    part3.questions[10 * 3 + 1].imageMediaId = null;
+    part3.questions[12 * 3].imageMediaId = imageId;
+    part4.questions[9 * 3 + 1].imageMediaId = audioId;
   });
   assert.deepEqual((await paths()).sort(), [
     'test.part3.groups[0].imageMediaId', 'test.part3.groups[10].imageMediaId', 'test.part3.groups[12].imageMediaId',
@@ -174,7 +166,6 @@ test('conversations 11-13 and talks 9-10 need a graphic on one question', async 
   await draft();
   assert.deepEqual(await paths(), []);
 
-  // A conversation holds at most three questions, a part at most its full-test count.
   await draft(({ part3, part5 }) => {
     part3.questions.splice(1, 0, structuredClone({ ...part3.questions[0], id: undefined }));
     part5.questions = Array.from({ length: 31 }, (_, index) => structuredClone({ ...part5.questions[0], prompt: `Q${index} ___` }));
@@ -202,7 +193,6 @@ test('learning-service reads published mock tests and their papers', async () =>
   assert.equal(paper.test.part5.questions[0].options.filter((option) => option.isCorrect).length, 1);
   assert.equal(paper.media[audioId].url, 'https://media.test/a.mp3');
 
-  // Editing creates version 2; version 1 stays readable by id.
   await service.saveMockTestDraft(manager, first.id, content((value) => {
     value.test.part5.questions.pop();
     return value;
@@ -213,7 +203,6 @@ test('learning-service reads published mock tests and their papers', async () =>
   assert.equal((await service.getMockPaper(first.id, { versionId: version.versionId })).test.part5.questions.length, 2);
   await assert.rejects(() => service.getMockPaper(draftOnly.id), { code: 40 });
   await assert.rejects(() => service.getMockPaper(first.id, { versionId: randomUUID() }), { code: 40 });
-  // Files used by a published mock test are not deleted.
   assert.deepEqual(await service.deleteMedia(manager, audioId), { deleted: false });
 });
 
@@ -228,18 +217,15 @@ test('exam types: everyone lists them, an admin adds and renames, tests need a t
 
   const { examType } = await service.createExamType(admin, { name: 'HSK 1' });
   assert.deepEqual({ ...examType, id: null }, { id: null, code: 'hsk-1', name: 'HSK 1', format: null, hasEditor: false });
-  // Names must differ, also by case and punctuation.
   for (const name of ['toeic', 'Toeic', 'HSK-1', 'hsk 1', '!!!'])
     await assert.rejects(() => service.createExamType(admin, { name }), (error) => error.code === 45 && error.status === 409 && error.data.reason === 'NAME_TAKEN', name);
 
   const renamed = await service.updateExamType(admin, examType.id, { name: 'HSK Level 1' });
   assert.deepEqual([renamed.examType.name, renamed.examType.code], ['HSK Level 1', 'hsk-1']);
   await assert.rejects(() => service.updateExamType(admin, examType.id, { name: 'TOEIC' }), { code: 45 });
-  // Renaming to its own name is fine.
   assert.equal((await service.updateExamType(admin, examType.id, { name: 'HSK Level 1' })).examType.name, 'HSK Level 1');
   await assert.rejects(() => service.updateExamType(admin, '00000000-0000-4000-8000-000000000000', { name: 'Y' }), { code: 40, status: 404 });
 
-  // A mock test is created for TOEIC; a type without an editor is refused.
   const base = { title: 'Mock', level: 1, durationMinutes: 120 };
   await assert.rejects(() => service.createMockTest(manager, { ...base, examTypeId: examType.id }), (error) => error.code === 45 && error.data.reason === 'NO_EDITOR');
   await assert.rejects(() => service.createMockTest(manager, { ...base, examTypeId: '00000000-0000-4000-8000-000000000000' }), { code: 40 });
@@ -247,7 +233,6 @@ test('exam types: everyone lists them, an admin adds and renames, tests need a t
   assert.deepEqual(created.mockTest.examType, { id: toeicExamTypeId, code: 'toeic', name: 'TOEIC' });
   assert.equal((await service.listMockTests(manager)).mockTests[0].examType.name, 'TOEIC');
 });
-
 
 test('transcribe runs on one recording of a mock test and keeps the latest job of each recording (D161)', async () => {
   const { service, repository, audioId, content } = await harness();
@@ -261,7 +246,7 @@ test('transcribe runs on one recording of a mock test and keeps the latest job o
 
   const { job } = await listening.requestMockTranscribe(manager, mockTest.id, { audioMediaId: audioId });
   assert.deepEqual([job.task, job.status], ['transcribe', 'QUEUED']);
-  assert.deepEqual(sent, [{ jobId: job.id, task: 'transcribe', audioUrl: 'https://media.test/a.mp3', language: 'en', kind: 'part1', lines: [] }]);
+  assert.deepEqual(repository.tables.contentEvents.map((event) => event.payload), [{ jobId: job.id, task: 'transcribe', audioUrl: 'https://media.test/a.mp3', language: 'en', kind: 'part1', lines: [] }]);
   assert.equal((await listening.requestMockTranscribe(manager, mockTest.id, { audioMediaId: audioId })).job.id, job.id);
 
   await listening.onAutoTimeResult({ jobId: job.id, status: 'DONE', lines: [{ text: ' A man is reading. ', start: 0, end: 2 }] });

@@ -4,10 +4,6 @@ export const RATE_LIMIT_STORE = Symbol('RATE_LIMIT_STORE');
 
 const logger = new Logger('RateLimit');
 
-// A store answers hit(key, windowMs) with { count, resetAt }: the number of
-// hits of that key in its current fixed window, this one included.
-
-// Counters in process memory: for tests and for a single gateway without Redis.
 export class MemoryRateLimitStore {
   constructor({ now = () => Date.now() } = {}) {
     this.now = now;
@@ -27,7 +23,6 @@ export class MemoryRateLimitStore {
     return { count: entry.count, resetAt: entry.resetAt };
   }
 
-  // Expired windows are dropped at most once a minute so memory stays bounded.
   prune(now) {
     if (now - this.lastPrune < 60000) return;
     this.lastPrune = now;
@@ -35,10 +30,6 @@ export class MemoryRateLimitStore {
   }
 }
 
-// Counters in Redis, shared by every gateway instance: INCR, and the window's
-// expiry set when the key is new. The client is created lazily so the gateway
-// starts without Redis; a failing call throws and the guard lets the request
-// through (fail open), logging at most once a minute.
 export class RedisRateLimitStore {
   constructor({ url, client } = {}) {
     this.url = url;
@@ -80,7 +71,6 @@ export class RedisRateLimitStore {
   }
 }
 
-// RATE_LIMIT_STORE=redis (default when REDIS_URL is set) or memory.
 export function createRateLimitStore(env = process.env) {
   const kind = env.RATE_LIMIT_STORE || (env.REDIS_URL ? 'redis' : 'memory');
   if (kind === 'memory') return new MemoryRateLimitStore();

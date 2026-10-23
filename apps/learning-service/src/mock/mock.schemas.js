@@ -4,7 +4,6 @@ import { GOAL_SCORE, MockAttemptKind } from '@appenglish/learning-contracts';
 
 export const mockIdSchema = z.string().uuid();
 
-// Which attempt a call is about: the full test, or the mini test of one part.
 const reference = {
   kind: z.enum(Object.values(MockAttemptKind)),
   partKey: z.enum(LESSON_TEST_PARTS.map((part) => part.key)).optional(),
@@ -27,7 +26,6 @@ export const attemptReviewSchema = z
   .strict()
   .refine(...partMatchesKind);
 
-// 101 estimated section scores, for 0 to 100 right answers.
 const sectionTable = z
   .array(z.number().int().min(5).max(495).multipleOf(5))
   .length(101)

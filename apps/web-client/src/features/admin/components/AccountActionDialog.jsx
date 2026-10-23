@@ -7,7 +7,6 @@ import { Textarea } from '../../../components/ui/textarea.jsx';
 import { adminAccountAction } from '../../auth/api/auth-api.js';
 import { resetLearnerPlacement } from '../api/learner-api.js';
 
-// What each one-off action says and does (D114).
 export const actionCopy = Object.freeze({
   [AdminAccountAction.REVOKE_SESSIONS]: {
     title: 'Sign out of every device',
@@ -37,7 +36,6 @@ export const actionCopy = Object.freeze({
     done: 'Display name reset',
     reason: 'optional',
   },
-  // D131
   [AdminAccountAction.ACTIVATE]: {
     title: 'Activate without the code',
     description: 'The account becomes active even though the email was never verified. Do this only when you have checked who the person is; the reason is kept in the history.',
@@ -68,8 +66,6 @@ export const actionCopy = Object.freeze({
   },
 });
 
-// The placement lives in learning-service (D131); every other action is an
-// auth-service account action.
 async function runAction(account, action, reason) {
   if (action === AdminAccountAction.RESET_PLACEMENT) {
     const result = await resetLearnerPlacement(account.id, reason);
@@ -79,7 +75,6 @@ async function runAction(account, action, reason) {
   return { account: result.data.account, changed: result.data.changed, detail: result.data.changed ? undefined : 'Nothing needed to change.' };
 }
 
-// Confirms one action on an account, with an optional note for the audit trail.
 export function AccountActionDialog({ account, action, onOpenChange, onDone }) {
   const [reason, setReason] = useState('');
   const [pending, setPending] = useState(false);

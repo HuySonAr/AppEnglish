@@ -21,7 +21,6 @@ const highlights = [
   },
 ];
 
-// Sign-in area: the form on one side and, on wide screens, a brand panel.
 export function AuthLayout() {
   return (
     <div className="grid min-h-screen bg-background lg:grid-cols-[1.1fr_1fr]">

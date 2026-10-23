@@ -10,7 +10,6 @@ const question = (number, prompt, answer = 'A') =>
 const plan = (key, text, part = emptyContent().test[key]) => lessonPastePlan(part, spec(key), null, text);
 
 test('questions with the numbers of a book fill a lesson part in order', () => {
-  // Part 3 of a lesson test holds questions 4-6.
   const { part, count, lines } = plan('part3', question(38, 'Who?') + question(39, 'What?', 'C') + question(40, 'When?', 'D'));
   assert.equal(count, 3);
   assert.deepEqual(lines.map((line) => [line.title, line.note, line.errors, line.warnings]), [
@@ -40,7 +39,6 @@ test('Parts 1 and 2 are pasted as what the recording says', () => {
   assert.deepEqual(part1.part.questions[0].options.map((option) => [option.text, option.isCorrect]), [['', false], ['', true], ['', false], ['', false]]);
   assert.equal(part1.part.questions[0].prompt, '');
 
-  // Part 2 holds questions 2-3; questions numbered 7 and 8 in a book fill them in order.
   const before = { ...emptyContent().test.part2, transcript: 'Old.' };
   const text = 'Question 7\nWhere is the meeting?\n(A) In room 3.\n(B) At noon.\n(C) Yes, it is.\nAnswer: A\n8. When does the train leave?\n(A) Platform 2.\n(B) At six.\n(C) By bus.\nAnswer: B';
   const part2 = plan('part2', text, before);
@@ -51,7 +49,6 @@ test('Parts 1 and 2 are pasted as what the recording says', () => {
   );
   assert.deepEqual(part2.part.questions.map((item) => item.options.findIndex((option) => option.isCorrect)), [0, 1]);
 
-  // Part 2 has no option D, and one question alone leaves the other out of the transcript.
   const one = plan('part2', 'Question 2\nWho called?\n(A) Tom.\n(B) Yes.\n(C) At five.\n(D) No.\nAnswer: A', before);
   assert.deepEqual(one.lines[0].errors, ['Part 2 has options A–C only']);
   assert.deepEqual(one.lines[0].warnings, ['the transcript will hold 1 of the 2 questions of the part']);
@@ -78,7 +75,6 @@ test('a pasted passage fills Part 6 and Part 7 of a lesson', () => {
   assert.equal(part6.part.passage, 'Thank you for your ___ support. We received a lot of ___. ___ See you soon.');
   assert.deepEqual(part6.part.questions.map((item) => item.options.findIndex((option) => option.isCorrect)), [2, 0, 1]);
 
-  // A passage of four blanks does not fit the three questions of a lesson.
   const four = plan('part6', `Passage 1 – Questions 131–134\nA [131] b [132] c [133] d [134].\n${[131, 132, 133, 134].map((number) => `Question ${number}\n${options}`).join('')}`);
   assert.equal(four.lines[0].errors[0], 'Part 6 of this test has only questions 16–18');
   assert.equal(four.part.passage, '');

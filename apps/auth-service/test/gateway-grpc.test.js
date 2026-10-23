@@ -44,9 +44,6 @@ test('Gateway HTTP to auth-service gRPC contract', async (t) => {
     async findAccountById(id) { return id === fixture.id ? fixture : null; },
     async accountStats() { return { total: 1, byStatus: { ACTIVE: 1 }, byRole: { STUDENT: 1 }, activeLast7Days: 0, stalePending: 0, newPerDay: [] }; },
   }, undefined, undefined, undefined, new AuthorizationService());
-  // Session validation and credential checks are isolated; the handlers,
-  // schemas, mapper, authorization, gRPC transport and gateway HTTP server are
-  // real. No database, credentials or real tokens are used.
   const seen = {};
   service.me = async (accessToken) => {
     seen.accessToken = accessToken;
@@ -149,7 +146,6 @@ test('Gateway HTTP to auth-service gRPC contract', async (t) => {
       actorRole = 'ADMIN';
     });
     await t.test('admin detail and update map errors to their HTTP envelopes', async () => {
-      // "stats" must reach the statistics route, never be read as an account id (D114).
       const stats = await fetch(`${base}/auth/admin/accounts/stats`, { headers: adminCookie });
       assert.equal(stats.status, 200);
       assert.equal((await stats.json()).data.total, 1);
@@ -203,7 +199,6 @@ test('Gateway HTTP to auth-service gRPC contract', async (t) => {
       const ready = await fetch(`${base}/health/ready`);
       assert.equal(ready.status, 200);
       assert.equal((await ready.json()).database, 'ok');
-      // The dashboard probe (D115): always 200, auth-service answers over gRPC.
       const services = await (await fetch(`${base}/health/services`)).json();
       assert.deepEqual(services.services.map((service) => service.name), ['auth-service', 'content-service', 'learning-service', 'progress-service', 'speech-service']);
       assert.equal(services.services[0].status, 'ok');
@@ -213,7 +208,6 @@ test('Gateway HTTP to auth-service gRPC contract', async (t) => {
       const notReady = await fetch(`${base}/health/ready`);
       assert.equal(notReady.status, 503);
       assert.equal((await notReady.json()).code, 32);
-      // With its database down, auth-service is listed as down, still with HTTP 200.
       const degraded = await fetch(`${base}/health/services`);
       assert.equal(degraded.status, 200);
       const degradedBody = await degraded.json();

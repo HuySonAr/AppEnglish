@@ -7,11 +7,8 @@ import { authErrors } from '../auth/auth.errors.js';
 
 export const AVATAR_STORAGE = Symbol('AVATAR_STORAGE');
 
-// Relative AVATAR_LOCAL_ROOT values are resolved from the repository root.
 const repositoryRoot = fileURLToPath(new URL('../../../../', import.meta.url));
 
-// Avatar rules (D113): JPEG, PNG or WebP, small, and that is all; the web
-// client has already cropped the picture square.
 export function validateAvatar(input, maxBytes = PROFILE_LIMITS.avatarMaxBytes) {
   if (!PROFILE_LIMITS.avatarMimeTypes.includes(String(input.mimeType).toLowerCase()))
     throw authErrors.avatarInvalid('AVATAR_MIME_TYPE_NOT_ALLOWED');
@@ -23,8 +20,6 @@ export function validateAvatar(input, maxBytes = PROFILE_LIMITS.avatarMaxBytes) 
   return input;
 }
 
-// Stores avatars under an ignored directory; auth-service serves them at
-// /avatars/:name for local development.
 export class LocalAvatarStorage {
   constructor({ rootDirectory, publicBaseUrl = 'http://localhost:3001/avatars', maxBytes } = {}) {
     this.rootDirectory = rootDirectory || path.resolve(repositoryRoot, 'storage/avatars');
@@ -41,7 +36,6 @@ export class LocalAvatarStorage {
     return { storage: 'local', storageId: id, url: `${this.publicBaseUrl}/${name}` };
   }
 
-  // A file that is already gone counts as deleted.
   async delete({ storage, storageId }) {
     if (storage !== 'local') throw new Error(`Cannot delete ${storage} avatar: storage is not configured`);
     const names = await readdir(this.rootDirectory).catch(() => []);
@@ -50,8 +44,6 @@ export class LocalAvatarStorage {
   }
 }
 
-// ImageKit keeps the avatars (D68); the SDK is loaded only when it is enabled
-// so local runs and tests never need it.
 export class ImageKitAvatarStorage {
   constructor({ client, privateKey, publicKey, urlEndpoint, maxBytes, localStorage } = {}) {
     if (!client && (!privateKey || !publicKey || !urlEndpoint))
@@ -72,7 +64,6 @@ export class ImageKitAvatarStorage {
     validateAvatar(input, this.maxBytes);
     const { toFile } = await this.sdk();
     const result = await this.client.files.upload({
-      // A bare Buffer would be sent as one form field per byte.
       file: await toFile(Buffer.from(input.data), input.fileName, { type: input.mimeType }),
       fileName: input.fileName,
       useUniqueFileName: true,
@@ -81,7 +72,6 @@ export class ImageKitAvatarStorage {
     return { storage: 'imagekit', storageId: result.fileId || randomUUID(), url: result.url };
   }
 
-  // A file ImageKit no longer has counts as deleted.
   async delete(asset) {
     if (asset.storage !== 'imagekit') {
       if (!this.localStorage) throw new Error(`Cannot delete ${asset.storage} avatar: storage is not configured`);
@@ -96,7 +86,6 @@ export class ImageKitAvatarStorage {
   }
 }
 
-// AVATAR_STORAGE_ADAPTER chooses where new avatars go: local or imagekit.
 export function createAvatarStorage(source = process.env) {
   const adapter = source.AVATAR_STORAGE_ADAPTER || 'local';
   const maxBytes = Number(source.AVATAR_MAX_FILE_SIZE_BYTES || PROFILE_LIMITS.avatarMaxBytes);

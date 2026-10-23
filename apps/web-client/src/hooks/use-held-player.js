@@ -1,23 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
-// The browser's own player held to one timed sentence or song line (D95):
-// play starts at the line's start when it is outside the line or at its end,
-// it stops at the line's end (checked on every frame so it never runs into
-// the next line), and moving outside the line goes back to its start. A line
-// without times ({ start: null }) leaves the player free.
-//   audioRef  ref of the <audio controls> element
-//   line      { id, start, end } the player is held to
-//   speed     playback rate
-//   active    false while the <audio> is not rendered; listeners are added
-//             again when it comes back
-//   onStop    called when the player stops at the line's end
-// Returns { started, playLine(line?), reset(line?) }: started once play was
-// pressed; playLine plays a line (by default the current one) from its start.
 export function useHeldPlayer(audioRef, { line, speed = 1, active = true, onStop }) {
   const [started, setStarted] = useState(false);
   const stopAt = useRef(null);
   const frame = useRef(null);
-  // The line the player is held to; set before a new line plays.
   const lineRef = useRef(line);
   if (!lineRef.current || lineRef.current.id !== line?.id) lineRef.current = line;
   const onStopRef = useRef(onStop);
@@ -72,8 +58,6 @@ export function useHeldPlayer(audioRef, { line, speed = 1, active = true, onStop
     };
   }, [active, speed]);
 
-  // Plays the line (by default the current one) from its start. Rejects when
-  // the browser refuses to play.
   function playLine(target = lineRef.current) {
     const audio = audioRef.current;
     if (!audio || !target) return Promise.resolve();
@@ -82,7 +66,6 @@ export function useHeldPlayer(audioRef, { line, speed = 1, active = true, onStop
     return audio.play();
   }
 
-  // Stops and forgets that play was pressed; the player is held to `target`.
   function reset(target = line) {
     cancelAnimationFrame(frame.current);
     stopAt.current = null;

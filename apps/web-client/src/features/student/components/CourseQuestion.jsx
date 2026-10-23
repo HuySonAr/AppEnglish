@@ -2,9 +2,6 @@ import { Check, X } from 'lucide-react';
 import { cn } from '../../../lib/utils.js';
 import { Badge } from '../../../components/ui';
 
-// One multiple-choice question of the Listening course (D143): before it is
-// checked the learner picks an option; once checked (`marked`), the right
-// option shows in green, a wrong choice in red, with the explanation.
 export function CourseQuestion({ number, question, chosen, marked, onChoose }) {
   const picked = marked ? marked.chosenOptionId : chosen;
   return (

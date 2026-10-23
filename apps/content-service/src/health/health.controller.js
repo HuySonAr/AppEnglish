@@ -9,8 +9,6 @@ export class HealthController {
     this.broker = broker;
   }
   check() { return healthResponseSchema.parse(this.healthService.check()); }
-  // speech-service has no HTTP port: content-service, which talks to it over
-  // RabbitMQ, reports whether a worker listens (D133).
   async speech() {
     if (!this.broker) return { status: 'down', detail: 'not configured' };
     try {

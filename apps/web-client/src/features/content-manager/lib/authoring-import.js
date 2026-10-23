@@ -9,11 +9,6 @@ import {
 import { workingContent } from './lesson-draft.js';
 import { workingUnitReview } from './unit-review-draft.js';
 
-// Import and export of a lesson or unit review as the authoring JSON (D124).
-// Importing replaces the text of the draft but keeps what the file cannot
-// carry: the pronunciation of a word still in the lesson (by word), and the
-// recordings and images of the test (by part and question position).
-
 const lower = (text) => (text || '').trim().toLowerCase();
 
 export function mergeImportedLesson(current, imported) {
@@ -42,7 +37,6 @@ export function mergeImportedLesson(current, imported) {
   return { ...imported, vocabulary, test };
 }
 
-// The parsed file checked and turned into editor content, or the problems.
 export function planLessonImport(text, current) {
   let data;
   try {
@@ -70,5 +64,4 @@ export function planReviewImport(text) {
 export const exportLesson = (content, { number, title } = {}) => ({ ...(number ? { number } : {}), ...(title ? { title } : {}), ...authoringFromLesson(content) });
 export const exportReview = (content, { unit, title } = {}) => ({ ...(unit ? { unit } : {}), ...(title ? { title } : {}), ...authoringFromReview(content) });
 
-// A safe file name for a download.
 export const jsonFileName = (title) => `${(title || 'content').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'content'}.json`;

@@ -1,7 +1,3 @@
-// Progress (F06, D33, D110): the per-skill counts of every finished lesson
-// test and full mock test a learner took, and the lessons they completed, as
-// reported by learning-service over RabbitMQ. Ids refer to other services'
-// data and have no foreign keys.
 export class CreateProgress1740000000000 {
   name = 'CreateProgress1740000000000';
 

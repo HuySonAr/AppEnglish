@@ -16,8 +16,6 @@ export const mockListSortOptions = [
   { value: MockListSort.BEST, label: 'My best score' },
 ];
 
-// The learner's mock-test list. level and examType are 'all' or a value as
-// text; taken is 'all', 'taken' or 'not-taken' (in full).
 export function filterStudentMocks(mockTests, { search, level, examType, taken, sort }) {
   const byTitle = (a, b) => compareText(a.title, b.title);
   const byLevel = (a, b) => a.level - b.level || byTitle(a, b);
@@ -26,7 +24,6 @@ export function filterStudentMocks(mockTests, { search, level, examType, taken, 
     [MockListSort.LEVEL]: byLevel,
     [MockListSort.TITLE_ASC]: byTitle,
     [MockListSort.TITLE_DESC]: (a, b) => byTitle(b, a),
-    // Tests not taken yet come last.
     [MockListSort.BEST]: (a, b) => (b.bestPercent ?? -1) - (a.bestPercent ?? -1) || byTitle(a, b),
   }[sort];
   return mockTests
@@ -47,10 +44,6 @@ export const lessonStateOptions = [
   { value: LessonState.LOCKED, label: 'Locked' },
 ];
 
-// The learner's units with the lessons that pass the search and the state
-// filter, in learning order. A search matches a unit by its title (all its
-// lessons stay) or single lessons by theirs; units left without a lesson are
-// dropped while something is filtered.
 export function filterCurriculum(units, { search, state }) {
   const filtering = Boolean(search.trim()) || state !== 'all';
   const result = [];

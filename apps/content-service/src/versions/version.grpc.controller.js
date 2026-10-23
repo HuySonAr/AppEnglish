@@ -1,4 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
+import { withGrpcContext } from '@appenglish/backend-common/grpc-context';
 import { GrpcMethod } from '@nestjs/microservices';
 import { ContentResponseCode } from '@appenglish/content-contracts';
 import { CONTENT_GRPC_SERVICE } from '@appenglish/content-contracts/grpc';
@@ -6,8 +7,6 @@ import { ContentError } from '../content/content.errors.js';
 import { actorSchema, idSchema, versionRequestSchema } from '../content/content.schemas.js';
 import { ContentVersionService } from './version.service.js';
 
-// Version history (D122): id is the owner, the payload names the kind and,
-// for one version, its id.
 const rpcs = {
   ListContentVersions: { run: (service, { actor, id, payload }) => service.listVersions(actor, { ...payload, id }) },
   GetContentVersion: { run: (service, { actor, id, payload }) => service.getVersion(actor, { ...payload, id }) },
@@ -59,6 +58,7 @@ for (const [rpc, spec] of Object.entries(rpcs)) {
   VersionGrpcController.prototype[method] = function (request) {
     return this.handle(spec, request);
   };
+  withGrpcContext(VersionGrpcController.prototype, method, rpc);
   GrpcMethod(CONTENT_GRPC_SERVICE, rpc)(
     VersionGrpcController.prototype,
     method,

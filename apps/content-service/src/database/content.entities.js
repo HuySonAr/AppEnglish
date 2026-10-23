@@ -10,7 +10,6 @@ export const UnitEntity = new EntitySchema({
     position: { type: 'int' },
     status: { type: 'varchar', length: 16, default: 'DRAFT' },
     publishedAt: { type: 'timestamptz', nullable: true },
-    // The published version of the unit's review (D121), if any.
     reviewVersionId: { type: 'uuid', nullable: true },
     createdBy: { type: 'uuid' },
     createdAt: { type: 'timestamptz', createDate: true },
@@ -18,8 +17,6 @@ export const UnitEntity = new EntitySchema({
   },
 });
 
-// One row per version of a unit's review (D121); same life cycle as
-// LessonVersion: one DRAFT per unit, PUBLISHED rows never updated.
 export const UnitReviewVersionEntity = new EntitySchema({
   name: 'UnitReviewVersion',
   tableName: 'unit_review_versions',
@@ -54,8 +51,6 @@ export const LessonEntity = new EntitySchema({
   indices: [{ name: 'IDX_lessons_unit_position', columns: ['unitId', 'position'] }],
 });
 
-// One row per lesson version. A PUBLISHED row is never updated (D40); edits
-// go to the lesson's single DRAFT row and publishing creates the next version.
 export const LessonVersionEntity = new EntitySchema({
   name: 'LessonVersion',
   tableName: 'lesson_versions',
@@ -93,8 +88,6 @@ export const MediaAssetEntity = new EntitySchema({
   },
 });
 
-// One row per version of the single placement test; same life cycle as
-// LessonVersion.
 export const PlacementVersionEntity = new EntitySchema({
   name: 'PlacementVersion',
   tableName: 'placement_versions',
@@ -112,10 +105,6 @@ export const PlacementVersionEntity = new EntitySchema({
   indices: [{ name: 'UQ_placement_versions_number', columns: ['versionNumber'], unique: true }],
 });
 
-// A mock test: title, suggested level (1-3) and time allowed. Its questions
-// live in MockTestVersion rows with the same life cycle as LessonVersion.
-// A kind of exam the content is written for, e.g. TOEIC. format says which
-// editor and test screen its tests use; null means none exists yet.
 export const ExamTypeEntity = new EntitySchema({
   name: 'ExamType',
   tableName: 'exam_types',
@@ -167,9 +156,6 @@ export const MockTestVersionEntity = new EntitySchema({
   ],
 });
 
-
-// Listening practice (F05B-2, D85): topics, exercises and their versions,
-// with the same life cycle as mock tests (a PUBLISHED version never changes).
 export const ListeningTopicEntity = new EntitySchema({
   name: 'ListeningTopic',
   tableName: 'listening_topics',
@@ -221,10 +207,30 @@ export const ListeningExerciseVersionEntity = new EntitySchema({
   ],
 });
 
-// Auto-time jobs (D97): one row per request for the times of an exercise's
-// or a course topic's (D147) lines, answered by speech-service. Exactly one
-// of exerciseId and courseItemId is set. lines are the lines asked about
-// ({ id, text }), result the answer ({ id, start, end, matched }).
+export const ContentEventEntity = new EntitySchema({
+  name: 'ContentEvent',
+  tableName: 'content_events',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    type: { type: 'varchar', length: 40 },
+    payload: { type: 'jsonb' },
+    requestId: { type: 'varchar', length: 64, nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    publishedAt: { type: 'timestamptz', nullable: true },
+  },
+  indices: [{ name: 'IDX_content_events_pending', columns: ['publishedAt', 'createdAt'] }],
+});
+
+export const ProcessedMessageEntity = new EntitySchema({
+  name: 'ProcessedMessage',
+  tableName: 'processed_messages',
+  columns: {
+    messageId: { type: 'varchar', length: 64, primary: true },
+    queue: { type: 'varchar', length: 80 },
+    processedAt: { type: 'timestamptz' },
+  },
+});
+
 export const AdminNoticeEntity = new EntitySchema({
   name: 'AdminNotice',
   tableName: 'admin_notices',
@@ -260,7 +266,6 @@ export const ListeningTimingJobEntity = new EntitySchema({
     courseItemId: { type: 'uuid', nullable: true },
     mockTestId: { type: 'uuid', nullable: true },
     audioMediaId: { type: 'uuid', nullable: true },
-    // align (Auto-time, D97) or transcribe (D98).
     task: { type: 'varchar', length: 16, default: 'align' },
     status: { type: 'varchar', length: 16 },
     lines: { type: 'jsonb' },
@@ -279,8 +284,6 @@ export const ListeningTimingJobEntity = new EntitySchema({
   ],
 });
 
-// Listening course (F05C, D100): units and level tests of the CEFR levels,
-// versioned like mock tests (a PUBLISHED version never changes).
 export const ListeningCourseItemEntity = new EntitySchema({
   name: 'ListeningCourseItem',
   tableName: 'listening_course_items',
@@ -288,7 +291,6 @@ export const ListeningCourseItemEntity = new EntitySchema({
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     level: { type: 'varchar', length: 2, nullable: true },
     type: { type: 'varchar', length: 16 },
-    // The section of a unit (D107); null for a level test and the placement.
     section: { type: 'varchar', length: 24, nullable: true },
     title: { type: 'varchar', length: 200 },
     description: { type: 'text', default: '' },

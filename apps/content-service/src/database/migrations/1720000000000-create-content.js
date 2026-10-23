@@ -43,7 +43,6 @@ export class CreateContent1720000000000 {
         CONSTRAINT "UQ_lesson_versions_number" UNIQUE ("lessonId", "versionNumber")
       )
     `);
-    // At most one editable draft per lesson.
     await queryRunner.query(`CREATE UNIQUE INDEX IF NOT EXISTS "UQ_lesson_versions_one_draft" ON "lesson_versions" ("lessonId") WHERE "status" = 'DRAFT'`);
     await queryRunner.query(`
       CREATE TABLE IF NOT EXISTS "media_assets" (

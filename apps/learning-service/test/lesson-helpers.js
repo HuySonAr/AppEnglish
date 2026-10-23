@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { createMemoryRepository, placementPaper } from './helpers.js';
 
-// In-memory stand-in for LessonRepository.
 export function createLessonRepository() {
   const tables = { progress: [], attempts: [], reviewAttempts: [] };
   const copy = (row) => (row ? structuredClone(row) : null);
@@ -83,8 +82,6 @@ const words = [
   ['passenger', 'hành khách'],
 ];
 
-// A published lesson as content-service returns it. The test is the same
-// seven-part paper the placement helpers build (first option correct).
 export function lessonPaper(lesson, unit, { versionNumber = 1, wordCount = 5 } = {}) {
   const base = placementPaper();
   const vocabulary = words.slice(0, wordCount).map(([word, meaning]) => ({
@@ -111,8 +108,6 @@ export function lessonPaper(lesson, unit, { versionNumber = 1, wordCount = 5 } =
   };
 }
 
-// A published unit review as content-service returns it (D121, D129): 10
-// Part 5 questions and 3 Part 6 passages of 3; the first option is correct.
 export function reviewPaper(unit, { versionNumber = 1 } = {}) {
   const options = () => Array.from({ length: 4 }, (_, index) => ({ id: randomUUID(), text: `Option ${index + 1}`, isCorrect: index === 0 }));
   const question = (fields) => ({ id: randomUUID(), prompt: '', audioMediaId: null, transcript: '', imageMediaId: null, groupId: null, explanation: 'Secret explanation', options: options(), ...fields });
@@ -128,15 +123,11 @@ export function reviewPaper(unit, { versionNumber = 1 } = {}) {
   };
 }
 
-// Answers of a unit review with the first `correct` questions right.
 export function reviewAnswers(paper, correct) {
   const questions = [...paper.test.part5.questions, ...paper.test.part6.questions];
   return Object.fromEntries(questions.map((question, index) => [question.id, question.options[index < correct ? 0 : 1].id]));
 }
 
-// Content-service stand-in with a curriculum of `shape` lessons per unit,
-// e.g. [2, 2] is two units of two lessons. reviews lists the (0-based) units
-// that have a published review (D121).
 export function createCurriculum(shape = [2, 2], { reviews = [] } = {}) {
   const units = shape.map((count, unitIndex) => ({
     id: randomUUID(),
@@ -156,7 +147,6 @@ export function createCurriculum(shape = [2, 2], { reviews = [] } = {}) {
     lessons: units.flatMap((unit) => unit.lessons),
     paperOf: (lessonId) => papers.get(lessonId),
     reviewOf: (unitId) => reviewPapers.get(unitId),
-    // Publishes (a new version of) the review of a unit.
     publishReview(unitId) {
       const unit = units.find((item) => item.id === unitId);
       const paper = reviewPaper(unit, { versionNumber: (reviewPapers.get(unitId)?.versionNumber || 0) + 1 });
@@ -171,7 +161,6 @@ export function createCurriculum(shape = [2, 2], { reviews = [] } = {}) {
       const unit = units.find((item) => item.id === unitId);
       return unit?.reviewVersionId ? structuredClone(reviewPapers.get(unitId)) : null;
     },
-    // Publishes a new version of a lesson.
     republish(lessonId) {
       const unit = units.find((item) => item.lessons.some((lesson) => lesson.id === lessonId));
       const lesson = unit.lessons.find((item) => item.id === lessonId);
@@ -196,8 +185,6 @@ export function createCurriculum(shape = [2, 2], { reviews = [] } = {}) {
   return client;
 }
 
-// A placement repository where the learner already has a starting unit
-// (null: placement neither taken nor skipped).
 export async function placementWith(accountId, startUnit) {
   const repository = createMemoryRepository();
   if (startUnit !== null)
@@ -205,14 +192,12 @@ export async function placementWith(accountId, startUnit) {
   return repository;
 }
 
-// Right meaning for every word, except the first `wrong` ones.
 export function quizAnswers(paper, { wrong = 0 } = {}) {
   return Object.fromEntries(
     paper.content.vocabulary.map((item, index) => [item.id, index < wrong ? 'not the meaning' : item.meaning]),
   );
 }
 
-// Answers of the lesson test with the first `correct` questions right.
 export function testAnswers(paper, correct) {
   const questions = Object.values(paper.content.test).flatMap((part) => part.questions);
   return Object.fromEntries(

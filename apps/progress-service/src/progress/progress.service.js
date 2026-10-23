@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { AccountRole } from '@appenglish/auth-contracts';
-import { LearningEventType, MockAttemptKind } from '@appenglish/learning-contracts';
+import { LearningEventType, LearningQueue, MockAttemptKind } from '@appenglish/learning-contracts';
 import { LEADERBOARD_SIZE, NOTIFICATION_KEEP_DAYS, NOTIFICATION_LIST_SIZE, NotificationKind, ProgressSkill, ProgressSource } from '@appenglish/progress-contracts';
 import { progressErrors } from './progress.errors.js';
 import { completion, skillMastery } from './progress.rules.js';
@@ -22,10 +22,6 @@ const counts = (payload) => ({
   submittedAt: new Date(payload.submittedAt),
 });
 
-// Progress (F06, D33): lessons completed over the published lessons, and the
-// Reading and Listening mastery from the lesson tests and full mock tests.
-// Results arrive as learning.results messages; the curriculum is read from
-// content-service.
 export class ProgressService {
   constructor(repository, contentClient, { now = () => new Date() } = {}) {
     this.repository = repository;
@@ -42,8 +38,6 @@ export class ProgressService {
     return this.progressOf(actor.id);
   }
 
-  // Admin (D114): the progress and XP of one learner, read-only. The id must
-  // be a UUID; a learner without results simply has empty numbers.
   async getLearnerSummary(actor, learnerId) {
     if (actor.role !== AccountRole.ADMIN) throw progressErrors.forbiddenRole();
     const id = learnerIdSchema.parse(learnerId);
@@ -63,7 +57,6 @@ export class ProgressService {
         listening: skillMastery(results, ProgressSkill.LISTENING),
         reading: skillMastery(results, ProgressSkill.READING),
       },
-      // How many finished tests the mastery rests on, by kind.
       attempts: {
         lessonTests: results.filter((result) => result.source === ProgressSource.LESSON_TEST).length,
         mockTests: results.filter((result) => result.source === ProgressSource.MOCK_TEST).length,
@@ -71,11 +64,15 @@ export class ProgressService {
     };
   }
 
-  // Applies one learning.results message. Invalid messages throw a ZodError
-  // (the consumer drops them); unknown types are ignored. Applying the same
-  // message twice stores nothing new.
   async applyResult(message) {
-    const { type, payload } = resultMessageSchema.parse(message);
+    const { id, type, payload } = resultMessageSchema.parse(message);
+    if (await this.repository.isProcessed(id)) return 'duplicate';
+    const applied = await this.applyPayload(type, payload);
+    await this.repository.markProcessed(id, LearningQueue.RESULTS, this.now());
+    return applied;
+  }
+
+  async applyPayload(type, payload) {
     const schema = payloadSchemas[type];
     if (!schema) {
       logger.warn(`Ignored learning result of unknown type ${type}`);
@@ -100,7 +97,6 @@ export class ProgressService {
     } else if (type === LearningEventType.LESSON_COMPLETED) {
       await this.repository.saveCompletion({ accountId: data.accountId, lessonId: data.lessonId, completedAt: new Date(data.completedAt) });
     } else if (type === LearningEventType.MOCK_SUBMITTED) {
-      // Only full tests count (workflow 07); learning-service sends no others.
       if (data.kind !== MockAttemptKind.FULL) return false;
       await this.repository.saveResult({
         id: data.attemptId,
@@ -111,7 +107,6 @@ export class ProgressService {
       });
       const previous = await this.repository.latestMockNotification(data.accountId, data.mockTestId);
       if (previous?.key !== `mock:${data.attemptId}`) await this.repository.addNotification(mockResultNotification(data, previous));
-      // XP from the first full attempt only (D63); one row per test.
       if (earnsXp(data)) {
         await this.repository.saveXp({
           id: data.attemptId,
@@ -158,8 +153,6 @@ export class ProgressService {
     return streakView(await this.repository.listStudyDays(actor.id), this.now());
   }
 
-  // The learner's XP (F07): the total, their rank, and the mock tests it
-  // came from, latest first.
   async getXp(actor) {
     this.assertStudent(actor);
     return this.xpOf(actor.id);
@@ -183,8 +176,6 @@ export class ProgressService {
     };
   }
 
-  // The XP leaderboard (D39): the top learners by total XP, ties broken by
-  // who reached the total first, and the learner's own place.
   async getLeaderboard(actor) {
     this.assertStudent(actor);
     const ranked = rankTotals(await this.repository.listXpTotals());

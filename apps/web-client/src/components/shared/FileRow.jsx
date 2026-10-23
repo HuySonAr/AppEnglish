@@ -5,10 +5,6 @@ import { Button } from '../ui/button.jsx';
 
 const icons = { audio: FileAudio, video: FileVideo, image: FileImage, json: FileJson, text: FileText };
 
-// One chosen or uploaded file (D125): its name, size and where its upload
-// stands, with a bar underneath. status: "pending" (kept in the browser,
-// uploads later), "uploading", "done", "failed" (with error). note is the
-// short text after the size; children show a preview (player, picture).
 export function FileRow({ name, type, sizeBytes, status = 'done', note, error, onRemove, onRetry, children, className }) {
   const Icon = icons[fileKind(name, type)] || FileText;
   const failed = status === 'failed';

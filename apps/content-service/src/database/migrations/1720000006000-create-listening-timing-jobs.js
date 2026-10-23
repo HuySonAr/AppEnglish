@@ -1,5 +1,3 @@
-// Auto-time (D97): the requests for the times of a listening exercise's lines,
-// answered by speech-service through RabbitMQ.
 export class CreateListeningTimingJobs1720000006000 {
   name = 'CreateListeningTimingJobs1720000006000';
 

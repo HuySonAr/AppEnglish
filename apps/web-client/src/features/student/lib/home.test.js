@@ -14,7 +14,6 @@ test('the next step is the placement, then the first open lesson, then done', ()
   ];
   const next = nextLessonStep(curriculum(false, units));
   assert.deepEqual([next.kind, next.lesson.id, next.unit.id], ['lesson', 'c', 'u2']);
-  // Lessons before the starting unit are open but not required: the first open one is still the suggestion.
   assert.equal(nextLessonStep(curriculum(false, [{ id: 'u1', title: 'One', lessons: [lesson('a', 'OPEN'), lesson('b', 'OPEN')] }])).lesson.id, 'a');
   assert.deepEqual(nextLessonStep(curriculum(false, [{ id: 'u1', title: 'One', lessons: [lesson('a', 'COMPLETED')] }])), { kind: 'done' });
   assert.deepEqual(nextLessonStep(curriculum(false, [])), { kind: 'none' });
@@ -37,9 +36,7 @@ test('the suggested mock test is a recommended one not taken yet', () => {
   assert.equal(suggestedMockTest({ mockTests: [] }), null);
   const tests = [mock('l1', 1, false, 0), mock('l2a', 2, true, 2, 71), mock('l2b', 2, true, 0), mock('l3', 3, false, 1, 40)];
   assert.equal(suggestedMockTest({ mockTests: tests }).id, 'l2b');
-  // Every recommended test taken: the one taken the fewest times.
   assert.equal(suggestedMockTest({ mockTests: [mock('l2a', 2, true, 2, 71), mock('l2b', 2, true, 1, 50)] }).id, 'l2b');
-  // No recommended test: a test not taken, else the first.
   assert.equal(suggestedMockTest({ mockTests: [mock('l1', 1, false, 1, 60), mock('l3', 3, false, 0)] }).id, 'l3');
   assert.equal(suggestedMockTest({ mockTests: [mock('l1', 1, false, 1, 60)] }).id, 'l1');
   assert.equal(bestMockPercent({ mockTests: tests }), 71);

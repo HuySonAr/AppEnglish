@@ -2,12 +2,11 @@ import { Body, Controller, Delete, Get, HttpException, Inject, Param, Post, Put,
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
 import { AUTH_GRPC_CLIENT, attachProfiles, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
+import { resolveSession } from '../auth/session-cache.js';
 import { callService } from '../grpc/grpc-call.js';
 
 export const LEARNING_GRPC_CLIENT = 'LEARNING_GRPC_CLIENT';
 
-// Shared by the two controllers below: authenticates the session and relays
-// one call to learning-service over gRPC.
 class LearningRelay {
   constructor(authClient, learningClient) {
     this.authClient = authClient;
@@ -19,14 +18,8 @@ class LearningRelay {
     this.learning = this.learningClient.getService(LEARNING_GRPC_SERVICE);
   }
 
-  // Every route needs a valid session: auth-service verifies the access
-  // cookie and returns the account that learning-service authorizes.
   async forward(rpc, request, { id = '', body } = {}) {
-    const session = await callAuth(this.auth, 'Me', {
-      accessToken: sessionTokens(request).accessToken,
-    });
-    if (session.status >= 400) throw new HttpException(session.payload, session.status);
-    const { id: accountId, role, email } = session.payload.data.account;
+    const { id: accountId, role, email } = await resolveSession(this.auth, request);
     const { status, payload } = await callService(
       this.learning,
       rpc,
@@ -42,7 +35,6 @@ class LearningRelay {
   }
 }
 
-// Public /placement/* routes (F03).
 export class LearningGatewayController extends LearningRelay {
 
   getPlacement(request) {
@@ -66,8 +58,6 @@ export class LearningGatewayController extends LearningRelay {
   updatePlacementSettings(body, request) {
     return this.forward('UpdatePlacementSettings', request, { body });
   }
-  // Admin (D131): learning-service removes the learner's attempt, then
-  // auth-service writes the audit row (who, when, why) on the account.
   async adminResetPlacement(accountId, body, request) {
     const result = await this.forward('AdminResetPlacement', request, { id: accountId });
     const reason = body && typeof body.reason === 'string' ? body.reason : '';
@@ -101,7 +91,6 @@ for (const [verb, path, method, params] of routes) {
   params.forEach((decorator, index) => decorator(LearningGatewayController.prototype, method, index));
 }
 
-// Public /learning/* routes (F04): the lesson flow of a student.
 export class LessonGatewayController extends LearningRelay {
   getCurriculum(request) {
     return this.forward('GetCurriculum', request);
@@ -166,7 +155,6 @@ export class LessonGatewayController extends LearningRelay {
   getListeningCourse(request) {
     return this.forward('GetListeningCourse', request);
   }
-  // A topic of the course (D145): id is the topic id.
   getCourseTopic(id, request) {
     return this.forward('GetCourseTopic', request, { id });
   }
@@ -179,7 +167,6 @@ export class LessonGatewayController extends LearningRelay {
   getCourseProgress(request) {
     return this.forward('GetCourseProgress', request);
   }
-  // Unit review (D121): id is the unit id.
   getUnitReview(id, request) {
     return this.forward('GetUnitReview', request, { id });
   }
@@ -192,7 +179,6 @@ export class LessonGatewayController extends LearningRelay {
   submitCourseTest(itemId, body, request) {
     return this.forward('SubmitCourseTest', request, { id: itemId, body });
   }
-  // Ranked learners are shown by display name and avatar (D113).
   async getLessonRanking(id, request) {
     const payload = await this.forward('GetLessonRanking', request, { id });
     await attachProfiles(this.auth, [...(payload.data.entries || []), payload.data.me]);
@@ -241,10 +227,7 @@ for (const [verb, path, method, params] of lessonRoutes) {
   params.forEach((decorator, index) => decorator(LessonGatewayController.prototype, method, index));
 }
 
-// Public /mock-tests/* routes (F05A): full mock tests and mini tests of a
-// student, and the Admin's score conversion table.
 export class MockGatewayController extends LearningRelay {
-  // Which attempt a GET is about, from ?kind=FULL or ?kind=MINI&partKey=part5.
   reference(query) {
     return {
       kind: query?.kind,
@@ -309,7 +292,6 @@ export class MockGatewayController extends LearningRelay {
 Controller('mock-tests')(MockGatewayController);
 Inject(AUTH_GRPC_CLIENT)(MockGatewayController, undefined, 0);
 Inject(LEARNING_GRPC_CLIENT)(MockGatewayController, undefined, 1);
-// The fixed paths come before ':id' so they are not read as a mock test id.
 const mockRoutes = [
   [Get, 'score-conversion', 'getScoreConversion', [Req()]],
   [Put, 'score-conversion', 'updateScoreConversion', [Body(), Req()]],

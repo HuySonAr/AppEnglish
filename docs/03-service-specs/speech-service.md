@@ -90,3 +90,7 @@ repository's `.env` loaded.
 - A second job on the same recording uses the cached words (D99): Auto-time
   after Transcribe took 0.01 s instead of about 108 s on "Proud of you".
   Python does not reload code: restart the worker (`pnpm dev`) after changing it.
+
+## Delivery (D168)
+
+Requests carry `requestId` (also header `x-request-id`); every answer carries it back and has its own `message_id`. A request is acked only after the answer is published. A request redelivered after the worker stopped is put back once with header `x-attempt`; if it is redelivered again it goes to `speech.autotime.requests.dead` and the job is answered `FAILED` ("The speech worker stopped twice on this recording.").

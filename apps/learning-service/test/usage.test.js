@@ -5,8 +5,6 @@ import { UsageGrpcController, UsageRepository } from '../src/usage/usage.grpc.co
 const lessonA = '11111111-1111-4111-8111-111111111111';
 const lessonB = '22222222-2222-4222-8222-222222222222';
 
-// A stand-in data source: each entity's rows, counted with the same shape the
-// query builder returns.
 function fakeDataSource(rows) {
   return {
     isInitialized: true,
@@ -44,7 +42,6 @@ test('usage counts learner rows per content id across the tables of its kind', a
   }));
   assert.deepEqual(await repository.countUsage('lesson', [lessonA, lessonB]), { [lessonA]: 3, [lessonB]: 1 });
   assert.deepEqual(await repository.countUsage('mockTest', [lessonB]), { [lessonB]: 0 });
-  // A course topic counts the learners who completed it (D145).
   assert.deepEqual(await repository.countUsage('courseTopic', [lessonA, lessonB]), { [lessonA]: 1, [lessonB]: 0 });
 });
 
@@ -57,9 +54,7 @@ test('a stored version counts the attempts taken on it (D128)', async () => {
   assert.deepEqual(await repository.countUsage('lessonVersion', [lessonA, lessonB]), { [lessonA]: 2, [lessonB]: 1 });
   assert.deepEqual(await repository.countUsage('mockVersion', [lessonA]), { [lessonA]: 1 });
   assert.deepEqual(await repository.countUsage('unitReviewVersion', [lessonB]), { [lessonB]: 1 });
-  // Course results are not tied to a version (D145).
   assert.deepEqual(await repository.countUsage('courseVersion', [lessonA, lessonB]), { [lessonA]: 0, [lessonB]: 0 });
-  // A listening exercise version is never referenced by a result.
   assert.deepEqual(await repository.countUsage('listeningVersion', [lessonA]), { [lessonA]: 0 });
 });
 

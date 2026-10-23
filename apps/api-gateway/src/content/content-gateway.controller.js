@@ -6,16 +6,13 @@ import { ContentResponseCode, ContentUsageKind } from '@appenglish/content-contr
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
 import { LEARNING_GRPC_CLIENT } from '../learning/learning-gateway.controller.js';
 import { AUTH_GRPC_CLIENT, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
+import { resolveSession } from '../auth/session-cache.js';
 import { callService } from '../grpc/grpc-call.js';
 
 export const CONTENT_GRPC_CLIENT = 'CONTENT_GRPC_CLIENT';
 
-// Upper bound for one uploaded file held in memory; content-service applies the
-// configured MEDIA_MAX_FILE_SIZE_BYTES and the type rules.
 const MAX_UPLOAD_BYTES = 48 * 1024 * 1024;
 
-// The usage kind that counts learner attempts on one stored version of each
-// versioned content (D128).
 const VERSION_USAGE_KINDS = Object.freeze({
   lesson: ContentUsageKind.LESSON_VERSION,
   mockTest: ContentUsageKind.MOCK_VERSION,
@@ -37,9 +34,6 @@ export class ContentGatewayController {
     this.learning = this.learningClient?.getService(LEARNING_GRPC_SERVICE);
   }
 
-  // Taking content away (D118). Unpublishing only hides it; deleting is
-  // refused with 409 CONTENT_IN_USE while any learner has results for it,
-  // which learning-service counts.
   unpublishUnit(id, request) {
     return this.forward('UnpublishUnit', request, { id });
   }
@@ -49,11 +43,9 @@ export class ContentGatewayController {
     const unit = (units.data.units || []).find((item) => item.id === id);
     if (!unit) throw new HttpException({ code: ContentResponseCode.CONTENT_NOT_FOUND, msg: 'fail', data: {} }, 404);
     await this.assertUnused(actor, ContentUsageKind.LESSON, unit.lessons.map((lesson) => lesson.id));
-    // Attempts at the unit's review count too (D121).
     await this.assertUnused(actor, ContentUsageKind.UNIT, [id]);
     return this.respond(await callService(this.content, 'DeleteUnit', { actor, id, payloadJson: '' }, 'Content'));
   }
-  // Version history (D122): kind is a ContentVersionKind, id its owner.
   listContentVersions(kind, id, request) {
     return this.forward('ListContentVersions', request, { id, body: { kind } });
   }
@@ -66,14 +58,12 @@ export class ContentGatewayController {
   discardContentDraft(kind, id, request) {
     return this.forward('DiscardContentDraft', request, { id, body: { kind } });
   }
-  // An old version goes only when no learner attempt refers to it (D128).
   async deleteContentVersion(kind, id, versionId, request) {
     const actor = await this.actor(request);
     const usageKind = VERSION_USAGE_KINDS[kind];
     if (usageKind) await this.assertUnused(actor, usageKind, [versionId]);
     return this.respond(await callService(this.content, 'DeleteContentVersion', { actor, id, payloadJson: JSON.stringify({ kind, versionId }) }, 'Content'));
   }
-  // Unit review (D121): the Reading test that closes a unit.
   getUnitReview(id, request) {
     return this.forward('GetUnitReview', request, { id });
   }
@@ -111,7 +101,6 @@ export class ContentGatewayController {
     const actor = await this.actor(request);
     const item = await this.call('GetCourseItem', actor, id);
     const type = item.data.item?.type;
-    // A topic counts the learners who completed it; a level test its attempts (D145).
     const kind = type === 'topic' ? ContentUsageKind.COURSE_TOPIC : ContentUsageKind.COURSE_TEST;
     await this.assertUnused(actor, kind, [id]);
     return this.respond(await callService(this.content, 'DeleteCourseItem', { actor, id, payloadJson: '' }, 'Content'));
@@ -129,7 +118,6 @@ export class ContentGatewayController {
     return this.respond(await callService(this.content, rpc, { actor, id, payloadJson: '' }, 'Content'));
   }
 
-  // 409 when learners already have results for any of the ids.
   async assertUnused(actor, kind, ids) {
     if (!ids.length) return;
     const usage = await callService(this.learning, 'GetContentUsage', { actor, id: '', payloadJson: JSON.stringify({ kind, ids }) }, 'Learning');
@@ -288,7 +276,6 @@ export class ContentGatewayController {
   publishCourseItem(id, request) {
     return this.forward('PublishCourseItem', request, { id });
   }
-  // D147: speech jobs on a course topic's own recording.
   requestCourseAutoTime(id, request) {
     return this.forward('RequestCourseAutoTime', request, { id });
   }
@@ -321,14 +308,9 @@ export class ContentGatewayController {
     );
   }
 
-  // Every content route needs a valid session: auth-service verifies the
-  // access cookie and returns the account that content-service authorizes.
   async actor(request) {
-    const { status, payload } = await callAuth(this.auth, 'Me', {
-      accessToken: sessionTokens(request).accessToken,
-    });
-    if (status >= 400) throw new HttpException(payload, status);
-    return { id: payload.data.account.id, role: payload.data.account.role };
+    const { id, role } = await resolveSession(this.auth, request);
+    return { id, role };
   }
 
   async forward(rpc, request, { id = '', body } = {}) {
@@ -410,7 +392,6 @@ const routes = [
   [Get, 'versions/:kind/:id/:versionId', 'getContentVersion', [Param('kind'), Param('id'), Param('versionId'), Req()]],
   [Post, 'versions/:kind/:id/:versionId/restore', 'restoreContentVersion', [Param('kind'), Param('id'), Param('versionId'), Req()]],
   [Delete, 'versions/:kind/:id/draft', 'discardContentDraft', [Param('kind'), Param('id'), Req()]],
-  // After the literal "draft" route: Nest matches in declaration order.
   [Delete, 'versions/:kind/:id/:versionId', 'deleteContentVersion', [Param('kind'), Param('id'), Param('versionId'), Req()]],
   [Get, 'units/:id/review', 'getUnitReview', [Param('id'), Req()]],
   [Put, 'units/:id/review/draft', 'saveUnitReviewDraft', [Param('id'), Body(), Req()]],

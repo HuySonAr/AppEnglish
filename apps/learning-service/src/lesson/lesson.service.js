@@ -35,7 +35,6 @@ import {
   wrongQuizAnswers,
 } from './lesson.rules.js';
 
-// A submit that arrives this long after the deadline still counts.
 const SUBMIT_GRACE_MS = 30 * 1000;
 const RANKING_SIZE = 50;
 const IN_PROGRESS = 'IN_PROGRESS';
@@ -45,10 +44,6 @@ const percent = (correctCount, totalCount) =>
   totalCount ? Math.round((correctCount * 100) / totalCount) : 0;
 
 export class LessonService {
-  // contentClient reads the curriculum and lesson papers from content-service;
-  // placementRepository gives the learner's starting unit; events reports
-  // finished tests and completed lessons to progress-service (F06); now() and
-  // random() are replaceable in tests.
   constructor(repository, placementRepository, contentClient, { now = () => new Date(), random = Math.random, events = noEvents } = {}) {
     this.repository = repository;
     this.placementRepository = placementRepository;
@@ -62,7 +57,6 @@ export class LessonService {
     if (actor.role !== AccountRole.STUDENT) throw placementErrors.forbiddenRole();
   }
 
-  // The published curriculum and where the learner stands in it.
   async standing(actor) {
     const [curriculum, placement, progress, reviewAttempts] = await Promise.all([
       this.contentClient.getCurriculum(),
@@ -70,11 +64,9 @@ export class LessonService {
       this.repository.listProgress(actor.id),
       this.repository.listReviewAttempts(actor.id),
     ]);
-    // Lessons open once the placement test is taken or skipped (D35).
     const placed = Boolean(placement) && placement.status !== PlacementStatus.IN_PROGRESS;
     const startUnit = placed ? placement.startUnit : null;
     const completed = new Set(progress.filter((row) => row.completedAt).map((row) => row.lessonId));
-    // Units whose review the learner passed (D121).
     const passedReviews = new Set(reviewAttempts.filter((attempt) => attempt.passed).map((attempt) => attempt.unitId));
     return {
       curriculum,
@@ -103,7 +95,6 @@ export class LessonService {
         number: index + 1,
         title: unit.title,
         description: unit.description,
-        // The review that closes the unit (D121), or null when it has none.
         review: this.reviewSummary(standing, unit.id),
         lessons: unit.lessons.map((lesson) => {
           const entry = standing.access.get(lesson.id);
@@ -119,7 +110,6 @@ export class LessonService {
     };
   }
 
-  // Loads what every lesson action needs and refuses a locked lesson.
   async open(actor, lessonId) {
     this.assertStudent(actor);
     const standing = await this.standing(actor);
@@ -132,7 +122,6 @@ export class LessonService {
     return { standing, entry, paper, progress, steps: lessonSteps(entry, progress) };
   }
 
-  // Refuses when a step before `step` is not finished.
   requireStep(steps, step) {
     const target = steps.findIndex((item) => item.key === step);
     const blocking = steps.findIndex((item) => item.status !== StepStatus.DONE);
@@ -174,9 +163,6 @@ export class LessonService {
       fillIn: {
         passage: fillIn.passage,
         blankCount: countBlanks(fillIn.passage),
-        // The words to place, shuffled (D111): exactly the answers, so a word
-        // used in two blanks appears twice. Which blank each one goes to is
-        // what the learner works out.
         wordBank: shuffled(fillIn.answers, this.random),
       },
       test: {
@@ -190,7 +176,6 @@ export class LessonService {
     };
   }
 
-  // The learner has opened every word of the lesson.
   async markVocabularyStudied(actor, lessonId) {
     const { progress, steps } = await this.open(actor, lessonId);
     this.requireStep(steps, LessonStep.VOCABULARY);
@@ -200,8 +185,6 @@ export class LessonService {
     return { studied: true };
   }
 
-  // The words a quiz is about: this lesson's, or the previous lesson's for the
-  // review.
   async quizSource(opened, lessonKind) {
     const { entry, paper, steps } = opened;
     if (lessonKind === QuizKind.VOCABULARY) {
@@ -219,8 +202,6 @@ export class LessonService {
     return { kind, questions: vocabularyQuiz(await this.quizSource(opened, kind), this.random) };
   }
 
-  // Every word must get its meaning; the wrong ones are named so the learner
-  // can try again. No limit on tries.
   async submitVocabularyQuiz(actor, lessonId, { kind, answers }) {
     const opened = await this.open(actor, lessonId);
     const vocabulary = await this.quizSource(opened, kind);
@@ -234,10 +215,6 @@ export class LessonService {
     return { kind, passed: !wrongIds.length, total: vocabulary.length, wrongIds };
   }
 
-  // ----- Vocabulary practice (F05B-1, D84)
-
-  // 20 random words of the completed lessons, with their answers; locked
-  // (no questions) while those lessons hold fewer than 20 different words.
   async getVocabularyPractice(actor) {
     this.assertStudent(actor);
     const standing = await this.standing(actor);
@@ -288,14 +265,10 @@ export class LessonService {
     return { passed: !blanks.length, total: paper.content.fillIn.answers.length, wrongBlanks: blanks };
   }
 
-  // ----- Lesson test
-
   isExpired(attempt) {
     return this.now().getTime() > new Date(attempt.expiresAt).getTime() + SUBMIT_GRACE_MS;
   }
 
-  // The learner's attempts at the lesson; one whose time ran out is finished
-  // first with the answers saved so far.
   async attempts(actor, lessonId) {
     const attempts = await this.repository.listAttempts(actor.id, lessonId);
     const open = attempts.find((attempt) => attempt.status === IN_PROGRESS);
@@ -333,7 +306,6 @@ export class LessonService {
       durationMinutes: LESSON_TEST_DURATION_MINUTES,
       passPercent: LESSON_PASS_PERCENT,
       attempts: finished.map((attempt) => this.attemptSummary(attempt)),
-      // Whether the learner is getting better or worse over the retakes (D62).
       progression: testProgression(finished),
     };
     if (!open) {
@@ -354,7 +326,6 @@ export class LessonService {
     };
   }
 
-  // Starts a new attempt, or returns the one in progress.
   async startLessonTest(actor, lessonId) {
     const { paper, steps } = await this.open(actor, lessonId);
     let attempts = await this.attempts(actor, lessonId);
@@ -371,7 +342,6 @@ export class LessonService {
       status: IN_PROGRESS,
       startedAt,
       expiresAt: new Date(startedAt.getTime() + LESSON_TEST_DURATION_MINUTES * 60 * 1000),
-      // Options of Parts 3-7 are shuffled for each attempt (D31).
       optionOrder: shuffledOptionOrder(paper.content.test, this.random),
       answers: {},
     });
@@ -398,9 +368,6 @@ export class LessonService {
     return { saved: true };
   }
 
-  // Throws away the attempt in progress: it is not scored and leaves no trace
-  // in the history or the ranking (D82). An attempt whose time already ran
-  // out is finished instead, as it would be on the next visit.
   async discardLessonTest(actor, lessonId) {
     const attempt = await this.openAttempt(actor, lessonId);
     if (this.isExpired(attempt)) {
@@ -411,11 +378,8 @@ export class LessonService {
     return { discarded: true };
   }
 
-  // Scores the attempt and returns the result with the full review: correct
-  // answers, explanations and transcripts (D59).
   async submitLessonTest(actor, lessonId, { answers }) {
     const attempt = await this.openAttempt(actor, lessonId);
-    // A submit after the grace period is scored with the answers saved in time.
     const finished = await this.complete(attempt, this.isExpired(attempt) ? attempt.answers : answers);
     return this.reviewView(finished);
   }
@@ -425,7 +389,6 @@ export class LessonService {
     if (!paper) throw lessonErrors.notFound();
     const score = scoreTest(paper.content.test, answers);
     const submittedAt = this.now();
-    // Time counted for the ranking never exceeds the time allowed.
     const end = Math.min(submittedAt.getTime(), new Date(attempt.expiresAt).getTime());
     Object.assign(attempt, score, {
       answers,
@@ -444,7 +407,6 @@ export class LessonService {
       ...this.attemptSummary(saved),
     });
     if (saved.passed) {
-      // Passing completes the lesson and opens the next one.
       const progress = (await this.repository.findProgress(attempt.accountId, attempt.lessonId)) || {
         accountId: attempt.accountId,
         lessonId: attempt.lessonId,
@@ -461,8 +423,6 @@ export class LessonService {
     return saved;
   }
 
-  // One finished attempt (the latest, or the given number) with every answer
-  // explained.
   async getLessonTestReview(actor, lessonId, { attemptNumber } = {}) {
     await this.open(actor, lessonId);
     const finished = (await this.attempts(actor, lessonId)).filter((attempt) => attempt.status === COMPLETED);
@@ -485,9 +445,6 @@ export class LessonService {
     };
   }
 
-  // ----- Unit review (D121): the untimed, 30-question Reading test that
-  // closes a unit. Scored on submit; every attempt is kept; no XP.
-
   reviewAttemptSummary(attempt) {
     return {
       attemptNumber: attempt.attemptNumber,
@@ -499,7 +456,6 @@ export class LessonService {
     };
   }
 
-  // Where the learner stands with a unit's review, or null for a unit without one.
   reviewSummary(standing, unitId) {
     const entry = standing.reviews.get(unitId);
     if (!entry || entry.state === UnitReviewState.NONE) return null;
@@ -514,7 +470,6 @@ export class LessonService {
     };
   }
 
-  // Loads what both review actions need and refuses a locked or missing review.
   async openReview(actor, unitId) {
     this.assertStudent(actor);
     const standing = await this.standing(actor);
@@ -526,8 +481,6 @@ export class LessonService {
     return { standing, entry, paper };
   }
 
-  // The review with the learner's attempts and the paper to work on: no
-  // answers or explanations; the options of every question are shuffled (D31).
   async getUnitReview(actor, unitId) {
     const { standing, entry, paper } = await this.openReview(actor, unitId);
     const attempts = standing.reviewAttempts.filter((attempt) => attempt.unitId === unitId);
@@ -542,8 +495,6 @@ export class LessonService {
     };
   }
 
-  // Scores the answers against the current published review, keeps the
-  // attempt and returns the result with every answer explained.
   async submitUnitReview(actor, unitId, { answers }) {
     const { standing, paper } = await this.openReview(actor, unitId);
     const score = scoreTest(paper.test, answers, UNIT_REVIEW_PARTS);
@@ -578,9 +529,6 @@ export class LessonService {
     };
   }
 
-  // Learners of the lesson ranked by their first attempt. Every student can
-  // see it. The gateway replaces the email with the learner's display name
-  // and avatar (D60, D113).
   async getLessonRanking(actor, lessonId) {
     this.assertStudent(actor);
     const standing = await this.standing(actor);
@@ -598,7 +546,6 @@ export class LessonService {
     return {
       total: rows.length,
       entries: rows.slice(0, RANKING_SIZE),
-      // The learner's own row, also when it is below the listed ones.
       me: rows.find((row) => row.isMe) || null,
     };
   }

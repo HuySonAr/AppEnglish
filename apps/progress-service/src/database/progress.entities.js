@@ -1,9 +1,5 @@
 import { EntitySchema } from 'typeorm';
 
-// One finished test with its per-skill counts (F06, D33): a lesson-test
-// attempt or a full mock-test attempt, as learning-service reported it. The
-// id is the attempt id in learning-service, so a message applied twice is
-// stored once. Exact counts are kept; percents are computed when read (D39).
 export const SkillResultEntity = new EntitySchema({
   name: 'SkillResult',
   tableName: 'skill_results',
@@ -11,7 +7,6 @@ export const SkillResultEntity = new EntitySchema({
     id: { type: 'uuid', primary: true },
     accountId: { type: 'uuid' },
     source: { type: 'varchar', length: 16 },
-    // The lesson id or the mock test id: the test the attempt belongs to.
     sourceId: { type: 'uuid' },
     attemptNumber: { type: 'int' },
     correctCount: { type: 'int' },
@@ -26,8 +21,6 @@ export const SkillResultEntity = new EntitySchema({
   indices: [{ name: 'IDX_skill_results_account', columns: ['accountId'] }],
 });
 
-// A lesson the learner completed (its test passed for the first time). One
-// row per learner and lesson; the lesson's existence is content-service's.
 export const LessonCompletionEntity = new EntitySchema({
   name: 'LessonCompletion',
   tableName: 'lesson_completions',
@@ -41,9 +34,6 @@ export const LessonCompletionEntity = new EntitySchema({
   indices: [{ name: 'UQ_lesson_completions_account_lesson', columns: ['accountId', 'lessonId'], unique: true }],
 });
 
-// XP earned on a mock test (F07, D63, D112): the first full attempt only,
-// one row per learner and mock test. The id is the attempt id in
-// learning-service. accountEmail and mockTestTitle are snapshots.
 export const XpLedgerEntity = new EntitySchema({
   name: 'XpLedger',
   tableName: 'xp_ledger',
@@ -63,6 +53,16 @@ export const XpLedgerEntity = new EntitySchema({
     { name: 'UQ_xp_ledger_account_mock', columns: ['accountId', 'mockTestId'], unique: true },
     { name: 'IDX_xp_ledger_account', columns: ['accountId'] },
   ],
+});
+
+export const ProcessedMessageEntity = new EntitySchema({
+  name: 'ProcessedMessage',
+  tableName: 'processed_messages',
+  columns: {
+    messageId: { type: 'varchar', length: 64, primary: true },
+    queue: { type: 'varchar', length: 80 },
+    processedAt: { type: 'timestamptz' },
+  },
 });
 
 export const NotificationEntity = new EntitySchema({

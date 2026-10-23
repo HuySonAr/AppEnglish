@@ -73,7 +73,6 @@ Correct Answer: B
 test('pasted passages are read with their blanks and questions', () => {
   const [announcement, letter] = parsePastedPassages(first + second);
   assert.deepEqual([announcement.from, announcement.to, announcement.blanks], [131, 134, [131, 132, 133, 134]]);
-  // The line naming the document is left out; line breaks and the lines of a letter stay.
   assert.ok(announcement.passage.startsWith('Come to the Maxley Heights Center for Horticulture. ___ We will teach'));
   assert.ok(announcement.passage.includes('flowers. ___, rain gardens'));
   assert.equal(announcement.passage.split('\n').length, 3);
@@ -86,7 +85,6 @@ test('pasted passages are read with their blanks and questions', () => {
     [138, '', 1],
   ]);
 
-  // Other ways of writing the heading and the blanks.
   const [other] = parsePastedPassages('Questions 131-132 refer to the following e-mail.\nWe ---131--- you. Please (132) ------- soon.\n131. (A) thank\n132. (A) reply');
   assert.deepEqual([other.passage, other.blanks, other.questions.length], ['We ___ you. Please ___ soon.', [131, 132], 2]);
 });
@@ -103,7 +101,6 @@ test('pasted passages become the sets of Part 6', () => {
   assert.equal(part.groups[1].passage.split('___').length - 1, 4);
   assert.deepEqual(part.questions[5].options.map((option) => [option.text, option.isCorrect])[0], ['attention', true]);
 
-  // Pasting a passage again replaces it and keeps its questions.
   part.questions[0].explanation = 'The workshop is announced first.';
   const again = pastedPassagesPlan(part, part6, parsePastedPassages(first.replace('(A) we', '(A) us')));
   assert.deepEqual([again.rows[0].set, again.rows[0].replaces], [0, true]);
@@ -116,7 +113,6 @@ test('pasted passages become the sets of Part 6', () => {
 
 test('passages that cannot be used are reported and left out', () => {
   const empty = workingMock(null).test.part6;
-  // Passage 2 alone does not follow an empty part.
   const alone = pastedPassagesPlan(empty, part6, parsePastedPassages(second));
   assert.deepEqual(alone.rows[0].errors, ['questions 135–138 do not follow what Part 6 holds: the next passage starts at question 131']);
   assert.equal(alone.part, empty);

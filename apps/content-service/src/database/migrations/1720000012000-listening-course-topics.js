@@ -1,7 +1,3 @@
-// Listening course topics (D143–D145): a level (A1 to C2) has topics and, for
-// A1 to C1, a level test; units, their sections and the placement are gone.
-// The course tables were emptied first (D142); any row of an old type left
-// is removed with its versions so the new checks can hold.
 export class ListeningCourseTopics1720000012000 {
   name = 'ListeningCourseTopics1720000012000';
 
@@ -34,7 +30,6 @@ export class ListeningCourseTopics1720000012000 {
   }
 
   async down(queryRunner) {
-    // The old structure (units, sections, placement) cannot hold topics.
     await queryRunner.query(`DELETE FROM "listening_course_versions" WHERE "itemId" IN (SELECT "id" FROM "listening_course_items" WHERE "type" = 'topic')`);
     await queryRunner.query(`DELETE FROM "listening_course_items" WHERE "type" = 'topic'`);
     await queryRunner.query('ALTER TABLE "listening_course_items" DROP CONSTRAINT IF EXISTS "CK_listening_course_items_section"');

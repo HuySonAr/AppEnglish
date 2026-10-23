@@ -4,7 +4,6 @@ from speech_service.alignment import align_lines, split_lines, tokens
 
 
 def heard(*items):
-    """Words as Whisper gives them: (word, start, end)."""
     return [{"word": word, "start": start, "end": end} for word, start, end in items]
 
 
@@ -45,8 +44,8 @@ class AlignLinesTest(unittest.TestCase):
         )
         result = align_lines(self.lines, words)
         self.assertEqual([line["start"] for line in result], [0.4, 2.1, 4.3])
-        self.assertEqual(result[1]["matched"], 0.83)  # 5 of 6 words
-        self.assertEqual(result[2]["matched"], 1.0)  # "we're" = "we are"
+        self.assertEqual(result[1]["matched"], 0.83)
+        self.assertEqual(result[2]["matched"], 1.0)
 
     def test_a_line_not_heard_has_no_times_and_neighbours_do_not_overlap(self):
         words = heard((" Attention", 0.5, 1.1), (" passengers", 1.1, 2.25), (" We", 2.3, 2.4), (" are", 2.4, 2.5), (" sorry", 2.5, 2.9))
@@ -73,7 +72,6 @@ class SplitLinesTest(unittest.TestCase):
         )
 
     def test_a_song_is_cut_into_lyric_lines_from_whisper_phrases(self):
-        # Sung without a break (a word every 0.4 s), as Whisper writes it.
         sung = (
             "Love in your eyes, sitting silent by my side Going on holding hands, walking through the nights "
             "Teaching me to love with heart Helping me to open my mind I can fly, I'm proud that I can fly "

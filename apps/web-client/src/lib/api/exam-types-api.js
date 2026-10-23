@@ -1,7 +1,5 @@
 import { httpClient } from './http-client.js';
 
-// Exam types (TOEIC, …). Every role can list them; only an Admin can add or
-// rename one.
 export async function listExamTypes() {
   return (await httpClient.get('/content/exam-types')).data;
 }

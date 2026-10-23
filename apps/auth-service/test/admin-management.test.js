@@ -9,7 +9,6 @@ import { TokenService } from '../src/auth/token.service.js';
 
 process.env.AUTH_JWT_SECRET = process.env.AUTH_JWT_SECRET || 'test-secret-that-is-long-enough-for-hs256';
 
-// In-memory repository with the admin-management methods (D114).
 function harness(accounts) {
   const audits = [];
   const noticeReads = [];
@@ -67,7 +66,6 @@ test('locking an account needs a reason, which is stored, audited and shown at s
   assert.equal(updated.account.status, 'SUSPENDED');
   assert.equal(updated.account.statusReason, 'Shared answers during a mock test');
   assert.equal(h.audits.at(-1).reason, 'Shared answers during a mock test');
-  // The person sees the reason when signing in.
   await assert.rejects(
     () => h.service.login({ email: student.email, password: 'correct horse battery staple' }),
     (error) => error.code === 22 && error.reason === 'Shared answers during a mock test',
@@ -76,7 +74,6 @@ test('locking an account needs a reason, which is stored, audited and shown at s
     () => h.controller.login({ email: student.email, password: 'correct horse battery staple' }, { setHeader() {} }),
     (error) => error.getStatus() === 403 && error.getResponse().data.reason === 'Shared answers during a mock test',
   );
-  // Unlocking clears the reason; a role change alone needs none.
   const unlocked = await h.service.adminUpdate(h.token(admin), student.id, { status: 'ACTIVE' });
   assert.equal(unlocked.account.statusReason, null);
   const promoted = await h.service.adminUpdate(h.token(admin), student.id, { role: 'CONTENT_MANAGER' });
@@ -97,7 +94,6 @@ test('the admin account page carries live sessions and the audit trail; sign-ins
   assert.equal(page.account.displayName, 'Minh Anh');
   assert.equal(page.account.lastLoginAt, student.lastLoginAt.toISOString());
   assert.equal(page.account.statusReason, 'Requested by the learner');
-  // The lock revoked the session the login created.
   assert.equal(page.activeSessions, 0);
   assert.deepEqual(page.audits.map((audit) => [audit.action, audit.actor, audit.reason, audit.nextStatus]), [['STATUS_UPDATED', admin.email, 'Requested by the learner', 'DISABLED']]);
 });
@@ -134,7 +130,6 @@ test('one-off admin actions: sign out everywhere, send a reset email, remove the
     ['DISPLAY_NAME_RESET', 'Offensive'],
   ]);
 
-  // A reset email needs an ACTIVE account; non-admins are refused; bad actions are 400.
   student.status = 'PENDING_VERIFICATION';
   await assert.rejects(() => h.service.adminAction(token, student.id, { action: 'SEND_PASSWORD_RESET' }), { code: 25 });
   await assert.rejects(() => h.service.adminAction(h.token(student), admin.id, { action: 'REVOKE_SESSIONS' }), { code: 26 });
@@ -151,7 +146,6 @@ test('account statistics are admin-only and pass the repository numbers through'
   await assert.rejects(() => h.controller.adminStats(undefined), (error) => error.getStatus() === 401);
 });
 
-// D131: invitations.
 test('an admin invites an account; the person accepts with the emailed code and a password', async () => {
   const admin = account('ADMIN');
   const someone = account('STUDENT');
@@ -166,16 +160,12 @@ test('an admin invites an account; the person accepts with the emailed code and 
   assert.equal(invited.account.displayName, 'Mai');
   assert.ok(invited.account.invitedAt);
   assert.deepEqual(h.sent, [{ email: 'new.manager@example.com', purpose: 'INVITE', context: { role: 'CONTENT_MANAGER', displayName: 'Mai', expiresInHours: 72 } }]);
-  // The code lasts 72 hours, not five minutes.
   assert.ok(h.otps[0].expiresAt.getTime() - Date.now() > 71 * 3600000);
   assert.deepEqual(h.audits.map((audit) => audit.action), ['ACCOUNT_INVITED']);
-  // The same email cannot be invited twice.
   await assert.rejects(() => h.service.adminInvite(token, { email: 'new.manager@example.com', displayName: '', role: 'STUDENT' }), { code: 19 });
 
   const stored = h.audits[0] && (await h.service.accountRepository.findByEmail('new.manager@example.com'));
-  // Nobody can sign in before accepting: the password is unknown, and the account is pending.
   await assert.rejects(() => h.service.login({ email: stored.email, password: 'anything at all' }), { code: 10 });
-  // A wrong code is refused; the admin can send the invitation again; the right code sets the password and signs in.
   await assert.rejects(() => h.service.acceptInvite({ email: stored.email, otp: '000000', password: 'chosen by the person' }), (error) => error.code === 15 || error.code === 16);
   h.otps.forEach((otp) => { otp.resendAfter = new Date(0); });
   const resent = await h.service.adminAction(token, stored.id, { action: 'RESEND_INVITE' });
@@ -187,13 +177,10 @@ test('an admin invites an account; the person accepts with the emailed code and 
   assert.ok(session.setCookies.length);
   assert.ok(stored.emailVerifiedAt);
   assert.equal((await h.service.login({ email: stored.email, password: 'chosen by the person' })).account.id, stored.id);
-  // Accepting again answers LOGIN guidance, no session.
   assert.equal((await h.service.acceptInvite({ email: stored.email, otp: '123456', password: 'another password' })).data.nextAction, 'LOGIN');
-  // Unknown or not-invited emails look like a wrong code.
   await assert.rejects(() => h.service.acceptInvite({ email: 'nobody@example.com', otp: '123456', password: 'another password' }), { code: 15 });
   await assert.rejects(() => h.service.acceptInvite({ email: admin.email, otp: '123456', password: 'another password' }), { code: 15 });
   assert.deepEqual(h.audits.map((audit) => audit.action), ['ACCOUNT_INVITED', 'INVITE_RESENT', 'INVITE_ACCEPTED']);
-  // Once active, the invitation cannot be resent.
   await assert.rejects(() => h.service.adminAction(token, stored.id, { action: 'RESEND_INVITE' }), { code: 25 });
 });
 
@@ -224,7 +211,6 @@ test('a self-registered pending account can get a new code or be activated with 
     ['ACCOUNT_ACTIVATED', 'PENDING_VERIFICATION', 'ACTIVE', 'Code never arrived; identity checked by phone'],
   ]);
 
-  // The placement reset audit row: learners only.
   const reset = await h.service.adminAction(token, active.id, { action: 'RESET_PLACEMENT', reason: 'Asked to retake' });
   assert.equal(reset.changed, true);
   await assert.rejects(() => h.service.adminAction(token, admin.id, { action: 'RESET_PLACEMENT' }), { code: 26 });

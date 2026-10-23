@@ -21,7 +21,6 @@ test('a learner starts at A1 with every topic open; higher levels open through t
 
 test('a topic comes with everything to study it; locked levels and unknown topics are refused', async () => {
   const h = courseHarness();
-  // The second topic opens straight away: nothing is locked inside a level.
   const topic = await h.service.getTopic(student, h.paying.item.id);
   assert.deepEqual([topic.topic.title, topic.done, topic.previous.title, topic.next], ['Paying', false, 'Ordering', null]);
   assert.equal(topic.audioUrl, 'https://media.test/cafe.mp3');
@@ -33,7 +32,6 @@ test('a topic comes with everything to study it; locked levels and unknown topic
   assert.equal(topic.sentences.length, 4);
   assert.deepEqual([topic.sentences[1].translation, topic.sentences[1].pieces], ['Câu 2', [{ text: 'Yes, a ' }, { blank: 0, answer: 'coffee' }, { text: ' ' }, { blank: 1, answer: 'please' }, { text: '.' }]]);
   assert.equal(topic.sentences[0].pieces, null);
-  // The same learner always gets the same shuffle.
   assert.deepEqual((await h.service.getTopic(student, h.paying.item.id)).ordering.items, topic.ordering.items);
 
   await assert.rejects(() => h.service.getTopic(student, h.meetings.item.id), { code: 61, status: 409 });
@@ -54,7 +52,6 @@ test('a dictation sentence is checked word by word or blank by blank; nothing is
   const blanks = await h.service.checkSentence(student, id, { segmentId: second.id, mode: 'blanks', text: '', blanks: ['Coffee', 'pleas'] });
   assert.deepEqual(blanks.blanks.map((blank) => [blank.expected, blank.correct]), [['coffee', true], ['please', false]]);
   assert.deepEqual([blanks.correct, blanks.accuracy], [false, 50]);
-  // A sentence without blanks cannot be checked in the blanks mode.
   await assert.rejects(() => h.service.checkSentence(student, id, { segmentId: first.id, mode: 'blanks', text: '', blanks: [] }), { code: 30 });
   await assert.rejects(() => h.service.checkSentence(student, id, { segmentId: '99999999-9999-4999-8999-999999999999', mode: 'full', text: '', blanks: [] }), { code: 30 });
   assert.deepEqual([h.repository.tables.results.length, h.repository.tables.tests.length], [0, 0]);
@@ -71,7 +68,6 @@ test('completing a topic counts for progress only, and stays done', async () => 
   const course = await h.service.getCourse(student);
   assert.deepEqual(course.levels[0].topics.map((topic) => topic.done), [false, true]);
   assert.equal((await h.service.getTopic(student, h.paying.item.id)).done, true);
-  // Another learner is not affected.
   assert.deepEqual((await h.service.getCourse(other)).levels[0].topics.map((topic) => topic.done), [false, false]);
   await assert.rejects(() => h.service.completeTopic(student, h.meetings.item.id), { code: 61 });
 });
@@ -91,13 +87,11 @@ test('passing a level test, at any time, opens the next level; the last level ha
   assert.equal(passed.sections[0].transcript.length, 4);
   assert.deepEqual(passed.sections[0].transcript[0], { id: '1', speaker: 'Man', text: 'Can I help you?' });
   assert.equal(passed.sections[0].questions[0].correct, true);
-  // A worse attempt later keeps the level open.
   await h.service.submitTest(student, h.a1Test.item.id, { answers: testAnswers(h.a1Test, 0) });
   const course = await h.service.getCourse(student);
   assert.deepEqual(course.levels.slice(0, 3).map((level) => level.state), ['OPEN', 'OPEN', 'LOCKED']);
   assert.equal(course.currentLevel, 'A2');
   assert.equal((await h.service.getTopic(student, h.meetings.item.id)).topic.title, 'Meetings');
-  // A2's test opens B1 even though B1 has no topics yet; B1 has no test, so B2 stays closed.
   await h.service.submitTest(student, h.a2Test.item.id, { answers: testAnswers(h.a2Test, 2) });
   assert.deepEqual((await h.service.getCourse(student)).levels.map((level) => level.state), ['OPEN', 'OPEN', 'OPEN', 'LOCKED', 'LOCKED', 'LOCKED']);
   await assert.rejects(() => h.service.submitTest(student, h.a1Test.item.id, { versionId: '99999999-9999-4999-8999-999999999999', answers: {} }), { code: 60 });

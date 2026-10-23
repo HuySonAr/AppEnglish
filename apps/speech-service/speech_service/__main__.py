@@ -1,4 +1,3 @@
-"""Starts the worker: python -m speech_service (run.mjs loads the .env)."""
 
 import logging
 
@@ -9,7 +8,6 @@ from .pronounce import Pronouncer
 from .transcriber import Transcriber
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
-# pika logs every failed handshake with a stack trace; broker.py says it in one line.
 logging.getLogger("pika").setLevel(logging.CRITICAL)
 
 settings = load_settings()

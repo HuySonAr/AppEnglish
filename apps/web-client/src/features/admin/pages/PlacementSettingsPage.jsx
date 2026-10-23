@@ -9,13 +9,11 @@ import {
 } from '../api/placement-settings-api.js';
 import { FormPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
-// Whole percent between 1 and 100, or null.
 function percent(text) {
   const value = Number(text);
   return /^\d+$/.test(text) && value >= 1 && value <= 100 ? value : null;
 }
 
-// The score thresholds that decide the unit a learner starts at.
 export function PlacementSettingsPage() {
   const [state, setState] = useState('loading');
   const [saved, setSaved] = useState(null);

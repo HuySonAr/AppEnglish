@@ -1,16 +1,6 @@
 import { FILL_IN_BLANK } from '@appenglish/content-contracts';
 import { tableRowFromTabs } from '../../../lib/passage.js';
 
-// Reads questions pasted as text, in the layout of test books:
-//   Question 38
-//   What industry do the speakers most likely work in?
-//   (A) Shipping
-//   (B) Manufacturing
-//   (C) Hospitality
-//   (D) Meteorology
-//   Correct Answer: A
-// "38." also starts a question, options may be written "A." or "A)", and the
-// answer line may be "Answer: A" or "Đáp án: A".
 const QUESTION = /^(?:question\s+(\d+)\s*[.:]?|(\d+)\s*[.)])\s*(.*)$/i;
 const OPTION = /^\(?([A-D])[).]\s*(.*)$/;
 const ANSWER = /^(?:correct\s+answer|answer|đáp án)\s*:?\s*\(?([A-D])\)?\.?$/i;
@@ -18,16 +8,9 @@ const letters = 'ABCD';
 
 const joined = (before, more) => (before ? `${before} ${more}` : more);
 
-// The questions found in the text, in order: { number, prompt, options,
-// correct }. options holds the texts by letter ('' for a letter left out);
-// correct is the index of the right option, null when no answer line was
-// given. Lines before the first question and after an answer line (headings
-// such as "Questions 38-40 refer to…") are left out.
 export function parsePastedQuestions(text) {
   const questions = [];
   let current = null;
-  // What a line without a marker continues: 'prompt', an option index, or
-  // null once the answer was read.
   let open = null;
   for (const raw of text.split(/\r?\n/)) {
     const line = raw.trim();
@@ -57,23 +40,10 @@ export function parsePastedQuestions(text) {
   return questions.map((question) => ({ ...question, options: Array.from(question.options, (option) => option ?? '') }));
 }
 
-// "Passage 1 – Questions 131–134" or "Questions 131-134 refer to the
-// following e-mail." starts a passage of Part 6 or 7.
 const PASSAGE = /^(?:passage\s+\d+\s*[-–—:]?\s*)?questions\s+(\d+)\s*(?:[-–—]|to|through)\s*(\d+)\b/i;
-// A first line that only names the document: "Letter", "E-mail", "Press release".
 const DOCUMENT_NAME = /^[a-z]+(?:[ -][a-z]+){0,2}$/i;
-// A numbered blank: "[131]", "---131---", "-------(131)" or "(131) -------".
 const BLANK = /\[(\d+)\]|-{2,}\s*\(?(\d+)\)?\s*-*|\((\d+)\)\s*-{2,}/g;
 
-// The passages found in the text, in order: { from, to, passage, blanks,
-// questions }. from and to are the question numbers of the heading. passage
-// is the text up to the first of those questions, its line breaks kept, the
-// line naming the document left out and every numbered blank replaced by the
-// blank mark; blanks are the numbers those blanks had. questions are read as
-// by parsePastedQuestions. Text before the first heading is left out.
-// With blanks false (Part 7) the passage is kept whole: the line naming the
-// document stays, bracketed numbers stay, and lines copied from a table
-// become table rows.
 export function parsePastedPassages(text, { blanks: withBlanks = true } = {}) {
   const passages = [];
   let current = null;
@@ -113,8 +83,6 @@ const PROMPT_MAX_LENGTH = 1000;
 const OPTION_MAX_LENGTH = 300;
 export const PASSAGE_MAX_LENGTH = 10000;
 
-// What is wrong with one pasted question: `errors` (the paste cannot be
-// used) and `warnings` (to complete in the editor afterwards).
 export function pastedQuestionProblems(item, spec) {
   const errors = [];
   const warnings = [];
@@ -127,8 +95,6 @@ export function pastedQuestionProblems(item, spec) {
   return { errors, warnings };
 }
 
-// A question with the text, options and correct answer of a pasted one; it
-// keeps the rest (id, explanation, graphic).
 export function withPastedText(question, item) {
   return {
     ...question,

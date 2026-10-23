@@ -19,7 +19,6 @@ export const AuthCookie = Object.freeze({
 export const OtpPurpose = Object.freeze({
   VERIFY_EMAIL: 'VERIFY_EMAIL',
   RESET_PASSWORD: 'RESET_PASSWORD',
-  // The code of an invitation email (D131); valid for INVITE_TTL_HOURS.
   INVITE: 'INVITE'
 });
 
@@ -50,26 +49,20 @@ export const ResponseCode = Object.freeze({
   VALIDATION_ERROR: 30,
   EMAIL_SEND_ERROR: 31,
   SYSTEM_ERROR: 32,
-  // 429 from the gateway (D117); data carries scope, limit, retryAfterSeconds.
   RATE_LIMITED: 33
 });
 
 export const ResponseMsg = Object.freeze({ SUCCESS: 'success', ADDITIONAL: 'additional', FAIL: 'fail' });
 export const NextAction = Object.freeze({ VERIFY_EMAIL: 'VERIFY_EMAIL', LOGIN: 'LOGIN', RESET_PASSWORD: 'RESET_PASSWORD' });
 
-// Profile (F09, D113): a free display name that may repeat, and an optional
-// avatar; the email cannot be changed.
 export const PROFILE_LIMITS = Object.freeze({
   displayNameMax: 50,
-  // The web client crops and shrinks the picture before upload (D113).
   avatarMaxBytes: 2 * 1024 * 1024,
   avatarMimeTypes: Object.freeze(['image/jpeg', 'image/png', 'image/webp']),
   avatarExtensions: Object.freeze(['.jpg', '.jpeg', '.png', '.webp']),
   avatarSize: 256
 });
 
-// The name shown for an account: its display name, or the part of the email
-// before @ while it has none (D113). Leaderboards never show the full email.
 export function displayNameOf({ displayName, email } = {}) {
   const name = typeof displayName === 'string' ? displayName.trim() : '';
   if (name) return name;
@@ -77,27 +70,21 @@ export function displayNameOf({ displayName, email } = {}) {
   return local || 'Learner';
 }
 
-// The letter an avatar placeholder shows.
 export function avatarInitialOf(account) {
   return displayNameOf(account).slice(0, 1).toUpperCase();
 }
 
-// Admin account management (F01B, D114).
 export const AdminAccountAction = Object.freeze({
   REVOKE_SESSIONS: 'REVOKE_SESSIONS',
   SEND_PASSWORD_RESET: 'SEND_PASSWORD_RESET',
   REMOVE_AVATAR: 'REMOVE_AVATAR',
   RESET_DISPLAY_NAME: 'RESET_DISPLAY_NAME',
-  // D131: a self-registered PENDING_VERIFICATION account becomes ACTIVE
-  // without the code (reason required); a new verification code; a new
-  // invitation code; the audit row of a placement reset done by learning-service.
   ACTIVATE: 'ACTIVATE',
   RESEND_VERIFICATION: 'RESEND_VERIFICATION',
   RESEND_INVITE: 'RESEND_INVITE',
   RESET_PLACEMENT: 'RESET_PLACEMENT'
 });
 
-// What the audit trail records; role/status changes keep their F01B names.
 export const AccountAuditAction = Object.freeze({
   ROLE_UPDATED: 'ROLE_UPDATED',
   STATUS_UPDATED: 'STATUS_UPDATED',
@@ -106,7 +93,6 @@ export const AccountAuditAction = Object.freeze({
   PASSWORD_RESET_SENT: 'PASSWORD_RESET_SENT',
   AVATAR_REMOVED: 'AVATAR_REMOVED',
   DISPLAY_NAME_RESET: 'DISPLAY_NAME_RESET',
-  // D131
   ACCOUNT_INVITED: 'ACCOUNT_INVITED',
   INVITE_RESENT: 'INVITE_RESENT',
   INVITE_ACCEPTED: 'INVITE_ACCEPTED',
@@ -122,9 +108,7 @@ export const AdminAccountSort = Object.freeze({
   EMAIL: 'email'
 });
 
-// A pending account older than this counts as stale (never verified).
 export const STALE_PENDING_DAYS = 7;
 export const ADMIN_STATS_DAYS = 30;
 export const ADMIN_AUDIT_LIMIT = 50;
-// An invitation code stays valid this long (D131); other codes five minutes.
 export const INVITE_TTL_HOURS = 72;

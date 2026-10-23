@@ -164,8 +164,6 @@ test('wrong OTP is rejected and a valid OTP activates the account once', async (
   const session = await harness.service.verifyEmail({ email: account.email, otp: '123456' });
   assert.equal(session.account.status, 'ACTIVE');
   assert.equal(harness.refreshTokens.length, 1);
-  // Re-submitting the old OTP for the now verified account directs to login
-  // without creating a second session.
   const again = await harness.service.verifyEmail({ email: account.email, otp: '123456' });
   assert.equal(again.code, 1);
   assert.equal(again.data.nextAction, 'LOGIN');

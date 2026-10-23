@@ -1,11 +1,3 @@
-// Checks the authored lesson files of content-samples/600-words against the
-// lesson content schema and the publishing rules, so that a lesson imported
-// by seed-600-words.mjs lacks nothing but its audio and photographs.
-//
-//   node scripts/validate-600-words.mjs            # every lesson listed in pack.json
-//   node scripts/validate-600-words.mjs 6 7 12     # only these lesson numbers
-//
-// Exits 1 when any lesson has an error; warnings are printed but do not fail.
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
@@ -17,17 +9,13 @@ import { toContent, toReviewContent } from '../../../content-samples/600-words/t
 const here = dirname(fileURLToPath(import.meta.url));
 const packDir = resolve(here, '../../../content-samples/600-words');
 const pack = JSON.parse(await readFile(resolve(packDir, 'pack.json'), 'utf8'));
-// Lesson numbers, or "reviews" for the unit reviews only (then unit numbers).
 const reviewsOnly = process.argv.includes('reviews');
 const only = process.argv.slice(2).map(Number).filter(Boolean);
 
 const lower = (text) => (text || '').trim().toLowerCase();
 const words = (text) => (text || '').split(/\s+/).filter(Boolean).length;
-// A Part 5 sentence marks its blank with underscores or dashes (_____, ___, -------).
 const hasBlank = (text) => /_{3,}|-{3,}/.test(text || '');
-// Media is added later in the editor: these issues are expected.
 const mediaIssue = (issue) => /^(Audio|Image) is required$/.test(issue.message);
-// An inflected answer still starts like one of the words ("obligates" ~ "obligate", "parties" ~ "part").
 const relatedTo = (answer, list) => list.some((word) => {
   const a = lower(answer).replace(/\s+/g, ' ');
   const w = lower(word);
@@ -49,8 +37,6 @@ const withIds = (content) => ({
 let failed = 0;
 let checked = 0;
 
-// A unit review (D121): the real shape and publishing rules, every word of
-// the unit used somewhere, Part 5 blanks written _____.
 async function checkReview(unitNumber, unit) {
   const label = `review ${String(unitNumber).padStart(2, '0')} ${unit.title}`;
   const errors = [];
@@ -116,7 +102,6 @@ for (const unit of pack.units) {
     if (lesson.number !== entry.number) errors.push(`number is ${lesson.number}, pack says ${entry.number}`);
     if (lesson.title !== entry.title) errors.push(`title is "${lesson.title}", pack says "${entry.title}"`);
 
-    // Vocabulary: exactly the words of the pack, every text field filled.
     const have = (lesson.vocabulary || []).map((item) => lower(item.word));
     const want = entry.words.map(lower);
     for (const word of want) if (!have.includes(word)) errors.push(`vocabulary is missing "${word}"`);
@@ -129,7 +114,6 @@ for (const unit of pack.units) {
       if (/[^\x00-\x7F]/.test(item.example || '') && !/[’“”…–—é]/.test(item.example)) warnings.push(`vocabulary[${index}] "${item.word}": example has non-ASCII text`);
     });
 
-    // Fill-in: one answer per blank, answers drawn from the lesson words.
     const blanks = countBlanks(lesson.fillIn?.passage);
     const answers = lesson.fillIn?.answers || [];
     if (blanks !== answers.length) errors.push(`fill-in has ${blanks} blanks but ${answers.length} answers`);
@@ -142,9 +126,7 @@ for (const unit of pack.units) {
     if (unused.length) warnings.push(`fill-in does not use: ${unused.join(', ')}`);
     if (words(lesson.fillIn?.passage) < 120) warnings.push(`fill-in passage is short (${words(lesson.fillIn?.passage)} words; aim for 130–200)`);
 
-    // The test, through the real schema and publishing rules.
     try {
-      // The service assigns ids on save; the rules expect them to exist.
       const content = withIds(lessonContentSchema.parse(toContent(lesson)));
       for (const issue of publishIssues(content, new Map())) if (!mediaIssue(issue)) errors.push(`${issue.path}: ${issue.message}`);
       const test = lesson.test;
@@ -156,7 +138,6 @@ for (const unit of pack.units) {
         if (!hasBlank(item.prompt)) errors.push(`part5 question ${index + 1} has no blank (_____ or ___)`);
       });
       if (words(test.part7.passage) < 110) warnings.push(`part7 passage is short (${words(test.part7.passage)} words; aim for 120–200)`);
-      // Each lesson word should appear somewhere in the test.
       const testText = lower(JSON.stringify(test));
       const absent = want.filter((word) => !testText.includes(word.split(' ')[0].slice(0, Math.max(3, word.split(' ')[0].length - 2))));
       if (absent.length) warnings.push(`test does not use: ${absent.join(', ')}`);

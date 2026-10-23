@@ -76,17 +76,12 @@ const questionSchema = z
     audioMediaId: mediaId,
     transcript: text(2000).default(''),
     imageMediaId: mediaId,
-    // Mock tests only: the passage group the question belongs to.
     groupId: z.string().uuid().nullable().default(null),
     options: z.array(optionSchema).max(4).default([]),
     explanation: text(2000).default(''),
   })
   .strict();
 
-// One lesson-test part: shared audio/passage/image plus its questions. Which
-// fields a part uses is defined by LESSON_TEST_PARTS. Question and option
-// audio/transcript are unused since D48 but stay in the shape so drafts saved
-// before it still parse.
 const partSchema = z
   .object({
     audioMediaId: mediaId,
@@ -97,7 +92,6 @@ const partSchema = z
   })
   .strict();
 
-// The seven-part, 23-question test used by lessons and by placement.
 const testSchema = z
   .object(
     Object.fromEntries(LESSON_TEST_PARTS.map((part) => [part.key, partSchema.default({})])),
@@ -105,8 +99,6 @@ const testSchema = z
   .strict()
   .default({});
 
-// A draft may be incomplete: only shapes and sizes are enforced here. The
-// publishing requirements are checked by publishIssues().
 export const lessonContentSchema = z
   .object({
     vocabulary: z
@@ -138,12 +130,8 @@ export const lessonContentSchema = z
   })
   .strict();
 
-// The placement test is one seven-part test (D46).
 export const placementContentSchema = z.object({ test: testSchema }).strict();
 
-// A mock-test part: like a lesson-test part, with as many questions as the
-// test needs and, in Parts 3, 4, 6 and 7, sets (`groups`) the questions refer
-// to: a recording with its transcript, or a passage.
 const mockPartSchema = partSchema.extend({
   groups: z
     .array(
@@ -173,8 +161,6 @@ export const mockContentSchema = z
   })
   .strict();
 
-// A unit review (D121): Parts 5 and 6 in the mock-test shape (Part 6 passages
-// are sets); no other part. A draft may be incomplete.
 export const unitReviewContentSchema = z
   .object({
     test: z
@@ -201,7 +187,6 @@ export const mockUpdateSchema = z
 
 export const placementPaperSchema = z.object({ versionId: z.string().uuid().optional() }).strict();
 
-// Version history (D122): which kind of content, and which version.
 export const versionRequestSchema = z
   .object({ kind: z.enum(Object.values(ContentVersionKind)), versionId: z.string().uuid().optional() })
   .strict();
@@ -218,7 +203,6 @@ export const mediaUploadSchema = z.object({
   kind: z.enum(Object.values(MediaKind)),
   fileName: requiredText(255),
   mimeType: requiredText(128),
-  // Empty when the upload is not tied to a lesson (gRPC sends '' for unset).
   lessonId: z.preprocess((value) => value || undefined, z.string().uuid().optional()),
   section: z.preprocess((value) => value || undefined, z.enum(Object.values(MediaSection)).default(MediaSection.TEST)),
 });
@@ -228,7 +212,6 @@ function duplicates(values) {
   return values.some((value) => seen.size === seen.add(value).size);
 }
 
-// Every media asset id a lesson or placement content refers to.
 export function contentMediaIds(content) {
   const parts = Object.values(content.test);
   return [
@@ -248,7 +231,6 @@ export function contentMediaIds(content) {
 
 const lower = (value) => value.toLowerCase();
 
-// The checks shared by every publishing rule; they add to `issues`.
 function issueChecks(issues, mediaById) {
   const issue = (path, message) => issues.push({ path, message });
   const required = (path, value) => {
@@ -258,7 +240,6 @@ function issueChecks(issues, mediaById) {
     if (!id) issue(path, `${kind === MediaKind.AUDIO ? 'Audio' : 'Image'} is required`);
     else if (mediaById.get(id)?.kind !== kind) issue(path, `Media asset is missing or is not ${kind}`);
   };
-  // Audio is always published together with its transcript.
   const requiredAudio = (path, item) => {
     requiredMedia(`${path}.audioMediaId`, item.audioMediaId, MediaKind.AUDIO);
     required(`${path}.transcript`, item.transcript);
@@ -266,8 +247,6 @@ function issueChecks(issues, mediaById) {
   return { issue, required, requiredMedia, requiredAudio };
 }
 
-// Returns the reasons a lesson draft cannot be published; empty when it can.
-// mediaById maps the ids of existing media assets to their rows.
 export function publishIssues(content, mediaById) {
   const issues = [];
   const { issue, required, requiredMedia } = issueChecks(issues, mediaById);
@@ -275,7 +254,6 @@ export function publishIssues(content, mediaById) {
   if (!content.vocabulary.length) issue('vocabulary', 'At least one vocabulary item is required');
   content.vocabulary.forEach((item, index) => {
     const path = `vocabulary[${index}]`;
-    // Phonetic, audio and the example translation are optional for now (D51).
     for (const field of ['word', 'meaning', 'example'])
       required(`${path}.${field}`, item[field]);
     if (!Object.values(PartOfSpeech).includes(item.partOfSpeech))
@@ -283,7 +261,6 @@ export function publishIssues(content, mediaById) {
     for (const field of ['audioUkMediaId', 'audioUsMediaId'])
       if (item[field]) requiredMedia(`${path}.${field}`, item[field], MediaKind.AUDIO);
   });
-  // The same word may appear once per part of speech.
   if (duplicates(content.vocabulary.filter((item) => item.word).map((item) => `${lower(item.word)}|${item.partOfSpeech}`)))
     issue('vocabulary', 'A word can appear only once per part of speech');
   const blanks = countBlanks(content.fillIn.passage);
@@ -291,8 +268,6 @@ export function publishIssues(content, mediaById) {
   else if (!blanks) issue('fillIn.passage', `The passage needs at least one blank (${FILL_IN_BLANK})`);
   if (blanks && content.fillIn.answers.length !== blanks)
     issue('fillIn.answers', `The passage has ${blanks} blanks but ${content.fillIn.answers.length} answers`);
-  // Answers are typed by the Content Manager (D119); they need not be lesson
-  // vocabulary, only present.
   content.fillIn.answers.forEach((answer, index) => {
     if (!answer.trim()) issue(`fillIn.answers[${index}]`, 'Required');
   });
@@ -309,7 +284,6 @@ export function publishIssues(content, mediaById) {
   return issues;
 }
 
-// Returns the reasons a placement draft cannot be published.
 export function placementIssues(content, mediaById) {
   const issues = [];
   testIssues(content.test, issues, mediaById);
@@ -319,7 +293,6 @@ export function placementIssues(content, mediaById) {
   return issues;
 }
 
-// Publishing rules of the seven-part test (D45, D48).
 function testIssues(test, issues, mediaById) {
   const { issue, required, requiredMedia, requiredAudio } = issueChecks(issues, mediaById);
   for (const spec of LESSON_TEST_PARTS) {
@@ -351,8 +324,6 @@ function testIssues(test, issues, mediaById) {
   }
 }
 
-// Returns the reasons a mock-test draft cannot be published. A mock test may
-// hold any number of questions, but every part needs at least one (D63).
 export function mockIssues(content, mediaById) {
   const issues = [];
   const { issue, required, requiredMedia, requiredAudio } = issueChecks(issues, mediaById);
@@ -370,7 +341,6 @@ export function mockIssues(content, mediaById) {
       part.groups.forEach((group, index) => {
         const path = `${partPath}.groups[${index}]`;
         const count = part.questions.filter((question) => question.groupId === group.id).length;
-        // A set is a recording with its transcript (Parts 3-4) or a passage.
         if (groupAudio) requiredAudio(path, group);
         else required(`${path}.passage`, group.passage);
         if (!count) issue(path, `The ${groupNoun} needs at least one question`);
@@ -379,7 +349,6 @@ export function mockIssues(content, mediaById) {
         if (spec.group.blanks && group.passage && countBlanks(group.passage) !== count)
           issue(`${path}.passage`, `The passage has ${countBlanks(group.passage)} blanks (${FILL_IN_BLANK}) but ${count} questions`);
         if (group.imageMediaId) requiredMedia(`${path}.imageMediaId`, group.imageMediaId, MediaKind.IMAGE);
-        // Parts 3-4: the graphic sets have it on exactly one question (D71).
         if (groupAudio) {
           const graphics = part.questions.filter((question) => question.groupId === group.id && question.imageMediaId).length;
           const graphicSets = MOCK_GRAPHIC_SET_INDEXES[spec.key];
@@ -395,7 +364,6 @@ export function mockIssues(content, mediaById) {
       const path = `${partPath}.questions[${index}]`;
       if (grouped && !part.groups.some((group) => group.id === question.groupId))
         issue(path, `The question does not belong to a ${groupNoun}`);
-      // Parts 1 and 2: every question has its own recording.
       if (MOCK_QUESTION_AUDIO_PARTS.includes(spec.key)) requiredAudio(path, question);
       if (spec.question.prompt) required(`${path}.prompt`, question.prompt);
       if (spec.question.image || (groupAudio && question.imageMediaId))
@@ -423,11 +391,6 @@ export function mockIssues(content, mediaById) {
   return issues;
 }
 
-// Returns the reasons a unit review draft cannot be published (D121, D129):
-// exactly UNIT_REVIEW_PART_COUNTS.part5 Part 5 questions and
-// UNIT_REVIEW_PASSAGE_COUNT Part 6 passages of UNIT_REVIEW_PASSAGE_QUESTIONS
-// blanks and questions each, every question with text (Part 5), four
-// different options, one correct and an explanation. A review has no media.
 export function unitReviewIssues(content) {
   const issues = [];
   const { issue, required } = issueChecks(issues, new Map());

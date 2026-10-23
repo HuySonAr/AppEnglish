@@ -31,7 +31,6 @@ function freePort() {
   });
 }
 
-// Stand-in for auth-service: the access token is the role name.
 const accounts = { manager, admin, student: { ...student, email: 'learner@appenglish.test' } };
 class FakeAuthController {
   me({ accessToken }) {
@@ -40,7 +39,6 @@ class FakeAuthController {
       ? { httpStatus: 200, code: 0, msg: 'success', dataJson: JSON.stringify({ account }), setCookies: [] }
       : { httpStatus: 401, code: 21, msg: 'fail', dataJson: '{}', setCookies: [] };
   }
-  // Public profiles for the ranking (D113): the learner has a display name.
   getProfiles({ accountIds }) {
     const profiles = accountIds
       .filter((id) => id === student.id)
@@ -118,7 +116,6 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       assert.equal(locked.status, 409);
       assert.deepEqual(locked.json, { code: 54, msg: 'fail', data: { placementRequired: false } });
       assert.equal((await call('GET', `${lesson}/quiz/other`)).status, 400);
-      // A unit without a published review has none to take (D121).
       const noReview = await call('GET', `/learning/units/${content.units[0].id}/review`);
       assert.equal(noReview.status, 404);
       assert.equal(noReview.json.code, 63);
@@ -147,7 +144,6 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       assert.deepEqual((await call('POST', `${lesson}/fill-in`, { body: { answers: paper.content.fillIn.answers } })).json.data, { passed: true, total: 2, wrongBlanks: [] });
 
       assert.equal((await call('GET', `${lesson}/test`)).json.data.status, 'READY');
-      // Leaving without submitting removes the attempt (D82).
       await call('POST', `${lesson}/test/start`);
       assert.deepEqual((await call('POST', `${lesson}/test/discard`)).json.data, { discarded: true });
       assert.equal((await call('POST', `${lesson}/test/discard`)).status, 409);
@@ -158,7 +154,6 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       assert.deepEqual((await call('PUT', `${lesson}/test/answers`, { body: { answers: testAnswers(paper, 2) } })).json.data, { saved: true });
       assert.equal((await call('PUT', `${lesson}/test/answers`, { body: { mode: 'all', answers: {} } })).status, 400);
 
-      // Listening practice (D86).
       const listeningList = await call('GET', '/learning/practice/listening');
       assert.deepEqual([listeningList.status, listeningList.json.data.exercises.length], [200, 3]);
       const song = listening.papers[2].exercise.id;
@@ -177,7 +172,6 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       });
       assert.deepEqual([checked.status, checked.json.data.accuracy], [201, 100]);
       assert.equal((await call('POST', `/learning/practice/listening/${photo.exercise.id}/check`, { body: { mode: 'all', answers: {} } })).status, 400);
-      // Listening course (D145).
       const courseMap = await call('GET', '/learning/listening-course');
       assert.deepEqual([courseMap.status, courseMap.json.data.levels[0].topics.length, courseMap.json.data.currentLevel], [200, 2, 'A1']);
       assert.equal((await call('GET', '/learning/listening-course', { as: 'manager' })).status, 403);
@@ -214,12 +208,10 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       assert.equal((await call('GET', `${lesson}/test/review/abc`)).status, 400);
       assert.equal((await call('GET', `${lesson}/test`)).json.data.progression, null);
 
-      // The gateway swaps the email for the learner's profile (D113).
       const ranking = await call('GET', `${lesson}/ranking`);
       assert.deepEqual(ranking.json.data.entries.map((entry) => [entry.rank, entry.displayName, entry.avatarUrl, entry.email, entry.isMe]), [[1, 'Learner One', 'https://cdn.test/learner.webp', undefined, true]]);
       assert.equal(ranking.json.data.me.displayName, 'Learner One');
       assert.deepEqual((await call('GET', '/learning/curriculum')).json.data.units[0].lessons.map((item) => [item.state, item.bestPercent]), [['COMPLETED', 91], ['OPEN', null]]);
-      // The next lesson now asks for the review of this one.
       const next = await call('GET', `/learning/lessons/${second.id}`);
       assert.deepEqual(next.json.data.review, { lessonId: first.id, lessonTitle: 'U1L1' });
       assert.equal((await call('GET', `/learning/lessons/${second.id}/quiz/review`)).json.data.questions.length, 5);

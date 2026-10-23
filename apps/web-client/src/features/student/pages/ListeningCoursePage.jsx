@@ -29,8 +29,6 @@ import {
 
 const PAGE_SIZE = 10;
 
-// The level test of a level (D145): taken at any time; passed, it opens the
-// next level.
 function LevelTestCard({ level, passPercent, linkState }) {
   const test = level.levelTest;
   if (!test)
@@ -62,9 +60,6 @@ function LevelTestCard({ level, passPercent, linkState }) {
   );
 }
 
-// The Listening course for a learner (D143–D145): levels A1 to C2. Every
-// topic of an open level can be studied in any order; the level test opens
-// the next level.
 export function ListeningCoursePage() {
   const [state, setState] = useState('loading');
   const [course, setCourse] = useState(null);

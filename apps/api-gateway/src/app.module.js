@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { MetricsController } from './metrics/metrics.controller.js';
 import { APP_GUARD } from '@nestjs/core';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { authGrpcOptions } from '@appenglish/auth-contracts/grpc';
@@ -29,7 +30,7 @@ Module({
     ]),
   ],
   controllers: [
-    HealthController,
+    MetricsController, HealthController,
     AuthGatewayController,
     ContentGatewayController,
     LearningGatewayController,
@@ -37,8 +38,6 @@ Module({
     MockGatewayController,
     ProgressGatewayController,
   ],
-  // Every public route is rate limited (D117); counters live in Redis when
-  // REDIS_URL is set, else in memory.
   providers: [
     { provide: RATE_LIMIT_STORE, useFactory: () => createRateLimitStore() },
     { provide: APP_GUARD, useClass: RateLimitGuard },

@@ -2,7 +2,6 @@ import { Search } from 'lucide-react';
 import { Input } from '../ui/input.jsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select.jsx';
 
-// Search box of a list toolbar.
 export function SearchField({ value, onChange, placeholder, label }) {
   return (
     <div className="relative min-w-0 flex-1 sm:min-w-[14rem]">
@@ -19,8 +18,6 @@ export function SearchField({ value, onChange, placeholder, label }) {
   );
 }
 
-// One drop-down of a list toolbar (a filter or the sort order).
-// options: [{ value, label }].
 export function FilterSelect({ label, value, onChange, options, className = 'w-full sm:w-44' }) {
   return (
     <Select value={value} onValueChange={onChange}>

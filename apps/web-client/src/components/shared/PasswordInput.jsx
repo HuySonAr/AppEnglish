@@ -3,11 +3,6 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Input } from '../ui/input.jsx';
 import { cn } from '../../lib/utils.js';
 
-// A password field with an eye button that shows or hides what was typed.
-// The eye appears once the field has text (an empty field has nothing to
-// reveal); the browser's own reveal button is hidden globally in index.css so
-// only one eye ever shows. Takes every Input prop (works with react-hook-form's
-// register as well as controlled value/onChange).
 export const PasswordInput = forwardRef(function PasswordInput({ className, disabled, value, defaultValue, onChange, ...props }, ref) {
   const [visible, setVisible] = useState(false);
   const [typed, setTyped] = useState(Boolean(defaultValue));

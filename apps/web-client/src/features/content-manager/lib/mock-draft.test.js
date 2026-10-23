@@ -43,7 +43,6 @@ test('questions and passages are added and removed', () => {
   assert.equal(part.questions[0].options.length, 4);
   assert.equal(withoutQuestion(part, part.questions[0].id).questions.length, 1);
 
-  // Questions of a passage stay together, in passage order.
   let grouped = withGroup(withGroup(workingMock(null).test.part7));
   const [first, second] = grouped.groups.map((group) => group.id);
   grouped = withQuestion(grouped, spec('part7'), second);
@@ -69,7 +68,6 @@ test('the graphic of a conversation is on one question, the middle one by defaul
   assert.deepEqual(part.questions.map((question) => question.imageMediaId), [null, null, 'image-1']);
   assert.equal(graphicQuestion(part, groupId).id, last.id);
 
-  // A graphic saved on the set itself moves to the middle question.
   const legacy = workingMock({
     draft: { content: { test: { part4: {
       groups: [{ id: groupId, imageMediaId: 'image-2' }],
@@ -83,7 +81,6 @@ test('the graphic of a conversation is on one question, the middle one by defaul
 test('publish issue paths of a mock test become readable labels', () => {
   assert.equal(mockIssueLabel('test.part1.audioMediaId'), 'Part 1 · audio');
   assert.equal(mockIssueLabel('test.part5.questions'), 'Part 5 · questions');
-  // Questions carry their number in the whole test.
   assert.equal(mockIssueLabel('test.part5.questions[2].options', workingMock(null)), 'Part 5 · question 103 · options');
   assert.equal(mockIssueLabel('test.part6.groups[1].passage'), 'Part 6 · set 2 · passage');
   assert.equal(mockIssueLabel('test.part3.groups[0].audioMediaId'), 'Part 3 · set 1 · audio');
@@ -93,7 +90,6 @@ test('publish issue paths of a mock test become readable labels', () => {
 test('questions keep the number they have in a full test', () => {
   assert.deepEqual(MOCK_FIRST_QUESTION_NUMBERS, { part1: 1, part2: 7, part3: 32, part4: 71, part5: 101, part6: 131, part7: 147 });
 
-  // Part 3: a conversation keeps its three numbers whatever the others hold.
   let part = workingMock(null).test.part3;
   for (let index = 0; index < 5; index++) part = withGroup(part);
   const sets = part.groups.map((group) => group.id);
@@ -103,7 +99,6 @@ test('questions keep the number they have in a full test', () => {
   part = withQuestion(part, spec('part3'), sets[1]);
   assert.deepEqual(part.questions.map((_, index) => mockQuestionNumber(spec('part3'), part, index)), [32, 35, 44, 45]);
 
-  // Part 7: passages differ in size, so its questions are numbered in order.
   let reading = withGroup(withGroup(workingMock(null).test.part7));
   reading = withQuestion(reading, spec('part7'), reading.groups[1].id);
   assert.equal(mockQuestionNumber(spec('part7'), reading, 0), 147);

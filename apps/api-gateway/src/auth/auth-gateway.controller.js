@@ -9,20 +9,14 @@ export { gatewayFailure };
 
 export const AUTH_GRPC_CLIENT = 'AUTH_GRPC_CLIENT';
 
-// Calls one AuthService RPC and returns { status, payload, setCookies }.
 export function callAuth(auth, rpc, message = {}) {
   return callService(auth, rpc, message, 'Authentication');
 }
 
-// Reads the session cookies the auth RPCs take as tokens.
 export function sessionTokens(request) {
   return cookies(request);
 }
 
-// Gives ranking rows the learner's public profile (F09, D113): displayName
-// and avatarUrl by accountId, and drops the email the services still carry.
-// When auth-service cannot answer, the rows fall back to the email's local
-// part so the board still renders.
 export async function attachProfiles(auth, rows) {
   const list = rows.filter(Boolean);
   const ids = [...new Set(list.map((row) => row.accountId).filter(Boolean))];
@@ -32,7 +26,6 @@ export async function attachProfiles(auth, rows) {
       const { status, payload } = await callAuth(auth, 'GetProfiles', { accountIds: ids });
       if (status < 400) byId = new Map(payload.data.profiles.map((profile) => [profile.id, profile]));
     } catch {
-      // Fallback below.
     }
   }
   for (const row of list) {
@@ -43,10 +36,8 @@ export async function attachProfiles(auth, rows) {
   }
 }
 
-// Upper bound for one avatar held in memory; auth-service applies the exact rules.
 const MAX_AVATAR_UPLOAD_BYTES = PROFILE_LIMITS.avatarMaxBytes + 64 * 1024;
 
-// JSON body values become proto strings; auth-service validates them.
 function text(value) {
   return value === undefined || value === null ? '' : String(value);
 }
@@ -65,7 +56,6 @@ function cookies(request) {
     try {
       parsed[part.slice(0, index).trim()] = decodeURIComponent(part.slice(index + 1).trim());
     } catch {
-      // A malformed cookie value is treated as absent.
     }
   }
   return {
@@ -111,12 +101,9 @@ export class AuthGatewayController {
     return this.forward('Me', { accessToken: cookies(request).accessToken }, response);
   }
   async adminList(query, request, response) {
-    // Keys and empty values are relayed as sent; repeated keys keep the last value.
     const relayed = Object.fromEntries(new URLSearchParams(query));
     return this.forward('AdminListAccounts', { accessToken: cookies(request).accessToken, query: relayed }, response);
   }
-  // Declared before adminGet: Nest registers routes in method order, and
-  // "admin/accounts/stats" must be matched before "admin/accounts/:id".
   async adminNotifications(request, response) {
     return this.forward('AdminListNotifications', { accessToken: cookies(request).accessToken }, response);
   }
@@ -137,7 +124,6 @@ export class AuthGatewayController {
       response,
     );
   }
-  // Invitations (D131).
   async adminInvite(body, request, response) {
     return this.forward(
       'AdminInviteAccount',
@@ -156,7 +142,6 @@ export class AuthGatewayController {
     );
   }
 
-  // Profile of the signed-in account (F09, D113).
   async updateProfile(body, request, response) {
     return this.forward(
       'UpdateProfile',
@@ -218,7 +203,6 @@ const routes = [
   [Get, 'me', 'me', [Req(), passthrough()]],
   [Get, 'admin/accounts', 'adminList', [Query(), Req(), passthrough()]],
   [Post, 'admin/accounts', 'adminInvite', [Body(), Req(), passthrough()]],
-  // Before :id so "stats" is never read as an account id.
   [Get, 'admin/accounts/stats', 'adminStats', [Req(), passthrough()]],
   [Get, 'admin/notifications', 'adminNotifications', [Req(), passthrough()]],
   [Post, 'admin/notifications/read', 'adminMarkNotificationsRead', [Body(), Req(), passthrough()]],

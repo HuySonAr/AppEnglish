@@ -8,22 +8,15 @@ import {
 } from '@appenglish/content-contracts';
 import { newMockGroup, newMockQuestion } from './mock-draft.js';
 
-// The unit review (D121) in the editor: Parts 5 and 6 of the mock-test shape
-// (Part 6 passages are sets), 20 + 2 × 5 questions numbered 1-30.
 export const UNIT_REVIEW_SPECS = UNIT_REVIEW_PARTS.map((key) => LESSON_TEST_PARTS.find((part) => part.key === key));
 
-// The number of each part's first question: Part 5 starts at 1, Part 6 at 21.
 export const UNIT_REVIEW_FIRST_NUMBERS = Object.freeze({ part5: 1, part6: 1 + UNIT_REVIEW_PART_COUNTS.part5 });
 
-// What each part of a review holds, for the editor's limits and badges.
 export const UNIT_REVIEW_LIMITS = Object.freeze({
   part5: Object.freeze({ target: UNIT_REVIEW_PART_COUNTS.part5 }),
   part6: Object.freeze({ target: UNIT_REVIEW_PART_COUNTS.part6, maxSets: UNIT_REVIEW_PASSAGE_COUNT, setQuestionLimit: UNIT_REVIEW_PASSAGE_QUESTIONS }),
 });
 
-// The review as the editor works on it: the draft, else a copy of the
-// published version, with both parts present and every question holding
-// four options.
 export function workingUnitReview(reviewData) {
   const source = structuredClone(reviewData?.draft?.content || reviewData?.published?.content || {});
   return {
@@ -61,8 +54,6 @@ export function unitReviewQuestionCount(content) {
   return UNIT_REVIEW_PARTS.reduce((sum, key) => sum + (content.test[key]?.questions.length || 0), 0);
 }
 
-// True when the review holds exactly what the publishing rules want in size:
-// 20 Part 5 questions and 2 passages of 5.
 export function unitReviewComplete(content) {
   const part6 = content.test.part6;
   return (
@@ -73,8 +64,6 @@ export function unitReviewComplete(content) {
   );
 }
 
-// "Part 6 · passage 2 · question 27 · options" for a publish issue path such
-// as "test.part6.groups[1].passage" or "test.part6.questions[6].options".
 export function unitReviewIssueLabel(path) {
   const labels = { prompt: 'question text' };
   let partKey = null;

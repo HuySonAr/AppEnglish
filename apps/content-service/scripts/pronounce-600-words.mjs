@@ -1,14 +1,3 @@
-// Fills the phonetic and the British/American pronunciation audio of every
-// vocabulary word of the lesson drafts (D123), through the same
-// AutofillPronunciation call the editor's button makes: content-service asks
-// speech-service (Piper) over RabbitMQ and stores the MP3s as lesson media.
-// Only empty fields are filled; what the Content Manager entered stays.
-//
-// content-service and speech-service must be running (pnpm dev), with
-// RabbitMQ from Docker. Each word takes about a second; 600 words take a
-// quarter of an hour. Safe to run again: filled words are skipped.
-//
-//   node --env-file=../../.env scripts/pronounce-600-words.mjs [--manager-id <uuid>] [--only <lesson title>] [--limit <n>]
 import grpc from '@grpc/grpc-js';
 import protoLoader from '@grpc/proto-loader';
 import { CONTENT_GRPC_MAX_MESSAGE_BYTES, CONTENT_PROTO_PATH, contentGrpcLoader, contentGrpcUrl } from '@appenglish/content-contracts/grpc';

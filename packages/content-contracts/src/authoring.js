@@ -1,8 +1,3 @@
-// The authoring format of lessons and unit reviews (D120, D124): the plain
-// JSON a Content Manager writes or exports (content-samples/600-words,
-// AUTHORING.md), and its two-way conversion with the content shape the
-// service stores. Pure, shared by the web editor's Import/Export and the
-// seed and validate scripts. Media ids are never part of the format.
 import { LESSON_TEST_PARTS, UNIT_REVIEW_PART_COUNTS, UNIT_REVIEW_PASSAGE_COUNT, UNIT_REVIEW_PASSAGE_QUESTIONS } from './index.js';
 
 const letters = ['A', 'B', 'C', 'D'];
@@ -22,17 +17,12 @@ const part = (fields) => ({ audioMediaId: null, transcript: '', passage: '', ima
 const lettered = (options) => options.map((text, index) => `(${letters[index]}) ${text}`);
 const list = (value) => (Array.isArray(value) ? value : []);
 
-// What the recording of Part 1 says, from the authored options.
 export const part1Transcript = (options) => ['Number 1. Look at the picture marked Number 1.', ...lettered(options)].join('\n');
-// What the recording of Part 2 says: both questions with their responses.
 export const part2Transcript = (items) =>
   items.map((item, index) => [`Number ${2 + index}. ${item.question || ''}`.trimEnd(), ...lettered(item.options || [])].join('\n')).join('\n\n');
 const PART3_LEAD = 'Questions 4 through 6 refer to the following conversation.';
 const PART4_LEAD = 'Questions 7 through 9 refer to the following talk.';
 
-// The lesson content of an authored lesson. An authored `transcript` on
-// part1, or `part2Transcript`, replaces the generated one (the transcript
-// a Content Manager typed from a recording).
 export function lessonFromAuthoring(lesson) {
   const test = lesson.test || {};
   const p1 = test.part1 || {};
@@ -70,7 +60,6 @@ export function lessonFromAuthoring(lesson) {
   };
 }
 
-// The unit review content of an authored review (D121).
 export function reviewFromAuthoring(review) {
   const passages = list(review.part6);
   const groups = passages.map((passage) => ({ id: uuid(), audioMediaId: null, transcript: '', passage: passage.passage || '', imageMediaId: null }));
@@ -85,8 +74,6 @@ export function reviewFromAuthoring(review) {
   };
 }
 
-// ----- Back to the authoring format (Export).
-
 const answerOf = (item) => letters[(item.options || []).findIndex((opt) => opt.isCorrect)] || '';
 const authoredQuestion = (item, { prompt = true } = {}) => ({
   ...(prompt ? { prompt: item.prompt || '' } : {}),
@@ -94,7 +81,6 @@ const authoredQuestion = (item, { prompt = true } = {}) => ({
   answer: answerOf(item),
   explanation: item.explanation || '',
 });
-// "(A) text" lines of a spoken part, in order.
 const spokenOptions = (block) => block.split('\n').map((line) => /^\(([A-D])\)\s*(.*)$/.exec(line.trim())).filter(Boolean).map((match) => match[2]);
 const stripLead = (transcript, lead) => (transcript.startsWith(lead) ? transcript.slice(lead.length).replace(/^\s+/, '') : transcript);
 
@@ -152,9 +138,6 @@ export function authoringFromReview(content) {
     })),
   };
 }
-
-// ----- Checks before an import: the shape and the counts the publishing
-// rules will want. Returns { errors, warnings, summary } with plain lines.
 
 const counts = Object.fromEntries(LESSON_TEST_PARTS.map((spec) => [spec.key, spec]));
 

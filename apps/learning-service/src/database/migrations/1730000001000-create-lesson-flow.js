@@ -1,5 +1,3 @@
-// Lesson progress and lesson-test attempts (F04). accountId, lessonId and
-// lessonVersionId refer to other services' data, so they have no foreign key.
 export class CreateLessonFlow1730000001000 {
   name = 'CreateLessonFlow1730000001000';
 
@@ -44,9 +42,7 @@ export class CreateLessonFlow1730000001000 {
         CONSTRAINT "UQ_lesson_test_attempts_number" UNIQUE ("accountId", "lessonId", "attemptNumber")
       )
     `);
-    // At most one attempt in progress per learner and lesson.
     await queryRunner.query(`CREATE UNIQUE INDEX IF NOT EXISTS "UQ_lesson_test_attempts_open" ON "lesson_test_attempts" ("accountId", "lessonId") WHERE "status" = 'IN_PROGRESS'`);
-    // The ranking reads the first attempts of a lesson.
     await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_lesson_test_attempts_ranking" ON "lesson_test_attempts" ("lessonId", "attemptNumber", "status")`);
   }
 

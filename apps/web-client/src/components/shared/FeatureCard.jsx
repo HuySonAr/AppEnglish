@@ -10,8 +10,6 @@ const tones = {
   info: 'bg-info/10 text-info',
 };
 
-// Dashboard tile. With `to` the whole tile is a link; without it the tile
-// shows a feature that is not available yet.
 export function FeatureCard({
   icon: Icon,
   title,

@@ -27,6 +27,7 @@
     "typeorm": "^0.3.27",
     "zod": "^3.25.76",
     "nodemailer": "^7.0.6",
-    "@appenglish/auth-contracts": "workspace:*"
+    "@appenglish/auth-contracts": "workspace:*",
+    "@appenglish/backend-common": "workspace:*"
   }
 }

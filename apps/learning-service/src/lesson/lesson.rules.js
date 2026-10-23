@@ -9,9 +9,6 @@ import {
   VOCABULARY_PRACTICE_SIZE,
 } from '@appenglish/learning-contracts';
 
-// Pure rules of the lesson flow and of the seven-part test. No I/O here.
-
-// Fisher–Yates with a replaceable random source.
 export function shuffled(items, random = Math.random) {
   const result = [...items];
   for (let index = result.length - 1; index > 0; index--) {
@@ -21,20 +18,11 @@ export function shuffled(items, random = Math.random) {
   return result;
 }
 
-// Where each lesson stands for one learner. curriculum is the published units
-// (in order) with their published lessons; startUnit is the unit number the
-// placement gave, or null while the placement is neither taken nor skipped
-// (then every lesson is locked); completed is the set of completed lesson ids;
-// passedReviews the ids of the units whose review the learner passed (D121).
-// Returns a Map: lesson id -> { state, unitNumber, lessonNumber, unit,
-// lesson, previousLessonId, reviewRequired }.
 export function lessonAccess(curriculum, startUnit, completed, passedReviews = new Set()) {
   const access = new Map();
   let previous = null;
   curriculum.units.forEach((unit, unitIndex) => {
     const unitNumber = unitIndex + 1;
-    // The unit before closes with its review (D121): until it is passed, the
-    // first lesson here stays locked even though the last lesson there is done.
     const before = unitIndex > 0 ? curriculum.units[unitIndex - 1] : null;
     const reviewBlocks = Boolean(before?.reviewVersionId && before.lessons.length && !passedReviews.has(before.id));
     unit.lessons.forEach((lesson, lessonIndex) => {
@@ -44,7 +32,7 @@ export function lessonAccess(curriculum, startUnit, completed, passedReviews = n
         ? LessonState.COMPLETED
         : startUnit === null
           ? LessonState.LOCKED
-          : // Units before the starting unit are open freely (D35).
+          :
             unitNumber < startUnit || firstOfStartUnit || afterPrevious
             ? LessonState.OPEN
             : LessonState.LOCKED;
@@ -55,9 +43,6 @@ export function lessonAccess(curriculum, startUnit, completed, passedReviews = n
         unit,
         lesson,
         previousLessonId: previous,
-        // The previous lesson's vocabulary is reviewed only when the learner
-        // has studied that lesson; the first lesson of the starting unit is
-        // exempt (D35).
         reviewRequired: Boolean(previous) && !firstOfStartUnit && completed.has(previous),
       });
       previous = lesson.id;
@@ -66,11 +51,6 @@ export function lessonAccess(curriculum, startUnit, completed, passedReviews = n
   return access;
 }
 
-// Where the review of each unit stands for one learner (D121). A unit without
-// a published review is NONE. Otherwise the review is PASSED once passed,
-// OPEN when every lesson of the unit is completed (or the unit lies before
-// the starting unit, whose lessons are open freely), and LOCKED until then.
-// Returns a Map: unit id -> { state, unitNumber, unit, lessonsLeft }.
 export function unitReviewAccess(curriculum, startUnit, completed, passedReviews) {
   const access = new Map();
   curriculum.units.forEach((unit, unitIndex) => {
@@ -90,10 +70,7 @@ export function unitReviewAccess(curriculum, startUnit, completed, passedReviews
   return access;
 }
 
-// The lesson's steps in order with their status. progress is the learner's
-// row for the lesson (or an empty object).
 export function lessonSteps(entry, progress) {
-  // A review that became required after the learner started is not imposed.
   const reviewPending =
     entry.reviewRequired && !progress.reviewPassedAt && !progress.vocabularyStudiedAt;
   const done = {
@@ -119,8 +96,6 @@ export function lessonSteps(entry, progress) {
   });
 }
 
-// One question per vocabulary item, in random order: choose the meaning of
-// the word among up to four distinct meanings of the same lesson.
 export function vocabularyQuiz(vocabulary, random = Math.random) {
   return shuffled(vocabulary, random).map((item) => {
     const others = [
@@ -135,9 +110,6 @@ export function vocabularyQuiz(vocabulary, random = Math.random) {
   });
 }
 
-// The words a learner can practise (D84): the vocabulary of the completed
-// lessons, each word once (the same word and part of speech in two lessons
-// counts once, the first one kept).
 export function practiceWords(items) {
   const seen = new Set();
   return items.filter((item) => {
@@ -150,11 +122,6 @@ export function practiceWords(items) {
 
 const sameText = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
 
-// A vocabulary practice (D84): `size` random words, half asked word → meaning
-// (MEANING) and half meaning → word (WORD), in random order. Each question has
-// four options from the other words, the same part of speech first, and
-// carries its answer and the word itself: practice is checked right away in
-// the browser and earns nothing.
 export function vocabularyPractice(words, random = Math.random, size = VOCABULARY_PRACTICE_SIZE) {
   const chosen = shuffled(words, random).slice(0, size);
   const half = Math.ceil(chosen.length / 2);
@@ -163,7 +130,6 @@ export function vocabularyPractice(words, random = Math.random, size = VOCABULAR
       const direction = index < half ? PracticeDirection.MEANING : PracticeDirection.WORD;
       const field = direction === PracticeDirection.MEANING ? 'meaning' : 'word';
       const answer = item[field];
-      // A word with the same meaning would be a second right answer.
       const candidates = shuffled(words, random)
         .filter((other) => !sameText(other[field], answer) && !sameText(other.meaning, item.meaning))
         .sort((a, b) => Number(b.partOfSpeech === item.partOfSpeech) - Number(a.partOfSpeech === item.partOfSpeech));
@@ -184,12 +150,10 @@ export function vocabularyPractice(words, random = Math.random, size = VOCABULAR
   );
 }
 
-// Ids of the vocabulary items whose chosen meaning is wrong or missing.
 export function wrongQuizAnswers(vocabulary, answers) {
   return vocabulary.filter((item) => answers[item.id] !== item.meaning).map((item) => item.id);
 }
 
-// Indexes of the blanks filled with the wrong word (case-insensitive).
 export function wrongBlanks(expected, answers) {
   const normal = (value) => (value || '').trim().toLowerCase();
   return expected
@@ -197,12 +161,9 @@ export function wrongBlanks(expected, answers) {
     .filter((index) => index !== null);
 }
 
-// The parts a call is about: all seven, or only the given keys (a mini test).
 const partsOf = (partKeys) =>
   LESSON_TEST_PARTS.filter((spec) => !partKeys || partKeys.includes(spec.key));
 
-// Counts the right answers of a seven-part test, in total and per skill.
-// answers maps question id to the chosen option id.
 export function scoreTest(test, answers, partKeys) {
   const score = { totalCount: 0, correctCount: 0, listeningCorrect: 0, readingCorrect: 0 };
   for (const spec of partsOf(partKeys)) {
@@ -218,9 +179,6 @@ export function scoreTest(test, answers, partKeys) {
   return score;
 }
 
-// A random option order for every question whose options are written out
-// (Parts 3-7). Parts 1 and 2 keep their order: the recording reads the
-// options in it (D31, D48). Returns { questionId: [optionId, ...] }.
 export function shuffledOptionOrder(test, random = Math.random, partKeys) {
   const order = {};
   for (const spec of partsOf(partKeys)) {
@@ -236,15 +194,9 @@ function orderedOptions(question, optionOrder) {
   if (!order) return question.options;
   const byId = new Map(question.options.map((option) => [option.id, option]));
   const listed = order.map((id) => byId.get(id)).filter(Boolean);
-  // Options the stored order does not know keep their place at the end.
   return [...listed, ...question.options.filter((option) => !order.includes(option.id))];
 }
 
-// The test as the learner sees it. Without `answers` it is the paper to work
-// on: no correct answers, explanations or transcripts. With `answers` it is
-// the review of a finished attempt and includes all of them. Questions are
-// numbered from 1 across the parts shown. A mock-test part may have passage
-// groups; its questions then carry their groupId.
 export function testParts({ test, media }, { optionOrder, answers, partKeys } = {}) {
   const url = (mediaId) => (mediaId && media[mediaId]?.url) || null;
   const review = Boolean(answers);
@@ -260,7 +212,6 @@ export function testParts({ test, media }, { optionOrder, answers, partKeys } = 
       imageUrl: url(part.imageMediaId),
       passage: part.passage,
       ...(review ? { transcript: part.transcript } : {}),
-      // Sets of a mock-test part: a recording (Parts 3-4) or a passage.
       groups: (part.groups || []).map((group) => ({
         id: group.id,
         audioUrl: url(group.audioMediaId),
@@ -274,7 +225,6 @@ export function testParts({ test, media }, { optionOrder, answers, partKeys } = 
         groupId: question.groupId ?? null,
         prompt: question.prompt,
         imageUrl: url(question.imageMediaId),
-        // Mock-test Parts 1-2: each question has its own recording.
         audioUrl: url(question.audioMediaId),
         ...(review
           ? {
@@ -293,16 +243,11 @@ export function testParts({ test, media }, { optionOrder, answers, partKeys } = 
   });
 }
 
-// Number of questions per skill in the seven-part test.
 export const SKILL_TOTALS = Object.freeze({
   listening: LESSON_TEST_PARTS.filter((part) => part.skill === Skill.LISTENING).reduce((sum, part) => sum + part.questionCount, 0),
   reading: LESSON_TEST_PARTS.filter((part) => part.skill === Skill.READING).reduce((sum, part) => sum + part.questionCount, 0),
 });
 
-// How a learner's results at one lesson test develop over the retakes (D62).
-// attempts are the finished attempts, oldest first. Returns null with fewer
-// than two; otherwise the latest attempt compared with the one before it and
-// with the first, in right answers (total and per skill).
 export function testProgression(attempts) {
   if (attempts.length < 2) return null;
   const [first, previous, latest] = [attempts[0], attempts.at(-2), attempts.at(-1)];
@@ -317,7 +262,6 @@ export function testProgression(attempts) {
   };
 }
 
-// Number of questions per skill in a test (or in some of its parts).
 export function skillTotals(test, partKeys) {
   const totals = { listening: 0, reading: 0 };
   for (const spec of partsOf(partKeys))

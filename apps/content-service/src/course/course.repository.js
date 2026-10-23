@@ -22,7 +22,6 @@ export class CourseRepository {
     return (await this.repo(ListeningCourseItemEntity)).save(item);
   }
 
-  // Saves rows one by one in a transaction (positions after a move).
   async saveItems(items) {
     await this.repo(ListeningCourseItemEntity);
     return this.dataSource.transaction(async (manager) => {
@@ -30,7 +29,6 @@ export class CourseRepository {
     });
   }
 
-  // Returns null when the item clashes with an existing one (one level test per level).
   async createItemWithDraft(item, draft) {
     await this.repo(ListeningCourseItemEntity);
     try {
@@ -45,7 +43,6 @@ export class CourseRepository {
     }
   }
 
-  // Version metadata without the content payload.
   async deleteItemWithVersions(itemId) {
     await this.repo(ListeningCourseItemEntity);
     return this.dataSource.transaction(async (manager) => {

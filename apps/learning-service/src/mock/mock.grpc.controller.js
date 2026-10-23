@@ -1,4 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
+import { withGrpcContext } from '@appenglish/backend-common/grpc-context';
 import { GrpcMethod } from '@nestjs/microservices';
 import { LearningResponseCode } from '@appenglish/learning-contracts';
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
@@ -16,8 +17,6 @@ import {
   mistakeAnswerSchema,
 } from './mock.schemas.js';
 
-// Each RPC: whether it targets a mock test id, the schema of its JSON payload
-// (if any) and the service call.
 const rpcs = {
   ListMockTests: { run: (service, { actor }) => service.listMockTests(actor) },
   GetMockTest: { id: true, run: (service, { actor, id }) => service.getMockTest(actor, id) },
@@ -80,8 +79,6 @@ export class MockGrpcController {
     this.mockService = mockService;
   }
 
-  // Shapes the { code, msg, data } envelope. Unexpected errors propagate as a
-  // gRPC error and the gateway answers 500.
   async handle(spec, request) {
     try {
       const data = await spec.run(this.mockService, {
@@ -113,6 +110,7 @@ for (const [rpc, spec] of Object.entries(rpcs)) {
   MockGrpcController.prototype[method] = function (request) {
     return this.handle(spec, request);
   };
+  withGrpcContext(MockGrpcController.prototype, method, rpc);
   GrpcMethod(LEARNING_GRPC_SERVICE, rpc)(
     MockGrpcController.prototype,
     method,

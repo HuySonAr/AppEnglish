@@ -5,11 +5,6 @@ import { cn } from '../../lib/utils.js';
 import { fileIssue, formatBytes } from '../../lib/files.js';
 import { Button } from '../ui/button.jsx';
 
-// The one way to choose a file (D125): a dashed zone that takes a dropped or
-// selected file, checks its type and size (accept, maxBytes) and hands it to
-// onFile. kindLabel names what is accepted ("MP3, MP4 or M4A"); compact is
-// the small variant for a field inside a form. The zone is keyboard
-// reachable: the button opens the picker, and so does Enter on the zone.
 export function FileDropzone({ id, accept, maxBytes, kindLabel, onFile, disabled = false, compact = false, title, className }) {
   const generatedId = useId();
   const inputId = id || generatedId;

@@ -28,10 +28,6 @@ const formats = {
   },
 };
 
-// Saves the sentences of a listening exercise with their times (D90, D91).
-// Where the browser lets a page ask (Edge, Chrome), the system's "Save as"
-// window picks the folder, the name and the type (.srt or .lrc); elsewhere a
-// dialog picks the type and the name and the file is downloaded.
 export function ExportTimedDialog({ segments, kind, title, disabled, triggerClassName = 'gap-1.5' }) {
   const preferred = kind.key === 'song' ? ExportFormat.LRC : ExportFormat.SRT;
   const [open, setOpen] = useState(false);

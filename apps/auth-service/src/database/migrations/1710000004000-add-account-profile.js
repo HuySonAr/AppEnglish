@@ -1,4 +1,3 @@
-// F09 profile (D113): display name and avatar on the account. Append-only.
 export class AddAccountProfile1710000004000 {
   name = 'AddAccountProfile1710000004000';
 

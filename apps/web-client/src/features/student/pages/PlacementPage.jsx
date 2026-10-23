@@ -43,7 +43,6 @@ function Fact({ icon: Icon, title, text }) {
   );
 }
 
-// The result shows the score and the starting unit only.
 function PlacementResult({ placement }) {
   const skipped = placement.status === PlacementStatus.SKIPPED;
   return (
@@ -101,14 +100,12 @@ export function PlacementPage() {
     load();
   }, []);
 
-  // Runs one placement action and shows the state it returns.
   async function run(action, failure) {
     setBusy(true);
     try {
       setPlacement((await action()).data);
     } catch (error) {
       notify({ title: failure, description: getApiErrorMessage(error), variant: 'destructive' });
-      // The state may have changed on the server (e.g. the time ran out).
       await load();
     } finally {
       setBusy(false);

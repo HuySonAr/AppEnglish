@@ -1,10 +1,6 @@
 import { Accent, SpeechQueue } from '@appenglish/content-contracts';
 import { PronunciationUnavailableError } from './dictionary-pronunciation.source.js';
 
-// Pronunciation made by speech-service (D123): IPA and MP3 in British and
-// American English from Piper, asked over RabbitMQ and answered at once. No
-// outside service, and a phrase works like a word. The lookup returns the
-// audio bytes themselves as the "download references".
 export class SpeechPronunciationSource {
   constructor(broker, { timeoutMs = 30_000, ipaAccent = Accent.UK } = {}) {
     this.broker = broker;
@@ -12,7 +8,6 @@ export class SpeechPronunciationSource {
     this.ipaAccent = ipaAccent;
   }
 
-  // Returns { found, phonetic, audio: { uk, us } } with MP3 buffers or null.
   async lookup(word) {
     let reply;
     try {
@@ -31,7 +26,6 @@ export class SpeechPronunciationSource {
     };
   }
 
-  // The lookup already carries the bytes.
   async download(reference) {
     if (!Buffer.isBuffer(reference) || !reference.byteLength) throw new Error('No audio was made');
     return reference;

@@ -16,22 +16,16 @@ import { mockStats, numberOf } from './mock.stats.js';
 import { mistakeSummary, mistakesOf } from './mistakes.rules.js';
 import { goalView, partRates, weakestPart } from './goal.rules.js';
 
-// A submit that arrives this long after the deadline still counts.
 const SUBMIT_GRACE_MS = 30 * 1000;
 const IN_PROGRESS = 'IN_PROGRESS';
 const COMPLETED = 'COMPLETED';
 
 const percent = (correctCount, totalCount) =>
   totalCount ? Math.round((correctCount * 100) / totalCount) : 0;
-// Attempts of the full test have partKey ''; a mini test has its part's key.
 const sameAttemptSeries = (attempt, kind, partKey) =>
   attempt.kind === kind && attempt.partKey === (partKey || '');
 
 export class MockService {
-  // contentClient reads published mock tests from content-service;
-  // placementRepository gives the starting unit for the first suggestion;
-  // events reports finished full tests to progress-service (F06); now() and
-  // random() are replaceable in tests.
   constructor(repository, placementRepository, contentClient, { now = () => new Date(), random = Math.random, events = noEvents } = {}) {
     this.repository = repository;
     this.placementRepository = placementRepository;
@@ -50,7 +44,6 @@ export class MockService {
     return stored ? { listening: stored.listening, reading: stored.reading } : defaultScoreConversion();
   }
 
-  // Published mock tests with the learner's results and the suggested level.
   async listMockTests(actor) {
     this.assertRole(actor, AccountRole.STUDENT);
     const [{ mockTests }, attempts, placement] = await Promise.all([
@@ -87,8 +80,6 @@ export class MockService {
     return paper;
   }
 
-  // The learner's attempts at one mock test; a full attempt whose time ran
-  // out is finished first with the answers saved so far.
   async attempts(actor, mockTestId) {
     const attempts = await this.repository.listTestAttempts(actor.id, mockTestId);
     for (const [index, attempt] of attempts.entries())
@@ -117,7 +108,6 @@ export class MockService {
       readingTotal: attempt.readingTotal,
       durationSeconds: attempt.durationSeconds,
       submittedAt: new Date(attempt.submittedAt).toISOString(),
-      // Estimated TOEIC scores, for full tests only (D64).
       estimated: full
         ? {
             listeningScore: attempt.listeningScore,
@@ -125,14 +115,10 @@ export class MockService {
             totalScore: attempt.listeningScore + attempt.readingScore,
           }
         : null,
-      // Only the first full attempt of a mock test earns XP (D63).
       countsForXp: full && attempt.attemptNumber === 1,
     };
   }
 
-  // What a learner sees of one series of attempts (the full test, or the mini
-  // test of one part): the finished ones, how they develop, and whether one
-  // is open.
   series(attempts, kind, partKey) {
     const own = attempts.filter((attempt) => sameAttemptSeries(attempt, kind, partKey));
     const finished = own.filter((attempt) => attempt.status === COMPLETED);
@@ -143,8 +129,6 @@ export class MockService {
     };
   }
 
-  // One mock test: the full test and the mini test of each part, with the
-  // learner's history of each.
   async getMockTest(actor, mockTestId) {
     this.assertRole(actor, AccountRole.STUDENT);
     const paper = await this.paper(mockTestId);
@@ -174,7 +158,6 @@ export class MockService {
       attemptNumber: attempt.attemptNumber,
       title: paper.mockTest.title,
       startedAt: new Date(attempt.startedAt).toISOString(),
-      // A mini test has no time limit (D63).
       expiresAt: attempt.expiresAt ? new Date(attempt.expiresAt).toISOString() : null,
       serverNow: this.now().toISOString(),
       answers: attempt.answers,
@@ -185,7 +168,6 @@ export class MockService {
     };
   }
 
-  // The attempt in progress for the full test or a part's mini test, if any.
   async getMockAttempt(actor, mockTestId, { kind, partKey }) {
     this.assertRole(actor, AccountRole.STUDENT);
     const open = (await this.attempts(actor, mockTestId)).find(
@@ -195,8 +177,6 @@ export class MockService {
     return this.attemptView(open, await this.paper(mockTestId, open.mockVersionId));
   }
 
-  // Starts the full test or the mini test of one part, or returns the one in
-  // progress. Both can be taken any number of times.
   async startMockAttempt(actor, mockTestId, { kind, partKey }) {
     this.assertRole(actor, AccountRole.STUDENT);
     const paper = await this.paper(mockTestId);
@@ -220,7 +200,6 @@ export class MockService {
         kind === MockAttemptKind.FULL
           ? new Date(startedAt.getTime() + paper.mockTest.durationMinutes * 60 * 1000)
           : null,
-      // Options of Parts 3-7 are shuffled for each attempt (D31).
       optionOrder: shuffledOptionOrder(paper.test, this.random, partKeys),
       answers: {},
     });
@@ -248,9 +227,6 @@ export class MockService {
     return { saved: true };
   }
 
-  // Throws away the attempt in progress: it is not scored and leaves no trace
-  // in the history (D82). An attempt whose time already ran out is finished
-  // instead, as it would be on the next visit.
   async discardMockAttempt(actor, mockTestId, reference) {
     const attempt = await this.openAttempt(actor, mockTestId, reference);
     if (this.isExpired(attempt)) {
@@ -261,15 +237,12 @@ export class MockService {
     return { discarded: true };
   }
 
-  // Scores the attempt and returns the result with every answer explained.
   async submitMockAttempt(actor, mockTestId, { answers, ...reference }) {
     const attempt = await this.openAttempt(actor, mockTestId, reference);
-    // A submit after the grace period is scored with the answers saved in time.
     const finished = await this.complete(attempt, this.isExpired(attempt) ? attempt.answers : answers, actor);
     return this.reviewView(finished);
   }
 
-  // actor is the learner, for the email the XP leaderboard shows (D112).
   async complete(attempt, answers, actor) {
     const paper = await this.paper(attempt.mockTestId, attempt.mockVersionId);
     const partKeys = attempt.partKey ? [attempt.partKey] : undefined;
@@ -287,15 +260,12 @@ export class MockService {
       readingTotal: totals.reading,
       durationSeconds: Math.max(0, Math.round((end - new Date(attempt.startedAt).getTime()) / 1000)),
     });
-    // The estimate is stored with the attempt, so a later change of the
-    // conversion table does not rewrite past results.
     if (attempt.kind === MockAttemptKind.FULL) {
       const { listeningScore, readingScore } = estimatedScores(score, totals, await this.conversion());
       Object.assign(attempt, { listeningScore, readingScore });
     }
     const saved = await this.repository.saveAttempt(attempt);
     await recordActivity(this.events, saved.accountId, StudyActivity.MOCK_TEST, submittedAt);
-    // Only full tests reach progress and XP; mini tests are practice (D63).
     if (saved.kind === MockAttemptKind.FULL) {
       const { estimated, countsForXp, durationSeconds, scorePercent, ...counts } = this.summary(saved);
       await this.events.record(LearningEventType.MOCK_SUBMITTED, {
@@ -314,7 +284,6 @@ export class MockService {
     return saved;
   }
 
-  // One finished attempt of a series (the latest, or the given number).
   async getMockReview(actor, mockTestId, { kind, partKey, attemptNumber }) {
     this.assertRole(actor, AccountRole.STUDENT);
     const finished = (await this.attempts(actor, mockTestId)).filter(
@@ -471,8 +440,6 @@ export class MockService {
     return { conversion: await this.conversion(), isDefault: !(await this.repository.findConversion()) };
   }
 
-  // The new table applies to tests finished afterwards; stored results keep
-  // their estimate.
   async updateScoreConversion(actor, conversion) {
     this.assertRole(actor, AccountRole.ADMIN);
     await this.repository.saveConversion({ ...conversion, updatedBy: actor.id });

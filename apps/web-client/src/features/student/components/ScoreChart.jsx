@@ -5,13 +5,11 @@ import { SCORE_CHART_LATEST, scoreChartPoints } from '../lib/score-chart.js';
 
 const chartConfig = { scorePercent: { label: 'Score', color: 'hsl(var(--chart-1))' } };
 const success = 'hsl(var(--success))';
-// Room each attempt needs for its label; narrower screens scroll sideways.
 const POINT_WIDTH = 56;
 
 const shortDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 const monthName = (iso) => new Date(iso).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
-// Under each point: the attempt number, then the day it was submitted.
 function AttemptTick({ x, y, payload, points }) {
   const point = points.find((item) => item.attemptNumber === payload.value);
   return (
@@ -40,10 +38,6 @@ function PointTooltip({ active, payload, passPercent }) {
   );
 }
 
-// The score of each finished attempt as a line, oldest first: one point per
-// attempt with its number and day, a dashed line where a new month starts,
-// and the pass mark when the test has one (points that reached it are green).
-// The latest SCORE_CHART_LATEST attempts are shown until all are asked for.
 export function ScoreChart({ attempts, passPercent }) {
   const [all, setAll] = useState(false);
   const points = scoreChartPoints(attempts, { all });

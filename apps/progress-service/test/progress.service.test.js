@@ -12,7 +12,6 @@ test('mastery of a skill averages the best share of each test; a skill without t
   const mock = randomUUID();
   const results = [
     { source: 'LESSON_TEST', sourceId: lesson, listeningCorrect: 4, listeningTotal: 9, readingCorrect: 14, readingTotal: 14 },
-    // A retake raises listening to 8/9; reading drops, but the best is kept.
     { source: 'LESSON_TEST', sourceId: lesson, listeningCorrect: 8, listeningTotal: 9, readingCorrect: 7, readingTotal: 14 },
     { source: 'MOCK_TEST', sourceId: mock, listeningCorrect: 50, listeningTotal: 100, readingCorrect: 0, readingTotal: 0 },
   ];
@@ -20,11 +19,9 @@ test('mastery of a skill averages the best share of each test; a skill without t
     { source: 'LESSON_TEST', sourceId: lesson, listening: 8 / 9, reading: 1 },
     { source: 'MOCK_TEST', sourceId: mock, listening: 0.5, reading: null },
   ]);
-  // (8/9 + 0.5) / 2 = 69.4%; reading rests on the lesson test alone.
   assert.deepEqual(skillMastery(results, 'listening'), { percent: 69, testCount: 2, lessonTests: 1, mockTests: 1 });
   assert.deepEqual(skillMastery(results, 'reading'), { percent: 100, testCount: 1, lessonTests: 1, mockTests: 0 });
   assert.deepEqual(skillMastery([], 'reading'), { percent: null, testCount: 0, lessonTests: 0, mockTests: 0 });
-  // Exact values stay exact until shown: 2/3 of one test shows 67, not 66 (D39).
   assert.equal(skillMastery([{ source: 'LESSON_TEST', sourceId: lesson, listeningCorrect: 6, listeningTotal: 9, readingCorrect: 0, readingTotal: 14 }], 'listening').percent, 67);
 });
 
@@ -35,7 +32,6 @@ test('completion counts the published lessons only', () => {
       { id: 'u2', title: 'Two', lessons: [{ id: 'c' }] },
     ],
   };
-  // 'gone' was completed but is no longer published: it neither counts nor blocks.
   assert.deepEqual(completion([{ lessonId: 'a' }, { lessonId: 'gone' }], curriculum), {
     completedLessons: 1,
     totalLessons: 3,
@@ -79,10 +75,11 @@ test('results and completions from learning-service build the progress; a messag
   const passed = message(LESSON_TEST_SUBMITTED, lessonTest(student.id, first.id, { attemptNumber: 2, listening: 9, reading: 12, minute: 2 }));
   const completed = message(LESSON_COMPLETED, { accountId: student.id, lessonId: first.id, completedAt: '2026-10-17T08:02:00.000Z' });
   const full = message(MOCK_SUBMITTED, mockTest(student.id, mock, { listening: 60, listeningTotal: 100, reading: 40, readingTotal: 100, minute: 3 }));
-  for (const item of [failed, passed, completed, full, passed, completed, full]) assert.equal(await service.applyResult(item), true);
+  for (const item of [failed, passed, completed, full]) assert.equal(await service.applyResult(item), true);
+  for (const item of [passed, completed, full]) assert.equal(await service.applyResult(item), 'duplicate');
+  for (const item of [passed, completed, full]) assert.equal(await service.applyResult({ ...item, id: randomUUID() }), true);
   assert.deepEqual([repository.tables.results.length, repository.tables.completions.length], [3, 1]);
 
-  // Another learner's results stay theirs.
   await service.applyResult(message(LESSON_TEST_SUBMITTED, lessonTest(otherStudent.id, second.id, { listening: 9, reading: 14 })));
   await service.applyResult(message(LESSON_COMPLETED, { accountId: otherStudent.id, lessonId: second.id, completedAt: '2026-10-17T08:05:00.000Z' }));
 
@@ -90,7 +87,6 @@ test('results and completions from learning-service build the progress; a messag
   assert.deepEqual(progress.completion.completedLessons, 1);
   assert.deepEqual(progress.completion.units.map((unit) => [unit.completed, unit.total]), [[1, 2], [0, 1]]);
   assert.equal(progress.completion.percent, 33);
-  // Listening: lesson best 9/9, mock 60/100 → 80%. Reading: lesson best 12/14, mock 40/100 → (0.857 + 0.4) / 2 = 63%.
   assert.deepEqual(progress.skills.listening, { percent: 80, testCount: 2, lessonTests: 1, mockTests: 1 });
   assert.deepEqual(progress.skills.reading, { percent: 63, testCount: 2, lessonTests: 1, mockTests: 1 });
   assert.deepEqual(progress.attempts, { lessonTests: 2, mockTests: 1 });
@@ -118,7 +114,6 @@ test('an admin reads the progress and XP of one learner; others cannot; the id m
   assert.equal(summary.learnerId, student.id);
   assert.equal(summary.progress.completion.completedLessons, 1);
   assert.deepEqual([summary.xp.totalXp, summary.xp.rank], [0, null]);
-  // A learner without anything yet still answers.
   assert.equal((await service.getLearnerSummary(admin, otherStudent.id)).progress.completion.completedLessons, 0);
   await assert.rejects(() => service.getLearnerSummary(student, otherStudent.id), { code: 26 });
   await assert.rejects(() => service.getLearnerSummary(manager, otherStudent.id), { code: 26 });

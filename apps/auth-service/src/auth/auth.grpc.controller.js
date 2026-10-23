@@ -1,16 +1,15 @@
 import { Controller, HttpException, Inject } from '@nestjs/common';
+import { withGrpcContext } from '@appenglish/backend-common/grpc-context';
 import { GrpcMethod } from '@nestjs/microservices';
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { AuthController } from './auth.controller.js';
 import { HealthService } from '../health/health.service.js';
 import { AUTH_DATA_SOURCE } from '../database/database.tokens.js';
 
-// proto3 strings default to ''; optional fields and tokens treat that as absent.
 function optional(value) {
   return value === '' ? undefined : value;
 }
 
-// A JSON payload; an empty string is an empty object.
 function parseJson(text) {
   if (!text) return {};
   try {
@@ -160,8 +159,6 @@ export class AuthGrpcController {
     }
   }
 
-  // Runs a handler and turns its envelope, HTTP-status error and cookies into
-  // an AuthReply. Unexpected errors propagate as a gRPC error.
   async reply(handler) {
     let setCookies = [];
     const response = {
@@ -220,6 +217,7 @@ for (const rpc of [
   'Ready',
 ]) {
   const method = rpc[0].toLowerCase() + rpc.slice(1);
+  withGrpcContext(AuthGrpcController.prototype, method, rpc);
   GrpcMethod(AUTH_GRPC_SERVICE, rpc)(
     AuthGrpcController.prototype,
     method,

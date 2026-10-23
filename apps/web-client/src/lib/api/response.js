@@ -45,7 +45,6 @@ const messages = Object.freeze({
   [LearningResponseCode.UNIT_REVIEW_LOCKED]: 'The unit review opens once every lesson of the unit is completed.',
 });
 
-// data.reason of a MEDIA_INVALID error says which upload rule failed.
 const mediaReasons = Object.freeze({
   MEDIA_MIME_TYPE_NOT_ALLOWED: 'This file format is not allowed. Use MP3, MP4 or M4A for audio and JPEG, PNG or WebP for images.',
   MEDIA_EXTENSION_NOT_ALLOWED: 'This file extension is not allowed. Use .mp3, .mp4 or .m4a for audio and .jpg, .jpeg, .png or .webp for images.',
@@ -68,9 +67,6 @@ export function errorCode(error) {
   return error?.response?.data?.code;
 }
 
-// The free-text reason of an error envelope (why an account is locked, D114);
-// avatar errors use data.reason for a rule code instead, which the caller
-// maps itself.
 export function errorReason(error) {
   const code = errorCode(error);
   if (code !== ResponseCode.AUTH_ACCOUNT_DISABLED && code !== ResponseCode.AUTH_ACCOUNT_SUSPENDED) return null;
@@ -78,13 +74,10 @@ export function errorReason(error) {
   return typeof reason === 'string' && reason.trim() ? reason.trim() : null;
 }
 
-// Reads data.nextAction from an error envelope, e.g.
-// { code: 13, msg: 'fail', data: { nextAction: 'VERIFY_EMAIL' } }.
 export function errorNextAction(error) {
   return error?.response?.data?.data?.nextAction ?? null;
 }
 
-// "Try again in 2 minutes" from a 429's retryAfterSeconds.
 function waitText(seconds) {
   if (!seconds) return '';
   if (seconds < 90) return ` Try again in ${Math.max(1, Math.round(seconds))} second${seconds === 1 ? '' : 's'}.`;
@@ -96,7 +89,6 @@ export function getApiErrorMessage(error) {
   const code = errorCode(error);
   if (code === ResponseCode.RATE_LIMITED || error?.response?.status === 429)
     return `Too many attempts.${waitText(error?.response?.data?.data?.retryAfterSeconds)}`;
-  // The gateway refuses files above its own limit before content-service sees them.
   if (error?.response?.status === 413) return mediaReasons.MEDIA_FILE_TOO_LARGE;
   const reason = mediaReasons[error?.response?.data?.data?.reason];
   if ((code === ContentResponseCode.MEDIA_INVALID || code === ResponseCode.AVATAR_INVALID) && reason) return reason;

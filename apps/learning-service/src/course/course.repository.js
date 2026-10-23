@@ -18,8 +18,6 @@ export class CourseRepository {
     return (await this.repo()).findOne({ where: { accountId, lessonId } });
   }
 
-  // Records one finished lesson in a single statement: the best score is
-  // never lowered and the first pass is kept.
   async recordAttempt(accountId, unitId, lessonId, score, passed, at) {
     const repository = await this.repo();
     await repository.query(
@@ -38,8 +36,6 @@ export class CourseRepository {
     return this.findResult(accountId, lessonId);
   }
 
-  // Level tests (D145), by item id. A topic done is kept as a lesson result
-  // whose unitId and lessonId are the topic id.
   async listTestResults(accountId) {
     return (await this.repo(CourseTestResultEntity)).find({ where: { accountId } });
   }

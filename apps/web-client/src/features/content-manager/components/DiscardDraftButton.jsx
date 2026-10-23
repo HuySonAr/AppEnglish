@@ -15,10 +15,6 @@ import {
 } from '../../../components/ui';
 import { discardContentDraft } from '../api/content-api.js';
 
-// Throws the draft of a lesson, mock test, exercise, course item or unit
-// review away (D127), with the files only the draft used; the editor then
-// shows the published version, or nothing. kind is a ContentVersionKind;
-// onDiscarded reloads the editor. size "icon" is the variant for a list row.
 export function DiscardDraftButton({ kind, id, noun, disabled = false, onDiscarded, size }) {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);

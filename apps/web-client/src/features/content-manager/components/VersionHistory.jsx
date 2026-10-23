@@ -31,7 +31,6 @@ import { deleteContentVersion, getContentVersion, listContentVersions, restoreCo
 import { versionOutline } from '../lib/version-outline.js';
 import { DiscardDraftButton } from './DiscardDraftButton.jsx';
 
-// Why an old version could not be deleted (D128).
 function deleteVersionMessage(error) {
   const data = error?.response?.data?.data || {};
   if (errorCode(error) === ContentResponseCode.CONTENT_IN_USE)
@@ -46,17 +45,12 @@ function statusOf(version) {
   return { label: 'Published · taken down', variant: 'outline' };
 }
 
-// The versions of one piece of content (D122): every published version with
-// the live one marked, the draft, a read-only look at any of them, and
-// "Restore as draft", which copies a version over the current draft.
-// refreshKey changes when the editor saved or published, to reload the list;
-// onRestored is called after a restore so the editor reloads its content.
 export function VersionHistory({ kind, id, refreshKey, onRestored, noun = 'content' }) {
   const [state, setState] = useState('loading');
   const [versions, setVersions] = useState([]);
-  const [viewing, setViewing] = useState(null); // { meta, content } or null
-  const [restoring, setRestoring] = useState(null); // version to confirm
-  const [deleting, setDeleting] = useState(null); // old version to confirm
+  const [viewing, setViewing] = useState(null);
+  const [restoring, setRestoring] = useState(null);
+  const [deleting, setDeleting] = useState(null);
   const [busy, setBusy] = useState(false);
 
   async function remove() {

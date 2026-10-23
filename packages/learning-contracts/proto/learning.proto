@@ -2,23 +2,15 @@ syntax = "proto3";
 
 package appenglish.learning.v1;
 
-// Internal contract between api-gateway and learning-service. The gateway
-// authenticates the caller through auth-service and passes the actor;
-// learning-service enforces the role, validates payloads and owns the rules.
 service LearningService {
-  // Placement (F03). Student: state, start, save answers, submit, skip.
   rpc GetPlacement(LearningRequest) returns (LearningReply);
   rpc StartPlacement(LearningRequest) returns (LearningReply);
   rpc SavePlacementAnswers(LearningRequest) returns (LearningReply);
   rpc SubmitPlacement(LearningRequest) returns (LearningReply);
   rpc SkipPlacement(LearningRequest) returns (LearningReply);
-  // Admin: the score thresholds that decide the starting unit.
   rpc GetPlacementSettings(LearningRequest) returns (LearningReply);
   rpc UpdatePlacementSettings(LearningRequest) returns (LearningReply);
-  // Admin (D131): removes a learner's placement attempt (id = account id) so
-  // they take or skip the test again.
   rpc AdminResetPlacement(LearningRequest) returns (LearningReply);
-  // Lesson flow (F04). Student only; id is the lesson id where there is one.
   rpc GetCurriculum(LearningRequest) returns (LearningReply);
   rpc GetLesson(LearningRequest) returns (LearningReply);
   rpc MarkVocabularyStudied(LearningRequest) returns (LearningReply);
@@ -29,56 +21,32 @@ service LearningService {
   rpc StartLessonTest(LearningRequest) returns (LearningReply);
   rpc SaveLessonTestAnswers(LearningRequest) returns (LearningReply);
   rpc SubmitLessonTest(LearningRequest) returns (LearningReply);
-  // Leaves the test in progress without submitting; the attempt is removed.
   rpc DiscardLessonTest(LearningRequest) returns (LearningReply);
   rpc GetLessonTestReview(LearningRequest) returns (LearningReply);
   rpc GetLessonRanking(LearningRequest) returns (LearningReply);
-  // Unit review (D121). Student: the review of a unit (id = the unit id) with
-  // the learner's attempts and the paper, and the answers scored and kept.
   rpc GetUnitReview(LearningRequest) returns (LearningReply);
   rpc SubmitUnitReview(LearningRequest) returns (LearningReply);
-  // Gateway-internal (D118): how many learner results name each content id.
-  // payload_json = { kind, ids[] } with kind in ContentUsageKind.
   rpc GetContentUsage(LearningRequest) returns (LearningReply);
-  // Practice (F05B). Student: 20 words of the completed lessons (D84).
   rpc GetVocabularyPractice(LearningRequest) returns (LearningReply);
-  // A round of word memory finished (D154): counts as a day of study.
   rpc CompleteVocabularyPractice(LearningRequest) returns (LearningReply);
-  // Listening practice (F05B-3, D86; songs D88): the published dictation
-  // exercises with the learner's best accuracy per mode, one exercise without
-  // its transcript (or a song with its blanks hidden), and the check of what
-  // the learner wrote.
   rpc ListListeningPractice(LearningRequest) returns (LearningReply);
   rpc GetListeningPractice(LearningRequest) returns (LearningReply);
   rpc CheckListeningPractice(LearningRequest) returns (LearningReply);
-  // One line checked as the learner goes (D93); nothing is kept.
   rpc CheckListeningLine(LearningRequest) returns (LearningReply);
-  // D157: the full transcript with its Vietnamese translation, for the
-  // Full transcript tab.
   rpc GetListeningTranscript(LearningRequest) returns (LearningReply);
-  // Listening course (F05C, D143–D145). Student: the course by level with the
-  // learner's topics done and level tests passed.
   rpc GetListeningCourse(LearningRequest) returns (LearningReply);
-  // D145: one topic with everything to study it (id = the topic id); the
-  // check of one dictation sentence (nothing kept); the topic marked done.
   rpc GetCourseTopic(LearningRequest) returns (LearningReply);
   rpc CheckCourseSentence(LearningRequest) returns (LearningReply);
   rpc CompleteCourseTopic(LearningRequest) returns (LearningReply);
-  // A level test (id = its id) without its answers, and the answers scored
-  // and kept; passed, it opens the next level (D145).
   rpc GetCourseTest(LearningRequest) returns (LearningReply);
   rpc SubmitCourseTest(LearningRequest) returns (LearningReply);
-  // The learner's progress in the course.
   rpc GetCourseProgress(LearningRequest) returns (LearningReply);
-  // Mock tests (F05A). Student: full tests and mini tests; id is the mock
-  // test id. Admin: the estimated-score conversion table.
   rpc ListMockTests(LearningRequest) returns (LearningReply);
   rpc GetMockTest(LearningRequest) returns (LearningReply);
   rpc GetMockAttempt(LearningRequest) returns (LearningReply);
   rpc StartMockAttempt(LearningRequest) returns (LearningReply);
   rpc SaveMockAnswers(LearningRequest) returns (LearningReply);
   rpc SubmitMockAttempt(LearningRequest) returns (LearningReply);
-  // Leaves the attempt in progress without submitting; the attempt is removed.
   rpc DiscardMockAttempt(LearningRequest) returns (LearningReply);
   rpc GetMockReview(LearningRequest) returns (LearningReply);
   rpc GetMockStats(LearningRequest) returns (LearningReply);
@@ -92,30 +60,22 @@ service LearningService {
   rpc UpdateScoreConversion(LearningRequest) returns (LearningReply);
 }
 
-// The authenticated account as verified by auth-service.
 message Actor {
   string id = 1;
   string role = 2;
-  // Shown in the lesson ranking (D60).
   string email = 3;
 }
 
 message LearningRequest {
   Actor actor = 1;
-  // Target id; empty when the call has none.
   string id = 2;
-  // JSON request body validated by learning-service; empty when there is none.
   string payload_json = 3;
 }
 
 message LearningReply {
-  // HTTP status the gateway answers with when it is an error (>= 400).
   int32 http_status = 1;
-  // Envelope code and msg; codes are in @appenglish/learning-contracts.
   int32 code = 2;
   string msg = 3;
-  // JSON object for the envelope's data; its shape depends on the call.
   string data_json = 4;
-  // Unused by learning calls; keeps the reply shape shared with AuthReply.
   repeated string set_cookies = 5;
 }

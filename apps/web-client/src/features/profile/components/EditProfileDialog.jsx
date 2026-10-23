@@ -19,15 +19,12 @@ import { FileDropzone } from '../../../components/shared/FileDropzone.jsx';
 import { removeAvatar, updateProfile, uploadAvatar } from '../../auth/api/auth-api.js';
 import { avatarFileIssue, normalizeDisplayName, prepareAvatar } from '../lib/avatar.js';
 
-// Name and picture in one dialog (D113). A chosen picture is only previewed;
-// nothing reaches the server until Save. Cancel drops every pending change.
 export function EditProfileDialog({ open, onOpenChange, account, onSaved }) {
   const [name, setName] = useState('');
   const [picture, setPicture] = useState({ file: null, url: null, remove: false });
   const [preparing, setPreparing] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Start from the account each time the dialog opens; free the preview URL.
   useEffect(() => {
     if (!open) return undefined;
     setName(account?.displayName || '');

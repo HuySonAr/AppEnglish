@@ -1,5 +1,3 @@
-// Placement attempts and settings (F03). accountId and placementVersionId
-// refer to other services' data, so they have no foreign key.
 export class CreatePlacement1730000000000 {
   name = 'CreatePlacement1730000000000';
 

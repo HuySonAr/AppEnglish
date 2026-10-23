@@ -11,10 +11,8 @@ import {
 
 const text = (max) => z.string().trim().max(max);
 const requiredText = (max) => text(max).min(1);
-// A time in the recording, in seconds (one decimal is enough to cut a sentence).
 const seconds = z.number().min(0).max(3 * 60 * 60).nullable().default(null);
 
-// format: how the topic's exercises are written (D88); null for not yet.
 const topicFormat = z.enum(Object.values(ListeningFormat)).nullable();
 export const markJobsSeenSchema = z.object({ ids: z.array(z.string().uuid()).max(100).optional() }).strict();
 
@@ -47,9 +45,6 @@ export const listeningExerciseUpdateSchema = z
     message: 'At least one field is required',
   });
 
-// One piece of the transcript the learner writes down: a sentence of a
-// conversation or talk, a statement of Part 1, the question or a response of
-// Part 2. speaker is an optional label such as "Man" (Part 3).
 const segmentSchema = z
   .object({
     id: z.string().uuid().optional(),
@@ -76,10 +71,6 @@ export const listeningContentSchema = z
   })
   .strict();
 
-// An answer of speech-service (D97, D98), read from speech.autotime.results:
-// lines are timed lines of the exercise (align: id and matched) or new lines
-// heard in the recording (transcribe: text). Extra fields are ignored so
-// speech-service can add some.
 export const autoTimeResultSchema = z.object({
   jobId: z.string().uuid(),
   status: z.enum(['RUNNING', 'DONE', 'FAILED']),
@@ -102,9 +93,6 @@ export function listeningMediaIds(content) {
   return [content.audioMediaId].filter(Boolean);
 }
 
-// Returns the reasons a listening-exercise draft cannot be published; empty
-// when it can. kind is the exercise's entry of LISTENING_KINDS and
-// mediaById maps existing media ids to their rows.
 export function listeningIssues(content, kind, mediaById) {
   const issues = [];
   const issue = (path, message) => issues.push({ path, message });
@@ -119,7 +107,6 @@ export function listeningIssues(content, kind, mediaById) {
   segments.forEach((segment, index) => {
     const path = `segments[${index}]`;
     if (!segment.text) issue(`${path}.text`, 'Required');
-    // Songs: blanks are words in square brackets (D88).
     if (kind.key === 'song' && segment.text) {
       const pieces = lyricPieces(segment.text);
       if (pieces.some((piece) => 'blank' in piece && !piece.blank)) issue(`${path}.text`, 'A blank [ ] needs the word inside');
@@ -127,7 +114,6 @@ export function listeningIssues(content, kind, mediaById) {
         issue(`${path}.text`, 'A bracket is not closed: write a blank as [word]');
     }
     const timed = segment.start !== null || segment.end !== null;
-    // Parts 3 and 4 are written down sentence by sentence, each replayed alone.
     if (kind.timed && !timed) issue(`${path}.start`, 'Start and end in the recording are required');
     else if (timed) {
       if (segment.start === null || segment.end === null) issue(`${path}.start`, 'Give both the start and the end');

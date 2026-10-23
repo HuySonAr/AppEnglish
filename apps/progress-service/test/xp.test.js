@@ -11,7 +11,7 @@ const third = { id: '66666666-6666-4666-8666-666666666666', role: 'STUDENT' };
 test('XP of a mock test is the share of right answers scaled to 100 and rounded', () => {
   assert.equal(xpOf(200, 200), 100);
   assert.equal(xpOf(0, 200), 0);
-  assert.equal(xpOf(133, 200), 67); // 66.5 rounds to 67
+  assert.equal(xpOf(133, 200), 67);
   assert.equal(xpOf(9, 13), 69);
   assert.equal(xpOf(5, 0), 0);
 });
@@ -24,7 +24,6 @@ test('the leaderboard ranks by total XP, then by who reached it first', () => {
     { accountId: 'c', accountEmail: 'c@x', mockTestId: '1', xp: 50, earnedAt: '2026-10-17T07:00:00Z' },
   ];
   const ranked = rankTotals(totalsOf(rows));
-  // a and b both have 90: b reached it at 09:00, a only at 10:00, so b is first.
   assert.deepEqual(
     ranked.map((entry) => [entry.rank, entry.accountId, entry.totalXp, entry.mockCount, entry.accountEmail]),
     [
@@ -41,7 +40,6 @@ test('only the first full attempt of a mock test earns XP; the learner sees thei
   const level1 = randomUUID();
   const level2 = randomUUID();
   const first = mockTest(student.id, level1, { listening: 60, listeningTotal: 100, reading: 40, readingTotal: 100, minute: 1, email: 'me@x', title: 'Level 1 test' });
-  // A retake with a better score: counts for mastery, not for XP (D63).
   const retake = mockTest(student.id, level1, { attemptNumber: 2, listening: 90, listeningTotal: 100, reading: 90, readingTotal: 100, minute: 2, email: 'me@x', title: 'Level 1 test' });
   const second = mockTest(student.id, level2, { listening: 30, listeningTotal: 100, reading: 50, readingTotal: 100, minute: 3, email: 'me@x', title: 'Level 2 test' });
   const mini = mockTest(student.id, level2, { kind: 'MINI', listening: 10, listeningTotal: 10, reading: 0, readingTotal: 0, minute: 4 });
@@ -53,7 +51,6 @@ test('only the first full attempt of a mock test earns XP; the learner sees thei
 
   await assert.rejects(() => service.getXp(manager), { code: 26, status: 403 });
   const xp = await service.getXp(student);
-  // 90 total; otherStudent has 95, third has 90 too but reached it earlier.
   assert.deepEqual([xp.totalXp, xp.rank, xp.learnerCount], [90, 3, 3]);
   assert.deepEqual(
     xp.entries.map((entry) => [entry.mockTestTitle, entry.xp, entry.correctCount, entry.totalCount, entry.earnedAt]),
@@ -74,7 +71,6 @@ test('only the first full attempt of a mock test earns XP; the learner sees thei
   );
   assert.deepEqual([board.learnerCount, board.you.rank, board.you.totalXp], [3, 3, 90]);
 
-  // A learner without XP has no rank and no place on the board.
   const nobody = { id: '77777777-7777-4777-8777-777777777777', role: 'STUDENT' };
   assert.deepEqual(await service.getXp(nobody), { totalXp: 0, rank: null, learnerCount: 3, entries: [] });
   assert.equal((await service.getLeaderboard(nobody)).you, null);

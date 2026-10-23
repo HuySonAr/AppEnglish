@@ -6,10 +6,6 @@ import { ListeningService } from '../src/listening/listening.service.js';
 import { courseItemCreateSchema } from '../src/course/course.schemas.js';
 import { admin, createMemoryRepository, manager, student } from './memory-repository.js';
 
-// The Listening course of D143–D147: levels A1–C2 with topics (one listening
-// lesson each, on the topic's own recording) and a level test for every level
-// but the last.
-
 async function harness() {
   const repository = createMemoryRepository();
   const deleted = [];
@@ -80,7 +76,6 @@ test('levels A1–C2 hold topics in order and a level test for every level but t
   assert.equal(course.levels[0].levelTest.title, 'A1 test');
   assert.equal('placement' in course, false);
 
-  // Moving a topic renumbers its level; deleting closes the gap.
   await service.updateItem(manager, second.item.id, { position: 1 });
   assert.deepEqual((await service.listCourse(manager)).levels[0].topics.map((topic) => topic.title), ['Numbers', 'Greetings']);
   await service.delete(manager, second.item.id);
@@ -96,7 +91,6 @@ test('a topic is published when its recording, words, questions, ordering and se
     return ['audioMediaId', 'segments', 'vocabulary', 'questions'].every((path) => paths.includes(path));
   });
 
-  // Every rule, one by one.
   const broken = await completeTopic(h, {
     vocabulary: (await completeTopic(h)).vocabulary.slice(0, 3).map((word, index) => (index === 0 ? { ...word, phonetic: '', audioMediaId: null } : word)),
     ordering: { enabled: true, prompt: '', items: [{ text: 'One' }, { text: 'one' }, { text: 'Two' }] },
@@ -121,13 +115,11 @@ test('a topic is published when its recording, words, questions, ordering and se
     return true;
   });
 
-  // An ordering turned off is not checked; a complete topic publishes.
   const ready = await completeTopic(h);
   const saved = await h.service.saveDraft(manager, item.id, ready);
   assert.ok(saved.draft.content.vocabulary.every((word) => word.id));
   assert.ok(saved.draft.content.ordering.items.every((idea) => idea.id));
   assert.ok(saved.draft.content.segments.every((segment) => segment.id));
-  // The recording and the four pronunciations, for the editor.
   assert.equal(Object.keys(saved.media).length, 5);
   assert.deepEqual(saved.media[ready.audioMediaId], { kind: 'audio', fileName: 'shop.mp3', url: 'https://media.test/shop.mp3' });
   const published = await h.service.publish(manager, item.id);
@@ -151,7 +143,6 @@ test('learning-service reads the published course and a topic with its answers a
   const testAudio = await h.upload('test.mp3');
   await h.service.saveDraft(manager, test1.item.id, { sections: [{ ...section, audioMediaId: testAudio, transcript: LINES.join('\n') }] });
   await h.service.publish(manager, test1.item.id);
-  // A draft topic stays out.
   await h.service.createItem(manager, courseItemCreateSchema.parse({ level: 'A2', type: 'topic', title: 'Draft only' }));
 
   const course = await h.service.listPublished();
@@ -200,10 +191,9 @@ test('auto-time and transcribe run on the topic recording (D147)', async () => {
 
   const { job } = await h.service.requestAutoTime(manager, item.id);
   assert.equal(job.status, 'QUEUED');
-  const sent = h.published.at(-1);
+  const sent = h.repository.tables.contentEvents.at(-1).payload;
   assert.deepEqual([sent.task, sent.kind, sent.audioUrl, sent.lines.length], ['align', 'part3', 'https://media.test/shop.mp3', 4]);
   assert.deepEqual(sent.lines[0], { id: saved.draft.content.segments[0].id, text: 'Can I help you?' });
-  // A job still waiting is returned instead of a new one.
   assert.equal((await h.service.requestAutoTime(manager, item.id)).job.id, job.id);
 
   await h.listening.onAutoTimeResult({ jobId: job.id, status: 'DONE', lines: sent.lines.map((line, index) => ({ id: line.id, start: index, end: index + 0.9, matched: 1 })) });
@@ -211,9 +201,8 @@ test('auto-time and transcribe run on the topic recording (D147)', async () => {
   assert.deepEqual([answer.status, answer.lines.length, answer.lines[1].start], ['DONE', 4, 1]);
 
   const transcribe = await h.service.requestTranscribe(manager, item.id);
-  assert.deepEqual([transcribe.job.task, h.published.at(-1).lines], ['transcribe', []]);
+  assert.deepEqual([transcribe.job.task, h.repository.tables.contentEvents.at(-1).payload.lines], ['transcribe', []]);
 
-  // A level test has no sentences to time.
   const levelTest = await h.service.createItem(manager, courseItemCreateSchema.parse({ level: 'A1', type: 'level_test', title: 'A1 test' }));
   await assert.rejects(() => h.service.requestAutoTime(manager, levelTest.item.id), { code: 41 });
 });

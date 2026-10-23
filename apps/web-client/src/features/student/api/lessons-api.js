@@ -11,7 +11,6 @@ export async function getLesson(id) {
 export async function markVocabularyStudied(id) {
   return (await httpClient.post(`${lesson(id)}/vocabulary/studied`)).data;
 }
-// kind is QuizKind: this lesson's vocabulary, or the review of the previous lesson.
 export async function getVocabularyQuiz(id, kind) {
   return (await httpClient.get(`${lesson(id)}/quiz/${kind}`)).data;
 }
@@ -33,19 +32,15 @@ export async function saveLessonTestAnswers(id, answers) {
 export async function submitLessonTest(id, answers) {
   return (await httpClient.post(`${lesson(id)}/test/submit`, { answers })).data;
 }
-// Leaves the test in progress without submitting; it is removed (D82).
 export async function discardLessonTest(id) {
   return (await httpClient.post(`${lesson(id)}/test/discard`)).data;
 }
-// 20 words of the completed lessons with their answers, or the locked state
-// (D84).
 export async function getVocabularyPractice() {
   return (await httpClient.get('/learning/practice/vocabulary')).data;
 }
 export async function completeVocabularyPractice() {
   return (await httpClient.post('/learning/practice/vocabulary/complete')).data;
 }
-// The answers of one finished attempt; the latest when attemptNumber is omitted.
 export async function getLessonTestReview(id, attemptNumber) {
   const suffix = attemptNumber ? `/${attemptNumber}` : '';
   return (await httpClient.get(`${lesson(id)}/test/review${suffix}`)).data;
@@ -53,8 +48,6 @@ export async function getLessonTestReview(id, attemptNumber) {
 export async function getLessonRanking(id) {
   return (await httpClient.get(`${lesson(id)}/ranking`)).data;
 }
-// The review that closes a unit (D121): its state, the learner's attempts
-// and the paper; and the answers scored.
 export async function getUnitReview(unitId) {
   return (await httpClient.get(`/learning/units/${unitId}/review`)).data;
 }

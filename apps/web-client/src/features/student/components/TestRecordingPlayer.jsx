@@ -9,11 +9,6 @@ const clock = (seconds) => {
   return `${Math.floor(value / 60)}:${String(value % 60).padStart(2, '0')}`;
 };
 
-// A recording in a unit check, level test or placement (D141): heard at its
-// own speed, from the start, at most COURSE_LIMITS.testPlays times, without
-// seeking, as in an exam. Pausing is allowed within a play. The plays used are
-// kept for the browser session (playKey), so reloading the page does not give
-// them back.
 export function TestRecordingPlayer({ src, playKey }) {
   const audio = useRef(null);
   const [used, setUsed] = useState(() => readPlays(playKey));

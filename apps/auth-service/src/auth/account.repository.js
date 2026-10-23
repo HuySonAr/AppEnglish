@@ -98,7 +98,6 @@ export class AccountRepository {
     return { items, total };
   }
 
-  // Devices still signed in: refresh-token families not revoked and not expired.
   async countActiveSessions(accountId) {
     await this.ensureInitialized();
     const row = await this.dataSource
@@ -110,7 +109,6 @@ export class AccountRepository {
     return Number(row?.count || 0);
   }
 
-  // The audit trail of one account, newest first, with who did it.
   async listAudits(targetAccountId, limit) {
     await this.ensureInitialized();
     const rows = await this.dataSource
@@ -121,8 +119,6 @@ export class AccountRepository {
       .addSelect('actor.email', 'actorEmail')
       .addSelect('actor."displayName"', 'actorDisplayName')
       .where('audit.targetAccountId = :targetAccountId', { targetAccountId })
-      // Property paths, not quoted columns: with take() TypeORM maps the order
-      // onto the entity metadata and a raw expression has none.
       .orderBy('audit.createdAt', 'DESC')
       .take(limit)
       .getRawAndEntities();
@@ -138,7 +134,6 @@ export class AccountRepository {
     await this.dataSource.getRepository(AccountEntity).update({ id: accountId }, { lastLoginAt: at });
   }
 
-  // The numbers of the accounts page (D114).
   async countStudentsCreatedBetween(from, to) {
     await this.ensureInitialized();
     return this.dataSource
@@ -249,8 +244,6 @@ export class AccountRepository {
       });
   }
 
-  // Latest challenge regardless of usedAt; verification uses this to reject
-  // already-used codes explicitly instead of relying on the unused filter.
   async findLatestOtpChallenge(accountId, purpose) {
     await this.ensureInitialized();
     return this.dataSource

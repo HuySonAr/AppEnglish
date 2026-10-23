@@ -1,7 +1,5 @@
 import { CONTENT_GRPC_SERVICE } from '@appenglish/content-contracts/grpc';
 
-// What progress-service reads from content-service over gRPC: the published
-// curriculum, for the number of lessons to complete (D33).
 export class ContentClient {
   constructor(grpcClient) {
     this.grpcClient = grpcClient;
@@ -16,7 +14,6 @@ export class ContentClient {
     return JSON.parse(reply.dataJson);
   }
 
-  // Published units in order, each with its published lessons in order.
   getCurriculum() {
     return this.call('getCurriculum', {});
   }

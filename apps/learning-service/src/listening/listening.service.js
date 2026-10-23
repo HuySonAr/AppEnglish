@@ -8,8 +8,6 @@ import { listeningErrors } from './listening.errors.js';
 
 const isSong = (exercise) => exercise.kind === 'song';
 
-// The words of a song line in brackets are blanks (D88), numbered across the
-// whole song from 0: the line's pieces with { blank: number, answer }.
 function numberedPieces(segments) {
   let next = 0;
   return segments.map((segment) =>
@@ -17,12 +15,7 @@ function numberedPieces(segments) {
   );
 }
 
-// Listening practice (F05B-3, D85, D86; songs D88): dictation exercises
-// written in content-service, open to every learner. Each check is scored
-// here and the learner's best and latest accuracy per exercise and mode is
-// kept.
 export class ListeningPracticeService {
-  // now() is replaceable in tests.
   constructor(repository, contentClient, { now = () => new Date(), events = noEvents } = {}) {
     this.repository = repository;
     this.contentClient = contentClient;
@@ -40,15 +33,11 @@ export class ListeningPracticeService {
       : { bestAccuracy: null, lastAccuracy: null, checkCount: 0 };
   }
 
-  // The results of one exercise: those of the full mode at the top level,
-  // those of the blanks mode under `blanks`.
   resultsView(results) {
     const of = (mode) => results.find((result) => result.mode === mode);
     return { ...this.resultView(of(ListeningMode.FULL)), blanks: this.resultView(of(ListeningMode.BLANKS)) };
   }
 
-  // The topics that have published exercises, and those exercises with the
-  // learner's results.
   async listPractice(actor) {
     this.assertStudent(actor);
     const [published, results] = await Promise.all([
@@ -73,16 +62,12 @@ export class ListeningPracticeService {
     return paper;
   }
 
-  // The blanks of a song, refusing an exercise that has none.
   blanksOf(paper) {
     const pieces = isSong(paper.exercise) ? numberedPieces(paper.content.segments) : [];
     if (!pieces.flat().some((piece) => 'blank' in piece)) throw listeningErrors.noBlanks();
     return pieces;
   }
 
-  // One exercise to practise: the recording and the sentences with their
-  // place in it. In full mode the text is left out; in blanks mode a song's
-  // lines come with the blanks in place of their words.
   async getExercise(actor, exerciseId, { mode = ListeningMode.FULL } = {}) {
     this.assertStudent(actor);
     const [paper, results] = await Promise.all([this.paper(exerciseId), this.repository.listResults(actor.id, exerciseId)]);
@@ -121,8 +106,6 @@ export class ListeningPracticeService {
     };
   }
 
-  // Scores what the learner wrote, keeps the result for the mode and returns
-  // it with the transcript.
   async check(actor, exerciseId, { mode = ListeningMode.FULL, answers }) {
     this.assertStudent(actor);
     const paper = await this.paper(exerciseId);
@@ -132,9 +115,6 @@ export class ListeningPracticeService {
     return { mode, accuracy: scored.accuracy, ...this.resultView(result), segments: scored.segments };
   }
 
-  // Checks one sentence or song line as the learner goes (D93): the same
-  // scoring as a whole check, but only that line comes back and nothing is
-  // kept; the score is kept by the check of the whole exercise at the end.
   async checkLine(actor, exerciseId, { mode = ListeningMode.FULL, segmentId, answers }) {
     this.assertStudent(actor);
     const paper = await this.paper(exerciseId);
@@ -143,7 +123,6 @@ export class ListeningPracticeService {
     return { mode, segment: scored.segments.find((segment) => segment.id === segmentId) };
   }
 
-  // Every sentence written down (answers by sentence id), word by word (D86).
   checkLines(paper, answers) {
     let total = 0;
     let errors = 0;
@@ -158,8 +137,6 @@ export class ListeningPracticeService {
     return { accuracy: accuracyOf(total, errors), segments };
   }
 
-  // The blanks of a song filled in (answers by blank number): each is right or
-  // wrong; the score is the share of right blanks (D88).
   checkBlanks(paper, answers) {
     const pieces = this.blanksOf(paper);
     let right = 0;

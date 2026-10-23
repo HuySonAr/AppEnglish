@@ -19,10 +19,8 @@ test('the estimated score follows the conversion table', () => {
   assert.deepEqual([listening[0], listening[100], reading[0], reading[100]], [5, 495, 5, 495]);
   assert.equal(scoreConversionSchema.safeParse({ listening, reading }).success, true);
   assert.equal(estimatedSectionScore(50, 100, listening), listening[50]);
-  // A section with another number of questions is scaled by its share.
   assert.equal(estimatedSectionScore(3, 6, listening), listening[50]);
   assert.equal(estimatedSectionScore(0, 0, listening), 5);
-  // Tables must have 101 non-decreasing multiples of 5 between 5 and 495.
   for (const bad of [listening.slice(1), listening.map((value, index) => (index === 50 ? 5 : value)), listening.map(() => 7), listening.map(() => 500)])
     assert.equal(scoreConversionSchema.safeParse({ listening: bad, reading }).success, false);
 });
@@ -57,14 +55,12 @@ test('a full mock test is timed, shuffled, scored and estimated', async () => {
   assert.deepEqual(started.parts.flatMap((part) => part.questions.map((question) => question.number)), Array.from({ length: 13 }, (_, index) => index + 1));
   assert.equal(started.parts[5].groups.length, 1);
   assert.equal(started.parts[5].questions[0].groupId, started.parts[5].groups[0].id);
-  // Parts 1-2 carry a recording per question, Parts 3-4 one per set.
   assert.equal(started.parts[0].questions[1].audioUrl, 'https://media.test/a.mp3');
   assert.equal(started.parts[0].audioUrl, null);
   assert.equal(started.parts[2].groups[0].audioUrl, 'https://media.test/a.mp3');
   assert.equal(started.parts[2].questions[0].audioUrl, null);
   for (const secret of ['isCorrect', 'Secret'])
     assert.equal(JSON.stringify(started).includes(secret), false, secret);
-  // Starting again resumes; answers are kept.
   await service.saveMockAnswers(student, first.id, { ...FULL, answers: answers(first.id, 2) });
   assert.equal(Object.keys((await service.startMockAttempt(student, first.id, FULL)).answers).length, 13);
   assert.equal(repository.tables.attempts.length, 1);
@@ -72,7 +68,6 @@ test('a full mock test is timed, shuffled, scored and estimated', async () => {
   advance(30);
   const result = await service.submitMockAttempt(student, first.id, { ...FULL, answers: answers(first.id, 9) });
   const { listening, reading } = defaultScoreConversion();
-  // 9 right: all 6 listening and 3 of 7 reading.
   assert.deepEqual({ ...result.attempt, submittedAt: null }, {
     attemptNumber: 1, correctCount: 9, totalCount: 13, scorePercent: 69,
     listeningCorrect: 6, listeningTotal: 6, readingCorrect: 3, readingTotal: 7,
@@ -85,7 +80,6 @@ test('a full mock test is timed, shuffled, scored and estimated', async () => {
   assert.equal(result.parts[4].questions[0].explanation, 'Secret explanation');
   await assert.rejects(() => service.submitMockAttempt(student, first.id, { ...FULL, answers: {} }), { code: 58, status: 409 });
 
-  // A retake counts for the history but not for XP.
   await service.startMockAttempt(student, first.id, FULL);
   const retake = await service.submitMockAttempt(student, first.id, { ...FULL, answers: answers(first.id, 13) });
   assert.equal(retake.attempt.attemptNumber, 2);
@@ -99,11 +93,9 @@ test('a full mock test is timed, shuffled, scored and estimated', async () => {
   assert.equal((await service.getMockReview(student, first.id, FULL)).attempt.attemptNumber, 2);
   assert.deepEqual(await service.getMockReview(student, first.id, { ...FULL, attemptNumber: 9 }), { attempt: null, parts: [] });
 
-  // The latest full score now drives the suggestion: 990 is level 3.
   const after = await service.listMockTests(student);
   assert.equal(after.recommendedLevel, 3);
   assert.deepEqual(after.mockTests.map((item) => [item.attemptCount, item.bestPercent, item.latestTotalScore]), [[2, 100, 990], [0, null, null]]);
-  // Another learner is not affected.
   assert.equal((await service.listMockTests(otherStudent)).recommendedLevel, 1);
 });
 
@@ -113,7 +105,6 @@ test('the full test clock is kept by the server', async () => {
   await service.startMockAttempt(student, second.id, FULL);
   await service.saveMockAnswers(student, second.id, { ...FULL, answers: answers(second.id, 4) });
   advance(61);
-  // Too late: the saved answers are scored.
   await assert.rejects(() => service.saveMockAnswers(student, second.id, { ...FULL, answers: {} }), { code: 58 });
   const detail = await service.getMockTest(student, second.id);
   assert.deepEqual(detail.full.attempts.map((attempt) => [attempt.correctCount, attempt.durationSeconds]), [[4, 3600]]);
@@ -129,11 +120,9 @@ test('a mini test is one part, untimed, repeatable and without XP', async () => 
   assert.equal(started.partKey, 'part6');
   assert.deepEqual(started.parts.map((part) => part.key), ['part6']);
   assert.deepEqual(started.parts[0].questions.map((question) => question.number), [1, 2]);
-  // It runs next to a full attempt and next to another part's mini test.
   await service.startMockAttempt(student, first.id, FULL);
   await service.startMockAttempt(student, first.id, mini('part1'));
   advance(90);
-  // No time limit: still open long after a part would take.
   assert.equal((await service.getMockAttempt(student, first.id, mini('part6'))).status, 'IN_PROGRESS');
 
   const result = await service.submitMockAttempt(student, first.id, { ...mini('part6'), answers: answers(first.id, 1, ['part6']) });
@@ -152,10 +141,8 @@ test('a mini test is one part, untimed, repeatable and without XP', async () => 
   assert.equal(part6.questionCount, 2);
   assert.deepEqual(part6.mini.attempts.map((attempt) => attempt.scorePercent), [50, 100]);
   assert.equal(part6.mini.progression.trend, 'IMPROVED');
-  // The other series are separate.
   assert.equal(detail.parts.find((part) => part.key === 'part1').mini.inProgress, true);
   assert.deepEqual(detail.parts.find((part) => part.key === 'part5').mini, { attempts: [], progression: null, inProgress: false });
-  // Mini tests do not count as full attempts in the list.
   assert.equal((await service.listMockTests(student)).mockTests[0].attemptCount, 0);
 });
 
@@ -170,7 +157,6 @@ test('an attempt finishes on the version it started, and the estimate is stored'
   const result = await service.submitMockAttempt(student, first.id, { ...FULL, answers: right });
   assert.equal(result.attempt.correctCount, 13);
 
-  // An admin changes the table: stored results keep their estimate.
   const { conversion, isDefault } = await service.getScoreConversion(admin);
   assert.equal(isDefault, true);
   const lower = { listening: conversion.listening.map(() => 5), reading: conversion.reading.map(() => 5) };
@@ -189,14 +175,12 @@ test('an attempt left without submitting is removed, and the next one starts afr
   await service.startMockAttempt(student, first.id, FULL);
   await service.saveMockAnswers(student, first.id, { ...FULL, answers: answers(first.id, 5) });
   assert.deepEqual(await service.discardMockAttempt(student, first.id, FULL), { discarded: true });
-  // Only the full attempt goes; the mini test of Part 5 stays in progress.
   assert.deepEqual(repository.tables.attempts.map((row) => [row.kind, row.status]), [['MINI', 'IN_PROGRESS']]);
   const detail = await service.getMockTest(student, first.id);
   assert.deepEqual([detail.full.attempts, detail.full.inProgress], [[], false]);
   const again = await service.startMockAttempt(student, first.id, FULL);
   assert.deepEqual([again.attemptNumber, again.answers], [1, {}]);
 
-  // An attempt whose time ran out is scored instead.
   advance(200);
   await assert.rejects(() => service.discardMockAttempt(student, first.id, FULL), { code: 58 });
   assert.equal((await service.getMockTest(student, first.id)).full.attempts.length, 1);

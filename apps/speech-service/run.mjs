@@ -1,7 +1,3 @@
-// Runs Python for speech-service: the service's own .venv when it exists,
-// else the python on the PATH, with the repository's .env loaded.
-// Starting the worker (pnpm dev) without the .venv only prints how to set it
-// up and leaves quietly, so the other services of `pnpm dev` keep running.
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';

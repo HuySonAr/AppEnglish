@@ -12,11 +12,9 @@ test('the learner searches, filters and sorts mock tests', () => {
   ];
   const base = { search: '', level: 'all', examType: 'all', taken: 'all', sort: 'recommended' };
   const titles = (options) => filterStudentMocks(mockTests, { ...base, ...options }).map((item) => item.title);
-  // Recommended tests first, then by level and title.
   assert.deepEqual(titles({}), ['Test 2', 'Test 10', 'Đề số 1', 'Advanced']);
   assert.deepEqual(titles({ sort: 'level' }), ['Đề số 1', 'Test 2', 'Test 10', 'Advanced']);
   assert.deepEqual(titles({ sort: 'title-desc' }), ['Test 10', 'Test 2', 'Đề số 1', 'Advanced']);
-  // Best score first; tests not taken come last.
   assert.deepEqual(titles({ sort: 'best' }), ['Đề số 1', 'Test 2', 'Advanced', 'Test 10']);
   assert.deepEqual(titles({ search: 'de so' }), ['Đề số 1']);
   assert.deepEqual(titles({ level: '2' }), ['Test 2', 'Test 10']);
@@ -37,7 +35,6 @@ test('the learner searches and filters lessons, keeping the learning order', () 
   assert.deepEqual(shape({}), [['u1', ['Contracts', 'Marketing', 'Warranties']], ['u2', ['Computers', 'Business letters']], ['u3', []]]);
   assert.deepEqual(shape({ state: 'LOCKED' }), [['u1', ['Warranties']], ['u2', ['Computers', 'Business letters']]]);
   assert.deepEqual(shape({ state: 'OPEN' }), [['u1', ['Marketing']]]);
-  // A unit title keeps all its lessons; a lesson title keeps that lesson.
   assert.deepEqual(shape({ search: 'business' }), [['u1', ['Contracts', 'Marketing', 'Warranties']], ['u2', ['Business letters']]]);
   assert.deepEqual(shape({ search: 'business', state: 'LOCKED' }), [['u1', ['Warranties']], ['u2', ['Business letters']]]);
   assert.deepEqual(shape({ search: 'nothing like this' }), []);

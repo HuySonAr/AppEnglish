@@ -52,7 +52,6 @@ test('a pasted transcript replaces the sentences and keeps their times', () => {
   const plan = listeningPastePlan(before, 'Man: Hello.\nWoman: Hi there.', part3);
   assert.deepEqual(plan.segments.map((item) => [item.speaker, item.text, item.start, item.end]), [['Man', 'Hello.', 1, 2], ['Woman', 'Hi there.', null, null]]);
   assert.deepEqual(plan.lines.map((line) => line.note), [' · Man · keeps its times', ' · Woman']);
-  // Part 1 has four sentences: a fifth is refused, three are padded with an empty one.
   const part1 = listeningKindOf('part1');
   const five = listeningPastePlan([], 'A\nB\nC\nD\nE', part1);
   assert.deepEqual([five.segments, five.lines[4].errors], [[], ['Part 1 has 4 sentences']]);
@@ -82,7 +81,6 @@ test('auto-time writes the times it found and names the lines to check (D97)', (
   ];
   const { segments: next, timed, check } = applyAutoTime(segments, answer);
   assert.deepEqual(next.map((item) => [item.id, item.start, item.end]), [['a', 0.4, 1.9], ['b', 2, 3.1], ['c', null, null], ['d', 57.5, 75.1]]);
-  // 'd' was found whole but lasts 17.6 s: worth a listen.
   assert.deepEqual([timed, check], [3, ['b', 'c', 'd']]);
 });
 

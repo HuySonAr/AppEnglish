@@ -73,6 +73,5 @@ test('chart data per unit, per level and per course level', () => {
     { level: 'A2', topics: 0, publishedTopics: 0, levelTest: 'missing' },
   ]);
   assert.equal(courseCoverage(null).length, 6);
-  // The last level has no level test (D145).
   assert.equal(courseCoverage(course)[5].levelTest, 'none');
 });

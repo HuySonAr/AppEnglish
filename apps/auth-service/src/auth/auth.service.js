@@ -35,9 +35,6 @@ export class AuthService {
     const existing = await this.accountRepository.findByEmail(email);
     if (existing) {
       if (existing.status === AccountStatus.PENDING_VERIFICATION) {
-        // Resume a pending registration: keep the existing account and password
-        // untouched and do not send another OTP; the user requests a resend
-        // explicitly and the backend keeps enforcing its cooldown/rate limits.
         return {
           code: ResponseCode.ADDITIONAL,
           msg: ResponseMsg.ADDITIONAL,
@@ -82,13 +79,11 @@ export class AuthService {
     return this.createSessionResponse(account);
   }
 
-  // The last sign-in (D114); a failure to note it never blocks the sign-in.
   async recordLogin(account) {
     account.lastLoginAt = new Date();
     try {
       await this.accountRepository.updateLastLogin?.(account.id, account.lastLoginAt);
     } catch {
-      // Statistics only.
     }
   }
 
@@ -96,14 +91,9 @@ export class AuthService {
     const account = await this.accountRepository.findByEmail(
       input.email.trim().toLowerCase(),
     );
-    // An unknown email answers like a wrong code so this public route does not
-    // reveal which emails are registered.
     if (!account) throw authErrors.otpInvalid();
     this.assertLoginStatus(account);
     if (account.status === AccountStatus.ACTIVE) {
-      // The email is already verified (e.g. an old OTP was re-submitted):
-      // direct the user to sign in instead of re-verifying or creating a
-      // second session.
       return {
         code: ResponseCode.ADDITIONAL,
         msg: ResponseMsg.ADDITIONAL,
@@ -178,7 +168,6 @@ export class AuthService {
     const account = await this.accountRepository.findByEmail(
       input.email.trim().toLowerCase(),
     );
-    // Same non-enumerating answer as forgot-password: unknown email == bad OTP.
     if (!account) throw authErrors.otpInvalid();
     await this.verifyOtp(account, OtpPurpose.RESET_PASSWORD, input.otp);
     account.passwordHash = this.passwordService.hash(input.password);
@@ -188,8 +177,6 @@ export class AuthService {
     return { code: 0, msg: 'success', data: {} };
   }
 
-  // ttlMs: how long the code lasts (five minutes; INVITE_TTL_HOURS for an
-  // invitation). context goes into the email (D131).
   async issueOtp(account, purpose, { ttlMs = 300000, context = {} } = {}) {
     const now = Date.now();
     const recent = await this.accountRepository.countRecentOtps(
@@ -257,7 +244,6 @@ export class AuthService {
       .digest('hex');
   }
 
-  // A locked account is told why (the reason the admin gave, D114).
   assertLoginStatus(account) {
     if (account.status === AccountStatus.DISABLED)
       throw authErrors.accountDisabled(account.statusReason);
@@ -294,8 +280,6 @@ export class AuthService {
     };
   }
 
-  // The account page of the admin (D114): the account, its live sessions
-  // and its audit trail.
   async adminGet(accessToken, accountId) {
     await this.requireAdmin(accessToken);
     const account = await this.accountRepository.findAccountById(accountId);
@@ -322,7 +306,6 @@ export class AuthService {
     };
   }
 
-  // One-off admin actions on an account (D114), each written to the audit.
   async adminAction(accessToken, accountId, { action, reason }) {
     const actor = await this.requireAdmin(accessToken);
     const target = await this.accountRepository.findAccountById(accountId);
@@ -366,9 +349,6 @@ export class AuthService {
       await this.accountRepository.saveAudit(audit(AccountAuditAction.DISPLAY_NAME_RESET));
       return { account: this.toAdminResponse(target), changed: true };
     }
-    // D131: activation without the code, for a self-registered account whose
-    // code never arrived; needs a reason. An invited account has no password
-    // yet, so it is activated by accepting the invitation instead.
     if (action === AdminAccountAction.ACTIVATE) {
       if (target.status !== AccountStatus.PENDING_VERIFICATION) throw authErrors.notPending();
       if (target.invitedAt) throw authErrors.invitedPending();
@@ -393,9 +373,6 @@ export class AuthService {
       await this.accountRepository.saveAudit(audit(AccountAuditAction.INVITE_RESENT));
       return { account: this.toAdminResponse(target), changed: true, expiresInHours: INVITE_TTL_HOURS };
     }
-    // The placement itself lives in learning-service; the gateway calls this
-    // after learning-service removed the attempt, so the account's history
-    // shows who reset it and why (D131).
     if (action === AdminAccountAction.RESET_PLACEMENT) {
       if (target.role !== AccountRole.STUDENT) throw authErrors.forbiddenRole();
       await this.accountRepository.saveAudit(audit(AccountAuditAction.PLACEMENT_RESET));
@@ -404,16 +381,11 @@ export class AuthService {
     throw authErrors.unauthorized();
   }
 
-  // Invitation (D131): the admin creates the account (PENDING_VERIFICATION,
-  // no usable password) and the person receives a code valid for
-  // INVITE_TTL_HOURS to choose a password on /accept-invite. The admin never
-  // sets or sees a password.
   async adminInvite(accessToken, { email, displayName, role }) {
     const actor = await this.requireAdmin(accessToken);
     if (await this.accountRepository.findByEmail(email)) throw authErrors.emailTaken();
     const account = await this.accountRepository.createAccount({
       email,
-      // Unusable until the invitation is accepted: nobody knows this value.
       passwordHash: this.passwordService.hash(randomBytes(32).toString('hex')),
       role,
       status: AccountStatus.PENDING_VERIFICATION,
@@ -441,11 +413,8 @@ export class AuthService {
     };
   }
 
-  // The invited person chooses a password with the emailed code (D131): the
-  // account becomes ACTIVE, the email counts as verified, a session starts.
   async acceptInvite(input) {
     const account = await this.accountRepository.findByEmail(input.email.trim().toLowerCase());
-    // Unknown email == bad code, as on the other public OTP routes.
     if (!account || !account.invitedAt) throw authErrors.otpInvalid();
     this.assertLoginStatus(account);
     if (account.status === AccountStatus.ACTIVE)
@@ -473,8 +442,6 @@ export class AuthService {
     return this.createSessionResponse(account);
   }
 
-  // The numbers of the accounts page (D114): totals by status and role, who
-  // signed in this week, stale pending accounts, and sign-ups per day.
   async adminNotices(now = new Date()) {
     const weeks = lastWeeks(now);
     const [newLearners, before] = await Promise.all([
@@ -526,7 +493,6 @@ export class AuthService {
     }
     if (nextRole === target.role && nextStatus === target.status)
       return { account: this.toAdminResponse(target), changed: false };
-    // Locking an account needs a reason the person will be shown (D114).
     const locking = nextStatus !== target.status && nextStatus !== AccountStatus.ACTIVE;
     if (locking && !changes.reason) throw authErrors.reasonRequired();
     const previous = { role: target.role, status: target.status };
@@ -552,13 +518,11 @@ export class AuthService {
     return { account: this.toAdminResponse(target), changed: true };
   }
 
-  // The account behind a session, as stored (for profile changes).
   async requireAccount(accessToken) {
     const { account } = await this.me(accessToken);
     return this.accountRepository.findAccountById(account.id);
   }
 
-  // Profile (F09, D113): a free display name; empty clears it.
   async updateProfile(accessToken, changes) {
     const account = await this.requireAccount(accessToken);
     account.displayName = changes.displayName || null;
@@ -566,7 +530,6 @@ export class AuthService {
     return { account: this.toResponse(account) };
   }
 
-  // Step 1 of the password change (D113): is this the current password?
   async verifyPassword(accessToken, { currentPassword }) {
     const account = await this.requireAccount(accessToken);
     if (!this.passwordService.verify(currentPassword, account.passwordHash))
@@ -574,9 +537,6 @@ export class AuthService {
     return { verified: true };
   }
 
-  // Changing the password needs the current one, signs every other device
-  // out (session version and refresh families) and keeps this one signed in
-  // with fresh cookies.
   async changePassword(accessToken, { currentPassword, newPassword }) {
     const account = await this.requireAccount(accessToken);
     if (!this.passwordService.verify(currentPassword, account.passwordHash))
@@ -589,7 +549,6 @@ export class AuthService {
     return { ...session, passwordChanged: true };
   }
 
-  // A new avatar replaces the previous file (D68: ImageKit when enabled).
   async uploadAvatar(accessToken, file) {
     const account = await this.requireAccount(accessToken);
     const stored = await this.avatarStorage.upload(file);
@@ -619,7 +578,6 @@ export class AuthService {
       : null;
   }
 
-  // Public profiles for rankings: name and avatar only, never the email.
   async getProfiles(accountIds) {
     const ids = [...new Set(accountIds)];
     const accounts = ids.length ? await this.accountRepository.findAccountsByIds(ids) : [];

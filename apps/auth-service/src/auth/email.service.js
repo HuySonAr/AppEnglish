@@ -14,7 +14,6 @@ export class EmailService {
       });
   }
 
-  // context (D131, invitations): { role, displayName, expiresInHours }.
   async sendOtp(email, code, purpose, context = {}) {
     if (!process.env.SMTP_HOST) {
       if (process.env.NODE_ENV === 'test') return;
@@ -35,8 +34,6 @@ function otpMessage(code, purpose) {
   };
 }
 
-// The invitation (D131): where to go, the code, how long it lasts. WEB_APP_URL
-// is the address of the web client; without it the email names the page.
 export function inviteMessage(email, code, { role = 'STUDENT', displayName = '', expiresInHours = 72 } = {}) {
   const roleName = { STUDENT: 'a learner', CONTENT_MANAGER: 'a Content Manager', ADMIN: 'an administrator' }[role] || 'a member';
   const base = (process.env.WEB_APP_URL || '').replace(/\/+$/, '');

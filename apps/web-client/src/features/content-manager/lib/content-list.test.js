@@ -19,10 +19,8 @@ test('without filters every unit and lesson is listed in its order', () => {
 });
 
 test('search finds units by title and lessons by title', () => {
-  // "business" is a unit title (all its lessons stay) and a lesson of another unit.
   assert.deepEqual(shape(filterUnits(units, { ...all, search: 'business' })), [['u1', ['Contracts', 'Marketing', 'Warranties']], ['u2', ['Business letters']]]);
   assert.deepEqual(shape(filterUnits(units, { ...all, search: 'contr' })), [['u1', ['Contracts']]]);
-  // A unit found by its own title is listed even with no lesson.
   assert.deepEqual(shape(filterUnits(units, { ...all, search: 'empty' })), [['u3', []]]);
   assert.deepEqual(filterUnits(units, { ...all, search: 'nothing like this' }), []);
   assert.equal(isReorderable({ ...all, search: 'x' }), false);
@@ -32,7 +30,6 @@ test('the status filter keeps matching lessons and drops units without any', () 
   assert.deepEqual(shape(filterUnits(units, { ...all, status: 'published' })), [['u1', ['Contracts', 'Warranties']], ['u2', ['Business letters']]]);
   assert.deepEqual(shape(filterUnits(units, { ...all, status: 'unpublished' })), [['u1', ['Marketing']], ['u2', ['Computers']]]);
   assert.deepEqual(shape(filterUnits(units, { ...all, status: 'draft' })), [['u1', ['Marketing', 'Warranties']]]);
-  // Counts still describe the whole unit.
   assert.deepEqual(filterUnits(units, { ...all, status: 'draft' }).map((unit) => [unit.lessonCount, unit.publishedCount]), [[3, 2]]);
   assert.equal(isReorderable({ ...all, status: 'draft' }), false);
 });
@@ -41,7 +38,6 @@ test('sorting by title sorts units and their lessons', () => {
   assert.deepEqual(shape(filterUnits(units, { ...all, sort: 'title-desc' })), [['u2', ['Computers', 'Business letters']], ['u1', ['Warranties', 'Marketing', 'Contracts']], ['u3', []]]);
   assert.deepEqual(shape(filterUnits(units, { ...all, sort: 'title-asc' }))[0], ['u3', []]);
   assert.equal(isReorderable({ ...all, sort: 'title-asc' }), false);
-  // The stored list is not changed.
   assert.deepEqual(units[0].lessons.map((item) => item.title), ['Contracts', 'Marketing', 'Warranties']);
 });
 
@@ -64,13 +60,11 @@ test('mock tests are searched, filtered and sorted', () => {
   assert.deepEqual(titles({ status: 'published' }), ['Đề số 1', 'Test 10']);
   assert.deepEqual(titles({ status: 'draft', level: '2' }), ['Test 2']);
   assert.deepEqual(titles({ search: 'test', status: 'unpublished' }), ['Test 2']);
-  // By exam type.
   mockTests[0].examType = { id: 'toeic' };
   mockTests[3].examType = { id: 'ielts' };
   assert.deepEqual(titles({ examType: 'ielts' }), ['Advanced']);
   assert.deepEqual(titles({ examType: 'toeic', level: '2' }), ['Test 10']);
   assert.equal(titles({ examType: 'all' }).length, 4);
-  // The stored list is not changed.
   assert.equal(mockTests[0].title, 'Test 10');
 });
 

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { MetricsController } from './metrics/metrics.controller.js';
 import { HealthController } from './health/health.controller.js';
 import { ContentGrpcController } from './content/content.grpc.controller.js';
 import { ContentRepository } from './content/content.repository.js';
@@ -11,6 +12,7 @@ import { ListeningGrpcController } from './listening/listening.grpc.controller.j
 import { ListeningRepository } from './listening/listening.repository.js';
 import { ListeningService } from './listening/listening.service.js';
 import { SpeechBroker } from './speech/speech.broker.js';
+import { ContentEvents } from './speech/content-events.js';
 import { VersionGrpcController } from './versions/version.grpc.controller.js';
 import { ContentVersionService } from './versions/version.service.js';
 import {
@@ -27,15 +29,11 @@ import { SpeechPronunciationSource } from './pronunciation/speech-pronunciation.
 
 export class AppModule {}
 Module({
-  controllers: [HealthController, ContentGrpcController, ListeningGrpcController, CourseGrpcController, VersionGrpcController],
+  controllers: [MetricsController, HealthController, ContentGrpcController, ListeningGrpcController, CourseGrpcController, VersionGrpcController],
   providers: [
     { provide: MEDIA_STORAGE, useFactory: () => createMediaStorage() },
-    // One RabbitMQ link to speech-service: auto-time answers (D97) and
-    // pronunciation requests (D123).
     { provide: SpeechBroker, useFactory: () => new SpeechBroker(process.env.RABBITMQ_URL || 'amqp://localhost:5672') },
     {
-      // Pronunciation from speech-service (D123); the dictionary of D47 stays
-      // available with PRONUNCIATION_SOURCE=dictionary.
       provide: PRONUNCIATION_SOURCE,
       useFactory: (broker) =>
         process.env.PRONUNCIATION_SOURCE === 'dictionary'
@@ -57,10 +55,13 @@ Module({
     },
     {
       provide: ListeningService,
-      // Auto-time answers from speech-service arrive over RabbitMQ (D97).
       useFactory: (dataSource, contentService, broker) => {
-        const service = new ListeningService(new ListeningRepository(dataSource), contentService, { broker });
-        broker.start((answer) => service.onAutoTimeResult(answer));
+        const repository = new ListeningRepository(dataSource);
+        const relay = new ContentEvents(repository, broker);
+        const service = new ListeningService(repository, contentService, { broker, relay });
+        broker.start((answer, meta) => service.onAutoTimeResult(answer, meta));
+        broker.onConnected = () => relay.flush();
+        relay.start();
         return service;
       },
       inject: [CONTENT_DATA_SOURCE, ContentService, SpeechBroker],
@@ -72,7 +73,6 @@ Module({
       inject: [CONTENT_DATA_SOURCE, ContentService, ListeningService],
     },
     {
-      // Version history of every versioned content (D122).
       provide: ContentVersionService,
       useFactory: (repository, contentService, listeningService, courseService) =>
         new ContentVersionService(repository, contentService, listeningService, courseService),

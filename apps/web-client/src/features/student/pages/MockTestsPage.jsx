@@ -25,7 +25,6 @@ const takenOptions = [
 export function MockTestsPage() {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
-  // Search, filters and sort of the list; changing one goes back to page 1.
   const { filters, setFilters, setFilter, page, setPage } = useListState({ search: '', level: 'all', examType: 'all', taken: 'all', sort: MockListSort.RECOMMENDED });
 
   async function load() {
@@ -51,7 +50,6 @@ export function MockTestsPage() {
       </Button>
     );
 
-  // The exam types that have a published test; the filter shows with two or more.
   const examTypes = [...new Map(data.mockTests.filter((item) => item.examType).map((item) => [item.examType.id, item.examType])).values()];
   const levels = [...new Set(data.mockTests.map((item) => item.level))].sort();
   const shown = paginate(filterStudentMocks(data.mockTests, filters), page, PAGE_SIZE);

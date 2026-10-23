@@ -1,6 +1,3 @@
-// Unit reviews (D121): the 30-question Reading test that closes a unit,
-// versioned like lessons. The unit keeps the id of its published review
-// version; a PUBLISHED version is never updated (D40).
 export class CreateUnitReviews1720000011000 {
   name = 'CreateUnitReviews1720000011000';
 
@@ -21,7 +18,6 @@ export class CreateUnitReviews1720000011000 {
         CONSTRAINT "UQ_unit_review_versions_number" UNIQUE ("unitId", "versionNumber")
       )
     `);
-    // At most one editable draft per unit.
     await queryRunner.query(`CREATE UNIQUE INDEX IF NOT EXISTS "UQ_unit_review_versions_one_draft" ON "unit_review_versions" ("unitId") WHERE "status" = 'DRAFT'`);
   }
 

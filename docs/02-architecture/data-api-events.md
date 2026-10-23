@@ -231,3 +231,17 @@ persistent JSON. Contract: `SpeechQueue`/`AutoTimeStatus` in
 `@appenglish/content-contracts` and `docs/03-service-specs/speech-service.md`.
 content-service keeps the job state in `app_content.listening_timing_jobs`;
 speech-service has no database.
+
+## Reliable messaging and observability (D168)
+
+**Correlation id.** The gateway reads `x-request-id` from the request (letters, digits, `.`, `_`, `-`, at most 64) or makes a UUID, returns it in the response header and sends it to every service in gRPC metadata. Each gRPC handler runs inside that id (`withGrpcContext`, `@appenglish/backend-common`), and every log line is one JSON object `{ time, level, service, context, requestId, message }` (`JsonLogger`). Outbox rows keep the id (`learning_events.requestId`, `content_events.requestId`), the envelope carries `requestId`, consumers run in it, and speech-service echoes it in its answers.
+
+**Outbox in content-service.** A speech job and its request are written in one transaction (`listening_timing_jobs` + `content_events`); `ContentEvents` relays unsent rows to `speech.autotime.requests` on a confirm channel every 5 s and when the broker connects, with `messageId` = the event id. A job is accepted while RabbitMQ is away and sent when it is back; `SPEECH_UNAVAILABLE` is no longer returned for Auto-time and Transcribe.
+
+**Idempotent consumers.** progress-service (`learning.results`) and content-service (`speech.autotime.results`) keep `processed_messages (messageId, queue, processedAt)` in their own database: a message whose id is already there is acked and skipped (`duplicate`). speech-service gives every answer a fresh `message_id`.
+
+**Retry and dead letters.** For `learning.results` and `speech.autotime.results`, a message that fails is republished to `<queue>.retry.1|2|3` (TTL 10 s, 1 min, 5 min, dead-lettering back to the queue) with header `x-attempt`; after the third retry it goes to `<queue>.dead`. A message that cannot be read (not JSON, wrong shape) goes to the dead queue at once. The main queues keep their arguments, so no queue has to be recreated. speech-service acks a request only after answering; a request redelivered after the worker stopped is retried once, then moved to `speech.autotime.requests.dead` and the job is answered FAILED.
+
+**Gateway sessions.** The gateway checks the access token itself (HS256 with `AUTH_JWT_SECRET`, type `access`, not expired) and caches the account `{ id, role, email }` from auth-service `Me` in Redis (`session:<sha256(token)>`, 30 s, never longer than the token). A token it cannot check, or a cache miss, goes to auth-service as before. A locked account, a password change or "log out everywhere" takes effect within 30 s. Without Redis the cache is in memory.
+
+**Metrics.** Every Node service serves `GET /metrics` (Prometheus text) on its HTTP port: process CPU, memory, uptime; gRPC calls and time; HTTP requests and time (gateway); outbox sent and waiting; messages handled by outcome (applied, duplicate, retry, dead); speech jobs finished, waiting and working time; sessions by source (cache, auth, refused). The gateway's `/metrics` answers only from localhost. `GET /health/system` (Admin) gathers them with the RabbitMQ management API (queues, ready, in progress, consumers).

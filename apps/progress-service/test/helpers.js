@@ -6,9 +6,8 @@ export const student = { id: '22222222-2222-4222-8222-222222222222', role: 'STUD
 export const otherStudent = { id: '44444444-4444-4444-8444-444444444444', role: 'STUDENT' };
 export const manager = { id: '11111111-1111-4111-8111-111111111111', role: 'CONTENT_MANAGER' };
 
-// In-memory stand-in for ProgressRepository.
 export function createProgressRepository() {
-  const tables = { results: [], completions: [], xp: [], studyDays: [], notifications: [] };
+  const tables = { results: [], completions: [], xp: [], studyDays: [], notifications: [], processed: [] };
   const copy = (row) => (row ? structuredClone(row) : null);
   return {
     tables,
@@ -47,6 +46,8 @@ export function createProgressRepository() {
       if (!row) tables.studyDays.push({ accountId, day, activities: [activity], firstAt: at, lastAt: at });
       else if (!row.activities.includes(activity)) row.activities.push(activity);
     },
+    async isProcessed(messageId) { return tables.processed.includes(messageId); },
+    async markProcessed(messageId) { if (!tables.processed.includes(messageId)) tables.processed.push(messageId); },
     async addNotification(notification) {
       if (tables.notifications.some((row) => row.accountId === notification.accountId && row.key === notification.key)) return;
       tables.notifications.push({ id: randomUUID(), readAt: null, ...structuredClone(notification) });
@@ -75,8 +76,6 @@ export function createProgressRepository() {
   };
 }
 
-// Content-service stand-in: a published curriculum of units with lessons,
-// shape = lessons per unit.
 export function createCurriculum(shape = [2, 2]) {
   let number = 0;
   const units = shape.map((count, index) => ({
@@ -101,14 +100,12 @@ export function progressHarness(shape, { now } = {}) {
   return { repository, content, service };
 }
 
-// A learning.results message as learning-service sends it.
 export function message(type, payload, id = randomUUID()) {
   return { id, type, occurredAt: '2026-10-17T08:00:00.000Z', payload };
 }
 
 const at = (minute) => `2026-10-17T08:${String(minute).padStart(2, '0')}:00.000Z`;
 
-// A finished lesson-test attempt (23 questions: 9 listening, 14 reading).
 export function lessonTest(accountId, lessonId, { attemptNumber = 1, listening, reading, minute = 0 }) {
   return {
     attemptId: randomUUID(),
@@ -129,7 +126,6 @@ export function lessonTest(accountId, lessonId, { attemptNumber = 1, listening, 
   };
 }
 
-// A finished full mock-test attempt with the given totals.
 export function mockTest(accountId, mockTestId, { attemptNumber = 1, listening, listeningTotal, reading, readingTotal, kind = 'FULL', minute = 0, email = '', title = 'Mock test' }) {
   return {
     attemptId: randomUUID(),

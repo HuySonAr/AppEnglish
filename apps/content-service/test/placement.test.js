@@ -49,7 +49,6 @@ test('the placement test follows the seven-part publishing rules', async () => {
     const paths = error.data.issues.map((issue) => issue.path);
     for (const path of ['test.part1.audioMediaId', 'test.part1.questions', 'test.part6.passage', 'test.part7.questions'])
       assert.ok(paths.includes(path), path);
-    // Lesson-only rules do not apply.
     assert.equal(paths.some((path) => path.startsWith('vocabulary') || path.startsWith('fillIn')), false);
     return true;
   });
@@ -68,7 +67,6 @@ test('learning-service reads the published paper with answers; edits create a ne
   const { service, repository, content, audioId } = await harness();
   await assert.rejects(() => service.getPlacementPaper(), { code: 40, status: 404 });
   await service.savePlacementDraft(manager, content());
-  // A draft is not a paper.
   await assert.rejects(() => service.getPlacementPaper(), { code: 40 });
   const first = (await service.publishPlacement(manager)).published;
 
@@ -78,7 +76,6 @@ test('learning-service reads the published paper with answers; edits create a ne
   assert.equal(paper.test.part5.questions[0].options.filter((option) => option.isCorrect).length, 1);
   assert.deepEqual(paper.media[audioId], { kind: 'audio', fileName: 'a.mp3', url: 'https://media.test/a.mp3' });
 
-  // The Content Manager fixes a mistake: version 2, version 1 stays readable.
   const edited = await service.savePlacementDraft(manager, content((value) => {
     value.test.part5.questions[0].prompt = 'Fixed question';
     return value;
@@ -128,7 +125,6 @@ test('learning-service reads the published curriculum and a lesson paper', async
   await service.updateLesson(manager, second.id, { position: 1 });
   await service.publishUnit(manager, unit.id);
 
-  // Only published units and their published lessons, in order.
   assert.deepEqual(await service.getCurriculum(), {
     units: [{ id: unit.id, title: 'Unit A', description: 'About A', reviewVersionId: null, lessons: [{ id: second.id, title: 'L2' }, { id: first.id, title: 'L1' }] }],
   });
@@ -140,7 +136,6 @@ test('learning-service reads the published curriculum and a lesson paper', async
   assert.equal(paper.content.test.part5.questions[0].options.some((option) => option.isCorrect), true);
   assert.equal(paper.media[audioId].url, 'https://media.test/a.mp3');
 
-  // A new version is served by default; the earlier one stays readable by id.
   await service.saveLessonDraft(manager, first.id, { ...lessonContent(), fillIn: { passage: 'A ___ only.', answers: ['ticket'] } });
   await service.publishLesson(manager, first.id);
   assert.equal((await service.getLessonPaper(first.id)).versionNumber, 2);
@@ -148,7 +143,6 @@ test('learning-service reads the published curriculum and a lesson paper', async
 
   for (const id of [draftOnly.id, hidden.id, '00000000-0000-4000-8000-000000000000'])
     await assert.rejects(() => service.getLessonPaper(id), { code: 40, status: 404 });
-  // A version of another lesson is not served.
   const other = await service.getLessonPaper(second.id);
   await assert.rejects(() => service.getLessonPaper(first.id, { versionId: other.versionId }), { code: 40 });
 });

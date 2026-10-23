@@ -1,22 +1,20 @@
 import { HttpException } from '@nestjs/common';
+import { Metadata } from '@grpc/grpc-js';
+import { REQUEST_ID_HEADER, currentRequestId } from '@appenglish/backend-common/observability';
 
-// Gateway-originated failures use the shared { code, msg, data } envelope with
-// SYSTEM_ERROR (32).
 export function gatewayFailure(message) {
   return { code: 32, msg: 'fail', data: { message } };
 }
 
-// gRPC status codes that mean the service could not be reached in time.
 const UNAVAILABLE_GRPC_CODES = [4, 14];
 
-// Calls one RPC whose reply is { httpStatus, code, msg, dataJson, setCookies }
-// and returns { status, payload, setCookies }. Transport failures become a
-// gateway envelope with 503/500; label names the service in that message.
 export async function callService(service, rpc, message, label) {
   let reply;
+  const metadata = new Metadata();
+  if (currentRequestId()) metadata.set(REQUEST_ID_HEADER, currentRequestId());
   try {
     reply = await new Promise((resolve, reject) => {
-      service[rpc](message).subscribe({ next: resolve, error: reject });
+      service[rpc](message, metadata).subscribe({ next: resolve, error: reject });
     });
   } catch (error) {
     if (UNAVAILABLE_GRPC_CODES.includes(error?.code))

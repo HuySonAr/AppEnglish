@@ -1,14 +1,17 @@
 import amqp from 'amqplib';
 import { Logger } from '@nestjs/common';
 import { LearningEventType, LearningQueue } from '@appenglish/learning-contracts';
+import { metrics } from '@appenglish/backend-common/metrics';
+import { currentRequestId } from '@appenglish/backend-common/observability';
+
+const published = metrics.counter('outbox_published_total', 'Outbox events sent to the broker.');
+const pendingGauge = metrics.gauge('outbox_pending', 'Outbox events not sent yet (last relay).');
 
 const logger = new Logger('LearningEvents');
 const RETRY_MS = 10_000;
 const RELAY_MS = 5_000;
 const BATCH = 100;
 
-// RabbitMQ side of the outbox: a confirm channel on the learning.results
-// queue. The service starts without the broker and keeps trying to reach it.
 export class RabbitTransport {
   constructor(url) {
     this.url = url;
@@ -16,7 +19,6 @@ export class RabbitTransport {
     this.stopped = false;
   }
 
-  // onReady runs every time the broker is (re)connected.
   start(onReady) {
     this.onReady = onReady;
     this.connect();
@@ -50,7 +52,6 @@ export class RabbitTransport {
     return Boolean(this.channel);
   }
 
-  // Resolves once the broker has confirmed the persistent message.
   send(message) {
     return new Promise((resolve, reject) => {
       this.channel.sendToQueue(
@@ -68,11 +69,6 @@ export class RabbitTransport {
   }
 }
 
-// Results leaving learning-service for progress-service (F06, D110). An event
-// is first written to learning_events, next to the result it reports (an
-// outbox), and relayed to RabbitMQ afterwards: right away when the broker is
-// there, otherwise as soon as it is back. So progress may lag, but never
-// misses a result. transport is replaceable in tests.
 export class LearningEvents {
   constructor(repository, { url = 'amqp://localhost:5672', transport = new RabbitTransport(url), now = () => new Date() } = {}) {
     this.repository = repository;
@@ -87,12 +83,10 @@ export class LearningEvents {
     this.timer.unref?.();
   }
 
-  // Writes one event and tries to relay it. A failure to write is logged, not
-  // thrown: the learner's result is already saved and must be answered.
   async record(type, payload) {
     let event;
     try {
-      event = await this.repository.addEvent({ type, payload, createdAt: this.now(), publishedAt: null });
+      event = await this.repository.addEvent({ type, payload, requestId: currentRequestId(), createdAt: this.now(), publishedAt: null });
     } catch (error) {
       logger.error(`Result event ${type} not recorded: ${error.message}`);
       return null;
@@ -101,21 +95,24 @@ export class LearningEvents {
     return event;
   }
 
-  // Relays the pending events in order; one at a time across callers.
   async flush() {
     if (!this.transport.ready || this.flushing) return;
     this.flushing = true;
     try {
       const pending = await this.repository.listPendingEvents(BATCH);
+      pendingGauge.set({ outbox: 'learning_events' }, pending.length);
       for (const event of pending) {
         await this.transport.send({
           id: event.id,
           type: event.type,
           occurredAt: new Date(event.createdAt).toISOString(),
+          ...(event.requestId ? { requestId: event.requestId } : {}),
           payload: event.payload,
         });
         await this.repository.markPublished(event.id, this.now());
+        published.inc({ outbox: 'learning_events' });
       }
+      pendingGauge.set({ outbox: 'learning_events' }, 0);
     } catch (error) {
       logger.warn(`Result events not relayed: ${error.message}`);
     } finally {
@@ -129,7 +126,6 @@ export class LearningEvents {
   }
 }
 
-// For services built without a publisher (tests): records nothing.
 export const noEvents = Object.freeze({ record: async () => null });
 
 export function recordActivity(events, accountId, activity, at = new Date()) {

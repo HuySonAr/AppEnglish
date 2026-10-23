@@ -11,9 +11,6 @@ import { Input } from '../../../components/ui/input.jsx';
 import { Label } from '../../../components/ui/label.jsx';
 import { PasswordInput } from '../../../components/shared/PasswordInput.jsx';
 
-// The invited person chooses a password with the emailed code (D131). The
-// link in the email carries ?email=; the code lasts 72 hours. On success the
-// account is active and signed in.
 export function AcceptInvitePage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();

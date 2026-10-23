@@ -3,8 +3,6 @@ import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { cn } from '../../lib/utils.js';
 
-// A panel that slides in from the left or right edge (side); used for
-// navigation on phones.
 export const Sheet = SheetPrimitive.Root;
 export const SheetTrigger = SheetPrimitive.Trigger;
 export const SheetClose = SheetPrimitive.Close;

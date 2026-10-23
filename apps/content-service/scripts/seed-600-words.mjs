@@ -1,25 +1,3 @@
-// Loads the 600 Essential Words lesson pack (content-samples/600-words) into a
-// running content-service, through the same gRPC calls a Content Manager's
-// pages use: the ten units and fifty lessons of the book, each lesson saved
-// as a draft (nothing is published; audio and photographs are added in the
-// editor afterwards).
-//
-// Safe to run again: units and lessons are found by title, and a lesson that
-// already holds a full vocabulary (12 words) is left alone unless --force is
-// given. When a lesson already has content, the phonetic and the pronunciation
-// audio of a word that is kept, and the audio and images of the test, are
-// carried over into the new draft by word and by position, so no upload is
-// lost (an old recording may no longer match the new transcript: replace it).
-//
-// The unit reviews (D121) listed in pack.json are saved as drafts the same
-// way; a review that already holds 30 questions is kept unless --force.
-//
-//   node --env-file=../../.env scripts/seed-600-words.mjs [--manager-id <uuid>] [--only 1,2,3] [--reviews] [--force]
-//
-// --reviews seeds the unit reviews only (--only then names unit numbers).
-//
-// --manager-id is recorded as the author (createdBy); use the id of a
-// Content Manager account. Without it a fixed demo id is used.
 import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -60,7 +38,6 @@ const rpc = (name, { id = '', payload } = {}) => call(name, { id, payloadJson: p
 
 const lower = (text) => (text || '').trim().toLowerCase();
 
-// The new content with what the lesson already had that is worth keeping.
 function merged(fresh, existing) {
   if (!existing) return fresh;
   const byWord = new Map((existing.vocabulary || []).map((item) => [lower(item.word), item]));
@@ -106,7 +83,6 @@ for (const unitEntry of pack.units) {
     console.log(`+ unit "${unit.title}"`);
   } else console.log(`= unit "${unit.title}"`);
 
-  // The unit review (D121), saved as a draft.
   if (unitEntry.review && (reviewsOnly || !only.length)) {
     const authored = JSON.parse(await readFile(resolve(packDir, unitEntry.review), 'utf8'));
     const view = await rpc('GetUnitReview', { id: unit.id });

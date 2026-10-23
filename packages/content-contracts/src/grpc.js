@@ -1,5 +1,3 @@
-// Node-only gRPC contract helpers for api-gateway and content-service. Keep
-// this out of src/index.js so the web client can import the constants.
 import { fileURLToPath } from 'node:url';
 
 export const CONTENT_GRPC_PACKAGE = 'appenglish.content.v1';
@@ -8,8 +6,6 @@ export const CONTENT_PROTO_PATH = fileURLToPath(
   new URL('../proto/content.proto', import.meta.url),
 );
 
-// Media uploads and full mock tests exceed gRPC's 4 MB default message
-// size; a mock-test part can carry one long recording.
 export const CONTENT_GRPC_MAX_MESSAGE_BYTES = 64 * 1024 * 1024;
 
 export const contentGrpcLoader = Object.freeze({

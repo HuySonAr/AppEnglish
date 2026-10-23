@@ -1,5 +1,7 @@
-import { In, MoreThan } from 'typeorm';
+import { In, IsNull, MoreThan } from 'typeorm';
 import {
+  ContentEventEntity,
+  ProcessedMessageEntity,
   ListeningCourseItemEntity,
   ListeningExerciseEntity,
   ListeningExerciseVersionEntity,
@@ -46,7 +48,6 @@ export class ListeningRepository {
     return (await this.repo(ListeningExerciseEntity)).save(exercise);
   }
 
-  // Version metadata without the content payload.
   async listVersionSummaries() {
     return (await this.repo(ListeningExerciseVersionEntity)).find({
       select: { id: true, exerciseId: true, versionNumber: true, status: true },
@@ -86,6 +87,31 @@ export class ListeningRepository {
     });
   }
 
+  async saveTimingJobWithEvent(job, eventOf) {
+    await this.repo(ListeningTimingJobEntity);
+    return this.dataSource.transaction(async (manager) => {
+      const saved = await manager.getRepository(ListeningTimingJobEntity).save(job);
+      await manager.getRepository(ContentEventEntity).save(eventOf(saved));
+      return saved;
+    });
+  }
+
+  async listPendingEvents(limit) {
+    return (await this.repo(ContentEventEntity)).find({ where: { publishedAt: IsNull() }, order: { createdAt: 'ASC' }, take: limit });
+  }
+
+  async markEventPublished(id, at) {
+    await (await this.repo(ContentEventEntity)).update({ id }, { publishedAt: at });
+  }
+
+  async isProcessed(messageId) {
+    return Boolean(await (await this.repo(ProcessedMessageEntity)).findOne({ where: { messageId } }));
+  }
+
+  async markProcessed(messageId, queue, at) {
+    await (await this.repo(ProcessedMessageEntity)).createQueryBuilder().insert().values({ messageId, queue, processedAt: at }).orIgnore().execute();
+  }
+
   async saveTimingJob(job) {
     return (await this.repo(ListeningTimingJobEntity)).save(job);
   }
@@ -94,7 +120,6 @@ export class ListeningRepository {
     return (await this.repo(ListeningTimingJobEntity)).findOne({ where: { id } });
   }
 
-  // owner: { exerciseId } or { courseItemId } (D147).
   async listJobsUpdatedSince(since) {
     return (await this.repo(ListeningTimingJobEntity)).find({ where: { updatedAt: MoreThan(since) }, select: { id: true, status: true, task: true, error: true, lines: true, result: true, createdAt: true, updatedAt: true } });
   }

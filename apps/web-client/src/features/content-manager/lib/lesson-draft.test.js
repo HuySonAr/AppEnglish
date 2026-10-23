@@ -119,7 +119,6 @@ test('pending files are uploaded on save and only when still used', async () => 
   assert.deepEqual(Object.keys(result.uploaded), ['temp-1', 'temp-2']);
   assert.equal(content.vocabulary[0].audioUkMediaId, 'temp-1');
 
-  // A failure keeps what was already uploaded so a retry skips it.
   const failing = await uploadPending(content, pending, async ({ kind, file }) => {
     if (file.name === 'part1.mp4') throw new Error('too large');
     return { id: 'real-uk', fileName: file.name };

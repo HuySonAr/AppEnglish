@@ -10,8 +10,6 @@ import { listeningContentSchema } from '../src/listening/listening.schemas.js';
 import { createMemoryRepository, manager, publishableContent, student, toeicExamTypeId, toeicTopicId } from './memory-repository.js';
 import { publishableReview } from './review-helpers.js';
 
-// Version history (D122): browse, read and restore; taking content down
-// keeps its content in the draft.
 async function harness() {
   const repository = createMemoryRepository();
   const storage = {
@@ -38,7 +36,6 @@ test('a lesson taken down keeps its content as the draft, and its versions can b
   const first = lessonContentSchema.parse(publishableContent({ audioId, imageId }));
   await h.content.saveLessonDraft(manager, lesson.id, first);
   await h.content.publishLesson(manager, lesson.id);
-  // Version 2 changes the first word and is published too.
   const second = structuredClone(first);
   second.vocabulary[0].word = 'contract';
   await h.content.saveLessonDraft(manager, lesson.id, second);
@@ -53,32 +50,26 @@ test('a lesson taken down keeps its content as the draft, and its versions can b
   const v1 = listed.versions[1];
   const read = await h.versions.getVersion(manager, { kind, id: lesson.id, versionId: v1.id });
   assert.equal(read.version.content.vocabulary[0].word, 'ticket');
-  // A version of another lesson is not reachable through this one.
   const { lesson: other } = await h.content.createLesson(manager, unit.id, { title: 'Other' });
   await assert.rejects(() => h.versions.getVersion(manager, { kind, id: other.id, versionId: v1.id }), { code: 40 });
 
-  // Taking the lesson down without a draft: version 2 becomes draft 3.
   const hidden = await h.content.unpublishLesson(manager, lesson.id);
   assert.equal(hidden.published, null);
   assert.equal(hidden.draft.versionNumber, 3);
   assert.equal(hidden.draft.content.vocabulary[0].word, 'contract');
-  // Taking it down again changes nothing more.
   assert.equal((await h.content.unpublishLesson(manager, lesson.id)).draft.versionNumber, 3);
   assert.deepEqual((await h.versions.listVersions(manager, { kind, id: lesson.id })).versions.map((version) => `${version.versionNumber}${version.status[0]}${version.current ? '*' : ''}`), ['3D', '2P', '1P']);
 
-  // Restoring version 1 rewrites the draft; the draft itself cannot be "restored".
   const restored = await h.versions.restoreVersion(manager, { kind, id: lesson.id, versionId: v1.id });
   assert.equal(restored.restoredFrom.versionNumber, 1);
   assert.equal(restored.draft.versionNumber, 3);
   assert.equal(restored.draft.content.vocabulary[0].word, 'ticket');
   const draftId = (await h.versions.listVersions(manager, { kind, id: lesson.id })).versions[0].id;
   await assert.rejects(() => h.versions.restoreVersion(manager, { kind, id: lesson.id, versionId: draftId }), { code: 41 });
-  // Publishing the restored draft makes version 3 the current one; 1 and 2 stay.
   const published = await h.content.publishLesson(manager, lesson.id);
   assert.equal(published.published.versionNumber, 3);
   assert.equal(h.repository.tables.versions.filter((version) => version.lessonId === lesson.id).length, 3);
 
-  // Discarding a draft (D127) removes its row and the files only it used.
   await assert.rejects(() => h.versions.discardDraft(manager, { kind, id: lesson.id }), { code: 41 });
   const extraAudio = await h.upload('extra.mp3');
   const fourth = structuredClone(first);
@@ -93,18 +84,17 @@ test('a lesson taken down keeps its content as the draft, and its versions can b
   assert.deepEqual((await h.versions.listVersions(manager, { kind, id: lesson.id })).versions.map((version) => version.versionNumber), [3, 2, 1]);
   assert.equal((await h.content.getLesson(manager, lesson.id)).draft, null);
 
-  // Deleting an old version (D128): not the live one, not a draft; its own files go.
   const current = (await h.versions.listVersions(manager, { kind, id: lesson.id })).versions.find((version) => version.current);
   await assert.rejects(() => h.versions.deleteVersion(manager, { kind, id: lesson.id, versionId: current.id }), (error) => error.code === 41 && error.data.reason === 'CURRENT');
   const oldAudio = await h.upload('old-only.mp3');
   const fifth = structuredClone(first);
   fifth.vocabulary[0].audioUkMediaId = oldAudio;
   await h.content.saveLessonDraft(manager, lesson.id, fifth);
-  await h.content.publishLesson(manager, lesson.id); // version 4 live; 1, 2, 3 old
+  await h.content.publishLesson(manager, lesson.id);
   const old = (await h.versions.listVersions(manager, { kind, id: lesson.id })).versions.find((version) => version.versionNumber === 3);
   const removed = await h.versions.deleteVersion(manager, { kind, id: lesson.id, versionId: old.id });
   assert.deepEqual(removed, { deleted: { versionId: old.id, versionNumber: 3 }, removedMedia: 0 }, 'version 3 shares every file with 1 and 2');
-  await h.content.unpublishLesson(manager, lesson.id); // 4 taken down: draft 5 copies it
+  await h.content.unpublishLesson(manager, lesson.id);
   const taken = (await h.versions.listVersions(manager, { kind, id: lesson.id })).versions.find((version) => version.versionNumber === 4);
   assert.equal((await h.versions.discardDraft(manager, { kind, id: lesson.id })).removedMedia, 0, 'version 4 still uses the file');
   const removedOld = await h.versions.deleteVersion(manager, { kind, id: lesson.id, versionId: taken.id });
@@ -116,13 +106,11 @@ test('a lesson taken down keeps its content as the draft, and its versions can b
 
 test('mock tests, listening exercises, course items and unit reviews keep their content when taken down and list their versions', async () => {
   const h = await harness();
-  // Mock test: publish a minimal full test is long; a draft-only test has versions too.
   const { mockTest } = await h.content.createMockTest(manager, { title: 'Level 1', level: 1, durationMinutes: 120, examTypeId: toeicExamTypeId });
   await h.content.saveMockTestDraft(manager, mockTest.id, mockContentSchema.parse({ test: { part5: { questions: [{ prompt: 'x' }] } } }));
   const mockVersions = await h.versions.listVersions(manager, { kind: ContentVersionKind.MOCK_TEST, id: mockTest.id });
   assert.deepEqual(mockVersions.versions.map((version) => [version.versionNumber, version.status]), [[1, 'DRAFT']]);
 
-  // Listening exercise: published, taken down, content kept.
   const audioId = await h.upload('talk.mp3');
   const { exercise } = await h.listening.createExercise(manager, { title: 'At the airport', level: 'A2', kind: 'part1', topicId: toeicTopicId });
   await h.listening.saveDraft(manager, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [{ text: 'One.' }, { text: 'Two.' }, { text: 'Three.' }, { text: 'Four.' }] }));
@@ -135,13 +123,11 @@ test('mock tests, listening exercises, course items and unit reviews keep their 
   const restoredExercise = await h.versions.restoreVersion(manager, { kind: ContentVersionKind.LISTENING_EXERCISE, id: exercise.id, versionId: exerciseVersions.versions[1].id });
   assert.equal(restoredExercise.draft.content.segments[0].text, 'One.');
 
-  // Course item: a draft with a title change, taken down from nothing stays as it is.
   const { item } = await h.course.createItem(manager, { level: 'A2', type: 'unit', section: 'social_and_travel', title: 'Unit', description: '' });
   const courseVersions = await h.versions.listVersions(manager, { kind: ContentVersionKind.COURSE_ITEM, id: item.id });
   assert.equal(courseVersions.versions.length, 1);
   assert.equal((await h.course.unpublish(manager, item.id)).draft.versionNumber, 1);
 
-  // Unit review: published, taken down, content kept, restorable.
   const { unit } = await h.content.createUnit(manager, { title: 'General Business', description: '' });
   await h.content.saveUnitReviewDraft(manager, unit.id, unitReviewContentSchema.parse(publishableReview()));
   await h.content.publishUnitReview(manager, unit.id);

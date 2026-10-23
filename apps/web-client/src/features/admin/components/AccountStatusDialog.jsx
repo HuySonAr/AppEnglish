@@ -24,9 +24,6 @@ import { lockReasonRequired, statusLabels } from '../lib/accounts.js';
 
 const editableStatuses = [AccountStatus.ACTIVE, AccountStatus.DISABLED, AccountStatus.SUSPENDED];
 
-// Role and status of one account (F01B, D114). Locking needs a reason the
-// person is shown at sign-in; every change signs the account out everywhere.
-// preset: { role?, status? } chosen in the table before the dialog opened (D131).
 export function AccountStatusDialog({ account, open, onOpenChange, onSaved, preset = null }) {
   const [role, setRole] = useState(account?.role);
   const [status, setStatus] = useState(account?.status);

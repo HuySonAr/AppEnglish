@@ -1,6 +1,3 @@
-"""The words heard in a recording, kept on disk by recording and model (D99),
-so a second job on the same recording (Auto-time after Transcribe, or a
-second Auto-time) skips the download and Whisper and only aligns."""
 
 from __future__ import annotations
 

@@ -41,11 +41,8 @@ import { AccountStatusDialog } from '../components/AccountStatusDialog.jsx';
 import { InviteAccountDialog } from '../components/InviteAccountDialog.jsx';
 import { availableActions, isInvitedPending, sortOptions, statusChoices, statusLabels, timeAgo } from '../lib/accounts.js';
 
-// Search, filters, sort, page and rows per page live in the URL (D130).
 const defaults = { search: '', role: '', status: '', stale: false, sort: AdminAccountSort.NEWEST, pageSize: '20' };
 
-// How each status looks in its pill (D131): colour, icon and label together,
-// never colour alone.
 const statusLook = {
   [AccountStatus.ACTIVE]: { icon: CheckCircle2, className: 'bg-success/15 text-success hover:bg-success/25' },
   [AccountStatus.PENDING_VERIFICATION]: { icon: Clock3, className: 'bg-info/15 text-info hover:bg-info/25' },
@@ -87,8 +84,6 @@ function RowsSkeleton() {
   );
 }
 
-// The status pill: what the account is now, and where it can go (D131). A
-// pending account offers its way to Active: the code again, or activation.
 function StatusPill({ account, onStatus, onAction }) {
   const look = statusLook[account.status] || statusLook[AccountStatus.ACTIVE];
   const Icon = look.icon;
@@ -219,15 +214,10 @@ function AccountRow({ account, isMe, onRole, onStatus, onAction }) {
   );
 }
 
-// Admin account management (F01B, D114, D131): every account in one table
-// with search, filters, sort and server paging. Role and status change in the
-// row; the ⋯ menu holds the one-off actions; "Add account" invites someone.
-// The numbers and charts live on the admin dashboard (D115).
 export function AdminAccountsPage() {
   const { account: me } = useAuth();
   const { filters, setFilter, setFilters, page, setPage } = useListState(defaults);
   const [list, setList] = useState({ state: 'loading', items: [], pagination: null });
-  // The open dialog: { kind: 'invite' } | { kind: 'status', account, preset } | { kind: 'action', account, action }.
   const [dialog, setDialog] = useState(null);
   const pageSize = Number(filters.pageSize) || 20;
 
@@ -254,7 +244,6 @@ export function AdminAccountsPage() {
     loadList();
   }, [filters.search, filters.role, filters.status, filters.stale, filters.sort, page, pageSize]);
 
-  // A changed account replaces its row; nothing else moves.
   const replaceRow = (account) => {
     if (!account) return;
     setList((current) => ({ ...current, items: current.items.map((item) => (item.id === account.id ? { ...item, ...account } : item)) }));

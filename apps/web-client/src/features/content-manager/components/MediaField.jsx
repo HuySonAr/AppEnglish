@@ -6,11 +6,6 @@ import { Label } from '../../../components/ui';
 const audioAccept = '.mp3,.mp4,.m4a,audio/mpeg,audio/mp4,video/mp4,audio/x-m4a';
 const imageAccept = '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp';
 
-// File control for one media reference. media = { choose(kind, file, path),
-// clear(path, mediaId), fileNames, pending, stored, uploading, failed } from
-// the page. A chosen file is only previewed; it is uploaded when the lesson
-// is saved. Stored files can be played or viewed again when they have a
-// delivery URL. audioRef, when given, is attached to the audio player.
 export function MediaField({ id, label, kind, path, mediaId, media, audioRef }) {
   const chosen = media.pending[mediaId];
   const url = chosen?.url || media.stored[mediaId]?.url;

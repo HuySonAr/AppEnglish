@@ -13,7 +13,6 @@ import { attachProfiles } from '../../api-gateway/src/auth/auth-gateway.controll
 
 process.env.AUTH_JWT_SECRET = process.env.AUTH_JWT_SECRET || 'test-secret-that-is-long-enough-for-hs256';
 
-// PNG header bytes: enough for the storage, which checks type, name and size.
 const png = Buffer.from('89504e470d0a1a0a0000000d49484452', 'hex');
 
 function harness(accounts, avatarStorage) {
@@ -45,7 +44,6 @@ test('the display name is saved trimmed and an empty one clears it; me returns i
   assert.equal((await h.service.me(h.token(account))).account.displayName, 'Minh Anh');
   const cleared = await h.service.updateProfile(h.token(account), { displayName: '' });
   assert.equal(cleared.account.displayName, null);
-  // Validation at the handler layer: whitespace collapses, too long is 400.
   const controller = new AuthController(h.service);
   const viaHandler = await controller.updateProfile({ displayName: '  Bình   Nguyễn ' }, h.token(account));
   assert.equal(viaHandler.data.account.displayName, 'Bình Nguyễn');
@@ -58,7 +56,6 @@ test('changing the password needs the current one, signs other devices out and k
   const h = harness([account]);
   const oldToken = h.token(account);
   await h.service.saveSession(account, h.service.tokenService.createRefreshToken(account));
-  // Step 1 checks the current password without changing anything.
   await assert.rejects(() => h.service.verifyPassword(oldToken, { currentPassword: 'wrong' }), { code: 27 });
   assert.deepEqual(await h.service.verifyPassword(oldToken, { currentPassword: 'correct horse battery staple' }), { verified: true });
   assert.equal(account.sessionVersion, 0);
@@ -68,7 +65,6 @@ test('changing the password needs the current one, signs other devices out and k
   assert.equal(result.setCookies.length, 2);
   assert.equal(account.sessionVersion, 1);
   assert.equal(h.passwordService.verify('another long password', account.passwordHash), true);
-  // The old access token is refused; the previous refresh family is revoked, the new one is live.
   await assert.rejects(() => h.service.me(oldToken), { code: 21 });
   assert.deepEqual(h.refreshTokens.map((token) => Boolean(token.revokedAt)), [true, false]);
   assert.equal((await h.service.me(h.token(account))).account.email, account.email);
@@ -94,7 +90,6 @@ test('avatars are validated, stored, replaced and removed', async (t) => {
 
   const second = await h.service.uploadAvatar(token, { fileName: 'me.webp', mimeType: 'image/webp', data: png });
   assert.notEqual(second.account.avatarUrl, first.account.avatarUrl);
-  // The previous file is gone.
   assert.deepEqual(await readdir(root), [path.basename(new URL(second.account.avatarUrl).pathname)]);
 
   const removed = await h.service.removeAvatar(token);
@@ -102,7 +97,6 @@ test('avatars are validated, stored, replaced and removed', async (t) => {
   assert.equal(account.avatarStorageId, null);
   assert.deepEqual(await readdir(root), []);
 
-  // The handler maps a bad file to the 400 envelope with the reason.
   const controller = new AuthController(h.service);
   await assert.rejects(
     () => controller.uploadAvatar({ fileName: 'a.gif', mimeType: 'image/gif', data: png }, token),
@@ -143,7 +137,6 @@ test('the gateway attaches profiles to ranking rows and falls back to the email 
     { rank: 1, accountId: known, displayName: 'Minh Anh', avatarUrl: 'https://ik.test/a.webp' },
     { rank: 2, accountId: unknown, displayName: 'binh.nguyen', avatarUrl: null },
   ]);
-  // auth-service down: the board still renders by local part.
   const down = { GetProfiles: () => ({ subscribe: ({ error }) => error(Object.assign(new Error('down'), { code: 14 })) }) };
   const row = { rank: 1, accountId: known, email: 'minh.anh@example.com' };
   await attachProfiles(down, [row]);

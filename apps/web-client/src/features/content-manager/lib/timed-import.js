@@ -1,13 +1,8 @@
 import { LISTENING_MAX_SEGMENTS, LISTENING_SEGMENT_MAX_LENGTH, lyricText } from '@appenglish/content-contracts';
 import { formatSeconds, segmentFromLine, segmentLabel } from './listening-draft.js';
 
-// Timed files for listening exercises (D89-D91): subtitles (.srt, .vtt) and
-// lyrics (.lrc) read in the browser into sentences with their times, and the
-// sentences written back as .srt or .lrc.
-
 const round = (seconds) => Math.round(seconds * 10) / 10;
 
-// "00:01:02,500", "01:02.500" (WebVTT may leave out the hours) → seconds.
 function cueTime(text) {
   const match = /^(?:(\d+):)?(\d{1,2}):(\d{2})[,.](\d{1,3})$/.exec(text.trim());
   if (!match) return null;
@@ -15,8 +10,6 @@ function cueTime(text) {
   return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds) + Number(fraction.padEnd(3, '0')) / 1000;
 }
 
-// Subtitle text as a sentence: lines joined, formatting tags ("<i>",
-// "{\an8}"), music signs and sound notes ("[Music]", "(applause)") left out.
 function subtitleText(lines) {
   return lines
     .join(' ')
@@ -28,8 +21,6 @@ function subtitleText(lines) {
     .trim();
 }
 
-// The cues of an .srt or .vtt text: { start, end, text } in seconds. Cues
-// left without words (only "[Music]" or "♪") are dropped.
 export function parseSubtitles(text) {
   const cues = [];
   for (const block of text.replace(/\r/g, '').split(/\n\s*\n/)) {
@@ -49,12 +40,6 @@ export function parseSubtitles(text) {
 const LRC_TIME = /^\[(\d+):(\d{1,2}(?:[.:]\d{1,3})?)\]/;
 const LRC_TAG = /^\[([a-z]+):([^\]]*)\]\s*$/i;
 
-// The lines of an .lrc text: { start, end, text }. A line keeps its words in
-// [brackets] (the blanks of a song); only the times in front are read. A
-// line with several times is sung at each of them. A line ends where the
-// next one starts, or at a time on its own line; the last one at
-// `duration` when it is known, else it has no end. [offset:ms] moves every
-// time (a positive offset makes the lyrics come earlier).
 export function parseLrc(text, { duration = null } = {}) {
   let offset = 0;
   const marks = [];
@@ -71,7 +56,6 @@ export function parseLrc(text, { duration = null } = {}) {
       line = line.slice(match[0].length).trimStart();
     }
     if (!times.length) continue;
-    // Enhanced LRC times the words too: "<00:12.80>word".
     const words = line.replace(/<\d+:\d{1,2}(?:[.:]\d{1,3})?>/g, '').replace(/\s+/g, ' ').trim();
     for (const time of times) marks.push({ time: Math.max(0, time - offset), text: words });
   }
@@ -85,16 +69,12 @@ export function parseLrc(text, { duration = null } = {}) {
   return lines;
 }
 
-// Which kind of timed file the text is: 'srt' (also .vtt), 'lrc' or null.
 export function timedFormat(text) {
   if (/-->/.test(text)) return 'srt';
   if (/^\s*\[\d+:\d{1,2}/m.test(text)) return 'lrc';
   return null;
 }
 
-// What importing a timed file does (PasteDialog): the sentences afterwards
-// (the imported ones replace those there), their number and the lines to
-// check. duration is the recording's length in seconds when known.
 export function timedImportPlan(segments, text, kind, { duration = null } = {}) {
   const format = timedFormat(text);
   const timed = format === 'srt' ? parseSubtitles(text) : format === 'lrc' ? parseLrc(text, { duration }) : [];
@@ -126,24 +106,17 @@ export function timedImportPlan(segments, text, kind, { duration = null } = {}) 
   return { segments: usable ? next : segments, count: imported.length, lines };
 }
 
-// Every time moved by `seconds` (negative: earlier), never below 0.
 export function shiftTimes(segments, seconds) {
   const move = (time) => (time === null ? null : Math.max(0, round(time + seconds)));
   return segments.map((segment) => ({ ...segment, start: move(segment.start), end: move(segment.end) }));
 }
 
-// 62.5 → "00:01:02,500".
 function srtTime(seconds) {
   const millis = Math.round(seconds * 1000);
   const pad = (value, size = 2) => String(value).padStart(size, '0');
   return `${pad(Math.floor(millis / 3600000))}:${pad(Math.floor(millis / 60000) % 60)}:${pad(Math.floor(millis / 1000) % 60)},${pad(millis % 1000, 3)}`;
 }
 
-// The sentences with a start and an end after it, in the order of the
-// recording, each with the text to write: Parts 1-2 with their label
-// ("(A) …", "Question: …") and a speaker in front ("Man: …"), so the file
-// reads well and comes back the same through "Import timed file". A song
-// keeps its [blanks] only when `blanks` is set.
 function timedLines(segments, kind, { blanks }) {
   return segments
     .map((segment, index) => ({ segment, index }))
@@ -157,26 +130,18 @@ function timedLines(segments, kind, { blanks }) {
     });
 }
 
-// The sentences as an .srt file (D90). A song is written without its
-// [brackets], which subtitles read as sound notes. `skipped` counts the
-// sentences left out for want of a start and an end.
 export function toSrt(segments, kind) {
   const lines = timedLines(segments, kind, { blanks: false });
   const cues = lines.map((line, at) => `${at + 1}\n${srtTime(line.start)} --> ${srtTime(line.end)}\n${line.text}\n`);
   return { text: cues.join('\n'), count: lines.length, skipped: segments.length - lines.length };
 }
 
-// 62.5 → "01:02.50".
 function lrcTime(seconds) {
   const hundredths = Math.round(seconds * 100);
   const pad = (value) => String(value).padStart(2, '0');
   return `${pad(Math.floor(hundredths / 6000))}:${pad(Math.floor(hundredths / 100) % 60)}.${pad(hundredths % 100)}`;
 }
 
-// The sentences as an .lrc file (D91), keeping a song's [blanks]. LRC has
-// only start times, so an end is written as a time on its own line wherever
-// the next line does not start right then; the file comes back with the same
-// starts and ends.
 export function toLrc(segments, kind, { title = '' } = {}) {
   const lines = timedLines(segments, kind, { blanks: true });
   const out = title ? [`[ti:${title.replace(/[[\]]/g, '')}]`] : [];
@@ -188,16 +153,13 @@ export function toLrc(segments, kind, { title = '' } = {}) {
   return { text: `${out.join('\n')}\n`, count: lines.length, skipped: segments.length - lines.length };
 }
 
-// The file of the format: 'srt' or 'lrc'.
 export const ExportFormat = Object.freeze({ SRT: 'srt', LRC: 'lrc' });
 export function exportFile(segments, kind, format, { title = '' } = {}) {
   return format === ExportFormat.LRC ? toLrc(segments, kind, { title }) : toSrt(segments, kind);
 }
 
-// "Proud of You!" → "proud-of-you".
 export function exportBaseName(title) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'listening';
 }
 
-// The format a chosen file name asks for, by its extension; srt otherwise.
 export const formatOfFileName = (name) => (/\.lrc$/i.test(name) ? ExportFormat.LRC : ExportFormat.SRT);

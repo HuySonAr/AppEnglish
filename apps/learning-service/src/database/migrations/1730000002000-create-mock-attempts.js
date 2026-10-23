@@ -1,5 +1,3 @@
-// Mock-test attempts and the score conversion table (F05A). accountId,
-// mockTestId and mockVersionId refer to other services' data: no foreign key.
 export class CreateMockAttempts1730000002000 {
   name = 'CreateMockAttempts1730000002000';
 
@@ -33,8 +31,6 @@ export class CreateMockAttempts1730000002000 {
         CONSTRAINT "UQ_mock_attempts_number" UNIQUE ("accountId", "mockTestId", "kind", "partKey", "attemptNumber")
       )
     `);
-    // At most one attempt in progress per learner for the full test and for
-    // each part's mini test.
     await queryRunner.query(`CREATE UNIQUE INDEX IF NOT EXISTS "UQ_mock_attempts_open" ON "mock_attempts" ("accountId", "mockTestId", "kind", "partKey") WHERE "status" = 'IN_PROGRESS'`);
     await queryRunner.query(`
       CREATE TABLE IF NOT EXISTS "score_conversion" (

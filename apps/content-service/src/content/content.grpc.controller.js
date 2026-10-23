@@ -1,11 +1,11 @@
 import { Controller, Inject } from '@nestjs/common';
+import { withGrpcContext } from '@appenglish/backend-common/grpc-context';
 import { GrpcMethod } from '@nestjs/microservices';
 import { ContentResponseCode } from '@appenglish/content-contracts';
 import { CONTENT_GRPC_SERVICE } from '@appenglish/content-contracts/grpc';
 import { ContentError } from './content.errors.js';
 import { z } from 'zod';
 
-// The orphan files the Content Manager chose to delete (D118).
 const orphanMediaDeleteSchema = z.object({ ids: z.array(z.string().uuid()).min(1).max(500) }).strict();
 import { ContentService } from './content.service.js';
 import {
@@ -27,8 +27,6 @@ import {
   unitUpdateSchema,
 } from './content.schemas.js';
 
-// Each RPC: whether it targets an id (internal ones take no actor), the schema of its JSON payload (if any)
-// and the service call.
 const rpcs = {
   ListUnits: { run: (service, { actor }) => service.listUnits(actor) },
   CreateUnit: {
@@ -46,7 +44,6 @@ const rpcs = {
   },
   UnpublishUnit: { id: true, run: (service, { actor, id }) => service.unpublishUnit(actor, id) },
   DeleteUnit: { id: true, run: (service, { actor, id }) => service.deleteUnit(actor, id) },
-  // Unit review (D121); id is the unit id.
   GetUnitReview: { id: true, run: (service, { actor, id }) => service.getUnitReview(actor, id) },
   SaveUnitReviewDraft: {
     id: true,
@@ -100,7 +97,6 @@ const rpcs = {
     run: (service, { actor, payload }) => service.savePlacementDraft(actor, payload),
   },
   PublishPlacement: { run: (service, { actor }) => service.publishPlacement(actor) },
-  // Called by learning-service, not by the gateway: there is no actor.
   GetPlacementPaper: {
     internal: true,
     payload: placementPaperSchema,
@@ -196,8 +192,6 @@ export class ContentGrpcController {
     );
   }
 
-  // Shapes the { code, msg, data } envelope. Unexpected errors propagate as a
-  // gRPC error and the gateway answers 500.
   async reply(run) {
     try {
       return this.toReply(200, ContentResponseCode.SUCCESS, 'success', await run());
@@ -227,6 +221,7 @@ for (const [rpc, spec] of Object.entries(rpcs)) {
 }
 for (const rpc of [...Object.keys(rpcs), 'UploadMedia']) {
   const method = rpc[0].toLowerCase() + rpc.slice(1);
+  withGrpcContext(ContentGrpcController.prototype, method, rpc);
   GrpcMethod(CONTENT_GRPC_SERVICE, rpc)(
     ContentGrpcController.prototype,
     method,

@@ -2,27 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import { deleteMedia, uploadMedia } from '../api/content-api.js';
 import { uploadPending } from '../lib/lesson-draft.js';
 
-// Files of a draft being edited. A chosen file stays in the browser (with a
-// preview) until the draft is saved; uploadAll then uploads what the content
-// still uses.
-//   edit(path, value)  sets one field of the content
-//   sectionFor(path)   storage section of the field at that path
-//   lessonId           lesson the files belong to (none for placement)
 export function useDraftMedia({ edit, sectionFor, lessonId }) {
-  // Chosen but not uploaded yet, by temporary id: { kind, file, section, url }.
   const [pending, setPending] = useState({});
-  // Files the saved content uses, by media id: { kind, fileName, url }.
   const [stored, setStored] = useState({});
-  // Names of files uploaded in this session; saved content only holds ids.
   const [fileNames, setFileNames] = useState({});
-  // Temporary ids being uploaded right now, and the error of the ones that
-  // failed in the last save (D125): MediaField shows both.
   const [uploading, setUploading] = useState(new Set());
   const [failed, setFailed] = useState({});
   const pendingRef = useRef(pending);
   pendingRef.current = pending;
 
-  // Previews are released when the page is left.
   useEffect(
     () => () =>
       Object.values(pendingRef.current).forEach((item) => URL.revokeObjectURL(item.url)),
@@ -47,16 +35,12 @@ export function useDraftMedia({ edit, sectionFor, lessonId }) {
     }));
   }
 
-  // What MediaField needs.
   const media = {
     fileNames,
     pending,
     stored,
     uploading,
     failed,
-    // A file that was never uploaded is just dropped. Removing a stored file
-    // also deletes it unless a saved version still uses it; in that case the
-    // server deletes it when the draft is saved.
     clear(path, mediaId) {
       edit(path, null);
       if (pending[mediaId]) forget([mediaId]);
@@ -72,9 +56,6 @@ export function useDraftMedia({ edit, sectionFor, lessonId }) {
     },
   };
 
-  // Uploads the chosen files the content still uses. Returns the content with
-  // the real media ids, whether anything was uploaded, and the error of the
-  // upload that failed (its fileName says which file).
   async function uploadAll(content) {
     const idOf = (item) => Object.keys(pending).find((id) => pending[id] === item);
     setFailed({});
@@ -109,7 +90,6 @@ export function useDraftMedia({ edit, sectionFor, lessonId }) {
     setStored,
     rememberFileNames,
     uploadAll,
-    // After a successful save nothing chosen is left to upload.
     reset: () => forget(Object.keys(pendingRef.current)),
   };
 }

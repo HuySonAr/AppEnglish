@@ -1,5 +1,3 @@
-// Mock tests (F05A): full TOEIC-style tests, versioned like lessons. A
-// PUBLISHED version is never updated (D40).
 export class CreateMockTests1720000003000 {
   name = 'CreateMockTests1720000003000';
 
@@ -31,7 +29,6 @@ export class CreateMockTests1720000003000 {
         CONSTRAINT "UQ_mock_test_versions_number" UNIQUE ("mockTestId", "versionNumber")
       )
     `);
-    // At most one editable draft per mock test.
     await queryRunner.query(`CREATE UNIQUE INDEX IF NOT EXISTS "UQ_mock_test_versions_one_draft" ON "mock_test_versions" ("mockTestId") WHERE "status" = 'DRAFT'`);
   }
 

@@ -1,4 +1,5 @@
 import { Controller, Inject } from '@nestjs/common';
+import { withGrpcContext } from '@appenglish/backend-common/grpc-context';
 import { GrpcMethod } from '@nestjs/microservices';
 import { LearningResponseCode } from '@appenglish/learning-contracts';
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
@@ -7,8 +8,6 @@ import { actorSchema } from '../placement/placement.schemas.js';
 import { CourseLessonService } from './course.service.js';
 import { itemIdSchema, sentenceCheckSchema, testAnswersSchema } from './course.schemas.js';
 
-// Each RPC: whether it targets an id (a topic or a level test), the schema of
-// its JSON payload (if any) and the service call.
 const rpcs = {
   GetListeningCourse: { run: (service, { actor }) => service.getCourse(actor) },
   GetCourseTopic: { id: true, run: (service, { actor, id }) => service.getTopic(actor, id) },
@@ -34,8 +33,6 @@ export class CourseGrpcController {
     this.courseService = courseService;
   }
 
-  // Shapes the { code, msg, data } envelope. Unexpected errors propagate as a
-  // gRPC error and the gateway answers 500.
   async handle(spec, request) {
     try {
       const data = await spec.run(this.courseService, {
@@ -63,5 +60,6 @@ for (const [rpc, spec] of Object.entries(rpcs)) {
   CourseGrpcController.prototype[method] = function (request) {
     return this.handle(spec, request);
   };
+  withGrpcContext(CourseGrpcController.prototype, method, rpc);
   GrpcMethod(LEARNING_GRPC_SERVICE, rpc)(CourseGrpcController.prototype, method, Object.getOwnPropertyDescriptor(CourseGrpcController.prototype, method));
 }

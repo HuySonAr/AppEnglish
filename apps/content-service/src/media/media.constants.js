@@ -5,8 +5,6 @@ export const MediaKind = Object.freeze({
 
 export const allowedMediaTypes = Object.freeze({
   [MediaKind.AUDIO]: Object.freeze({
-    // Browsers report .mp4 files as video/mp4 even when they hold only audio,
-    // and .m4a files as audio/x-m4a or audio/mp4.
     mimeTypes: Object.freeze(['audio/mpeg', 'audio/mp4', 'video/mp4', 'audio/x-m4a', 'audio/m4a']),
     extensions: Object.freeze(['.mp3', '.mp4', '.m4a'])
   }),
@@ -16,5 +14,4 @@ export const allowedMediaTypes = Object.freeze({
   })
 });
 
-// A mock-test part can be one long recording.
 export const defaultMaxFileSizeBytes = 40 * 1024 * 1024;

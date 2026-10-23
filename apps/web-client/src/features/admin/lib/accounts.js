@@ -1,7 +1,5 @@
 import { AccountAuditAction, AccountRole, AccountStatus, AdminAccountAction, AdminAccountSort, ADMIN_STATS_DAYS } from '@appenglish/auth-contracts';
 
-// Pure rules of the admin account pages (F01B, D114).
-
 export const statusLabels = Object.freeze({
   [AccountStatus.PENDING_VERIFICATION]: 'Pending verification',
   [AccountStatus.ACTIVE]: 'Active',
@@ -23,12 +21,10 @@ export const sortOptions = Object.freeze([
   { value: AdminAccountSort.EMAIL, label: 'Email A–Z' },
 ]);
 
-// A status change away from ACTIVE needs a reason the person will be shown.
 export function lockReasonRequired(previousStatus, nextStatus) {
   return nextStatus !== previousStatus && nextStatus !== AccountStatus.ACTIVE && nextStatus !== AccountStatus.PENDING_VERIFICATION;
 }
 
-// One audit row as a sentence, without the actor.
 export function auditDescription(audit, labels = { status: statusLabels, role: {} }) {
   const role = (value) => labels.role[value] || value;
   const status = (value) => labels.status[value] || value;
@@ -66,8 +62,6 @@ export function auditDescription(audit, labels = { status: statusLabels, role: {
 
 const dayKey = (date) => date.toISOString().slice(0, 10);
 
-// Sign-ups per day for the chart: one point per day of the window, oldest
-// first, days without sign-ups at 0. newPerDay is [{ day: 'YYYY-MM-DD', count }].
 export function signupSeries(newPerDay = [], { days = ADMIN_STATS_DAYS, today = new Date() } = {}) {
   const counts = new Map(newPerDay.map((row) => [row.day, row.count]));
   const end = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
@@ -79,7 +73,6 @@ export function signupSeries(newPerDay = [], { days = ADMIN_STATS_DAYS, today = 
   });
 }
 
-// Status breakdown for the bars, in a fixed order, with shares of the total.
 export function statusBreakdown(byStatus = {}, total = 0) {
   return Object.keys(statusLabels).map((status) => {
     const count = byStatus[status] || 0;
@@ -87,7 +80,6 @@ export function statusBreakdown(byStatus = {}, total = 0) {
   });
 }
 
-// "3 days ago", "2 hours ago", "just now"; '' for nothing.
 export function timeAgo(iso, now = new Date()) {
   if (!iso) return '';
   const diff = Math.max(0, now - new Date(iso));
@@ -102,14 +94,10 @@ export function timeAgo(iso, now = new Date()) {
   return `${months} month${months === 1 ? '' : 's'} ago`;
 }
 
-// A pending account created by an admin, waiting for the person to accept
-// the invitation (D131).
 export function isInvitedPending(account) {
   return account?.status === AccountStatus.PENDING_VERIFICATION && Boolean(account.invitedAt);
 }
 
-// The one-off actions that make sense for an account right now (D131), in
-// menu order. Picture and name moderation stay on the account page.
 export function availableActions(account) {
   if (!account) return [];
   const pending = account.status === AccountStatus.PENDING_VERIFICATION;
@@ -123,8 +111,6 @@ export function availableActions(account) {
   return actions;
 }
 
-// The statuses the status menu of a row offers (D131): where the account can
-// go from here. A pending account is activated through the ACTIVATE action.
 export function statusChoices(account) {
   switch (account?.status) {
     case AccountStatus.ACTIVE:

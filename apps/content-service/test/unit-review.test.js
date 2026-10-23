@@ -6,8 +6,6 @@ import { lessonContentSchema, unitReviewContentSchema, unitReviewIssues } from '
 import { createMemoryRepository, manager, publishableContent, student } from './memory-repository.js';
 import { publishableReview } from './review-helpers.js';
 
-// A unit review (D121): 20 Part 5 questions and 2 Part 6 passages of 5.
-
 async function harness() {
   const repository = createMemoryRepository();
   const storage = {
@@ -21,7 +19,6 @@ async function harness() {
   return { repository, service, unit };
 }
 
-// A unit with one published lesson, so it can be published itself.
 async function publishedUnit(h) {
   const audioId = (await h.service.uploadMedia(manager, { kind: 'audio', fileName: 'a.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1]) })).media.id;
   const imageId = (await h.service.uploadMedia(manager, { kind: 'image', fileName: 'i.png', mimeType: 'image/png', data: Buffer.from([1]) })).media.id;
@@ -36,7 +33,6 @@ test('the publishing rules of a unit review name every gap', () => {
   assert.deepEqual(empty.map((issue) => issue.path), ['test.part5.questions', 'test.part6.groups']);
   const review = unitReviewContentSchema.parse(publishableReview());
   assert.deepEqual(unitReviewIssues(review), []);
-  // A passage with the wrong number of blanks or questions, a question without text.
   review.test.part6.groups[0].passage = 'Only ___ two ___.';
   review.test.part6.questions.pop();
   review.test.part5.questions[0].prompt = '';
@@ -66,7 +62,6 @@ test('a Content Manager writes, publishes, republishes and unpublishes the revie
   assert.equal(published.draft, null);
   const listed = (await h.service.listUnits(manager)).units[0];
   assert.deepEqual(listed.review, { publishedVersionNumber: 1, hasDraft: false });
-  // Learners get the review only through a published unit.
   await assert.rejects(() => h.service.getUnitReviewPaper(h.unit.id), { code: 40 });
   await publishedUnit(h);
   const paper = await h.service.getUnitReviewPaper(h.unit.id);
@@ -75,7 +70,6 @@ test('a Content Manager writes, publishes, republishes and unpublishes the revie
   assert.equal(UNIT_REVIEW_QUESTION_COUNT, 19);
   assert.equal((await h.service.getCurriculum()).units[0].reviewVersionId, paper.versionId);
 
-  // Editing again creates version 2; the published one stays until republished.
   const again = await h.service.saveUnitReviewDraft(manager, h.unit.id, unitReviewContentSchema.parse(publishableReview()));
   assert.equal(again.draft.versionNumber, 2);
   assert.equal(again.published.versionNumber, 1);
@@ -84,13 +78,11 @@ test('a Content Manager writes, publishes, republishes and unpublishes the revie
 
   const hidden = await h.service.unpublishUnitReview(manager, h.unit.id);
   assert.equal(hidden.published, null);
-  // Without a draft, the version taken down becomes the draft (D122).
   assert.equal(hidden.draft.versionNumber, 3);
   assert.equal((await h.service.getCurriculum()).units[0].reviewVersionId, null);
   await assert.rejects(() => h.service.getUnitReviewPaper(h.unit.id), { code: 40 });
   assert.equal(h.repository.tables.reviewVersions.length, 3, 'versions are kept');
 
-  // Deleting the unit removes its review versions.
   await h.service.deleteUnit(manager, h.unit.id);
   assert.equal(h.repository.tables.reviewVersions.length, 0);
 });
