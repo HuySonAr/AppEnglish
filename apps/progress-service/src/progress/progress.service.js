@@ -1,11 +1,12 @@
 import { Logger } from '@nestjs/common';
 import { AccountRole } from '@appenglish/auth-contracts';
 import { LearningEventType, MockAttemptKind } from '@appenglish/learning-contracts';
-import { LEADERBOARD_SIZE, ProgressSkill, ProgressSource } from '@appenglish/progress-contracts';
+import { LEADERBOARD_SIZE, NOTIFICATION_KEEP_DAYS, NOTIFICATION_LIST_SIZE, NotificationKind, ProgressSkill, ProgressSource } from '@appenglish/progress-contracts';
 import { progressErrors } from './progress.errors.js';
 import { completion, skillMastery } from './progress.rules.js';
 import { learnerIdSchema, payloadSchemas, resultMessageSchema } from './progress.schemas.js';
 import { dayOf, streakView } from './streak.rules.js';
+import { levelUpNotification, mockResultNotification, needsStreakReminder, notificationView, streakReminderKey, unitOpenedNotification } from './notification.rules.js';
 import { earnsXp, rankTotals, xpOf } from './xp.rules.js';
 
 const logger = new Logger('ProgressService');
@@ -92,6 +93,10 @@ export class ProgressService {
     } else if (type === LearningEventType.ACTIVITY_RECORDED) {
       const at = new Date(data.occurredAt);
       await this.repository.saveStudyDay({ accountId: data.accountId, day: dayOf(at), activity: data.activity, at });
+    } else if (type === LearningEventType.UNIT_REVIEW_PASSED) {
+      await this.repository.addNotification(unitOpenedNotification(data));
+    } else if (type === LearningEventType.COURSE_LEVEL_UP) {
+      await this.repository.addNotification(levelUpNotification(data));
     } else if (type === LearningEventType.LESSON_COMPLETED) {
       await this.repository.saveCompletion({ accountId: data.accountId, lessonId: data.lessonId, completedAt: new Date(data.completedAt) });
     } else if (type === LearningEventType.MOCK_SUBMITTED) {
@@ -104,6 +109,8 @@ export class ProgressService {
         sourceId: data.mockTestId,
         ...counts(data),
       });
+      const previous = await this.repository.latestMockNotification(data.accountId, data.mockTestId);
+      if (previous?.key !== `mock:${data.attemptId}`) await this.repository.addNotification(mockResultNotification(data, previous));
       // XP from the first full attempt only (D63); one row per test.
       if (earnsXp(data)) {
         await this.repository.saveXp({
@@ -120,6 +127,30 @@ export class ProgressService {
       }
     }
     return true;
+  }
+
+  async listNotifications(actor) {
+    this.assertStudent(actor);
+    const now = this.now();
+    await this.repository.deleteNotificationsBefore(actor.id, new Date(now.getTime() - NOTIFICATION_KEEP_DAYS * 86400000));
+    const streak = streakView(await this.repository.listStudyDays(actor.id), now);
+    if (needsStreakReminder(streak, now))
+      await this.repository.addNotification({
+        accountId: actor.id,
+        kind: NotificationKind.STREAK_REMINDER,
+        key: streakReminderKey(streak.today),
+        data: { streak: streak.current, day: streak.today },
+        createdAt: now,
+      });
+    else if (streak.studiedToday) await this.repository.markNotificationKeyRead(actor.id, streakReminderKey(streak.today), now);
+    const [rows, unread] = await Promise.all([this.repository.listNotifications(actor.id, NOTIFICATION_LIST_SIZE), this.repository.countUnread(actor.id)]);
+    return { notifications: rows.map(notificationView), unread };
+  }
+
+  async markNotificationsRead(actor, { ids } = {}) {
+    this.assertStudent(actor);
+    await this.repository.markNotificationsRead(actor.id, ids || null, this.now());
+    return { unread: await this.repository.countUnread(actor.id) };
   }
 
   async getStreak(actor) {

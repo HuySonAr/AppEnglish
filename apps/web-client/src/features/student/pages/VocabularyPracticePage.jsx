@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Brain, Check, RotateCcw, X } from 'lucide-react';
+import { ArrowRight, Brain, Check, RotateCcw, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { Badge, Button } from '../../../components/ui';
@@ -120,10 +121,7 @@ export function VocabularyPracticePage() {
   });
 
   const back = (
-    <Link to="/student/practice" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-      <ArrowLeft className="h-4 w-4" />
-      Practice
-    </Link>
+    <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Word memory' }]} />
   );
 
   if (state === 'loading') return <DetailPageSkeleton />;

@@ -2,6 +2,7 @@ import { AccountEntity } from '../database/account.entity.js';
 import { RefreshTokenEntity } from '../database/refresh-token.entity.js';
 import { OtpEntity } from '../database/otp.entity.js';
 import { AccountAuditEntity } from '../database/account-audit.entity.js';
+import { AdminNoticeReadEntity } from '../database/admin-notice-read.entity.js';
 import { ADMIN_STATS_DAYS, AdminAccountSort, STALE_PENDING_DAYS } from '@appenglish/auth-contracts';
 
 const daysAgo = (days) => new Date(Date.now() - days * 86400000);
@@ -138,6 +139,28 @@ export class AccountRepository {
   }
 
   // The numbers of the accounts page (D114).
+  async countStudentsCreatedBetween(from, to) {
+    await this.ensureInitialized();
+    return this.dataSource
+      .getRepository(AccountEntity)
+      .createQueryBuilder('account')
+      .where('account.role = :role AND account."createdAt" >= :from AND account."createdAt" < :to', { role: 'STUDENT', from, to })
+      .getCount();
+  }
+
+  async readNoticeKeys(accountId, keys) {
+    if (!keys.length) return new Set();
+    await this.ensureInitialized();
+    const rows = await this.dataSource.getRepository(AdminNoticeReadEntity).createQueryBuilder('read').where('read."accountId" = :accountId AND read.key IN (:...keys)', { accountId, keys }).getMany();
+    return new Set(rows.map((row) => row.key));
+  }
+
+  async markNoticesRead(accountId, keys, at) {
+    if (!keys.length) return;
+    await this.ensureInitialized();
+    await this.dataSource.getRepository(AdminNoticeReadEntity).createQueryBuilder().insert().values(keys.map((key) => ({ accountId, key, readAt: at }))).orIgnore().execute();
+  }
+
   async accountStats() {
     await this.ensureInitialized();
     const accounts = this.dataSource.getRepository(AccountEntity);

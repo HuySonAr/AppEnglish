@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, CheckCircle2, Lock } from 'lucide-react';
+import { CheckCircle2, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { CourseLevelState } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -55,10 +56,7 @@ export function CourseProgressPage() {
   }, []);
 
   const back = (
-    <Link to="/student/listening-course" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-      <ArrowLeft className="h-4 w-4" />
-      Listening course
-    </Link>
+    <PageBreadcrumb items={[{ label: 'Listening course', to: '/student/listening-course' }, { label: 'My progress' }]} />
   );
 
   if (state === 'loading') return <DetailPageSkeleton />;

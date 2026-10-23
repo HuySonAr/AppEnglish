@@ -21,6 +21,7 @@ import {
 } from '../components/ui/sheet.jsx';
 import { Brand } from './components/Brand.jsx';
 import { SidebarNav } from './components/SidebarNav.jsx';
+import { NotificationBell } from './components/NotificationBell.jsx';
 import { ThemeToggle } from './components/ThemeToggle.jsx';
 import { UserMenu } from './components/UserMenu.jsx';
 
@@ -115,6 +116,7 @@ export function SidebarLayout({ role, side = 'left', drawerSide = side }) {
           {drawerRight ? null : drawer}
           <Brand to={home} compact className="lg:hidden" />
           <div className="ml-auto flex items-center gap-1 sm:gap-2">
+            <NotificationBell />
             <ThemeToggle />
             <UserMenu />
             {drawerRight ? drawer : null}

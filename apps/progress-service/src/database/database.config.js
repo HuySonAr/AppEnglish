@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { LessonCompletionEntity, SkillResultEntity, StudyDayEntity, XpLedgerEntity } from './progress.entities.js';
+import { LessonCompletionEntity, NotificationEntity, SkillResultEntity, StudyDayEntity, XpLedgerEntity } from './progress.entities.js';
 
 export function createProgressDataSource() {
   return new DataSource({
@@ -9,7 +9,7 @@ export function createProgressDataSource() {
     username: process.env.POSTGRES_USER || 'postgres',
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.PROGRESS_DATABASE_NAME || 'app_progress',
-    entities: [SkillResultEntity, LessonCompletionEntity, XpLedgerEntity, StudyDayEntity],
+    entities: [SkillResultEntity, LessonCompletionEntity, XpLedgerEntity, StudyDayEntity, NotificationEntity],
     migrations: ['src/database/migrations/*.js'],
   });
 }

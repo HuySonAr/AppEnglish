@@ -65,6 +65,24 @@ export const XpLedgerEntity = new EntitySchema({
   ],
 });
 
+export const NotificationEntity = new EntitySchema({
+  name: 'Notification',
+  tableName: 'notifications',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    accountId: { type: 'uuid' },
+    kind: { type: 'varchar', length: 32 },
+    key: { type: 'varchar', length: 120 },
+    data: { type: 'jsonb', default: () => "'{}'::jsonb" },
+    createdAt: { type: 'timestamptz' },
+    readAt: { type: 'timestamptz', nullable: true },
+  },
+  indices: [
+    { name: 'UQ_notifications_account_key', columns: ['accountId', 'key'], unique: true },
+    { name: 'IDX_notifications_account_created', columns: ['accountId', 'createdAt'] },
+  ],
+});
+
 export const StudyDayEntity = new EntitySchema({
   name: 'StudyDay',
   tableName: 'study_days',

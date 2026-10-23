@@ -16,6 +16,12 @@ const seconds = z.number().min(0).max(3 * 60 * 60).nullable().default(null);
 
 // format: how the topic's exercises are written (D88); null for not yet.
 const topicFormat = z.enum(Object.values(ListeningFormat)).nullable();
+export const markJobsSeenSchema = z.object({ ids: z.array(z.string().uuid()).max(100).optional() }).strict();
+
+export const markNoticesReadSchema = z.object({ ids: z.array(z.string().min(1).max(160)).max(100).optional() }).strict();
+
+export const mockTranscribeSchema = z.object({ audioMediaId: z.string().uuid() }).strict();
+
 export const listeningTopicCreateSchema = z.object({ name: requiredText(100), format: topicFormat.default(null) }).strict();
 export const listeningTopicUpdateSchema = z
   .object({ name: requiredText(100).optional(), format: topicFormat.optional() })
@@ -51,6 +57,14 @@ const segmentSchema = z
     text: text(LISTENING_SEGMENT_MAX_LENGTH).default(''),
     start: seconds,
     end: seconds,
+    translation: text(1000).default(''),
+  })
+  .strict();
+
+const sourceSchema = z
+  .object({
+    name: text(100).default(''),
+    url: z.union([z.string().trim().url().max(500), z.literal('')]).default(''),
   })
   .strict();
 
@@ -58,6 +72,7 @@ export const listeningContentSchema = z
   .object({
     audioMediaId: z.string().uuid().nullable().default(null),
     segments: z.array(segmentSchema).max(LISTENING_MAX_SEGMENTS).default([]),
+    source: sourceSchema.default({}),
   })
   .strict();
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Inject, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Inject, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
 import { AUTH_GRPC_CLIENT, attachProfiles, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
@@ -154,6 +154,9 @@ export class LessonGatewayController extends LearningRelay {
   getListeningPractice(id, query, request) {
     return this.forward('GetListeningPractice', request, { id, body: query?.mode ? { mode: query.mode } : {} });
   }
+  getListeningTranscript(id, request) {
+    return this.forward('GetListeningTranscript', request, { id });
+  }
   checkListeningLine(id, body, request) {
     return this.forward('CheckListeningLine', request, { id, body });
   }
@@ -221,6 +224,7 @@ const lessonRoutes = [
   [Post, 'practice/vocabulary/complete', 'completeVocabularyPractice', [Req()]],
   [Get, 'practice/listening', 'listListeningPractice', [Req()]],
   [Get, 'practice/listening/:id', 'getListeningPractice', [Param('id'), Query(), Req()]],
+  [Get, 'practice/listening/:id/transcript', 'getListeningTranscript', [Param('id'), Req()]],
   [Post, 'practice/listening/:id/check', 'checkListeningPractice', [Param('id'), Body(), Req()]],
   [Post, 'practice/listening/:id/check-line', 'checkListeningLine', [Param('id'), Body(), Req()]],
   [Get, 'listening-course', 'getListeningCourse', [Req()]],
@@ -255,6 +259,24 @@ export class MockGatewayController extends LearningRelay {
   updateScoreConversion(body, request) {
     return this.forward('UpdateScoreConversion', request, { body });
   }
+  getStudyGoal(request) {
+    return this.forward('GetStudyGoal', request);
+  }
+  saveStudyGoal(body, request) {
+    return this.forward('SaveStudyGoal', request, { body });
+  }
+  deleteStudyGoal(request) {
+    return this.forward('DeleteStudyGoal', request);
+  }
+  getMockMistakes(request) {
+    return this.forward('GetMockMistakes', request);
+  }
+  getMistakePractice(query, request) {
+    return this.forward('GetMistakePractice', request, { body: query?.partKey ? { partKey: query.partKey } : {} });
+  }
+  answerMistake(body, request) {
+    return this.forward('AnswerMistake', request, { body });
+  }
   listMockTests(request) {
     return this.forward('ListMockTests', request);
   }
@@ -279,6 +301,9 @@ export class MockGatewayController extends LearningRelay {
   getMockReview(id, query, request) {
     return this.forward('GetMockReview', request, { id, body: this.reference(query) });
   }
+  getMockStats(id, request) {
+    return this.forward('GetMockStats', request, { id });
+  }
 }
 
 Controller('mock-tests')(MockGatewayController);
@@ -288,6 +313,12 @@ Inject(LEARNING_GRPC_CLIENT)(MockGatewayController, undefined, 1);
 const mockRoutes = [
   [Get, 'score-conversion', 'getScoreConversion', [Req()]],
   [Put, 'score-conversion', 'updateScoreConversion', [Body(), Req()]],
+  [Get, 'goal', 'getStudyGoal', [Req()]],
+  [Put, 'goal', 'saveStudyGoal', [Body(), Req()]],
+  [Delete, 'goal', 'deleteStudyGoal', [Req()]],
+  [Get, 'mistakes', 'getMockMistakes', [Req()]],
+  [Get, 'mistakes/practice', 'getMistakePractice', [Query(), Req()]],
+  [Post, 'mistakes/answer', 'answerMistake', [Body(), Req()]],
   [Get, '', 'listMockTests', [Req()]],
   [Get, ':id', 'getMockTest', [Param('id'), Req()]],
   [Get, ':id/attempt', 'getMockAttempt', [Param('id'), Query(), Req()]],
@@ -296,6 +327,7 @@ const mockRoutes = [
   [Post, ':id/attempt/submit', 'submitMockAttempt', [Param('id'), Body(), Req()]],
   [Post, ':id/attempt/discard', 'discardMockAttempt', [Param('id'), Body(), Req()]],
   [Get, ':id/review', 'getMockReview', [Param('id'), Query(), Req()]],
+  [Get, ':id/stats', 'getMockStats', [Param('id'), Req()]],
 ];
 for (const [verb, path, method, params] of mockRoutes) {
   const descriptor = Object.getOwnPropertyDescriptor(MockGatewayController.prototype, method);

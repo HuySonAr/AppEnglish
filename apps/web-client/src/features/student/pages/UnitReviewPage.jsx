@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, CheckCircle2, ClipboardCheck, ListChecks, Target, Trophy } from 'lucide-react';
+import { CheckCircle2, ClipboardCheck, ListChecks, Target, Trophy } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { UNIT_REVIEW_PART_COUNTS, UNIT_REVIEW_PASSAGE_COUNT, UNIT_REVIEW_PASSAGE_QUESTIONS } from '@appenglish/content-contracts';
 import { UnitReviewState } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
@@ -94,10 +95,7 @@ export function UnitReviewPage() {
 
   return (
     <section className="space-y-6">
-      <Link to={back.to} state={back.state} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" />
-        Lessons
-      </Link>
+      <PageBreadcrumb items={[{ label: 'Lessons', to: back.to, state: back.state }, { label: `Unit review: ${data.unit.title}` }]} />
 
       {result ? (
         <div className="space-y-4">

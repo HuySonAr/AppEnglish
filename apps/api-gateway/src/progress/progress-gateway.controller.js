@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, Inject, Param, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Inject, Param, Post, Req } from '@nestjs/common';
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { PROGRESS_GRPC_SERVICE } from '@appenglish/progress-contracts/grpc';
 import { AUTH_GRPC_CLIENT, attachProfiles, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
@@ -49,6 +49,12 @@ export class ProgressGatewayController {
     return this.forward('GetStreak', request);
   }
   // Admin: a learner's progress and XP, read-only (D114).
+  listNotifications(request) {
+    return this.forward('ListNotifications', request);
+  }
+  markNotificationsRead(body, request) {
+    return this.forward('MarkNotificationsRead', request, { body: body || {} });
+  }
   getLearnerSummary(id, request) {
     return this.forward('GetLearnerSummary', request, { id });
   }
@@ -68,6 +74,8 @@ const routes = [
   [Get, 'xp', 'getXp', [Req()]],
   [Get, 'streak', 'getStreak', [Req()]],
   [Get, 'leaderboard', 'getLeaderboard', [Req()]],
+  [Get, 'notifications', 'listNotifications', [Req()]],
+  [Post, 'notifications/read', 'markNotificationsRead', [Body(), Req()]],
   [Get, 'admin/learners/:id', 'getLearnerSummary', [Param('id'), Req()]],
 ];
 for (const [verb, path, method, params] of routes) {

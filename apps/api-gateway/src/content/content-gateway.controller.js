@@ -222,6 +222,27 @@ export class ContentGatewayController {
   updateListeningTopic(id, body, request) {
     return this.forward('UpdateListeningTopic', request, { id, body });
   }
+  deleteListeningTopic(id, request) {
+    return this.forward('DeleteListeningTopic', request, { id });
+  }
+  requestMockTranscribe(id, body, request) {
+    return this.forward('RequestMockTranscribe', request, { id, body });
+  }
+  listMockTranscribe(id, request) {
+    return this.forward('ListMockTranscribe', request, { id });
+  }
+  listContentNotifications(request) {
+    return this.forward('ListContentNotifications', request);
+  }
+  markContentNotificationsRead(body, request) {
+    return this.forward('MarkContentNotificationsRead', request, { body: body || {} });
+  }
+  listAdminContentNotifications(request) {
+    return this.forward('ListAdminContentNotifications', request);
+  }
+  markAdminContentNotificationsRead(body, request) {
+    return this.forward('MarkAdminContentNotificationsRead', request, { body: body || {} });
+  }
   listListeningExercises(request) {
     return this.forward('ListListeningExercises', request);
   }
@@ -352,9 +373,16 @@ const routes = [
   [Get, 'mock-tests/:id', 'getMockTest', [Param('id'), Req()]],
   [Put, 'mock-tests/:id/draft', 'saveMockTestDraft', [Param('id'), Body(), Req()]],
   [Post, 'mock-tests/:id/publish', 'publishMockTest', [Param('id'), Req()]],
+  [Post, 'mock-tests/:id/transcribe', 'requestMockTranscribe', [Param('id'), Body(), Req()]],
+  [Get, 'mock-tests/:id/transcribe', 'listMockTranscribe', [Param('id'), Req()]],
+  [Get, 'notifications', 'listContentNotifications', [Req()]],
+  [Post, 'notifications/read', 'markContentNotificationsRead', [Body(), Req()]],
+  [Get, 'admin/notifications', 'listAdminContentNotifications', [Req()]],
+  [Post, 'admin/notifications/read', 'markAdminContentNotificationsRead', [Body(), Req()]],
   [Get, 'listening-topics', 'listListeningTopics', [Req()]],
   [Post, 'listening-topics', 'createListeningTopic', [Body(), Req()]],
   [Patch, 'listening-topics/:id', 'updateListeningTopic', [Param('id'), Body(), Req()]],
+  [Delete, 'listening-topics/:id', 'deleteListeningTopic', [Param('id'), Req()]],
   [Get, 'listening-exercises', 'listListeningExercises', [Req()]],
   [Post, 'listening-exercises', 'createListeningExercise', [Body(), Req()]],
   [Patch, 'listening-exercises/:id', 'updateListeningExercise', [Param('id'), Body(), Req()]],

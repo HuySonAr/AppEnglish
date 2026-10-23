@@ -16,7 +16,7 @@ export function workingListening(data, kindKey) {
   const segments = (content.segments || []).map((segment) => newSegment(segment));
   const { segmentCount } = listeningKindOf(kindKey);
   if (segmentCount) while (segments.length < segmentCount) segments.push(newSegment());
-  return { audioMediaId: content.audioMediaId ?? null, segments };
+  return { audioMediaId: content.audioMediaId ?? null, segments, source: { name: '', url: '', ...(content.source || {}) } };
 }
 
 // What a sentence is called in the editor and in issues: its fixed label in
@@ -150,5 +150,23 @@ export function transcribedSegments(lines, kind) {
   const segments = lines.map((line) => newSegment({ text: line.text, start: line.start, end: line.end }));
   if (kind.segmentCount) while (segments.length < kind.segmentCount) segments.push(newSegment());
   return segments;
+}
+
+export function translationPastePlan(segments, text) {
+  const pasted = String(text || '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const lines = pasted.map((line, index) => ({
+    title: `Sentence ${index + 1}`,
+    note: segments[index] ? ` · ${segments[index].text.slice(0, 60)}` : '',
+    text: line,
+    errors: index >= segments.length ? [`there are only ${segments.length} sentences`] : line.length > 1000 ? ['longer than 1000 characters'] : [],
+    warnings: [],
+  }));
+  if (pasted.length && pasted.length < segments.length) lines[0].warnings.push(`${pasted.length} of ${segments.length} sentences; the rest keep theirs`);
+  const usable = lines.every((line) => !line.errors.length);
+  const next = segments.map((segment, index) => (index < pasted.length ? { ...segment, translation: pasted[index] } : segment));
+  return { segments: usable ? next : segments, count: pasted.length, lines };
 }
 

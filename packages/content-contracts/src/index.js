@@ -199,7 +199,7 @@ export const UNIT_REVIEW_QUESTION_COUNT = UNIT_REVIEW_PART_COUNTS.part5 + UNIT_R
 export const LISTENING_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
 // How the exercises of a topic are written: TOEIC parts or songs (D88). A
 // topic without a format has no editor yet, like an exam type (D69).
-export const ListeningFormat = Object.freeze({ TOEIC: 'toeic', SONG: 'song' });
+export const ListeningFormat = Object.freeze({ TOEIC: 'toeic', SONG: 'song', TALKS: 'talks' });
 // The kinds of TOEIC dictation. segmentCount is fixed for Parts 1 and 2
 // (four statements; a question and three responses); timed: every segment of
 // Parts 3 and 4 needs its start and end in the recording.
@@ -207,17 +207,26 @@ export const LISTENING_TOEIC_KINDS = Object.freeze(
   [
     { key: 'part1', number: 1, title: 'Photographs', segmentCount: 4, timed: false, labels: ['(A)', '(B)', '(C)', '(D)'] },
     { key: 'part2', number: 2, title: 'Question-Response', segmentCount: 4, timed: false, labels: ['Question', '(A)', '(B)', '(C)'] },
-    { key: 'part3', number: 3, title: 'Conversation', segmentCount: null, timed: true, labels: null },
+    { key: 'part3', number: 3, title: 'Conversation', segmentCount: null, timed: true, labels: null, speakers: true },
     { key: 'part4', number: 4, title: 'Talk', segmentCount: null, timed: true, labels: null },
   ].map((kind) => Object.freeze(kind)),
 );
 // A song (F05B-4, D88): the lyrics line by line, every line timed. Words in
 // square brackets are the blanks of the fill-in mode.
 export const LISTENING_SONG_KIND = Object.freeze({ key: 'song', number: null, title: 'Song', segmentCount: null, timed: true, labels: null });
+// Talks and news (D155): recordings such as VOA Learning English, written
+// down sentence by sentence, every sentence timed.
+export const LISTENING_TALK_KINDS = Object.freeze(
+  [
+    { key: 'conversation', number: null, title: 'Conversation', segmentCount: null, timed: true, labels: null, speakers: true },
+    { key: 'talk', number: null, title: 'Talk', segmentCount: null, timed: true, labels: null },
+  ].map((kind) => Object.freeze(kind)),
+);
 // The kinds of exercise each format has.
 export const LISTENING_KINDS = Object.freeze({
   [ListeningFormat.TOEIC]: LISTENING_TOEIC_KINDS,
   [ListeningFormat.SONG]: Object.freeze([LISTENING_SONG_KIND]),
+  [ListeningFormat.TALKS]: LISTENING_TALK_KINDS,
 });
 export const listeningKind = (key) =>
   Object.values(LISTENING_KINDS)

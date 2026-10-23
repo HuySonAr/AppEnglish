@@ -53,6 +53,9 @@ service LearningService {
   rpc CheckListeningPractice(LearningRequest) returns (LearningReply);
   // One line checked as the learner goes (D93); nothing is kept.
   rpc CheckListeningLine(LearningRequest) returns (LearningReply);
+  // D157: the full transcript with its Vietnamese translation, for the
+  // Full transcript tab.
+  rpc GetListeningTranscript(LearningRequest) returns (LearningReply);
   // Listening course (F05C, D143–D145). Student: the course by level with the
   // learner's topics done and level tests passed.
   rpc GetListeningCourse(LearningRequest) returns (LearningReply);
@@ -78,6 +81,13 @@ service LearningService {
   // Leaves the attempt in progress without submitting; the attempt is removed.
   rpc DiscardMockAttempt(LearningRequest) returns (LearningReply);
   rpc GetMockReview(LearningRequest) returns (LearningReply);
+  rpc GetMockStats(LearningRequest) returns (LearningReply);
+  rpc GetStudyGoal(LearningRequest) returns (LearningReply);
+  rpc SaveStudyGoal(LearningRequest) returns (LearningReply);
+  rpc DeleteStudyGoal(LearningRequest) returns (LearningReply);
+  rpc GetMockMistakes(LearningRequest) returns (LearningReply);
+  rpc GetMistakePractice(LearningRequest) returns (LearningReply);
+  rpc AnswerMistake(LearningRequest) returns (LearningReply);
   rpc GetScoreConversion(LearningRequest) returns (LearningReply);
   rpc UpdateScoreConversion(LearningRequest) returns (LearningReply);
 }

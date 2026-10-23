@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { ContentResponseCode, UNIT_REVIEW_PART_COUNTS, UNIT_REVIEW_PASSAGE_COUNT, UNIT_REVIEW_PASSAGE_QUESTIONS, UNIT_REVIEW_QUESTION_COUNT } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -10,6 +10,7 @@ import { DiscardDraftButton } from '../components/DiscardDraftButton.jsx';
 import { ImportExportJson } from '../components/ImportExportJson.jsx';
 import { exportReview, jsonFileName, planReviewImport } from '../lib/authoring-import.js';
 import { MockPartEditor } from '../components/MockPartEditor.jsx';
+import { SectionNav } from '../components/SectionNav.jsx';
 import { issueLocation, lessonState, setIn } from '../lib/lesson-draft.js';
 import {
   UNIT_REVIEW_FIRST_NUMBERS,
@@ -20,20 +21,17 @@ import {
   unitReviewQuestionCount,
   workingUnitReview,
 } from '../lib/unit-review-draft.js';
-import { Badge, Button, Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui';
+import { Badge, Button } from '../../../components/ui';
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
-import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { VersionHistory } from '../components/VersionHistory.jsx';
 import { PublishButton, usePublishAction } from '../../../components/shared/PublishButton.jsx';
 import { useFocusReturn, useListLinkState, useReturnTo } from '../../../hooks/use-return-to.js';
 
 const hints = {
-  part5: `Reading · ${UNIT_REVIEW_PART_COUNTS.part5} sentences, each with one blank and four options; test the words of the unit, mostly as word forms`,
-  part6: `Reading · ${UNIT_REVIEW_PASSAGE_COUNT} passages (email, memo, notice…) with exactly ${UNIT_REVIEW_PASSAGE_QUESTIONS} blanks each, written ___, one question of four options per blank`,
+  part5: `${UNIT_REVIEW_PART_COUNTS.part5} sentences that test the unit's words, mostly as word forms.`,
+  part6: `${UNIT_REVIEW_PASSAGE_COUNT} short passages with ${UNIT_REVIEW_PASSAGE_QUESTIONS} blanks each, written ___.`,
 };
 
-// Editor of the review that closes a unit (D121, D129): 10 Part 5 questions and 3
-// Part 6 passages, saved as a draft and published as a version like a lesson.
 export function UnitReviewEditorPage() {
   const { unitId } = useParams();
   const back = useReturnTo('/content-manager/units');
@@ -143,31 +141,39 @@ export function UnitReviewEditorPage() {
     );
 
   const total = unitReviewQuestionCount(content);
-  const rangeOf = (key) => {
-    const first = UNIT_REVIEW_FIRST_NUMBERS[key];
-    return `${first}–${first + UNIT_REVIEW_LIMITS[key].target - 1}`;
-  };
+  const spec = UNIT_REVIEW_SPECS.find((item) => item.key === partTab);
+  const issuesOf = (key) => issues.filter((issue) => issueLocation(issue.path).part === key).length;
+  const groups = [
+    {
+      label: 'Reading',
+      items: UNIT_REVIEW_SPECS.map((item) => {
+        const part = content.test[item.key];
+        const count = part.questions.length;
+        const target = UNIT_REVIEW_LIMITS[item.key].target;
+        const sets = item.key === 'part6' ? `${part.groups.length}/${UNIT_REVIEW_PASSAGE_COUNT} passages · ` : '';
+        return { key: item.key, title: `Part ${item.number}`, detail: `${sets}${count}/${target} questions`, done: count >= target, issues: issuesOf(item.key), progress: (count * 100) / target };
+      }),
+    },
+  ];
 
   return (
-    <section className="space-y-6">
-      <Link to={back.to} state={back.state} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" />
-        Units and lessons
-      </Link>
-      <PageHeader
-        eyebrow={`Unit ${unit.position}`}
-        title={`Unit review: ${unit.title}`}
-        description={`${UNIT_REVIEW_PART_COUNTS.part5} sentences (Part 5) and ${UNIT_REVIEW_PASSAGE_COUNT} passages of ${UNIT_REVIEW_PASSAGE_QUESTIONS} blanks (Part 6), ${UNIT_REVIEW_QUESTION_COUNT} questions.`}
-      />
+    <section className="space-y-5">
+      <PageBreadcrumb items={[{ label: 'Units and lessons', to: back.to, state: back.state }, { label: `Unit ${unit.position}: ${unit.title}` }, { label: 'Unit review' }]} />
 
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-2 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-        {status.publishedVersion ? <Badge variant="success">Published v{status.publishedVersion}</Badge> : <Badge variant="outline">Not published</Badge>}
-        {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
-        {dirty ? <Badge variant="info">Unsaved changes</Badge> : null}
-        <Badge variant={unitReviewComplete(content) ? 'success' : 'secondary'}>
-          {total} / {UNIT_REVIEW_QUESTION_COUNT} questions
-        </Badge>
-        <div className="ml-auto flex flex-wrap gap-2">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-lg font-semibold sm:text-xl">Unit review: {unit.title}</h1>
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+            <span>Unit {unit.position}</span>
+            <Badge variant={unitReviewComplete(content) ? 'success' : 'secondary'} className="tabular-nums">
+              {total}/{UNIT_REVIEW_QUESTION_COUNT} questions
+            </Badge>
+            {status.publishedVersion ? <Badge variant="success">Published v{status.publishedVersion}</Badge> : <Badge variant="outline">Not published</Badge>}
+            {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
+            {dirty ? <Badge variant="info">Unsaved</Badge> : null}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
           <ImportExportJson
             noun="unit review"
             disabled={busy}
@@ -184,16 +190,8 @@ export function UnitReviewEditorPage() {
             {busy ? 'Working…' : 'Save draft'}
           </Button>
           <PublishButton state={publish.state} disabled={busy || !(dirty || status.hasDraft)} onClick={() => publish.run(onPublish)} />
-          {status.hasDraft ? (
-            <DiscardDraftButton kind="unitReview" id={unitId} noun="unit review" disabled={busy} onDiscarded={load} />
-          ) : null}
-          <ContentDangerActions
-            noun="unit review"
-            published={Boolean(status.publishedVersion)}
-            busy={busy}
-            deletable={false}
-            onUnpublish={async () => apply((await unpublishUnitReview(unitId)).data)}
-          />
+          {status.hasDraft ? <DiscardDraftButton kind="unitReview" id={unitId} noun="unit review" disabled={busy} onDiscarded={load} size="icon" /> : null}
+          <ContentDangerActions noun="unit review" published={Boolean(status.publishedVersion)} busy={busy} deletable={false} onUnpublish={async () => apply((await unpublishUnitReview(unitId)).data)} />
         </div>
       </div>
 
@@ -220,32 +218,26 @@ export function UnitReviewEditorPage() {
         </div>
       ) : null}
 
-      <Tabs value={partTab} onValueChange={setPartTab}>
-        <TabsList className="h-auto flex-wrap justify-start">
-          {UNIT_REVIEW_SPECS.map((spec) => (
-            <TabsTrigger key={spec.key} value={spec.key}>
-              Part {spec.number} ({rangeOf(spec.key)})
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        {UNIT_REVIEW_SPECS.map((spec) => (
-          <TabsContent key={spec.key} value={spec.key}>
-            <MockPartEditor
-              spec={spec}
-              part={content.test[spec.key]}
-              edit={edit}
-              updatePart={(change) => update((current) => ({ ...current, test: { ...current.test, [spec.key]: change(current.test[spec.key]) } }))}
-              media={{}}
-              target={UNIT_REVIEW_LIMITS[spec.key].target}
-              firstNumber={UNIT_REVIEW_FIRST_NUMBERS[spec.key]}
-              maxSets={UNIT_REVIEW_LIMITS[spec.key].maxSets}
-              setQuestionLimit={UNIT_REVIEW_LIMITS[spec.key].setQuestionLimit}
-              hint={hints[spec.key]}
-              paste={false}
-            />
-          </TabsContent>
-        ))}
-      </Tabs>
+      <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start">
+        <SectionNav label="Parts" groups={groups} active={partTab} onChoose={setPartTab} />
+
+        <div className="min-w-0">
+          <MockPartEditor
+            key={spec.key}
+            spec={spec}
+            part={content.test[spec.key]}
+            edit={edit}
+            updatePart={(change) => update((current) => ({ ...current, test: { ...current.test, [spec.key]: change(current.test[spec.key]) } }))}
+            media={{}}
+            target={UNIT_REVIEW_LIMITS[spec.key].target}
+            firstNumber={UNIT_REVIEW_FIRST_NUMBERS[spec.key]}
+            maxSets={UNIT_REVIEW_LIMITS[spec.key].maxSets}
+            setQuestionLimit={UNIT_REVIEW_LIMITS[spec.key].setQuestionLimit}
+            hint={hints[spec.key]}
+            paste={false}
+          />
+        </div>
+      </div>
 
       <VersionHistory kind="unitReview" id={unitId} noun="unit review" refreshKey={`${status.publishedVersion}-${status.draftVersion}`} onRestored={load} />
     </section>

@@ -560,6 +560,18 @@ export class LessonService {
       submittedAt: this.now(),
     });
     await recordActivity(this.events, actor.id, StudyActivity.UNIT_REVIEW, this.now());
+    if (saved.passed && !own.some((attempt) => attempt.passed)) {
+      const units = standing.curriculum.units || [];
+      const index = units.findIndex((unit) => unit.id === unitId);
+      await this.events.record(LearningEventType.UNIT_REVIEW_PASSED, {
+        accountId: actor.id,
+        unitId,
+        unitTitle: units[index]?.title || '',
+        nextUnitId: units[index + 1]?.id || null,
+        nextUnitTitle: units[index + 1]?.title || null,
+        passedAt: new Date(saved.submittedAt).toISOString(),
+      });
+    }
     return {
       attempt: this.reviewAttemptSummary(saved),
       parts: testParts({ test: paper.test, media: {} }, { answers, partKeys: UNIT_REVIEW_PARTS }),

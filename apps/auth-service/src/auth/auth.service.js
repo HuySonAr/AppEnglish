@@ -1,5 +1,6 @@
 import { accountResponseSchema, authResponseSchema } from './auth.schemas.js';
 import { authErrors } from './auth.errors.js';
+import { lastWeeks, newLearnersNotice, startOfDay } from './admin-notices.js';
 import { AccountResponseDto } from './auth.dto.js';
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
 import { ADMIN_AUDIT_LIMIT, ADMIN_STATS_DAYS, AccountAuditAction, AdminAccountAction, INVITE_TTL_HOURS, displayNameOf } from '@appenglish/auth-contracts';
@@ -474,6 +475,30 @@ export class AuthService {
 
   // The numbers of the accounts page (D114): totals by status and role, who
   // signed in this week, stale pending accounts, and sign-ups per day.
+  async adminNotices(now = new Date()) {
+    const weeks = lastWeeks(now);
+    const [newLearners, before] = await Promise.all([
+      this.accountRepository.countStudentsCreatedBetween(startOfDay(weeks.lastWeek), startOfDay(weeks.thisWeek)),
+      this.accountRepository.countStudentsCreatedBetween(startOfDay(weeks.weekBefore), startOfDay(weeks.lastWeek)),
+    ]);
+    return [newLearnersNotice(weeks, newLearners, before)];
+  }
+
+  async adminNotifications(accessToken) {
+    const actor = await this.requireAdmin(accessToken);
+    const notices = await this.adminNotices();
+    const read = await this.accountRepository.readNoticeKeys(actor.id, notices.map((notice) => notice.id));
+    const notifications = notices.map((notice) => ({ ...notice, read: read.has(notice.id) }));
+    return { notifications, unread: notifications.filter((item) => !item.read).length };
+  }
+
+  async adminMarkNotificationsRead(accessToken, ids) {
+    const actor = await this.requireAdmin(accessToken);
+    const keys = ids?.length ? ids : (await this.adminNotices()).map((notice) => notice.id);
+    await this.accountRepository.markNoticesRead(actor.id, keys, new Date());
+    return { unread: (await this.adminNotifications(accessToken)).unread };
+  }
+
   async adminStats(accessToken) {
     await this.requireAdmin(accessToken);
     const stats = await this.accountRepository.accountStats();

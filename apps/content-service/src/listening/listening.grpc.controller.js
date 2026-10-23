@@ -11,6 +11,9 @@ import {
   listeningExerciseUpdateSchema,
   listeningTopicCreateSchema,
   listeningTopicUpdateSchema,
+  markJobsSeenSchema,
+  markNoticesReadSchema,
+  mockTranscribeSchema,
 } from './listening.schemas.js';
 
 // Each RPC: whether it targets an id, the schema of its JSON payload (if any)
@@ -26,6 +29,17 @@ const rpcs = {
     payload: listeningTopicUpdateSchema,
     run: (service, { actor, id, payload }) => service.updateTopic(actor, id, payload),
   },
+  DeleteListeningTopic: { id: true, run: (service, { actor, id }) => service.deleteTopic(actor, id) },
+  RequestMockTranscribe: {
+    id: true,
+    payload: mockTranscribeSchema,
+    run: (service, { actor, id, payload }) => service.requestMockTranscribe(actor, id, payload),
+  },
+  ListMockTranscribe: { id: true, run: (service, { actor, id }) => service.listMockTranscribe(actor, id) },
+  ListContentNotifications: { run: (service, { actor }) => service.listNotifications(actor) },
+  MarkContentNotificationsRead: { payload: markJobsSeenSchema, run: (service, { actor, payload }) => service.markNotificationsRead(actor, payload) },
+  ListAdminContentNotifications: { run: (service, { actor }) => service.listAdminNotifications(actor) },
+  MarkAdminContentNotificationsRead: { payload: markNoticesReadSchema, run: (service, { actor, payload }) => service.markAdminNotificationsRead(actor, payload) },
   ListListeningExercises: { run: (service, { actor }) => service.listExercises(actor) },
   CreateListeningExercise: {
     payload: listeningExerciseCreateSchema,

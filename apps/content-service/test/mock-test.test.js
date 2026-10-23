@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ContentService } from '../src/content/content.service.js';
+import { ListeningService } from '../src/listening/listening.service.js';
 import { mockContentSchema } from '../src/content/content.schemas.js';
 import { admin, createMemoryRepository, manager, student, toeicExamTypeId } from './memory-repository.js';
 
@@ -247,3 +248,23 @@ test('exam types: everyone lists them, an admin adds and renames, tests need a t
   assert.equal((await service.listMockTests(manager)).mockTests[0].examType.name, 'TOEIC');
 });
 
+
+test('transcribe runs on one recording of a mock test and keeps the latest job of each recording (D161)', async () => {
+  const { service, repository, audioId, content } = await harness();
+  const sent = [];
+  const listening = new ListeningService(repository.listening, service, { broker: { ready: true, publish: (message) => sent.push(message) > 0 } });
+  const { mockTest } = await service.createMockTest(manager, { title: 'Mock', level: 1, durationMinutes: 120, examTypeId: toeicExamTypeId });
+  await assert.rejects(() => listening.requestMockTranscribe(manager, mockTest.id, { audioMediaId: audioId }), { code: 41 });
+  await service.saveMockTestDraft(manager, mockTest.id, content());
+  await assert.rejects(() => listening.requestMockTranscribe(student, mockTest.id, { audioMediaId: audioId }), { code: 26 });
+  await assert.rejects(() => listening.requestMockTranscribe(manager, mockTest.id, { audioMediaId: randomUUID() }), { code: 41 });
+
+  const { job } = await listening.requestMockTranscribe(manager, mockTest.id, { audioMediaId: audioId });
+  assert.deepEqual([job.task, job.status], ['transcribe', 'QUEUED']);
+  assert.deepEqual(sent, [{ jobId: job.id, task: 'transcribe', audioUrl: 'https://media.test/a.mp3', language: 'en', kind: 'part1', lines: [] }]);
+  assert.equal((await listening.requestMockTranscribe(manager, mockTest.id, { audioMediaId: audioId })).job.id, job.id);
+
+  await listening.onAutoTimeResult({ jobId: job.id, status: 'DONE', lines: [{ text: ' A man is reading. ', start: 0, end: 2 }] });
+  const { jobs } = await listening.listMockTranscribe(manager, mockTest.id);
+  assert.deepEqual(jobs.map((item) => [item.audioMediaId, item.status, item.lines.map((line) => line.text)]), [[audioId, 'DONE', ['A man is reading.']]]);
+});

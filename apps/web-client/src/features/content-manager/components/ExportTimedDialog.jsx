@@ -32,7 +32,7 @@ const formats = {
 // Where the browser lets a page ask (Edge, Chrome), the system's "Save as"
 // window picks the folder, the name and the type (.srt or .lrc); elsewhere a
 // dialog picks the type and the name and the file is downloaded.
-export function ExportTimedDialog({ segments, kind, title, disabled }) {
+export function ExportTimedDialog({ segments, kind, title, disabled, triggerClassName = 'gap-1.5' }) {
   const preferred = kind.key === 'song' ? ExportFormat.LRC : ExportFormat.SRT;
   const [open, setOpen] = useState(false);
   const [format, setFormat] = useState(preferred);
@@ -87,7 +87,7 @@ export function ExportTimedDialog({ segments, kind, title, disabled }) {
       <Button
         variant="outline"
         size="sm"
-        className="gap-1.5"
+        className={triggerClassName}
         disabled={disabled}
         onClick={() => {
           if (typeof window.showSaveFilePicker === 'function') saveWithPicker();

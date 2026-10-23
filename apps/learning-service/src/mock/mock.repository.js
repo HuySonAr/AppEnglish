@@ -1,4 +1,4 @@
-import { MockAttemptEntity, ScoreConversionEntity } from '../database/learning.entities.js';
+import { LearnerGoalEntity, MockAttemptEntity, MockReviewAnswerEntity, ScoreConversionEntity } from '../database/learning.entities.js';
 
 export class MockRepository {
   constructor(dataSource) {
@@ -27,6 +27,50 @@ export class MockRepository {
     return (await this.repo(MockAttemptEntity)).find({
       where: { accountId, mockTestId },
       order: { attemptNumber: 'ASC' },
+    });
+  }
+
+  async listRecentAttempts(accountId, limit) {
+    return (await this.repo(MockAttemptEntity)).find({
+      where: { accountId, status: 'COMPLETED' },
+      select: { id: true, mockTestId: true, mockVersionId: true, kind: true, partKey: true, answers: true, submittedAt: true },
+      order: { submittedAt: 'DESC' },
+      take: limit,
+    });
+  }
+
+  async listCompletedAttempts(accountId) {
+    return (await this.repo(MockAttemptEntity)).find({
+      where: { accountId, status: 'COMPLETED' },
+      select: { id: true, mockTestId: true, mockVersionId: true, kind: true, partKey: true, answers: true, submittedAt: true },
+      order: { submittedAt: 'ASC' },
+    });
+  }
+
+  async listReviewAnswers(accountId) {
+    return (await this.repo(MockReviewAnswerEntity)).find({ where: { accountId }, order: { answeredAt: 'ASC' } });
+  }
+
+  async saveReviewAnswer(answer) {
+    return (await this.repo(MockReviewAnswerEntity)).save(answer);
+  }
+
+  async findGoal(accountId) {
+    return (await this.repo(LearnerGoalEntity)).findOne({ where: { accountId } });
+  }
+
+  async saveGoal(goal) {
+    return (await this.repo(LearnerGoalEntity)).save(goal);
+  }
+
+  async deleteGoal(accountId) {
+    await (await this.repo(LearnerGoalEntity)).delete({ accountId });
+  }
+
+  async listCompletedTestAttempts(mockTestId) {
+    return (await this.repo(MockAttemptEntity)).find({
+      where: { mockTestId, status: 'COMPLETED' },
+      select: { id: true, accountId: true, mockVersionId: true, kind: true, partKey: true, answers: true, listeningScore: true, readingScore: true },
     });
   }
 

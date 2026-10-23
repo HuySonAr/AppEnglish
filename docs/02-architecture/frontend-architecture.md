@@ -27,7 +27,7 @@ apps/web-client/src/
     content-manager/     # api, lib, components, pages
   components/
     ui/                  # shadcn/ui (Radix) primitives
-    shared/              # PageHeader, FeatureCard, EmptyState, PageSkeleton, ListFilter, Pagination, FileDropzone, FileRow, PublishButton, StepNav
+    shared/              # PageHeader, FeatureCard, EmptyState, PageSkeleton, ListFilter, Pagination, FileDropzone, FileRow, PublishButton, StepNav, PageBreadcrumb
   hooks/                 # use-theme, use-list-state, use-return-to
   lib/                   # api/ (HTTP client, response), utils.js (cn), notify.js (Sonner notifications), list.js (search, sort, paging), leave-guard.js
   constants/
@@ -179,6 +179,7 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
 - Tiêu đề trang dùng `PageHeader`; danh sách rỗng dùng `EmptyState`; ô dashboard
   dùng `FeatureCard`.
 - Trang có nhiều bước (lesson, chủ đề Listening course) dùng `StepNav` cho dải bước.
+- Trang con (chi tiết, trình soạn, bài làm) mở đầu bằng `PageBreadcrumb` (dựa trên `components/ui/breadcrumb.jsx`, theo shadcn Breadcrumb) cho đường dẫn từ trang cha tới trang hiện tại, thay cho link "← Quay lại"; bước cuối là trang hiện tại, bước giữa không có trang riêng hiện chữ thường.
 - Thẻ từ vựng lật dùng `features/student/components/WordFlipCard.jsx`; màn hình bắt đầu bài test (lesson test, unit review, mock test, mini test) dùng `TestStartCard.jsx`; vòng điểm kết quả dùng `ScoreRing.jsx`.
 - Ô mật khẩu dùng `PasswordInput` (`components/shared/PasswordInput.jsx`): nút
   con mắt hiện/ẩn chỉ xuất hiện khi ô đã có chữ; nút reveal mặc định của trình
@@ -193,13 +194,18 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
   theo định dạng soạn (`lib/authoring-import.js` kiểm tra, chuyển đổi qua
   `@appenglish/content-contracts/authoring` và gộp media đang có; có test) và
   xuất bản đang soạn (D124). Không gọi API: nội dung nhập vào state của editor.
+- Trình soạn có nhiều phần (lesson, mock test, Unit review, placement) có thanh trên cố định (tên, trạng thái, nút Save draft/Publish) và menu phần bên trái
+  `SectionNav` (`features/content-manager/components/SectionNav.jsx`): nhóm, mỗi mục có tiến độ, dấu xong và số lỗi khi publish.
+  Câu hỏi trắc nghiệm dùng `QuestionCard` của `MockPartEditor.jsx` (đáp án là nút chữ cái, đáp án đúng màu xanh).
+- Chọn ngày dùng `DatePicker` (`components/shared/DatePicker.jsx`, lịch tự làm, hàm trong `lib/calendar.js`); không dùng `<input type="date">` và không thêm thư viện lịch. Lịch mở trong một hộp thoại nhỏ riêng ở giữa màn hình (chọn rồi bấm xác nhận), không làm hộp thoại đang mở dài ra và không bị cắt.
+- Hộp thoại (`Dialog`, `AlertDialog`) cao tối đa bằng màn hình trừ 2rem và tự cuộn; nội dung dài trong hộp thoại (danh sách xem trước…) nên có vùng cuộn riêng.
 - Người dùng hiện bằng `Avatar` (`components/shared/Avatar.jsx`): ảnh đại diện,
   hoặc chữ cái đầu của tên khi chưa có ảnh; tên lấy từ `displayNameOf()` của
   `@appenglish/auth-contracts` (D113). Không hiện email đầy đủ của người khác.
 - Biểu đồ dùng `ChartContainer` của shadcn chart (`components/ui/chart.jsx`, Recharts) với màu `--chart-1`…`--chart-5`; không tự vẽ biểu đồ bằng `div` hay thêm thư viện biểu đồ khác (D78).
 - Màu chỉ lấy từ token trong `styles/index.css`; mọi trang phải dùng được ở
   chế độ sáng, tối và trên màn hình điện thoại.
-- Chữ trên giao diện viết bằng tiếng Anh.
+- Chữ trên giao diện viết bằng tiếng Anh. Ngoại lệ (D158): kết quả full mock test có một dòng chú thích tiếng Việt cho điểm TOEIC tổng.
 
 ## Luồng client
 React page → feature hook/API → shared HTTP client → HTTP Gateway/BFF → backend. Browser không giao tiếp trực tiếp với gRPC hoặc database.

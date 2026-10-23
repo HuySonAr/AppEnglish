@@ -19,6 +19,11 @@ const logger = new Logger('ListeningService');
 // A job with no answer after this long is shown as failed (speech-service
 // down or the request lost); a new request can then be made.
 const AUTOTIME_TIMEOUT_MS = 30 * 60 * 1000;
+const SPEECH_NOTICE_DAYS = 7;
+const ADMIN_NOTICE_DAYS = 30;
+const dayFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit' });
+const speechDay = (iso) => dayFormatter.format(new Date(iso));
+const SPEECH_NOTICE_LIMIT = 30;
 const active = (job) => job.status === AutoTimeStatus.QUEUED || job.status === AutoTimeStatus.RUNNING;
 
 const iso = (date) => (date ? new Date(date).toISOString() : null);
@@ -101,6 +106,17 @@ export class ListeningService {
       topic.format = format;
     }
     return { topic: this.topicView(await this.repository.saveTopic(topic)) };
+  }
+
+  async deleteTopic(actor, topicId) {
+    this.assertTopicEditor(actor);
+    const topic = await this.repository.findTopic(topicId);
+    if (!topic) throw contentErrors.listeningTopicNotFound();
+    const count = (await this.repository.listExercises()).filter((exercise) => exercise.topicId === topicId).length;
+    if (count)
+      throw contentErrors.listeningTopicInvalid('HAS_EXERCISES', `The topic still has ${count} exercise${count === 1 ? '' : 's'}`, { exerciseCount: count });
+    await this.repository.deleteTopic(topicId);
+    return { deleted: { id: topicId } };
   }
 
   // ----- Exercises
@@ -236,6 +252,7 @@ export class ListeningService {
     if (exercise.publishedVersionId) {
       exercise.publishedVersionId = null;
       await this.repository.saveExercise(exercise);
+      await this.contentService.noteUnpublished(actor, { type: 'exercise', id: exercise.id, title: exercise.title });
     }
     let draft = await this.repository.findDraft(exerciseId);
     // The version taken down becomes the draft when there is none (D122).
@@ -329,6 +346,98 @@ export class ListeningService {
   async latestSpeechJob(owner) {
     const job = await this.repository.findLatestTimingJob(owner);
     return { job: job ? this.timingJobView(job) : null };
+  }
+
+  mockRecordingKind(content, audioMediaId) {
+    for (const [key, part] of Object.entries(content?.test || {})) {
+      const items = [...(part.groups || []), ...(part.questions || [])];
+      if (items.some((item) => item.audioMediaId === audioMediaId)) return key;
+    }
+    return null;
+  }
+
+  async listNotifications(actor) {
+    this.assertManager(actor);
+    const since = new Date(this.now().getTime() - SPEECH_NOTICE_DAYS * 86400000);
+    const jobs = (await this.repository.listJobsRequestedBy(actor.id, since, SPEECH_NOTICE_LIMIT))
+      .map((job) => ({ job, view: this.timingJobView(job) }))
+      .filter(({ view }) => view.status === AutoTimeStatus.DONE || view.status === AutoTimeStatus.FAILED);
+    const ids = (field) => [...new Set(jobs.map(({ job }) => job[field]).filter(Boolean))];
+    const titles = await this.repository.titlesOf({ exerciseIds: ids('exerciseId'), courseItemIds: ids('courseItemId'), mockTestIds: ids('mockTestId') });
+    const ownerOf = (job) =>
+      job.exerciseId ? { type: 'exercise', id: job.exerciseId } : job.courseItemId ? { type: 'courseItem', id: job.courseItemId } : { type: 'mockTest', id: job.mockTestId };
+    const notifications = jobs.map(({ job, view }) => {
+      const owner = ownerOf(job);
+      return {
+        id: job.id,
+        kind: 'SPEECH_JOB',
+        data: { task: view.task, status: view.status, error: view.error, lineCount: view.lineCount, owner: { ...owner, title: titles.get(owner.id) || '' } },
+        createdAt: view.updatedAt,
+        read: Boolean(job.seenAt),
+      };
+    });
+    return { notifications, unread: notifications.filter((item) => !item.read).length };
+  }
+
+  async markNotificationsRead(actor, { ids } = {}) {
+    this.assertManager(actor);
+    await this.repository.markJobsSeen(actor.id, ids || null, this.now());
+    return { unread: (await this.listNotifications(actor)).unread };
+  }
+
+  async adminNotices() {
+    const now = this.now();
+    const notices = (await this.contentService.repository.listAdminNotices(new Date(now.getTime() - ADMIN_NOTICE_DAYS * 86400000))).map((row) => ({
+      id: row.key,
+      kind: row.kind,
+      data: row.data,
+      createdAt: new Date(row.createdAt).toISOString(),
+    }));
+    const failures = new Map();
+    for (const job of await this.repository.listJobsUpdatedSince(new Date(now.getTime() - SPEECH_NOTICE_DAYS * 86400000))) {
+      const view = this.timingJobView(job);
+      if (view.status !== AutoTimeStatus.FAILED) continue;
+      const day = speechDay(view.updatedAt);
+      const entry = failures.get(day) || { day, count: 0, lastError: '', lastAt: view.updatedAt };
+      entry.count++;
+      if (view.updatedAt >= entry.lastAt) Object.assign(entry, { lastAt: view.updatedAt, lastError: view.error || '' });
+      failures.set(day, entry);
+    }
+    for (const entry of failures.values())
+      notices.push({ id: `speech:${entry.day}:${entry.count}`, kind: 'SPEECH_FAILURES', data: { day: entry.day, count: entry.count, lastError: entry.lastError }, createdAt: entry.lastAt });
+    return notices.sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, SPEECH_NOTICE_LIMIT);
+  }
+
+  async listAdminNotifications(actor) {
+    this.contentService.assertAdmin(actor);
+    const notices = await this.adminNotices();
+    const read = await this.contentService.repository.readNoticeKeys(actor.id, notices.map((notice) => notice.id));
+    const notifications = notices.map((notice) => ({ ...notice, read: read.has(notice.id) }));
+    return { notifications, unread: notifications.filter((item) => !item.read).length };
+  }
+
+  async markAdminNotificationsRead(actor, { ids } = {}) {
+    this.contentService.assertAdmin(actor);
+    const keys = ids || (await this.adminNotices()).map((notice) => notice.id);
+    await this.contentService.repository.markNoticesRead(actor.id, keys, this.now());
+    return { unread: (await this.listAdminNotifications(actor)).unread };
+  }
+
+  async requestMockTranscribe(actor, mockTestId, { audioMediaId }) {
+    this.assertManager(actor);
+    const mockTest = await this.contentService.findMockOrThrow(mockTestId);
+    const version = (await this.contentService.repository.findMockDraft(mockTestId)) || (await this.contentService.publishedMockVersion(mockTest));
+    const kind = this.mockRecordingKind(version?.content, audioMediaId);
+    if (!kind) throw contentErrors.autoTimeInvalid('NO_AUDIO', 'Add the recording and save the draft first');
+    return this.queueSpeechJob(actor, { owner: { mockTestId, audioMediaId }, task: SpeechTask.TRANSCRIBE, kind, audioMediaId, segments: [] });
+  }
+
+  async listMockTranscribe(actor, mockTestId) {
+    this.assertManager(actor);
+    await this.contentService.findMockOrThrow(mockTestId);
+    const latest = new Map();
+    for (const job of await this.repository.listTimingJobs({ mockTestId })) latest.set(job.audioMediaId, job);
+    return { jobs: [...latest.values()].map((job) => ({ audioMediaId: job.audioMediaId, ...this.timingJobView(job) })) };
   }
 
   // Auto-time (D97): the times of the saved lines.

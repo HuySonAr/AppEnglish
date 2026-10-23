@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, RotateCcw, Trophy } from 'lucide-react';
+import { ArrowRight, Check, RotateCcw, Trophy } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { cn } from '../../../lib/utils.js';
@@ -64,10 +65,7 @@ export function CourseTestPage() {
   }
 
   const back = (
-    <Link to="/student/listening-course" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-      <ArrowLeft className="h-4 w-4" />
-      Listening course
-    </Link>
+    <PageBreadcrumb items={[{ label: 'Listening course', to: '/student/listening-course' }, { label: data?.test?.title || 'Level test' }]} />
   );
 
   if (state === 'loading') return <DetailPageSkeleton />;

@@ -61,7 +61,9 @@ async function harness() {
   const repository = createLessonRepository();
   const placement = await placementWith(learner.id, 1);
   const clock = { now: new Date('2026-10-20T08:00:00Z') };
-  const service = new LessonService(repository, placement, content, { now: () => new Date(clock.now) });
+  const recorded = [];
+  const events = { record: async (type, payload) => recorded.push({ type, payload }) };
+  const service = new LessonService(repository, placement, content, { now: () => new Date(clock.now), events });
   // Completes a lesson the regular way: the review of the previous lesson
   // when required, study, then pass the test.
   const complete = async (lesson) => {
@@ -76,7 +78,7 @@ async function harness() {
     clock.now = new Date(clock.now.getTime() + 5 * 60 * 1000);
     await service.submitLessonTest(learner, lesson.id, { answers: testAnswers(paper, 23) });
   };
-  return { content, repository, service, complete, units: content.units };
+  return { content, repository, service, complete, units: content.units, recorded };
 }
 
 test('a learner takes the review after the lessons of the unit; passing it opens the next unit', async () => {
@@ -127,6 +129,8 @@ test('a learner takes the review after the lessons of the unit; passing it opens
   assert.equal(again.attempt.attemptNumber, 3);
   assert.equal((await h.service.getUnitReview(learner, unit1.id)).attempts.length, 3);
   assert.equal((await h.service.getCurriculum(learner)).units[0].review.state, 'PASSED');
+  const opened = h.recorded.filter((event) => event.type === 'unit-review.passed');
+  assert.deepEqual(opened.map((event) => [event.payload.unitId, event.payload.unitTitle, event.payload.nextUnitId, event.payload.nextUnitTitle]), [[unit1.id, 'Unit 1', unit2.id, 'Unit 2']]);
 
   // Unpublishing the review closes the unit with its last lesson again.
   h.content.unpublishReview(unit1.id);

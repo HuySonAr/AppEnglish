@@ -13,3 +13,6 @@ export async function createListeningTopic(name, format) {
 export async function updateListeningTopic(id, changes) {
   return (await httpClient.patch(`/content/listening-topics/${id}`, changes)).data;
 }
+export async function deleteListeningTopic(id) {
+  return (await httpClient.delete(`/content/listening-topics/${id}`)).data;
+}

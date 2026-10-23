@@ -21,6 +21,7 @@ const rpcs = {
     payload: lineAnswersSchema,
     run: (service, { actor, id, payload }) => service.checkLine(actor, id, payload),
   },
+  GetListeningTranscript: { id: true, run: (service, { actor, id }) => service.getTranscript(actor, id) },
   CheckListeningPractice: {
     id: true,
     payload: dictationAnswersSchema,

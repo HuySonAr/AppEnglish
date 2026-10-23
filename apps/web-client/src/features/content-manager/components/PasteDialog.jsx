@@ -22,7 +22,7 @@ import { FileDropzone } from '../../../components/shared/FileDropzone.jsx';
 // A line with errors blocks it. noun names what is counted ("question").
 // With fileAccept (e.g. ".srt,.lrc") a text file can be opened instead of
 // pasting; its text lands in the box. icon replaces the paste icon.
-export function PasteDialog({ id, button, title, description, label, placeholder, notFound, noun, done, planFor, onApply, fileAccept, icon: Icon = ClipboardPaste }) {
+export function PasteDialog({ id, button, title, description, label, placeholder, notFound, noun, done, planFor, onApply, fileAccept, icon: Icon = ClipboardPaste, triggerClassName = 'gap-1.5' }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
   const plan = planFor(text);
@@ -38,7 +38,7 @@ export function PasteDialog({ id, button, title, description, label, placeholder
 
   return (
     <>
-      <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setOpen(true)}>
+      <Button variant="outline" size="sm" className={triggerClassName} onClick={() => setOpen(true)}>
         <Icon className="h-4 w-4" />
         {button}
       </Button>

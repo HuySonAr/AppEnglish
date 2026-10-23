@@ -1,6 +1,6 @@
 import { AccountRole } from '@appenglish/auth-contracts';
 import { LESSON_TEST_PARTS } from '@appenglish/content-contracts';
-import { LearningEventType, MockAttemptKind, PlacementStatus, StudyActivity } from '@appenglish/learning-contracts';
+import { GOAL_HISTORY_SIZE, GOAL_RECENT_ATTEMPTS, MOCK_MISTAKE_CLEAR_STREAK, MOCK_MISTAKE_SESSION, LearningEventType, MOCK_STATS_MIN_LEARNERS, MockAttemptKind, PlacementStatus, StudyActivity } from '@appenglish/learning-contracts';
 import {
   scoreTest,
   shuffledOptionOrder,
@@ -12,6 +12,9 @@ import { noEvents, recordActivity } from '../events/learning-events.js';
 import { placementErrors } from '../placement/placement.errors.js';
 import { mockErrors } from './mock.errors.js';
 import { defaultScoreConversion, estimatedScores, recommendedLevel } from './mock.rules.js';
+import { mockStats, numberOf } from './mock.stats.js';
+import { mistakeSummary, mistakesOf } from './mistakes.rules.js';
+import { goalView, partRates, weakestPart } from './goal.rules.js';
 
 // A submit that arrives this long after the deadline still counts.
 const SUBMIT_GRACE_MS = 30 * 1000;
@@ -339,6 +342,128 @@ export class MockService {
         },
       ),
     };
+  }
+
+  async mistakeState(accountId) {
+    const [attempts, reviews] = await Promise.all([this.repository.listCompletedAttempts(accountId), this.repository.listReviewAnswers(accountId)]);
+    const papers = new Map();
+    const pairs = new Map([...attempts.map((attempt) => [attempt.mockVersionId, attempt.mockTestId]), ...reviews.map((review) => [review.mockVersionId, review.mockTestId])]);
+    for (const [versionId, mockTestId] of pairs) papers.set(versionId, await this.contentClient.getMockPaper(mockTestId, versionId).catch(() => null));
+    const mistakes = mistakesOf(attempts, papers, reviews).filter((item) => papers.get(item.versionId));
+    return { mistakes, papers };
+  }
+
+  mistakeQuestion(paper, mistake) {
+    const part = paper.test[mistake.partKey];
+    const index = part.questions.findIndex((question) => question.id === mistake.questionId);
+    if (index === -1) return null;
+    const [view] = testParts({ test: paper.test, media: paper.media || {} }, { partKeys: [mistake.partKey] });
+    const question = view.questions[index];
+    const group = question.groupId ? view.groups.find((item) => item.id === question.groupId) : null;
+    return {
+      questionId: question.id,
+      partKey: mistake.partKey,
+      partNumber: view.number,
+      partTitle: view.title,
+      number: numberOf(mistake.partKey, part, part.questions[index], index),
+      mockTestTitle: paper.mockTest?.title || '',
+      prompt: question.prompt,
+      imageUrl: question.imageUrl,
+      audioUrl: question.audioUrl || group?.audioUrl || view.audioUrl || null,
+      passage: group?.passage || view.passage || '',
+      passageImageUrl: group?.imageUrl || view.imageUrl || null,
+      options: question.options,
+      lettersOnly: !LESSON_TEST_PARTS.find((spec) => spec.key === mistake.partKey).option.text,
+      streak: mistake.streak,
+      wrongCount: mistake.wrongCount,
+    };
+  }
+
+  async getMockMistakes(actor) {
+    this.assertRole(actor, AccountRole.STUDENT);
+    const { mistakes } = await this.mistakeState(actor.id);
+    return { total: mistakes.length, clearStreak: MOCK_MISTAKE_CLEAR_STREAK, parts: mistakeSummary(mistakes) };
+  }
+
+  async getMistakePractice(actor, { partKey } = {}) {
+    this.assertRole(actor, AccountRole.STUDENT);
+    const { mistakes, papers } = await this.mistakeState(actor.id);
+    const chosen = mistakes.filter((item) => !partKey || item.partKey === partKey).slice(0, MOCK_MISTAKE_SESSION);
+    return { total: mistakes.length, questions: chosen.map((item) => this.mistakeQuestion(papers.get(item.versionId), item)).filter(Boolean) };
+  }
+
+  async answerMistake(actor, { questionId, optionId }) {
+    this.assertRole(actor, AccountRole.STUDENT);
+    const { mistakes, papers } = await this.mistakeState(actor.id);
+    const mistake = mistakes.find((item) => item.questionId === questionId);
+    if (!mistake) throw mockErrors.mistakeNotFound();
+    const paper = papers.get(mistake.versionId);
+    const part = paper.test[mistake.partKey];
+    const question = part.questions.find((item) => item.id === questionId);
+    const group = question.groupId ? (part.groups || []).find((item) => item.id === question.groupId) : null;
+    const correct = Boolean(question.options.find((option) => option.id === optionId)?.isCorrect);
+    const at = this.now();
+    await this.repository.saveReviewAnswer({ accountId: actor.id, mockTestId: mistake.mockTestId, mockVersionId: mistake.versionId, partKey: mistake.partKey, questionId, optionId: optionId || null, correct, answeredAt: at });
+    await recordActivity(this.events, actor.id, StudyActivity.MISTAKE_REVIEW, at);
+    const streak = correct ? mistake.streak + 1 : 0;
+    return {
+      correct,
+      correctOptionId: question.options.find((option) => option.isCorrect)?.id || null,
+      explanation: question.explanation || '',
+      transcript: question.transcript || group?.transcript || part.transcript || '',
+      streak,
+      cleared: streak >= MOCK_MISTAKE_CLEAR_STREAK,
+      remaining: mistakes.length - (streak >= MOCK_MISTAKE_CLEAR_STREAK ? 1 : 0),
+    };
+  }
+
+  async getStudyGoal(actor) {
+    this.assertRole(actor, AccountRole.STUDENT);
+    const [goal, finished, recent] = await Promise.all([
+      this.repository.findGoal(actor.id),
+      this.repository.listFinishedAttempts(actor.id),
+      this.repository.listRecentAttempts(actor.id, GOAL_RECENT_ATTEMPTS),
+    ]);
+    const scored = finished.filter((attempt) => attempt.kind === MockAttemptKind.FULL && attempt.listeningScore !== null && attempt.listeningScore !== undefined);
+    const latest = scored.at(-1);
+    const papers = new Map();
+    for (const attempt of recent)
+      if (!papers.has(attempt.mockVersionId)) papers.set(attempt.mockVersionId, await this.contentClient.getMockPaper(attempt.mockTestId, attempt.mockVersionId).catch(() => null));
+    const parts = partRates(recent, papers);
+    return {
+      goal: goalView(goal),
+      estimate: latest
+        ? { total: latest.listeningScore + latest.readingScore, listening: latest.listeningScore, reading: latest.readingScore, mockTestId: latest.mockTestId, at: new Date(latest.submittedAt).toISOString() }
+        : null,
+      history: scored.slice(-GOAL_HISTORY_SIZE).map((attempt) => ({ at: new Date(attempt.submittedAt).toISOString(), total: attempt.listeningScore + attempt.readingScore, mockTestId: attempt.mockTestId })),
+      parts,
+      weakestPart: weakestPart(parts)?.key || null,
+      today: this.now().toISOString(),
+    };
+  }
+
+  async saveStudyGoal(actor, { targetScore, examDate }) {
+    this.assertRole(actor, AccountRole.STUDENT);
+    if (examDate && examDate < this.now().toISOString().slice(0, 10)) throw mockErrors.goalInvalid('The exam date is in the past');
+    await this.repository.saveGoal({ accountId: actor.id, targetScore, examDate: examDate || null });
+    return this.getStudyGoal(actor);
+  }
+
+  async deleteStudyGoal(actor) {
+    this.assertRole(actor, AccountRole.STUDENT);
+    await this.repository.deleteGoal(actor.id);
+    return this.getStudyGoal(actor);
+  }
+
+  async getMockStats(actor, mockTestId) {
+    this.assertRole(actor, AccountRole.CONTENT_MANAGER);
+    const attempts = await this.repository.listCompletedTestAttempts(mockTestId);
+    const fetch = (versionId) => this.contentClient.getMockPaper(mockTestId, versionId).catch(() => null);
+    const paper = await fetch();
+    const papers = new Map();
+    for (const versionId of new Set(attempts.map((attempt) => attempt.mockVersionId)))
+      papers.set(versionId, paper?.versionId === versionId ? paper : await fetch(versionId));
+    return mockStats({ paper, papers, attempts, minLearners: MOCK_STATS_MIN_LEARNERS });
   }
 
   async getScoreConversion(actor) {

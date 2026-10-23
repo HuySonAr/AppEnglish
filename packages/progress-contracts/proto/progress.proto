@@ -17,6 +17,8 @@ service ProgressService {
   rpc GetStreak(ProgressRequest) returns (ProgressReply);
   // Admin (D114): one learner's progress and XP, read-only; id = the learner.
   rpc GetLearnerSummary(ProgressRequest) returns (ProgressReply);
+  rpc ListNotifications(ProgressRequest) returns (ProgressReply);
+  rpc MarkNotificationsRead(ProgressRequest) returns (ProgressReply);
 }
 
 // The authenticated account as verified by auth-service.

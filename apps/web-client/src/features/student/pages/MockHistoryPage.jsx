@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, History } from 'lucide-react';
+import { History } from 'lucide-react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { MockAttemptKind } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -120,10 +121,7 @@ export function MockHistoryPage() {
 
   const series = seriesOf(data, partKey);
   const backLink = (
-    <Link to={testPath} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-      <ArrowLeft className="h-4 w-4" />
-      {data.mockTest.title}
-    </Link>
+    <PageBreadcrumb items={[{ label: 'Mock tests', to: '/student/mock-tests' }, { label: data.mockTest.title, to: testPath }, { label: partKey ? 'Mini test history' : 'History' }]} />
   );
 
   if (!series)

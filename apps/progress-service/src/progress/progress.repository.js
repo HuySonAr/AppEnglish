@@ -1,4 +1,5 @@
-import { LessonCompletionEntity, SkillResultEntity, StudyDayEntity, XpLedgerEntity } from '../database/progress.entities.js';
+import { IsNull, LessThan } from 'typeorm';
+import { LessonCompletionEntity, NotificationEntity, SkillResultEntity, StudyDayEntity, XpLedgerEntity } from '../database/progress.entities.js';
 
 export class ProgressRepository {
   constructor(dataSource) {
@@ -32,6 +33,40 @@ export class ProgressRepository {
   // (or the same attempt) changes nothing.
   async saveXp(entry) {
     await (await this.repo(XpLedgerEntity)).createQueryBuilder().insert().values(entry).orIgnore().execute();
+  }
+
+  async addNotification(notification) {
+    await (await this.repo(NotificationEntity)).createQueryBuilder().insert().values(notification).orIgnore().execute();
+  }
+
+  async latestMockNotification(accountId, mockTestId) {
+    return (await this.repo(NotificationEntity))
+      .createQueryBuilder('n')
+      .where('n.accountId = :accountId AND n.kind = :kind AND n.data ->> \'mockTestId\' = :mockTestId', { accountId, kind: 'MOCK_RESULT', mockTestId })
+      .orderBy('n.createdAt', 'DESC')
+      .getOne();
+  }
+
+  async listNotifications(accountId, limit) {
+    return (await this.repo(NotificationEntity)).find({ where: { accountId }, order: { createdAt: 'DESC' }, take: limit });
+  }
+
+  async countUnread(accountId) {
+    return (await this.repo(NotificationEntity)).count({ where: { accountId, readAt: IsNull() } });
+  }
+
+  async markNotificationsRead(accountId, ids, at) {
+    const query = (await this.repo(NotificationEntity)).createQueryBuilder().update().set({ readAt: at }).where('"accountId" = :accountId AND "readAt" IS NULL', { accountId });
+    if (ids) query.andWhere('id IN (:...ids)', { ids: ids.length ? ids : ['00000000-0000-0000-0000-000000000000'] });
+    await query.execute();
+  }
+
+  async markNotificationKeyRead(accountId, key, at) {
+    await (await this.repo(NotificationEntity)).update({ accountId, key, readAt: IsNull() }, { readAt: at });
+  }
+
+  async deleteNotificationsBefore(accountId, before) {
+    await (await this.repo(NotificationEntity)).delete({ accountId, createdAt: LessThan(before) });
   }
 
   async saveStudyDay({ accountId, day, activity, at }) {

@@ -116,6 +116,10 @@ D147: course items hold their own recordings in their versions' content.
 a CHECK keeps exactly one of the two (migration
 `1720000013000-course-own-recordings.js`, which also moves existing course
 contents to the new shape).
+D161: `listening_timing_jobs` also gets `mockTestId` (foreign key to `mock_tests`,
+deleted with it) and `audioMediaId` (the recording transcribed); the CHECK keeps
+exactly one of `exerciseId`, `courseItemId`, `mockTestId` (migration
+`1720000014000-mock-transcribe.js`, additive).
 
 ## F06 progress schema
 
@@ -129,7 +133,25 @@ one row per learner and mock test with the XP of the first full attempt and
 snapshots of the email and the test title. D154 adds `study_days` (migration
 `1740000002000-create-study-days.js`): one row per learner and day of study in
 Vietnam time (primary key `accountId`, `day`), the activities of that day
-(`activities` jsonb) and the first and last time. `learning-service` adds the outbox `learning_events` to
+(`activities` jsonb) and the first and last time. D163 adds `notifications` (migration
+`1740000003000-create-notifications.js`): one row per learner notification
+(`kind`, `key` unique per learner so a replayed event adds nothing, `data`
+jsonb, `createdAt`, `readAt`), kept 30 days. In `app_content`, D163 adds
+`seenAt` to `listening_timing_jobs` (migration `1720000015000-speech-job-seen.js`)
+for the Content Manager's speech-job notices. D164 adds, in `app_content`,
+`admin_notices` (one row per admin notice, `key` unique; migration
+`1720000016000-create-admin-notices.js`, now only content taken down) and
+`admin_notice_reads` (`accountId`, `key`, `readAt`); in `app_identity`,
+`admin_notice_reads` with the same shape (migration
+`1710000007000-create-admin-notice-reads.js`) for the weekly new-learner notice,
+which is computed from `accounts` and not stored. D165 adds `learner_goals` to
+`app_learning` (migration `1730000012000-create-learner-goals.js`): one row per
+learner (`accountId` primary key, `targetScore`, `examDate` nullable). D167 adds `mock_review_answers`
+to `app_learning` (migration `1730000013000-create-mock-review-answers.js`):
+one row per answer in the mistake review (`accountId`, `mockTestId`,
+`mockVersionId`, `partKey`, `questionId`, `optionId`, `correct`, `answeredAt`);
+the review list itself is computed from these rows and the finished mock
+attempts, not stored. `learning-service` adds the outbox `learning_events` to
 `app_learning` (migration `1730000009000-create-learning-events.js`): each
 result is written there with the attempt and relayed to RabbitMQ afterwards
 (D110). `accountId`, `lessonId` and `sourceId` are other services' ids without

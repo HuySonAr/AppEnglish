@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { ContentService } from '../src/content/content.service.js';
 import { ListeningService } from '../src/listening/listening.service.js';
 import { listeningContentSchema, listeningIssues } from '../src/listening/listening.schemas.js';
-import { LISTENING_TOEIC_KINDS, LISTENING_SONG_KIND } from '@appenglish/content-contracts';
+import { LISTENING_TOEIC_KINDS, LISTENING_SONG_KIND, listeningKind } from '@appenglish/content-contracts';
 import { admin, createMemoryRepository, manager, student, toeicTopicId } from './memory-repository.js';
 
 async function harness() {
@@ -55,7 +55,7 @@ test('a Content Manager writes, saves and publishes a TOEIC dictation exercise',
   }
   const created = await service.createExercise(manager, input);
   assert.deepEqual(created.exercise.topic, { id: toeicTopicId, code: 'toeic', name: 'TOEIC' });
-  assert.deepEqual(created.draft, { versionNumber: 1, content: { audioMediaId: null, segments: [] } });
+  assert.deepEqual(created.draft, { versionNumber: 1, content: { audioMediaId: null, segments: [], source: { name: '', url: '' } } });
   const id = created.exercise.id;
 
   // An empty draft cannot be published.
@@ -149,6 +149,11 @@ test('a topic gets a format, and songs are written with [blanks] (D88)', async (
   // The format is fixed once the topic has exercises; renaming still works.
   await assert.rejects(() => service.updateTopic(admin, songs.id, { format: 'toeic' }), { code: 46, data: { reason: 'HAS_EXERCISES' } });
   assert.equal((await service.updateTopic(admin, songs.id, { name: 'Music', format: 'song' })).topic.name, 'Music');
+  await assert.rejects(() => service.deleteTopic(admin, songs.id), { code: 46, data: { reason: 'HAS_EXERCISES', exerciseCount: 1 } });
+  await assert.rejects(() => service.deleteTopic({ id: songs.id, role: 'STUDENT' }, later.id));
+  assert.deepEqual((await service.deleteTopic(manager, later.id)).deleted, { id: later.id });
+  assert.equal((await service.listTopics()).topics.some((topic) => topic.id === later.id), false);
+  await assert.rejects(() => service.deleteTopic(manager, later.id), { code: 40 });
 
   const audioId = await upload('audio', 'home.mp3', 'audio/mpeg');
   const lines = [sentence('I [walked] across an [empty] land', 0, 3), sentence('I knew the pathway like the back of my hand', 3, 7)];
@@ -243,3 +248,60 @@ test('transcribe asks for the lines of the recording alone and keeps the lines h
   assert.deepEqual([done.task, done.status, done.lineCount, done.lines], ['transcribe', 'DONE', 2, [{ text: 'Love in your eyes', start: 10.8, end: 13.2 }, { text: 'Sitting silent by my side', start: 13.8, end: 16.6 }]]);
 });
 
+test('talks and news (D155): conversation and talk kinds, and a credited source', () => {
+  assert.deepEqual(listeningKind('talk'), { key: 'talk', number: null, title: 'Talk', segmentCount: null, timed: true, labels: null });
+  assert.equal(listeningKind('conversation').speakers, true);
+  const sourced = listeningContentSchema.parse({ source: { name: 'VOA Learning English', url: 'https://learningenglish.voanews.com/a/7000000.html' } });
+  assert.deepEqual(sourced.source, { name: 'VOA Learning English', url: 'https://learningenglish.voanews.com/a/7000000.html' });
+  assert.throws(() => listeningContentSchema.parse({ source: { name: 'x', url: 'not a link' } }));
+});
+
+
+test('a Content Manager is told when a speech job of theirs finishes or fails (D163)', async () => {
+  const { repository } = await harness();
+  const content = new ContentService(repository, { async upload(input) { return { id: 's', kind: input.kind, fileName: input.fileName, mimeType: input.mimeType, sizeBytes: 1, url: `https://media.test/${input.fileName}`, storage: 'r2' }; }, async delete() {} });
+  const service = new ListeningService(repository.listening, content, { broker: { ready: true, publish: () => true } });
+  const songs = (await service.createTopic(admin, { name: 'Songs', format: 'song' })).topic;
+  const { exercise } = await service.createExercise(manager, { topicId: songs.id, title: 'Home', level: 'A2', kind: 'song' });
+  const audioId = (await content.uploadMedia(manager, { kind: 'audio', fileName: 's.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1]), section: 'listening' })).media.id;
+  await service.saveDraft(manager, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [] }));
+  const { job } = await service.requestTranscribe(manager, exercise.id);
+  assert.deepEqual((await service.listNotifications(manager)).notifications, []);
+  await assert.rejects(() => service.listNotifications(student), { code: 26 });
+
+  await service.onAutoTimeResult({ jobId: job.id, status: 'FAILED', error: 'No speech found' });
+  const listed = await service.listNotifications(manager);
+  assert.equal(listed.unread, 1);
+  assert.deepEqual(listed.notifications.map((item) => [item.kind, item.data.task, item.data.status, item.data.error, item.data.owner, item.read]), [
+    ['SPEECH_JOB', 'transcribe', 'FAILED', 'No speech found', { type: 'exercise', id: exercise.id, title: 'Home' }, false],
+  ]);
+  assert.deepEqual(await service.markNotificationsRead(manager, {}), { unread: 0 });
+  assert.equal((await service.listNotifications(manager)).notifications[0].read, true);
+});
+
+test('an admin is told when content is taken down and when speech jobs fail (D164)', async () => {
+  const { repository } = await harness();
+  const content = new ContentService(repository, { async upload(input) { return { id: 's', kind: input.kind, fileName: input.fileName, mimeType: input.mimeType, sizeBytes: 1, url: `https://media.test/${input.fileName}`, storage: 'r2' }; }, async delete() {} });
+  const service = new ListeningService(repository.listening, content, { broker: { ready: true, publish: () => true } });
+  const songs = (await service.createTopic(admin, { name: 'Songs', format: 'song' })).topic;
+  const { exercise } = await service.createExercise(manager, { topicId: songs.id, title: 'Home', level: 'A2', kind: 'song' });
+  const audioId = (await content.uploadMedia(manager, { kind: 'audio', fileName: 's.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1]), section: 'listening' })).media.id;
+  await service.saveDraft(manager, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [sentence('I [walked] home', 0, 2)] }));
+  await service.publish(manager, exercise.id);
+  await assert.rejects(() => service.listAdminNotifications(manager), { code: 26 });
+  assert.deepEqual((await service.listAdminNotifications(admin)).notifications, []);
+
+  await service.unpublish(manager, exercise.id);
+  await service.unpublish(manager, exercise.id);
+  const { job } = await service.requestTranscribe(manager, exercise.id);
+  await service.onAutoTimeResult({ jobId: job.id, status: 'FAILED', error: 'The speech service is down' });
+  const listed = await service.listAdminNotifications(admin);
+  assert.equal(listed.unread, 2);
+  const byKind = Object.fromEntries(listed.notifications.map((item) => [item.kind, item]));
+  assert.deepEqual(byKind.CONTENT_UNPUBLISHED.data, { type: 'exercise', id: exercise.id, title: 'Home', by: manager.id });
+  assert.deepEqual([byKind.SPEECH_FAILURES.data.count, byKind.SPEECH_FAILURES.data.lastError], [1, 'The speech service is down']);
+
+  assert.deepEqual(await service.markAdminNotificationsRead(admin, { ids: [byKind.CONTENT_UNPUBLISHED.id] }), { unread: 1 });
+  assert.deepEqual(await service.markAdminNotificationsRead(admin, {}), { unread: 0 });
+  assert.equal((await service.listAdminNotifications({ ...admin, id: '99999999-9999-4999-8999-999999999999' })).unread, 2);
+});

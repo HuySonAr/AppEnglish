@@ -1,6 +1,6 @@
 import { AccountRole } from '@appenglish/auth-contracts';
 import { COURSE_PASS_PERCENT, CourseItemType, lyricPieces } from '@appenglish/content-contracts';
-import { CourseDictationMode, StudyActivity } from '@appenglish/learning-contracts';
+import { CourseDictationMode, LearningEventType, StudyActivity } from '@appenglish/learning-contracts';
 import { noEvents, recordActivity } from '../events/learning-events.js';
 import { accuracyOf, checkSentence, sameWords } from '../listening/dictation.rules.js';
 import { placementErrors } from '../placement/placement.errors.js';
@@ -252,6 +252,8 @@ export class CourseLessonService {
     const result = await this.repository.recordTestAttempt(actor.id, itemId, 'level_test', paper.item.level, score, passed, this.now());
     await recordActivity(this.events, actor.id, StudyActivity.COURSE_TEST, this.now());
     const { map } = await this.mapOf(actor.id);
+    const levelUp = before.currentLevel !== map.currentLevel ? { from: before.currentLevel, to: map.currentLevel } : null;
+    if (levelUp) await this.events.record(LearningEventType.COURSE_LEVEL_UP, { accountId: actor.id, ...levelUp, reachedAt: this.now().toISOString() });
     return {
       ...this.resultView(result),
       test: this.testView(paper),
@@ -261,7 +263,7 @@ export class CourseLessonService {
       passPercent,
       rightCount: right,
       questionCount: questions.length,
-      levelUp: before.currentLevel !== map.currentLevel ? { from: before.currentLevel, to: map.currentLevel } : null,
+      levelUp,
       sections: marked,
     };
   }

@@ -90,6 +90,7 @@ export class ListeningPracticeService {
     const pieces = mode === ListeningMode.BLANKS ? this.blanksOf(paper) : null;
     return {
       exercise: paper.exercise,
+      source: paper.content.source?.name ? { name: paper.content.source.name, url: paper.content.source.url || '' } : null,
       mode,
       audioUrl: (audioMediaId && paper.media[audioMediaId]?.url) || null,
       blankCount: isSong(paper.exercise) ? numberedPieces(segments).flat().filter((piece) => 'blank' in piece).length : 0,
@@ -101,6 +102,22 @@ export class ListeningPracticeService {
         ...(pieces ? { pieces: pieces[index].map((piece) => ('blank' in piece ? { blank: piece.blank } : piece)) } : {}),
       })),
       ...this.resultsView(results),
+    };
+  }
+
+  async getTranscript(actor, exerciseId) {
+    this.assertStudent(actor);
+    const paper = await this.paper(exerciseId);
+    const song = isSong(paper.exercise);
+    return {
+      segments: paper.content.segments.map(({ id, speaker, text, start, end, translation }) => ({
+        id,
+        speaker,
+        text: song ? lyricText(text) : text,
+        translation: translation || '',
+        start,
+        end,
+      })),
     };
   }
 

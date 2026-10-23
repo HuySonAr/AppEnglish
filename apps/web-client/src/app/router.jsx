@@ -26,9 +26,11 @@ import { LessonPage } from '../features/student/pages/LessonPage.jsx';
 import { LessonTestPage } from '../features/student/pages/LessonTestPage.jsx';
 import { PlacementSettingsPage } from '../features/admin/pages/PlacementSettingsPage.jsx';
 import { MockTestsManagePage } from '../features/content-manager/pages/MockTestsManagePage.jsx';
+import { MockStatsPage } from '../features/content-manager/pages/MockStatsPage.jsx';
 import { MockTestEditorPage } from '../features/content-manager/pages/MockTestEditorPage.jsx';
 import { MockTestsPage } from '../features/student/pages/MockTestsPage.jsx';
 import { MockTestPage } from '../features/student/pages/MockTestPage.jsx';
+import { MockMistakesPage } from '../features/student/pages/MockMistakesPage.jsx';
 import { MockHistoryPage } from '../features/student/pages/MockHistoryPage.jsx';
 import { PracticePage } from '../features/student/pages/PracticePage.jsx';
 import { ListeningExercisePage } from '../features/student/pages/ListeningExercisePage.jsx';
@@ -91,6 +93,7 @@ export function AppRouter() {
             <Route path="lessons/:lessonId/test" element={<LessonTestPage />} />
             <Route path="units/:unitId/review" element={<UnitReviewPage />} />
             <Route path="mock-tests" element={<MockTestsPage />} />
+            <Route path="mock-tests/mistakes" element={<MockMistakesPage />} />
             <Route path="mock-tests/:mockTestId" element={<MockTestPage />} />
             <Route path="mock-tests/:mockTestId/history" element={<MockHistoryPage />} />
             <Route path="mock-tests/:mockTestId/mini/:partKey" element={<MockHistoryPage />} />
@@ -132,6 +135,7 @@ export function AppRouter() {
             <Route path="placement" element={<PlacementEditorPage />} />
             <Route path="mock-tests" element={<MockTestsManagePage />} />
             <Route path="mock-tests/:mockTestId" element={<MockTestEditorPage />} />
+            <Route path="mock-tests/:mockTestId/results" element={<MockStatsPage />} />
             <Route path="listening" element={<ListeningExercisesPage />} />
             <Route path="listening/:exerciseId" element={<ListeningExerciseEditorPage />} />
             <Route path="listening-topics" element={<ListeningTopicsPage eyebrow="Content Manager" />} />

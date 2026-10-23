@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCheck, Clock, ListChecks, Target, Trophy } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ClipboardCheck, Clock, ListChecks, Target, Trophy } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { LESSON_TEST_QUESTION_COUNT } from '@appenglish/content-contracts';
 import { LessonState, LessonStep, QuizKind, StepStatus } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
@@ -105,10 +106,7 @@ export function LessonPage() {
   const test = data.test;
   return (
     <section className="space-y-6">
-      <Link to={back.to} state={back.state} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" />
-        Lessons
-      </Link>
+      <PageBreadcrumb items={[{ label: 'Lessons', to: back.to, state: back.state }, { label: `Unit ${lesson.unitNumber}: ${lesson.unitTitle}` }, { label: `Lesson ${lesson.number}: ${lesson.title}` }]} />
 
       <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
         <div className="min-w-0 space-y-1.5">

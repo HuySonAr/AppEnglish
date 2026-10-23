@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronRight, Headphones } from 'lucide-react';
+import { ChevronRight, Headphones } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { LISTENING_KINDS, LISTENING_LEVELS } from '@appenglish/content-contracts';
 import { ListeningMode } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
@@ -55,13 +56,7 @@ export function ListeningExerciseListPage() {
   const topic = data?.topics.find((item) => item.id === topicId);
   const modes = topicModes(topic);
   const back = (
-    <Link
-      to={modes.length > 1 ? `/student/practice/listening/topics/${topicId}` : '/student/practice/listening'}
-      className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-    >
-      <ArrowLeft className="h-4 w-4" />
-      {modes.length > 1 && topic ? topic.name : 'Listening'}
-    </Link>
+    <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Listening', to: '/student/practice/listening' }, topic ? { label: topic.name, to: modes.length > 1 ? `/student/practice/listening/topics/${topicId}` : undefined } : null, modes.length > 1 ? { label: modeLabels[mode] } : null]} />
   );
 
   if (state === 'loading') return <ListPageSkeleton />;

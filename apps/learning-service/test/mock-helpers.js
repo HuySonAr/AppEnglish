@@ -50,6 +50,32 @@ export function createMockRepository() {
         .sort((a, b) => a.attemptNumber - b.attemptNumber)
         .map(copy);
     },
+    async listRecentAttempts(accountId, limit) {
+      return tables.attempts
+        .filter((row) => row.accountId === accountId && row.status === 'COMPLETED')
+        .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
+        .slice(0, limit)
+        .map(copy);
+    },
+    async listCompletedAttempts(accountId) {
+      return tables.attempts
+        .filter((row) => row.accountId === accountId && row.status === 'COMPLETED')
+        .sort((a, b) => new Date(a.submittedAt) - new Date(b.submittedAt))
+        .map(copy);
+    },
+    async listReviewAnswers(accountId) {
+      return (tables.reviews || []).filter((row) => row.accountId === accountId).map(copy);
+    },
+    async saveReviewAnswer(answer) {
+      tables.reviews = [...(tables.reviews || []), { id: randomUUID(), ...structuredClone(answer) }];
+      return copy(answer);
+    },
+    async findGoal(accountId) { return copy(tables.goals?.[accountId]); },
+    async saveGoal(goal) { tables.goals = { ...tables.goals, [goal.accountId]: { ...goal } }; return copy(goal); },
+    async deleteGoal(accountId) { if (tables.goals) delete tables.goals[accountId]; },
+    async listCompletedTestAttempts(mockTestId) {
+      return tables.attempts.filter((row) => row.mockTestId === mockTestId && row.status === 'COMPLETED').map(copy);
+    },
     async createAttempt(attempt) {
       const same = (row) => row.accountId === attempt.accountId && row.mockTestId === attempt.mockTestId && row.kind === attempt.kind && row.partKey === attempt.partKey;
       if (tables.attempts.some((row) => same(row) && (row.status === 'IN_PROGRESS' || row.attemptNumber === attempt.attemptNumber))) return null;

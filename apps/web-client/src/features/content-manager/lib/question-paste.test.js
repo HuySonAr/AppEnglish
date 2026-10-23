@@ -124,3 +124,23 @@ Correct Answer: D
   assert.deepEqual([filled.questions.length, filled.questions[1].id, filled.questions[1].prompt], [3, part.questions[1].id, 'The ------- is open.']);
   assert.deepEqual(pastePreview(empty, part5, parsePastedQuestions('Question 131\nWho?'))[0].errors, ['Part 5 holds questions 101–130']);
 });
+
+test('mock Parts 1 and 2: what the recording says becomes the transcript and sets the answer', () => {
+  const part2 = LESSON_TEST_PARTS.find((part) => part.key === 'part2');
+  const part1 = LESSON_TEST_PARTS.find((part) => part.key === 'part1');
+  const empty = workingMock(null).test.part2;
+  const text = 'Question 8\nWhere is the meeting?\n(A) In room 3.\n(B) At noon.\n(C) Yes, it is.\nAnswer: A';
+  const rows = pastePreview(empty, part2, parsePastedQuestions(text));
+  assert.deepEqual(rows.map((row) => [row.place, row.errors, row.warnings]), [[1, [], []]]);
+  const part = withPastedQuestions(empty, part2, rows);
+  assert.equal(part.questions.length, 2);
+  assert.equal(part.questions[1].transcript, 'Where is the meeting?\n(A) In room 3.\n(B) At noon.\n(C) Yes, it is.');
+  assert.deepEqual(part.questions[1].options.map((option) => [option.text, option.isCorrect]), [['', true], ['', false], ['', false]]);
+  assert.equal(pastePreview(part, part2, parsePastedQuestions('Question 8\nWho?\n(A) Me.'))[0].replaces, true);
+  assert.deepEqual(pastePreview(empty, part2, parsePastedQuestions('Question 7\nWho?\n(A) a\n(B) b\n(C) c\n(D) d'))[0].errors, ['Part 2 has options A–C only']);
+  assert.deepEqual(pastePreview(empty, part2, parsePastedQuestions('Question 7\n(A) a\n(B) b\n(C) c\nAnswer: B'))[0].warnings, ['no question line']);
+
+  const photo = withPastedQuestions(workingMock(null).test.part1, part1, parsePastedQuestions('Question 1\n(A) A man is reading.\n(B) A woman is typing.\n(C) They walk.\n(D) It is empty.\nAnswer: B'));
+  assert.equal(photo.questions[0].transcript, '(A) A man is reading.\n(B) A woman is typing.\n(C) They walk.\n(D) It is empty.');
+  assert.deepEqual(photo.questions[0].options.map((option) => option.isCorrect), [false, true, false, false]);
+});

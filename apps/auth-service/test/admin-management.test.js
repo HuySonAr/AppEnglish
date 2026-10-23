@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { lastWeeks, startOfDay } from '../src/auth/admin-notices.js';
 import { AuthService } from '../src/auth/auth.service.js';
 import { AuthController } from '../src/auth/auth.controller.js';
 import { AuthorizationService } from '../src/auth/authorization.service.js';
@@ -11,6 +12,7 @@ process.env.AUTH_JWT_SECRET = process.env.AUTH_JWT_SECRET || 'test-secret-that-i
 // In-memory repository with the admin-management methods (D114).
 function harness(accounts) {
   const audits = [];
+  const noticeReads = [];
   const otps = [];
   const sent = [];
   const codes = [];
@@ -35,6 +37,9 @@ function harness(accounts) {
     countActiveSessions: async (accountId) => new Set(refreshTokens.filter((token) => token.accountId === accountId && !token.revokedAt).map((token) => token.familyId)).size,
     listAudits: async (targetAccountId) => audits.filter((audit) => audit.targetAccountId === targetAccountId).reverse().map((audit) => ({ ...audit, actorEmail: accounts.find((account) => account.id === audit.actorId)?.email || null, actorDisplayName: null })),
     updateLastLogin: async (id, at) => { Object.assign(accounts.find((account) => account.id === id), { lastLoginAt: at }); },
+    countStudentsCreatedBetween: async (from, to) => accounts.filter((account) => account.role === 'STUDENT' && account.createdAt >= from && account.createdAt < to).length,
+    readNoticeKeys: async (accountId, keys) => new Set(noticeReads.filter((row) => row.accountId === accountId && keys.includes(row.key)).map((row) => row.key)),
+    markNoticesRead: async (accountId, keys) => { for (const key of keys) if (!noticeReads.some((row) => row.accountId === accountId && row.key === key)) noticeReads.push({ accountId, key }); },
     accountStats: async () => ({ total: accounts.length, byStatus: { ACTIVE: accounts.length }, byRole: {}, activeLast7Days: 1, stalePending: 0, newPerDay: [{ day: '2026-10-19', count: 2 }] }),
     saveRefreshToken: async (token) => { refreshTokens.push({ ...token }); },
     countRecentOtps: async () => 0,
@@ -224,4 +229,27 @@ test('a self-registered pending account can get a new code or be activated with 
   assert.equal(reset.changed, true);
   await assert.rejects(() => h.service.adminAction(token, admin.id, { action: 'RESET_PLACEMENT' }), { code: 26 });
   assert.deepEqual(h.audits.at(-1).action, 'PLACEMENT_RESET');
+});
+
+test('an admin is told how many learners joined last week, Monday to Sunday in Vietnam time (D164)', async () => {
+  const weeks = lastWeeks(new Date());
+  const inWeek = (week, hours) => new Date(startOfDay(week).getTime() + hours * 3600000);
+  const admin = account('ADMIN');
+  const manager = account('CONTENT_MANAGER', { createdAt: inWeek(weeks.lastWeek, 5) });
+  const accounts = [
+    admin,
+    manager,
+    account('STUDENT', { createdAt: inWeek(weeks.lastWeek, 1) }),
+    account('STUDENT', { createdAt: inWeek(weeks.lastWeek, 24 * 6 + 23) }),
+    account('STUDENT', { createdAt: inWeek(weeks.weekBefore, 10) }),
+    account('STUDENT', { createdAt: inWeek(weeks.thisWeek, 0) }),
+  ];
+  const h = harness(accounts);
+  await assert.rejects(() => h.service.adminNotifications(h.token(manager)), { code: 26 });
+  const listed = await h.service.adminNotifications(h.token(admin));
+  assert.equal(listed.unread, 1);
+  assert.deepEqual(listed.notifications[0].data, { weekStart: weeks.lastWeek, weekEnd: new Date(Date.parse(`${weeks.thisWeek}T00:00:00Z`) - 86400000).toISOString().slice(0, 10), newLearners: 2, change: 1 });
+  assert.equal(listed.notifications[0].kind, 'NEW_LEARNERS');
+  assert.deepEqual(await h.service.adminMarkNotificationsRead(h.token(admin), []), { unread: 0 });
+  assert.equal((await h.service.adminNotifications(h.token(admin))).notifications[0].read, true);
 });

@@ -225,6 +225,32 @@ export const ListeningExerciseVersionEntity = new EntitySchema({
 // or a course topic's (D147) lines, answered by speech-service. Exactly one
 // of exerciseId and courseItemId is set. lines are the lines asked about
 // ({ id, text }), result the answer ({ id, start, end, matched }).
+export const AdminNoticeEntity = new EntitySchema({
+  name: 'AdminNotice',
+  tableName: 'admin_notices',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    kind: { type: 'varchar', length: 32 },
+    key: { type: 'varchar', length: 160 },
+    data: { type: 'jsonb', default: () => "'{}'::jsonb" },
+    createdAt: { type: 'timestamptz' },
+  },
+  indices: [
+    { name: 'UQ_admin_notices_key', columns: ['key'], unique: true },
+    { name: 'IDX_admin_notices_created', columns: ['createdAt'] },
+  ],
+});
+
+export const AdminNoticeReadEntity = new EntitySchema({
+  name: 'AdminNoticeRead',
+  tableName: 'admin_notice_reads',
+  columns: {
+    accountId: { type: 'uuid', primary: true },
+    key: { type: 'varchar', length: 160, primary: true },
+    readAt: { type: 'timestamptz' },
+  },
+});
+
 export const ListeningTimingJobEntity = new EntitySchema({
   name: 'ListeningTimingJob',
   tableName: 'listening_timing_jobs',
@@ -232,6 +258,8 @@ export const ListeningTimingJobEntity = new EntitySchema({
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     exerciseId: { type: 'uuid', nullable: true },
     courseItemId: { type: 'uuid', nullable: true },
+    mockTestId: { type: 'uuid', nullable: true },
+    audioMediaId: { type: 'uuid', nullable: true },
     // align (Auto-time, D97) or transcribe (D98).
     task: { type: 'varchar', length: 16, default: 'align' },
     status: { type: 'varchar', length: 16 },
@@ -239,12 +267,15 @@ export const ListeningTimingJobEntity = new EntitySchema({
     result: { type: 'jsonb', nullable: true },
     error: { type: 'text', nullable: true },
     requestedBy: { type: 'uuid' },
+    seenAt: { type: 'timestamptz', nullable: true },
     createdAt: { type: 'timestamptz', createDate: true },
     updatedAt: { type: 'timestamptz', updateDate: true },
   },
   indices: [
+    { name: 'IDX_listening_timing_jobs_requester', columns: ['requestedBy', 'updatedAt'] },
     { name: 'IDX_listening_timing_jobs_exercise', columns: ['exerciseId', 'createdAt'] },
     { name: 'IDX_listening_timing_jobs_course_item', columns: ['courseItemId', 'createdAt'] },
+    { name: 'IDX_listening_timing_jobs_mock_test', columns: ['mockTestId', 'createdAt'] },
   ],
 });
 

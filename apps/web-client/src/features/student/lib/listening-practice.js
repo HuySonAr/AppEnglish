@@ -98,3 +98,11 @@ export function runningScore(results) {
   return scores.length ? Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length) : null;
 }
 
+export function maskedWords(words = []) {
+  return words.map((word) => {
+    if (word.status === 'correct') return { text: word.text, status: 'correct' };
+    if (word.status === 'extra') return { text: word.text, status: 'extra' };
+    return { text: '*'.repeat(Math.max(1, String(word.text).replace(/[^\p{L}\p{N}']/gu, '').length)), status: 'hidden' };
+  });
+}
+

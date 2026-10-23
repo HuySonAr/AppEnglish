@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { COURSE_LIMITS, ContentResponseCode, CourseItemType, MediaKind, MediaSection } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { Badge, Button, Card, CardContent, Input, Label } from '../../../components/ui';
+import { Badge, Button, Input, Label } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { PublishButton, usePublishAction } from '../../../components/shared/PublishButton.jsx';
@@ -29,57 +30,54 @@ import { lessonState, setIn } from '../lib/lesson-draft.js';
 
 const saveErrorMessage = (error) => `${error?.fileName ? `${error.fileName}: ` : ''}${getApiErrorMessage(error)}`;
 
-// The recordings of a level test (D147), each uploaded here with its
-// transcript (shown to learners after the test) and its questions.
 function SectionsEditor({ sections, onChange, draftMedia }) {
   const count = sectionQuestionCount(sections);
   const minimum = COURSE_LIMITS.levelTestQuestions;
   const setSection = (index, change) => onChange(sections.map((section, at) => (at === index ? change(section) : section)));
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge variant={count >= minimum ? 'success' : 'secondary'}>
-          {count} question{count === 1 ? '' : 's'} (at least {minimum})
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card p-4 shadow-sm">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-lg font-semibold">Level test</h2>
+          <p className="text-sm text-muted-foreground">Add recordings with their questions; at least {minimum} questions.</p>
+        </div>
+        <Badge variant={count >= minimum ? 'success' : 'outline'} className="tabular-nums">
+          {count}/{minimum} questions
         </Badge>
-        <Button variant="outline" size="sm" className="ml-auto gap-1.5" disabled={sections.length >= COURSE_LIMITS.sections} onClick={() => onChange([...sections, newSection()])}>
-          <Plus className="h-4 w-4" />
-          Add a recording
-        </Button>
       </div>
-      {sections.length === 0 ? <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">No recording yet. Add the first one.</p> : null}
+      {sections.length === 0 ? <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">No recording yet.</p> : null}
       {sections.map((section, index) => (
-        <Card key={section.id}>
-          <CardContent className="space-y-3 pt-6">
-            <div className="flex items-center gap-2">
-              <span className="font-medium">Recording {index + 1}</span>
-              <Button variant="ghost" size="icon" className="ml-auto" aria-label={`Remove recording ${index + 1}`} onClick={() => onChange(sections.filter((_, at) => at !== index))}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-            <MediaField
-              id={`test-audio-${section.id}`}
-              label="Recording (MP3, MP4 or M4A)"
-              kind={MediaKind.AUDIO}
-              path={['sections', index, 'audioMediaId']}
-              mediaId={section.audioMediaId}
-              media={draftMedia.media}
-            />
-            <div className="space-y-1">
-              <Label htmlFor={`test-transcript-${section.id}`}>Transcript</Label>
-              <Textarea
-                id={`test-transcript-${section.id}`}
-                rows={4}
-                maxLength={COURSE_LIMITS.transcript}
-                placeholder={'One sentence per line; "Man: …" at the start of a line names the speaker.'}
-                value={section.transcript}
-                onChange={(event) => setSection(index, (current) => ({ ...current, transcript: event.target.value }))}
-              />
-              <p className="text-xs text-muted-foreground">Learners read it with the answers after the test.</p>
+        <div key={section.id} className="overflow-hidden rounded-xl border bg-muted/20">
+          <div className="flex flex-wrap items-center gap-2 border-b bg-card px-4 py-2.5">
+            <p className="font-semibold">Recording {index + 1}</p>
+            <Badge variant="secondary" className="tabular-nums">
+              {section.questions.length} question{section.questions.length === 1 ? '' : 's'}
+            </Badge>
+            <Button variant="ghost" size="sm" className="ml-auto h-8 gap-1.5 text-muted-foreground hover:text-destructive" onClick={() => onChange(sections.filter((_, at) => at !== index))}>
+              <Trash2 className="h-4 w-4" />
+              Remove recording
+            </Button>
+          </div>
+          <div className="space-y-3 p-4">
+            <div className="grid gap-3 md:grid-cols-2">
+              <MediaField id={`test-audio-${section.id}`} label="Recording" kind={MediaKind.AUDIO} path={['sections', index, 'audioMediaId']} mediaId={section.audioMediaId} media={draftMedia.media} />
+              <div className="space-y-2">
+                <Label htmlFor={`test-transcript-${section.id}`}>Transcript</Label>
+                <Textarea
+                  id={`test-transcript-${section.id}`}
+                  rows={4}
+                  maxLength={COURSE_LIMITS.transcript}
+                  placeholder="One sentence per line; “Man: …” names the speaker."
+                  value={section.transcript}
+                  onChange={(event) => setSection(index, (current) => ({ ...current, transcript: event.target.value }))}
+                />
+              </div>
             </div>
             {section.questions.map((question, at) => (
               <CourseQuestionEditor
                 key={question.id}
                 id={question.id}
+                number={at + 1}
                 label={`Question ${at + 1}`}
                 question={question}
                 onChange={(next) => setSection(index, (current) => ({ ...current, questions: current.questions.map((item) => (item.id === question.id ? next : item)) }))}
@@ -87,23 +85,25 @@ function SectionsEditor({ sections, onChange, draftMedia }) {
               />
             ))}
             <Button
-              variant="ghost"
-              size="sm"
-              className="gap-1.5"
+              variant="outline"
+              className="w-full gap-1.5 border-dashed"
               disabled={section.questions.length >= COURSE_LIMITS.questionsPerSection}
               onClick={() => setSection(index, (current) => ({ ...current, questions: [...current.questions, newQuestion()] }))}
             >
               <Plus className="h-4 w-4" />
-              Add question
+              Add question to recording {index + 1}
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ))}
+      <Button variant="outline" className="w-full gap-1.5 border-dashed" disabled={sections.length >= COURSE_LIMITS.sections} onClick={() => onChange([...sections, newSection()])}>
+        <Plus className="h-4 w-4" />
+        Add a recording
+      </Button>
     </div>
   );
 }
 
-// A topic or a level test of the Listening course (D143–D145).
 export function CourseItemEditorPage() {
   const { itemId } = useParams();
   const back = useReturnTo('/content-manager/listening-course');
@@ -117,19 +117,14 @@ export function CourseItemEditorPage() {
   const [busy, setBusy] = useState(false);
   const publish = usePublishAction();
   const [issues, setIssues] = useState([]);
-  // The URLs of the words' pronunciations, by media id.
   const [wordMedia, setWordMedia] = useState({});
 
-  // A change is a new content or a function of the current one.
   function update(change) {
     setContent((current) => (typeof change === 'function' ? change(current) : change));
     setDirty(true);
   }
   const edit = (path, value) => update((current) => setIn(current, path, value));
-  // Recordings chosen in the browser are uploaded when the draft is saved.
   const draftMedia = useDraftMedia({ edit, sectionFor: () => MediaSection.LISTENING });
-  // A sentence replaced by a paste or an import keeps its translation and
-  // blanks when its words stay the same (D147).
   const setSegments = (change) => update((current) => ({ ...current, segments: keepSentenceExtras(current.segments, change(current.segments)) }));
 
   function apply(data) {
@@ -165,7 +160,6 @@ export function CourseItemEditorPage() {
     return () => window.removeEventListener('beforeunload', warn);
   }, [dirty]);
 
-  // Saving first uploads the recordings chosen since the last save.
   async function saveDraft({ quiet = false } = {}) {
     const result = await draftMedia.uploadAll(content);
     if (result.uploadedAny) setContent(result.content);
@@ -223,10 +217,7 @@ export function CourseItemEditorPage() {
   }
 
   const backLink = (
-    <Link to={back.to} state={back.state} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-      <ArrowLeft className="h-4 w-4" />
-      Listening course
-    </Link>
+    <PageBreadcrumb items={[{ label: 'Listening course', to: back.to, state: back.state }, item ? { label: item.level } : null, { label: item?.title || 'Item' }]} />
   );
 
   if (state === 'loading') return <EditorPageSkeleton />;
@@ -244,34 +235,27 @@ export function CourseItemEditorPage() {
   const detailsChanged = details.title.trim() !== item.title || details.description.trim() !== item.description;
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-5">
       {backLink}
-      <form onSubmit={onSaveDetails} className="grid gap-3 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-        <div className="space-y-2">
-          <Label htmlFor="item-title">{topic ? 'Topic' : 'Title'}</Label>
-          <Input id="item-title" maxLength={200} value={details.title} onChange={(event) => setDetails({ ...details, title: event.target.value })} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="item-description">Description</Label>
-          <Input id="item-description" maxLength={2000} value={details.description} onChange={(event) => setDetails({ ...details, description: event.target.value })} />
-        </div>
-        <Button type="submit" variant="outline" disabled={busy || !details.title.trim() || !detailsChanged}>
-          Save details
-        </Button>
-      </form>
 
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-2 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-        <Badge variant="info">{item.level}</Badge>
-        <Badge variant="secondary">{topic ? 'Topic' : 'Level test'}</Badge>
-        {status.publishedVersion ? <Badge variant="success">Published v{status.publishedVersion}</Badge> : <Badge variant="outline">Not published</Badge>}
-        {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
-        {dirty ? <Badge variant="info">Unsaved changes</Badge> : null}
-        <div className="ml-auto flex gap-2">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-lg font-semibold sm:text-xl">{item.title}</h1>
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+            <span>
+              {item.level} · {topic ? 'Topic' : 'Level test'}
+            </span>
+            {status.publishedVersion ? <Badge variant="success">Published v{status.publishedVersion}</Badge> : <Badge variant="outline">Not published</Badge>}
+            {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
+            {dirty ? <Badge variant="info">Unsaved</Badge> : null}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
           <Button loading={busy} variant="outline" disabled={busy || !dirty} onClick={onSave}>
             {busy ? 'Working…' : 'Save draft'}
           </Button>
           <PublishButton state={publish.state} disabled={busy || !(dirty || status.hasDraft)} onClick={() => publish.run(onPublish)} />
-          {status.hasDraft ? <DiscardDraftButton kind="courseItem" id={itemId} noun="item" disabled={busy} onDiscarded={load} /> : null}
+          {status.hasDraft ? <DiscardDraftButton kind="courseItem" id={itemId} noun="item" disabled={busy} onDiscarded={load} size="icon" /> : null}
           <ContentDangerActions
             noun={topic ? 'course topic' : 'level test'}
             published={Boolean(status.publishedVersion)}
@@ -284,6 +268,20 @@ export function CourseItemEditorPage() {
           />
         </div>
       </div>
+
+      <form onSubmit={onSaveDetails} className="grid gap-3 rounded-xl border bg-card p-4 shadow-sm md:grid-cols-[1fr_1.4fr_auto] md:items-end">
+        <div className="space-y-2">
+          <Label htmlFor="item-title">{topic ? 'Topic' : 'Title'}</Label>
+          <Input id="item-title" maxLength={200} value={details.title} onChange={(event) => setDetails({ ...details, title: event.target.value })} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="item-description">Description</Label>
+          <Input id="item-description" maxLength={2000} value={details.description} onChange={(event) => setDetails({ ...details, description: event.target.value })} />
+        </div>
+        <Button type="submit" variant="outline" disabled={busy || !details.title.trim() || !detailsChanged}>
+          Save details
+        </Button>
+      </form>
 
       {issues.length ? (
         <div role="alert" className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
@@ -307,6 +305,7 @@ export function CourseItemEditorPage() {
           edit={edit}
           setSegments={setSegments}
           draftMedia={draftMedia}
+          issues={issues}
           beforeJob={async () => {
             if (dirty) await saveDraft({ quiet: true });
           }}
@@ -314,10 +313,7 @@ export function CourseItemEditorPage() {
           onWordMedia={(id, url) => setWordMedia((current) => ({ ...current, [id]: url }))}
         />
       ) : (
-        <>
-          <h2 className="text-lg font-semibold">Level test</h2>
-          <SectionsEditor sections={content.sections} onChange={(sections) => update((current) => ({ ...current, sections }))} draftMedia={draftMedia} />
-        </>
+        <SectionsEditor sections={content.sections} onChange={(sections) => update((current) => ({ ...current, sections }))} draftMedia={draftMedia} />
       )}
 
       <VersionHistory kind="courseItem" id={itemId} noun="item" refreshKey={`${status.publishedVersion}-${status.draftVersion}`} onRestored={load} />

@@ -1,8 +1,11 @@
+import { In, MoreThan } from 'typeorm';
 import {
+  ListeningCourseItemEntity,
   ListeningExerciseEntity,
   ListeningExerciseVersionEntity,
   ListeningTimingJobEntity,
   ListeningTopicEntity,
+  MockTestEntity,
 } from '../database/content.entities.js';
 
 export class ListeningRepository {
@@ -25,6 +28,10 @@ export class ListeningRepository {
 
   async saveTopic(topic) {
     return (await this.repo(ListeningTopicEntity)).save(topic);
+  }
+
+  async deleteTopic(id) {
+    await (await this.repo(ListeningTopicEntity)).delete({ id });
   }
 
   async listExercises() {
@@ -88,6 +95,30 @@ export class ListeningRepository {
   }
 
   // owner: { exerciseId } or { courseItemId } (D147).
+  async listJobsUpdatedSince(since) {
+    return (await this.repo(ListeningTimingJobEntity)).find({ where: { updatedAt: MoreThan(since) }, select: { id: true, status: true, task: true, error: true, lines: true, result: true, createdAt: true, updatedAt: true } });
+  }
+
+  async listJobsRequestedBy(requestedBy, since, limit) {
+    return (await this.repo(ListeningTimingJobEntity)).find({ where: { requestedBy, updatedAt: MoreThan(since) }, order: { updatedAt: 'DESC' }, take: limit });
+  }
+
+  async markJobsSeen(requestedBy, ids, at) {
+    const query = (await this.repo(ListeningTimingJobEntity)).createQueryBuilder().update().set({ seenAt: at }).where('"requestedBy" = :requestedBy AND "seenAt" IS NULL', { requestedBy });
+    if (ids) query.andWhere('id IN (:...ids)', { ids: ids.length ? ids : ['00000000-0000-0000-0000-000000000000'] });
+    await query.execute();
+  }
+
+  async titlesOf({ exerciseIds, courseItemIds, mockTestIds }) {
+    const find = async (entity, ids) => (ids.length ? (await this.repo(entity)).find({ where: { id: In(ids) }, select: { id: true, title: true } }) : []);
+    const rows = [...(await find(ListeningExerciseEntity, exerciseIds)), ...(await find(ListeningCourseItemEntity, courseItemIds)), ...(await find(MockTestEntity, mockTestIds))];
+    return new Map(rows.map((row) => [row.id, row.title]));
+  }
+
+  async listTimingJobs(owner) {
+    return (await this.repo(ListeningTimingJobEntity)).find({ where: owner, order: { createdAt: 'ASC' } });
+  }
+
   async findLatestTimingJob(owner) {
     return (await this.repo(ListeningTimingJobEntity)).findOne({ where: owner, order: { createdAt: 'DESC' } });
   }

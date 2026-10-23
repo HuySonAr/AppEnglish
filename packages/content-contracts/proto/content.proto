@@ -69,6 +69,13 @@ service ContentService {
   rpc ListListeningTopics(ContentRequest) returns (ContentReply);
   rpc CreateListeningTopic(ContentRequest) returns (ContentReply);
   rpc UpdateListeningTopic(ContentRequest) returns (ContentReply);
+  rpc DeleteListeningTopic(ContentRequest) returns (ContentReply);
+  rpc RequestMockTranscribe(ContentRequest) returns (ContentReply);
+  rpc ListMockTranscribe(ContentRequest) returns (ContentReply);
+  rpc ListContentNotifications(ContentRequest) returns (ContentReply);
+  rpc MarkContentNotificationsRead(ContentRequest) returns (ContentReply);
+  rpc ListAdminContentNotifications(ContentRequest) returns (ContentReply);
+  rpc MarkAdminContentNotificationsRead(ContentRequest) returns (ContentReply);
   rpc ListListeningExercises(ContentRequest) returns (ContentReply);
   rpc CreateListeningExercise(ContentRequest) returns (ContentReply);
   rpc UpdateListeningExercise(ContentRequest) returns (ContentReply);

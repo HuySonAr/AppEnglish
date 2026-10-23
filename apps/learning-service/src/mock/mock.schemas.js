@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { LESSON_TEST_PARTS } from '@appenglish/content-contracts';
-import { MockAttemptKind } from '@appenglish/learning-contracts';
+import { GOAL_SCORE, MockAttemptKind } from '@appenglish/learning-contracts';
 
 export const mockIdSchema = z.string().uuid();
 
@@ -37,4 +37,14 @@ const sectionTable = z
 
 export const scoreConversionSchema = z
   .object({ listening: sectionTable, reading: sectionTable })
+  .strict();
+
+export const mistakePracticeSchema = z.object({ partKey: z.enum(LESSON_TEST_PARTS.map((spec) => spec.key)).optional() }).strict();
+export const mistakeAnswerSchema = z.object({ questionId: z.string().uuid(), optionId: z.string().uuid().nullable() }).strict();
+
+export const studyGoalSchema = z
+  .object({
+    targetScore: z.number().int().min(GOAL_SCORE.min).max(GOAL_SCORE.max).refine((value) => value % GOAL_SCORE.step === 0, 'The target is a multiple of 5'),
+    examDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional().default(null),
+  })
   .strict();

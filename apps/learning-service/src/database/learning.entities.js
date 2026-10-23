@@ -161,6 +161,35 @@ export const MockAttemptEntity = new EntitySchema({
   ],
 });
 
+export const MockReviewAnswerEntity = new EntitySchema({
+  name: 'MockReviewAnswer',
+  tableName: 'mock_review_answers',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    accountId: { type: 'uuid' },
+    mockTestId: { type: 'uuid' },
+    mockVersionId: { type: 'uuid' },
+    partKey: { type: 'varchar', length: 8 },
+    questionId: { type: 'uuid' },
+    optionId: { type: 'uuid', nullable: true },
+    correct: { type: 'boolean' },
+    answeredAt: { type: 'timestamptz' },
+  },
+  indices: [{ name: 'IDX_mock_review_answers_account', columns: ['accountId', 'answeredAt'] }],
+});
+
+export const LearnerGoalEntity = new EntitySchema({
+  name: 'LearnerGoal',
+  tableName: 'learner_goals',
+  columns: {
+    accountId: { type: 'uuid', primary: true },
+    targetScore: { type: 'int' },
+    examDate: { type: 'date', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+});
+
 // Single row (id 1): estimated section score for 0-100 right answers.
 export const ScoreConversionEntity = new EntitySchema({
   name: 'ScoreConversion',

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Headphones, Music } from 'lucide-react';
+import { Headphones, Music, Newspaper } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { ListeningFormat } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -32,10 +33,7 @@ export function ListeningPracticePage() {
   }, []);
 
   const back = (
-    <Link to="/student/practice" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-      <ArrowLeft className="h-4 w-4" />
-      Practice
-    </Link>
+    <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Listening' }]} />
   );
 
   if (state === 'loading') return <CardGridPageSkeleton cards={2} toolbar={false} />;
@@ -61,17 +59,18 @@ export function ListeningPracticePage() {
             const own = data.exercises.filter((exercise) => exercise.topic?.id === topic.id);
             const tried = own.filter(isTried).length;
             const song = topic.format === ListeningFormat.SONG;
+            const talks = topic.format === ListeningFormat.TALKS;
             return (
               <PracticeCard
                 key={topic.id}
-                icon={song ? Music : Headphones}
+                icon={song ? Music : talks ? Newspaper : Headphones}
                 title={topic.name}
-                description={song ? 'Listen to songs and write the lyrics.' : 'Listen and write down each sentence.'}
+                description={song ? 'Listen to songs and write the lyrics.' : talks ? 'Real talks and news, sentence by sentence.' : 'Listen and write down each sentence.'}
                 total={own.length}
                 done={tried}
                 unit={song ? 'song' : 'exercise'}
                 to={`/student/practice/listening/topics/${topic.id}`}
-                tone={song ? 'warning' : 'info'}
+                tone={song ? 'warning' : talks ? 'success' : 'info'}
               />
             );
           })}

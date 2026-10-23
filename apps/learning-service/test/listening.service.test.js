@@ -85,3 +85,16 @@ test('a song is checked line by line as the learner goes, without keeping a scor
   await assert.rejects(() => service.checkLine(manager, song.exercise.id, { segmentId: first.id, answers: {} }), { code: 26 });
 });
 
+test('the full transcript comes with the translations; song brackets are removed (D157)', async () => {
+  const { service, papers } = listeningHarness();
+  papers[1].content.segments[0].translation = 'Xin lỗi, cổng 5 ở đâu?';
+  const conversation = await service.getTranscript(student, papers[1].exercise.id);
+  assert.deepEqual(conversation.segments.map((item) => [item.speaker, item.text, item.translation, item.start]), [
+    ['Man', "Excuse me, where's gate 5?", 'Xin lỗi, cổng 5 ở đâu?', 0],
+    ['Woman', "It's next to the café.", '', 2],
+  ]);
+  const song = await service.getTranscript(student, papers[2].exercise.id);
+  assert.equal(song.segments[0].text, 'I walked across an empty land');
+  await assert.rejects(() => service.getTranscript(manager, papers[1].exercise.id), { code: 26 });
+});
+

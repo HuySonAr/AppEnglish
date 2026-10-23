@@ -120,8 +120,10 @@ export function courseHarness() {
   };
   const repository = createCourseRepository();
   const clock = { now: new Date('2026-10-22T08:00:00Z') };
-  const service = new CourseLessonService(repository, contentClient, { now: () => new Date(clock.now) });
-  return { service, repository, course, segments: paying.content.segments, ordering, paying, a1Test, meetings, a2Test };
+  const recorded = [];
+  const events = { record: async (type, payload) => recorded.push({ type, payload }) };
+  const service = new CourseLessonService(repository, contentClient, { now: () => new Date(clock.now), events });
+  return { service, repository, course, segments: paying.content.segments, ordering, paying, a1Test, meetings, a2Test, recorded };
 }
 
 // The answers of a level test with the first `right` questions right.

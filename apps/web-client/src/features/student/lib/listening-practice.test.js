@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterListeningPractice, isTimed, isTried, kindLabel, lineAnswers, lineBlanks, resultOf, runningScore, sentenceLabel, topicModes } from './listening-practice.js';
+import { filterListeningPractice, isTimed, maskedWords, isTried, kindLabel, lineAnswers, lineBlanks, resultOf, runningScore, sentenceLabel, topicModes } from './listening-practice.js';
 
 test('listening exercises are filtered by topic, searched and sorted', () => {
   const exercises = [
@@ -63,5 +63,22 @@ test('one song line at a time: its answers and the score so far (D93)', () => {
   assert.deepEqual(lineAnswers('full', { id: 'a' }, { a: 'I walked', b: 'other' }), { a: 'I walked' });
   assert.equal(runningScore({}), null);
   assert.equal(runningScore({ a: { accuracy: 100 }, b: { accuracy: 50 }, c: { accuracy: null } }), 75);
+});
+
+test('a checked sentence hides the wrong and missing words behind asterisks', () => {
+  const words = [
+    { text: 'Today', status: 'correct' },
+    { text: 'is', status: 'correct' },
+    { text: 'November', status: 'wrong', typed: 'December' },
+    { text: '26th.', status: 'missing' },
+    { text: 'very', status: 'extra' },
+  ];
+  assert.deepEqual(maskedWords(words), [
+    { text: 'Today', status: 'correct' },
+    { text: 'is', status: 'correct' },
+    { text: '********', status: 'hidden' },
+    { text: '****', status: 'hidden' },
+    { text: 'very', status: 'extra' },
+  ]);
 });
 

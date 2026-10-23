@@ -87,6 +87,7 @@ test('passing a level test, at any time, opens the next level; the last level ha
   assert.deepEqual([failed.score, failed.passed, failed.levelUp], [50, false, null]);
   const passed = await h.service.submitTest(student, h.a1Test.item.id, { versionId: paper.versionId, answers: testAnswers(h.a1Test, 3) });
   assert.deepEqual([passed.score, passed.passed, passed.testPassed, passed.levelUp], [75, true, true, { from: 'A1', to: 'A2' }]);
+  assert.deepEqual(h.recorded.filter((event) => event.type === 'course.level-up').map((event) => [event.payload.from, event.payload.to]), [['A1', 'A2']]);
   assert.equal(passed.sections[0].transcript.length, 4);
   assert.deepEqual(passed.sections[0].transcript[0], { id: '1', speaker: 'Man', text: 'Can I help you?' });
   assert.equal(passed.sections[0].questions[0].correct, true);

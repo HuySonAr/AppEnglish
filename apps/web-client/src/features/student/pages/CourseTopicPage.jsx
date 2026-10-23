@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, CheckCircle2, ChevronLeft, ChevronRight, Eye, GripVertical, Lightbulb, Play, RotateCcw, Trophy, X } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { CourseDictationMode, LearningResponseCode } from '@appenglish/learning-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -722,10 +723,7 @@ export function CourseTopicPage() {
   }
 
   const backLink = (
-    <Link to={back.to} state={back.state} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-      <ArrowLeft className="h-4 w-4" />
-      Listening course
-    </Link>
+    <PageBreadcrumb items={[{ label: 'Listening course', to: back.to, state: back.state }, data?.topic ? { label: data.topic.level } : null, { label: data?.topic?.title || 'Topic' }]} />
   );
 
   if (state === 'loading') return <DetailPageSkeleton />;

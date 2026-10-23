@@ -8,7 +8,7 @@ export const manager = { id: '11111111-1111-4111-8111-111111111111', role: 'CONT
 
 // In-memory stand-in for ProgressRepository.
 export function createProgressRepository() {
-  const tables = { results: [], completions: [], xp: [], studyDays: [] };
+  const tables = { results: [], completions: [], xp: [], studyDays: [], notifications: [] };
   const copy = (row) => (row ? structuredClone(row) : null);
   return {
     tables,
@@ -46,6 +46,28 @@ export function createProgressRepository() {
       const row = tables.studyDays.find((item) => item.accountId === accountId && item.day === day);
       if (!row) tables.studyDays.push({ accountId, day, activities: [activity], firstAt: at, lastAt: at });
       else if (!row.activities.includes(activity)) row.activities.push(activity);
+    },
+    async addNotification(notification) {
+      if (tables.notifications.some((row) => row.accountId === notification.accountId && row.key === notification.key)) return;
+      tables.notifications.push({ id: randomUUID(), readAt: null, ...structuredClone(notification) });
+    },
+    async latestMockNotification(accountId, mockTestId) {
+      return copy(tables.notifications.filter((row) => row.accountId === accountId && row.kind === 'MOCK_RESULT' && row.data.mockTestId === mockTestId).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]);
+    },
+    async listNotifications(accountId, limit) {
+      return tables.notifications.filter((row) => row.accountId === accountId).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, limit).map(copy);
+    },
+    async countUnread(accountId) {
+      return tables.notifications.filter((row) => row.accountId === accountId && !row.readAt).length;
+    },
+    async markNotificationsRead(accountId, ids, at) {
+      for (const row of tables.notifications) if (row.accountId === accountId && !row.readAt && (!ids || ids.includes(row.id))) row.readAt = at;
+    },
+    async markNotificationKeyRead(accountId, key, at) {
+      for (const row of tables.notifications) if (row.accountId === accountId && row.key === key && !row.readAt) row.readAt = at;
+    },
+    async deleteNotificationsBefore(accountId, before) {
+      tables.notifications = tables.notifications.filter((row) => row.accountId !== accountId || new Date(row.createdAt) >= before);
     },
     async listStudyDays(accountId) {
       return tables.studyDays.filter((row) => row.accountId === accountId).map((row) => row.day).sort();

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  translationPastePlan,
   applyAutoTime,
   formatSeconds,
   listeningPastePlan,
@@ -31,7 +32,9 @@ test('the editor starts from the draft and keeps four sentences in Parts 1 and 2
   assert.equal(workingListening({ draft: null, published: null }, 'part1').segments.length, 4);
   assert.equal(workingListening({ draft: null, published: null }, 'part3').segments.length, 0);
   const data = { draft: { content: { audioMediaId: 'a', segments: [{ id: 's1', speaker: 'Man', text: 'Hi.', start: 0, end: 1 }] } } };
-  assert.deepEqual(workingListening(data, 'part4'), { audioMediaId: 'a', segments: [{ id: 's1', speaker: 'Man', text: 'Hi.', start: 0, end: 1 }] });
+  assert.deepEqual(workingListening(data, 'part4'), { audioMediaId: 'a', segments: [{ id: 's1', speaker: 'Man', text: 'Hi.', start: 0, end: 1 }], source: { name: '', url: '' } });
+  const sourced = { draft: { content: { segments: [], source: { name: 'VOA Learning English', url: 'https://learningenglish.voanews.com/a/1.html' } } } };
+  assert.deepEqual(workingListening(sourced, 'talk').source, { name: 'VOA Learning English', url: 'https://learningenglish.voanews.com/a/1.html' });
 });
 
 test('setting an end starts the next sentence there, and issues are named', () => {
@@ -89,5 +92,16 @@ test('the lines heard by transcribe become the lines, Parts 1 and 2 keeping four
   assert.deepEqual(song.map((item) => [item.text, item.start, item.end, item.speaker]), [['A man is reading.', 0.4, 2.1, ''], ['A woman is typing.', 2.3, 4, '']]);
   assert.ok(song[0].id);
   assert.equal(transcribedSegments(heard, listeningKindOf('part1')).length, 4);
+});
+
+test('pasted translations fill the sentences in order (D157)', () => {
+  const segments = [{ id: 'a', text: 'Hello.' }, { id: 'b', text: 'Bye.' }];
+  const plan = translationPastePlan(segments, 'Xin chào.\n\nTạm biệt.');
+  assert.deepEqual(plan.segments.map((segment) => segment.translation), ['Xin chào.', 'Tạm biệt.']);
+  const short = translationPastePlan(segments, 'Xin chào.');
+  assert.deepEqual([short.segments[1].translation, short.lines[0].warnings.length], [undefined, 1]);
+  const long = translationPastePlan(segments, 'a\nb\nc');
+  assert.equal(long.segments, segments);
+  assert.equal(long.lines[2].errors.length, 1);
 });
 

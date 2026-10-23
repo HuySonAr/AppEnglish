@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto';
 export function createMemoryRepository() {
   const tables = {
     units: [], lessons: [], versions: [], reviewVersions: [], media: [], placement: [], mockTests: [], mockVersions: [],
-    listeningExercises: [], listeningVersions: [], timingJobs: [], courseItems: [], courseVersions: [],
+    listeningExercises: [], listeningVersions: [], timingJobs: [], courseItems: [], courseVersions: [], adminNotices: [], noticeReads: [],
     listeningTopics: [{ id: toeicTopicId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
     // The migration creates TOEIC.
     examTypes: [{ id: toeicExamTypeId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
@@ -32,6 +32,7 @@ export function createMemoryRepository() {
     async listTopics() { return tables.listeningTopics.map(copy); },
     async findTopic(id) { return copy(tables.listeningTopics.find((item) => item.id === id)); },
     async saveTopic(topic) { return save('listeningTopics', topic); },
+    async deleteTopic(id) { tables.listeningTopics = tables.listeningTopics.filter((item) => item.id !== id); },
     async listExercises() { return tables.listeningExercises.map(copy); },
     async findExercise(id) { return copy(tables.listeningExercises.find((item) => item.id === id)); },
     async saveExercise(exercise) { return save('listeningExercises', exercise); },
@@ -60,8 +61,23 @@ export function createMemoryRepository() {
     },
     async findTimingJob(id) { return copy(tables.timingJobs.find((job) => job.id === id)); },
     async findLatestTimingJob(owner) {
-      const [[field, value]] = Object.entries(owner);
-      return copy(tables.timingJobs.filter((job) => job[field] === value).at(-1));
+      return copy(tables.timingJobs.filter((job) => Object.entries(owner).every(([field, value]) => job[field] === value)).at(-1));
+    },
+    async listJobsUpdatedSince(since) {
+      return tables.timingJobs.filter((job) => new Date(job.updatedAt) > since).map(copy);
+    },
+    async listJobsRequestedBy(requestedBy, since, limit) {
+      return tables.timingJobs.filter((job) => job.requestedBy === requestedBy && new Date(job.updatedAt) > since).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).slice(0, limit).map(copy);
+    },
+    async markJobsSeen(requestedBy, ids, at) {
+      for (const job of tables.timingJobs) if (job.requestedBy === requestedBy && !job.seenAt && (!ids || ids.includes(job.id))) job.seenAt = at;
+    },
+    async titlesOf({ exerciseIds, courseItemIds, mockTestIds }) {
+      const rows = [...tables.listeningExercises.filter((row) => exerciseIds.includes(row.id)), ...tables.courseItems.filter((row) => courseItemIds.includes(row.id)), ...tables.mockTests.filter((row) => mockTestIds.includes(row.id))];
+      return new Map(rows.map((row) => [row.id, row.title]));
+    },
+    async listTimingJobs(owner) {
+      return tables.timingJobs.filter((job) => Object.entries(owner).every(([field, value]) => job[field] === value)).map(copy);
     },
   };
   // In-memory stand-in for CourseRepository.
@@ -102,6 +118,18 @@ export function createMemoryRepository() {
     tables,
     listening,
     course,
+    async addAdminNotice(notice) {
+      if (!tables.adminNotices.some((row) => row.key === notice.key)) tables.adminNotices.push({ id: randomUUID(), ...structuredClone(notice) });
+    },
+    async listAdminNotices(since) {
+      return tables.adminNotices.filter((row) => new Date(row.createdAt) > since).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(copy);
+    },
+    async readNoticeKeys(accountId, keys) {
+      return new Set(tables.noticeReads.filter((row) => row.accountId === accountId && keys.includes(row.key)).map((row) => row.key));
+    },
+    async markNoticesRead(accountId, keys, at) {
+      for (const key of keys) if (!tables.noticeReads.some((row) => row.accountId === accountId && row.key === key)) tables.noticeReads.push({ accountId, key, readAt: at });
+    },
     async listUnits() { return tables.units.map(copy).sort(byPosition); },
     async findUnit(id) { return copy(tables.units.find((unit) => unit.id === id)); },
     async saveUnit(unit) { return save('units', unit); },

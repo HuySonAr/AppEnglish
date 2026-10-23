@@ -13,6 +13,10 @@ import { getCurriculum } from '../api/lessons-api.js';
 import { listMockTests } from '../api/mock-api.js';
 import { getPlacement } from '../api/placement-api.js';
 import { getProgress, getStreak } from '../api/progress-api.js';
+import { getStudyGoal } from '../api/goal-api.js';
+import { GoalPlanCard } from '../components/GoalPlanCard.jsx';
+import { ScoreForecastCard } from '../components/ScoreForecastCard.jsx';
+import { dailyPlan } from '../lib/study-plan.js';
 import { ScoreRing } from '../components/ScoreRing.jsx';
 import { StreakStrip } from '../components/Streak.jsx';
 import { bestMockPercent, greeting, lessonStats, nextLessonStep, suggestedMockTest } from '../lib/home.js';
@@ -25,6 +29,7 @@ const sources = {
   mocks: listMockTests,
   progress: getProgress,
   streak: getStreak,
+  goal: getStudyGoal,
 };
 
 function Bar({ value, total, className }) {
@@ -80,37 +85,6 @@ function Tile({ icon: Icon, label, value, detail, children }) {
       <p className="mt-1 text-2xl font-bold tabular-nums">{value}</p>
       {detail ? <p className="truncate text-xs text-muted-foreground">{detail}</p> : null}
       {children}
-    </div>
-  );
-}
-
-function NextCard({ icon: Icon, tone, eyebrow, title, detail, to, action, failed, empty }) {
-  return (
-    <div className="flex flex-col gap-3 rounded-2xl border bg-card p-5 shadow-sm">
-      <div className="flex items-center gap-3">
-        <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', tone)}>
-          <Icon className="h-5 w-5" />
-        </span>
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{eyebrow}</p>
-      </div>
-      {failed ? (
-        <p className="text-sm text-muted-foreground">Could not load this part.</p>
-      ) : title ? (
-        <>
-          <div className="min-w-0">
-            <p className="truncate font-semibold">{title}</p>
-            {detail ? <p className="truncate text-sm text-muted-foreground">{detail}</p> : null}
-          </div>
-          <Button asChild variant="outline" size="sm" className="mt-auto w-fit gap-1.5">
-            <Link to={to}>
-              {action}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </>
-      ) : (
-        <p className="text-sm text-muted-foreground">{empty}</p>
-      )}
     </div>
   );
 }
@@ -209,6 +183,9 @@ export function StudentDashboardPage() {
         </div>
       </div>
 
+      <GoalPlanCard data={data.goal} tasks={dailyPlan({ goal: data.goal, curriculum, course: failed.course ? null : course, mocks })} failed={Boolean(failed.goal)} onChange={(goal) => setData((current) => ({ ...current, goal }))} />
+      {data.goal?.goal ? <ScoreForecastCard data={data.goal} /> : null}
+
       {streak ? <StreakStrip streak={streak} /> : null}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -227,30 +204,6 @@ export function StudentDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <NextCard
-          icon={Headphones}
-          tone="bg-info/15 text-info"
-          eyebrow="Listening course"
-          failed={failed.course}
-          title={courseNext?.title}
-          detail={courseNext ? `${nextKind[courseNext.type]} · ${courseNext.level}` : null}
-          to={courseNext?.path}
-          action="Continue listening"
-          empty={course?.currentLevel ? `Every ${course.currentLevel} topic is done.` : 'Topics will appear when they are published.'}
-        />
-        <NextCard
-          icon={Timer}
-          tone="bg-warning/15 text-warning"
-          eyebrow="Mock test for you"
-          failed={failed.mocks}
-          title={suggested?.title}
-          detail={suggested ? `Level ${suggested.level}${suggested.durationMinutes ? ` · ${suggested.durationMinutes} min` : ''} · ${suggested.attemptCount ? `best ${suggested.bestPercent}%` : 'not taken yet'}` : null}
-          to={suggested ? `/student/mock-tests/${suggested.id}` : '/student/mock-tests'}
-          action="Open the test"
-          empty="No mock test is published yet."
-        />
-      </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">

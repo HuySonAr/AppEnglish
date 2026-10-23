@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDown, ArrowUp, ClipboardCheck, Library, Pencil, Plus } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronRight, ClipboardCheck, Library, Pencil, Plus, X } from 'lucide-react';
 import { UnitStatus } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -19,10 +19,6 @@ import { PublishButton, usePublishAction } from '../../../components/shared/Publ
 import {
   Badge,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -31,7 +27,6 @@ import {
   DialogTitle,
   Input,
   Label,
-  Skeleton,
 } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
@@ -54,56 +49,78 @@ import { useFocusReturn, useListLinkState, useReturnTo } from '../../../hooks/us
 function MoveButtons({ label, index, count, onMove, disabled }) {
   return (
     <div className="flex">
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={`Move ${label} up`}
-        disabled={disabled || index === 0}
-        onClick={() => onMove(index)}
-      >
+      <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Move ${label} up`} disabled={disabled || index === 0} onClick={() => onMove(index)}>
         <ArrowUp className="h-4 w-4" />
       </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={`Move ${label} down`}
-        disabled={disabled || index === count - 1}
-        onClick={() => onMove(index + 2)}
-      >
+      <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Move ${label} down`} disabled={disabled || index === count - 1} onClick={() => onMove(index + 2)}>
         <ArrowDown className="h-4 w-4" />
       </Button>
     </div>
   );
 }
 
-function LessonBadges({ lesson }) {
+function LessonRow({ lesson, index, count, linkState, unitId, busy, reorderable, onMove }) {
   return (
-    <div className="flex flex-wrap gap-2">
-      {lesson.publishedVersionNumber ? (
-        <Badge variant="success">Published v{lesson.publishedVersionNumber}</Badge>
-      ) : (
-        <Badge variant="outline">Not published</Badge>
-      )}
-      {lesson.hasDraft ? <Badge variant="warning">Draft</Badge> : null}
-    </div>
+    <li className="group flex items-center gap-2 pr-2 transition-colors hover:bg-accent">
+      <Link
+        to={`/content-manager/lessons/${lesson.id}`}
+        state={linkState(unitId)}
+        className="flex min-w-0 flex-1 items-center gap-3 px-4 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+      >
+        <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-muted px-1.5 text-xs font-semibold tabular-nums text-muted-foreground">{lesson.position}</span>
+        <span className="min-w-0 flex-1 truncate font-medium">{lesson.title}</span>
+        <span className="flex shrink-0 flex-wrap justify-end gap-1.5">
+          {lesson.hasDraft ? <Badge variant="warning">Draft</Badge> : null}
+          {lesson.publishedVersionNumber ? <Badge variant="success">Published v{lesson.publishedVersionNumber}</Badge> : <Badge variant="outline">Not published</Badge>}
+        </span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+      </Link>
+      <MoveButtons label={`lesson ${lesson.title}`} index={index} count={count} disabled={busy || !reorderable} onMove={onMove} />
+    </li>
+  );
+}
+
+function AddLessonForm({ unit, busy, onAdd }) {
+  const [title, setTitle] = useState('');
+  return (
+    <form
+      onSubmit={async (event) => {
+        event.preventDefault();
+        if (title.trim() && (await onAdd(title.trim()))) setTitle('');
+      }}
+      className="flex items-center gap-2 border-t bg-muted/20 px-4 py-2.5"
+    >
+      <Plus className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <Input
+        aria-label={`New lesson title for unit ${unit.title}`}
+        placeholder="Add a lesson"
+        value={title}
+        maxLength={200}
+        className="h-9 border-dashed bg-transparent"
+        onChange={(event) => setTitle(event.target.value)}
+      />
+      {title.trim() ? (
+        <Button type="submit" size="sm" disabled={busy}>
+          Add
+        </Button>
+      ) : null}
+    </form>
   );
 }
 
 const UNITS_PER_PAGE = 5;
+const DEFAULTS = { search: '', status: StatusFilter.ALL, sort: LessonSort.ORDER };
 
 export function ContentUnitsPage() {
   const [units, setUnits] = useState([]);
   const [state, setState] = useState('loading');
   const [busy, setBusy] = useState(false);
-  // The publish animation of the unit being published (D126).
   const publish = usePublishAction();
   const [publishingUnitId, setPublishingUnitId] = useState(null);
-  const [newUnitTitle, setNewUnitTitle] = useState('');
-  const [lessonTitles, setLessonTitles] = useState({});
+  const [creating, setCreating] = useState(null);
   const [editing, setEditing] = useState(null);
-  // Search, filter and sort of the list; changing one goes back to page 1.
   const linkState = useListLinkState();
-  const { filters, setFilters, setFilter, page, setPage } = useListState({ search: '', status: StatusFilter.ALL, sort: LessonSort.ORDER });
+  const { filters, setFilters, setFilter, page, setPage } = useListState(DEFAULTS);
 
   async function load({ quiet = false } = {}) {
     if (!quiet) setState('loading');
@@ -112,11 +129,7 @@ export function ContentUnitsPage() {
       setState('ready');
     } catch (error) {
       setState('error');
-      notify({
-        title: 'Could not load content',
-        description: getApiErrorMessage(error),
-        variant: 'destructive',
-      });
+      notify({ title: 'Could not load content', description: getApiErrorMessage(error), variant: 'destructive' });
     }
   }
 
@@ -125,7 +138,6 @@ export function ContentUnitsPage() {
   }, []);
   useFocusReturn(state === 'ready');
 
-  // Runs one change, then reloads the list so positions and badges stay true.
   async function run(action, { success, failure }) {
     setBusy(true);
     try {
@@ -135,11 +147,7 @@ export function ContentUnitsPage() {
       return true;
     } catch (error) {
       const issues = error?.response?.data?.data?.issues;
-      notify({
-        title: failure,
-        description: issues?.[0]?.message || getApiErrorMessage(error),
-        variant: 'destructive',
-      });
+      notify({ title: failure, description: issues?.[0]?.message || getApiErrorMessage(error), variant: 'destructive' });
       return false;
     } finally {
       setBusy(false);
@@ -148,18 +156,8 @@ export function ContentUnitsPage() {
 
   async function addUnit(event) {
     event.preventDefault();
-    const title = newUnitTitle.trim();
-    if (!title) return;
-    if (await run(() => createUnit({ title }), { success: 'Unit created', failure: 'Could not create the unit' }))
-      setNewUnitTitle('');
-  }
-
-  async function addLesson(event, unit) {
-    event.preventDefault();
-    const title = (lessonTitles[unit.id] || '').trim();
-    if (!title) return;
-    if (await run(() => createLesson(unit.id, { title }), { success: 'Lesson created', failure: 'Could not create the lesson' }))
-      setLessonTitles({ ...lessonTitles, [unit.id]: '' });
+    const title = creating.trim();
+    if (title && (await run(() => createUnit({ title }), { success: 'Unit created', failure: 'Could not create the unit' }))) setCreating(null);
   }
 
   async function saveUnitDetails() {
@@ -169,232 +167,220 @@ export function ContentUnitsPage() {
       setEditing(null);
   }
 
-  // Units and lessons can be moved only while the list is shown as stored.
   const reorderable = isReorderable(filters);
   const shown = paginate(filterUnits(units, filters), page, UNITS_PER_PAGE);
+  const narrowed = filters.search || filters.status !== StatusFilter.ALL || filters.sort !== LessonSort.ORDER;
+  const lessonTotal = units.reduce((sum, unit) => sum + unit.lessonCount, 0);
+  const newButton = (
+    <Button className="gap-2" disabled={state !== 'ready'} onClick={() => setCreating('')}>
+      <Plus className="h-4 w-4" />
+      New unit
+    </Button>
+  );
 
   return (
     <section className="space-y-6">
-      <PageHeader
-        eyebrow="Content Manager"
-        title="Units and lessons"
-        description="Create, order and publish units and their lessons."
-      />
-
-      <form onSubmit={addUnit} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row">
-        <Input
-          aria-label="New unit title"
-          placeholder="New unit title"
-          value={newUnitTitle}
-          maxLength={200}
-          onChange={(event) => setNewUnitTitle(event.target.value)}
-        />
-        <Button type="submit" disabled={busy || !newUnitTitle.trim()} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Add unit
-        </Button>
-      </form>
-
-      {units.length ? (
-        <div className="space-y-2">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search units and lessons by title" />
-            <FilterSelect label="Lesson status" value={filters.status} onChange={setFilter('status')} options={statusOptions} />
-            <FilterSelect label="Sort by" value={filters.sort} onChange={setFilter('sort')} options={lessonSortOptions} />
-          </div>
-          {reorderable ? null : (
-            <p className="text-sm text-muted-foreground">
-              Moving units and lessons is off while the list is searched, filtered or sorted by title.
-            </p>
-          )}
-        </div>
-      ) : null}
+      <PageHeader eyebrow="Content Manager" title="Units and lessons" description="Create, order and publish units and their lessons." actions={newButton} />
 
       {state === 'loading' ? (
         <RowsSkeleton rows={5} tall />
       ) : state === 'error' ? (
-        <Button variant="outline" onClick={() => load()}>Try again</Button>
+        <Button variant="outline" onClick={() => load()}>
+          Try again
+        </Button>
       ) : units.length === 0 ? (
-        <EmptyState icon={Library} title="No units yet" description="Add the first unit above." />
-      ) : shown.total === 0 ? (
-        <EmptyState icon={Library} title="Nothing matches" description="Try another search or filter." />
+        <EmptyState icon={Library} title="No units yet" description="Create the first unit." action={newButton} />
       ) : (
-        shown.items.map((unit) => {
-          const unitIndex = units.findIndex((item) => item.id === unit.id);
-          const publishedLessons = unit.publishedCount;
-          const isPublished = unit.status === UnitStatus.PUBLISHED;
-          return (
-            <Card key={unit.id} id={`focus-${unit.id}`} className="scroll-mt-24">
-              <CardHeader className="space-y-3">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="space-y-2">
-                    <CardTitle className="text-xl">
-                      Unit {unit.position}: {unit.title}
-                    </CardTitle>
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                      <Badge variant={isPublished ? 'success' : 'outline'}>
-                        {isPublished ? 'Published' : 'Draft'}
-                      </Badge>
-                      <span>
-                        {publishedLessons} of {unit.lessonCount} lessons published
-                      </span>
-                    </div>
-                    {unit.description ? (
-                      <p className="text-sm text-muted-foreground">{unit.description}</p>
-                    ) : null}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-1">
-                    <MoveButtons
-                      label={`unit ${unit.title}`}
-                      index={unitIndex}
-                      count={units.length}
-                      disabled={busy || !reorderable}
-                      onMove={(position) =>
-                        run(() => updateUnit(unit.id, { position }), { failure: 'Could not move the unit' })
-                      }
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label={`Edit unit ${unit.title}`}
-                      onClick={() => setEditing({ id: unit.id, title: unit.title, description: unit.description })}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button asChild variant="outline" size="sm" className="gap-1.5">
-                      <Link to={`/content-manager/units/${unit.id}/review`} state={linkState(unit.id)}>
-                        <ClipboardCheck className="h-4 w-4" />
-                        Unit review
+        <>
+          <div className="space-y-3 rounded-xl border bg-card p-3 shadow-sm">
+            <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+              <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search units and lessons" />
+              <div className="grid grid-cols-2 gap-2 sm:flex">
+                <FilterSelect label="Lesson status" value={filters.status} onChange={setFilter('status')} options={statusOptions} className="w-full sm:w-40" />
+                <FilterSelect label="Sort by" value={filters.sort} onChange={setFilter('sort')} options={lessonSortOptions} className="w-full sm:w-44" />
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+              <span className="tabular-nums">
+                {units.length} unit{units.length === 1 ? '' : 's'} · {lessonTotal} lesson{lessonTotal === 1 ? '' : 's'}
+                {reorderable ? '' : ' · reordering is off while filtering'}
+              </span>
+              {narrowed ? (
+                <Button variant="ghost" size="sm" className="h-7 gap-1 px-2" onClick={() => setFilters(DEFAULTS)}>
+                  <X className="h-3.5 w-3.5" />
+                  Clear filters
+                </Button>
+              ) : null}
+            </div>
+          </div>
+
+          {shown.total === 0 ? (
+            <EmptyState icon={Library} title="Nothing matches" description="Try another search or filter." />
+          ) : (
+            <div className="space-y-4">
+              {shown.items.map((unit) => {
+                const unitIndex = units.findIndex((item) => item.id === unit.id);
+                const isPublished = unit.status === UnitStatus.PUBLISHED;
+                const share = unit.lessonCount ? (unit.publishedCount * 100) / unit.lessonCount : 0;
+                return (
+                  <article key={unit.id} id={`focus-${unit.id}`} className="scroll-mt-24 overflow-hidden rounded-xl border bg-card shadow-sm">
+                    <header className="flex flex-wrap items-start gap-4 p-4">
+                      <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-primary/10 leading-none text-primary">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider">Unit</span>
+                        <span className="text-xl font-bold tabular-nums">{unit.position}</span>
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-1.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="text-lg font-semibold">{unit.title}</h2>
+                          <Badge variant={isPublished ? 'success' : 'outline'}>{isPublished ? 'Published' : 'Not published'}</Badge>
+                        </div>
+                        {unit.description ? <p className="line-clamp-2 text-sm text-muted-foreground">{unit.description}</p> : null}
+                        <div className="flex max-w-sm items-center gap-2 text-xs text-muted-foreground">
+                          <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                            <span className="block h-full rounded-full bg-success" style={{ width: `${share}%` }} />
+                          </span>
+                          <span className="shrink-0 tabular-nums">
+                            {unit.publishedCount}/{unit.lessonCount} lessons published
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <MoveButtons
+                          label={`unit ${unit.title}`}
+                          index={unitIndex}
+                          count={units.length}
+                          disabled={busy || !reorderable}
+                          onMove={(position) => run(() => updateUnit(unit.id, { position }), { failure: 'Could not move the unit' })}
+                        />
+                        <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Edit unit ${unit.title}`} onClick={() => setEditing({ id: unit.id, title: unit.title, description: unit.description || '' })}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        {isPublished ? null : (
+                          <PublishButton
+                            size="sm"
+                            label="Publish unit"
+                            state={publishingUnitId === unit.id ? publish.state : 'idle'}
+                            disabled={busy}
+                            onClick={() => {
+                              setPublishingUnitId(unit.id);
+                              publish.run(() => run(() => publishUnit(unit.id), { success: 'Unit published', failure: 'Unit cannot be published yet' }));
+                            }}
+                          />
+                        )}
+                        <ContentDangerActions
+                          noun="unit"
+                          published={isPublished}
+                          busy={busy}
+                          onUnpublish={async () => {
+                            await unpublishUnit(unit.id);
+                            await load({ quiet: true });
+                          }}
+                          onDelete={async () => {
+                            await deleteUnit(unit.id);
+                            await load({ quiet: true });
+                          }}
+                          deleteNote="Every lesson of the unit goes with it."
+                        />
+                      </div>
+                    </header>
+
+                    <div className="border-t">
+                      {unit.lessons.length === 0 ? (
+                        <p className="px-4 py-5 text-center text-sm text-muted-foreground">{unit.lessonCount ? 'No lesson of this unit matches.' : 'No lesson yet.'}</p>
+                      ) : (
+                        <ul className="divide-y">
+                          {unit.lessons.map((lesson, lessonIndex) => (
+                            <LessonRow
+                              key={lesson.id}
+                              lesson={lesson}
+                              index={lessonIndex}
+                              count={unit.lessons.length}
+                              linkState={linkState}
+                              unitId={unit.id}
+                              busy={busy}
+                              reorderable={reorderable}
+                              onMove={(position) => run(() => updateLesson(lesson.id, { position }), { failure: 'Could not move the lesson' })}
+                            />
+                          ))}
+                        </ul>
+                      )}
+                      <Link
+                        to={`/content-manager/units/${unit.id}/review`}
+                        state={linkState(unit.id)}
+                        className="group flex items-center gap-3 border-t px-4 py-2.5 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                      >
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-info/10 text-info">
+                          <ClipboardCheck className="h-4 w-4" />
+                        </span>
+                        <span className="flex-1 font-medium">Unit review</span>
                         {unit.review?.publishedVersionNumber ? (
-                          <Badge variant="success">v{unit.review.publishedVersionNumber}</Badge>
+                          <Badge variant="success">Published v{unit.review.publishedVersionNumber}</Badge>
                         ) : unit.review?.hasDraft ? (
                           <Badge variant="warning">Draft</Badge>
                         ) : (
-                          <Badge variant="outline">None</Badge>
+                          <Badge variant="outline">Not written</Badge>
                         )}
+                        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                       </Link>
-                    </Button>
-                    {isPublished ? null : (
-                      <PublishButton
-                        size="sm"
-                        label="Publish unit"
-                        state={publishingUnitId === unit.id ? publish.state : 'idle'}
-                        disabled={busy}
-                        onClick={() => {
-                          setPublishingUnitId(unit.id);
-                          publish.run(() => run(() => publishUnit(unit.id), { success: 'Unit published', failure: 'Unit cannot be published yet' }));
-                        }}
+                      <AddLessonForm
+                        unit={unit}
+                        busy={busy}
+                        onAdd={(title) => run(() => createLesson(unit.id, { title }), { success: 'Lesson created', failure: 'Could not create the lesson' })}
                       />
-                    )}
-                    <ContentDangerActions
-                      noun="unit"
-                      published={isPublished}
-                      busy={busy}
-                      onUnpublish={async () => {
-                        await unpublishUnit(unit.id);
-                        await load({ quiet: true });
-                      }}
-                      onDelete={async () => {
-                        await deleteUnit(unit.id);
-                        await load({ quiet: true });
-                      }}
-                      deleteNote="Every lesson of the unit goes with it."
-                    />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {unit.lessons.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    {unit.lessonCount ? 'No lesson of this unit matches.' : 'No lessons in this unit yet.'}
-                  </p>
-                ) : (
-                  <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border">
-                    {unit.lessons.map((lesson, lessonIndex) => (
-                      <li key={lesson.id} className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 transition-colors hover:bg-muted/50">
-                        <div className="flex min-w-0 flex-wrap items-center gap-3">
-                          <span className="text-sm text-muted-foreground">{lesson.position}.</span>
-                          <Link
-                            to={`/content-manager/lessons/${lesson.id}`}
-                            state={linkState(unit.id)}
-                            className="font-medium text-foreground underline-offset-4 hover:underline"
-                          >
-                            {lesson.title}
-                          </Link>
-                          <LessonBadges lesson={lesson} />
-                        </div>
-                        <MoveButtons
-                          label={`lesson ${lesson.title}`}
-                          index={lessonIndex}
-                          count={unit.lessons.length}
-                          disabled={busy || !reorderable}
-                          onMove={(position) =>
-                            run(() => updateLesson(lesson.id, { position }), { failure: 'Could not move the lesson' })
-                          }
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <form onSubmit={(event) => addLesson(event, unit)} className="flex flex-col gap-3 sm:flex-row">
-                  <Input
-                    aria-label={`New lesson title for unit ${unit.title}`}
-                    placeholder="New lesson title"
-                    value={lessonTitles[unit.id] || ''}
-                    maxLength={200}
-                    onChange={(event) => setLessonTitles({ ...lessonTitles, [unit.id]: event.target.value })}
-                  />
-                  <Button
-                    type="submit"
-                    variant="outline"
-                    disabled={busy || !(lessonTitles[unit.id] || '').trim()}
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add lesson
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          );
-        })
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+          <Pagination page={shown.page} pageCount={shown.pageCount} total={shown.total} noun="unit" onChange={setPage} />
+        </>
       )}
-      {state === 'ready' ? (
-        <Pagination page={shown.page} pageCount={shown.pageCount} total={shown.total} noun="unit" onChange={setPage} />
-      ) : null}
+
+      <Dialog open={creating !== null} onOpenChange={(open) => !open && !busy && setCreating(null)}>
+        <DialogContent>
+          <form onSubmit={addUnit} className="space-y-4">
+            <DialogHeader>
+              <DialogTitle>New unit</DialogTitle>
+              <DialogDescription>Add its lessons after creating it.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2">
+              <Label htmlFor="new-unit-title">Title</Label>
+              <Input id="new-unit-title" autoFocus value={creating || ''} maxLength={200} onChange={(event) => setCreating(event.target.value)} />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" disabled={busy} onClick={() => setCreating(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" loading={busy} disabled={busy || !creating?.trim()}>
+                Create unit
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit unit</DialogTitle>
-            <DialogDescription>
-              Changes to the title and description are visible to learners
-              immediately when the unit is published.
-            </DialogDescription>
+            <DialogDescription>Learners see the change once the unit is published.</DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-2">
             <div className="space-y-2">
               <Label htmlFor="unit-title">Title</Label>
-              <Input
-                id="unit-title"
-                value={editing?.title || ''}
-                maxLength={200}
-                onChange={(event) => setEditing({ ...editing, title: event.target.value })}
-              />
+              <Input id="unit-title" value={editing?.title || ''} maxLength={200} onChange={(event) => setEditing({ ...editing, title: event.target.value })} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="unit-description">Description</Label>
-              <Textarea
-                id="unit-description"
-                value={editing?.description || ''}
-                maxLength={2000}
-                onChange={(event) => setEditing({ ...editing, description: event.target.value })}
-              />
+              <Textarea id="unit-description" value={editing?.description || ''} maxLength={2000} onChange={(event) => setEditing({ ...editing, description: event.target.value })} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-            <Button onClick={saveUnitDetails} disabled={busy || !editing?.title.trim()}>
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              Cancel
+            </Button>
+            <Button loading={busy} onClick={saveUnitDetails} disabled={busy || !editing?.title.trim()}>
               Save
             </Button>
           </DialogFooter>

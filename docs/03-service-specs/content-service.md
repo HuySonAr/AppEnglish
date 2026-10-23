@@ -372,6 +372,7 @@ folder `audio/listening`). Migration `1720000005000-create-listening` creates
 (`topicId`, `title`, `level` A1–C2, `kind` part1–part4, `publishedVersionId`)
 and `listening_exercise_versions` (DRAFT/PUBLISHED, one draft per exercise,
 `content` jsonb). `isMediaReferenced` also searches the listening versions.
+Each sentence may carry a Vietnamese `translation` (D157). A listening exercise's content may carry a `source` (`{ name, url }`, both optional, D155), shown to learners as a credit, for example VOA Learning English.
 
 Content: `{ audioMediaId, segments: [{ id, speaker, text, start, end }] }`,
 times in seconds, at most 80 sentences of 500 characters.
@@ -379,8 +380,9 @@ times in seconds, at most 80 sentences of 500 characters.
 | Method | Path | RPC | Who |
 |---|---|---|---|
 | GET | `/content/listening-topics` | `ListListeningTopics` | Any role |
-| POST, PATCH | `/content/listening-topics`, `/content/listening-topics/:id` | `CreateListeningTopic`, `UpdateListeningTopic` | Admin, Content Manager; `{ name, format }` (`toeic`, `song` or null; PATCH takes either); 46 `LISTENING_TOPIC_INVALID` (`NAME_TAKEN`, `HAS_EXERCISES` when the format of a topic with exercises changes) |
-| GET, POST | `/content/listening-exercises` | `ListListeningExercises`, `CreateListeningExercise` | Content Manager; create `{ topicId, title, level, kind }` (kind `part1`–`part4` for a TOEIC topic, `song` for a song topic); 46 (`NO_EDITOR` for a topic without format, `KIND_MISMATCH`) |
+| POST, PATCH | `/content/listening-topics`, `/content/listening-topics/:id` | `CreateListeningTopic`, `UpdateListeningTopic` | Admin, Content Manager; `{ name, format }` (`toeic`, `song`, `talks` (D155) or null; PATCH takes either); 46 `LISTENING_TOPIC_INVALID` (`NAME_TAKEN`, `HAS_EXERCISES` when the format of a topic with exercises changes) |
+| DELETE | `/content/listening-topics/:id` | `DeleteListeningTopic` | Admin, Content Manager (D159); only a topic without exercises (drafts included); returns `{ deleted: { id } }`; 40 when missing; 46 `LISTENING_TOPIC_INVALID` `HAS_EXERCISES` with `exerciseCount` |
+| GET, POST | `/content/listening-exercises` | `ListListeningExercises`, `CreateListeningExercise` | Content Manager; create `{ topicId, title, level, kind }` (kind `part1`–`part4` for a TOEIC topic, `song` for a song topic, `conversation` or `talk` for a talks topic, D155); 46 (`NO_EDITOR` for a topic without format, `KIND_MISMATCH`) |
 | PATCH, GET | `/content/listening-exercises/:id` | `UpdateListeningExercise` (`title`, `level`), `GetListeningExercise` | Content Manager |
 | PUT | `/content/listening-exercises/:id/draft` | `SaveListeningExerciseDraft` | Content Manager |
 | POST | `/content/listening-exercises/:id/publish` | `PublishListeningExercise` | Content Manager; 42 with `issues` |
@@ -457,6 +459,27 @@ with `courseItemId` and answered like the library's:
 | POST | `/content/listening-course/items/:id/auto-time` | `RequestCourseAutoTime` | Times the saved sentences (kind `part3`); 409 `NO_AUDIO` / `NO_LINES`, 409 `NOT_A_TOPIC` for a level test, 503 without the broker. A job still waiting or running is returned |
 | POST | `/content/listening-course/items/:id/transcribe` | `RequestCourseTranscribe` | Writes the sentences from the recording alone |
 | GET | `/content/listening-course/items/:id/auto-time` | `GetCourseAutoTime` | The latest job of the topic, or null |
+
+Transcribe on a mock test recording (D161), stored in `listening_timing_jobs` with `mockTestId` and `audioMediaId`:
+
+| Method | Gateway route | RPC | Purpose |
+|---|---|---|---|
+| POST | `/content/mock-tests/:id/transcribe` | `RequestMockTranscribe` | Content Manager; body `{ audioMediaId }`, a recording of Part 1–4 in the saved draft (or the published version); kind sent is the part key; 409 `NO_AUDIO` when the recording is not in the test or not downloadable, 503 without the broker. A job still waiting or running for that recording is returned |
+| GET | `/content/mock-tests/:id/transcribe` | `ListMockTranscribe` | `{ jobs }`: the latest job of each recording of the test, each with `audioMediaId` |
+
+Speech-job notices for the Content Manager (D163), read from `listening_timing_jobs` requested by the caller in the last 7 days that are done or failed (a job past the timeout counts as failed):
+
+| Method | Gateway route | RPC | Purpose |
+|---|---|---|---|
+| GET | `/content/notifications` | `ListContentNotifications` | Content Manager; `{ notifications: [{ id, kind: 'SPEECH_JOB', data: { task, status, error, lineCount, owner: { type, id, title } }, createdAt, read }], unread }`, 30 latest |
+| POST | `/content/notifications/read` | `MarkContentNotificationsRead` | Body `{ ids? }`; sets `seenAt`; returns `{ unread }` |
+
+Admin notices (D164): `CONTENT_UNPUBLISHED` rows written by every unpublish that takes a published unit, unit review, lesson, mock test, listening exercise or course item down (`data { type, id, title, by }`), kept 30 days, and `SPEECH_FAILURES` computed per Vietnam day from the failed (or timed-out) speech jobs of the last 7 days (`id` `speech:<day>:<count>`, `data { day, count, lastError }`).
+
+| Method | Gateway route | RPC | Purpose |
+|---|---|---|---|
+| GET | `/content/admin/notifications` | `ListAdminContentNotifications` | Admin; `{ notifications: [{ id, kind, data, createdAt, read }], unread }` |
+| POST | `/content/admin/notifications/read` | `MarkAdminContentNotificationsRead` | Admin; body `{ ids? }` (keys; all listed when left out); returns `{ unread }` |
 
 learning-service reads `ListPublishedCourse` and `GetCoursePaper` (the content
 with answers and `media`: id → URL of the recordings and pronunciations).

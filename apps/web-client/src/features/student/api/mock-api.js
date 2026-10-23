@@ -33,3 +33,12 @@ export async function getMockReview(id, reference, attemptNumber) {
     })
   ).data;
 }
+export async function getMockMistakes() {
+  return (await httpClient.get('/mock-tests/mistakes')).data;
+}
+export async function getMistakePractice(partKey) {
+  return (await httpClient.get('/mock-tests/mistakes/practice', { params: partKey ? { partKey } : {} })).data;
+}
+export async function answerMistake(questionId, optionId) {
+  return (await httpClient.post('/mock-tests/mistakes/answer', { questionId, optionId })).data;
+}

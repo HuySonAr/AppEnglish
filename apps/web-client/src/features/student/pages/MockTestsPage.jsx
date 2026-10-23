@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight, Clock, FileText, ListChecks, Sparkles } from 'lucide-react';
+import { ChevronRight, Clock, FileText, ListChecks, RotateCcw, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -62,6 +62,14 @@ export function MockTestsPage() {
         eyebrow="Practice for the test"
         title="Mock tests"
         description="Full tests against the clock, or one part at a time."
+        actions={
+          <Button asChild variant="outline" className="gap-1.5">
+            <Link to="/student/mock-tests/mistakes">
+              <RotateCcw className="h-4 w-4" />
+              Review my mistakes
+            </Link>
+          </Button>
+        }
       />
       {data.mockTests.length === 0 ? (
         <EmptyState icon={FileText} title="No mock tests yet" description="Mock tests will appear here when they are published." />

@@ -79,6 +79,15 @@ export async function saveMockTestDraft(id, content) {
 export async function publishMockTest(id) {
   return (await httpClient.post(`/content/mock-tests/${id}/publish`, undefined, { timeout: 30000 })).data;
 }
+export async function getMockStats(id) {
+  return (await httpClient.get(`/mock-tests/${id}/stats`)).data;
+}
+export async function requestMockTranscribe(id, audioMediaId) {
+  return (await httpClient.post(`/content/mock-tests/${id}/transcribe`, { audioMediaId })).data;
+}
+export async function listMockTranscribe(id) {
+  return (await httpClient.get(`/content/mock-tests/${id}/transcribe`)).data;
+}
 // Listening exercises (F05B-2, D85).
 export async function listListeningExercises() {
   return (await httpClient.get('/content/listening-exercises')).data;

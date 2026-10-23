@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, BookOpen, Clock, FileText, Headphones, History, ListChecks, Minus, Sigma, TrendingDown, TrendingUp } from 'lucide-react';
+import { BookOpen, Clock, FileText, Headphones, History, ListChecks, Minus, Sigma, TrendingDown, TrendingUp } from 'lucide-react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { MockAttemptKind, TestTrend } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -163,10 +164,7 @@ export function MockTestPage() {
 
   return (
     <section className="space-y-8">
-      <Link to="/student/mock-tests" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" />
-        Mock tests
-      </Link>
+      <PageBreadcrumb items={[{ label: 'Mock tests', to: '/student/mock-tests' }, { label: mockTest.title }]} />
 
       <TestStartCard
         icon={FileText}

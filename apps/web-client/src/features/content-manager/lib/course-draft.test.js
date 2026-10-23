@@ -55,6 +55,8 @@ test('replaced sentences keep their translation and blanks by id, or by place wh
   // Times found by Auto-time keep everything (same objects, same ids).
   const timed = keepSentenceExtras(previous, previous.map((segment) => ({ ...segment, start: 1 })));
   assert.equal(timed[0].translation, 'Xin chào.');
+  const onlyTranslation = keepSentenceExtras(previous, pasted, ['translation']);
+  assert.deepEqual(onlyTranslation[0], { id: 'p1', speaker: '', text: 'Hello  there.', start: null, end: null, translation: 'Xin chào.' });
   assert.equal(blankCount([{ gap: 'a [b] c [d]' }, { gap: '' }, { gap: '[x]' }]), 3);
 });
 

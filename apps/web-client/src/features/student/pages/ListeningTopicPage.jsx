@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Headphones, PenLine, TextCursorInput } from 'lucide-react';
+import { Headphones, PenLine, TextCursorInput } from 'lucide-react';
 import { Link, Navigate, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { ListeningMode } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -38,10 +39,7 @@ export function ListeningTopicPage() {
   }, [topicId]);
 
   const back = (
-    <Link to="/student/practice/listening" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-      <ArrowLeft className="h-4 w-4" />
-      Listening
-    </Link>
+    <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Listening', to: '/student/practice/listening' }, { label: data?.topics?.find((item) => item.id === topicId)?.name || 'Topic' }]} />
   );
 
   if (state === 'loading') return <CardGridPageSkeleton cards={2} toolbar={false} />;

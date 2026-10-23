@@ -33,8 +33,8 @@ export const contentErrors = Object.freeze({
   listeningTopicNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Listening topic was not found', 404),
   // reason: NAME_TAKEN, or NO_EDITOR when exercises cannot be written for the topic yet.
-  listeningTopicInvalid: (reason, message) =>
-    new ContentError(ContentResponseCode.LISTENING_TOPIC_INVALID, message, 409, { reason }),
+  listeningTopicInvalid: (reason, message, details = {}) =>
+    new ContentError(ContentResponseCode.LISTENING_TOPIC_INVALID, message, 409, { reason, ...details }),
   // Auto-time (D97): RabbitMQ cannot be reached, so no job can be sent.
   speechUnavailable: () =>
     new ContentError(

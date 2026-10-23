@@ -168,6 +168,20 @@ export class AuthController {
       throw this.normalizeError(error);
     }
   }
+  async adminNotifications(accessToken) {
+    try {
+      return this.envelope(await this.authService.adminNotifications(accessToken));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
+  async adminMarkNotificationsRead(ids, accessToken) {
+    try {
+      return this.envelope(await this.authService.adminMarkNotificationsRead(accessToken, (ids || []).filter((id) => typeof id === 'string' && id.length <= 160).slice(0, 100)));
+    } catch (error) {
+      throw this.normalizeError(error);
+    }
+  }
   async adminStats(accessToken) {
     try {
       return this.envelope(await this.authService.adminStats(accessToken));

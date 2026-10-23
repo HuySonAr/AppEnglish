@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowDown, ArrowLeft, ArrowUp, ClipboardCheck, Clock, ListChecks, Target, Trophy } from 'lucide-react';
+import { ArrowDown, ArrowUp, ClipboardCheck, Clock, ListChecks, Target, Trophy } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { LESSON_TEST_QUESTION_COUNT } from '@appenglish/content-contracts';
 import { LessonTestStatus } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
@@ -149,14 +150,7 @@ export function LessonTestPage() {
   const passed = test.attempts.some((attempt) => attempt.passed);
   return (
     <section className="space-y-6">
-      <Link
-        to={`/student/lessons/${lessonId}`}
-        state={back.passThrough}
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to the lesson
-      </Link>
+      <PageBreadcrumb items={[{ label: 'Lessons', to: back.to, state: back.state }, { label: 'Lesson', to: `/student/lessons/${lessonId}`, state: back.passThrough }, { label: 'Lesson test' }]} />
 
       {/* Laptop: the ranking stays on the right; phone: everything in one column. */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">

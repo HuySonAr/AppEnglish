@@ -3,50 +3,49 @@ import { Badge, Button } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import { formatRemaining } from '../lib/placement.js';
 
-// Finished attempts of one test, oldest first, each with the change against
-// the one before it and a button to see its answers. attempts are the
-// summaries from the API; shownNumber is the attempt whose answers are open.
+function Change({ value, unit }) {
+  if (!value) return null;
+  const up = value > 0;
+  return (
+    <span className={cn('flex items-center text-xs font-semibold tabular-nums', up ? 'text-success' : 'text-destructive')}>
+      {up ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />}
+      {Math.abs(value)}
+      {unit}
+    </span>
+  );
+}
+
 export function AttemptList({ attempts, shownNumber, busy, onReview }) {
   return (
-    <ul className="divide-y overflow-hidden rounded-xl border bg-card text-sm shadow-sm">
+    <ul className="divide-y overflow-hidden rounded-2xl border bg-card text-sm shadow-sm">
       {attempts.map((attempt, index) => {
-        const change = index ? attempt.correctCount - attempts[index - 1].correctCount : 0;
+        const before = attempts[index - 1];
         const shown = shownNumber === attempt.attemptNumber;
+        const toeic = attempt.estimated;
+        const change = before ? (toeic && before.estimated ? toeic.totalScore - before.estimated.totalScore : attempt.correctCount - before.correctCount) : 0;
         return (
-          <li
-            key={attempt.attemptNumber}
-            className={cn('flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3', shown && 'bg-primary/5')}
-          >
+          <li key={attempt.attemptNumber} className={cn('flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3', shown && 'bg-primary/5')}>
+            <div className="w-24 shrink-0">
+              {toeic ? (
+                <p className="tabular-nums">
+                  <span className="text-2xl font-bold text-primary">{toeic.totalScore}</span>
+                  <span className="text-xs text-muted-foreground"> /990</span>
+                </p>
+              ) : (
+                <p className="text-2xl font-bold tabular-nums">{attempt.scorePercent}%</p>
+              )}
+              <Change value={change} unit={toeic && before?.estimated ? '' : ' right'} />
+            </div>
             <div className="min-w-0 flex-1">
               <p className="flex flex-wrap items-center gap-2 font-medium">
                 Attempt {attempt.attemptNumber}
                 {attempt.countsForXp ? <Badge variant="info">Counts for XP</Badge> : null}
               </p>
               <p className="text-xs text-muted-foreground tabular-nums">
-                {new Date(attempt.submittedAt).toLocaleString()} · {formatRemaining(attempt.durationSeconds * 1000)}
-                {attempt.listeningTotal ? ` · Listening ${attempt.listeningCorrect}/${attempt.listeningTotal}` : ''}
-                {attempt.readingTotal ? ` · Reading ${attempt.readingCorrect}/${attempt.readingTotal}` : ''}
+                {toeic ? `Listening ${toeic.listeningScore} · Reading ${toeic.readingScore} · ` : ''}
+                {attempt.correctCount}/{attempt.totalCount} correct{toeic ? ` (${attempt.scorePercent}%)` : ''} · {formatRemaining(attempt.durationSeconds * 1000)} ·{' '}
+                {new Date(attempt.submittedAt).toLocaleDateString()}
               </p>
-            </div>
-            <div className="flex items-center gap-2 tabular-nums">
-              {attempt.estimated ? (
-                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-                  ≈ {attempt.estimated.totalScore}
-                </span>
-              ) : null}
-              <span className="text-base font-bold">{attempt.scorePercent}%</span>
-              {change > 0 ? (
-                <span className="flex items-center text-xs font-semibold text-success">
-                  <ArrowUp className="h-3.5 w-3.5" />
-                  {change}
-                </span>
-              ) : null}
-              {change < 0 ? (
-                <span className="flex items-center text-xs font-semibold text-destructive">
-                  <ArrowDown className="h-3.5 w-3.5" />
-                  {-change}
-                </span>
-              ) : null}
             </div>
             <Button variant={shown ? 'secondary' : 'outline'} size="sm" disabled={busy || shown} onClick={() => onReview(attempt.attemptNumber)}>
               {shown ? 'Shown below' : 'View answers'}

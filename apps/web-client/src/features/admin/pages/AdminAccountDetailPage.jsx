@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, BookOpen, CalendarDays, Headphones, History, KeyRound, LogOut, Mail, MailPlus, MonitorSmartphone, RotateCcw, Shield, ShieldCheck, Trash2, Trophy, UserCog, UserRoundX } from 'lucide-react';
+import { BookOpen, CalendarDays, Headphones, History, KeyRound, LogOut, Mail, MailPlus, MonitorSmartphone, RotateCcw, Shield, ShieldCheck, Trash2, Trophy, UserCog, UserRoundX } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { AccountRole, AccountStatus, AdminAccountAction, displayNameOf } from '@appenglish/auth-contracts';
 import { RoleLabels } from '../../../constants/auth.js';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
@@ -142,12 +143,7 @@ export function AdminAccountDetailPage() {
   }, [accountId]);
 
   const back = (
-    <Button asChild variant="ghost" size="sm">
-      <Link to="/admin/accounts">
-        <ArrowLeft className="h-4 w-4" />
-        All accounts
-      </Link>
-    </Button>
+    <PageBreadcrumb items={[{ label: 'Accounts', to: '/admin/accounts' }, { label: data?.account ? displayNameOf(data.account) : 'Account' }]} />
   );
 
   if (state === 'loading') return <DetailPageSkeleton aside />;

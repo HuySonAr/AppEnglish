@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
+import { Plus } from 'lucide-react';
 import {
   Accent,
   ContentResponseCode,
@@ -30,18 +31,10 @@ import {
   withFillInPassage,
   workingContent,
 } from '../lib/lesson-draft.js';
-import {
-  Badge,
-  Button,
-  Input,
-  Label,
-  Skeleton,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '../../../components/ui';
-import { PartEditor, questionRange } from '../components/PartEditor.jsx';
+import { Badge, Button, Input, Label } from '../../../components/ui';
+import { cn } from '../../../lib/utils.js';
+import { PartEditor, partAnswered } from '../components/PartEditor.jsx';
+import { SectionNav } from '../components/SectionNav.jsx';
 import { PasteVocabularyDialog } from '../components/PasteVocabularyDialog.jsx';
 import { ImportExportJson } from '../components/ImportExportJson.jsx';
 import { exportLesson, jsonFileName, planLessonImport } from '../lib/authoring-import.js';
@@ -70,7 +63,6 @@ export function LessonEditorPage() {
   const [issues, setIssues] = useState([]);
   const [tab, setTab] = useState('vocabulary');
   const [partTab, setPartTab] = useState(LESSON_TEST_PARTS[0].key);
-  // Id of the vocabulary item whose pronunciation is being looked up.
   const [filling, setFilling] = useState(null);
 
   function apply(data) {
@@ -102,7 +94,6 @@ export function LessonEditorPage() {
     load();
   }, [lessonId]);
 
-  // Leaving with unsaved edits asks the browser to confirm.
   useEffect(() => {
     if (!dirty) return undefined;
     const warn = (event) => event.preventDefault();
@@ -110,8 +101,6 @@ export function LessonEditorPage() {
     return () => window.removeEventListener('beforeunload', warn);
   }, [dirty]);
 
-  // Edits apply to the latest content, so an upload that finishes while the
-  // user keeps typing does not overwrite what they typed.
   function update(change) {
     setContent((current) => change(current));
     setDirty(true);
@@ -119,7 +108,6 @@ export function LessonEditorPage() {
   const edit = (path, value) =>
     update((current) => setIn(current, path, value));
 
-  // Vocabulary files and test files are stored in separate folders.
   const draftMedia = useDraftMedia({
     edit,
     lessonId,
@@ -128,8 +116,6 @@ export function LessonEditorPage() {
   });
   const { media } = draftMedia;
 
-  // Fills the phonetic text and the audio slots that are still empty with the
-  // speech service (D123); anything it lacks stays for manual entry or upload.
   async function onAutofill(item) {
     const missing = [
       item.audioUkMediaId ? null : Accent.UK,
@@ -199,7 +185,6 @@ export function LessonEditorPage() {
     if (location.part) setPartTab(location.part);
   }
 
-  // Saving first uploads the files chosen since the last save.
   async function saveDraft({ quiet = false } = {}) {
     const result = await draftMedia.uploadAll(content);
     if (result.uploadedAny) setContent(result.content);
@@ -296,109 +281,111 @@ export function LessonEditorPage() {
     );
 
   const canPublish = dirty || status.hasDraft;
+  const issueCount = (match) => issues.filter((issue) => match(issueLocation(issue.path))).length;
+  const blanks = content.fillIn.answers.length;
+  const blanksFilled = content.fillIn.answers.filter((answer) => answer.trim()).length;
+  const section = tab === 'test' ? partTab : tab;
+  const choose = (key) => {
+    if (key === 'vocabulary' || key === 'fillIn') setTab(key);
+    else {
+      setTab('test');
+      setPartTab(key);
+    }
+  };
+  const navItems = [
+    {
+      label: 'Lesson',
+      items: [
+        { key: 'vocabulary', title: 'Vocabulary', detail: `${content.vocabulary.length} word${content.vocabulary.length === 1 ? '' : 's'}`, done: content.vocabulary.length > 0, issues: issueCount((at) => at.tab === 'vocabulary') },
+        { key: 'fillIn', title: 'Fill-in', detail: `${blanksFilled}/${blanks} blanks`, done: blanks > 0 && blanksFilled === blanks, issues: issueCount((at) => at.tab === 'fillIn') },
+      ],
+    },
+    {
+      label: 'Lesson test',
+      items: LESSON_TEST_PARTS.map((spec) => {
+        const answered = partAnswered(content.test[spec.key]);
+        return {
+          key: spec.key,
+          title: `Part ${spec.number}`,
+          detail: `${answered}/${spec.questionCount} answered`,
+          done: answered === spec.questionCount,
+          issues: issueCount((at) => at.part === spec.key),
+          progress: (answered * 100) / spec.questionCount,
+        };
+      }),
+    },
+  ];
 
   return (
-    <section className="space-y-6">
-      <Link
-        to={back.to} state={back.state}
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Units and lessons
-      </Link>
+    <section className="space-y-5">
+      <PageBreadcrumb items={[{ label: 'Units and lessons', to: back.to, state: back.state }, { label: lesson?.title || 'Lesson' }]} />
 
-      <div className="sticky top-16 z-10 -mx-4 space-y-3 border-b bg-background/90 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
-        <div className="flex flex-wrap items-center gap-2">
-          {status.publishedVersion ? (
-            <Badge variant="success">
-              Published v{status.publishedVersion}
-            </Badge>
-          ) : (
-            <Badge variant="outline">Not published</Badge>
-          )}
-          {status.hasDraft ? (
-            <Badge variant="warning">Draft v{status.draftVersion}</Badge>
-          ) : null}
-          {dirty ? <Badge variant="info">Unsaved changes</Badge> : null}
-        </div>
-        <div className="flex flex-col gap-2 lg:flex-row">
-          <Input
-            aria-label="Lesson title"
-            value={title}
-            maxLength={200}
-            onChange={(event) => setTitle(event.target.value)}
-            className="text-lg font-semibold"
-          />
-          <div className="flex flex-wrap gap-2 justify-end">
-            <ImportExportJson
-              noun="lesson"
-              disabled={busy}
-              plan={(text) => planLessonImport(text, content)}
-              onImport={(imported) => {
-                setContent(imported);
-                setDirty(true);
-                setIssues([]);
-              }}
-              exportData={() => exportLesson(content, { number: lesson.position, title: lesson.title })}
-              fileName={jsonFileName(lesson.title)}
-            />
-            <Button
-              variant="outline"
-              disabled={busy || !title.trim() || title.trim() === lesson.title}
-              onClick={onRename}
-            >
-              Rename
-            </Button>
-            <Button loading={busy}
-              variant="outline"
-              disabled={busy || !dirty}
-              onClick={onSave}
-            >
-              {busy ? 'Working…' : 'Save draft'}
-            </Button>
-            <PublishButton state={publish.state} disabled={busy || !canPublish} onClick={() => publish.run(onPublish)} />
-            {status.hasDraft ? (
-              <DiscardDraftButton kind="lesson" id={lessonId} noun="lesson" disabled={busy} onDiscarded={load} />
-            ) : null}
-            <ContentDangerActions
-              noun="lesson"
-              published={Boolean(status.publishedVersion)}
-              busy={busy}
-              onUnpublish={async () => setStatus(lessonState((await unpublishLesson(lessonId)).data))}
-              onDelete={async () => {
-                await deleteLesson(lessonId);
-                navigate(back.to, { replace: true, state: back.state });
-              }}
-              deleteNote="Later lessons of the unit move up one place."
-            />
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-lg font-semibold sm:text-xl">
+            Lesson {lesson.position}: {lesson.title}
+          </h1>
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+            {status.publishedVersion ? <Badge variant="success">Published v{status.publishedVersion}</Badge> : <Badge variant="outline">Not published</Badge>}
+            {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
+            {dirty ? <Badge variant="info">Unsaved</Badge> : null}
           </div>
         </div>
-      </div>
-      <div>
-        <p className="text-sm text-muted-foreground">
-          Learners keep the published version until you publish again.
-          Publishing creates a new version; earlier versions are kept unchanged.
-          Audio and images you choose are previewed here and uploaded when you
-          save.
-        </p>
+        <div className="flex flex-wrap gap-2">
+          <ImportExportJson
+            noun="lesson"
+            disabled={busy}
+            plan={(text) => planLessonImport(text, content)}
+            onImport={(imported) => {
+              setContent(imported);
+              setDirty(true);
+              setIssues([]);
+            }}
+            exportData={() => exportLesson(content, { number: lesson.position, title: lesson.title })}
+            fileName={jsonFileName(lesson.title)}
+          />
+          <Button loading={busy} variant="outline" disabled={busy || !dirty} onClick={onSave}>
+            {busy ? 'Working…' : 'Save draft'}
+          </Button>
+          <PublishButton state={publish.state} disabled={busy || !canPublish} onClick={() => publish.run(onPublish)} />
+          {status.hasDraft ? <DiscardDraftButton kind="lesson" id={lessonId} noun="lesson" disabled={busy} onDiscarded={load} size="icon" /> : null}
+          <ContentDangerActions
+            noun="lesson"
+            published={Boolean(status.publishedVersion)}
+            busy={busy}
+            onUnpublish={async () => setStatus(lessonState((await unpublishLesson(lessonId)).data))}
+            onDelete={async () => {
+              await deleteLesson(lessonId);
+              navigate(back.to, { replace: true, state: back.state });
+            }}
+            deleteNote="Later lessons of the unit move up one place."
+          />
+        </div>
       </div>
 
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          onRename();
+        }}
+        className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-end"
+      >
+        <div className="min-w-0 flex-1 space-y-2">
+          <Label htmlFor="lesson-title">Title</Label>
+          <Input id="lesson-title" value={title} maxLength={200} onChange={(event) => setTitle(event.target.value)} />
+        </div>
+        <Button type="submit" variant="outline" disabled={busy || !title.trim() || title.trim() === lesson.title}>
+          Rename
+        </Button>
+      </form>
+
       {issues.length ? (
-        <div
-          role="alert"
-          className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm"
-        >
-          <p className="font-medium">
-            Fix these before publishing ({issues.length}):
-          </p>
+        <div role="alert" className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
+          <p className="font-medium">Fix these before publishing ({issues.length}):</p>
           <ul className="mt-2 max-h-64 list-disc space-y-1 overflow-y-auto pl-5">
             {issues.map((issue, index) => (
               <li key={index}>
-                <button
-                  type="button"
-                  className="font-medium underline-offset-4 hover:underline"
-                  onClick={() => showIssue(issue.path)}
-                >
+                <button type="button" className="font-medium underline-offset-4 hover:underline" onClick={() => showIssue(issue.path)}>
                   {issueLabel(issue.path)}
                 </button>
                 : {issue.message}
@@ -408,126 +395,78 @@ export function LessonEditorPage() {
         </div>
       ) : null}
 
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="h-auto flex-wrap justify-start">
-          <TabsTrigger value="vocabulary">
-            Vocabulary ({content.vocabulary.length})
-          </TabsTrigger>
-          <TabsTrigger value="fillIn">
-            Fill-in ({content.fillIn.answers.length})
-          </TabsTrigger>
-          <TabsTrigger value="test">Lesson test</TabsTrigger>
-        </TabsList>
+      <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start">
+        <SectionNav label="Lesson sections" groups={navItems} active={section} onChoose={choose} />
 
-        <TabsContent value="vocabulary" className="space-y-4">
-          {content.vocabulary.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No vocabulary yet.</p>
+        <div className="min-w-0 space-y-4">
+          {tab === 'vocabulary' ? (
+            <>
+              <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card p-4 shadow-sm">
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-lg font-semibold">Vocabulary</h2>
+                  <p className="text-sm text-muted-foreground">Auto-fill adds the IPA and audio a word is missing.</p>
+                </div>
+                <PasteVocabularyDialog vocabulary={content.vocabulary} onApply={(vocabulary) => update((current) => ({ ...current, vocabulary }))} />
+              </div>
+              {content.vocabulary.length === 0 ? <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">No word yet.</p> : null}
+              {content.vocabulary.map((item, index) => (
+                <VocabularyCard key={item.id} item={item} index={index} edit={edit} update={update} media={media} filling={filling} onAutofill={onAutofill} />
+              ))}
+              <Button variant="outline" className="w-full gap-1.5 border-dashed" onClick={() => update((current) => ({ ...current, vocabulary: [...current.vocabulary, newVocabulary()] }))}>
+                <Plus className="h-4 w-4" />
+                Add word
+              </Button>
+            </>
           ) : null}
-          {content.vocabulary.map((item, index) => (
-            <VocabularyCard
-              key={item.id}
-              item={item}
-              index={index}
-              edit={edit}
-              update={update}
-              media={media}
-              filling={filling}
-              onAutofill={onAutofill}
-            />
-          ))}
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() =>
-                update((current) => ({
-                  ...current,
-                  vocabulary: [...current.vocabulary, newVocabulary()],
-                }))
-              }
-            >
-              <Plus className="h-4 w-4" />
-              Add word
-            </Button>
-            <PasteVocabularyDialog
-              vocabulary={content.vocabulary}
-              onApply={(vocabulary) => update((current) => ({ ...current, vocabulary }))}
-            />
-          </div>
-        </TabsContent>
 
-        <TabsContent value="fillIn" className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Write one passage and type {FILL_IN_BLANK} for each blank, then
-            type the answer of each blank below. Learners get exactly these
-            answers as a shuffled word bank and place them in the blanks.
-          </p>
-          <TextField
-            id="fill-in-passage"
-            label="Passage"
-            value={content.fillIn.passage}
-            maxLength={5000}
-            multiline
-            rows={8}
-            onChange={(value) =>
-              update((current) => ({
-                ...current,
-                fillIn: withFillInPassage(current.fillIn, value),
-              }))
-            }
-          />
-          {content.fillIn.answers.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              The passage has no blanks yet.
-            </p>
-          ) : (
-            <div className="grid gap-3 md:grid-cols-3">
-              {content.fillIn.answers.map((answer, index) => (
-                <div key={index} className="space-y-2">
-                  <Label htmlFor={`blank-${index}`}>Blank {index + 1}</Label>
-                  <Input
-                    id={`blank-${index}`}
-                    value={answer}
-                    maxLength={100}
-                    placeholder="Answer"
-                    autoComplete="off"
-                    onChange={(event) =>
-                      edit(['fillIn', 'answers', index], event.target.value)
-                    }
+          {tab === 'fillIn' ? (
+            <>
+              <div className="rounded-xl border bg-card p-4 shadow-sm">
+                <h2 className="text-lg font-semibold">Fill-in</h2>
+                <p className="text-sm text-muted-foreground">Type {FILL_IN_BLANK} for each blank, then its answer.</p>
+              </div>
+              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_16rem]">
+                <div className="rounded-xl border bg-card p-4 shadow-sm">
+                  <TextField
+                    id="fill-in-passage"
+                    label="Passage"
+                    value={content.fillIn.passage}
+                    maxLength={5000}
+                    multiline
+                    rows={12}
+                    onChange={(value) => update((current) => ({ ...current, fillIn: withFillInPassage(current.fillIn, value) }))}
                   />
                 </div>
-              ))}
-            </div>
-          )}
-        </TabsContent>
+                <div className="space-y-2 rounded-xl border bg-card p-4 shadow-sm">
+                  <p className="text-sm font-medium">Answers</p>
+                  {blanks === 0 ? (
+                    <p className="text-sm text-muted-foreground">No blank yet.</p>
+                  ) : (
+                    content.fillIn.answers.map((answer, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Label htmlFor={`blank-${index}`} className="flex h-7 min-w-7 items-center justify-center rounded-full bg-muted text-xs font-semibold tabular-nums">
+                          {index + 1}
+                        </Label>
+                        <Input
+                          id={`blank-${index}`}
+                          value={answer}
+                          maxLength={100}
+                          placeholder="Answer"
+                          autoComplete="off"
+                          className={cn(answer.trim() ? '' : 'border-dashed')}
+                          onChange={(event) => edit(['fillIn', 'answers', index], event.target.value)}
+                        />
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </>
+          ) : null}
 
-        <TabsContent value="test" className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            The lesson test always has seven parts and 23 questions: Parts 1–4
-            are Listening, Parts 5–7 are Reading. Every question needs its
-            correct answer and an explanation; every audio needs a transcript.
-          </p>
-          <Tabs value={partTab} onValueChange={setPartTab}>
-            <TabsList className="h-auto flex-wrap justify-start">
-              {LESSON_TEST_PARTS.map((spec) => (
-                <TabsTrigger key={spec.key} value={spec.key}>
-                  Part {spec.number} ({questionRange(spec, '')})
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            {LESSON_TEST_PARTS.map((spec) => (
-              <TabsContent key={spec.key} value={spec.key}>
-                <PartEditor
-                  spec={spec}
-                  part={content.test[spec.key]}
-                  edit={edit}
-                  media={media}
-                />
-              </TabsContent>
-            ))}
-          </Tabs>
-        </TabsContent>
-      </Tabs>
+          {tab === 'test' ? <PartEditor key={partTab} spec={LESSON_TEST_PARTS.find((spec) => spec.key === partTab)} part={content.test[partTab]} edit={edit} media={media} /> : null}
+        </div>
+      </div>
 
       <VersionHistory kind="lesson" id={lessonId} noun="lesson" refreshKey={`${status.publishedVersion}-${status.draftVersion}`} onRestored={load} />
     </section>

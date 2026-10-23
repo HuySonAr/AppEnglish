@@ -74,9 +74,33 @@ export const activityRecordedSchema = z
   })
   .passthrough();
 
+export const unitReviewPassedSchema = z
+  .object({
+    accountId: z.string().uuid(),
+    unitId: z.string().uuid(),
+    unitTitle: z.string().max(200).optional().default(''),
+    nextUnitId: z.string().uuid().nullable().optional().default(null),
+    nextUnitTitle: z.string().max(200).nullable().optional().default(null),
+    passedAt: isoDate,
+  })
+  .passthrough();
+
+export const courseLevelUpSchema = z
+  .object({
+    accountId: z.string().uuid(),
+    from: z.string().min(1).max(4),
+    to: z.string().min(1).max(4),
+    reachedAt: isoDate,
+  })
+  .passthrough();
+
+export const markReadSchema = z.object({ ids: z.array(z.string().uuid()).max(100).optional() }).strict();
+
 export const payloadSchemas = Object.freeze({
   [LearningEventType.LESSON_TEST_SUBMITTED]: lessonTestSubmittedSchema,
   [LearningEventType.LESSON_COMPLETED]: lessonCompletedSchema,
   [LearningEventType.MOCK_SUBMITTED]: mockSubmittedSchema,
   [LearningEventType.ACTIVITY_RECORDED]: activityRecordedSchema,
+  [LearningEventType.UNIT_REVIEW_PASSED]: unitReviewPassedSchema,
+  [LearningEventType.COURSE_LEVEL_UP]: courseLevelUpSchema,
 });

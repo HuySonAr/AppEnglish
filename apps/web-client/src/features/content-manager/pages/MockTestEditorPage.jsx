@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import {
   ContentResponseCode,
   LESSON_TEST_PARTS,
   MOCK_TEST_LEVELS,
   MOCK_TEST_PART_COUNTS,
   MediaSection,
+  Skill,
 } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { ContentDangerActions } from '../components/ContentDangerActions.jsx';
@@ -15,35 +17,19 @@ import { deleteMockTest, unpublishMockTest } from '../api/content-api.js';
 import { notify } from '../../../lib/notify.js';
 import {
   getMockTest,
+  listMockTranscribe,
   publishMockTest,
+  requestMockTranscribe,
   saveMockTestDraft,
   updateMockTest,
 } from '../api/content-api.js';
 import { MockPartEditor } from '../components/MockPartEditor.jsx';
+import { SectionNav } from '../components/SectionNav.jsx';
 import { useDraftMedia } from '../hooks/use-draft-media.js';
 import { issueLocation, lessonState, setIn } from '../lib/lesson-draft.js';
-import {
-  MOCK_FIRST_QUESTION_NUMBERS,
-  mockIssueLabel,
-  mockQuestionCount,
-  workingMock,
-} from '../lib/mock-draft.js';
-import {
-  Badge,
-  Button,
-  Input,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Skeleton,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '../../../components/ui';
+import { mockIssueLabel, mockQuestionCount, workingMock } from '../lib/mock-draft.js';
+import { Badge, Button, Input, Label } from '../../../components/ui';
+import { cn } from '../../../lib/utils.js';
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { VersionHistory } from '../components/VersionHistory.jsx';
 import { PublishButton, usePublishAction } from '../../../components/shared/PublishButton.jsx';
@@ -51,9 +37,8 @@ import { PublishButton, usePublishAction } from '../../../components/shared/Publ
 const saveErrorMessage = (error) =>
   `${error?.fileName ? `${error.fileName}: ` : ''}${getApiErrorMessage(error)}`;
 const fullQuestionCount = Object.values(MOCK_TEST_PART_COUNTS).reduce((sum, count) => sum + count, 0);
+const skillLabels = { [Skill.LISTENING]: 'Listening', [Skill.READING]: 'Reading' };
 
-// Editor of one mock test: its details (title, level, minutes) and the
-// questions of its seven parts.
 export function MockTestEditorPage() {
   const { mockTestId } = useParams();
   const [state, setState] = useState('loading');
@@ -67,6 +52,8 @@ export function MockTestEditorPage() {
   const publish = usePublishAction();
   const [issues, setIssues] = useState([]);
   const [partTab, setPartTab] = useState(LESSON_TEST_PARTS[0].key);
+  const [transcribeJobs, setTranscribeJobs] = useState({});
+  const [dismissedJobs, setDismissedJobs] = useState(() => new Set());
 
   function update(change) {
     setContent((current) => change(current));
@@ -102,9 +89,25 @@ export function MockTestEditorPage() {
 
   useEffect(() => {
     load();
+    loadTranscribe();
   }, [mockTestId]);
 
-  // Leaving with unsaved edits asks the browser to confirm.
+  async function loadTranscribe() {
+    try {
+      const { jobs } = (await listMockTranscribe(mockTestId)).data;
+      setTranscribeJobs(Object.fromEntries(jobs.map((job) => [job.audioMediaId, job])));
+    } catch {
+      setTranscribeJobs((current) => ({ ...current }));
+    }
+  }
+
+  const transcribing = Object.values(transcribeJobs).some((job) => job.status === 'QUEUED' || job.status === 'RUNNING');
+  useEffect(() => {
+    if (!transcribing) return undefined;
+    const timer = setTimeout(loadTranscribe, 3000);
+    return () => clearTimeout(timer);
+  }, [transcribeJobs, transcribing]);
+
   useEffect(() => {
     if (!dirty) return undefined;
     const warn = (event) => event.preventDefault();
@@ -112,7 +115,6 @@ export function MockTestEditorPage() {
     return () => window.removeEventListener('beforeunload', warn);
   }, [dirty]);
 
-  // Saving first uploads the files chosen since the last save.
   async function saveDraft({ quiet = false } = {}) {
     const result = await draftMedia.uploadAll(content);
     if (result.uploadedAny) setContent(result.content);
@@ -121,7 +123,26 @@ export function MockTestEditorPage() {
     apply(data);
     draftMedia.reset();
     if (!quiet) notify({ title: `Draft saved (version ${data.draft.versionNumber})` });
+    return result.content;
   }
+
+  const speech = {
+    jobOf: (audioMediaId) => {
+      const job = transcribeJobs[audioMediaId];
+      return job && !dismissedJobs.has(job.id) ? job : null;
+    },
+    dismiss: (job) => setDismissedJobs((current) => new Set(current).add(job.id)),
+    request: async (path) => {
+      try {
+        const saved = dirty ? await saveDraft({ quiet: true }) : content;
+        const audioMediaId = [...path, 'audioMediaId'].reduce((value, key) => value?.[key], saved);
+        const { job } = (await requestMockTranscribe(mockTestId, audioMediaId)).data;
+        setTranscribeJobs((current) => ({ ...current, [audioMediaId]: { ...job, audioMediaId } }));
+      } catch (error) {
+        notify({ title: 'Could not start transcribe', description: saveErrorMessage(error), variant: 'destructive' });
+      }
+    },
+  };
 
   async function onSave() {
     setBusy(true);
@@ -195,71 +216,48 @@ export function MockTestEditorPage() {
   const detailsChanged =
     details.title.trim() !== mockTest.title || Number(details.level) !== mockTest.level || minutes !== mockTest.durationMinutes;
   const total = mockQuestionCount(content);
-  // The questions a part holds in a full test, numbered 1-200 across the parts.
-  const rangeOf = (key) => {
-    const first = MOCK_FIRST_QUESTION_NUMBERS[key];
-    return `${first}–${first + MOCK_TEST_PART_COUNTS[key] - 1}`;
-  };
+  const issuesOf = (key) => issues.filter((issue) => issueLocation(issue.path).part === key).length;
+  const spec = LESSON_TEST_PARTS.find((item) => item.key === partTab);
+  const groups = [Skill.LISTENING, Skill.READING].map((skill) => ({
+    label: skillLabels[skill],
+    items: LESSON_TEST_PARTS.filter((item) => item.skill === skill).map((item) => {
+      const count = content.test[item.key].questions.length;
+      const target = MOCK_TEST_PART_COUNTS[item.key];
+      return { key: item.key, title: `Part ${item.number}`, detail: `${count}/${target} · ${item.title}`, done: count >= target, issues: issuesOf(item.key), progress: (count * 100) / target };
+    }),
+  }));
 
   return (
-    <section className="space-y-6">
-      <Link
-        to="/content-manager/mock-tests"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Mock tests
-      </Link>
+    <section className="space-y-5">
+      <PageBreadcrumb items={[{ label: 'Mock tests', to: '/content-manager/mock-tests' }, { label: mockTest.title }]} />
 
-      <form onSubmit={onSaveDetails} className="grid gap-3 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-[1fr_9rem_9rem_auto] sm:items-end">
-        <div className="space-y-2">
-          <Label htmlFor="mock-title">Title</Label>
-          <Input id="mock-title" value={details.title} maxLength={200} onChange={(event) => setDetails({ ...details, title: event.target.value })} />
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-lg font-semibold sm:text-xl">{mockTest.title}</h1>
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+            <span>{[mockTest.examType?.name, `Level ${mockTest.level}`, `${mockTest.durationMinutes} min`].filter(Boolean).join(' · ')}</span>
+            <Badge variant={total === fullQuestionCount ? 'success' : 'secondary'} className="tabular-nums">
+              {total}/{fullQuestionCount} questions
+            </Badge>
+            {status.publishedVersion ? <Badge variant="success">Published v{status.publishedVersion}</Badge> : <Badge variant="outline">Not published</Badge>}
+            {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
+            {dirty ? <Badge variant="info">Unsaved</Badge> : null}
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="mock-level">Level</Label>
-          <Select value={details.level} onValueChange={(level) => setDetails({ ...details, level })}>
-            <SelectTrigger id="mock-level">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {MOCK_TEST_LEVELS.map((level) => (
-                <SelectItem key={level} value={String(level)}>
-                  Level {level}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="mock-minutes">Minutes</Label>
-          <Input id="mock-minutes" inputMode="numeric" value={details.durationMinutes} onChange={(event) => setDetails({ ...details, durationMinutes: event.target.value.trim() })} />
-        </div>
-        <Button type="submit" variant="outline" disabled={busy || !detailsValid || !detailsChanged}>
-          Save details
-        </Button>
-      </form>
-
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-2 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-        {status.publishedVersion ? (
-          <Badge variant="success">Published v{status.publishedVersion}</Badge>
-        ) : (
-          <Badge variant="outline">Not published</Badge>
-        )}
-        {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
-        {dirty ? <Badge variant="info">Unsaved changes</Badge> : null}
-        {mockTest.examType ? <Badge variant="info">{mockTest.examType.name}</Badge> : null}
-        <Badge variant={total === fullQuestionCount ? 'success' : 'secondary'}>
-          {total} / {fullQuestionCount} questions
-        </Badge>
-        <div className="ml-auto flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {status.publishedVersion ? (
+            <Button asChild variant="ghost" className="gap-1.5">
+              <Link to={`/content-manager/mock-tests/${mockTestId}/results`}>
+                <BarChart3 className="h-4 w-4" />
+                Results
+              </Link>
+            </Button>
+          ) : null}
           <Button loading={busy} variant="outline" disabled={busy || !dirty} onClick={onSave}>
             {busy ? 'Working…' : 'Save draft'}
           </Button>
           <PublishButton state={publish.state} disabled={busy || !(dirty || status.hasDraft)} onClick={() => publish.run(onPublish)} />
-          {status.hasDraft ? (
-            <DiscardDraftButton kind="mockTest" id={mockTestId} noun="mock test" disabled={busy} onDiscarded={load} />
-          ) : null}
+          {status.hasDraft ? <DiscardDraftButton kind="mockTest" id={mockTestId} noun="mock test" disabled={busy} onDiscarded={load} size="icon" /> : null}
           <ContentDangerActions
             noun="mock test"
             published={Boolean(status.publishedVersion)}
@@ -273,11 +271,38 @@ export function MockTestEditorPage() {
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        A full TOEIC test has {fullQuestionCount} questions; a mock test can be published with fewer
-        as long as every part has at least one. Title, level and minutes apply at once; questions
-        reach learners when you publish, and publishing again creates a new version.
-      </p>
+      <form onSubmit={onSaveDetails} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm lg:flex-row lg:items-end">
+        <div className="min-w-0 flex-1 space-y-2">
+          <Label htmlFor="mock-title">Title</Label>
+          <Input id="mock-title" value={details.title} maxLength={200} onChange={(event) => setDetails({ ...details, title: event.target.value })} />
+        </div>
+        <div className="space-y-2">
+          <Label>Level</Label>
+          <div className="flex gap-1">
+            {MOCK_TEST_LEVELS.map((level) => (
+              <button
+                key={level}
+                type="button"
+                aria-pressed={details.level === String(level)}
+                onClick={() => setDetails({ ...details, level: String(level) })}
+                className={cn(
+                  'h-10 min-w-11 rounded-md border px-2.5 text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  details.level === String(level) ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
+                )}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="mock-minutes">Minutes</Label>
+          <Input id="mock-minutes" className="w-24" inputMode="numeric" value={details.durationMinutes} onChange={(event) => setDetails({ ...details, durationMinutes: event.target.value.trim() })} />
+        </div>
+        <Button type="submit" variant="outline" disabled={busy || !detailsValid || !detailsChanged}>
+          Save details
+        </Button>
+      </form>
 
       {issues.length ? (
         <div role="alert" className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
@@ -302,28 +327,21 @@ export function MockTestEditorPage() {
         </div>
       ) : null}
 
-      <Tabs value={partTab} onValueChange={setPartTab}>
-        <TabsList className="h-auto flex-wrap justify-start">
-          {LESSON_TEST_PARTS.map((spec) => (
-            <TabsTrigger key={spec.key} value={spec.key}>
-              Part {spec.number} ({rangeOf(spec.key)})
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        {LESSON_TEST_PARTS.map((spec) => (
-          <TabsContent key={spec.key} value={spec.key}>
-            <MockPartEditor
-              spec={spec}
-              part={content.test[spec.key]}
-              edit={edit}
-              updatePart={(change) =>
-                update((current) => ({ ...current, test: { ...current.test, [spec.key]: change(current.test[spec.key]) } }))
-              }
-              media={draftMedia.media}
-            />
-          </TabsContent>
-        ))}
-      </Tabs>
+      <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start">
+        <SectionNav label="Parts" groups={groups} active={partTab} onChoose={setPartTab} />
+
+        <div className="min-w-0">
+          <MockPartEditor
+            key={spec.key}
+            spec={spec}
+            part={content.test[spec.key]}
+            edit={edit}
+            updatePart={(change) => update((current) => ({ ...current, test: { ...current.test, [spec.key]: change(current.test[spec.key]) } }))}
+            media={draftMedia.media}
+            speech={speech}
+          />
+        </div>
+      </div>
 
       <VersionHistory kind="mockTest" id={mockTestId} noun="mock test" refreshKey={`${status.publishedVersion}-${status.draftVersion}`} onRestored={load} />
     </section>

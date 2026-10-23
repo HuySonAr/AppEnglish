@@ -1,10 +1,18 @@
 import { useEffect, useState } from 'react';
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { ContentResponseCode } from '@appenglish/content-contracts';
-import { createListeningTopic, listListeningTopics, updateListeningTopic } from '../../../lib/api/listening-topics-api.js';
+import { createListeningTopic, deleteListeningTopic, listListeningTopics, updateListeningTopic } from '../../../lib/api/listening-topics-api.js';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Badge,
   Button,
   Dialog,
@@ -28,6 +36,7 @@ import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 const formats = [
   { value: 'toeic', label: 'TOEIC parts' },
   { value: 'song', label: 'Songs' },
+  { value: 'talks', label: 'Talks and news' },
   { value: 'none', label: 'Not yet' },
 ];
 const formatLabel = (format) => formats.find((item) => item.value === (format || 'none')).label;
@@ -37,6 +46,13 @@ const failure = (error) => {
   return error?.response?.data?.data?.reason === 'HAS_EXERCISES'
     ? 'The exercise type of a topic with exercises cannot change.'
     : 'A topic with this name already exists.';
+};
+
+const deleteFailure = (error) => {
+  const data = error?.response?.data?.data;
+  if (errorCode(error) !== ContentResponseCode.LISTENING_TOPIC_INVALID || data?.reason !== 'HAS_EXERCISES') return getApiErrorMessage(error);
+  const count = data.exerciseCount;
+  return `It still has ${count ? `${count} exercise${count === 1 ? '' : 's'}` : 'exercises'}. Delete or move them first.`;
 };
 
 function FormatSelect({ id, value, onChange }) {
@@ -67,6 +83,7 @@ export function ListeningTopicsPage({ eyebrow }) {
   const [format, setFormat] = useState('song');
   // { id, name, format } of the topic being edited.
   const [editing, setEditing] = useState(null);
+  const [removing, setRemoving] = useState(null);
   const [busy, setBusy] = useState(false);
 
   async function load({ quiet = false } = {}) {
@@ -109,6 +126,20 @@ export function ListeningTopicsPage({ eyebrow }) {
   async function onSaveEdit() {
     const changes = { name: editing.name.trim(), format: editing.format === 'none' ? null : editing.format };
     if (await run(() => updateListeningTopic(editing.id, changes), 'Topic saved', 'Could not save the topic')) setEditing(null);
+  }
+
+  async function onDelete() {
+    setBusy(true);
+    try {
+      await deleteListeningTopic(removing.id);
+      notify({ title: 'Topic deleted' });
+      setRemoving(null);
+      await load({ quiet: true });
+    } catch (error) {
+      notify({ title: 'Could not delete the topic', description: deleteFailure(error), variant: 'destructive' });
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -156,6 +187,9 @@ export function ListeningTopicsPage({ eyebrow }) {
               <Button variant="ghost" size="icon" aria-label={`Edit ${topic.name}`} onClick={() => setEditing({ id: topic.id, name: topic.name, format: topic.format || 'none' })}>
                 <Pencil className="h-4 w-4" />
               </Button>
+              <Button variant="ghost" size="icon" aria-label={`Delete ${topic.name}`} title="Delete" onClick={() => setRemoving({ id: topic.id, name: topic.name })}>
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
             </li>
           ))}
         </ul>
@@ -187,6 +221,28 @@ export function ListeningTopicsPage({ eyebrow }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!removing} onOpenChange={(open) => !open && !busy && setRemoving(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete “{removing?.name}”?</AlertDialogTitle>
+            <AlertDialogDescription>Only a topic without exercises can be deleted.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={busy}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(event) => {
+                event.preventDefault();
+                onDelete();
+              }}
+            >
+              {busy ? 'Deleting…' : 'Delete topic'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }

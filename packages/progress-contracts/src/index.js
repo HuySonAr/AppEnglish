@@ -19,6 +19,16 @@ export const LEADERBOARD_SIZE = 50;
 export const STREAK_TIME_ZONE = 'Asia/Ho_Chi_Minh';
 export const STREAK_REST_DAYS_PER_WEEK = 1;
 export const STREAK_CALENDAR_WEEKS = 8;
+
+export const NotificationKind = Object.freeze({
+  MOCK_RESULT: 'MOCK_RESULT',
+  UNIT_OPENED: 'UNIT_OPENED',
+  COURSE_LEVEL_UP: 'COURSE_LEVEL_UP',
+  STREAK_REMINDER: 'STREAK_REMINDER',
+});
+export const NOTIFICATION_LIST_SIZE = 30;
+export const NOTIFICATION_KEEP_DAYS = 30;
+export const STREAK_REMINDER_HOUR = 18;
 export const StreakDayState = Object.freeze({ STUDIED: 'studied', REST: 'rest', MISSED: 'missed', TODAY: 'today', FUTURE: 'future' });
 
 // Exact values are stored; the client shows whole percents (D39).

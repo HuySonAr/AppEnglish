@@ -201,3 +201,104 @@ test('an attempt left without submitting is removed, and the next one starts afr
   await assert.rejects(() => service.discardMockAttempt(student, first.id, FULL), { code: 58 });
   assert.equal((await service.getMockTest(student, first.id)).full.attempts.length, 1);
 });
+
+test('mock stats (D162): only a Content Manager, nothing per question below the minimum of learners', async () => {
+  const { service, repository, content, tests } = await harness();
+  const mockTest = tests[0];
+  const paper = content.paperOf(mockTest.id);
+  const questions = Object.values(paper.test).flatMap((part) => part.questions);
+  const [tricky] = questions;
+  const completed = (accountId, fields = {}) => ({
+    id: randomUUID(), accountId, mockTestId: mockTest.id, mockVersionId: paper.versionId, kind: 'FULL', partKey: '', attemptNumber: 1, status: 'COMPLETED',
+    answers: Object.fromEntries(questions.map((question) => [question.id, question.options[question === tricky ? 1 : 0].id])),
+    listeningScore: 300, readingScore: 200, ...fields,
+  });
+  await assert.rejects(() => service.getMockStats(student, mockTest.id), { code: 26 });
+  await assert.rejects(() => service.getMockStats(admin, mockTest.id), { code: 26 });
+
+  const learners = Array.from({ length: 5 }, () => randomUUID());
+  repository.tables.attempts.push(...learners.slice(0, 4).map((id) => completed(id)));
+  const few = await service.getMockStats(manager, mockTest.id);
+  assert.deepEqual([few.learners, few.enoughLearners, few.averageScore, few.questions], [4, false, null, []]);
+
+  repository.tables.attempts.push(completed(learners[4], { listeningScore: 400, readingScore: 300 }));
+  repository.tables.attempts.push(completed(learners[0], { kind: 'MINI', partKey: 'part5', attemptNumber: 1, listeningScore: null, readingScore: null, answers: {} }));
+  repository.tables.attempts.push({ ...completed(learners[1]), status: 'IN_PROGRESS' });
+  const stats = await service.getMockStats(manager, mockTest.id);
+  assert.deepEqual([stats.learners, stats.fullAttempts, stats.miniAttempts, stats.enoughLearners], [5, 5, 1, true]);
+  assert.deepEqual(stats.averageScore, { total: 540, listening: 320, reading: 220 });
+  const first = stats.questions.find((question) => question.id === tricky.id);
+  assert.deepEqual([first.number, first.shown, first.correct, first.rate, first.flag], [1, 5, 0, 0, 'CHECK_KEY']);
+  assert.deepEqual(first.options.map((option) => [option.letter, option.chosen, option.isCorrect]), [['A', 0, true], ['B', 5, false], ['C', 0, false], ['D', 0, false]]);
+  const part5 = stats.questions.find((question) => question.partKey === 'part5');
+  assert.deepEqual([part5.number, part5.shown, part5.skipped, part5.rate, part5.flag], [101, 6, 1, 83, null]);
+  const part3 = stats.questions.filter((question) => question.partKey === 'part3').map((question) => question.number);
+  assert.deepEqual(part3, [32, 33]);
+  assert.equal(stats.questions.find((question) => question.partKey === 'part7').flag, 'EASY');
+  assert.deepEqual(stats.parts.find((part) => part.key === 'part1'), { key: 'part1', number: 1, skill: 'LISTENING', questionCount: 2, shown: 10, correct: 5, rate: 50 });
+});
+
+test('study goal (D165): a student sets a target, sees the latest estimate and the weakest part of recent attempts', async () => {
+  const { service, tests, answers, content } = await harness();
+  await assert.rejects(() => service.getStudyGoal(manager), { code: 26 });
+  const empty = await service.getStudyGoal(student);
+  assert.deepEqual([empty.goal, empty.estimate, empty.weakestPart], [null, null, null]);
+  await assert.rejects(() => service.saveStudyGoal(student, { targetScore: 650, examDate: '2020-01-01' }), { code: 30 });
+
+  const id = tests[0].id;
+  await service.startMockAttempt(student, id, FULL);
+  const paper = content.paperOf(id);
+  const right = answers(id, 13);
+  for (const question of paper.test.part2.questions) right[question.id] = question.options[1].id;
+  for (const question of paper.test.part5.questions) right[question.id] = question.options[1].id;
+  await service.submitMockAttempt(student, id, { ...FULL, answers: right });
+
+  const saved = await service.saveStudyGoal(student, { targetScore: 650, examDate: '2026-12-20' });
+  assert.deepEqual(saved.goal, { targetScore: 650, examDate: '2026-12-20' });
+  assert.equal(typeof saved.estimate.total, 'number');
+  assert.equal(saved.estimate.mockTestId, id);
+  assert.deepEqual(saved.history.map((point) => [point.total, point.mockTestId]), [[saved.estimate.total, id]]);
+  assert.deepEqual(saved.parts.map((part) => [part.key, part.shown, part.rate]), [['part1', 2, 100], ['part2', 1, 0], ['part3', 2, 100], ['part4', 1, 100], ['part5', 2, 0], ['part6', 2, 100], ['part7', 3, 100]]);
+  assert.equal(saved.weakestPart, null, 'a part needs at least 3 answered questions');
+  await service.startMockAttempt(student, id, mini('part5'));
+  await service.submitMockAttempt(student, id, { ...mini('part5'), answers: {} });
+  assert.equal((await service.getStudyGoal(student)).weakestPart, 'part5');
+  assert.deepEqual((await service.deleteStudyGoal(student)).goal, null);
+});
+
+test('mock mistakes (D167): wrong answers wait for review and leave after two right answers in a row', async () => {
+  const { service, tests, content, advance } = await harness();
+  const id = tests[0].id;
+  const paper = content.paperOf(id);
+  const questions = Object.values(paper.test).flatMap((part) => part.questions);
+  const [first, second] = paper.test.part5.questions;
+  await assert.rejects(() => service.getMockMistakes(manager), { code: 26 });
+  assert.equal((await service.getMockMistakes(student)).total, 0);
+
+  const allRight = Object.fromEntries(questions.map((question) => [question.id, question.options[0].id]));
+  await service.startMockAttempt(student, id, FULL);
+  await service.submitMockAttempt(student, id, { ...FULL, answers: { ...allRight, [first.id]: first.options[1].id, [second.id]: undefined } });
+  const summary = await service.getMockMistakes(student);
+  assert.deepEqual([summary.total, summary.parts.find((part) => part.key === 'part5').count], [2, 2]);
+
+  const practice = await service.getMistakePractice(student, { partKey: 'part5' });
+  assert.deepEqual(practice.questions.map((question) => [question.questionId, question.number, question.partNumber]), [[first.id, 101, 5], [second.id, 102, 5]]);
+  assert.equal(JSON.stringify(practice).includes('isCorrect'), false);
+  assert.equal(JSON.stringify(practice).includes('Secret explanation'), false);
+
+  advance(1);
+  const wrong = await service.answerMistake(student, { questionId: first.id, optionId: first.options[2].id });
+  assert.deepEqual([wrong.correct, wrong.correctOptionId, wrong.explanation, wrong.streak, wrong.cleared], [false, first.options[0].id, 'Secret explanation', 0, false]);
+  advance(1);
+  assert.deepEqual((({ correct, streak, cleared }) => [correct, streak, cleared])(await service.answerMistake(student, { questionId: first.id, optionId: first.options[0].id })), [true, 1, false]);
+  advance(1);
+  const done = await service.answerMistake(student, { questionId: first.id, optionId: first.options[0].id });
+  assert.deepEqual([done.cleared, done.remaining], [true, 1]);
+  assert.equal((await service.getMockMistakes(student)).total, 1);
+  await assert.rejects(() => service.answerMistake(student, { questionId: first.id, optionId: first.options[0].id }), { code: 57 });
+
+  advance(1);
+  await service.startMockAttempt(student, id, mini('part5'));
+  await service.submitMockAttempt(student, id, { ...mini('part5'), answers: { [first.id]: first.options[0].id, [second.id]: second.options[0].id } });
+  assert.equal((await service.getMockMistakes(student)).total, 1, 'one right answer in a test counts toward the two');
+});

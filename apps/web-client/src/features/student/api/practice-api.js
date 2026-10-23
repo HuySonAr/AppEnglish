@@ -15,6 +15,9 @@ export async function checkListeningPractice(id, answers, mode = 'full') {
   return (await httpClient.post(`/learning/practice/listening/${id}/check`, { mode, answers })).data;
 }
 // One line checked as the learner goes (D93); nothing is kept.
+export async function getListeningTranscript(id) {
+  return (await httpClient.get(`/learning/practice/listening/${id}/transcript`)).data;
+}
 export async function checkListeningLine(id, segmentId, answers, mode = 'full') {
   return (await httpClient.post(`/learning/practice/listening/${id}/check-line`, { mode, segmentId, answers })).data;
 }

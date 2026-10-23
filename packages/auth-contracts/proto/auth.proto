@@ -22,6 +22,8 @@ service AuthService {
   // numbers behind the accounts page.
   rpc AdminAccountAction(AdminAccountActionRequest) returns (AuthReply);
   rpc AdminAccountStats(AccessRequest) returns (AuthReply);
+  rpc AdminListNotifications(AccessRequest) returns (AuthReply);
+  rpc AdminMarkNotificationsRead(AdminMarkNotificationsReadRequest) returns (AuthReply);
   // D131: an admin creates an account by invitation; the person sets the
   // password with the emailed code.
   rpc AdminInviteAccount(AdminInviteAccountRequest) returns (AuthReply);
@@ -92,6 +94,11 @@ message AdminUpdateAccountRequest {
   string status = 4;
   // Why the status changes; required when an account is disabled or suspended (D114).
   string reason = 5;
+}
+
+message AdminMarkNotificationsReadRequest {
+  string access_token = 1;
+  repeated string ids = 2;
 }
 
 message AdminAccountActionRequest {

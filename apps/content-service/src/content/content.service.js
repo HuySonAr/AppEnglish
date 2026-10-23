@@ -168,6 +168,7 @@ export class ContentService {
     if (unit.status === UnitStatus.PUBLISHED) {
       unit.status = UnitStatus.DRAFT;
       await this.repository.saveUnit(unit);
+      await this.noteUnpublished(actor, { type: 'unit', id: unit.id, title: unit.title });
     }
     return { unit: this.unitView(unit) };
   }
@@ -257,6 +258,7 @@ export class ContentService {
     if (unit.reviewVersionId) {
       unit.reviewVersionId = null;
       await this.repository.saveUnit(unit);
+      await this.noteUnpublished(actor, { type: 'unitReview', id: unit.id, title: unit.title });
     }
     let draft = await this.repository.findReviewDraft(unitId);
     // The version taken down becomes the draft when there is none (D122).
@@ -431,6 +433,7 @@ export class ContentService {
     if (lesson.publishedVersionId) {
       lesson.publishedVersionId = null;
       await this.repository.saveLesson(lesson);
+      await this.noteUnpublished(actor, { type: 'lesson', id: lesson.id, title: lesson.title });
     }
     let draft = await this.repository.findDraft(lessonId);
     // Without a draft the editor would open empty: the version just taken
@@ -629,6 +632,11 @@ export class ContentService {
     if (actor.role !== AccountRole.ADMIN) throw contentErrors.forbiddenRole();
   }
 
+  async noteUnpublished(actor, { type, id, title }) {
+    const at = new Date();
+    await this.repository.addAdminNotice({ kind: 'CONTENT_UNPUBLISHED', key: `unpublished:${type}:${id}:${at.getTime()}`, data: { type, id, title, by: actor.id }, createdAt: at });
+  }
+
   // Lower-case letters and digits of the name, e.g. "HSK 1" -> "hsk-1".
   examTypeCode(name) {
     return name
@@ -798,6 +806,7 @@ export class ContentService {
     if (mockTest.publishedVersionId) {
       mockTest.publishedVersionId = null;
       await this.repository.saveMockTest(mockTest);
+      await this.noteUnpublished(actor, { type: 'mockTest', id: mockTest.id, title: mockTest.title });
     }
     let draft = await this.repository.findMockDraft(mockTestId);
     // The version taken down becomes the draft when there is none (D122).

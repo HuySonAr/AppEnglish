@@ -117,6 +117,13 @@ export class AuthGatewayController {
   }
   // Declared before adminGet: Nest registers routes in method order, and
   // "admin/accounts/stats" must be matched before "admin/accounts/:id".
+  async adminNotifications(request, response) {
+    return this.forward('AdminListNotifications', { accessToken: cookies(request).accessToken }, response);
+  }
+  async adminMarkNotificationsRead(body, request, response) {
+    const ids = Array.isArray(body?.ids) ? body.ids.map(String) : [];
+    return this.forward('AdminMarkNotificationsRead', { accessToken: cookies(request).accessToken, ids }, response);
+  }
   async adminStats(request, response) {
     return this.forward('AdminAccountStats', { accessToken: cookies(request).accessToken }, response);
   }
@@ -213,6 +220,8 @@ const routes = [
   [Post, 'admin/accounts', 'adminInvite', [Body(), Req(), passthrough()]],
   // Before :id so "stats" is never read as an account id.
   [Get, 'admin/accounts/stats', 'adminStats', [Req(), passthrough()]],
+  [Get, 'admin/notifications', 'adminNotifications', [Req(), passthrough()]],
+  [Post, 'admin/notifications/read', 'adminMarkNotificationsRead', [Body(), Req(), passthrough()]],
   [Get, 'admin/accounts/:id', 'adminGet', [Param('id'), Req(), passthrough()]],
   [Patch, 'admin/accounts/:id', 'adminUpdate', [Param('id'), Body(), Req(), passthrough()]],
   [Post, 'admin/accounts/:id/actions', 'adminAction', [Param('id'), Body(), Req(), passthrough()]],

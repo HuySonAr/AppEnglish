@@ -1,5 +1,7 @@
 import { DataSource } from 'typeorm';
 import {
+  AdminNoticeEntity,
+  AdminNoticeReadEntity,
   ExamTypeEntity,
   LessonEntity,
   LessonVersionEntity,
@@ -41,6 +43,8 @@ export function createContentDataSource() {
       ListeningTimingJobEntity,
       ListeningCourseItemEntity,
       ListeningCourseVersionEntity,
+      AdminNoticeEntity,
+      AdminNoticeReadEntity,
     ],
     migrations: ['src/database/migrations/*.js'],
   });

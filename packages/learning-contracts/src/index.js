@@ -10,6 +10,18 @@ export const PlacementStatus = Object.freeze({
 // Time allowed for the placement test; the server keeps the clock (D57).
 export const PLACEMENT_DURATION_MINUTES = 25;
 
+export const MOCK_STATS_MIN_LEARNERS = 5;
+export const GOAL_SCORE = Object.freeze({ min: 10, max: 990, step: 5 });
+export const GOAL_RECENT_ATTEMPTS = 5;
+export const GOAL_MIN_ANSWERED = 3;
+export const GOAL_STALE_DAYS = 14;
+export const GOAL_HISTORY_SIZE = 20;
+export const MOCK_MISTAKE_CLEAR_STREAK = 2;
+export const MOCK_MISTAKE_SESSION = 10;
+export const FORECAST_POINTS = 6;
+export const FORECAST_MAX_DAYS = 365;
+export const MockQuestionFlag = Object.freeze({ CHECK_KEY: 'CHECK_KEY', HARD: 'HARD', EASY: 'EASY' });
+
 // Minimum score (percent) to start at unit 2 and at unit 3 (D35). An Admin
 // can change them.
 export const DEFAULT_PLACEMENT_THRESHOLDS = Object.freeze({
@@ -154,6 +166,8 @@ export const LearningEventType = Object.freeze({
   LESSON_COMPLETED: 'lesson.completed',
   MOCK_SUBMITTED: 'mock.submitted',
   ACTIVITY_RECORDED: 'activity.recorded',
+  UNIT_REVIEW_PASSED: 'unit-review.passed',
+  COURSE_LEVEL_UP: 'course.level-up',
 });
 
 export const StudyActivity = Object.freeze({
@@ -165,4 +179,5 @@ export const StudyActivity = Object.freeze({
   LISTENING_PRACTICE: 'listeningPractice',
   WORD_MEMORY: 'wordMemory',
   MOCK_TEST: 'mockTest',
+  MISTAKE_REVIEW: 'mistakeReview',
 });

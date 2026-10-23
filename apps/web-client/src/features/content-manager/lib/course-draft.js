@@ -46,12 +46,12 @@ const same = (value) => String(value || '').replace(/\s+/g, ' ').trim();
 // The sentences after a change that may have replaced them (paste, import,
 // Transcribe): a new sentence keeps the translation and blanks of the one it
 // replaces when it has the same id, or the same words at the same place.
-export function keepSentenceExtras(previous, next) {
+export function keepSentenceExtras(previous, next, fields = ['translation', 'gap']) {
   const byId = new Map(previous.map((segment) => [segment.id, segment]));
   return next.map((segment, index) => {
-    if ('translation' in segment && 'gap' in segment) return segment;
+    if (fields.every((field) => field in segment)) return segment;
     const before = byId.get(segment.id) || (same(previous[index]?.text) === same(segment.text) ? previous[index] : null);
-    return { ...segment, translation: before?.translation || '', gap: before?.gap || '' };
+    return { ...segment, ...Object.fromEntries(fields.map((field) => [field, before?.[field] || ''])) };
   });
 }
 

@@ -191,6 +191,7 @@ export class CourseService {
     if (item.publishedVersionId) {
       item.publishedVersionId = null;
       await this.repository.saveItem(item);
+      await this.contentService.noteUnpublished(actor, { type: 'courseItem', id: item.id, title: item.title });
     }
     let draft = await this.repository.findDraft(itemId);
     // The version taken down becomes the draft when there is none (D122).

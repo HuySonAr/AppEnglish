@@ -157,7 +157,21 @@ export function mockQuestionNumber(spec, part, index) {
 }
 
 // Parts whose questions can be filled from pasted text (D73-D76).
-export const MOCK_PASTE_PARTS = Object.freeze(['part3', 'part4', 'part5', 'part6', 'part7']);
+export const MOCK_PASTE_PARTS = Object.freeze(['part1', 'part2', 'part3', 'part4', 'part5', 'part6', 'part7']);
+
+const spokenLetters = 'ABCD';
+
+export function spokenTranscript(item) {
+  return [item.prompt, ...item.options.map((option, index) => (option ? `(${spokenLetters[index]}) ${option}` : ''))].filter(Boolean).join('\n');
+}
+
+function withSpokenText(question, item) {
+  return {
+    ...question,
+    transcript: spokenTranscript(item),
+    options: question.options.map((option, index) => ({ ...option, isCorrect: index === item.correct })),
+  };
+}
 
 // Where pasted questions (parsePastedQuestions) go in Part 3, 4 or 5, and
 // what is wrong with them. A question goes to the place its number has in a
@@ -176,14 +190,17 @@ export function pastePreview(part, spec, pasted) {
     const existing = inSets
       ? part.questions.filter((question) => question.groupId === part.groups[set]?.id)[place]
       : part.questions[place];
+    const spoken = !spec.option.text;
     const { errors, warnings } = pastedQuestionProblems(item, spec);
+    if (spoken && !spec.question.image && !item.prompt) warnings.push('no question line');
+    if (item.options.length > spec.optionCount) errors.push(`Part ${spec.number} has options A–${spokenLetters[spec.optionCount - 1]} only`);
     if (item.number < first || item.number > last) errors.unshift(`Part ${spec.number} holds questions ${first}–${last}`);
     if (pasted.findIndex((other) => other.number === item.number) !== index) errors.push('this number appears twice');
     return {
       ...item,
       set,
       place,
-      replaces: Boolean(existing && (existing.prompt || existing.options.some((option) => option.text))),
+      replaces: Boolean(existing && (spoken ? existing.transcript : existing.prompt || existing.options.some((option) => option.text))),
       errors,
       warnings,
     };
@@ -209,7 +226,7 @@ export function withPastedQuestions(part, spec, pasted) {
     const target = siblings()[item.place];
     next = {
       ...next,
-      questions: next.questions.map((question) => (question === target ? withPastedText(question, item) : question)),
+      questions: next.questions.map((question) => (question !== target ? question : spec.option.text ? withPastedText(question, item) : withSpokenText(question, item))),
     };
   }
   return next;

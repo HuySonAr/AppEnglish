@@ -1,5 +1,7 @@
-import { In } from 'typeorm';
+import { In, MoreThan } from 'typeorm';
 import {
+  AdminNoticeEntity,
+  AdminNoticeReadEntity,
   ExamTypeEntity,
   LessonEntity,
   LessonVersionEntity,
@@ -21,6 +23,24 @@ export class ContentRepository {
   async repo(entity) {
     if (!this.dataSource.isInitialized) await this.dataSource.initialize();
     return this.dataSource.getRepository(entity);
+  }
+
+  async addAdminNotice(notice) {
+    await (await this.repo(AdminNoticeEntity)).createQueryBuilder().insert().values(notice).orIgnore().execute();
+  }
+
+  async listAdminNotices(since) {
+    return (await this.repo(AdminNoticeEntity)).find({ where: { createdAt: MoreThan(since) }, order: { createdAt: 'DESC' } });
+  }
+
+  async readNoticeKeys(accountId, keys) {
+    if (!keys.length) return new Set();
+    return new Set((await (await this.repo(AdminNoticeReadEntity)).find({ where: { accountId, key: In(keys) } })).map((row) => row.key));
+  }
+
+  async markNoticesRead(accountId, keys, at) {
+    if (!keys.length) return;
+    await (await this.repo(AdminNoticeReadEntity)).createQueryBuilder().insert().values(keys.map((key) => ({ accountId, key, readAt: at }))).orIgnore().execute();
   }
 
   async listUnits() {

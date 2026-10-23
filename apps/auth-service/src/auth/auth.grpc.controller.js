@@ -95,6 +95,12 @@ export class AuthGrpcController {
       this.handlers.adminAction(accountId, withoutEmpty({ action, reason }), optional(accessToken)),
     );
   }
+  adminListNotifications({ accessToken }) {
+    return this.reply(() => this.handlers.adminNotifications(optional(accessToken)));
+  }
+  adminMarkNotificationsRead({ accessToken, ids }) {
+    return this.reply(() => this.handlers.adminMarkNotificationsRead(ids || [], optional(accessToken)));
+  }
   adminAccountStats({ accessToken }) {
     return this.reply(() => this.handlers.adminStats(optional(accessToken)));
   }
@@ -201,6 +207,8 @@ for (const rpc of [
   'AdminUpdateAccount',
   'AdminAccountAction',
   'AdminAccountStats',
+  'AdminListNotifications',
+  'AdminMarkNotificationsRead',
   'AdminInviteAccount',
   'AcceptInvite',
   'UpdateProfile',

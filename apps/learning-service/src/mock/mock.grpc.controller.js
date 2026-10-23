@@ -11,6 +11,9 @@ import {
   attemptReviewSchema,
   mockIdSchema,
   scoreConversionSchema,
+  studyGoalSchema,
+  mistakePracticeSchema,
+  mistakeAnswerSchema,
 } from './mock.schemas.js';
 
 // Each RPC: whether it targets a mock test id, the schema of its JSON payload
@@ -48,6 +51,13 @@ const rpcs = {
     payload: attemptReviewSchema,
     run: (service, { actor, id, payload }) => service.getMockReview(actor, id, payload),
   },
+  GetMockStats: { id: true, run: (service, { actor, id }) => service.getMockStats(actor, id) },
+  GetStudyGoal: { run: (service, { actor }) => service.getStudyGoal(actor) },
+  SaveStudyGoal: { payload: studyGoalSchema, run: (service, { actor, payload }) => service.saveStudyGoal(actor, payload) },
+  DeleteStudyGoal: { run: (service, { actor }) => service.deleteStudyGoal(actor) },
+  GetMockMistakes: { run: (service, { actor }) => service.getMockMistakes(actor) },
+  GetMistakePractice: { payload: mistakePracticeSchema, run: (service, { actor, payload }) => service.getMistakePractice(actor, payload) },
+  AnswerMistake: { payload: mistakeAnswerSchema, run: (service, { actor, payload }) => service.answerMistake(actor, payload) },
   GetScoreConversion: { run: (service, { actor }) => service.getScoreConversion(actor) },
   UpdateScoreConversion: {
     payload: scoreConversionSchema,

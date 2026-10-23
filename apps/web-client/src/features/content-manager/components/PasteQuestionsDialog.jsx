@@ -67,6 +67,7 @@ export function PasteQuestionsDialog({ spec, part, setName, onApply, planFor = p
   const exampleLast = firstNumber + (exampleCount ?? (blanks ? 4 : 2)) - 1;
   let description =
     'Each question goes to the place of its number; blank questions are added for the numbers skipped before it. Explanations are still added in the editor.';
+  if (!spec.option.text) description = 'Paste what each recording says; it becomes the transcript and sets the answer.';
   if (setName)
     description = `Each question goes to the place of its number, and the ${setName.toLowerCase()}s it needs are added. Recordings, transcripts, graphics and explanations are still added in the editor.`;
   if (byPassage)
