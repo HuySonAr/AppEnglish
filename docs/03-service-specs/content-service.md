@@ -502,3 +502,34 @@ with answers and `media`: id → URL of the recordings and pronunciations).
 | DELETE | `/content/media/orphans` | `DeleteOrphanMedia` | `{ ids[] }`; re-checks references; returns `{ deleted[], skipped[] }` |
 
 `isMediaReferenced` now also scans `listening_course_versions`. The main placement test has no unpublish or delete.
+
+## Speaking/Writing prompt bank (F11, D170, D176)
+
+Code: `src/practice/` (`practice.schemas.js`, `practice.repository.js`, `practice.service.js`, `practice.grpc.controller.js`); tables in `database-allocation.md`.
+
+| Method | Path | RPC | Who | Rules |
+|---|---|---|---|---|
+| GET | `/content/practice-prompts` | `ListPracticePrompts` | Teacher, CM | Teacher: own prompts. CM: every prompt except those that only ever had a draft |
+| POST | `/content/practice-prompts` | `CreatePracticePrompt` | Teacher | `{ kind }`; creates version 1 as `DRAFT` with default content (level A2) |
+| GET | `/content/practice-prompts/:id` | `GetPracticePrompt` | Teacher (author), CM | `{ prompt, latest, published, media }`; another teacher's prompt is 404 |
+| PUT | `/content/practice-prompts/:id/draft` | `SavePracticePromptDraft` | Author | `{ content }`; updates a `DRAFT`/`RETURNED` version in place, otherwise starts a new version; 409 code 41 while in review |
+| POST | `/content/practice-prompts/:id/submit` | `SubmitPracticePrompt` | Author | Runs `practiceIssues`; missing fields are 409 code 42 with `issues[]` |
+| POST | `/content/practice-prompts/:id/withdraw` | `WithdrawPracticePrompt` | Author | Back to `DRAFT` |
+| POST | `/content/practice-prompts/:id/approve` | `ApprovePracticePrompt` | CM | Publishes the version; the previously published one becomes `ARCHIVED` |
+| POST | `/content/practice-prompts/:id/return` | `ReturnPracticePrompt` | CM | `{ note }` required (1–1000) |
+| POST | `/content/practice-prompts/:id/unpublish` | `UnpublishPracticePrompt` | CM | Published version becomes `UNPUBLISHED`; learners stop seeing it |
+| DELETE | `/content/practice-prompts/:id` | `DeletePracticePrompt` | Author | Only if no version was ever published and it is not in review; removes its unused media |
+
+Content limits come from `PRACTICE_LIMITS` in content-contracts. Required to submit: title and topic; read aloud needs the text (500 characters); open speaking and writing need instructions and a sample answer; writing needs `minWords <= maxWords` and a sample answer within that range. Open speaking time is 15–120 seconds. Media upload with `section=practice` is allowed for the `TEACHER` role only and stored under `<kind>/practice`; `isMediaReferenced` scans `practice_prompt_versions`. Errors: `PRACTICE_PROMPT_NOT_FOUND` 40/404, state conflicts 41/409.
+
+Web: teacher area `/teacher` (dashboard, `/teacher/prompts`, editor `/teacher/prompts/:id` with preview), CM review `/content-manager/practice-prompts` (waiting first) and `/content-manager/practice-prompts/:id` (new version vs live version, approve, return with note, take down). Shared `PracticePromptView` renders a prompt read-only.
+
+### Learner side of the prompt bank (F12, D177)
+
+| RPC | Caller | Notes |
+|---|---|---|
+| `ListPublishedPracticePrompts` | learning-service (internal) | `{ prompts: [{ id, kind, versionId, versionNumber, title, level, topic, publishedAt }] }` of published versions |
+| `GetPracticePaper` | learning-service (internal) | Published version with full content and `media` URLs; 404 code 40 otherwise |
+| `StoreLearnerRecording` (`UploadMediaRequest`) | learning-service (internal) | Media kind `recording` (webm, ogg, m4a, mp3, wav) under `learner-recordings/`; no `media_assets` row; returns `{ recording: { storage, storageId, url, mimeType, sizeBytes } }` |
+| `DeleteLearnerRecordings` | learning-service (internal) | `{ recordings: [{ storage, storageId }] }` (max 100) → `{ deleted[], failed[] }` |
+| `CreatePracticeMachineAudio` | Teacher, `POST /content/practice-prompts/machine-audio` `{ text }` (≤ 500) | Piper British voice through `speech.pronounce.requests`; saved as practice media like an upload; 503 when the worker does not answer |

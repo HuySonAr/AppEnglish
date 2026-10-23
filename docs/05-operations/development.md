@@ -214,6 +214,13 @@ pnpm --filter @appenglish/content-service seed:600-words -- --manager-id <id tà
 Lesson đã có đủ 12 từ được giữ nguyên (`--force` để ghi đè); `--only 6,7`
 chỉ nhập các lesson đó. Xem README trong thư mục.
 
+## writing-service (F13, D178)
+
+1. Đặt `GEMINI_KEY_SECRET` (ít nhất 32 ký tự ngẫu nhiên) trong `.env` gốc; learning-service và writing-service dùng chung. Đổi secret thì các key đã lưu không mở được nữa, học viên phải lưu lại.
+2. `GEMINI_MODEL` mặc định `gemini-3.8-flash`.
+3. `pnpm dev` chạy cả writing-service; riêng lẻ: `pnpm --filter @appenglish/writing-service dev`.
+4. Không có key chung: học viên tự dán key của mình ở Profile (trang hướng dẫn `/student/gemini-key`).
+
 ## Observability and reliable messaging (D168)
 
 - Logs are JSON lines with `requestId`; send `x-request-id` to follow one request through the services, the broker and speech-service.

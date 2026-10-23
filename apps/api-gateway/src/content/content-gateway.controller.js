@@ -219,6 +219,39 @@ export class ContentGatewayController {
   listMockTranscribe(id, request) {
     return this.forward('ListMockTranscribe', request, { id });
   }
+  listPracticePrompts(request) {
+    return this.forward('ListPracticePrompts', request);
+  }
+  createPracticePrompt(body, request) {
+    return this.forward('CreatePracticePrompt', request, { body });
+  }
+  getPracticePrompt(id, request) {
+    return this.forward('GetPracticePrompt', request, { id });
+  }
+  savePracticePromptDraft(id, body, request) {
+    return this.forward('SavePracticePromptDraft', request, { id, body });
+  }
+  submitPracticePrompt(id, request) {
+    return this.forward('SubmitPracticePrompt', request, { id });
+  }
+  withdrawPracticePrompt(id, request) {
+    return this.forward('WithdrawPracticePrompt', request, { id });
+  }
+  approvePracticePrompt(id, request) {
+    return this.forward('ApprovePracticePrompt', request, { id });
+  }
+  returnPracticePrompt(id, body, request) {
+    return this.forward('ReturnPracticePrompt', request, { id, body });
+  }
+  unpublishPracticePrompt(id, request) {
+    return this.forward('UnpublishPracticePrompt', request, { id });
+  }
+  deletePracticePrompt(id, request) {
+    return this.forward('DeletePracticePrompt', request, { id });
+  }
+  createPracticeMachineAudio(body, request) {
+    return this.forward('CreatePracticeMachineAudio', request, { body });
+  }
   listContentNotifications(request) {
     return this.forward('ListContentNotifications', request);
   }
@@ -358,6 +391,17 @@ const routes = [
   [Post, 'mock-tests/:id/transcribe', 'requestMockTranscribe', [Param('id'), Body(), Req()]],
   [Get, 'mock-tests/:id/transcribe', 'listMockTranscribe', [Param('id'), Req()]],
   [Get, 'notifications', 'listContentNotifications', [Req()]],
+  [Get, 'practice-prompts', 'listPracticePrompts', [Req()]],
+  [Post, 'practice-prompts', 'createPracticePrompt', [Body(), Req()]],
+  [Post, 'practice-prompts/machine-audio', 'createPracticeMachineAudio', [Body(), Req()]],
+  [Get, 'practice-prompts/:id', 'getPracticePrompt', [Param('id'), Req()]],
+  [Put, 'practice-prompts/:id/draft', 'savePracticePromptDraft', [Param('id'), Body(), Req()]],
+  [Post, 'practice-prompts/:id/submit', 'submitPracticePrompt', [Param('id'), Req()]],
+  [Post, 'practice-prompts/:id/withdraw', 'withdrawPracticePrompt', [Param('id'), Req()]],
+  [Post, 'practice-prompts/:id/approve', 'approvePracticePrompt', [Param('id'), Req()]],
+  [Post, 'practice-prompts/:id/return', 'returnPracticePrompt', [Param('id'), Body(), Req()]],
+  [Post, 'practice-prompts/:id/unpublish', 'unpublishPracticePrompt', [Param('id'), Req()]],
+  [Delete, 'practice-prompts/:id', 'deletePracticePrompt', [Param('id'), Req()]],
   [Post, 'notifications/read', 'markContentNotificationsRead', [Body(), Req()]],
   [Get, 'admin/notifications', 'listAdminContentNotifications', [Req()]],
   [Post, 'admin/notifications/read', 'markAdminContentNotificationsRead', [Body(), Req()]],

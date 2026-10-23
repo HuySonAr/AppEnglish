@@ -133,9 +133,11 @@ export function fakeTransport() {
     start(onReady) {
       transport.onReady = onReady;
     },
-    async send(message) {
+    queues: [],
+    async send(message, queue) {
       if (transport.failing) throw new Error('broker refused');
       transport.sent.push(structuredClone(message));
+      transport.queues.push(queue);
     },
     async stop() {},
   };

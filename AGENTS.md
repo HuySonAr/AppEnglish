@@ -10,11 +10,12 @@
 - Làm một feature mỗi lượt, theo docs/04-implementation/implementation-order.md.
 - Nghiệp vụ trong docs/01-business là nguồn yêu cầu sản phẩm đã chốt.
 - Không tự thêm nghiệp vụ, service, API, database, event hay công nghệ.
-- Không đưa Speaking, Writing, giáo viên, lớp học, assignment, CEFR hoặc XP lesson vào phạm vi. Streak chỉ theo D154 (chuỗi ngày học, không gắn XP). Ngoại lệ (D85, D100): A1–C2 là nhãn cấp độ của bài luyện nghe, và A1–C1 là các cấp của Listening course (D141) (xếp cấp nghe, kiểm tra lên cấp nghe trong phần đó); không dùng cho placement chính, lesson hay progress chung.
+- Speaking, Writing, vai trò Teacher và hồ sơ năng lực CEFR có trong phạm vi theo D169–D174 và `docs/01-business/workflows/09-speaking-writing.md`; không thêm gì ngoài đó. Không đưa lớp học, mã lớp, assignment, buổi học trực tiếp, tính lương giáo viên, placement CEFR, SM-2 hoặc XP lesson vào phạm vi. Streak chỉ theo D154 (chuỗi ngày học, không gắn XP). CEFR không thay TOEIC cho placement chính, lesson, mục tiêu điểm, kế hoạch học hay dự báo.
 - Không tự quyết định mục TBD. Nếu cần để triển khai, giải thích lựa chọn và hỏi người dùng.
 - Giữ pnpm workspaces/Turborepo, NestJS services, React + Vite client và quy ước code thật của repository. Không chuyển package manager/framework/language.
 - Trong NestJS, route thường nằm trong Controller; không tạo Express Router riêng nếu kiến trúc hiện tại không yêu cầu. Tách controller/DTO-validation/service/repository/model theo conventions hiện có.
 - Chỉ chọn một kiểu validate payload backend nhất quán (DTO + class-validator hoặc Zod schema); không validate trùng cùng rule.
+- Chấm Writing và Speaking nói mở dùng Gemini bằng API key của chính học viên, gọi từ máy chủ; key lưu mã hóa, không trả về trình duyệt, không ghi log; không có key AI chung do hệ thống trả tiền.
 - Không gọi DB service khác trực tiếp; dùng PostgreSQL databases app_identity, app_content, app_learning, app_progress theo database-allocation.md và contract hiện hữu. PostgreSQL local chạy ngoài Docker; Redis/RabbitMQ chạy Docker Compose theo development.md. Không đổi business logic để né broker.
 - Không xóa hay đổi schema/dữ liệu chưa kiểm tra ảnh hưởng.
 - Không viết comment trong code (JS/JSX/MJS, Python, proto, CSS), kể cả docstring; chỉ giữ chỉ thị công cụ như `eslint-disable`. Lý do và nghiệp vụ ghi trong docs (D149).

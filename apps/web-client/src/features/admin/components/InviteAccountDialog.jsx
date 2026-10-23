@@ -81,7 +81,7 @@ export function InviteAccountDialog({ open, onOpenChange, onInvited }) {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                {role === AccountRole.ADMIN ? 'An admin can manage every account. Make sure this is intended.' : role === AccountRole.CONTENT_MANAGER ? 'A Content Manager writes and publishes lessons, tests and listening material.' : 'A learner takes the placement test, lessons and mock tests.'}
+                {role === AccountRole.ADMIN ? 'An admin can manage every account. Make sure this is intended.' : role === AccountRole.CONTENT_MANAGER ? 'A Content Manager writes and publishes lessons, tests and listening material.' : role === AccountRole.TEACHER ? 'A teacher writes speaking and writing prompts.' : 'A learner takes the placement test, lessons and mock tests.'}
               </p>
             </div>
           </div>

@@ -218,7 +218,7 @@ export function AdminDashboardPage() {
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Tile icon={Users} label="All accounts" value={data.total} detail={`${data.byRole?.STUDENT || 0} students · ${data.byRole?.CONTENT_MANAGER || 0} content managers · ${data.byRole?.ADMIN || 0} admins`} />
+          <Tile icon={Users} label="All accounts" value={data.total} detail={`${data.byRole?.STUDENT || 0} students · ${data.byRole?.CONTENT_MANAGER || 0} content managers · ${data.byRole?.TEACHER || 0} teachers · ${data.byRole?.ADMIN || 0} admins`} />
           <Tile
             icon={UserPlus}
             label="New this week"

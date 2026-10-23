@@ -38,6 +38,8 @@ export class RabbitTransport {
       });
       const channel = await connection.createConfirmChannel();
       await channel.assertQueue(LearningQueue.RESULTS, { durable: true });
+      await channel.assertQueue(LearningQueue.SPEAKING_REQUESTS, { durable: true });
+      await channel.assertQueue(LearningQueue.WRITING_REQUESTS, { durable: true });
       this.connection = connection;
       this.channel = channel;
       logger.log('Connected to RabbitMQ for learning results');
@@ -52,10 +54,10 @@ export class RabbitTransport {
     return Boolean(this.channel);
   }
 
-  send(message) {
+  send(message, queue = LearningQueue.RESULTS) {
     return new Promise((resolve, reject) => {
       this.channel.sendToQueue(
-        LearningQueue.RESULTS,
+        queue,
         Buffer.from(JSON.stringify(message)),
         { persistent: true, contentType: 'application/json', messageId: message.id },
         (error) => (error ? reject(error) : resolve()),
@@ -108,7 +110,7 @@ export class LearningEvents {
           occurredAt: new Date(event.createdAt).toISOString(),
           ...(event.requestId ? { requestId: event.requestId } : {}),
           payload: event.payload,
-        });
+        }, event.queue || LearningQueue.RESULTS);
         await this.repository.markPublished(event.id, this.now());
         published.inc({ outbox: 'learning_events' });
       }

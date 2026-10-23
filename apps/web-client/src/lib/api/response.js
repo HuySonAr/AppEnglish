@@ -43,6 +43,12 @@ const messages = Object.freeze({
   [LearningResponseCode.COURSE_PLACEMENT_DONE]: 'You have already taken or skipped the listening placement.',
   [LearningResponseCode.UNIT_REVIEW_NOT_FOUND]: 'This unit has no review.',
   [LearningResponseCode.UNIT_REVIEW_LOCKED]: 'The unit review opens once every lesson of the unit is completed.',
+  [LearningResponseCode.PRACTICE_PROMPT_NOT_FOUND]: 'This prompt is not available.',
+  [LearningResponseCode.SUBMISSION_NOT_FOUND]: 'This attempt is not available.',
+  [LearningResponseCode.RECORDING_INVALID]: 'This recording cannot be used. Record again, up to 30 seconds.',
+  [LearningResponseCode.AI_KEY_INVALID]: 'Gemini rejected this key. Check that you copied all of it.',
+  [LearningResponseCode.AI_KEY_UNAVAILABLE]: 'The key cannot be checked right now. Try again in a minute.',
+  [LearningResponseCode.ANSWER_INVALID]: 'Keep your text within the word limits.',
 });
 
 const mediaReasons = Object.freeze({

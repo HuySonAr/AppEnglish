@@ -1,6 +1,7 @@
 export const MediaKind = Object.freeze({
   AUDIO: 'audio',
-  IMAGE: 'image'
+  IMAGE: 'image',
+  RECORDING: 'recording'
 });
 
 export const allowedMediaTypes = Object.freeze({
@@ -11,6 +12,10 @@ export const allowedMediaTypes = Object.freeze({
   [MediaKind.IMAGE]: Object.freeze({
     mimeTypes: Object.freeze(['image/jpeg', 'image/png', 'image/webp']),
     extensions: Object.freeze(['.jpg', '.jpeg', '.png', '.webp'])
+  }),
+  [MediaKind.RECORDING]: Object.freeze({
+    mimeTypes: Object.freeze(['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg', 'audio/wav', 'audio/x-wav']),
+    extensions: Object.freeze(['.webm', '.ogg', '.m4a', '.mp3', '.wav'])
   })
 });
 

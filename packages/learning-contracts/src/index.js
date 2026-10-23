@@ -101,9 +101,24 @@ export const LearningResponseCode = Object.freeze({
   COURSE_ITEM_LOCKED: 61,
   UNIT_REVIEW_NOT_FOUND: 63,
   UNIT_REVIEW_LOCKED: 64,
+  PRACTICE_PROMPT_NOT_FOUND: 65,
+  SUBMISSION_NOT_FOUND: 66,
+  RECORDING_INVALID: 67,
+  PROMPT_KIND_NOT_READY: 68,
+  AI_KEY_INVALID: 69,
+  AI_KEY_UNAVAILABLE: 70,
+  ANSWER_INVALID: 71,
 });
 
-export const LearningQueue = Object.freeze({ RESULTS: 'learning.results' });
+export const LearningQueue = Object.freeze({
+  RESULTS: 'learning.results',
+  SPEAKING_REQUESTS: 'speech.speaking.requests',
+  SPEAKING_RESULTS: 'speech.speaking.results',
+  WRITING_REQUESTS: 'writing.grading.requests',
+  WRITING_RESULTS: 'writing.grading.results',
+  AI_KEY_CHECKS: 'writing.key-checks',
+  OPEN_SPEAKING_RESULTS: 'writing.open-speaking.results',
+});
 
 export const LearningEventType = Object.freeze({
   LESSON_TEST_SUBMITTED: 'lesson-test.submitted',
@@ -112,6 +127,11 @@ export const LearningEventType = Object.freeze({
   ACTIVITY_RECORDED: 'activity.recorded',
   UNIT_REVIEW_PASSED: 'unit-review.passed',
   COURSE_LEVEL_UP: 'course.level-up',
+  SPEAKING_REQUESTED: 'speaking.requested',
+  SPEAKING_SCORED: 'speaking.scored',
+  WRITING_REQUESTED: 'writing.requested',
+  WRITING_SCORED: 'writing.scored',
+  SPEAKING_GRADING_REQUESTED: 'speaking.grading.requested',
 });
 
 export const StudyActivity = Object.freeze({
@@ -124,4 +144,62 @@ export const StudyActivity = Object.freeze({
   WORD_MEMORY: 'wordMemory',
   MOCK_TEST: 'mockTest',
   MISTAKE_REVIEW: 'mistakeReview',
+  SPEAKING: 'speaking',
+  WRITING: 'writing',
 });
+
+export const SubmissionStatus = Object.freeze({ SCORING: 'SCORING', DONE: 'DONE', FAILED: 'FAILED', SAVED: 'SAVED' });
+export const SpokenWordStatus = Object.freeze({ CORRECT: 'correct', MISPRONOUNCED: 'mispronounced', MISSING: 'missing' });
+export const READ_ALOUD_SCORING = Object.freeze({
+  confidence: 0.6,
+  pauseSeconds: 0.7,
+  pausePenaltyMax: 5,
+  rate: Object.freeze({ min: 90, max: 180, wordsPerPoint: 10, penaltyMax: 5 }),
+  weights: Object.freeze({ accuracy: 0.5, completeness: 0.3, fluency: 0.2 }),
+});
+export const RECORDING_LIMITS = Object.freeze({
+  maxBytes: 5 * 1024 * 1024,
+  readAloudSeconds: 30,
+  openSpeakingSeconds: 120,
+  mimeTypes: Object.freeze(['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg', 'audio/wav', 'audio/x-wav']),
+});
+export const RECORDING_KEEP_DAYS = 180;
+export const SUBMISSION_HISTORY_SIZE = 20;
+
+export const AI_KEY_LIMITS = Object.freeze({ min: 20, max: 200, pattern: /^[A-Za-z0-9_-]+$/ });
+export const AiKeyCheck = Object.freeze({ VALID: 'VALID', INVALID: 'INVALID', UNAVAILABLE: 'UNAVAILABLE' });
+export const WRITING_CRITERIA = Object.freeze(['cohesion', 'syntax', 'vocabulary', 'phraseology', 'grammar', 'conventions', 'task']);
+export const WRITING_GROUPS = Object.freeze({
+  vocabulary: Object.freeze(['vocabulary', 'phraseology']),
+  grammar: Object.freeze(['syntax', 'grammar', 'conventions']),
+  coherence: Object.freeze(['cohesion']),
+  task: Object.freeze(['task']),
+});
+export const WRITING_LIMITS = Object.freeze({ answerChars: 6000, errors: 30, errorText: 300, feedbackChars: 2000, rewriteChars: 6000 });
+
+const tenth = (value) => Math.floor(value * 10 + 0.5) / 10;
+
+export function writingScores(criteria) {
+  const groups = Object.fromEntries(
+    Object.entries(WRITING_GROUPS).map(([group, keys]) => [group, tenth(keys.reduce((sum, key) => sum + criteria[key], 0) / keys.length)]),
+  );
+  const values = Object.values(groups);
+  return { ...groups, total: tenth(values.reduce((sum, value) => sum + value, 0) / values.length) };
+}
+
+export function countWords(text) {
+  const trimmed = String(text || '').trim();
+  return trimmed ? trimmed.split(/\s+/).length : 0;
+}
+
+export const OPEN_SPEAKING_CRITERIA = Object.freeze(['task', 'vocabulary', 'grammar', 'coherence']);
+export const OPEN_SPEAKING_WEIGHTS = Object.freeze({ gemini: 0.6, fluency: 0.2, pronunciation: 0.2 });
+
+export function openSpeakingScores({ criteria, fluency, pronunciation }) {
+  const scores = { fluency, pronunciation };
+  if (!criteria) return { ...scores, total: null };
+  for (const key of OPEN_SPEAKING_CRITERIA) scores[key] = criteria[key];
+  const gemini = (OPEN_SPEAKING_CRITERIA.reduce((sum, key) => sum + criteria[key], 0) / OPEN_SPEAKING_CRITERIA.length) * 2;
+  scores.total = tenth(OPEN_SPEAKING_WEIGHTS.gemini * gemini + OPEN_SPEAKING_WEIGHTS.fluency * fluency + OPEN_SPEAKING_WEIGHTS.pronunciation * pronunciation);
+  return scores;
+}

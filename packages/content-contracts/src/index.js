@@ -24,6 +24,32 @@ export const MediaSection = Object.freeze({
   PLACEMENT: 'placement',
   MOCK: 'mock',
   LISTENING: 'listening',
+  PRACTICE: 'practice',
+});
+
+export const PracticePromptKind = Object.freeze({ READ_ALOUD: 'read_aloud', OPEN_SPEAKING: 'open_speaking', WRITING: 'writing' });
+export const PracticePromptStatus = Object.freeze({
+  DRAFT: 'DRAFT',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  PUBLISHED: 'PUBLISHED',
+  RETURNED: 'RETURNED',
+  ARCHIVED: 'ARCHIVED',
+  UNPUBLISHED: 'UNPUBLISHED',
+});
+export const WritingTaskType = Object.freeze({ SENTENCE: 'sentence', EMAIL: 'email', PARAGRAPH: 'paragraph', ESSAY: 'essay' });
+export const CEFR_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+export const PRACTICE_LIMITS = Object.freeze({
+  title: 120,
+  topic: 60,
+  readAloudText: 500,
+  instructions: 1500,
+  sampleAnswer: 4000,
+  keyPoints: 10,
+  keyPoint: 200,
+  reviewNote: 1000,
+  readAloudSeconds: 30,
+  speakingSeconds: Object.freeze({ min: 15, max: 120 }),
+  words: Object.freeze({ min: 1, max: 600 }),
 });
 
 export const Accent = Object.freeze({ UK: 'uk', US: 'us' });

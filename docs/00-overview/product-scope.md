@@ -1,10 +1,11 @@
 # Phạm vi sản phẩm
 
-AppEnglish hỗ trợ học viên học và luyện Reading/Listening qua unit, lesson, bài luyện và mock test; xem kết quả, tiến độ và bảng xếp hạng XP.
+AppEnglish hỗ trợ học viên học và luyện Reading/Listening qua unit, lesson, bài luyện và mock test; luyện Speaking và Writing theo đề cấp CEFR có chấm tự động và giáo viên chấm (D169); xem kết quả, tiến độ, hồ sơ năng lực CEFR và bảng xếp hạng XP.
 
 ## Actors
 - Student: placement, lesson, practice/mock, xem tiến độ và XP.
-- Content Manager: quản lý unit, lesson, từ vựng, bài tập, câu hỏi và đề.
+- Content Manager: quản lý unit, lesson, từ vựng, bài tập, câu hỏi và đề; duyệt và xuất bản đề Speaking/Writing do giáo viên gửi (D170).
+- Teacher: soạn đề Speaking và Writing theo cấp CEFR, gửi duyệt; chấm bài học viên gửi qua hàng chờ chung (D170, D173). Không có lớp học.
 - Admin: quản lý tài khoản, vai trò và cấu hình chung.
 
 ## Nội dung
@@ -24,5 +25,11 @@ AppEnglish hỗ trợ học viên học và luyện Reading/Listening qua unit, 
 - Practice luyện tự do theo kỹ năng từ câu hỏi của lesson đã hoàn thành, có đáp án và giải thích ngay sau mỗi câu.
 - Chỉ mock test cộng XP; lesson, placement, practice thường không cộng.
 
+## Speaking, Writing, giáo viên, CEFR (D169–D174)
+- Ngân hàng đề Speaking (đọc to, nói mở) và Writing, mỗi đề có cấp CEFR A1–C2, do giáo viên soạn và Content Manager duyệt; nghiệp vụ trong `docs/01-business/workflows/09-speaking-writing.md`.
+- Chấm tự động: đọc to bằng Whisper (miễn phí); nói mở và Writing bằng Gemini dùng API key riêng của học viên. Không có key AI chung do hệ thống trả tiền.
+- Giáo viên chấm: 3 lượt mỗi tuần cho mỗi học viên, chung Speaking và Writing.
+- Hồ sơ năng lực CEFR cho bốn kỹ năng (quy đổi từ điểm TOEIC ước tính và điểm Speaking/Writing); placement, mục tiêu, kế hoạch và dự báo vẫn theo TOEIC.
+
 ## Ngoài phạm vi
-Speaking, Writing (có thể mở rộng sau, D84), giáo viên, lớp học, assignment, AI grading, CEFR (trừ nhãn cấp độ A1–C2 của bài luyện nghe và các cấp A1–C1 của Listening course, D85, D100, D141), XP lesson/ôn tập. Streak có theo D154: chuỗi ngày học, chỉ học viên tự xem, không gắn XP hay bảng xếp hạng.
+Lớp học, mã lớp, assignment, buổi học trực tiếp, tính lương giáo viên (để sau), placement CEFR, ôn từ vựng lặp lại ngắt quãng (SM-2), XP lesson/ôn tập. Streak có theo D154: chuỗi ngày học, chỉ học viên tự xem, không gắn XP hay bảng xếp hạng.

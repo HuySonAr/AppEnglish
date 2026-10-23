@@ -49,6 +49,8 @@ export const contentErrors = Object.freeze({
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Listening exercise was not found', 404),
   inUse: (reason, message) =>
     new ContentError(ContentResponseCode.CONTENT_IN_USE, message, 409, { reason }),
+  practicePromptNotFound: () => new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Practice prompt was not found', 404),
+  practicePromptState: (reason, message) => new ContentError(ContentResponseCode.CONTENT_INVALID_STATE, message, 409, { reason }),
   mockNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Mock test was not found', 404),
   placementNotFound: () =>

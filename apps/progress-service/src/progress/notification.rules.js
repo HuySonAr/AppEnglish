@@ -54,6 +54,16 @@ export function levelUpNotification(data) {
   };
 }
 
+export function practiceResultNotification(data, kind = NotificationKind.SPEAKING_RESULT) {
+  return {
+    accountId: data.accountId,
+    kind,
+    key: `${kind === NotificationKind.WRITING_RESULT ? 'writing' : 'speaking'}:${data.submissionId}`,
+    data: { submissionId: data.submissionId, promptId: data.promptId, kind: data.kind, title: data.title, status: data.status, total: data.total },
+    createdAt: new Date(data.scoredAt),
+  };
+}
+
 export function notificationView(row) {
   return { id: row.id, kind: row.kind, data: row.data, createdAt: new Date(row.createdAt).toISOString(), read: Boolean(row.readAt) };
 }

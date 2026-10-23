@@ -8,7 +8,8 @@
     "./observability": "./src/observability.js",
     "./metrics": "./src/metrics.js",
     "./messaging": "./src/messaging.js",
-    "./grpc-context": "./src/grpc-context.js"
+    "./grpc-context": "./src/grpc-context.js",
+    "./secret-box": "./src/secret-box.js"
   },
   "scripts": {
     "build": "node ../../scripts/check-syntax.mjs src",

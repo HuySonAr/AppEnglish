@@ -161,3 +161,20 @@ result is written there with the attempt and relayed to RabbitMQ afterwards
 (D110). `accountId`, `lessonId` and `sourceId` are other services' ids without
 a foreign key; progress-service reads the published curriculum from
 content-service over gRPC and never another database.
+
+## Speaking/Writing prompt bank (F11, D170, D175)
+
+`content-service` adds to `app_content` (migration `1720000018000-create-practice-prompts.js`):
+
+- `practice_prompts`: `id`, `kind` (`read_aloud`, `open_speaking`, `writing`), `authorId` (auth account id, no foreign key), `publishedVersionId` (nullable), timestamps.
+- `practice_prompt_versions`: `id`, `promptId` (FK, cascade), `versionNumber` (unique per prompt), `status` (`DRAFT`, `PENDING_REVIEW`, `PUBLISHED`, `RETURNED`, `ARCHIVED`, `UNPUBLISHED`), `content` jsonb (title, level, topic and the kind's fields), `reviewNote`, `submittedAt`, `reviewedBy`, `reviewedAt`, `createdBy`, timestamps.
+
+`app_identity` gets `TEACHER` in `accounts_role_check` (auth migration `1710000008000`). Both migrations were applied locally on 2026-10-23.
+
+## Speaking submissions (F12, D177)
+
+`learning-service` adds `practice_submissions` to `app_learning` and the nullable `queue` column to `learning_events` (migration `1730000015000-create-practice-submissions.js`, applied locally 2026-10-23). Learner recordings are files in the content-service media store under `learner-recordings/`; `app_content` keeps no row for them, and learning-service keeps their storage keys. `promptId`/`promptVersionId` are content-service ids without a foreign key.
+
+## Gemini keys and writing (F13, D178)
+
+`learning-service` adds `ai_keys` to `app_learning`, the `answer` column and the `SAVED` status to `practice_submissions` (migration `1730000016000-create-ai-keys-and-writing.js`, applied locally 2026-10-23). Keys are stored only sealed with `GEMINI_KEY_SECRET`; writing-service has no database.

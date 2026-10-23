@@ -1,4 +1,4 @@
-import { Brain, Headphones } from 'lucide-react';
+import { Brain, Headphones, Mic, PenLine } from 'lucide-react';
 import { FeatureCard } from '../../../components/shared/FeatureCard.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 
@@ -23,6 +23,20 @@ export function PracticePage() {
           description="Listen and write down what you hear"
           to="/student/practice/listening"
           tone="info"
+        />
+        <FeatureCard
+          icon={Mic}
+          title="Speaking"
+          description="Read aloud and get a score"
+          to="/student/practice/speaking"
+          tone="success"
+        />
+        <FeatureCard
+          icon={PenLine}
+          title="Writing"
+          description="Write a short text and get feedback"
+          to="/student/practice/writing"
+          tone="warning"
         />
       </div>
     </section>

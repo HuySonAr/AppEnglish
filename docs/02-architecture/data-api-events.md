@@ -245,3 +245,22 @@ speech-service has no database.
 **Gateway sessions.** The gateway checks the access token itself (HS256 with `AUTH_JWT_SECRET`, type `access`, not expired) and caches the account `{ id, role, email }` from auth-service `Me` in Redis (`session:<sha256(token)>`, 30 s, never longer than the token). A token it cannot check, or a cache miss, goes to auth-service as before. A locked account, a password change or "log out everywhere" takes effect within 30 s. Without Redis the cache is in memory.
 
 **Metrics.** Every Node service serves `GET /metrics` (Prometheus text) on its HTTP port: process CPU, memory, uptime; gRPC calls and time; HTTP requests and time (gateway); outbox sent and waiting; messages handled by outcome (applied, duplicate, retry, dead); speech jobs finished, waiting and working time; sessions by source (cache, auth, refused). The gateway's `/metrics` answers only from localhost. `GET /health/system` (Admin) gathers them with the RabbitMQ management API (queues, ready, in progress, consumers).
+
+## Speaking read aloud (F12, D177)
+
+- HTTP: `/learning/speaking/prompts`, `/learning/speaking/prompts/:id`, `POST /learning/speaking/prompts/:id/submissions` (multipart `audio`), `/learning/speaking/submissions/:id`; `POST /content/practice-prompts/machine-audio`.
+- gRPC internal (learning → content): `ListPublishedPracticePrompts`, `GetPracticePaper`, `StoreLearnerRecording`, `DeleteLearnerRecordings`.
+- RabbitMQ: `speech.speaking.requests` (learning outbox → speech-service), `speech.speaking.results` (speech-service → learning, retry `.retry.1|2|3` and `.dead`), `learning.results` event types `speaking.scored` and `activity.recorded` with activity `speaking`.
+- progress-service: `speaking.scored` → notification `SPEAKING_RESULT` (key `speaking:<submissionId>`).
+
+## Gemini key and Writing (F13, D178)
+
+- HTTP: `/learning/ai-key` (GET, PUT, DELETE), `/learning/writing/prompts`, `/learning/writing/prompts/:id`, `POST /learning/writing/prompts/:id/submissions`, `/learning/writing/submissions/:id`.
+- RabbitMQ: `writing.grading.requests` (learning outbox → writing-service, retry `.retry.1|2|3`, `.dead`), `writing.grading.results` (writing-service → learning, retry and `.dead`), `writing.key-checks` (request/reply); `learning.results` event `writing.scored` and activity `writing`.
+- progress-service: `writing.scored` → notification `WRITING_RESULT` (key `writing:<submissionId>`).
+- External: Gemini REST `generativelanguage.googleapis.com/v1beta` from writing-service only, with each learner's key.
+
+## Speaking open answers (F14, D179)
+
+- RabbitMQ: `speech.speaking.requests` with `kind: open_speaking` and empty `text`; `writing.grading.requests` also carries `speaking.grading.requested` jobs; `writing.open-speaking.results` (writing-service → learning-service, retry and `.dead`).
+- `speaking.scored` may have `total: null` (open answer without a key); progress-service shows "Your speaking answer is ready".

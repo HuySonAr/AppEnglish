@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 export function createMemoryRepository() {
   const tables = {
     units: [], lessons: [], versions: [], reviewVersions: [], media: [], placement: [], mockTests: [], mockVersions: [],
-    listeningExercises: [], listeningVersions: [], timingJobs: [], courseItems: [], courseVersions: [], adminNotices: [], noticeReads: [], contentEvents: [], processed: [],
+    listeningExercises: [], listeningVersions: [], timingJobs: [], courseItems: [], courseVersions: [], adminNotices: [], noticeReads: [], contentEvents: [], processed: [], practicePrompts: [], practiceVersions: [],
     listeningTopics: [{ id: toeicTopicId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
     examTypes: [{ id: toeicExamTypeId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
   };
@@ -117,10 +117,36 @@ export function createMemoryRepository() {
       save('courseItems', item);
     },
   };
+  const practice = {
+    async listPrompts(where = {}) {
+      return tables.practicePrompts.filter((row) => Object.entries(where).every(([key, value]) => row[key] === value)).map(copy).reverse();
+    },
+    async findPrompt(id) { return copy(tables.practicePrompts.find((row) => row.id === id)); },
+    async savePrompt(prompt) { return save('practicePrompts', prompt); },
+    async listVersions(promptIds) {
+      return tables.practiceVersions.filter((row) => promptIds.includes(row.promptId)).sort((a, b) => a.versionNumber - b.versionNumber).map(copy);
+    },
+    async saveVersion(version) { return save('practiceVersions', { updatedAt: new Date(), ...version, updatedAt: new Date() }); },
+    async createPromptWithVersion(prompt, versionOf) {
+      const saved = save('practicePrompts', prompt);
+      const version = save('practiceVersions', { updatedAt: new Date(), ...versionOf(saved) });
+      return { prompt: saved, version };
+    },
+    async publishVersion(prompt, version, previous) {
+      if (previous) save('practiceVersions', previous);
+      save('practiceVersions', version);
+      save('practicePrompts', prompt);
+    },
+    async deletePrompt(id) {
+      tables.practicePrompts = tables.practicePrompts.filter((row) => row.id !== id);
+      tables.practiceVersions = tables.practiceVersions.filter((row) => row.promptId !== id);
+    },
+  };
   return {
     tables,
     listening,
     course,
+    practice,
     async addAdminNotice(notice) {
       if (!tables.adminNotices.some((row) => row.key === notice.key)) tables.adminNotices.push({ id: randomUUID(), ...structuredClone(notice) });
     },
@@ -213,12 +239,12 @@ export function createMemoryRepository() {
     async listReferencedMediaIds() {
       const uuid = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
       const referenced = new Set();
-      for (const version of [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions, ...tables.courseVersions, ...tables.reviewVersions])
+      for (const version of [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions, ...tables.courseVersions, ...tables.reviewVersions, ...tables.practiceVersions])
         for (const match of JSON.stringify(version.content).matchAll(uuid)) referenced.add(match[0].toLowerCase());
       return referenced;
     },
     async isMediaReferenced(id) {
-      return [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions, ...tables.courseVersions].some((version) => JSON.stringify(version.content).includes(id));
+      return [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions, ...tables.courseVersions, ...tables.practiceVersions].some((version) => JSON.stringify(version.content).includes(id));
     },
     async listExamTypes() { return tables.examTypes.map(copy); },
     async findExamType(id) { return copy(tables.examTypes.find((item) => item.id === id)); },

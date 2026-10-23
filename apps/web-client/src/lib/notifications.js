@@ -44,6 +44,20 @@ export function describeNotification({ kind, data }) {
     };
   if (kind === NotificationKind.COURSE_LEVEL_UP)
     return { tone: 'success', title: `You reached ${data.to} in the Listening course`, detail: `${data.from} level test passed.`, to: '/student/listening-course' };
+  if (kind === NotificationKind.SPEAKING_RESULT)
+    return {
+      tone: data.status === 'DONE' ? 'success' : 'destructive',
+      title: data.status !== 'DONE' ? 'Your speaking could not be scored' : data.total === null ? 'Your speaking answer is ready' : `Your speaking scored ${Number(data.total).toFixed(1)} / 10`,
+      detail: data.title || 'Speaking',
+      to: `/student/practice/speaking/${data.promptId}?submission=${data.submissionId}`,
+    };
+  if (kind === NotificationKind.WRITING_RESULT)
+    return {
+      tone: data.status === 'DONE' ? 'success' : 'destructive',
+      title: data.status === 'DONE' ? `Your writing scored ${Number(data.total).toFixed(1)} / 5` : 'Your writing could not be scored',
+      detail: data.title || 'Writing',
+      to: `/student/practice/writing/${data.promptId}?submission=${data.submissionId}`,
+    };
   if (kind === NotificationKind.STREAK_REMINDER)
     return { tone: 'warning', title: `Study today to keep your ${data.streak}-day streak`, detail: 'One short lesson is enough.', to: '/student' };
   if (kind === 'SPEECH_JOB') {

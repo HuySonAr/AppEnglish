@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import {
+  AiKeyEntity,
   CourseLessonResultEntity,
   CourseTestResultEntity,
   LearningEventEntity,
@@ -11,6 +12,7 @@ import {
   MockReviewAnswerEntity,
   PlacementAttemptEntity,
   PlacementSettingsEntity,
+  PracticeSubmissionEntity,
   ScoreConversionEntity,
   UnitReviewAttemptEntity,
 } from './learning.entities.js';
@@ -37,6 +39,8 @@ export function createLearningDataSource() {
       CourseLessonResultEntity,
       CourseTestResultEntity,
       LearningEventEntity,
+      PracticeSubmissionEntity,
+      AiKeyEntity,
     ],
     migrations: ['src/database/migrations/*.js'],
   });

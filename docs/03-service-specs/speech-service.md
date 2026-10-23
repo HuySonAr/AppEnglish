@@ -94,3 +94,20 @@ repository's `.env` loaded.
 ## Delivery (D168)
 
 Requests carry `requestId` (also header `x-request-id`); every answer carries it back and has its own `message_id`. A request is acked only after the answer is published. A request redelivered after the worker stopped is put back once with header `x-attempt`; if it is redelivered again it goes to `speech.autotime.requests.dead` and the job is answered `FAILED` ("The speech worker stopped twice on this recording.").
+
+## Speaking read aloud (F12, D177)
+
+`speech_service/speaking.py`: `heard_words` joins Whisper's apostrophe pieces and keeps the lowest probability; `score_read_aloud(text, words)` aligns the prompt words (whitespace words, normalised with `alignment.tokens`) with the heard tokens using difflib `equal` blocks only, gives each prompt word `correct` / `mispronounced` / `missing` (worst of its tokens) or `null` for punctuation-only words, lists unmatched heard words as `extra`, and scores Accuracy, Completeness, Fluency and Total with `READ_ALOUD_SCORING` in `config.py` (values in D177). `process_speaking(message)` reads the learning outbox envelope (`payload.submissionId`, `payload.audioUrl`, `payload.text`), downloads the recording, transcribes it without a prompt and answers `{ submissionId, status: "DONE", result }` or `{ submissionId, status: "FAILED", error }`.
+
+The transcriber now returns each word's `probability` and holds a lock, because the auto-time and speaking threads share one Whisper model.
+
+| Queue | Direction | Body |
+|---|---|---|
+| `speech.speaking.requests` | learning-service → speech-service | Outbox envelope `{ id, type: "speaking.requested", occurredAt, requestId?, payload: { submissionId, kind, audioUrl, text } }` |
+| `speech.speaking.results` | speech-service → learning-service | `{ submissionId, status, result?, error?, requestId? }`; `result`: `{ words: [{ text, status, confidence }], extra[], scores: { accuracy, completeness, fluency, total }, wordsPerMinute, pauses, heard }` |
+
+The speaking loop runs on its own thread and connection, one recording at a time, with the same redelivery rule as auto-time (`speech.speaking.requests.dead` after two worker stops, answering FAILED). Tests: `tests/test_speaking.py`. Restart the worker after updating.
+
+## Speaking open answers (F14, D179)
+
+`score_open_speaking(words)` in `speech_service/speaking.py` (no prompt text): the transcript, `fillers` (words made only of `OPEN_SPEAKING_SCORING.fillers`), `words` (the rest), Pronunciation = 10 × mean probability of the non-filler words, Fluency from `fluency()` with `OPEN_SPEAKING_SCORING` (pause from 1.0 s, rate 70–170 words per minute counting fillers) minus 0.2 per filler (at most 2). A recording with only fillers fails. `process_speaking` picks it when `payload.kind` is `open_speaking`; the answer goes on `speech.speaking.results` as `{ submissionId, status: "DONE", result: { transcript, scores: { fluency, pronunciation }, wordsPerMinute, pauses, fillers, words } }`.

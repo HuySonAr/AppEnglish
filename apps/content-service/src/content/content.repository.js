@@ -1,5 +1,6 @@
 import { In, MoreThan } from 'typeorm';
 import {
+  PracticePromptVersionEntity,
   AdminNoticeEntity,
   AdminNoticeReadEntity,
   ExamTypeEntity,
@@ -145,7 +146,7 @@ export class ContentRepository {
   }
 
   async isMediaReferenced(id) {
-    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity, ListeningExerciseVersionEntity, ListeningCourseVersionEntity]) {
+    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity, ListeningExerciseVersionEntity, ListeningCourseVersionEntity, PracticePromptVersionEntity]) {
       const count = await (await this.repo(entity))
         .createQueryBuilder('version')
         .where('CAST(version.content AS text) LIKE :pattern', { pattern: `%${id}%` })
@@ -158,7 +159,7 @@ export class ContentRepository {
   async listReferencedMediaIds() {
     const referenced = new Set();
     const uuid = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
-    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity, ListeningExerciseVersionEntity, ListeningCourseVersionEntity, UnitReviewVersionEntity]) {
+    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity, ListeningExerciseVersionEntity, ListeningCourseVersionEntity, UnitReviewVersionEntity, PracticePromptVersionEntity]) {
       const rows = await (await this.repo(entity)).createQueryBuilder('version').select('version.content', 'content').getRawMany();
       for (const row of rows) for (const match of JSON.stringify(row.content).matchAll(uuid)) referenced.add(match[0].toLowerCase());
     }

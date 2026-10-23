@@ -7,8 +7,9 @@ import threading
 import time
 import uuid
 
-from .config import PRONOUNCE_QUEUE, REQUESTS_QUEUE, RESULTS_QUEUE, Settings
+from .config import PRONOUNCE_QUEUE, REQUESTS_QUEUE, RESULTS_QUEUE, SPEAKING_REQUESTS_QUEUE, SPEAKING_RESULTS_QUEUE, Settings
 from .pronounce import process_pronounce
+from .speaking import process_speaking
 from .worker import process
 
 log = logging.getLogger("speech-service")
@@ -17,6 +18,7 @@ MAX_CRASH_ATTEMPTS = 2
 ATTEMPT_HEADER = "x-attempt"
 REQUEST_ID_HEADER = "x-request-id"
 DEAD_REQUESTS_QUEUE = f"{REQUESTS_QUEUE}.dead"
+DEAD_SPEAKING_QUEUE = f"{SPEAKING_REQUESTS_QUEUE}.dead"
 
 
 def redelivery_action(redelivered: bool, headers: dict | None) -> tuple[str, int]:
@@ -76,13 +78,13 @@ def _keep_serving_pronounce(settings: Settings, pronounce) -> None:
             time.sleep(RETRY_SECONDS)
 
 
-def _publish(channel, message: dict) -> None:
+def _publish(channel, message: dict, queue: str = RESULTS_QUEUE) -> None:
     import pika
 
     headers = {REQUEST_ID_HEADER: message["requestId"]} if message.get("requestId") else None
     channel.basic_publish(
         exchange="",
-        routing_key=RESULTS_QUEUE,
+        routing_key=queue,
         body=json.dumps(message).encode(),
         properties=pika.BasicProperties(content_type="application/json", delivery_mode=2, message_id=str(uuid.uuid4()), headers=headers),
     )
@@ -136,9 +138,66 @@ def _serve(settings: Settings, transcribe, cache) -> None:
         log.info("Auto-time job %s [%s]: %s", request.get("jobId"), request_id, outcome.get("status"))
 
 
-def run(settings: Settings, transcribe, cache=None, pronounce=None) -> None:
+def _serve_speaking(settings: Settings, transcribe) -> None:
+    import pika
+
+    connection = pika.BlockingConnection(pika.URLParameters(settings.rabbitmq_url))
+    channel = connection.channel()
+    channel.queue_declare(queue=SPEAKING_REQUESTS_QUEUE, durable=True)
+    channel.queue_declare(queue=SPEAKING_RESULTS_QUEUE, durable=True)
+    channel.queue_declare(queue=DEAD_SPEAKING_QUEUE, durable=True)
+    channel.basic_qos(prefetch_count=1)
+    log.info("Waiting for speaking submissions on %s", SPEAKING_REQUESTS_QUEUE)
+    for method, properties, body in channel.consume(SPEAKING_REQUESTS_QUEUE, inactivity_timeout=1):
+        if method is None:
+            continue
+        try:
+            message = json.loads(body)
+        except ValueError:
+            log.warning("Dropped a speaking submission that is not JSON")
+            channel.basic_ack(method.delivery_tag)
+            continue
+        payload = message.get("payload") if isinstance(message.get("payload"), dict) else message
+        request_id = message.get("requestId") or (properties.headers or {}).get(REQUEST_ID_HEADER)
+        action, attempt = redelivery_action(bool(method.redelivered), properties.headers)
+        if action != "process":
+            target = DEAD_SPEAKING_QUEUE if action == "dead" else SPEAKING_REQUESTS_QUEUE
+            channel.basic_publish(
+                exchange="",
+                routing_key=target,
+                body=body,
+                properties=pika.BasicProperties(
+                    content_type="application/json", delivery_mode=2, message_id=properties.message_id, headers={**(properties.headers or {}), ATTEMPT_HEADER: attempt}
+                ),
+            )
+            if action == "dead":
+                _publish(channel, result_message({"submissionId": payload.get("submissionId"), "status": "FAILED", "error": "The speech worker stopped twice on this recording."}, request_id), SPEAKING_RESULTS_QUEUE)
+            channel.basic_ack(method.delivery_tag)
+            continue
+        outcome: dict = {}
+        worker = threading.Thread(target=lambda: outcome.update(process_speaking(message, transcribe)), daemon=True)
+        worker.start()
+        while worker.is_alive():
+            connection.sleep(1)
+        _publish(channel, result_message(outcome, request_id), SPEAKING_RESULTS_QUEUE)
+        channel.basic_ack(method.delivery_tag)
+        log.info("Speaking submission %s [%s]: %s", payload.get("submissionId"), request_id, outcome.get("status"))
+
+
+def _keep_serving_speaking(settings: Settings, transcribe) -> None:
+    while True:
+        try:
+            _serve_speaking(settings, transcribe)
+        except Exception as error:  # noqa: BLE001 - keep serving
+            log.warning("RabbitMQ (speaking): %s; retrying in %d s", _explain(error, settings), RETRY_SECONDS)
+            time.sleep(RETRY_SECONDS)
+
+
+def run(settings: Settings, transcribe, cache=None, pronounce=None, speaking=True) -> None:
     if pronounce is not None:
         threading.Thread(target=_keep_serving_pronounce, args=(settings, pronounce), daemon=True).start()
+    if speaking:
+        threading.Thread(target=_keep_serving_speaking, args=(settings, transcribe), daemon=True).start()
     while True:
         try:
             _serve(settings, transcribe, cache)

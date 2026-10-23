@@ -1,0 +1,19 @@
+{
+  "name": "@appenglish/writing-service",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gemini grading worker for Writing with each learner's own key (D172, D175)",
+  "scripts": {
+    "build": "node --check src/main.js",
+    "dev": "node --env-file=../../.env --watch src/main.js",
+    "start": "node --env-file=../../.env src/main.js",
+    "lint": "node ../../scripts/check-syntax.mjs src test",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@appenglish/backend-common": "workspace:*",
+    "@appenglish/learning-contracts": "workspace:*",
+    "amqplib": "^0.10.9"
+  }
+}

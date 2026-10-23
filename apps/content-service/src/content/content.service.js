@@ -460,9 +460,12 @@ export class ContentService {
   }
 
   async uploadMedia(actor, input) {
-    this.assertManager(actor);
+    if (input.section === MediaSection.PRACTICE) {
+      if (actor.role !== AccountRole.TEACHER) throw contentErrors.forbiddenRole();
+    } else this.assertManager(actor);
     let folder;
-    if (input.section === MediaSection.PLACEMENT) folder = `${input.kind}/placement`;
+    if (input.section === MediaSection.PRACTICE) folder = `${input.kind}/practice`;
+    else if (input.section === MediaSection.PLACEMENT) folder = `${input.kind}/placement`;
     else if (input.section === MediaSection.MOCK) folder = `${input.kind}/mock`;
     else if (input.section === MediaSection.LISTENING) folder = `${input.kind}/listening`;
     else if (input.lessonId) {

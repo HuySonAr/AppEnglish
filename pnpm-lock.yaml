@@ -375,6 +375,18 @@ importers:
         specifier: ^7.1.7
         version: 7.3.7(@types/node@26.6.4)(jiti@1.21.7)
 
+  apps/writing-service:
+    dependencies:
+      '@appenglish/backend-common':
+        specifier: workspace:*
+        version: link:../../packages/backend-common
+      '@appenglish/learning-contracts':
+        specifier: workspace:*
+        version: link:../../packages/learning-contracts
+      amqplib:
+        specifier: ^0.10.9
+        version: 0.10.9
+
   packages/auth-contracts: {}
 
   packages/backend-common:

@@ -1,4 +1,4 @@
-import { Activity, BookOpen, Calculator, ClipboardCheck, Dumbbell, FileText, GraduationCap, Headphones, Home, Layers, LayoutDashboard, Library, Tags, Timer, TrendingUp, Trophy, Users } from 'lucide-react';
+import { Activity, BookOpen, Calculator, ClipboardCheck, Dumbbell, FileText, GraduationCap, MessageSquareText, Headphones, Home, Layers, LayoutDashboard, Library, Tags, Timer, TrendingUp, Trophy, Users } from 'lucide-react';
 import { Roles } from '../constants/auth.js';
 
 export const navigation = Object.freeze({
@@ -30,6 +30,14 @@ export const navigation = Object.freeze({
       { to: '/content-manager/listening-course', label: 'Listening course', icon: GraduationCap },
       { to: '/content-manager/listening', label: 'Listening library', icon: Headphones },
       { to: '/content-manager/listening-topics', label: 'Listening topics', icon: Tags },
+      { to: '/content-manager/practice-prompts', label: 'Speaking and writing', icon: MessageSquareText },
+    ],
+  },
+  [Roles.TEACHER]: {
+    home: '/teacher',
+    items: [
+      { to: '/teacher', label: 'Dashboard', icon: LayoutDashboard, end: true },
+      { to: '/teacher/prompts', label: 'Prompts', icon: MessageSquareText },
     ],
   },
   [Roles.ADMIN]: {

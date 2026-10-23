@@ -14,10 +14,10 @@ reset and cookie session lifecycle are implemented.
 - Detect refresh-token reuse and revoke the affected family.
 - Require email verification before login.
 - Support verification resend and forgot/reset password OTP flows.
-- Expose the three approved roles: `STUDENT`, `CONTENT_MANAGER`, `ADMIN`.
+- Expose the approved roles: `STUDENT`, `CONTENT_MANAGER`, `TEACHER` (D170, D175), `ADMIN`.
 - Provide a backend `AuthorizationService` for explicit role checks.
 
-No teacher/instructor or excluded product role is defined.
+`TEACHER` writes Speaking/Writing prompts only (D170); it has no class or assignment. Migration `1710000008000-allow-teacher-role.js` widens `accounts_role_check`. A teacher account is created only by an admin invitation; public registration still accepts `STUDENT` only.
 
 ## Data ownership
 

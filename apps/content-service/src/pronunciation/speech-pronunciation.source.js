@@ -8,10 +8,10 @@ export class SpeechPronunciationSource {
     this.ipaAccent = ipaAccent;
   }
 
-  async lookup(word) {
+  async lookup(word, { accents = Object.values(Accent) } = {}) {
     let reply;
     try {
-      reply = await this.broker.request(SpeechQueue.PRONOUNCE_REQUESTS, { word, accents: Object.values(Accent) }, this.timeoutMs);
+      reply = await this.broker.request(SpeechQueue.PRONOUNCE_REQUESTS, { word, accents }, this.timeoutMs);
     } catch (error) {
       throw new PronunciationUnavailableError(`speech-service is not answering (${error.message})`);
     }

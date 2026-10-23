@@ -393,3 +393,42 @@ contract with a stand-in for auth-service. Results are in
 ## Content usage (D118, D128)
 
 `GetContentUsage` (gateway-internal, no learner route): `payloadJson = { kind, ids[] }` with `kind` in `ContentUsageKind` (`lesson`, `mockTest`, `listeningExercise`, `courseTopic`, `courseTest`, and the version kinds of D128). Answers `{ kind, counts: { [id]: n }, total }` from `lesson_test_attempts` + `lesson_progress`, `mock_attempts`, `listening_results`, `course_lesson_results` (by `unitId`, which holds the topic id) and `course_test_results` (by `itemId`). The gateway refuses to delete content whose total is above 0. Code in `apps/learning-service/src/usage/`.
+
+## Speaking read aloud (F12, D177)
+
+### Data (`app_learning`)
+`practice_submissions` (migration `1730000015000-create-practice-submissions.js`): `id`, `accountId`, `promptId`, `promptVersionId`, `kind`, `prompt` jsonb (snapshot of the published content with `versionNumber` and the model audio URL), `recording` jsonb (`storage`, `storageId`, `url`, `mimeType`, `sizeBytes`, `durationSeconds`), `recordingDeletedAt`, `status` (`SCORING`, `DONE`, `FAILED`), `result` jsonb, `error`, `submittedAt`, `scoredAt`, timestamps. The same migration adds `learning_events.queue` (null = `learning.results`).
+
+### API
+| Method | Path | RPC | Notes |
+|---|---|---|---|
+| GET | `/learning/speaking/prompts` | `ListSpeakingPrompts` | Students; published read-aloud prompts with `attempts`, `bestTotal`, `lastSubmittedAt` |
+| GET | `/learning/speaking/prompts/:id` | `GetSpeakingPrompt` | Prompt (text, model `audioUrl`, `maxSeconds` 30; no sample answer) and the last 20 submissions; 404 code 65 |
+| POST | `/learning/speaking/prompts/:id/submissions` | `SubmitSpeaking` (`RecordingRequest` with bytes) | Multipart field `audio` plus `durationSeconds`; code 67 for a wrong type, empty, over 5 MB or over 30 s (+1 s); answers the `SCORING` submission |
+| GET | `/learning/speaking/submissions/:id` | `GetSpeakingSubmission` | Own submissions only (66 otherwise); the page polls it every 2 s while `SCORING` |
+
+### Rules
+`SpeakingService` stores the recording through content-service, then saves the submission and the `speaking.requested` outbox row (queue `speech.speaking.requests`) in one transaction, and records `activity.recorded` (`speaking`). `SpeakingResults` consumes `speech.speaking.results` with the D168 retry queues; `applyResult` changes only a `SCORING` submission (so a repeated answer is a no-op), validates the result with Zod (an invalid one becomes `FAILED`), and writes `speaking.scored` `{ accountId, submissionId, promptId, kind, title, status, total, scoredAt }` in the same transaction. `purgeRecordings` runs a minute after start and then every 6 hours, deleting recordings older than 180 days through content-service and setting `recordingDeletedAt`. Tests: `test/speaking.test.js`, `test/speaking-gateway-grpc.test.js`.
+
+## Gemini key and Writing (F13, D178)
+
+### Data (`app_learning`)
+Migration `1730000016000-create-ai-keys-and-writing.js`: `ai_keys` (`accountId` PK, `provider` `gemini`, `sealed` jsonb AES-256-GCM, `last4`, `verifiedAt`, timestamps); `practice_submissions.answer` text; status check adds `SAVED`.
+
+### API
+| Method | Path | RPC | Notes |
+|---|---|---|---|
+| GET | `/learning/ai-key` | `GetAiKey` | Students; `{ key: { last4, verifiedAt } \| null }` |
+| PUT | `/learning/ai-key` | `SaveAiKey` | `{ key }` 20–200 of `A-Z a-z 0-9 _ -`; checked through writing-service; 400 code 69 rejected, 503 code 70 cannot check now; validation issues never echo the key |
+| DELETE | `/learning/ai-key` | `DeleteAiKey` | Deletes the key and strips it from the learner's `writing.requested` outbox rows |
+| GET | `/learning/writing/prompts` | `ListWritingPrompts` | Published writing prompts with `attempts`, `bestTotal`; `hasKey` |
+| GET | `/learning/writing/prompts/:id` | `GetWritingPrompt` | Instructions, image, task type, word limits (no sample answer or key points), last 20 submissions, `hasKey` |
+| POST | `/learning/writing/prompts/:id/submissions` | `SubmitWriting` | `{ text }`; words counted on the server (code 71 outside the limits, 6,000 characters max); `SCORING` with a key, `SAVED` without |
+| GET | `/learning/writing/submissions/:id` | `GetWritingSubmission` | Own writing submissions; adds the answer, word count, sample answer and key points |
+
+### Rules
+`WritingService` writes the submission and the `writing.requested` outbox row (queue `writing.grading.requests`) in one transaction and records `activity.recorded` (`writing`). `PracticeResults` (shared with speaking) consumes `writing.grading.results`; `applyResult` changes only a `SCORING` submission, validates with Zod, recomputes the groups and total with `writingScores`, and writes `writing.scored`. `AiKeyChecker` sends `writing.key-checks` with a reply queue. `RabbitTransport` declares `writing.grading.requests` so outbox messages are never unroutable. Tests: `test/writing.test.js`.
+
+## Speaking open answers (F14, D179)
+
+`SpeakingService` now serves `read_aloud` and `open_speaking`. Open prompts show the instructions, image and `maxSeconds` (≤ 120; the upload is refused above it plus 1 s) and `hasKey`; submissions keep the instructions, sample answer and key points in the snapshot and show them after submitting; `stage` is `listening` or `grading` while `SCORING`. `applyResult` (Whisper) validates `openWhisperSchema`; with a key it stores the transcript and Whisper scores with `stage: "grading"` and writes the `speaking.grading.requested` outbox row (queue `writing.grading.requests`) in the same transaction; without a key, or with an empty transcript, it finishes `DONE` with `total: null`. `applyGrading` (consumer of `writing.open-speaking.results`) validates `openGradingSchema`, computes the total with `openSpeakingScores` (learning-contracts) and writes `speaking.scored`; a FAILED answer keeps the transcript and Whisper scores. Repeated answers at either step are no-ops. Tests: `test/open-speaking.test.js`.

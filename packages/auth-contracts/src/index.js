@@ -1,6 +1,7 @@
 export const AccountRole = Object.freeze({
   STUDENT: 'STUDENT',
   CONTENT_MANAGER: 'CONTENT_MANAGER',
+  TEACHER: 'TEACHER',
   ADMIN: 'ADMIN'
 });
 

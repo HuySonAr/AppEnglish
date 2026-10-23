@@ -34,6 +34,11 @@ import { MockTestPage } from '../features/student/pages/MockTestPage.jsx';
 import { MockMistakesPage } from '../features/student/pages/MockMistakesPage.jsx';
 import { MockHistoryPage } from '../features/student/pages/MockHistoryPage.jsx';
 import { PracticePage } from '../features/student/pages/PracticePage.jsx';
+import { SpeakingPromptsPage } from '../features/student/pages/SpeakingPromptsPage.jsx';
+import { SpeakingPromptPage } from '../features/student/pages/SpeakingPromptPage.jsx';
+import { WritingPromptsPage } from '../features/student/pages/WritingPromptsPage.jsx';
+import { WritingPromptPage } from '../features/student/pages/WritingPromptPage.jsx';
+import { GeminiKeyPage } from '../features/student/pages/GeminiKeyPage.jsx';
 import { ListeningExercisePage } from '../features/student/pages/ListeningExercisePage.jsx';
 import { ListeningPracticePage } from '../features/student/pages/ListeningPracticePage.jsx';
 import { ListeningExerciseListPage } from '../features/student/pages/ListeningExerciseListPage.jsx';
@@ -55,6 +60,11 @@ import { ExamTypesPage } from '../features/admin/pages/ExamTypesPage.jsx';
 import { ProfilePage } from '../features/profile/pages/ProfilePage.jsx';
 import { UnitReviewEditorPage } from '../features/content-manager/pages/UnitReviewEditorPage.jsx';
 import { UnitReviewPage } from '../features/student/pages/UnitReviewPage.jsx';
+import { TeacherDashboardPage } from '../features/teacher/pages/TeacherDashboardPage.jsx';
+import { TeacherPromptsPage } from '../features/teacher/pages/TeacherPromptsPage.jsx';
+import { PromptEditorPage } from '../features/teacher/pages/PromptEditorPage.jsx';
+import { PracticeReviewPage } from '../features/content-manager/pages/PracticeReviewPage.jsx';
+import { PracticeReviewDetailPage } from '../features/content-manager/pages/PracticeReviewDetailPage.jsx';
 import { Roles } from '../constants/auth.js';
 import { dashboardPathForRole } from '../features/auth/flow/auth-flow.js';
 import { useAuth } from '../features/auth/context/AuthContext.jsx';
@@ -107,6 +117,11 @@ export function AppRouter() {
             <Route path="practice" element={<PracticePage />} />
             <Route path="practice/vocabulary" element={<VocabularyPracticePage />} />
             <Route path="practice/listening" element={<ListeningPracticePage />} />
+            <Route path="practice/speaking" element={<SpeakingPromptsPage />} />
+            <Route path="practice/speaking/:promptId" element={<SpeakingPromptPage />} />
+            <Route path="practice/writing" element={<WritingPromptsPage />} />
+            <Route path="practice/writing/:promptId" element={<WritingPromptPage />} />
+            <Route path="gemini-key" element={<GeminiKeyPage />} />
             <Route path="practice/listening/topics/:topicId" element={<ListeningTopicPage />} />
             <Route path="practice/listening/topics/:topicId/:mode" element={<ListeningExerciseListPage />} />
             <Route path="practice/listening/:exerciseId" element={<ListeningExercisePage />} />
@@ -144,6 +159,16 @@ export function AppRouter() {
             <Route path="listening-course" element={<CourseManagePage />} />
             <Route path="listening-course/:itemId" element={<CourseItemEditorPage />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
+            <Route path="practice-prompts" element={<PracticeReviewPage />} />
+            <Route path="practice-prompts/:promptId" element={<PracticeReviewDetailPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+          </Route>
+        </Route>
+        <Route path="/teacher" element={<RoleRoute allowedRole={Roles.TEACHER} />}>
+          <Route element={<SidebarLayout role={Roles.TEACHER} />}>
+            <Route index element={<TeacherDashboardPage />} />
+            <Route path="prompts" element={<TeacherPromptsPage />} />
+            <Route path="prompts/:promptId" element={<PromptEditorPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>
         </Route>

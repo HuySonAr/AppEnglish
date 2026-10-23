@@ -207,6 +207,43 @@ export const ListeningExerciseVersionEntity = new EntitySchema({
   ],
 });
 
+export const PracticePromptEntity = new EntitySchema({
+  name: 'PracticePrompt',
+  tableName: 'practice_prompts',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    kind: { type: 'varchar', length: 20 },
+    authorId: { type: 'uuid' },
+    publishedVersionId: { type: 'uuid', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [{ name: 'IDX_practice_prompts_author', columns: ['authorId'] }],
+});
+
+export const PracticePromptVersionEntity = new EntitySchema({
+  name: 'PracticePromptVersion',
+  tableName: 'practice_prompt_versions',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    promptId: { type: 'uuid' },
+    versionNumber: { type: 'int' },
+    status: { type: 'varchar', length: 20 },
+    content: { type: 'jsonb' },
+    reviewNote: { type: 'text', nullable: true },
+    submittedAt: { type: 'timestamptz', nullable: true },
+    reviewedBy: { type: 'uuid', nullable: true },
+    reviewedAt: { type: 'timestamptz', nullable: true },
+    createdBy: { type: 'uuid' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [
+    { name: 'UQ_practice_prompt_versions_number', columns: ['promptId', 'versionNumber'], unique: true },
+    { name: 'IDX_practice_prompt_versions_status', columns: ['status'] },
+  ],
+});
+
 export const ContentEventEntity = new EntitySchema({
   name: 'ContentEvent',
   tableName: 'content_events',

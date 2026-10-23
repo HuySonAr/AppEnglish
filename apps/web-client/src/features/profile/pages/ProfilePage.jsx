@@ -15,6 +15,7 @@ import { getProgress, getStreak, getXp } from '../../student/api/progress-api.js
 import { StreakCalendar } from '../../student/components/Streak.jsx';
 import { getCourseProgress } from '../../student/api/course-api.js';
 import { ChangePasswordDialog } from '../components/ChangePasswordDialog.jsx';
+import { GeminiKeyCard } from '../../student/components/GeminiKeyCard.jsx';
 import { EditProfileDialog } from '../components/EditProfileDialog.jsx';
 import { LessonsRing, SkillsChart, XpChart } from '../components/ProfileCharts.jsx';
 import { lessonRing, LevelStep, levelSteps, memberFor, skillBars, xpBars } from '../lib/profile-charts.js';
@@ -22,6 +23,7 @@ import { lessonRing, LevelStep, levelSteps, memberFor, skillBars, xpBars } from 
 const eyebrows = {
   [Roles.STUDENT]: 'Student',
   [Roles.CONTENT_MANAGER]: 'Content Manager',
+  [Roles.TEACHER]: 'Teacher',
   [Roles.ADMIN]: 'Admin',
 };
 const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
@@ -299,7 +301,10 @@ export function ProfilePage() {
       {student ? (
         <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)] lg:items-start">
           {card}
-          <Standing />
+          <div className="space-y-6">
+            <Standing />
+            <GeminiKeyCard />
+          </div>
         </div>
       ) : (
         <div className="max-w-md">{card}</div>

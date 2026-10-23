@@ -7,6 +7,25 @@ from dataclasses import dataclass
 REQUESTS_QUEUE = "speech.autotime.requests"
 RESULTS_QUEUE = "speech.autotime.results"
 PRONOUNCE_QUEUE = "speech.pronounce.requests"
+SPEAKING_REQUESTS_QUEUE = "speech.speaking.requests"
+SPEAKING_RESULTS_QUEUE = "speech.speaking.results"
+
+READ_ALOUD_SCORING = {
+    "confidence": 0.6,
+    "pause_seconds": 0.7,
+    "pause_penalty_max": 5,
+    "rate": {"min": 90, "max": 180, "words_per_point": 10, "penalty_max": 5},
+    "weights": {"accuracy": 0.5, "completeness": 0.3, "fluency": 0.2},
+}
+
+OPEN_SPEAKING_SCORING = {
+    "pause_seconds": 1.0,
+    "pause_penalty_max": 5,
+    "rate": {"min": 70, "max": 170, "words_per_point": 10, "penalty_max": 5},
+    "filler_penalty": 0.2,
+    "filler_penalty_max": 2,
+    "fillers": ["um", "uh", "er", "erm", "uhm", "hmm", "ah", "mm"],
+}
 
 DEFAULT_VOICES = {"uk": "en_GB-cori-medium", "us": "en_US-lessac-medium"}
 

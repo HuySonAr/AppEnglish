@@ -1,4 +1,6 @@
-import { Body, Controller, Delete, Get, HttpException, Inject, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Inject, Param, Post, Put, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { RECORDING_LIMITS } from '@appenglish/learning-contracts';
 import { AUTH_GRPC_SERVICE } from '@appenglish/auth-contracts/grpc';
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
 import { AUTH_GRPC_CLIENT, attachProfiles, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
@@ -184,6 +186,54 @@ export class LessonGatewayController extends LearningRelay {
     await attachProfiles(this.auth, [...(payload.data.entries || []), payload.data.me]);
     return payload;
   }
+  listSpeakingPrompts(request) {
+    return this.forward('ListSpeakingPrompts', request);
+  }
+  getSpeakingPrompt(id, request) {
+    return this.forward('GetSpeakingPrompt', request, { id });
+  }
+  getSpeakingSubmission(id, request) {
+    return this.forward('GetSpeakingSubmission', request, { id });
+  }
+  listWritingPrompts(request) {
+    return this.forward('ListWritingPrompts', request);
+  }
+  getWritingPrompt(id, request) {
+    return this.forward('GetWritingPrompt', request, { id });
+  }
+  submitWriting(id, body, request) {
+    return this.forward('SubmitWriting', request, { id, body });
+  }
+  getWritingSubmission(id, request) {
+    return this.forward('GetWritingSubmission', request, { id });
+  }
+  getAiKey(request) {
+    return this.forward('GetAiKey', request);
+  }
+  saveAiKey(body, request) {
+    return this.forward('SaveAiKey', request, { body });
+  }
+  deleteAiKey(request) {
+    return this.forward('DeleteAiKey', request);
+  }
+  async submitSpeaking(id, file, body, request) {
+    const { id: accountId, role, email } = await resolveSession(this.auth, request);
+    const durationSeconds = Number(body?.durationSeconds);
+    const { status, payload } = await callService(
+      this.learning,
+      'SubmitSpeaking',
+      {
+        actor: { id: accountId, role, email: email || '' },
+        id,
+        mimeType: file?.mimetype || '',
+        data: file?.buffer || Buffer.alloc(0),
+        payloadJson: JSON.stringify({ durationSeconds: Number.isFinite(durationSeconds) ? durationSeconds : 0 }),
+      },
+      'Learning',
+    );
+    if (status >= 400) throw new HttpException(payload, status);
+    return payload;
+  }
 }
 
 Controller('learning')(LessonGatewayController);
@@ -219,6 +269,17 @@ const lessonRoutes = [
   [Post, 'listening-course/topics/:id/complete', 'completeCourseTopic', [Param('id'), Req()]],
   [Get, 'listening-course/progress', 'getCourseProgress', [Req()]],
   [Get, 'listening-course/tests/:itemId', 'getCourseTest', [Param('itemId'), Req()]],
+  [Get, 'speaking/prompts', 'listSpeakingPrompts', [Req()]],
+  [Get, 'speaking/prompts/:id', 'getSpeakingPrompt', [Param('id'), Req()]],
+  [Post, 'speaking/prompts/:id/submissions', 'submitSpeaking', [Param('id'), UploadedFile(), Body(), Req()]],
+  [Get, 'speaking/submissions/:id', 'getSpeakingSubmission', [Param('id'), Req()]],
+  [Get, 'writing/prompts', 'listWritingPrompts', [Req()]],
+  [Get, 'writing/prompts/:id', 'getWritingPrompt', [Param('id'), Req()]],
+  [Post, 'writing/prompts/:id/submissions', 'submitWriting', [Param('id'), Body(), Req()]],
+  [Get, 'writing/submissions/:id', 'getWritingSubmission', [Param('id'), Req()]],
+  [Get, 'ai-key', 'getAiKey', [Req()]],
+  [Put, 'ai-key', 'saveAiKey', [Body(), Req()]],
+  [Delete, 'ai-key', 'deleteAiKey', [Req()]],
   [Post, 'listening-course/tests/:itemId/submit', 'submitCourseTest', [Param('itemId'), Body(), Req()]],
 ];
 for (const [verb, path, method, params] of lessonRoutes) {
@@ -226,6 +287,11 @@ for (const [verb, path, method, params] of lessonRoutes) {
   verb(path)(LessonGatewayController.prototype, method, descriptor);
   params.forEach((decorator, index) => decorator(LessonGatewayController.prototype, method, index));
 }
+UseInterceptors(FileInterceptor('audio', { limits: { fileSize: RECORDING_LIMITS.maxBytes } }))(
+  LessonGatewayController.prototype,
+  'submitSpeaking',
+  Object.getOwnPropertyDescriptor(LessonGatewayController.prototype, 'submitSpeaking'),
+);
 
 export class MockGatewayController extends LearningRelay {
   reference(query) {

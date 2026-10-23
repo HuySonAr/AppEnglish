@@ -35,7 +35,7 @@ function otpMessage(code, purpose) {
 }
 
 export function inviteMessage(email, code, { role = 'STUDENT', displayName = '', expiresInHours = 72 } = {}) {
-  const roleName = { STUDENT: 'a learner', CONTENT_MANAGER: 'a Content Manager', ADMIN: 'an administrator' }[role] || 'a member';
+  const roleName = { STUDENT: 'a learner', CONTENT_MANAGER: 'a Content Manager', TEACHER: 'a teacher', ADMIN: 'an administrator' }[role] || 'a member';
   const base = (process.env.WEB_APP_URL || '').replace(/\/+$/, '');
   const where = base ? `${base}/accept-invite?email=${encodeURIComponent(email)}` : 'the "Accept invitation" page of AppEnglish';
   const greeting = displayName ? `Hello ${displayName},` : 'Hello,';

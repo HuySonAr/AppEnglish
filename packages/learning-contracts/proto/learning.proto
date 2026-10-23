@@ -58,6 +58,17 @@ service LearningService {
   rpc AnswerMistake(LearningRequest) returns (LearningReply);
   rpc GetScoreConversion(LearningRequest) returns (LearningReply);
   rpc UpdateScoreConversion(LearningRequest) returns (LearningReply);
+  rpc ListSpeakingPrompts(LearningRequest) returns (LearningReply);
+  rpc GetSpeakingPrompt(LearningRequest) returns (LearningReply);
+  rpc SubmitSpeaking(RecordingRequest) returns (LearningReply);
+  rpc GetSpeakingSubmission(LearningRequest) returns (LearningReply);
+  rpc ListWritingPrompts(LearningRequest) returns (LearningReply);
+  rpc GetWritingPrompt(LearningRequest) returns (LearningReply);
+  rpc SubmitWriting(LearningRequest) returns (LearningReply);
+  rpc GetWritingSubmission(LearningRequest) returns (LearningReply);
+  rpc GetAiKey(LearningRequest) returns (LearningReply);
+  rpc SaveAiKey(LearningRequest) returns (LearningReply);
+  rpc DeleteAiKey(LearningRequest) returns (LearningReply);
 }
 
 message Actor {
@@ -70,6 +81,14 @@ message LearningRequest {
   Actor actor = 1;
   string id = 2;
   string payload_json = 3;
+}
+
+message RecordingRequest {
+  Actor actor = 1;
+  string id = 2;
+  string mime_type = 3;
+  bytes data = 4;
+  string payload_json = 5;
 }
 
 message LearningReply {

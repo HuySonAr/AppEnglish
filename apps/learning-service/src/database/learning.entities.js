@@ -253,8 +253,50 @@ export const LearningEventEntity = new EntitySchema({
     type: { type: 'varchar', length: 40 },
     payload: { type: 'jsonb' },
     requestId: { type: 'varchar', length: 64, nullable: true },
+    queue: { type: 'varchar', length: 60, nullable: true },
     createdAt: { type: 'timestamptz', createDate: true },
     publishedAt: { type: 'timestamptz', nullable: true },
   },
   indices: [{ name: 'IDX_learning_events_pending', columns: ['publishedAt', 'createdAt'] }],
+});
+
+export const PracticeSubmissionEntity = new EntitySchema({
+  name: 'PracticeSubmission',
+  tableName: 'practice_submissions',
+  columns: {
+    id: { type: 'uuid', primary: true },
+    accountId: { type: 'uuid' },
+    promptId: { type: 'uuid' },
+    promptVersionId: { type: 'uuid' },
+    kind: { type: 'varchar', length: 20 },
+    prompt: { type: 'jsonb' },
+    answer: { type: 'text', nullable: true },
+    recording: { type: 'jsonb', nullable: true },
+    recordingDeletedAt: { type: 'timestamptz', nullable: true },
+    status: { type: 'varchar', length: 12 },
+    result: { type: 'jsonb', nullable: true },
+    error: { type: 'varchar', length: 500, nullable: true },
+    submittedAt: { type: 'timestamptz' },
+    scoredAt: { type: 'timestamptz', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+  indices: [
+    { name: 'IDX_practice_submissions_account', columns: ['accountId', 'promptId', 'submittedAt'] },
+    { name: 'IDX_practice_submissions_recordings', columns: ['recordingDeletedAt', 'submittedAt'] },
+  ],
+});
+
+export const AiKeyEntity = new EntitySchema({
+  name: 'AiKey',
+  tableName: 'ai_keys',
+  columns: {
+    accountId: { type: 'uuid', primary: true },
+    provider: { type: 'varchar', length: 20, default: 'gemini' },
+    sealed: { type: 'jsonb' },
+    last4: { type: 'varchar', length: 4 },
+    verifiedAt: { type: 'timestamptz' },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
 });

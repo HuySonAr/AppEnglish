@@ -14,6 +14,8 @@ import {
   LISTENING_REPOSITORY,
   MOCK_REPOSITORY,
   PLACEMENT_REPOSITORY,
+  SPEAKING_REPOSITORY,
+  AI_KEY_REPOSITORY,
 } from './database/database.tokens.js';
 import { CourseGrpcController } from './course/course.grpc.controller.js';
 import { CourseRepository } from './course/course.repository.js';
@@ -33,7 +35,18 @@ import { ContentClient } from './placement/content.client.js';
 import { PlacementGrpcController } from './placement/placement.grpc.controller.js';
 import { PlacementRepository } from './placement/placement.repository.js';
 import { PlacementService } from './placement/placement.service.js';
+import { SpeakingGrpcController } from './speaking/speaking.grpc.controller.js';
+import { SpeakingRepository } from './speaking/speaking.repository.js';
+import { PracticeResults } from './speaking/practice-results.js';
+import { LearningQueue } from '@appenglish/learning-contracts';
+import { AiKeyChecker } from './writing/ai-key.checker.js';
+import { AiKeyRepository } from './writing/ai-key.repository.js';
+import { WritingGrpcController } from './writing/writing.grpc.controller.js';
+import { WritingService } from './writing/writing.service.js';
+import { SpeakingService } from './speaking/speaking.service.js';
 import { USAGE_REPOSITORY, UsageGrpcController, UsageRepository } from './usage/usage.grpc.controller.js';
+
+const PURGE_EVERY_MS = 6 * 60 * 60 * 1000;
 
 export class AppModule {}
 Module({
@@ -42,7 +55,7 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [MetricsController, HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, CourseGrpcController, UsageGrpcController],
+  controllers: [MetricsController, HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, CourseGrpcController, UsageGrpcController, SpeakingGrpcController, WritingGrpcController],
   providers: [
     { provide: LEARNING_DATA_SOURCE, useFactory: createLearningDataSource },
     {
@@ -114,6 +127,42 @@ Module({
       provide: CourseLessonService,
       useFactory: (repository, contentClient, events) => new CourseLessonService(repository, contentClient, { events }),
       inject: [COURSE_REPOSITORY, CONTENT_CLIENT, LearningEvents],
+    },
+    {
+      provide: SPEAKING_REPOSITORY,
+      useFactory: (dataSource) => new SpeakingRepository(dataSource),
+      inject: [LEARNING_DATA_SOURCE],
+    },
+    {
+      provide: SpeakingService,
+      useFactory: (repository, contentClient, events, keys) => {
+        const url = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
+        const service = new SpeakingService(repository, contentClient, { events, keys });
+        new PracticeResults(url, (answer) => service.applyResult(answer)).start();
+        new PracticeResults(url, (answer) => service.applyGrading(answer), { queue: LearningQueue.OPEN_SPEAKING_RESULTS, requests: LearningQueue.WRITING_REQUESTS }).start();
+        const purge = () => service.purgeRecordings().catch(() => {});
+        setTimeout(purge, 60_000).unref?.();
+        setInterval(purge, PURGE_EVERY_MS).unref?.();
+        return service;
+      },
+      inject: [SPEAKING_REPOSITORY, CONTENT_CLIENT, LearningEvents, AI_KEY_REPOSITORY],
+    },
+    {
+      provide: AI_KEY_REPOSITORY,
+      useFactory: (dataSource) => new AiKeyRepository(dataSource),
+      inject: [LEARNING_DATA_SOURCE],
+    },
+    {
+      provide: WritingService,
+      useFactory: (repository, keys, contentClient, events) => {
+        const url = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
+        const checker = new AiKeyChecker(url);
+        checker.start();
+        const service = new WritingService(repository, keys, contentClient, { checker, secret: process.env.GEMINI_KEY_SECRET || '', events });
+        new PracticeResults(url, (answer) => service.applyResult(answer), { queue: LearningQueue.WRITING_RESULTS, requests: LearningQueue.WRITING_REQUESTS }).start();
+        return service;
+      },
+      inject: [SPEAKING_REPOSITORY, AI_KEY_REPOSITORY, CONTENT_CLIENT, LearningEvents],
     },
     {
       provide: MockService,

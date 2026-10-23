@@ -57,6 +57,22 @@ export class ContentClient {
     return this.call('getCoursePaper', { id: itemId, payloadJson: JSON.stringify(versionId ? { versionId } : {}) });
   }
 
+  listPublishedPracticePrompts() {
+    return this.call('listPublishedPracticePrompts', {});
+  }
+
+  getPracticePaper(promptId) {
+    return this.call('getPracticePaper', { id: promptId, payloadJson: '{}' });
+  }
+
+  storeLearnerRecording(mimeType, data) {
+    return this.call('storeLearnerRecording', { kind: 'recording', fileName: '', mimeType, data, lessonId: '', section: '' });
+  }
+
+  deleteLearnerRecordings(recordings) {
+    return this.call('deleteLearnerRecordings', { payloadJson: JSON.stringify({ recordings }) });
+  }
+
   getMockPaper(mockTestId, versionId) {
     return this.call('getMockPaper', {
       id: mockTestId,

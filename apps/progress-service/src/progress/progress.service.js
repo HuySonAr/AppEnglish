@@ -6,7 +6,7 @@ import { progressErrors } from './progress.errors.js';
 import { completion, skillMastery } from './progress.rules.js';
 import { learnerIdSchema, payloadSchemas, resultMessageSchema } from './progress.schemas.js';
 import { dayOf, streakView } from './streak.rules.js';
-import { levelUpNotification, mockResultNotification, needsStreakReminder, notificationView, streakReminderKey, unitOpenedNotification } from './notification.rules.js';
+import { levelUpNotification, mockResultNotification, needsStreakReminder, notificationView, practiceResultNotification, streakReminderKey, unitOpenedNotification } from './notification.rules.js';
 import { earnsXp, rankTotals, xpOf } from './xp.rules.js';
 
 const logger = new Logger('ProgressService');
@@ -94,6 +94,10 @@ export class ProgressService {
       await this.repository.addNotification(unitOpenedNotification(data));
     } else if (type === LearningEventType.COURSE_LEVEL_UP) {
       await this.repository.addNotification(levelUpNotification(data));
+    } else if (type === LearningEventType.SPEAKING_SCORED) {
+      await this.repository.addNotification(practiceResultNotification(data, NotificationKind.SPEAKING_RESULT));
+    } else if (type === LearningEventType.WRITING_SCORED) {
+      await this.repository.addNotification(practiceResultNotification(data, NotificationKind.WRITING_RESULT));
     } else if (type === LearningEventType.LESSON_COMPLETED) {
       await this.repository.saveCompletion({ accountId: data.accountId, lessonId: data.lessonId, completedAt: new Date(data.completedAt) });
     } else if (type === LearningEventType.MOCK_SUBMITTED) {

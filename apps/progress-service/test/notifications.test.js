@@ -66,3 +66,27 @@ test('the evening reminder appears once a day and is read once the learner studi
   clock.now = new Date('2026-11-25T03:00:00Z');
   assert.deepEqual((await service.listNotifications(student)).notifications, []);
 });
+
+test('a scored or failed reading becomes one notification, and speaking counts as a study day (F12)', async () => {
+  const { service } = progressHarness([1], { now: () => new Date('2026-10-23T03:00:00Z') });
+  const submissionId = randomUUID();
+  const scored = { accountId: student.id, submissionId, promptId: randomUUID(), kind: 'read_aloud', title: 'Train times', status: 'DONE', total: 8.1, scoredAt: '2026-10-23T02:00:00.000Z' };
+  await service.applyResult(message('speaking.scored', scored));
+  await service.applyResult(message('speaking.scored', scored));
+  await service.applyResult(message('speaking.scored', { ...scored, submissionId: randomUUID(), status: 'FAILED', total: null }));
+  await service.applyResult(message('activity.recorded', { accountId: student.id, activity: 'speaking', occurredAt: '2026-10-23T02:00:00.000Z' }));
+  const listed = await service.listNotifications(student);
+  assert.deepEqual(listed.notifications.map((item) => [item.kind, item.data.status, item.data.total]).sort(), [['SPEAKING_RESULT', 'DONE', 8.1], ['SPEAKING_RESULT', 'FAILED', null]]);
+  const streak = await service.getStreak(student);
+  assert.equal(streak.studiedToday, true);
+});
+
+test('a scored writing becomes a WRITING_RESULT notification (F13)', async () => {
+  const { service } = progressHarness([1], { now: () => new Date('2026-10-23T03:00:00Z') });
+  const submissionId = randomUUID();
+  const scored = { accountId: student.id, submissionId, promptId: randomUUID(), kind: 'writing', title: 'Day off', status: 'DONE', total: 3.6, scoredAt: '2026-10-23T02:00:00.000Z' };
+  await service.applyResult(message('writing.scored', scored));
+  await service.applyResult(message('speaking.scored', { ...scored, kind: 'read_aloud' }));
+  const listed = await service.listNotifications(student);
+  assert.deepEqual(listed.notifications.map((item) => item.kind).sort(), ['SPEAKING_RESULT', 'WRITING_RESULT']);
+});

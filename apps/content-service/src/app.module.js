@@ -13,6 +13,9 @@ import { ListeningRepository } from './listening/listening.repository.js';
 import { ListeningService } from './listening/listening.service.js';
 import { SpeechBroker } from './speech/speech.broker.js';
 import { ContentEvents } from './speech/content-events.js';
+import { PracticeGrpcController } from './practice/practice.grpc.controller.js';
+import { PracticeRepository } from './practice/practice.repository.js';
+import { PracticeService } from './practice/practice.service.js';
 import { VersionGrpcController } from './versions/version.grpc.controller.js';
 import { ContentVersionService } from './versions/version.service.js';
 import {
@@ -29,7 +32,7 @@ import { SpeechPronunciationSource } from './pronunciation/speech-pronunciation.
 
 export class AppModule {}
 Module({
-  controllers: [MetricsController, HealthController, ContentGrpcController, ListeningGrpcController, CourseGrpcController, VersionGrpcController],
+  controllers: [MetricsController, HealthController, ContentGrpcController, ListeningGrpcController, CourseGrpcController, VersionGrpcController, PracticeGrpcController],
   providers: [
     { provide: MEDIA_STORAGE, useFactory: () => createMediaStorage() },
     { provide: SpeechBroker, useFactory: () => new SpeechBroker(process.env.RABBITMQ_URL || 'amqp://localhost:5672') },
@@ -65,6 +68,11 @@ Module({
         return service;
       },
       inject: [CONTENT_DATA_SOURCE, ContentService, SpeechBroker],
+    },
+    {
+      provide: PracticeService,
+      useFactory: (dataSource, contentService) => new PracticeService(new PracticeRepository(dataSource), contentService),
+      inject: [CONTENT_DATA_SOURCE, ContentService],
     },
     {
       provide: CourseService,
