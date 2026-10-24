@@ -12,6 +12,7 @@ import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui/button.jsx';
 import { Input } from '../../../components/ui/input.jsx';
 import { PasswordInput } from '../../../components/shared/PasswordInput.jsx';
+import { AUTH_SIDE_RIGHT } from '../../../layouts/AuthLayout.jsx';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export function RegisterPage() {
       }
       setExistingEmail('');
       notify({ title: 'Check your email', description: 'A verification code was sent.' });
-      navigate('/verify-email', { state: { email: values.email } });
+      navigate('/verify-email', { state: { email: values.email, authSide: AUTH_SIDE_RIGHT } });
     } catch (error) {
       if (errorCode(error) === ResponseCode.AUTH_EMAIL_ALREADY_REGISTERED) setExistingEmail(values.email);
       notify({ title: 'Registration failed', description: getApiErrorMessage(error), variant: 'destructive' });

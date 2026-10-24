@@ -1,4 +1,5 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
+import { cn } from '../lib/utils.js';
 import { AuthShowcase } from './components/AuthShowcase.jsx';
 import { ThemeToggle } from './components/ThemeToggle.jsx';
 
@@ -12,11 +13,16 @@ function LogoMark(props) {
   );
 }
 
+export const AUTH_SIDE_RIGHT = 'right';
+const SLIDE = 'transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-none';
+
 export function AuthLayout() {
+  const location = useLocation();
+  const swapped = location.pathname === '/register' || location.state?.authSide === AUTH_SIDE_RIGHT;
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/70 p-3 sm:p-6 lg:p-8">
-      <div className="auth-rise grid w-full max-w-6xl overflow-hidden rounded-[2rem] border bg-card shadow-2xl shadow-foreground/5 sm:rounded-[2.5rem] lg:min-h-[min(46rem,calc(100vh-4rem))] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-        <section className="flex flex-col px-6 py-6 sm:px-10 sm:py-8">
+      <div className="auth-rise grid w-full max-w-6xl overflow-hidden rounded-[2rem] border bg-card shadow-2xl shadow-foreground/5 sm:rounded-[2.5rem] lg:min-h-[min(46rem,calc(100vh-4rem))] lg:grid-cols-2">
+        <section className={cn('relative z-10 flex flex-col bg-card px-6 py-6 sm:px-10 sm:py-8', SLIDE, swapped && 'lg:translate-x-full')}>
           <header className="flex items-center justify-between">
             <Link to="/login" className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 pr-4 text-base font-semibold tracking-tight transition-colors hover:bg-accent">
               <LogoMark className="h-7 w-7" />
@@ -28,7 +34,7 @@ export function AuthLayout() {
             <Outlet />
           </div>
         </section>
-        <aside className="hidden p-3 lg:block">
+        <aside className={cn('hidden p-3 lg:block', SLIDE, swapped && 'lg:-translate-x-full')}>
           <AuthShowcase />
         </aside>
       </div>
