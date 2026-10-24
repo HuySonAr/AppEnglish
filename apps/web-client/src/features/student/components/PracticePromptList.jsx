@@ -5,7 +5,7 @@ import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { paginate } from '../../../lib/list.js';
 import { cn } from '../../../lib/utils.js';
-import { Badge, Button } from '../../../components/ui';
+import { Badge, Button, Tabs, TabsList, TabsTrigger } from '../../../components/ui';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
 import { FilterSelect, SearchField } from '../../../components/shared/ListFilter.jsx';
 import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
@@ -13,12 +13,13 @@ import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { ListPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
+import { getCefrProfile } from '../api/progress-api.js';
 import {
-  DEFAULT_PRACTICE_LEVEL,
   PracticeSort,
   PracticeTried,
+  defaultPracticeLevel,
   filterPracticePrompts,
-  practiceLevelOptions,
+  levelCounts,
   practiceSortOptions,
   practiceTopicOptions,
   practiceTriedOptions,
@@ -27,18 +28,21 @@ import {
 } from '../lib/practice.js';
 
 const PAGE_SIZE = 12;
-const DEFAULTS = { search: '', level: DEFAULT_PRACTICE_LEVEL, topic: 'all', kind: 'all', tried: PracticeTried.ALL, sort: PracticeSort.LEVEL };
+const DEFAULTS = { search: '', level: '', topic: 'all', kind: 'all', tried: PracticeTried.ALL, sort: PracticeSort.LEVEL };
 const labelOf = (kindLabel, prompt) => (typeof kindLabel === 'function' ? kindLabel(prompt) : kindLabel);
 
-export function PracticePromptList({ title, description, icon, kindLabel, basePath, load: loadPrompts, maxScore = 10, notice }) {
+export function PracticePromptList({ title, description, icon, kindLabel, basePath, load: loadPrompts, skill, maxScore = 10, notice }) {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
+  const [profileLevel, setProfileLevel] = useState(null);
   const { filters, setFilters, setFilter, page, setPage } = useListState(DEFAULTS);
 
   async function load() {
     setState('loading');
     try {
-      setData((await loadPrompts()).data);
+      const [result, profile] = await Promise.all([loadPrompts(), skill ? getCefrProfile().catch(() => null) : null]);
+      setProfileLevel(profile?.data?.profile?.[skill]?.level || null);
+      setData(result.data);
       setState('ready');
     } catch (error) {
       setState('error');
@@ -63,10 +67,12 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
     );
 
   const prompts = data.prompts;
+  const level = filters.level || defaultPracticeLevel(prompts, profileLevel);
+  const levels = levelCounts(prompts);
   const kinds = [...new Set(prompts.map((prompt) => prompt.kind))];
   const kindOptions = [{ value: 'all', label: 'All kinds' }, ...kinds.map((kind) => ({ value: kind, label: labelOf(kindLabel, { kind }) }))];
-  const shown = paginate(filterPracticePrompts(prompts, filters), page, PAGE_SIZE);
-  const narrowed = Object.entries(DEFAULTS).some(([key, value]) => filters[key] !== value);
+  const shown = paginate(filterPracticePrompts(prompts, { ...filters, level }), page, PAGE_SIZE);
+  const narrowed = Object.entries(DEFAULTS).some(([key, value]) => key !== 'level' && filters[key] !== value);
 
   return (
     <section className="space-y-6">
@@ -77,9 +83,22 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
         <EmptyState icon={icon} title="No prompts yet" description="Prompts will appear here when they are published." />
       ) : (
         <>
+          <Tabs value={level} onValueChange={setFilter('level')}>
+            <div className="-mx-1 overflow-x-auto px-1">
+              <TabsList aria-label="Level" className="h-auto justify-start">
+                <TabsTrigger value="all">
+                  All <span className="ml-1.5 tabular-nums text-muted-foreground">{prompts.length}</span>
+                </TabsTrigger>
+                {levels.map((entry) => (
+                  <TabsTrigger key={entry.level} value={entry.level}>
+                    {entry.level} <span className="ml-1.5 tabular-nums text-muted-foreground">{entry.count}</span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
+          </Tabs>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search by title or topic" />
-            <FilterSelect label="Level" value={filters.level} onChange={setFilter('level')} options={practiceLevelOptions} className="w-full sm:w-32" />
             <FilterSelect label="Topic" value={filters.topic} onChange={setFilter('topic')} options={practiceTopicOptions(prompts)} className="w-full sm:w-40" />
             {kinds.length > 1 ? <FilterSelect label="Kind" value={filters.kind} onChange={setFilter('kind')} options={kindOptions} className="w-full sm:w-40" /> : null}
             <FilterSelect label="Tried" value={filters.tried} onChange={setFilter('tried')} options={practiceTriedOptions} />
@@ -91,7 +110,7 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
               title="No prompt matches"
               description="Try another level or filter."
               action={
-                narrowed ? (
+                narrowed || level !== 'all' ? (
                   <Button variant="outline" onClick={() => setFilters({ ...DEFAULTS, level: 'all' })}>
                     Show all prompts
                   </Button>

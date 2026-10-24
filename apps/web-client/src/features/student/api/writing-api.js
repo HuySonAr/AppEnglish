@@ -21,3 +21,9 @@ export async function saveAiKey(key) {
 export async function deleteAiKey() {
   return (await httpClient.delete('/learning/ai-key')).data;
 }
+export async function saveAiSettings(settings) {
+  return (await httpClient.put('/learning/ai-key/settings', settings)).data;
+}
+export async function getAiModels(fresh = false) {
+  return (await httpClient.get('/learning/ai-key/models', { params: fresh ? { fresh: 'true' } : {}, timeout: 40000 })).data;
+}

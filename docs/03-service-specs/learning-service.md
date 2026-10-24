@@ -419,7 +419,7 @@ Migration `1730000016000-create-ai-keys-and-writing.js`: `ai_keys` (`accountId` 
 | Method | Path | RPC | Notes |
 |---|---|---|---|
 | GET | `/learning/ai-key` | `GetAiKey` | Students; `{ key: { last4, verifiedAt } \| null }` |
-| PUT | `/learning/ai-key` | `SaveAiKey` | `{ key }` 20–200 of `A-Z a-z 0-9 _ -`; checked through writing-service; 400 code 69 rejected, 503 code 70 cannot check now; validation issues never echo the key |
+| PUT | `/learning/ai-key` | `SaveAiKey` | `{ key }` 20–300 of `A-Z a-z 0-9 . _ -` (old `AIza…` standard keys and the `AQ.…` auth keys AI Studio creates since 2026-05-28); checked through writing-service; 400 code 69 rejected, 503 code 70 cannot check now; validation issues never echo the key |
 | DELETE | `/learning/ai-key` | `DeleteAiKey` | Deletes the key and strips it from the learner's `writing.requested` outbox rows |
 | GET | `/learning/writing/prompts` | `ListWritingPrompts` | Published writing prompts with `attempts`, `bestTotal`; `hasKey` |
 | GET | `/learning/writing/prompts/:id` | `GetWritingPrompt` | Instructions, image, task type, word limits (no sample answer or key points), last 20 submissions, `hasKey` |
@@ -457,3 +457,8 @@ Speaking and writing prompt pages add `reviewQuota`; submissions add `review` (`
 
 ### Withdraw (D182)
 `POST /learning/reviews/withdraw` → `WithdrawReview` (student) `{ submissionId }`: deletes a `WAITING` request no teacher holds and answers `{ review: null, quota }`; 75 while a teacher holds it, 74 when there is nothing waiting. Declared before `reviews/:id`.
+
+### Gemini settings (D184)
+Migration `1730000018000-add-ai-key-settings.js` adds `ai_keys.model` and `ai_keys.thinkingLevel`. `PUT /learning/ai-key/settings` → `SaveAiSettings` `{ model, thinkingLevel|null }` (listed models only; the level must be one the model offers; 409 code 69 without a key). `GET /learning/ai-key` returns `model` (default `gemini-3.8-flash`) and `thinkingLevel`. Writing and open speaking grading jobs carry both.
+
+`GET /learning/ai-key/models?fresh=true` → `ListAiModels` (D186): asks writing-service over `writing.model-lists` for the models on the learner's key and returns `{ key, models: [{ id, label, levels, defaultLevel, recommended }] }`; models in `GEMINI_MODELS` first with their levels, others by id descending with no levels. Cached 10 minutes per learner (cleared when the key is saved or deleted; `fresh` skips it). An invalid key answers the key-invalid error, an unreachable service the unavailable error. `SaveAiSettings` accepts only models on that list (or, if the list cannot be fetched, models in `GEMINI_MODELS`); otherwise 400 code 69 with issues.

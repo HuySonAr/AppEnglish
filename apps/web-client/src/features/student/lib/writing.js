@@ -34,3 +34,16 @@ export function wordRangeState(words, min, max) {
   if (words > max) return 'long';
   return 'ok';
 }
+
+export function wordMeter(words, min, max) {
+  const scale = Math.max(max * 1.2, 1);
+  const percent = (value) => Math.min(100, Math.round((value / scale) * 1000) / 10);
+  return { fill: percent(words), zoneStart: percent(min), zoneEnd: percent(max), state: wordRangeState(words, min, max) };
+}
+
+export function wordHint(words, min, max) {
+  if (words === 0) return `Write ${min}–${max} words.`;
+  if (words < min) return `${min - words} more word${min - words === 1 ? '' : 's'} to go.`;
+  if (words > max) return `${words - max} word${words - max === 1 ? '' : 's'} over the limit.`;
+  return 'Ready to submit.';
+}

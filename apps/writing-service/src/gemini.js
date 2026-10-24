@@ -1,4 +1,4 @@
-export const GeminiFailure = Object.freeze({ KEY: 'KEY', QUOTA: 'QUOTA', UNAVAILABLE: 'UNAVAILABLE', BAD_OUTPUT: 'BAD_OUTPUT', REJECTED: 'REJECTED' });
+export const GeminiFailure = Object.freeze({ KEY: 'KEY', QUOTA: 'QUOTA', UNAVAILABLE: 'UNAVAILABLE', BAD_OUTPUT: 'BAD_OUTPUT', REJECTED: 'REJECTED', MODEL: 'MODEL' });
 
 export class GeminiError extends Error {
   constructor(kind, message) {
@@ -18,6 +18,7 @@ export function classify(status, body) {
   const text = `${error.status || ''} ${error.message || ''} ${reasons.join(' ')}`;
   if (status === 401 || status === 403 || reasons.includes('API_KEY_INVALID') || /api key/i.test(text)) return new GeminiError(GeminiFailure.KEY, 'The Gemini key was rejected');
   if (status === 429 || error.status === 'RESOURCE_EXHAUSTED') return new GeminiError(GeminiFailure.QUOTA, 'The Gemini quota of this key is used up for now');
+  if (status === 404) return new GeminiError(GeminiFailure.MODEL, 'The model is not available for this key');
   if (status >= 500) return new GeminiError(GeminiFailure.UNAVAILABLE, 'Gemini is not available right now');
   return new GeminiError(GeminiFailure.REJECTED, `Gemini refused the request (${status})`);
 }
@@ -60,16 +61,28 @@ export class GeminiClient {
     return true;
   }
 
-  async generateJson(apiKey, { system, prompt, schema }) {
+  async listModels(apiKey) {
+    const models = [];
+    let pageToken = '';
+    for (let page = 0; page < 10; page++) {
+      const body = await call(`${this.apiUrl}/models?pageSize=200${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ''}`, { method: 'GET', headers: this.headers(apiKey) }, { fetchImpl: this.fetchImpl, timeoutMs: 20_000 });
+      models.push(...(body?.models || []));
+      pageToken = body?.nextPageToken || '';
+      if (!pageToken) break;
+    }
+    return models;
+  }
+
+  async generateJson(apiKey, { system, prompt, schema }, { model = this.model, thinkingLevel = null } = {}) {
     const body = await call(
-      `${this.apiUrl}/models/${encodeURIComponent(this.model)}:generateContent`,
+      `${this.apiUrl}/models/${encodeURIComponent(model)}:generateContent`,
       {
         method: 'POST',
         headers: this.headers(apiKey),
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: system }] },
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 1, responseMimeType: 'application/json', responseSchema: schema },
+          generationConfig: { temperature: 1, responseMimeType: 'application/json', responseSchema: schema, ...(thinkingLevel ? { thinkingConfig: { thinkingLevel } } : {}) },
         }),
       },
       { fetchImpl: this.fetchImpl, timeoutMs: this.timeoutMs },

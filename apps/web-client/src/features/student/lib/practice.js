@@ -19,7 +19,6 @@ export const practiceTriedOptions = [
   { value: PracticeTried.NEW, label: 'Not tried yet' },
   { value: PracticeTried.TRIED, label: 'Tried' },
 ];
-export const practiceLevelOptions = [{ value: 'all', label: 'All levels' }, ...CEFR_LEVELS.map((level) => ({ value: level, label: level }))];
 
 export function practiceTopicOptions(prompts) {
   const topics = [...new Set(prompts.map((prompt) => prompt.topic).filter(Boolean))].sort(compareText);
@@ -83,4 +82,18 @@ export function wordCounts(words = []) {
   const counts = { [SpokenWordStatus.CORRECT]: 0, [SpokenWordStatus.MISPRONOUNCED]: 0, [SpokenWordStatus.MISSING]: 0 };
   for (const word of words) if (word.status in counts) counts[word.status]++;
   return counts;
+}
+
+export function levelCounts(prompts) {
+  return CEFR_LEVELS.map((level) => ({ level, count: prompts.filter((prompt) => prompt.level === level).length })).filter((entry) => entry.count > 0);
+}
+
+export function defaultPracticeLevel(prompts, profileLevel) {
+  const levels = levelCounts(prompts).map((entry) => entry.level);
+  if (!levels.length) return 'all';
+  if (profileLevel && levels.includes(profileLevel)) return profileLevel;
+  if (levels.includes(DEFAULT_PRACTICE_LEVEL)) return DEFAULT_PRACTICE_LEVEL;
+  const base = CEFR_LEVELS.indexOf(DEFAULT_PRACTICE_LEVEL);
+  const distance = (level) => Math.abs(CEFR_LEVELS.indexOf(level) - base);
+  return [...levels].sort((a, b) => distance(a) - distance(b) || CEFR_LEVELS.indexOf(a) - CEFR_LEVELS.indexOf(b))[0];
 }

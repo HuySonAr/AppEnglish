@@ -100,3 +100,37 @@
 @media (prefers-reduced-motion: reduce) {
   .publish-arrow, .publish-cloud, .publish-pop { animation: none; }
 }
+
+@keyframes auth-rise {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes auth-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes auth-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes auth-wave {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+@keyframes auth-ring {
+  0% { transform: scale(0.75); opacity: 0.55; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+@keyframes auth-pop {
+  0% { opacity: 0; transform: translateY(14px) scale(0.92); }
+  100% { opacity: 1; transform: none; }
+}
+.auth-rise { animation: auth-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.auth-in { animation: auth-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.auth-pop { animation: auth-pop 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.auth-float { animation: auth-float 6s ease-in-out infinite; }
+.auth-wave { transform-origin: center; animation: auth-wave 1.2s ease-in-out infinite; }
+.auth-ring { transform-origin: center; animation: auth-ring 2.8s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .auth-rise, .auth-in, .auth-pop, .auth-float, .auth-wave, .auth-ring { animation: none; }
+}

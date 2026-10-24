@@ -297,6 +297,8 @@ export const AiKeyEntity = new EntitySchema({
     sealed: { type: 'jsonb' },
     last4: { type: 'varchar', length: 4 },
     verifiedAt: { type: 'timestamptz' },
+    model: { type: 'varchar', length: 60, nullable: true },
+    thinkingLevel: { type: 'varchar', length: 10, nullable: true },
     createdAt: { type: 'timestamptz', createDate: true },
     updatedAt: { type: 'timestamptz', updateDate: true },
   },

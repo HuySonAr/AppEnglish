@@ -255,8 +255,8 @@ speech-service has no database.
 
 ## Gemini key and Writing (F13, D178)
 
-- HTTP: `/learning/ai-key` (GET, PUT, DELETE), `/learning/writing/prompts`, `/learning/writing/prompts/:id`, `POST /learning/writing/prompts/:id/submissions`, `/learning/writing/submissions/:id`.
-- RabbitMQ: `writing.grading.requests` (learning outbox → writing-service, retry `.retry.1|2|3`, `.dead`), `writing.grading.results` (writing-service → learning, retry and `.dead`), `writing.key-checks` (request/reply); `learning.results` event `writing.scored` and activity `writing`.
+- HTTP: `/learning/ai-key` (GET, PUT, DELETE), `GET /learning/ai-key/models`, `PUT /learning/ai-key/settings`, `/learning/writing/prompts`, `/learning/writing/prompts/:id`, `POST /learning/writing/prompts/:id/submissions`, `/learning/writing/submissions/:id`.
+- RabbitMQ: `writing.grading.requests` (learning outbox → writing-service, retry `.retry.1|2|3`, `.dead`), `writing.grading.results` (writing-service → learning, retry and `.dead`), `writing.key-checks` and `writing.model-lists` (request/reply, D186); `learning.results` event `writing.scored` and activity `writing`.
 - progress-service: `writing.scored` → notification `WRITING_RESULT` (key `writing:<submissionId>`).
 - External: Gemini REST `generativelanguage.googleapis.com/v1beta` from writing-service only, with each learner's key.
 

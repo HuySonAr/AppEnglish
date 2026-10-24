@@ -65,7 +65,8 @@ test('open prompts show the task and image, allow the prompt time, and hide the 
   await assert.rejects(() => service.submit(student, open.id, recording(62)), { code: 67 });
   const { submission } = await service.submit(student, open.id, recording(58));
   assert.equal(submission.stage, 'listening');
-  assert.equal(submission.prompt.sampleAnswer, open.content.sampleAnswer);
+  assert.equal('sampleAnswer' in submission.prompt, false);
+  assert.equal('keyPoints' in submission.prompt, false);
 });
 
 test('with a key, the transcript goes to Gemini and the total mixes 60% Gemini with Fluency and Pronunciation', async () => {

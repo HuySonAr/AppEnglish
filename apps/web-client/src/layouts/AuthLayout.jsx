@@ -1,66 +1,37 @@
-import { BookOpen, Headphones, LineChart } from 'lucide-react';
-import { Outlet } from 'react-router-dom';
-import { Brand } from './components/Brand.jsx';
+import { Link, Outlet } from 'react-router-dom';
+import { AuthShowcase } from './components/AuthShowcase.jsx';
 import { ThemeToggle } from './components/ThemeToggle.jsx';
 
-const highlights = [
-  {
-    icon: BookOpen,
-    title: 'Reading',
-    text: 'Build vocabulary and comprehension lesson by lesson.',
-  },
-  {
-    icon: Headphones,
-    title: 'Listening',
-    text: 'Train your ear with audio in every lesson test.',
-  },
-  {
-    icon: LineChart,
-    title: 'Progress',
-    text: 'Unlock the next lesson as you pass each test.',
-  },
-];
+function LogoMark(props) {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" {...props}>
+      <rect width="32" height="32" rx="10" className="fill-primary" />
+      <path d="M8 21.5 16 9l8 12.5" fill="none" stroke="white" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11.2 17h9.6" fill="none" stroke="white" strokeWidth="2.6" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 export function AuthLayout() {
   return (
-    <div className="grid min-h-screen bg-background lg:grid-cols-[1.1fr_1fr]">
-      <aside className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <p className="relative text-lg font-semibold tracking-tight">
-          AppEnglish
-        </p>
-        <div className="relative space-y-8">
-          <h2 className="max-w-md text-4xl font-bold leading-tight">
-            Reading and Listening, one lesson at a time.
-          </h2>
-          <ul className="space-y-5">
-            {highlights.map((item) => (
-              <li key={item.title} className="flex gap-4">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
-                  <item.icon className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="font-semibold">{item.title}</p>
-                  <p className="text-sm text-primary-foreground/80">
-                    {item.text}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p className="relative text-sm text-primary-foreground/70">
-          Learn at your own pace.
-        </p>
-      </aside>
-      <main className="flex min-h-screen flex-col">
-        <header className="flex items-center justify-between px-6 py-5">
-          <Brand to="/login" />
-          <ThemeToggle />
-        </header>
-        <div className="flex flex-1 items-center justify-center px-4 pb-12 sm:px-6">
-          <Outlet />
-        </div>
-      </main>
+    <div className="flex min-h-screen items-center justify-center bg-muted/70 p-3 sm:p-6 lg:p-8">
+      <div className="auth-rise grid w-full max-w-6xl overflow-hidden rounded-[2rem] border bg-card shadow-2xl shadow-foreground/5 sm:rounded-[2.5rem] lg:min-h-[min(46rem,calc(100vh-4rem))] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+        <section className="flex flex-col px-6 py-6 sm:px-10 sm:py-8">
+          <header className="flex items-center justify-between">
+            <Link to="/login" className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 pr-4 text-base font-semibold tracking-tight transition-colors hover:bg-accent">
+              <LogoMark className="h-7 w-7" />
+              AppEnglish
+            </Link>
+            <ThemeToggle />
+          </header>
+          <div className="flex flex-1 items-center justify-center py-10">
+            <Outlet />
+          </div>
+        </section>
+        <aside className="hidden p-3 lg:block">
+          <AuthShowcase />
+        </aside>
+      </div>
     </div>
   );
 }

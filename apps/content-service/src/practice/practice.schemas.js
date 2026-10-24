@@ -3,7 +3,10 @@ import { CEFR_LEVELS, PRACTICE_LIMITS, PracticePromptKind, WritingTaskType } fro
 
 const text = (max) => z.string().trim().max(max).default('');
 const mediaId = z.string().uuid().nullable().default(null);
-const keyPoints = z.array(z.string().trim().min(1).max(PRACTICE_LIMITS.keyPoint)).max(PRACTICE_LIMITS.keyPoints).default([]);
+const keyPoints = z.preprocess(
+  (value) => (Array.isArray(value) ? value.filter((item) => typeof item !== 'string' || item.trim()) : value),
+  z.array(z.string().trim().min(1).max(PRACTICE_LIMITS.keyPoint)).max(PRACTICE_LIMITS.keyPoints).default([]),
+);
 
 const common = {
   title: text(PRACTICE_LIMITS.title),

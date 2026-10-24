@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { errorSegments, wordRangeState } from './writing.js';
+import { errorSegments, wordHint, wordMeter, wordRangeState } from './writing.js';
 
 test('errors are marked where they first appear, without overlaps, in reading order', () => {
   const answer = 'I want take a day off. I want take it Friday.';
@@ -17,4 +17,10 @@ test('errors are marked where they first appear, without overlaps, in reading or
 
 test('the word counter says whether the text fits the limits', () => {
   assert.deepEqual([[0, 5, 10], [3, 5, 10], [7, 5, 10], [11, 5, 10]].map(([words, min, max]) => wordRangeState(words, min, max)), ['empty', 'short', 'ok', 'long']);
+});
+
+test('the word meter shows the allowed range and what is left', () => {
+  assert.deepEqual(wordMeter(60, 80, 120), { fill: 41.7, zoneStart: 55.6, zoneEnd: 83.3, state: 'short' });
+  assert.equal(wordMeter(500, 80, 120).fill, 100);
+  assert.deepEqual([0, 79, 80, 121].map((words) => wordHint(words, 80, 120)), ['Write 80–120 words.', '1 more word to go.', 'Ready to submit.', '1 word over the limit.']);
 });

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterPracticePrompts, formatClock, isScoring, recordingType, scoreTone, practiceTopicOptions, wordCounts } from './practice.js';
+import { defaultPracticeLevel, filterPracticePrompts, formatClock, levelCounts, isScoring, recordingType, scoreTone, practiceTopicOptions, wordCounts } from './practice.js';
 
 const prompts = [
   { id: '1', title: 'Train times', level: 'A2', topic: 'Travel', attempts: 2, bestTotal: 7.5, lastSubmittedAt: '2026-10-22T08:00:00Z' },
@@ -31,4 +31,15 @@ test('scores, words and recording helpers', () => {
   assert.deepEqual([0, 7.9, 30, 75].map(formatClock), ['0:00', '0:07', '0:30', '1:15']);
   assert.equal(isScoring({ status: 'SCORING' }), true);
   assert.equal(isScoring({ status: 'DONE' }), false);
+});
+
+test('the list opens on a level that has prompts', () => {
+  const at = (...levels) => levels.map((level) => ({ level }));
+  assert.deepEqual(levelCounts(at('B1', 'A1', 'B1')), [{ level: 'A1', count: 1 }, { level: 'B1', count: 2 }]);
+  assert.equal(defaultPracticeLevel(at('A2', 'B1'), 'B1'), 'B1');
+  assert.equal(defaultPracticeLevel(at('A2', 'B1'), 'C1'), 'A2');
+  assert.equal(defaultPracticeLevel(at('A2', 'B1'), null), 'A2');
+  assert.equal(defaultPracticeLevel(at('B1', 'C1'), 'BELOW_A1'), 'B1');
+  assert.equal(defaultPracticeLevel(at('A1', 'B1'), null), 'A1');
+  assert.equal(defaultPracticeLevel([], 'B1'), 'all');
 });

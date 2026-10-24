@@ -1,18 +1,16 @@
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { NextAction } from '@appenglish/auth-contracts';
 import { verifyEmail, resendVerification } from '../api/auth-api.js';
-import { AuthCard, AuthLink } from '../components/AuthCard.jsx';
+import { AuthCard, AuthLink, FieldLabel, authButton } from '../components/AuthCard.jsx';
+import { CodeSentTo } from '../components/CodeSentTo.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
-import {
-  dashboardPathForRole,
-  verifyOtpAndRestoreSession,
-} from '../flow/auth-flow.js';
+import { dashboardPathForRole, verifyOtpAndRestoreSession } from '../flow/auth-flow.js';
 import { notify } from '../../../lib/notify.js';
+import { isComplete } from '../../../lib/otp.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { Button } from '../../../components/ui/button.jsx';
-import { Input } from '../../../components/ui/input.jsx';
-import { Label } from '../../../components/ui/label.jsx';
+import { OtpInput } from '../../../components/shared/OtpInput.jsx';
 
 export function VerifyEmailPage() {
   const location = useLocation();
@@ -20,55 +18,41 @@ export function VerifyEmailPage() {
   const { restoreSession } = useAuth();
   const [email, setEmail] = useState(location.state?.email || '');
   const [otp, setOtp] = useState('');
+  const [invalid, setInvalid] = useState(false);
   const [pending, setPending] = useState(false);
   const [resendPending, setResendPending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const busy = useRef(false);
 
   useEffect(() => {
     if (!cooldown) return undefined;
-    const timer = window.setInterval(
-      () => setCooldown((value) => Math.max(value - 1, 0)),
-      1000,
-    );
+    const timer = window.setInterval(() => setCooldown((value) => Math.max(value - 1, 0)), 1000);
     return () => window.clearInterval(timer);
   }, [cooldown]);
 
-  async function submit(event) {
-    event.preventDefault();
+  async function verify(code) {
+    if (busy.current || !email || !isComplete(code)) return;
+    busy.current = true;
     setPending(true);
     try {
-      const { alreadyVerified, account, restoredAccount } =
-        await verifyOtpAndRestoreSession({
-          verifyEmail: () => verifyEmail({ email, otp }),
-          restoreSession,
-        });
+      const { alreadyVerified, account, restoredAccount } = await verifyOtpAndRestoreSession({ verifyEmail: () => verifyEmail({ email, otp: code }), restoreSession });
       if (alreadyVerified) {
-        notify({
-          title: 'Email already verified',
-          variant: 'info',
-          description: 'Please sign in.',
-        });
+        notify({ title: 'Email already verified', variant: 'info', description: 'Please sign in.' });
         navigate('/login', { replace: true, state: { email } });
         return;
       }
       if (!restoredAccount) {
-        notify({
-          title: 'Session could not be loaded',
-          description: `Email verified for ${account.email}. Please sign in.`,
-          variant: 'destructive',
-        });
+        notify({ title: 'Session could not be loaded', description: `Email verified for ${account.email}. Please sign in.`, variant: 'destructive' });
         navigate('/login', { replace: true, state: { email } });
         return;
       }
       notify({ title: 'Email verified', description: 'You are signed in.' });
       navigate(dashboardPathForRole(restoredAccount.role), { replace: true });
     } catch (error) {
-      notify({
-        title: 'Verification failed',
-        description: getApiErrorMessage(error),
-        variant: 'destructive',
-      });
+      setInvalid(true);
+      notify({ title: 'Verification failed', description: getApiErrorMessage(error), variant: 'destructive' });
     } finally {
+      busy.current = false;
       setPending(false);
     }
   }
@@ -78,80 +62,54 @@ export function VerifyEmailPage() {
     try {
       const result = await resendVerification({ email });
       if (result?.data?.nextAction === NextAction.LOGIN) {
-        notify({
-          title: 'Email already verified',
-          variant: 'info',
-          description: 'Please sign in.',
-        });
+        notify({ title: 'Email already verified', variant: 'info', description: 'Please sign in.' });
         return;
       }
       setCooldown(result?.data?.resendAfterSeconds || 60);
+      setOtp('');
+      setInvalid(false);
       notify({ title: 'Verification code sent' });
     } catch (error) {
-      notify({
-        title: 'Resend failed',
-        description: getApiErrorMessage(error),
-        variant: 'destructive',
-      });
+      notify({ title: 'Resend failed', description: getApiErrorMessage(error), variant: 'destructive' });
     } finally {
       setResendPending(false);
     }
   }
 
   return (
-    <AuthCard
-      title="Verify your email"
-      description="Enter the 6-digit code sent to your email address."
-    >
-      <form className="space-y-5" onSubmit={submit}>
+    <AuthCard title="Check your inbox" description="Enter the 6-digit code we sent you." footer={<AuthLink to="/login">Back to sign in</AuthLink>}>
+      <form
+        className="space-y-6"
+        onSubmit={(event) => {
+          event.preventDefault();
+          verify(otp);
+        }}
+      >
+        <CodeSentTo email={email} onEmail={setEmail} disabled={pending} />
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-            disabled={pending}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="otp">Verification code</Label>
-          <Input
+          <FieldLabel htmlFor="otp">Verification code</FieldLabel>
+          <OtpInput
             id="otp"
-            inputMode="numeric"
-            pattern="\d{6}"
-            maxLength="6"
             value={otp}
-            onChange={(event) => setOtp(event.target.value)}
-            required
+            onChange={(next) => {
+              setOtp(next);
+              setInvalid(false);
+            }}
+            onComplete={verify}
+            invalid={invalid}
             disabled={pending}
-            className="tracking-[0.3em]"
+            autoFocus={Boolean(email)}
           />
         </div>
-        <Button loading={pending}
-          className="w-full"
-          disabled={pending}
-          type="submit"
-        >
+        <Button loading={pending} className={authButton} disabled={pending || !email || !isComplete(otp)} type="submit">
           {pending ? 'Verifying…' : 'Verify email'}
         </Button>
       </form>
-      <Button
-        variant="ghost"
-        className="mt-5 w-full"
-        disabled={resendPending || cooldown > 0 || !email}
-        onClick={resend}
-        type="button"
-      >
-        {resendPending
-          ? 'Sending…'
-          : cooldown
-            ? `Resend in ${cooldown}s`
-            : 'Resend code'}
-      </Button>
       <p className="mt-5 text-center text-sm text-muted-foreground">
-        <AuthLink to="/login">Back to sign in</AuthLink>
+        Didn&apos;t get it?{' '}
+        <button type="button" className="font-medium text-primary underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline" disabled={resendPending || cooldown > 0 || !email} onClick={resend}>
+          {resendPending ? 'Sending…' : cooldown ? `Resend in ${cooldown}s` : 'Resend code'}
+        </button>
       </p>
     </AuthCard>
   );

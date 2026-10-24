@@ -5,6 +5,9 @@ import { seal } from '@appenglish/backend-common/secret-box';
 import { currentRequestId } from '@appenglish/backend-common/observability';
 import {
   AiKeyCheck,
+  DEFAULT_GEMINI_MODEL,
+  GEMINI_MODELS,
+  knownGeminiModel,
   LearningEventType,
   LearningQueue,
   StudyActivity,
@@ -20,6 +23,7 @@ import { writingErrors } from './writing.errors.js';
 import { writingResultSchema } from './writing.schemas.js';
 
 const iso = (value) => (value ? new Date(value).toISOString() : null);
+const MODEL_LIST_TTL_MS = 10 * 60 * 1000;
 
 export class WritingService {
   constructor(repository, keys, contentClient, { checker, secret = '', now = () => new Date(), events = noEvents, reviews = null } = {}) {
@@ -31,6 +35,7 @@ export class WritingService {
     this.now = now;
     this.events = events;
     this.reviews = reviews;
+    this.modelCache = new Map();
   }
 
   assertStudent(actor) {
@@ -83,8 +88,6 @@ export class WritingService {
       prompt: {
         title: submission.prompt.title,
         level: submission.prompt.level,
-        sampleAnswer: submission.prompt.sampleAnswer,
-        keyPoints: submission.prompt.keyPoints || [],
       },
       result: submission.result || null,
       teacherReview: submission.teacherReview || null,
@@ -97,7 +100,7 @@ export class WritingService {
 
   async keyView(accountId) {
     const key = await this.keys.findKey(accountId);
-    return key ? { last4: key.last4, verifiedAt: iso(key.verifiedAt) } : null;
+    return key ? { last4: key.last4, verifiedAt: iso(key.verifiedAt), model: key.model || DEFAULT_GEMINI_MODEL, thinkingLevel: key.thinkingLevel || null } : null;
   }
 
   async getKey(actor) {
@@ -117,12 +120,60 @@ export class WritingService {
     if (answer?.status === AiKeyCheck.INVALID) throw writingErrors.keyInvalid(answer.reason);
     if (answer?.status !== AiKeyCheck.VALID) throw writingErrors.keyUnavailable();
     const at = this.now();
+    this.modelCache.delete(actor.id);
     await this.keys.saveKey({ accountId: actor.id, provider: 'gemini', sealed, last4: key.slice(-4), verifiedAt: at });
+    return { key: await this.keyView(actor.id) };
+  }
+
+  describeModels(available) {
+    const ids = new Set(available.map((item) => item.id));
+    const known = GEMINI_MODELS.filter((item) => ids.has(item.id)).map((item) => ({ id: item.id, label: item.label, recommended: true, levels: [...item.levels], defaultLevel: item.defaultLevel }));
+    const others = available
+      .filter((item) => !knownGeminiModel(item.id))
+      .sort((a, b) => b.id.localeCompare(a.id, undefined, { numeric: true }))
+      .map((item) => ({ id: item.id, label: item.label, recommended: false, levels: [], defaultLevel: null }));
+    return [...known, ...others];
+  }
+
+  async availableModels(accountId, key, { fresh = false } = {}) {
+    const cached = this.modelCache.get(accountId);
+    if (!fresh && cached && this.now().getTime() - cached.at < MODEL_LIST_TTL_MS) return cached.models;
+    let answer;
+    try {
+      answer = await this.checker.listModels(key.sealed);
+    } catch {
+      throw writingErrors.keyUnavailable();
+    }
+    if (answer?.status === AiKeyCheck.INVALID) throw writingErrors.keyInvalid(answer.reason);
+    if (answer?.status !== AiKeyCheck.VALID) throw writingErrors.keyUnavailable();
+    const models = this.describeModels(answer.models || []);
+    this.modelCache.set(accountId, { at: this.now().getTime(), models });
+    return models;
+  }
+
+  async listModels(actor, { fresh = false } = {}) {
+    this.assertStudent(actor);
+    const key = await this.keys.findKey(actor.id);
+    if (!key) throw writingErrors.keyMissing();
+    return { models: await this.availableModels(actor.id, key, { fresh }), key: await this.keyView(actor.id) };
+  }
+
+  async saveSettings(actor, { model, thinkingLevel }) {
+    this.assertStudent(actor);
+    const key = await this.keys.findKey(actor.id);
+    if (!key) throw writingErrors.keyMissing();
+    const models = await this.availableModels(actor.id, key).catch((error) => {
+      if (knownGeminiModel(model)) return null;
+      throw error;
+    });
+    if (models && !models.some((item) => item.id === model)) throw writingErrors.modelUnavailable();
+    await this.keys.saveKey({ ...key, model, thinkingLevel });
     return { key: await this.keyView(actor.id) };
   }
 
   async deleteKey(actor) {
     this.assertStudent(actor);
+    this.modelCache.delete(actor.id);
     await this.keys.deleteKey(actor.id);
     return { key: null };
   }
@@ -206,6 +257,8 @@ export class WritingService {
               },
               answer,
               key: key.sealed,
+              model: key.model || null,
+              thinkingLevel: key.thinkingLevel || null,
             },
             requestId: currentRequestId(),
             createdAt: at,

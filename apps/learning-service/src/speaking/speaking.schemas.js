@@ -41,4 +41,5 @@ export const openGradingSchema = z.object({
   feedback: z.string().max(2000),
   errors: z.array(z.object({ text: line.min(1), suggestion: line, explanation: line })).max(30),
   rewrite: z.string().max(6000),
+  model: z.string().max(60).optional(),
 });

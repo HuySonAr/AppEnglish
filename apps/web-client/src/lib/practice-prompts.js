@@ -87,3 +87,18 @@ export const kindSlugs = {
 export const kindFromSlug = (slug) => Object.keys(kindSlugs).find((kind) => kindSlugs[kind] === slug) || null;
 export const teacherListPath = (kind) => `/teacher/${kindSlugs[kind]}`;
 export const teacherPromptPath = (kind, id) => `${teacherListPath(kind)}/${id}`;
+
+export const ReviewArea = Object.freeze({ SPEAKING: 'speaking', WRITING: 'writing' });
+export const reviewAreaOf = (kind) => (kind === PracticePromptKind.WRITING ? ReviewArea.WRITING : ReviewArea.SPEAKING);
+export const reviewAreaKinds = {
+  [ReviewArea.SPEAKING]: [PracticePromptKind.READ_ALOUD, PracticePromptKind.OPEN_SPEAKING],
+  [ReviewArea.WRITING]: [PracticePromptKind.WRITING],
+};
+export const reviewListPath = (area) => `/content-manager/${area}-prompts`;
+export const reviewPromptPath = (kind, id) => `${reviewListPath(reviewAreaOf(kind))}/${id}`;
+
+export function authorOptions(prompts) {
+  const authors = new Map();
+  for (const prompt of prompts) if (prompt.authorId && !authors.has(prompt.authorId)) authors.set(prompt.authorId, prompt.author?.displayName || 'Unknown teacher');
+  return [{ value: 'all', label: 'All teachers' }, ...[...authors].sort((a, b) => a[1].localeCompare(b[1])).map(([value, label]) => ({ value, label }))];
+}

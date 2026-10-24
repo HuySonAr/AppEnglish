@@ -1,7 +1,7 @@
 import { AlertCircle, KeyRound, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SubmissionStatus } from '@appenglish/learning-contracts';
-import { AnnotatedText, BetterVersion, CorrectionList, PromptReference } from './PracticeFeedback.jsx';
+import { SubmissionStatus, geminiModelLabel } from '@appenglish/learning-contracts';
+import { AnnotatedText, BetterVersion, CorrectionList } from './PracticeFeedback.jsx';
 import { ScoreBar, ScoreSummary } from './PracticeScore.jsx';
 
 const geminiBars = [
@@ -80,8 +80,7 @@ export function OpenSpeakingResult({ submission }) {
       <CorrectionList errors={gemini?.errors} />
       <BetterVersion text={gemini?.rewrite} />
       {submission.recordingUrl ? <audio controls src={submission.recordingUrl} className="w-full" /> : null}
-      <PromptReference sampleAnswer={submission.prompt.sampleAnswer} keyPoints={submission.prompt.keyPoints} />
-      {result ? <p className="text-xs text-muted-foreground">Gemini reads a transcript and cannot hear your voice.</p> : null}
+      {result ? <p className="text-xs text-muted-foreground">{gemini?.model ? `Scored by ${geminiModelLabel(gemini.model)}. ` : ''}Gemini reads a transcript and cannot hear your voice.</p> : null}
     </div>
   );
 }

@@ -29,6 +29,7 @@ export class AiKeyChecker {
       });
       const channel = await connection.createChannel();
       await channel.assertQueue(LearningQueue.AI_KEY_CHECKS, { durable: true });
+      await channel.assertQueue(LearningQueue.AI_MODEL_LISTS, { durable: true });
       const { queue } = await channel.assertQueue('', { exclusive: true });
       await channel.consume(
         queue,
@@ -54,6 +55,14 @@ export class AiKeyChecker {
   }
 
   check(sealedKey, timeoutMs = 25_000) {
+    return this.ask(LearningQueue.AI_KEY_CHECKS, sealedKey, timeoutMs);
+  }
+
+  listModels(sealedKey, timeoutMs = 25_000) {
+    return this.ask(LearningQueue.AI_MODEL_LISTS, sealedKey, timeoutMs);
+  }
+
+  ask(queue, sealedKey, timeoutMs) {
     if (!this.channel) return Promise.reject(new Error('RabbitMQ is not connected'));
     const correlationId = `${Date.now()}-${++this.next}`;
     return new Promise((resolve, reject) => {
@@ -71,7 +80,7 @@ export class AiKeyChecker {
           reject(error);
         },
       });
-      this.channel.sendToQueue(LearningQueue.AI_KEY_CHECKS, Buffer.from(JSON.stringify({ key: sealedKey })), {
+      this.channel.sendToQueue(queue, Buffer.from(JSON.stringify({ key: sealedKey })), {
         contentType: 'application/json',
         correlationId,
         replyTo: this.replyQueue,

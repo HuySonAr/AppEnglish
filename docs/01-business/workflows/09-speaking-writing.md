@@ -25,7 +25,7 @@ Mỗi đề có: loại, cấp CEFR (A1–C2), chủ đề, tiêu đề, ngườ
 
 - Bài mẫu là mốc tham khảo cho AI và giáo viên khi chấm, không phải đáp án so từng chữ: ý khác nhưng đúng đề không bị trừ.
 - Ý chính là danh sách các ý đề yêu cầu (ví dụ "nêu lý do xin nghỉ, đề xuất ngày bù, lời cảm ơn"); khi có, AI và giáo viên chấm mức hoàn thành yêu cầu đề theo danh sách này.
-- Học viên chỉ thấy bài mẫu sau khi đã nộp bài; không bao giờ thấy ý chính trước khi nộp.
+- Bài mẫu và ý chính chỉ dùng làm đầu vào cho AI chấm và để giáo viên tham khảo; học viên không bao giờ thấy, kể cả sau khi nộp (D185).
 
 ## Duyệt và xuất bản đề
 
@@ -43,10 +43,11 @@ Trạng thái một bản đề: `DRAFT` → `PENDING_REVIEW` → `PUBLISHED` ho
 ## Học viên làm bài
 
 - Practice có thêm hai mục: Speaking và Writing. Danh sách đề có tìm kiếm, lọc theo cấp CEFR, chủ đề, loại, trạng thái (chưa làm, đã làm, điểm cao nhất) và phân trang.
-- Mặc định mở ở cấp CEFR hiện tại của kỹ năng đó trong hồ sơ năng lực (chưa có thì A2).
+- Mặc định mở ở cấp CEFR hiện tại của kỹ năng đó trong hồ sơ năng lực (chưa có thì A2); nếu cấp đó chưa có đề thì mở cấp gần nhất có đề, không bao giờ mở một danh sách trống khi đã có đề (D183).
 - Speaking – đọc to: nghe mẫu, ghi âm trên trình duyệt (tối đa 30 giây), nộp.
 - Speaking – nói mở: đọc yêu cầu, ghi âm (tối đa theo đề, không quá 2 phút), nộp.
 - Writing: viết trong ô soạn có đếm từ; nộp khi đủ số từ tối thiểu và không quá số từ tối đa.
+- Trang đề có hai tab: làm bài (đề, chỗ làm, kết quả lần vừa nộp) và lịch sử (danh sách các lần nộp và kết quả từng lần) (D185).
 - Sau khi nộp, bài ở trạng thái "đang chấm"; có kết quả thì hiện ngay và có thông báo. Học viên làm lại đề bao nhiêu lần cũng được; mỗi đề có lịch sử các lần nộp, điểm AI và điểm giáo viên (nếu có).
 - Nộp bài Speaking/Writing tính là một ngày học của streak (D154).
 
@@ -65,7 +66,7 @@ Trạng thái một bản đề: `DRAFT` → `PENDING_REVIEW` → `PUBLISHED` ho
 - Speaking nói mở: điểm 1–5 cho Hoàn thành đề, Từ vựng, Ngữ pháp, Mạch lạc; Fluency/Pronunciation 0–10 từ Whisper; điểm tổng 0–10 = 60% Gemini (quy về thang 10) + 20% Fluency + 20% Pronunciation (D179).
 - Nhận xét: một đoạn nhận xét chung; danh sách lỗi (đoạn sai, gợi ý sửa, giải thích ngắn) tô ngay trong bài; có thể kèm bản viết lại tốt hơn.
 - Gemini nhận xét theo kỳ vọng của cấp đề (bài A2 không bị đòi cấu trúc C1), nhưng điểm vẫn theo thang cố định để so được với dữ liệu chuyên gia.
-- Hệ thống cố định một model Gemini và rubric; học viên không chọn model.
+- Rubric cố định. Học viên tự chọn model Gemini (trong danh sách Flash ổn định) và mức suy nghĩ cho key của mình; mỗi kết quả ghi model đã chấm (D184).
 
 ### Key Gemini của học viên
 - Học viên tự tạo API key Gemini bằng tài khoản Google của mình (Google AI Studio) và dán vào trang Profile; có trang hướng dẫn từng bước.

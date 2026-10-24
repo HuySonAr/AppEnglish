@@ -18,6 +18,7 @@ import {
   Skeleton,
 } from '../../../components/ui';
 import { deleteAiKey, getAiKey, saveAiKey } from '../api/writing-api.js';
+import { GeminiModelSettings } from './GeminiModelSettings.jsx';
 
 export function GeminiKeyCard({ showGuideLink = true }) {
   const [state, setState] = useState('loading');
@@ -51,7 +52,8 @@ export function GeminiKeyCard({ showGuideLink = true }) {
       setEditing(false);
       notify({ title: 'Gemini key saved' });
     } catch (error) {
-      notify({ title: 'Could not save the key', description: getApiErrorMessage(error), variant: 'destructive' });
+      const issue = error?.response?.data?.data?.issues?.[0]?.message;
+      notify({ title: 'Could not save the key', description: issue || getApiErrorMessage(error), variant: 'destructive' });
     } finally {
       setBusy(null);
     }
@@ -90,23 +92,35 @@ export function GeminiKeyCard({ showGuideLink = true }) {
           Try again
         </Button>
       ) : key && !editing ? (
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="min-w-0 flex-1 text-sm">
-            Key ending in <span className="font-mono font-semibold">••••{key.last4}</span>
-          </p>
-          <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
-            Replace
-          </Button>
-          <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-destructive" onClick={() => setConfirming(true)}>
-            <Trash2 className="h-4 w-4" />
-            Remove
-          </Button>
-        </div>
+        <>
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="min-w-0 flex-1 text-sm">
+              Key ending in <span className="font-mono font-semibold">••••{key.last4}</span>
+            </p>
+            <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+              Replace
+            </Button>
+            <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-destructive" onClick={() => setConfirming(true)}>
+              <Trash2 className="h-4 w-4" />
+              Remove
+            </Button>
+          </div>
+          <GeminiModelSettings key={`${key.model}:${key.thinkingLevel}`} settings={key} onSaved={setKey} />
+        </>
       ) : (
         <form className="space-y-2" onSubmit={save}>
           <Label htmlFor="gemini-key">API key</Label>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <Input id="gemini-key" type="password" autoComplete="off" spellCheck={false} value={value} onChange={(event) => setValue(event.target.value)} placeholder="Paste your key" disabled={Boolean(busy)} />
+            <Input
+              id="gemini-key"
+              type="password"
+              autoComplete="off"
+              spellCheck={false}
+              value={value}
+              onChange={(event) => setValue(event.target.value)}
+              placeholder="Paste your key"
+              disabled={Boolean(busy)}
+            />
             <div className="flex gap-2">
               <Button type="submit" loading={busy === 'save'} disabled={value.trim().length < 20}>
                 Save

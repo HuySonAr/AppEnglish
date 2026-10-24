@@ -87,3 +87,10 @@ test('read-aloud and open speaking prompts check their own fields; a never-publi
   await assert.rejects(() => service.submitPrompt(teacher, open.prompt.id), (error) => error.data.issues.map((issue) => issue.path).join() === 'title,topic,instructions,sampleAnswer');
   assert.deepEqual((await service.listPrompts(teacher)).prompts.map((item) => item.kind), ['open_speaking']);
 });
+
+test('blank key points are dropped when a draft is saved', async () => {
+  const { service } = harness();
+  const { prompt } = await service.createPrompt(teacher, { kind: 'writing' });
+  const saved = await service.saveDraft(teacher, prompt.id, { content: writing({ keyPoints: ['the day', '  ', ''] }) });
+  assert.deepEqual(saved.latest.content.keyPoints, ['the day']);
+});

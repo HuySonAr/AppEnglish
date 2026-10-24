@@ -69,6 +69,8 @@ service LearningService {
   rpc GetAiKey(LearningRequest) returns (LearningReply);
   rpc SaveAiKey(LearningRequest) returns (LearningReply);
   rpc DeleteAiKey(LearningRequest) returns (LearningReply);
+  rpc SaveAiSettings(LearningRequest) returns (LearningReply);
+  rpc ListAiModels(LearningRequest) returns (LearningReply);
   rpc GetReviewQuota(LearningRequest) returns (LearningReply);
   rpc RequestReview(LearningRequest) returns (LearningReply);
   rpc WithdrawReview(LearningRequest) returns (LearningReply);

@@ -1,0 +1,55 @@
+import { History } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui';
+import { EmptyState } from '../../../components/shared/EmptyState.jsx';
+import { timeAgo } from '../../../lib/notifications.js';
+import { PracticeAttempts } from './PracticeAttempts.jsx';
+import { TeacherReviewPanel } from './TeacherReviewPanel.jsx';
+
+export function ResultCard({ submission, title = 'Result', children }) {
+  return (
+    <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{submission.teacherReview ? 'AI score' : title}</p>
+        <span className="text-xs text-muted-foreground">{timeAgo(submission.submittedAt)}</span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+export function PracticeTabs({ tab, onTab, practiceLabel, practice, submissions, viewing, onOpen, renderResult, quota, onReview, maxScore = 10 }) {
+  return (
+    <Tabs value={tab} onValueChange={onTab} className="space-y-5">
+      <TabsList>
+        <TabsTrigger value="practice">{practiceLabel}</TabsTrigger>
+        <TabsTrigger value="history">
+          History <span className="ml-1.5 tabular-nums text-muted-foreground">{submissions.length}</span>
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="practice" className="mt-0">
+        {practice}
+      </TabsContent>
+
+      <TabsContent value="history" className="mt-0">
+        {submissions.length ? (
+          <div className="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
+            <PracticeAttempts submissions={submissions} currentId={viewing?.id} onOpen={onOpen} maxScore={maxScore} />
+            <div className="space-y-4">
+              {viewing ? (
+                <>
+                  <ResultCard submission={viewing}>{renderResult(viewing)}</ResultCard>
+                  <TeacherReviewPanel submission={viewing} quota={quota} onRequested={(answer) => onReview(viewing, answer)} />
+                </>
+              ) : (
+                <EmptyState icon={History} title="Choose an attempt" description="Pick one on the left to see its result." />
+              )}
+            </div>
+          </div>
+        ) : (
+          <EmptyState icon={History} title="No attempts yet" description="Your attempts appear here after you submit." />
+        )}
+      </TabsContent>
+    </Tabs>
+  );
+}

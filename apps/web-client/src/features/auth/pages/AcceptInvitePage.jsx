@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { acceptInvite } from '../api/auth-api.js';
-import { AuthCard, AuthLink } from '../components/AuthCard.jsx';
+import { AuthCard, AuthLink, FieldLabel, authButton, authInput } from '../components/AuthCard.jsx';
+import { CodeSentTo } from '../components/CodeSentTo.jsx';
 import { dashboardPathForRole, verifyOtpAndRestoreSession } from '../flow/auth-flow.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
+import { isComplete } from '../../../lib/otp.js';
 import { Button } from '../../../components/ui/button.jsx';
-import { Input } from '../../../components/ui/input.jsx';
-import { Label } from '../../../components/ui/label.jsx';
+import { OtpInput } from '../../../components/shared/OtpInput.jsx';
 import { PasswordInput } from '../../../components/shared/PasswordInput.jsx';
 
 export function AcceptInvitePage() {
@@ -19,15 +20,14 @@ export function AcceptInvitePage() {
   const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
   const [pending, setPending] = useState(false);
+  const ready = email && isComplete(otp) && password.length >= 8;
 
   async function submit(event) {
     event.preventDefault();
+    if (!ready) return;
     setPending(true);
     try {
-      const { alreadyVerified, restoredAccount } = await verifyOtpAndRestoreSession({
-        verifyEmail: () => acceptInvite({ email, otp, password }),
-        restoreSession,
-      });
+      const { alreadyVerified, restoredAccount } = await verifyOtpAndRestoreSession({ verifyEmail: () => acceptInvite({ email, otp, password }), restoreSession });
       if (alreadyVerified) {
         notify({ title: 'Invitation already accepted', variant: 'info', description: 'Please sign in with your password.' });
         navigate('/login', { replace: true, state: { email } });
@@ -48,28 +48,30 @@ export function AcceptInvitePage() {
   }
 
   return (
-    <AuthCard title="Accept your invitation" description="Enter the invitation code from the email and choose your password.">
-      <form className="space-y-5" onSubmit={submit}>
+    <AuthCard
+      title="Join AppEnglish"
+      description="Enter the code from your invitation and choose a password."
+      footer={
+        <>
+          Code lost or expired? Ask your administrator for a new one. Already set up? <AuthLink to="/login">Sign in</AuthLink>
+        </>
+      }
+    >
+      <form className="space-y-6" onSubmit={submit}>
+        <CodeSentTo email={email} onEmail={setEmail} disabled={pending} />
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required disabled={pending} />
+          <FieldLabel htmlFor="otp">Invitation code</FieldLabel>
+          <OtpInput id="otp" label="Invitation code" value={otp} onChange={setOtp} disabled={pending} autoFocus={Boolean(email)} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="otp">Invitation code</Label>
-          <Input id="otp" inputMode="numeric" pattern="\d{6}" maxLength="6" value={otp} onChange={(event) => setOtp(event.target.value)} required disabled={pending} className="tracking-[0.3em]" />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Choose a password</Label>
-          <PasswordInput id="password" value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} maxLength={128} autoComplete="new-password" disabled={pending} />
+          <FieldLabel htmlFor="password">Choose a password</FieldLabel>
+          <PasswordInput id="password" className={authInput} value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} maxLength={128} autoComplete="new-password" disabled={pending} />
           <p className="text-xs text-muted-foreground">At least 8 characters.</p>
         </div>
-        <Button loading={pending} className="w-full" type="submit">
+        <Button loading={pending} className={authButton} disabled={pending || !ready} type="submit">
           {pending ? 'Setting up…' : 'Set password and sign in'}
         </Button>
       </form>
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Code expired or lost? Ask the administrator who invited you to send it again. Already set your password? <AuthLink to="/login">Sign in</AuthLink>
-      </p>
     </AuthCard>
   );
 }

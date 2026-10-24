@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Check, EyeOff, Undo2 } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { PRACTICE_LIMITS, PracticePromptStatus } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -32,10 +32,13 @@ import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { PracticePromptView } from '../../../components/shared/PracticePromptView.jsx';
 import { approvePracticePrompt, getPracticePrompt, returnPracticePrompt, unpublishPracticePrompt } from '../../../lib/api/practice-prompts-api.js';
-import { changedFields, kindLabels, statusInfo } from '../../../lib/practice-prompts.js';
+import { changedFields, kindLabels, reviewAreaOf, reviewListPath, reviewPromptPath, statusInfo } from '../../../lib/practice-prompts.js';
+import { Avatar } from '../../../components/shared/Avatar.jsx';
 
 export function PracticeReviewDetailPage() {
   const { promptId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
   const [busy, setBusy] = useState(null);
@@ -46,7 +49,10 @@ export function PracticeReviewDetailPage() {
   async function load() {
     setState('loading');
     try {
-      setData((await getPracticePrompt(promptId)).data);
+      const result = (await getPracticePrompt(promptId)).data;
+      const wanted = reviewPromptPath(result.prompt.kind, promptId);
+      if (location.pathname !== wanted) return navigate(wanted, { replace: true });
+      setData(result);
       setState('ready');
     } catch (error) {
       setState('error');
@@ -79,7 +85,7 @@ export function PracticeReviewDetailPage() {
         <Button variant="outline" onClick={load}>
           Try again
         </Button>
-        <Link className="block text-sm text-primary underline-offset-4 hover:underline" to="/content-manager/practice-prompts">
+        <Link className="block text-sm text-primary underline-offset-4 hover:underline" to={location.pathname.includes('/writing-prompts') ? reviewListPath('writing') : reviewListPath('speaking')}>
           Back to prompts
         </Link>
       </div>
@@ -92,7 +98,7 @@ export function PracticeReviewDetailPage() {
 
   return (
     <section className="space-y-5">
-      <PageBreadcrumb items={[{ label: 'Speaking and writing', to: '/content-manager/practice-prompts' }, { label: latest.content.title || 'Untitled prompt' }]} />
+      <PageBreadcrumb items={[{ label: reviewAreaOf(prompt.kind) === 'writing' ? 'Writing prompts' : 'Speaking prompts', to: reviewListPath(reviewAreaOf(prompt.kind)) }, { label: latest.content.title || 'Untitled prompt' }]} />
 
       <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
         <div className="min-w-0 flex-1">
@@ -100,6 +106,11 @@ export function PracticeReviewDetailPage() {
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             <span>
               {kindLabels[prompt.kind]} · version {latest.versionNumber}
+            </span>
+            <span className="flex items-center gap-1.5">
+              · by
+              <Avatar account={prompt.author} size="sm" className="h-5 w-5 text-[10px]" />
+              <span className="font-medium text-foreground">{prompt.author?.displayName || 'Unknown teacher'}</span>
             </span>
             <Badge variant={statusInfo[latest.status].variant}>{statusInfo[latest.status].label}</Badge>
             {published && published.id !== latest.id ? <Badge variant="success">Live v{published.versionNumber}</Badge> : null}

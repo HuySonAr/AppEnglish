@@ -5,7 +5,7 @@ import { CONTENT_GRPC_SERVICE } from '@appenglish/content-contracts/grpc';
 import { ContentResponseCode, ContentUsageKind } from '@appenglish/content-contracts';
 import { LEARNING_GRPC_SERVICE } from '@appenglish/learning-contracts/grpc';
 import { LEARNING_GRPC_CLIENT } from '../learning/learning-gateway.controller.js';
-import { AUTH_GRPC_CLIENT, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
+import { AUTH_GRPC_CLIENT, attachProfiles, callAuth, sessionTokens } from '../auth/auth-gateway.controller.js';
 import { resolveSession } from '../auth/session-cache.js';
 import { callService } from '../grpc/grpc-call.js';
 
@@ -220,31 +220,31 @@ export class ContentGatewayController {
     return this.forward('ListMockTranscribe', request, { id });
   }
   listPracticePrompts(request) {
-    return this.forward('ListPracticePrompts', request);
+    return this.practice('ListPracticePrompts', request);
   }
   createPracticePrompt(body, request) {
-    return this.forward('CreatePracticePrompt', request, { body });
+    return this.practice('CreatePracticePrompt', request, { body });
   }
   getPracticePrompt(id, request) {
-    return this.forward('GetPracticePrompt', request, { id });
+    return this.practice('GetPracticePrompt', request, { id });
   }
   savePracticePromptDraft(id, body, request) {
-    return this.forward('SavePracticePromptDraft', request, { id, body });
+    return this.practice('SavePracticePromptDraft', request, { id, body });
   }
   submitPracticePrompt(id, request) {
-    return this.forward('SubmitPracticePrompt', request, { id });
+    return this.practice('SubmitPracticePrompt', request, { id });
   }
   withdrawPracticePrompt(id, request) {
-    return this.forward('WithdrawPracticePrompt', request, { id });
+    return this.practice('WithdrawPracticePrompt', request, { id });
   }
   approvePracticePrompt(id, request) {
-    return this.forward('ApprovePracticePrompt', request, { id });
+    return this.practice('ApprovePracticePrompt', request, { id });
   }
   returnPracticePrompt(id, body, request) {
-    return this.forward('ReturnPracticePrompt', request, { id, body });
+    return this.practice('ReturnPracticePrompt', request, { id, body });
   }
   unpublishPracticePrompt(id, request) {
-    return this.forward('UnpublishPracticePrompt', request, { id });
+    return this.practice('UnpublishPracticePrompt', request, { id });
   }
   deletePracticePrompt(id, request) {
     return this.forward('DeletePracticePrompt', request, { id });
@@ -356,6 +356,14 @@ export class ContentGatewayController {
         'Content',
       ),
     );
+  }
+
+  async practice(rpc, request, options) {
+    const payload = await this.forward(rpc, request, options);
+    const rows = [...(payload.data?.prompts || []), ...(payload.data?.prompt ? [payload.data.prompt] : [])].filter((row) => row.authorId);
+    const authors = rows.map((row) => (row.author = { accountId: row.authorId }));
+    await attachProfiles(this.auth, authors);
+    return payload;
   }
 
   respond({ status, payload }) {

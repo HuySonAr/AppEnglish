@@ -4,7 +4,7 @@ import { LearningQueue, SubmissionStatus } from '@appenglish/learning-contracts'
 import { RETRY_DELAYS_MS, assertRetryTopology, attemptOf, countMessage, retryOrDead, sendToDead } from '@appenglish/backend-common/messaging';
 import { REQUEST_ID_HEADER, runWithRequestId } from '@appenglish/backend-common/observability';
 import { gradingJobs, gradingWork, keyChecks } from './status-server.js';
-import { checkKey, failureText, gradeWriting, isSpeakingJob } from './worker.js';
+import { checkKey, failureText, gradeWriting, isSpeakingJob, listModels } from './worker.js';
 
 const RETRY_MS = 10_000;
 
@@ -13,6 +13,7 @@ export const DEFAULT_QUEUES = Object.freeze({
   results: LearningQueue.WRITING_RESULTS,
   openResults: LearningQueue.OPEN_SPEAKING_RESULTS,
   keyChecks: LearningQueue.AI_KEY_CHECKS,
+  modelLists: LearningQueue.AI_MODEL_LISTS,
 });
 
 export function outcomeOf(error, message, delays = RETRY_DELAYS_MS) {
@@ -82,14 +83,25 @@ export class WritingBroker {
   }
 
   async handleKeyCheck(channel, message) {
+    return this.answer(channel, message, async (request) => {
+      const answer = await checkKey(request, { gemini: this.gemini, secret: this.config.secret });
+      keyChecks.inc({ status: answer.status });
+      return answer;
+    });
+  }
+
+  async handleModelList(channel, message) {
+    return this.answer(channel, message, (request) => listModels(request, { gemini: this.gemini, secret: this.config.secret }));
+  }
+
+  async answer(channel, message, run) {
     let request = {};
     try {
       request = JSON.parse(message.content.toString());
     } catch {
       request = {};
     }
-    const answer = await checkKey(request, { gemini: this.gemini, secret: this.config.secret });
-    keyChecks.inc({ status: answer.status });
+    const answer = await run(request);
     if (message.properties?.replyTo)
       channel.sendToQueue(message.properties.replyTo, Buffer.from(JSON.stringify(answer)), { contentType: 'application/json', correlationId: message.properties.correlationId });
     channel.ack(message);
@@ -98,7 +110,7 @@ export class WritingBroker {
 
   async connect() {
     if (this.stopped) return;
-    const { requests, results, openResults, keyChecks } = this.queues;
+    const { requests, results, openResults, keyChecks, modelLists } = this.queues;
     try {
       const connection = await amqp.connect(this.config.rabbitmqUrl);
       connection.on('error', (error) => this.logger.warn(`RabbitMQ connection error: ${error.message}`));
@@ -119,6 +131,8 @@ export class WritingBroker {
       await checks.assertQueue(keyChecks, { durable: true });
       await checks.prefetch(4);
       await checks.consume(keyChecks, (message) => message && this.handleKeyCheck(checks, message).catch((error) => this.logger.warn(`Key check not answered: ${error.message}`)));
+      await checks.assertQueue(modelLists, { durable: true });
+      await checks.consume(modelLists, (message) => message && this.handleModelList(checks, message).catch((error) => this.logger.warn(`Model list not answered: ${error.message}`)));
       this.connection = connection;
       this.logger.log(`Waiting for writing submissions (model ${this.config.model})`);
     } catch (error) {

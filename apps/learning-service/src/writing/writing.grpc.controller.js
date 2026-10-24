@@ -7,7 +7,7 @@ import { LearningError } from '../placement/placement.errors.js';
 import { actorSchema } from '../placement/placement.schemas.js';
 import { promptIdSchema } from '../speaking/speaking.schemas.js';
 import { WritingService } from './writing.service.js';
-import { saveAiKeySchema, submitWritingSchema } from './writing.schemas.js';
+import { aiSettingsSchema, modelListSchema, saveAiKeySchema, submitWritingSchema } from './writing.schemas.js';
 
 const rpcs = {
   ListWritingPrompts: { run: (service, { actor }) => service.listPrompts(actor) },
@@ -17,6 +17,8 @@ const rpcs = {
   GetAiKey: { run: (service, { actor }) => service.getKey(actor) },
   SaveAiKey: { payload: saveAiKeySchema, run: (service, { actor, payload }) => service.saveKey(actor, payload) },
   DeleteAiKey: { run: (service, { actor }) => service.deleteKey(actor) },
+  SaveAiSettings: { payload: aiSettingsSchema, run: (service, { actor, payload }) => service.saveSettings(actor, payload) },
+  ListAiModels: { payload: modelListSchema, run: (service, { actor, payload }) => service.listModels(actor, payload) },
 };
 
 function parseJson(text) {

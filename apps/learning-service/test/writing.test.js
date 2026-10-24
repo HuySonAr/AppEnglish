@@ -5,14 +5,14 @@ import { open } from '@appenglish/backend-common/secret-box';
 import { LearningEventType, LearningQueue, StudyActivity } from '@appenglish/learning-contracts';
 import { LearningEvents } from '../src/events/learning-events.js';
 import { WritingService } from '../src/writing/writing.service.js';
-import { saveAiKeySchema } from '../src/writing/writing.schemas.js';
+import { aiSettingsSchema, saveAiKeySchema } from '../src/writing/writing.schemas.js';
 import { createEventRepository, fakeTransport, student } from './helpers.js';
 import { createSpeakingRepository, other } from './speaking-helpers.js';
 
 const secret = 'k'.repeat(40);
 const goodKey = 'AIzaSyGoodKey_1234567890abcd';
 
-function harness({ check = async () => ({ status: 'VALID' }) } = {}) {
+function harness({ check = async () => ({ status: 'VALID' }), models = async () => ({ status: 'UNAVAILABLE' }) } = {}) {
   const at = new Date('2026-10-23T08:00:00Z');
   const eventRepository = createEventRepository();
   const events = new LearningEvents(eventRepository, { transport: fakeTransport(), now: () => at });
@@ -61,14 +61,19 @@ function harness({ check = async () => ({ status: 'VALID' }) } = {}) {
     },
   };
   const checks = [];
+  const listed = [];
   const checker = {
     async check(sealed) {
       checks.push(sealed);
       return check(sealed);
     },
+    async listModels(sealed) {
+      listed.push(sealed);
+      return models(sealed);
+    },
   };
   const service = new WritingService(repository, keyRepository, content, { checker, secret, now: () => at, events });
-  return { service, repository, eventRepository, keys, checks, writing, reading };
+  return { service, repository, eventRepository, keys, checks, listed, writing, reading };
 }
 
 const result = {
@@ -84,7 +89,7 @@ test('a learner saves a Gemini key only after writing-service accepts it; only t
   await assert.rejects(() => service.getKey({ id: randomUUID(), role: 'TEACHER' }), { code: 26 });
   assert.deepEqual(await service.getKey(student), { key: null });
   const saved = await service.saveKey(student, { key: goodKey });
-  assert.deepEqual(saved, { key: { last4: 'abcd', verifiedAt: '2026-10-23T08:00:00.000Z' } });
+  assert.deepEqual(saved, { key: { last4: 'abcd', verifiedAt: '2026-10-23T08:00:00.000Z', model: 'gemini-3.8-flash', thinkingLevel: null } });
   assert.equal(JSON.stringify(keys.get(student.id)).includes(goodKey), false);
   assert.equal(open(keys.get(student.id).sealed, secret), goodKey);
   assert.equal(open(checks[0], secret), goodKey);
@@ -92,6 +97,8 @@ test('a learner saves a Gemini key only after writing-service accepts it; only t
   assert.equal(keys.size, 0);
   assert.throws(() => saveAiKeySchema.parse({ key: 'short' }));
   assert.throws(() => saveAiKeySchema.parse({ key: 'has spaces in it and is long enough' }));
+  assert.equal(saveAiKeySchema.parse({ key: 'AQ.Ab8RN6IexampleAuthKey_with-dots.and-dashes' }).key, 'AQ.Ab8RN6IexampleAuthKey_with-dots.and-dashes');
+  assert.equal(saveAiKeySchema.parse({ key: '  AIzaSyOldStandardKey1234567890  ' }).key, 'AIzaSyOldStandardKey1234567890');
 });
 
 test('a rejected or unchecked key is not saved', async () => {
@@ -120,7 +127,8 @@ test('without a key a text is saved; with a key it is queued for Gemini with the
   assert.equal(saved.status, 'SAVED');
   assert.equal(saved.answer, 'Dear Ms Lee,\nI want take Friday off. Thanks.');
   assert.equal(saved.words, 9);
-  assert.equal(saved.prompt.sampleAnswer, writing.content.sampleAnswer);
+  assert.equal('sampleAnswer' in saved.prompt, false);
+  assert.equal('keyPoints' in saved.prompt, false);
   assert.deepEqual(eventRepository.tables.events.map((event) => [event.type, event.payload.activity]), [[LearningEventType.ACTIVITY_RECORDED, StudyActivity.WRITING]]);
 
   await service.saveKey(student, { key: goodKey });
@@ -160,4 +168,56 @@ test('Gemini results are applied once, with the total recomputed from the seven 
   assert.equal((await service.getSubmission(student, third.id)).submission.error, 'The scoring result was not valid');
   const history = (await service.getPrompt(student, writing.id)).submissions;
   assert.equal(history.length, 3);
+});
+
+test('a learner picks the Gemini model and thinking level used for their own key', async () => {
+  const { service, writing, eventRepository } = harness();
+  await assert.rejects(() => service.saveSettings(student, { model: 'gemini-3.5-flash-lite', thinkingLevel: null }), { code: 69 });
+  await service.saveKey(student, { key: goodKey });
+  const { key } = await service.saveSettings(student, { model: 'gemini-3.5-flash-lite', thinkingLevel: 'low' });
+  assert.deepEqual([key.model, key.thinkingLevel, key.last4], ['gemini-3.5-flash-lite', 'low', 'abcd']);
+  await service.submit(student, writing.id, { text: 'Dear Ms Lee, I want take Friday off. Thanks.' });
+  const job = eventRepository.tables.events.find((event) => event.type === 'writing.requested');
+  assert.deepEqual([job.payload.model, job.payload.thinkingLevel], ['gemini-3.5-flash-lite', 'low']);
+  assert.throws(() => aiSettingsSchema.parse({ model: 'gemini-3.8-flash', thinkingLevel: 'minimal' }));
+  assert.throws(() => aiSettingsSchema.parse({ model: 'gpt-4', thinkingLevel: null }));
+  assert.deepEqual(aiSettingsSchema.parse({ model: 'gemini-3.6-flash' }), { model: 'gemini-3.6-flash', thinkingLevel: null });
+});
+
+test('the model list comes from the learner key: known models first with thinking levels, others by name; choices are checked against it', async () => {
+  const available = [
+    { id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash Lite', thinking: true },
+    { id: 'gemini-4-argon', label: 'Gemini 4 Argon', thinking: true },
+    { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro Preview', thinking: true },
+    { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash', thinking: true },
+  ];
+  const { service, listed } = harness({ models: async () => ({ status: 'VALID', models: available }) });
+  await assert.rejects(() => service.listModels(student), { code: 69 });
+  await service.saveKey(student, { key: goodKey });
+  const { models } = await service.listModels(student);
+  assert.deepEqual(models.map((item) => [item.id, item.recommended, item.levels.length]), [
+    ['gemini-3.8-flash', true, 3],
+    ['gemini-3.5-flash-lite', true, 4],
+    ['gemini-4-argon', false, 0],
+    ['gemini-3.1-pro-preview', false, 0],
+  ]);
+  await service.listModels(student);
+  assert.equal(listed.length, 1);
+  await service.listModels(student, { fresh: true });
+  assert.equal(listed.length, 2);
+
+  const { key } = await service.saveSettings(student, { model: 'gemini-4-argon', thinkingLevel: null });
+  assert.equal(key.model, 'gemini-4-argon');
+  await assert.rejects(() => service.saveSettings(student, { model: 'gemini-3.6-flash', thinkingLevel: null }), { code: 69, message: 'This model is not available for your key' });
+  assert.throws(() => aiSettingsSchema.parse({ model: 'gemini-4-argon', thinkingLevel: 'low' }));
+  assert.throws(() => aiSettingsSchema.parse({ model: 'gemini-3.5-transcribe', thinkingLevel: null }));
+  assert.deepEqual(aiSettingsSchema.parse({ model: 'gemini-4-argon' }), { model: 'gemini-4-argon', thinkingLevel: null });
+});
+
+test('when the list cannot be fetched, only known models can be chosen', async () => {
+  const { service } = harness({ models: async () => ({ status: 'UNAVAILABLE' }) });
+  await service.saveKey(student, { key: goodKey });
+  await assert.rejects(() => service.listModels(student), { code: 70 });
+  assert.equal((await service.saveSettings(student, { model: 'gemini-3.6-flash', thinkingLevel: 'low' })).key.model, 'gemini-3.6-flash');
+  await assert.rejects(() => service.saveSettings(student, { model: 'gemini-4-argon', thinkingLevel: null }), { code: 70 });
 });

@@ -122,6 +122,7 @@ export const LearningQueue = Object.freeze({
   WRITING_RESULTS: 'writing.grading.results',
   AI_KEY_CHECKS: 'writing.key-checks',
   OPEN_SPEAKING_RESULTS: 'writing.open-speaking.results',
+  AI_MODEL_LISTS: 'writing.model-lists',
 });
 
 export const LearningEventType = Object.freeze({
@@ -172,7 +173,7 @@ export const RECORDING_LIMITS = Object.freeze({
 export const RECORDING_KEEP_DAYS = 180;
 export const SUBMISSION_HISTORY_SIZE = 20;
 
-export const AI_KEY_LIMITS = Object.freeze({ min: 20, max: 200, pattern: /^[A-Za-z0-9_-]+$/ });
+export const AI_KEY_LIMITS = Object.freeze({ min: 20, max: 300, pattern: /^[A-Za-z0-9._-]+$/ });
 export const AiKeyCheck = Object.freeze({ VALID: 'VALID', INVALID: 'INVALID', UNAVAILABLE: 'UNAVAILABLE' });
 export const WRITING_CRITERIA = Object.freeze(['cohesion', 'syntax', 'vocabulary', 'phraseology', 'grammar', 'conventions', 'task']);
 export const WRITING_GROUPS = Object.freeze({
@@ -291,4 +292,32 @@ export function productiveCefr(results, rule, { recent = PRODUCTIVE_CEFR_RULES.r
   }).filter((entry) => entry.considered > 0);
   const reached = levels.filter((entry) => entry.passed >= needed).map((entry) => entry.level);
   return { level: reached.length ? reached.at(-1) : null, levels };
+}
+
+export const GEMINI_MODELS = Object.freeze([
+  Object.freeze({ id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash', defaultLevel: 'medium', levels: Object.freeze(['low', 'medium', 'high']) }),
+  Object.freeze({ id: 'gemini-3.6-flash', label: 'Gemini 3.6 Flash', defaultLevel: 'medium', levels: Object.freeze(['minimal', 'low', 'medium', 'high']) }),
+  Object.freeze({ id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite', defaultLevel: 'minimal', levels: Object.freeze(['minimal', 'low', 'medium', 'high']) }),
+]);
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
+
+export const GEMINI_MODEL_PATTERN = /^gemini-[a-z0-9][a-z0-9.-]{0,58}$/;
+const NOT_FOR_GRADING = /embedding|image|imagen|tts|audio|live|robotics|computer-use|transcribe|banana|customtools|aqa|veo/;
+
+export const knownGeminiModel = (id) => GEMINI_MODELS.find((item) => item.id === id) || null;
+export const isGradingModel = (id) => GEMINI_MODEL_PATTERN.test(String(id || '')) && !NOT_FOR_GRADING.test(id);
+
+export function geminiModelLabel(id) {
+  const known = knownGeminiModel(id);
+  if (known) return known.label;
+  return String(id || 'Gemini')
+    .split('-')
+    .map((part) => (part === 'gemini' ? 'Gemini' : /^[a-z]/.test(part) ? part[0].toUpperCase() + part.slice(1) : part))
+    .join(' ');
+}
+
+export function geminiChoice(model, thinkingLevel) {
+  const known = knownGeminiModel(model);
+  if (known) return { model: known.id, thinkingLevel: known.levels.includes(thinkingLevel) ? thinkingLevel : null };
+  return isGradingModel(model) ? { model, thinkingLevel: null } : null;
 }

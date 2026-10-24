@@ -40,7 +40,6 @@ const messages = Object.freeze({
   [LearningResponseCode.MOCK_TEST_NOT_IN_PROGRESS]: 'There is no mock test in progress.',
   [LearningResponseCode.COURSE_LESSON_NOT_FOUND]: 'This part of the listening course is not available.',
   [LearningResponseCode.COURSE_ITEM_LOCKED]: 'This part of the listening course is still locked. Pass the one before it first.',
-  [LearningResponseCode.COURSE_PLACEMENT_DONE]: 'You have already taken or skipped the listening placement.',
   [LearningResponseCode.UNIT_REVIEW_NOT_FOUND]: 'This unit has no review.',
   [LearningResponseCode.UNIT_REVIEW_LOCKED]: 'The unit review opens once every lesson of the unit is completed.',
   [LearningResponseCode.PRACTICE_PROMPT_NOT_FOUND]: 'This prompt is not available.',
@@ -102,7 +101,8 @@ export function getApiErrorMessage(error) {
   if (error?.response?.status === 413) return mediaReasons.MEDIA_FILE_TOO_LARGE;
   const reason = mediaReasons[error?.response?.data?.data?.reason];
   if ((code === ContentResponseCode.MEDIA_INVALID || code === ResponseCode.AVATAR_INVALID) && reason) return reason;
-  return messages[code] || error?.response?.data?.data?.message || 'Something went wrong. Please try again.';
+  if (!error?.response) return 'Could not reach the server. Check your connection and try again.';
+  return (code !== undefined && messages[code]) || error?.response?.data?.data?.message || 'Something went wrong. Please try again.';
 }
 
 export function isUnauthorizedError(error) {

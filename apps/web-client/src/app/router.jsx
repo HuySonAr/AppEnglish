@@ -161,7 +161,11 @@ export function AppRouter() {
             <Route path="listening-course" element={<CourseManagePage />} />
             <Route path="listening-course/:itemId" element={<CourseItemEditorPage />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
-            <Route path="practice-prompts" element={<PracticeReviewPage />} />
+            <Route path="speaking-prompts" element={<PracticeReviewPage key="speaking" area="speaking" />} />
+            <Route path="writing-prompts" element={<PracticeReviewPage key="writing" area="writing" />} />
+            <Route path="speaking-prompts/:promptId" element={<PracticeReviewDetailPage />} />
+            <Route path="writing-prompts/:promptId" element={<PracticeReviewDetailPage />} />
+            <Route path="practice-prompts" element={<Navigate to="/content-manager/speaking-prompts" replace />} />
             <Route path="practice-prompts/:promptId" element={<PracticeReviewDetailPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>

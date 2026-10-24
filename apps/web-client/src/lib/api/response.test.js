@@ -27,3 +27,9 @@ test('recognizes expired sessions from status or shared response code', () => {
   assert.equal(isUnauthorizedError({ response: { data: { code: ResponseCode.AUTH_SESSION_EXPIRED } } }), true);
   assert.equal(isUnauthorizedError({ response: { status: 403 } }), false);
 });
+
+test('an answer without a code never borrows another message', () => {
+  assert.equal(getApiErrorMessage({ message: 'socket hang up' }), 'Could not reach the server. Check your connection and try again.');
+  assert.equal(getApiErrorMessage({ response: { status: 500, data: { statusCode: 500, message: 'Internal server error' } } }), 'Something went wrong. Please try again.');
+  assert.equal(getApiErrorMessage({ response: { status: 502, data: '<html>bad gateway</html>' } }), 'Something went wrong. Please try again.');
+});

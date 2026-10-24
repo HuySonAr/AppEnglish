@@ -213,6 +213,12 @@ export class LessonGatewayController extends LearningRelay {
   saveAiKey(body, request) {
     return this.forward('SaveAiKey', request, { body });
   }
+  listAiModels(query, request) {
+    return this.forward('ListAiModels', request, { body: { fresh: query?.fresh === 'true' } });
+  }
+  saveAiSettings(body, request) {
+    return this.forward('SaveAiSettings', request, { body });
+  }
   deleteAiKey(request) {
     return this.forward('DeleteAiKey', request);
   }
@@ -307,6 +313,8 @@ const lessonRoutes = [
   [Get, 'ai-key', 'getAiKey', [Req()]],
   [Put, 'ai-key', 'saveAiKey', [Body(), Req()]],
   [Delete, 'ai-key', 'deleteAiKey', [Req()]],
+  [Put, 'ai-key/settings', 'saveAiSettings', [Body(), Req()]],
+  [Get, 'ai-key/models', 'listAiModels', [Query(), Req()]],
   [Get, 'cefr-profile', 'getCefrProfile', [Req()]],
   [Get, 'reviews/quota', 'getReviewQuota', [Req()]],
   [Get, 'reviews/queue', 'listReviewQueue', [Req()]],

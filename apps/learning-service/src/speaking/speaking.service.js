@@ -92,8 +92,6 @@ export class SpeakingService {
             title: submission.prompt.title,
             level: submission.prompt.level,
             instructions: submission.prompt.instructions,
-            sampleAnswer: submission.prompt.sampleAnswer,
-            keyPoints: submission.prompt.keyPoints || [],
           }
         : { title: submission.prompt.title, level: submission.prompt.level, text: submission.prompt.text },
       result: submission.result || null,
@@ -239,6 +237,8 @@ export class SpeakingService {
           answer: heard.transcript,
           durationSeconds: submission.recording?.durationSeconds ?? null,
           key: key.sealed,
+          model: key.model || null,
+          thinkingLevel: key.thinkingLevel || null,
         },
         requestId: currentRequestId(),
         createdAt: at,
