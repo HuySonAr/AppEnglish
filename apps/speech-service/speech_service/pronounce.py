@@ -11,6 +11,13 @@ from .config import Settings
 
 log = logging.getLogger("speech-service")
 
+MIN_LENGTH_SCALE = 0.8
+MAX_LENGTH_SCALE = 1.5
+MIN_WORDS_PER_MINUTE = 60
+MAX_WORDS_PER_MINUTE = 220
+MAX_PAUSE_SECONDS = 2.0
+SPEED_PASSES = 3
+
 _VOWELS = set("aeiouyæɐɑɒɔəɛɜɪʊʌɚɝɨʉɯɤøœɶɵɞᵻ")
 _MARKS = set("ːˑ̩̯̃ʲ")
 _STRESS = {"ˈ", "ˌ"}
@@ -129,13 +136,64 @@ class Pronouncer:
             self.voices[accent] = PiperVoice.load(path)
         return self.voices[accent]
 
-    def __call__(self, text: str, accent: str) -> tuple[str, bytes]:
+    def __call__(self, text: str, accent: str, speed: dict | None = None) -> tuple[str, bytes]:
         voice = self.voice(accent)
         ipa = format_ipa(voice.phonemize(text))
-        buffer = io.BytesIO()
-        with wave.open(buffer, "wb") as wav_file:
-            voice.synthesize_wav(text, wav_file)
-        return ipa, wav_to_mp3(buffer.getvalue())
+        if not speed:
+            buffer = io.BytesIO()
+            with wave.open(buffer, "wb") as wav_file:
+                voice.synthesize_wav(text, wav_file)
+            return ipa, wav_to_mp3(buffer.getvalue())
+        from piper import SynthesisConfig
+
+        words = count_words(text)
+        chunks = list(voice.synthesize(text))
+        pauses = speed["pause"] * max(0, len(chunks) - 1)
+        scale = 1.0
+        for _ in range(SPEED_PASSES):
+            next_scale = length_scale(words, chunk_seconds(chunks), pauses, speed["rate"], scale)
+            if abs(next_scale - scale) < 0.02:
+                break
+            scale = next_scale
+            chunks = list(voice.synthesize(text, SynthesisConfig(length_scale=(voice.config.length_scale or 1.0) * scale)))
+        return ipa, wav_to_mp3(join_chunks(chunks, speed["pause"]))
+
+
+def chunk_seconds(chunks) -> float:
+    return sum(len(chunk.audio_int16_bytes) / (chunk.sample_width * chunk.sample_channels * chunk.sample_rate) for chunk in chunks)
+
+
+def join_chunks(chunks, pause: float) -> bytes:
+    first = chunks[0]
+    frame = first.sample_width * first.sample_channels
+    silence = b"\x00" * (int(first.sample_rate * pause) * frame)
+    buffer = io.BytesIO()
+    with wave.open(buffer, "wb") as wav_file:
+        wav_file.setframerate(first.sample_rate)
+        wav_file.setsampwidth(first.sample_width)
+        wav_file.setnchannels(first.sample_channels)
+        wav_file.writeframes(silence.join(chunk.audio_int16_bytes for chunk in chunks))
+    return buffer.getvalue()
+
+
+def count_words(text: str) -> int:
+    return len([word for word in text.split() if any(ch.isalnum() for ch in word)])
+
+
+def length_scale(words: int, speech_seconds: float, pause_seconds: float, words_per_minute: int, current: float = 1.0) -> float:
+    if words < 1 or speech_seconds <= 0 or words_per_minute <= 0:
+        return current
+    wanted = words * 60 / words_per_minute - pause_seconds
+    return round(min(MAX_LENGTH_SCALE, max(MIN_LENGTH_SCALE, current * wanted / speech_seconds)), 3)
+
+
+def read_speed(request: dict) -> dict | None:
+    rate = request.get("wordsPerMinute")
+    if isinstance(rate, bool) or not isinstance(rate, (int, float)):
+        return None
+    pause = request.get("sentencePauseSeconds")
+    pause = pause if isinstance(pause, (int, float)) and not isinstance(pause, bool) else 0
+    return {"rate": int(min(MAX_WORDS_PER_MINUTE, max(MIN_WORDS_PER_MINUTE, rate))), "pause": float(min(MAX_PAUSE_SECONDS, max(0, pause)))}
 
 
 def process_pronounce(request: dict, pronounce) -> dict:
@@ -143,11 +201,12 @@ def process_pronounce(request: dict, pronounce) -> dict:
     accents = [accent for accent in request.get("accents") or ["uk", "us"] if accent in ("uk", "us")]
     if not word:
         return {"status": "FAILED", "error": "No word to pronounce"}
+    speed = read_speed(request)
     try:
         phonetic: dict = {}
         audio: dict = {}
         for accent in accents:
-            ipa, mp3 = pronounce(word, accent)
+            ipa, mp3 = pronounce(word, accent, speed) if speed else pronounce(word, accent)
             phonetic[accent] = ipa
             audio[accent] = base64.b64encode(mp3).decode("ascii")
         return {"status": "DONE", "word": word, "phonetic": phonetic, "audio": audio}

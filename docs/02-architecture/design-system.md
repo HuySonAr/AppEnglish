@@ -54,10 +54,23 @@ Thứ bậc từ trên xuống, cột phải `21rem` trên màn hình rộng:
 2. **Bước tiếp theo**: khối `bg-primary` phẳng `rounded-[2rem]` có `GridPattern`, nhãn viên thuốc, tiêu đề lớn, `CircleSwapLink` nền trắng, vòng `ScoreRing tone="inverse"` tiến độ bài học | `StreakCard`.
 3. `TodayPlanCard` | `GoalCard`.
 4. `ScoreForecastCard`: biểu đồ L&R khi chọn nhóm L&R; chỉ chọn S&W thì thẻ gọn `SwForecastCard` "Appears after scoring" (D197); thẻ mục tiêu S&W hiện điểm 0–200 của lượt chấm gần nhất khi đã có (D198).
-5. "Where you stand": 4 chỉ số (`Stat`, nâng nhẹ khi hover, số đếm lên) và CEFR (`CefrProfileCard bare`) trong một `SectionCard`.
+5. "Where you stand": 4 chỉ số (`Stat`, nâng nhẹ khi hover, số đếm lên) trong một `SectionCard`.
 6. Unit | Practice (`GlideCards` 2×2 + trạng thái placement).
 
 Khu vực dùng `SectionCard` (`rounded-3xl border bg-card p-5 sm:p-6`, tiêu đề có ô biểu tượng `bg-primary/10`, liên kết bên phải là `ArrowLink`). Ô bên trong dùng `rounded-2xl border bg-background`. Trang học viên khác dùng lại khung này khi được làm lại.
+
+### Trang luyện Speaking (đề đang làm)
+- Đầu trang gọn: `PageBreadcrumb` (Practice › Speaking), rồi một hàng gồm tiêu đề đề `h1 text-lg font-semibold` (cắt dòng khi dài), nhãn mức và dạng câu · chủ đề; tab Practice/History nằm bên phải cùng hàng (`PracticeTabs` nhận `toolbar`).
+- Từ `lg`: hai cột trong vùng cao vừa màn hình (`h-[calc(100dvh-12rem-var(--player-h))]`, tối thiểu `24rem`), trang không cuộn. Khung chỉ cao theo nội dung (`items-start`, `max-h-full`), cuộn bên trong khi dài. Khung gọn: `rounded-xl border bg-card p-4 sm:p-5`, không đổ bóng. Cột trái là đề (đoạn đọc `text-lg sm:text-xl`, hoặc yêu cầu và hình `max-h-[50dvh]`, hoặc bối cảnh và bảng thông tin); cột phải rộng `23rem` gồm khu ghi âm (công tắc bỏ đếm giờ, mốc thời gian ETS, nút micro `h-12`) và kết quả mới nhất.
+- Dưới `lg`: các khối xếp dọc theo thứ tự đề → ghi âm → kết quả.
+- Audio mẫu đọc to và audio câu hỏi khi luyện không đếm giờ phát ở **thanh phát cố định cuối màn hình** kiểu trình nghe nhạc (`ModelAudio`): `fixed bottom-0`, chừa sidebar từ `lg` (`lg:left-64`), cao `4rem`, `border-t bg-card`, ba vùng: trái là tên (Model reading / Question n), giữa là nút lùi 3 giây và nút phát tròn `h-8` (`bg-foreground`) trên một thanh tiến độ mảnh `h-1` có thời gian hai bên (hover: thanh đổi `primary`, hiện núm), phải là `SpeedSwitch`. Trên điện thoại ẩn phần tên. Thanh đặt biến CSS `--player-h` để trang chừa chỗ dưới cùng; ẩn khi sang tab History. Audio ghi âm của học viên vẫn phát tại chỗ.
+- Màn hình kết quả (`SpeakingResultScreen`, D203): cùng đầu trang gọn; trong lúc chấm là khung chờ `max-w-md` căn giữa (spinner, danh sách bước có trạng thái xong / đang làm / chờ); xong thì kết quả `max-w-3xl` với nút "Other prompts" và "Practice again". Nhận xét AI có `LanguageSwitch` English / Tiếng Việt (viên thuốc như `SpeedSwitch`).
+
+### Trang Word memory (theo mẫu "Pastel Vocabulary Quiz Dashboard")
+- Gọn trong một màn hình: đầu trang ô biểu tượng tròn `h-10 bg-primary/10`, tiêu đề `text-xl font-bold`, mô tả một câu; bên phải thẻ nhỏ "From your lessons" (số câu, số câu đúng).
+- Thẻ tiến độ mảnh `px-4 py-2 text-sm`: "Question n / N", thanh `h-1.5` màu `primary`, phần trăm đã trả lời.
+- Từ `lg` hai cột: trái là câu hỏi (nhãn viên thuốc "Question n" + hướng dẫn, đề `text-lg font-semibold`, bốn lựa chọn xếp dọc `px-3 py-2 text-sm` có vòng chữ cái `h-7`; đúng `success/10` + dấu tích, sai `destructive/10`). Phải là thẻ từ sau khi chọn (từ `text-2xl text-primary`, phiên âm, nút phát âm UK/US, loại từ, nghĩa), ô ví dụ `bg-muted/40`, ô bài học nguồn `bg-warning/10`; đúng/sai chỉ hiện trên đáp án, không lặp lại. Trước khi chọn, cột phải là `RoundPanel`: lời nhắc, ba ô Right / Wrong / Left, lưới số câu (đúng xanh, sai đỏ, đang làm màu chính) và phím tắt.
+- Thanh điều hướng dưới cùng (dính đáy khi cuộn): "Previous" và "Next word" / "See the results".
 
 ### Trang auth (`AuthLayout`)
 Tham khảo: [login-page.webp](../assets/design/login-page.webp).

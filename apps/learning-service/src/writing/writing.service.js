@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { AccountRole } from '@appenglish/auth-contracts';
-import { ETS_TASK_TIMING, EtsWritingTask, PracticePromptKind } from '@appenglish/content-contracts';
+import { ETS_TASK_TIMING, EtsWritingTask, PracticePromptKind, practiceLevelOf } from '@appenglish/content-contracts';
 import { seal } from '@appenglish/backend-common/secret-box';
 import { currentRequestId } from '@appenglish/backend-common/observability';
 import {
@@ -100,7 +100,7 @@ export class WritingService {
       words: countWords(submission.answer),
       prompt: {
         title: submission.prompt.title,
-        level: submission.prompt.level,
+        level: practiceLevelOf(submission.prompt.level),
       },
       result: submission.result || null,
       teacherReview: submission.teacherReview || null,

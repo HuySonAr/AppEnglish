@@ -13,8 +13,7 @@ import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { ListPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
-import { etsTaskLabel, etsTaskOptions } from '../../../lib/practice-prompts.js';
-import { getCefrProfile } from '../api/progress-api.js';
+import { etsTaskLabel, etsTaskOptions, levelLabel, levelScores, levelShort } from '../../../lib/practice-prompts.js';
 import {
   PracticeSort,
   PracticeTried,
@@ -32,17 +31,15 @@ const PAGE_SIZE = 12;
 const DEFAULTS = { search: '', level: '', topic: 'all', kind: 'all', etsTask: 'all', tried: PracticeTried.ALL, sort: PracticeSort.LEVEL };
 const labelOf = (kindLabel, prompt) => etsTaskLabel(prompt.etsTask, typeof kindLabel === 'function' ? kindLabel(prompt) : kindLabel);
 
-export function PracticePromptList({ title, description, icon, kindLabel, basePath, load: loadPrompts, skill, maxScore = 10, notice }) {
+export function PracticePromptList({ title, description, icon, kindLabel, basePath, load: loadPrompts, maxScore = 10, notice }) {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
-  const [profileLevel, setProfileLevel] = useState(null);
   const { filters, setFilters, setFilter, page, setPage } = useListState(DEFAULTS);
 
   async function load() {
     setState('loading');
     try {
-      const [result, profile] = await Promise.all([loadPrompts(), skill ? getCefrProfile().catch(() => null) : null]);
-      setProfileLevel(profile?.data?.profile?.[skill]?.level || null);
+      const result = await loadPrompts();
       setData(result.data);
       setState('ready');
     } catch (error) {
@@ -68,7 +65,7 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
     );
 
   const prompts = data.prompts;
-  const level = filters.level || defaultPracticeLevel(prompts, profileLevel);
+  const level = filters.level || defaultPracticeLevel(prompts);
   const levels = levelCounts(prompts);
   const shown = paginate(filterPracticePrompts(prompts, { ...filters, level }), page, PAGE_SIZE);
   const narrowed = Object.entries(DEFAULTS).some(([key, value]) => key !== 'level' && filters[key] !== value);
@@ -90,7 +87,7 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
                 </TabsTrigger>
                 {levels.map((entry) => (
                   <TabsTrigger key={entry.level} value={entry.level}>
-                    {entry.level} <span className="ml-1.5 tabular-nums text-muted-foreground">{entry.count}</span>
+                    {levelLabel(entry.level)} <span className="ml-1.5 tabular-nums text-muted-foreground">{entry.count}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -125,7 +122,7 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
                     className="group flex h-full flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <div className="flex items-start gap-3">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-sm font-bold text-primary">{prompt.level}</span>
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-sm font-bold text-primary" title={levelScores(prompt.level)}>{levelShort(prompt.level)}</span>
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold leading-snug">{prompt.title}</p>
                         <p className="text-xs text-muted-foreground">

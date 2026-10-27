@@ -58,9 +58,9 @@ export function SpeakingRecorder({ maxSeconds, submitting = false, onSubmit, sub
         type="button"
         onClick={() => recorder.start(maxSeconds)}
         aria-label="Start recording"
-        className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
-        <Mic className="h-7 w-7" />
+        <Mic className="h-5 w-5" />
       </button>
       <p className="text-sm text-muted-foreground">Tap to record, up to {maxSeconds} seconds.</p>
     </div>

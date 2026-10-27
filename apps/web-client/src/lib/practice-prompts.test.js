@@ -38,7 +38,7 @@ test('prompts are searched, filtered and counted by status', () => {
     { kind: 'writing', level: 'B1', status: 'DRAFT', title: 'My town', topic: 'Places', publishedVersionNumber: 2 },
   ];
   assert.equal(filterPrompts(prompts, { kind: 'writing' }).length, 2);
-  assert.equal(filterPrompts(prompts, { level: 'B1', status: 'PUBLISHED' })[0].title, 'At the station');
+  assert.equal(filterPrompts(prompts, { level: 'intermediate', status: 'PUBLISHED' })[0].title, 'At the station');
   assert.equal(filterPrompts(prompts, { search: 'travel' })[0].title, 'At the station');
   assert.deepEqual(statusCounts(prompts), { DRAFT: 1, PENDING_REVIEW: 1, RETURNED: 0, PUBLISHED: 1 });
 });

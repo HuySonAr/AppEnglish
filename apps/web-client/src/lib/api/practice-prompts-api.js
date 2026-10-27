@@ -39,6 +39,6 @@ export async function uploadPracticeMedia(kind, file) {
   form.set('file', file);
   return (await httpClient.post('/content/media', form, { timeout: 180000 })).data;
 }
-export async function createPracticeMachineAudio(text) {
-  return (await httpClient.post(`${base}/machine-audio`, { text }, { timeout: 60000 })).data;
+export async function createPracticeMachineAudio(text, speed) {
+  return (await httpClient.post(`${base}/machine-audio`, speed ? { text, speed } : { text }, { timeout: 60000 })).data;
 }

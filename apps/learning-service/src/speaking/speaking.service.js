@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { AccountRole } from '@appenglish/auth-contracts';
-import { ETS_SET_TASKS, ETS_TASK_TIMING, EtsSpeakingTask, PracticePromptKind } from '@appenglish/content-contracts';
+import { ETS_SET_TASKS, ETS_TASK_TIMING, EtsSpeakingTask, PracticePromptKind, practiceLevelOf } from '@appenglish/content-contracts';
 import { currentRequestId } from '@appenglish/backend-common/observability';
 import {
   LearningEventType,
@@ -17,7 +17,7 @@ import { noEvents, recordActivity } from '../events/learning-events.js';
 import { placementErrors } from '../placement/placement.errors.js';
 import { readAloudItem } from '../swtest/swtest.scoring.js';
 import { speakingErrors } from './speaking.errors.js';
-import { openGradingSchema, openWhisperSchema, readAloudResultSchema } from './speaking.schemas.js';
+import { openGradingSchema, openWhisperSchema, readAloudFeedbackSchema, readAloudResultSchema } from './speaking.schemas.js';
 
 const READY_KINDS = new Set([PracticePromptKind.READ_ALOUD, PracticePromptKind.OPEN_SPEAKING]);
 const isOpen = (kind) => kind === PracticePromptKind.OPEN_SPEAKING;
@@ -100,12 +100,12 @@ export class SpeakingService {
       prompt: isOpen(submission.kind)
         ? {
             title: submission.prompt.title,
-            level: submission.prompt.level,
+            level: practiceLevelOf(submission.prompt.level),
             etsTask: submission.prompt.etsTask || null,
             instructions: submission.prompt.instructions,
             question: submission.prompt.question || null,
           }
-        : { title: submission.prompt.title, level: submission.prompt.level, text: submission.prompt.text },
+        : { title: submission.prompt.title, level: practiceLevelOf(submission.prompt.level), text: submission.prompt.text },
       result: submission.result || null,
       teacherReview: submission.teacherReview || null,
     };
@@ -244,12 +244,22 @@ export class SpeakingService {
     const schema = isOpen(submission.kind) ? openWhisperSchema : readAloudResultSchema;
     const parsed = answer.status === SubmissionStatus.DONE ? schema.safeParse(answer.result) : null;
     if (!parsed?.success) return this.finish(submission, { status: SubmissionStatus.FAILED, result: null, error: parsed ? 'The scoring result was not valid' : answer.error });
-    if (!isOpen(submission.kind)) return this.finish(submission, { status: SubmissionStatus.DONE, result: { ...parsed.data, ets: readAloudEts(parsed.data.scores) } });
-    const heard = { ...parsed.data, scores: openSpeakingScores(parsed.data.scores), gemini: null };
+    const open = isOpen(submission.kind);
+    const heard = open ? { ...parsed.data, scores: openSpeakingScores(parsed.data.scores), gemini: null } : { ...parsed.data, ets: readAloudEts(parsed.data.scores), gemini: null };
     const key = await this.keyOf(submission.accountId);
-    if (!key || !heard.transcript.trim()) return this.finish(submission, { status: SubmissionStatus.DONE, result: heard });
+    const said = open ? heard.transcript : heard.heard;
+    if (!key || !said.trim()) return this.finish(submission, { status: SubmissionStatus.DONE, result: heard });
     const at = this.now();
     const prompt = submission.prompt;
+    const job = open
+      ? {
+          prompt: { title: prompt.title, level: prompt.level, instructions: prompt.instructions, maxSeconds: prompt.maxSeconds, sampleAnswer: prompt.sampleAnswer, keyPoints: prompt.keyPoints || [] },
+          etsTask: prompt.etsTask || null,
+        }
+      : {
+          prompt: { title: prompt.title, level: prompt.level, maxSeconds: prompt.maxSeconds },
+          readAloud: { text: prompt.text, words: heard.words, extra: heard.extra, scores: heard.scores, wordsPerMinute: heard.wordsPerMinute, pauses: heard.pauses, ets: heard.ets },
+        };
     await this.repository.saveWithEvent(
       { ...submission, result: { ...heard, stage: 'grading' } },
       {
@@ -258,9 +268,8 @@ export class SpeakingService {
         payload: {
           submissionId: submission.id,
           accountId: submission.accountId,
-          prompt: { title: prompt.title, level: prompt.level, instructions: prompt.instructions, maxSeconds: prompt.maxSeconds, sampleAnswer: prompt.sampleAnswer, keyPoints: prompt.keyPoints || [] },
-          etsTask: prompt.etsTask || null,
-          answer: heard.transcript,
+          ...job,
+          answer: said,
           durationSeconds: submission.recording?.durationSeconds ?? null,
           key: key.sealed,
           model: key.model || null,
@@ -275,11 +284,19 @@ export class SpeakingService {
     return 'applied';
   }
 
+  applyFeedback(submission, answer) {
+    const { stage, ...heard } = submission.result;
+    const parsed = answer.status === SubmissionStatus.DONE ? readAloudFeedbackSchema.safeParse(answer.result) : null;
+    const geminiError = parsed?.success ? null : parsed ? 'Gemini did not give usable feedback.' : String(answer.error || 'Gemini could not give feedback.').slice(0, 500);
+    return this.finish(submission, { status: SubmissionStatus.DONE, result: { ...heard, gemini: parsed?.success ? parsed.data : null, ...(geminiError ? { geminiError } : {}) } });
+  }
+
   async applyGrading(answer) {
     const submission = answer?.submissionId ? await this.repository.findSubmission(answer.submissionId) : null;
-    if (!submission || !isOpen(submission.kind)) return 'unknown';
+    if (!submission || !READY_KINDS.has(submission.kind)) return 'unknown';
     if (submission.status !== SubmissionStatus.SCORING || submission.result?.stage !== 'grading') return 'duplicate';
     if (answer.status !== SubmissionStatus.DONE && answer.status !== SubmissionStatus.FAILED) return 'ignored';
+    if (!isOpen(submission.kind)) return this.applyFeedback(submission, answer);
     const { stage, ...heard } = submission.result;
     const parsed = answer.status === SubmissionStatus.DONE ? openGradingSchema.safeParse(answer.result) : null;
     if (!parsed?.success) return this.finish(submission, { status: SubmissionStatus.FAILED, result: heard, error: parsed ? 'The scoring result was not valid' : answer.error });

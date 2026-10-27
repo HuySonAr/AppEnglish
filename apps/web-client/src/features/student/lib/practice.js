@@ -1,9 +1,8 @@
-import { CEFR_LEVELS } from '@appenglish/content-contracts';
+import { DEFAULT_PRACTICE_LEVEL, PRACTICE_LEVELS, practiceLevelOf } from '@appenglish/content-contracts';
 import { SpokenWordStatus, SubmissionStatus } from '@appenglish/learning-contracts';
 import { compareText, matchesSearch } from '../../../lib/list.js';
 import { matchesEtsTask } from '../../../lib/practice-prompts.js';
 
-export const DEFAULT_PRACTICE_LEVEL = 'A2';
 export const SCORING_POLL_MS = 2000;
 export const SCORING_POLL_LIMIT = 90;
 
@@ -29,7 +28,7 @@ export function practiceTopicOptions(prompts) {
 export function filterPracticePrompts(prompts, { search = '', level = 'all', topic = 'all', kind = 'all', etsTask = 'all', tried = PracticeTried.ALL, sort = PracticeSort.LEVEL }) {
   const byTitle = (a, b) => compareText(a.title, b.title);
   const compare = {
-    [PracticeSort.LEVEL]: (a, b) => CEFR_LEVELS.indexOf(a.level) - CEFR_LEVELS.indexOf(b.level) || byTitle(a, b),
+    [PracticeSort.LEVEL]: (a, b) => PRACTICE_LEVELS.indexOf(practiceLevelOf(a.level)) - PRACTICE_LEVELS.indexOf(practiceLevelOf(b.level)) || byTitle(a, b),
     [PracticeSort.TITLE]: byTitle,
     [PracticeSort.BEST]: (a, b) => (a.bestTotal ?? 11) - (b.bestTotal ?? 11) || byTitle(a, b),
     [PracticeSort.RECENT]: (a, b) => String(b.lastSubmittedAt || '').localeCompare(String(a.lastSubmittedAt || '')) || byTitle(a, b),
@@ -38,7 +37,7 @@ export function filterPracticePrompts(prompts, { search = '', level = 'all', top
     .filter(
       (prompt) =>
         matchesSearch(`${prompt.title} ${prompt.topic}`, search) &&
-        (level === 'all' || prompt.level === level) &&
+        (level === 'all' || practiceLevelOf(prompt.level) === level) &&
         (topic === 'all' || prompt.topic === topic) &&
         (kind === 'all' || prompt.kind === kind) &&
         matchesEtsTask(prompt, etsTask) &&
@@ -87,15 +86,11 @@ export function wordCounts(words = []) {
 }
 
 export function levelCounts(prompts) {
-  return CEFR_LEVELS.map((level) => ({ level, count: prompts.filter((prompt) => prompt.level === level).length })).filter((entry) => entry.count > 0);
+  return PRACTICE_LEVELS.map((level) => ({ level, count: prompts.filter((prompt) => practiceLevelOf(prompt.level) === level).length })).filter((entry) => entry.count > 0);
 }
 
-export function defaultPracticeLevel(prompts, profileLevel) {
+export function defaultPracticeLevel(prompts) {
   const levels = levelCounts(prompts).map((entry) => entry.level);
   if (!levels.length) return 'all';
-  if (profileLevel && levels.includes(profileLevel)) return profileLevel;
-  if (levels.includes(DEFAULT_PRACTICE_LEVEL)) return DEFAULT_PRACTICE_LEVEL;
-  const base = CEFR_LEVELS.indexOf(DEFAULT_PRACTICE_LEVEL);
-  const distance = (level) => Math.abs(CEFR_LEVELS.indexOf(level) - base);
-  return [...levels].sort((a, b) => distance(a) - distance(b) || CEFR_LEVELS.indexOf(a) - CEFR_LEVELS.indexOf(b))[0];
+  return levels.includes(DEFAULT_PRACTICE_LEVEL) ? DEFAULT_PRACTICE_LEVEL : levels[0];
 }

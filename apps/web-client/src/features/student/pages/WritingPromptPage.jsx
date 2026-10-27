@@ -4,7 +4,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { countWords } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { durationText, etsTaskLabel, taskTypeLabels } from '../../../lib/practice-prompts.js';
+import { durationText, etsTaskLabel, levelLabel, taskTypeLabels } from '../../../lib/practice-prompts.js';
 import { Badge, Button } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
@@ -177,7 +177,7 @@ export function WritingPromptPage() {
               <Badge variant="outline">
                 {prompt.minWords}–{prompt.maxWords} words
               </Badge>
-              <Badge variant="outline">Level {prompt.level}</Badge>
+              <Badge variant="outline">{levelLabel(prompt.level)}</Badge>
             </div>
             <div className="space-y-2 border-t pt-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Scored on</p>
@@ -279,7 +279,7 @@ export function WritingPromptPage() {
       {back}
       <div className="space-y-1">
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <Badge variant="secondary">{prompt.level}</Badge>
+          <Badge variant="secondary">{levelLabel(prompt.level)}</Badge>
           <span>
             {typeLabel} · {prompt.topic}
           </span>

@@ -53,7 +53,16 @@ export const PracticePromptStatus = Object.freeze({
   UNPUBLISHED: 'UNPUBLISHED',
 });
 export const WritingTaskType = Object.freeze({ SENTENCE: 'sentence', EMAIL: 'email', PARAGRAPH: 'paragraph', ESSAY: 'essay' });
-export const CEFR_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+export const PracticeLevel = Object.freeze({ BASIC: 'basic', INTERMEDIATE: 'intermediate', ADVANCED: 'advanced' });
+export const PRACTICE_LEVELS = Object.freeze(Object.values(PracticeLevel));
+export const DEFAULT_PRACTICE_LEVEL = PracticeLevel.INTERMEDIATE;
+export const PRACTICE_LEVEL_INFO = Object.freeze({
+  [PracticeLevel.BASIC]: Object.freeze({ label: 'Basic', short: '<110', scores: 'below 110', maxScore: 109 }),
+  [PracticeLevel.INTERMEDIATE]: Object.freeze({ label: 'Intermediate', short: '110+', scores: '110-150', minScore: 110, maxScore: 150 }),
+  [PracticeLevel.ADVANCED]: Object.freeze({ label: 'Advanced', short: '150+', scores: 'above 150', minScore: 151 }),
+});
+const LEVEL_FROM_CEFR = Object.freeze({ A1: PracticeLevel.BASIC, A2: PracticeLevel.BASIC, B1: PracticeLevel.INTERMEDIATE, B2: PracticeLevel.ADVANCED, C1: PracticeLevel.ADVANCED, C2: PracticeLevel.ADVANCED });
+export const practiceLevelOf = (value) => (PRACTICE_LEVELS.includes(value) ? value : LEVEL_FROM_CEFR[value] || null);
 export const PRACTICE_LIMITS = Object.freeze({
   title: 120,
   topic: 60,
@@ -101,6 +110,13 @@ export const ETS_TASK_TIMING = Object.freeze({
 });
 
 export const Accent = Object.freeze({ UK: 'uk', US: 'us' });
+
+export const VoiceSpeed = Object.freeze({ SLOW: 'slow', NORMAL: 'normal', NATURAL: 'natural' });
+export const VOICE_SPEEDS = Object.freeze({
+  [VoiceSpeed.SLOW]: Object.freeze({ wordsPerMinute: 130, sentencePauseSeconds: 0.8 }),
+  [VoiceSpeed.NORMAL]: Object.freeze({ wordsPerMinute: 145, sentencePauseSeconds: 0.45 }),
+  [VoiceSpeed.NATURAL]: Object.freeze({ wordsPerMinute: 165, sentencePauseSeconds: 0.3 }),
+});
 
 export const PartOfSpeech = Object.freeze({
   NOUN: 'noun',

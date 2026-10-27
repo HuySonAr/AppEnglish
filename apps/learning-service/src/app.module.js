@@ -46,8 +46,6 @@ import { WritingService } from './writing/writing.service.js';
 import { ReviewGrpcController } from './review/review.grpc.controller.js';
 import { ReviewRepository } from './review/review.repository.js';
 import { ReviewService } from './review/review.service.js';
-import { CefrGrpcController } from './cefr/cefr.grpc.controller.js';
-import { CefrService } from './cefr/cefr.service.js';
 
 const EXPIRE_EVERY_MS = 5 * 60 * 1000;
 import { SpeakingService } from './speaking/speaking.service.js';
@@ -62,7 +60,7 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [MetricsController, HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, UsageGrpcController, SpeakingGrpcController, WritingGrpcController, ReviewGrpcController, CefrGrpcController, SwTestGrpcController],
+  controllers: [MetricsController, HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, UsageGrpcController, SpeakingGrpcController, WritingGrpcController, ReviewGrpcController, SwTestGrpcController],
   providers: [
     { provide: LEARNING_DATA_SOURCE, useFactory: createLearningDataSource },
     {
@@ -124,11 +122,6 @@ Module({
       provide: ListeningPracticeService,
       useFactory: (repository, contentClient, events) => new ListeningPracticeService(repository, contentClient, { events }),
       inject: [LISTENING_REPOSITORY, CONTENT_CLIENT, LearningEvents],
-    },
-    {
-      provide: CefrService,
-      useFactory: (mockRepository, submissions) => new CefrService(mockRepository, submissions),
-      inject: [MOCK_REPOSITORY, SPEAKING_REPOSITORY],
     },
     {
       provide: REVIEW_REPOSITORY,

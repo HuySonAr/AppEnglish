@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ReviewAction, TEACHER_REVIEW_LIMITS } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { etsTaskLabel, taskTypeLabels } from '../../../lib/practice-prompts.js';
+import { etsTaskLabel, levelLabel, taskTypeLabels } from '../../../lib/practice-prompts.js';
 import { Badge, Button, Input, Label } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
@@ -146,7 +146,7 @@ export function TeacherReviewPage() {
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-xl font-semibold">{data.prompt.title}</h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-            <Badge variant="secondary">{data.prompt.level}</Badge>
+            {data.prompt.level ? <Badge variant="secondary">{levelLabel(data.prompt.level)}</Badge> : null}
             <span>{reviewKindLabels[data.review.kind]}</span>
             <span>· yours until {until}</span>
           </div>

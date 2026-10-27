@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ContentService } from '../src/content/content.service.js';
 import { PracticeService } from '../src/practice/practice.service.js';
-import { practiceReturnSchema } from '../src/practice/practice.schemas.js';
+import { practiceContentSchemas, practiceReturnSchema } from '../src/practice/practice.schemas.js';
+import { practiceLevelOf } from '@appenglish/content-contracts';
 import { admin, createMemoryRepository, manager, student, teacher } from './memory-repository.js';
 const otherTeacher = { id: '66666666-6666-4666-8666-666666666666', role: 'TEACHER' };
 
@@ -38,7 +39,7 @@ test('a teacher writes a prompt, sends it for review, and a content manager publ
   for (const actor of [student, admin, manager]) await assert.rejects(() => service.createPrompt(actor, { kind: 'writing' }), { code: 26 });
   const created = await service.createPrompt(teacher, { kind: 'writing' });
   const id = created.prompt.id;
-  assert.deepEqual([created.prompt.status, created.latest.versionNumber, created.latest.content.level], ['DRAFT', 1, 'A2']);
+  assert.deepEqual([created.prompt.status, created.latest.versionNumber, created.latest.content.level], ['DRAFT', 1, 'intermediate']);
   await assert.rejects(() => service.getPrompt(otherTeacher, id), { code: 40 });
   await assert.rejects(() => service.getPrompt(manager, id), { code: 40 }, 'a draft never sent is private');
   await assert.rejects(() => service.submitPrompt(teacher, id), (error) => error.code === 42 && error.data.issues.some((issue) => issue.path === 'sampleAnswer'));
@@ -129,3 +130,11 @@ test('ETS task types check their own fields (D195)', async () => {
   assert.equal((await service.saveDraft(teacher, read, { content: { ...base, text: 'Hello.' } })).latest.content.etsTask, 'read_aloud');
 });
 
+
+test('practice levels are TOEIC targets and old CEFR levels map onto them', () => {
+  const schema = practiceContentSchemas.read_aloud;
+  assert.deepEqual(['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'advanced', 'X'].map(practiceLevelOf), ['basic', 'basic', 'intermediate', 'advanced', 'advanced', 'advanced', 'advanced', null]);
+  assert.equal(schema.parse({ level: 'B1' }).level, 'intermediate');
+  assert.equal(schema.parse({}).level, 'intermediate');
+  assert.throws(() => schema.parse({ level: 'expert' }));
+});

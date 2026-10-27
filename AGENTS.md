@@ -10,7 +10,7 @@
 - Làm một feature mỗi lượt, theo docs/04-implementation/implementation-order.md.
 - Nghiệp vụ trong docs/01-business là nguồn yêu cầu sản phẩm đã chốt.
 - Không tự thêm nghiệp vụ, service, API, database, event hay công nghệ.
-- Speaking, Writing, vai trò Teacher và hồ sơ năng lực CEFR có trong phạm vi theo D169–D174 và `docs/01-business/workflows/09-speaking-writing.md`; không thêm gì ngoài đó. Không đưa lớp học, mã lớp, assignment, buổi học trực tiếp, tính lương giáo viên, placement CEFR, SM-2 hoặc XP lesson vào phạm vi. Streak chỉ theo D154 (chuỗi ngày học, không gắn XP). CEFR không thay TOEIC cho placement chính, lesson, mục tiêu điểm, kế hoạch học hay dự báo.
+- Speaking, Writing và vai trò Teacher có trong phạm vi theo D169–D173, D201 và `docs/01-business/workflows/09-speaking-writing.md`; không thêm gì ngoài đó. Không đưa lớp học, mã lớp, assignment, buổi học trực tiếp, tính lương giáo viên, placement CEFR, hồ sơ năng lực CEFR, SM-2 hoặc XP lesson vào phạm vi. Streak chỉ theo D154 (chuỗi ngày học, không gắn XP). CEFR không thay TOEIC cho placement chính, lesson, mục tiêu điểm, kế hoạch học hay dự báo.
 - Không tự quyết định mục TBD. Nếu cần để triển khai, giải thích lựa chọn và hỏi người dùng.
 - Giữ pnpm workspaces/Turborepo, NestJS services, React + Vite client và quy ước code thật của repository. Không chuyển package manager/framework/language.
 - Trong NestJS, route thường nằm trong Controller; không tạo Express Router riêng nếu kiến trúc hiện tại không yêu cầu. Tách controller/DTO-validation/service/repository/model theo conventions hiện có.

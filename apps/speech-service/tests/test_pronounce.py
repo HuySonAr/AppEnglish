@@ -1,7 +1,7 @@
 import base64
 import unittest
 
-from speech_service.pronounce import format_ipa, process_pronounce
+from speech_service.pronounce import count_words, format_ipa, length_scale, process_pronounce
 
 
 class FormatIpaTest(unittest.TestCase):
@@ -57,3 +57,27 @@ class ProcessPronounceTest(unittest.TestCase):
 
         failed = process_pronounce({"word": "x"}, broken)
         self.assertEqual((failed["status"], failed["error"]), ("FAILED", "RuntimeError: voice missing"))
+
+
+class SpeedTest(unittest.TestCase):
+    def test_a_speed_is_passed_to_the_voice_and_clamped(self):
+        calls = []
+
+        def pronounce(text, accent, speed=None):
+            calls.append(speed)
+            return "/x/", b"mp3"
+
+        for extra in ({"wordsPerMinute": 125, "sentencePauseSeconds": 0.8}, {"wordsPerMinute": 999, "sentencePauseSeconds": 9}, {"wordsPerMinute": "fast"}, {}):
+            process_pronounce({"word": "Hello there.", "accents": ["uk"], **extra}, pronounce)
+        self.assertEqual(calls, [{"rate": 125, "pause": 0.8}, {"rate": 220, "pause": 2.0}, None, None])
+
+    def test_the_length_scale_leaves_room_for_the_pauses_within_the_voice_limits(self):
+        self.assertEqual(length_scale(30, 10.0, 0, 180), 1.0)
+        self.assertEqual(length_scale(30, 12.0, 0, 120), 1.25)
+        self.assertEqual(length_scale(30, 12.0, 3.0, 120), 1.0)
+        self.assertEqual(length_scale(30, 6.0, 0, 120), 1.5)
+        self.assertEqual(length_scale(30, 20.0, 0, 180), 0.8)
+        self.assertEqual(length_scale(0, 5.0, 0, 120), 1.0)
+        self.assertEqual(length_scale(30, 12.0, 0, 120, 1.2), 1.5)
+        self.assertEqual(length_scale(30, 15.0, 0, 120, 1.2), 1.2)
+        self.assertEqual(count_words("The 9:30 train - leaves now."), 5)

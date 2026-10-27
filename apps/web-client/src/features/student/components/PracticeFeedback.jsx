@@ -1,5 +1,32 @@
 import { CheckCircle2 } from 'lucide-react';
+import { cn } from '../../../lib/utils.js';
 import { errorSegments } from '../lib/writing.js';
+
+const LANGUAGES = [
+  { value: 'en', label: 'English' },
+  { value: 'vi', label: 'Tiếng Việt' },
+];
+
+export function LanguageSwitch({ lang, onChange }) {
+  return (
+    <div className="inline-flex rounded-full border bg-muted/40 p-0.5" role="group" aria-label="Feedback language">
+      {LANGUAGES.map((item) => (
+        <button
+          key={item.value}
+          type="button"
+          aria-pressed={lang === item.value}
+          onClick={() => onChange(item.value)}
+          className={cn(
+            'rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            lang === item.value ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export function FeedbackSection({ title, children }) {
   return (
@@ -30,7 +57,7 @@ export function AnnotatedText({ title, text, errors = [] }) {
   );
 }
 
-export function CorrectionList({ errors = [] }) {
+export function CorrectionList({ errors = [], lang = 'en' }) {
   if (!errors.length) return null;
   return (
     <FeedbackSection title="Corrections">
@@ -42,7 +69,7 @@ export function CorrectionList({ errors = [] }) {
               <p>
                 <span className="text-destructive line-through">{error.text}</span> → <span className="font-medium text-success">{error.suggestion}</span>
               </p>
-              <p className="text-muted-foreground">{error.explanation}</p>
+              <p className="text-muted-foreground">{lang === 'vi' && error.explanationVi ? error.explanationVi : error.explanation}</p>
             </div>
           </li>
         ))}

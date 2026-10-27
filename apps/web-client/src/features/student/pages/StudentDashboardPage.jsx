@@ -22,7 +22,6 @@ import { getPlacement } from '../api/placement-api.js';
 import { getProgress, getStreak } from '../api/progress-api.js';
 import { getStudyGoal } from '../api/goal-api.js';
 import { GoalCard, TodayPlanCard } from '../components/GoalCards.jsx';
-import { CefrProfileCard } from '../components/CefrProfileCard.jsx';
 import { ScoreForecastCard, SwForecastCard } from '../components/ScoreForecastCard.jsx';
 import { dailyPlan } from '../lib/study-plan.js';
 import { ScoreRing } from '../components/ScoreRing.jsx';
@@ -265,9 +264,6 @@ export function StudentDashboardPage() {
             <Stat icon={Timer} label="Best full mock" value={percentValue(bestMock)} detail={suggested ? `Suggested: level ${suggested.level}` : 'Mock tests'} />
             <Stat icon={Headphones} label="Listening skill" value={percentValue(skills?.listening?.percent)} bar={skills?.listening?.percent ?? 0} />
             <Stat icon={BookOpen} label="Reading skill" value={percentValue(skills?.reading?.percent)} bar={skills?.reading?.percent ?? 0} />
-          </div>
-          <div className="mt-5 border-t pt-5">
-            <CefrProfileCard bare />
           </div>
         </SectionCard>
       </RevealItem>

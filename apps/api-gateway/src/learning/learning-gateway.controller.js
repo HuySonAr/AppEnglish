@@ -201,9 +201,6 @@ export class LessonGatewayController extends LearningRelay {
   deleteAiKey(request) {
     return this.forward('DeleteAiKey', request);
   }
-  getCefrProfile(request) {
-    return this.forward('GetCefrProfile', request);
-  }
   getReviewQuota(request) {
     return this.forward('GetReviewQuota', request);
   }
@@ -356,7 +353,6 @@ const lessonRoutes = [
   [Delete, 'ai-key', 'deleteAiKey', [Req()]],
   [Put, 'ai-key/settings', 'saveAiSettings', [Body(), Req()]],
   [Get, 'ai-key/models', 'listAiModels', [Query(), Req()]],
-  [Get, 'cefr-profile', 'getCefrProfile', [Req()]],
   [Get, 'reviews/quota', 'getReviewQuota', [Req()]],
   [Get, 'reviews/queue', 'listReviewQueue', [Req()]],
   [Post, 'reviews', 'requestReview', [Body(), Req()]],

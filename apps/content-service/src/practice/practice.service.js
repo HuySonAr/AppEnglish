@@ -1,7 +1,10 @@
 import { AccountRole } from '@appenglish/auth-contracts';
-import { Accent, MediaSection, PracticePromptStatus as Status } from '@appenglish/content-contracts';
+import { Accent, MediaSection, PracticePromptStatus as Status, VOICE_SPEEDS, VoiceSpeed, practiceLevelOf } from '@appenglish/content-contracts';
 import { contentErrors } from '../content/content.errors.js';
 import { practiceContentSchemas, practiceIssues, practiceMediaIds } from './practice.schemas.js';
+
+const MACHINE_AUDIO_TIMEOUT_MS = 55_000;
+const withLevel = (content) => (content ? { ...content, level: practiceLevelOf(content.level) } : content);
 
 const OPEN_EDIT = new Set([Status.DRAFT, Status.RETURNED]);
 const EVER_PUBLISHED = new Set([Status.PUBLISHED, Status.ARCHIVED, Status.UNPUBLISHED]);
@@ -47,7 +50,7 @@ export class PracticeService {
           id: version.id,
           versionNumber: version.versionNumber,
           status: version.status,
-          content: version.content,
+          content: withLevel(version.content),
           reviewNote: version.reviewNote || null,
           submittedAt: iso(version.submittedAt),
           reviewedAt: iso(version.reviewedAt),
@@ -66,7 +69,7 @@ export class PracticeService {
       authorId: prompt.authorId,
       title: shown.title || '',
       etsTask: shown.etsTask || null,
-      level: shown.level || null,
+      level: practiceLevelOf(shown.level),
       topic: shown.topic || '',
       status: latest?.status || Status.DRAFT,
       versionNumber: latest?.versionNumber || 1,
@@ -186,19 +189,19 @@ export class PracticeService {
     return { deleted: { id: promptId }, removedMedia: removed.length };
   }
 
-  async createMachineAudio(actor, { text }) {
+  async createMachineAudio(actor, { text, speed = VoiceSpeed.NORMAL }) {
     this.assertTeacher(actor);
     const source = this.contentService.pronunciationSource;
     let data;
     try {
-      const entry = await source.lookup(text, { accents: [Accent.UK] });
+      const entry = await source.lookup(text, { accents: [Accent.UK], speed: VOICE_SPEEDS[speed], timeoutMs: MACHINE_AUDIO_TIMEOUT_MS });
       if (!entry?.audio?.[Accent.UK]) throw contentErrors.pronunciationUnavailable();
       data = await source.download(entry.audio[Accent.UK]);
     } catch (error) {
       if (error?.name === 'PronunciationUnavailableError') throw contentErrors.pronunciationUnavailable();
       throw error;
     }
-    const { media } = await this.contentService.uploadMedia(actor, { kind: 'audio', fileName: 'read-aloud-uk.mp3', mimeType: 'audio/mpeg', data, section: MediaSection.PRACTICE });
+    const { media } = await this.contentService.uploadMedia(actor, { kind: 'audio', fileName: `read-aloud-uk-${speed}.mp3`, mimeType: 'audio/mpeg', data, section: MediaSection.PRACTICE });
     const [asset] = await this.contentService.repository.findMediaByIds([media.id]);
     return { media: { ...media, url: asset && asset.storage !== 'local' ? asset.url : null } };
   }
@@ -218,7 +221,7 @@ export class PracticeService {
             versionNumber: version.versionNumber,
             title: version.content.title,
             etsTask: version.content.etsTask || null,
-            level: version.content.level,
+            level: practiceLevelOf(version.content.level),
             topic: version.content.topic,
             publishedAt: iso(version.reviewedAt),
           };
@@ -240,7 +243,7 @@ export class PracticeService {
         kind: prompt.kind,
         versionId: version.id,
         versionNumber: version.versionNumber,
-        content: version.content,
+        content: withLevel(version.content),
         media: Object.fromEntries(media.map((asset) => [asset.id, { kind: asset.kind, url: asset.url }])),
       },
     };

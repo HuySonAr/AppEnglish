@@ -106,3 +106,33 @@ test('recordings older than 180 days are deleted; scores stay', async () => {
   assert.notEqual((await service.getSubmission(student, recent.id)).submission.recordingUrl, null);
   assert.equal(repository.tables.submissions.filter((row) => row.recordingDeletedAt).length, 1);
 });
+
+test('with a Gemini key a read-aloud score waits for feedback, which never changes the score', async () => {
+  const sealed = { v: 1, iv: 'aXY=', data: 'ZGF0YQ==', tag: 'dGFn' };
+  const { service, readAloud, eventRepository } = harness({ key: { sealed, model: 'gemini-3.8-flash', thinkingLevel: null } });
+  const { submission } = await service.submit(student, readAloud.id, audio());
+  assert.equal(await service.applyResult({ submissionId: submission.id, status: 'DONE', result: scored }), 'applied');
+  const waiting = (await service.getSubmission(student, submission.id)).submission;
+  assert.deepEqual([waiting.status, waiting.stage, waiting.result.scores.total], ['SCORING', 'grading', 8.1]);
+  const job = eventRepository.tables.events.find((event) => event.type === LearningEventType.SPEAKING_GRADING_REQUESTED);
+  assert.equal(job.queue, LearningQueue.WRITING_REQUESTS);
+  assert.equal(job.payload.answer, 'The train');
+  assert.equal(job.payload.readAloud.text, 'The train leaves at nine.');
+  assert.deepEqual(job.payload.readAloud.ets, { task: 'read_aloud', pronunciation: 2, intonation: 3, score: 2.5, max: 3 });
+  assert.equal('etsTask' in job.payload, false);
+  const feedback = { feedback: 'Clear start.', strengths: ['Steady pace'], improvements: ['Say "train" slowly.'], practiceWords: ['train'], vi: { feedback: 'Mở đầu rõ.', strengths: [], improvements: [] }, model: 'gemini-3.8-flash' };
+  assert.equal(await service.applyGrading({ submissionId: submission.id, status: 'DONE', result: feedback }), 'applied');
+  assert.equal(await service.applyGrading({ submissionId: submission.id, status: 'DONE', result: feedback }), 'duplicate');
+  const done = (await service.getSubmission(student, submission.id)).submission;
+  assert.deepEqual([done.status, done.stage, done.total, done.result.gemini.feedback, done.result.gemini.vi.feedback, done.result.stage], ['DONE', null, 8.1, 'Clear start.', 'Mở đầu rõ.', undefined]);
+
+  const second = (await service.submit(student, readAloud.id, audio())).submission;
+  await service.applyResult({ submissionId: second.id, status: 'DONE', result: scored });
+  await service.applyGrading({ submissionId: second.id, status: 'FAILED', error: 'Your Gemini key has used up its quota for now. Try again later.' });
+  const kept = (await service.getSubmission(student, second.id)).submission;
+  assert.deepEqual([kept.status, kept.total, kept.result.gemini, kept.result.geminiError], ['DONE', 8.1, null, 'Your Gemini key has used up its quota for now. Try again later.']);
+
+  const silent = (await service.submit(student, readAloud.id, audio())).submission;
+  await service.applyResult({ submissionId: silent.id, status: 'DONE', result: { ...scored, heard: ' ' } });
+  assert.equal((await service.getSubmission(student, silent.id)).submission.status, 'DONE');
+});

@@ -10,7 +10,7 @@ import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx'
 import { greeting } from '../../student/lib/home.js';
 import { listPracticePrompts } from '../../../lib/api/practice-prompts-api.js';
 import { listReviewQueue } from '../api/review-api.js';
-import { etsTaskLabel, etsTaskOf, kindLabels, statusCounts, statusInfo, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
+import { etsTaskLabel, etsTaskOf, kindLabels, levelLabel, statusCounts, statusInfo, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
 import { kindPages } from './TeacherPromptsPage.jsx';
 import { listContentReviews } from '../../content-manager/api/content-api.js';
 import { ReviewStatusBadge } from '../../content-manager/components/ContentReview.jsx';
@@ -148,7 +148,7 @@ export function TeacherDashboardPage() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium">{prompt.title || 'Untitled prompt'}</span>
                       <span className="block truncate text-xs text-muted-foreground">
-                        {etsTaskLabel(etsTaskOf(prompt.kind, prompt), kindLabels[prompt.kind])} · {prompt.level}
+                        {etsTaskLabel(etsTaskOf(prompt.kind, prompt), kindLabels[prompt.kind])} · {levelLabel(prompt.level)}
                       </span>
                     </span>
                     <Badge variant={statusInfo[prompt.status].variant}>{statusInfo[prompt.status].label}</Badge>

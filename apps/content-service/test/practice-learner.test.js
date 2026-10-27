@@ -42,7 +42,7 @@ test('learners only get published prompts, as their published version (F12)', as
   const id = await publish(service);
   const { prompt: draft } = await service.createPrompt(teacher, { kind: 'read_aloud' });
   const listed = await service.listPublished();
-  assert.deepEqual(listed.prompts.map((item) => [item.id, item.title, item.level, item.versionNumber]), [[id, 'Train times', 'A2', 1]]);
+  assert.deepEqual(listed.prompts.map((item) => [item.id, item.title, item.level, item.versionNumber]), [[id, 'Train times', 'basic', 1]]);
   await service.saveDraft(teacher, id, { content: { ...readAloud, title: 'Train times v2' } });
   const paper = await service.paper(id);
   assert.equal(paper.prompt.content.title, 'Train times');
@@ -81,12 +81,18 @@ test('a teacher makes the model audio of a read-aloud text with the British mach
   await assert.rejects(() => service.createMachineAudio(student, { text: 'Hello' }), { code: 26 });
   await assert.rejects(() => service.createMachineAudio(manager, { text: 'Hello' }), { code: 26 });
   const { media } = await service.createMachineAudio(teacher, { text: 'The train leaves at nine.' });
-  assert.deepEqual(asked, [['The train leaves at nine.', { accents: ['uk'] }]]);
+  await service.createMachineAudio(teacher, { text: 'Slowly, please.', speed: 'slow' });
+  assert.deepEqual(asked, [
+    ['The train leaves at nine.', { accents: ['uk'], speed: { wordsPerMinute: 145, sentencePauseSeconds: 0.45 }, timeoutMs: 55000 }],
+    ['Slowly, please.', { accents: ['uk'], speed: { wordsPerMinute: 130, sentencePauseSeconds: 0.8 }, timeoutMs: 55000 }],
+  ]);
   assert.equal(media.kind, 'audio');
-  assert.equal(media.fileName, 'read-aloud-uk.mp3');
-  assert.equal(media.url, 'https://media.test/1/read-aloud-uk.mp3');
-  assert.equal(repository.tables.media.length, 1);
+  assert.equal(media.fileName, 'read-aloud-uk-normal.mp3');
+  assert.equal(media.url, 'https://media.test/1/read-aloud-uk-normal.mp3');
+  assert.equal(repository.tables.media.length, 2);
   assert.throws(() => practiceMachineAudioSchema.parse({ text: 'x'.repeat(501) }));
+  assert.equal(practiceMachineAudioSchema.parse({ text: 'Hi' }).speed, 'normal');
+  assert.throws(() => practiceMachineAudioSchema.parse({ text: 'Hi', speed: 'fast' }));
 });
 
 test('machine audio reports an unavailable voice', async () => {

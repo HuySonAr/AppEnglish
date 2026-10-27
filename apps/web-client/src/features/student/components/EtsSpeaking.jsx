@@ -8,6 +8,7 @@ import { canRecord, useCountdown, useRecorder } from '../hooks/use-recorder.js';
 import { newSetId, nextSetStep, playCount, prepareSeconds, readSeconds, recordSeconds, setTotal } from '../lib/ets-practice.js';
 import { scoreTone, toneText } from '../lib/practice.js';
 import { cn } from '../../../lib/utils.js';
+import { ModelAudio } from './ModelAudio.jsx';
 import { Countdown } from './EtsTimer.jsx';
 import { NoRecorder, RecordingMeter, SpeakingRecorder } from './SpeakingRecorder.jsx';
 import { SpeakingResult } from './SpeakingResult.jsx';
@@ -70,7 +71,7 @@ export function TimedSpeakingTask({ prompt, submitting, onSubmit }) {
 
   return (
     <div className="flex flex-col items-center gap-3 py-2 text-center">
-      <Button size="lg" className="gap-2" onClick={begin}>
+      <Button className="gap-2" onClick={begin}>
         <Play className="h-4 w-4" />
         Start
       </Button>
@@ -138,7 +139,7 @@ export function QuestionAudio({ url, times, onFinished }) {
   );
 }
 
-export function SpeakingSet({ prompt, timed, onSubmitAnswer }) {
+export function SpeakingSet({ prompt, timed, onSubmitAnswer, onFinished }) {
   const [setId, setSetId] = useState(() => newSetId());
   const [phase, setPhase] = useState('intro');
   const [index, setIndex] = useState(0);
@@ -158,6 +159,7 @@ export function SpeakingSet({ prompt, timed, onSubmitAnswer }) {
       setIndex(next.index);
       setPhase(next.phase);
       recorder.reset();
+      if (next.phase === 'done') onFinished?.(setId);
     } catch (error) {
       setFailedTake(take);
       setPhase('failed');
@@ -192,7 +194,7 @@ export function SpeakingSet({ prompt, timed, onSubmitAnswer }) {
   if (phase === 'intro')
     return (
       <div className="flex flex-col items-center gap-3 py-2 text-center">
-        <Button size="lg" className="gap-2" onClick={begin}>
+        <Button className="gap-2" onClick={begin}>
           <Play className="h-4 w-4" />
           Start
         </Button>
@@ -230,7 +232,7 @@ export function SpeakingSet({ prompt, timed, onSubmitAnswer }) {
         <p className="text-lg font-medium leading-relaxed">{question.text}</p>
       </div>
       {timed && phase === 'question' ? <QuestionAudio key={`${setId}-${index}`} url={question.audioUrl} times={playCount(prompt, index)} onFinished={() => setPhase(prepare ? 'prepare' : 'recording-start')} /> : null}
-      {!timed && question.audioUrl ? <audio key={`${setId}-${index}`} controls src={question.audioUrl} className="w-full" /> : null}
+      {!timed && question.audioUrl ? <ModelAudio key={`${setId}-${index}`} src={question.audioUrl} label={`Question ${index + 1}`} /> : null}
       {timed && phase === 'prepare' ? <Countdown label="Prepare" left={prepareLeft} total={prepare} /> : null}
       {timed && phase === 'recording-start' ? <AutoStart onStart={startRecording} /> : null}
       {timed && recorder.phase === 'recording' ? <RecordingMeter label="Speak now" elapsed={recorder.elapsed} limit={speak} onStop={recorder.stop} /> : null}
@@ -260,7 +262,7 @@ function AutoStart({ onStart }) {
   return null;
 }
 
-export function SetResults({ answers, questions = [], quota, onReview }) {
+export function SetResults({ answers, questions = [], quota, onReview, hasKey }) {
   const total = setTotal(answers);
   return (
     <div className="space-y-4">
@@ -277,7 +279,7 @@ export function SetResults({ answers, questions = [], quota, onReview }) {
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Question {number}</p>
               <p className="font-medium">{answer.prompt?.question || questions[number - 1]?.text || ''}</p>
             </div>
-            <SpeakingResult submission={answer} />
+            <SpeakingResult submission={answer} hasKey={hasKey} />
             <TeacherReviewPanel submission={answer} quota={quota} onRequested={(result) => onReview(answer, result)} />
           </div>
         );

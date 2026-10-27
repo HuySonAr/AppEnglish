@@ -25,7 +25,6 @@ export function WritingPromptsPage() {
       kindLabel="Writing"
       basePath="/student/practice/writing"
       load={listWritingPrompts}
-      skill="writing"
       maxScore={5}
       notice={(data) => <KeyNotice hasKey={data.hasKey} />}
     />

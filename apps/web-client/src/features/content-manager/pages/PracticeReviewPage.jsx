@@ -14,7 +14,7 @@ import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
 import { timeAgo } from '../../../lib/notifications.js';
 import { listPracticePrompts } from '../../../lib/api/practice-prompts-api.js';
-import { ReviewArea, authorOptions, etsTaskLabel, etsTaskOf, etsTaskOptions, filterPrompts, kindLabels, levelOptions, reviewAreaKinds, reviewPromptPath, statusInfo } from '../../../lib/practice-prompts.js';
+import { ReviewArea, authorOptions, etsTaskLabel, etsTaskOf, etsTaskOptions, filterPrompts, kindLabels, levelOptions, levelScores, levelShort, reviewAreaKinds, reviewPromptPath, statusInfo } from '../../../lib/practice-prompts.js';
 
 const PAGE_SIZE = 10;
 const DEFAULTS = { search: '', kind: 'all', etsTask: 'all', level: 'all', status: 'PENDING_REVIEW', author: 'all' };
@@ -121,7 +121,7 @@ export function PracticeReviewPage({ area }) {
                       to={reviewPromptPath(prompt.kind, prompt.id)}
                       className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                     >
-                      <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-md bg-muted text-sm font-semibold">{prompt.level || '—'}</span>
+                      <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-md bg-muted text-sm font-semibold" title={levelScores(prompt.level)}>{levelShort(prompt.level)}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-medium">{prompt.title || 'Untitled prompt'}</span>
                         <span className="block truncate text-xs text-muted-foreground">

@@ -1,4 +1,5 @@
 import { AccountRole } from '@appenglish/auth-contracts';
+import { practiceLevelOf } from '@appenglish/content-contracts';
 import { currentRequestId } from '@appenglish/backend-common/observability';
 import {
   SW_REVIEW_KINDS,
@@ -167,7 +168,7 @@ export class ReviewService {
           id: review.id,
           kind: review.kind,
           title: sw ? submission?.title || '' : submission?.prompt?.title || '',
-          level: sw ? null : submission?.prompt?.level || null,
+          level: sw ? null : practiceLevelOf(submission?.prompt?.level),
           hasAi: sw ? Boolean(submission?.ai) : Boolean(submission && aiScoresOf(submission)),
           requestedAt: iso(review.requestedAt),
           expiresAt: iso(review.expiresAt),
@@ -201,7 +202,7 @@ export class ReviewService {
       review: { id: review.id, kind: review.kind, requestedAt: iso(review.requestedAt), expiresAt: iso(review.expiresAt), claimedAt: iso(review.claimedAt), lockedUntil: iso(review.lockedUntil) },
       prompt: {
         title: prompt.title,
-        level: prompt.level,
+        level: practiceLevelOf(prompt.level),
         topic: prompt.topic,
         text: prompt.text,
         audioUrl: prompt.audioUrl || null,

@@ -15,6 +15,7 @@ import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
 import { claimReview, listReviewQueue } from '../api/review-api.js';
 import { hoursLeft, isWrittenKind, reviewKindLabels } from '../lib/review.js';
+import { levelLabel } from '../../../lib/practice-prompts.js';
 
 const PAGE_SIZE = 15;
 const DEFAULTS = { kind: 'all', ai: 'all' };
@@ -115,7 +116,7 @@ export function TeacherReviewQueuePage() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium">{item.title || 'Untitled prompt'}</span>
                       <span className="block truncate text-xs text-muted-foreground">
-                        {[reviewKindLabels[item.kind], item.level].filter(Boolean).join(' · ')} · sent {timeAgo(item.requestedAt)} · {hoursLeft(item.expiresAt)} h left
+                        {[reviewKindLabels[item.kind], item.level && levelLabel(item.level)].filter(Boolean).join(' · ')} · sent {timeAgo(item.requestedAt)} · {hoursLeft(item.expiresAt)} h left
                       </span>
                     </span>
                     <span className="hidden shrink-0 gap-1.5 sm:flex">

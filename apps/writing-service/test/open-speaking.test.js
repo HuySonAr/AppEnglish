@@ -13,18 +13,24 @@ const job = () => ({ id: 'e2', type: 'speaking.grading.requested', payload: { su
 const raw = {
   criteria: { task: 4, vocabulary: 3.2, grammar: 3, coherence: 4 },
   feedback: 'You named the place and gave a reason.',
-  errors: [{ text: 'like travel', suggestion: 'like travelling', explanation: 'Use -ing after like.' }, { text: 'not said', suggestion: 'x', explanation: 'y' }],
+  errors: [{ text: 'like travel', suggestion: 'like travelling', explanation: 'Use -ing after like.', explanationVi: 'Dùng -ing sau like.' }, { text: 'not said', suggestion: 'x', explanation: 'y' }],
+  feedbackVi: 'Bạn đã nêu nơi chốn và lý do.',
   rewrite: 'I like travelling to Da Nang because the beach is beautiful.',
 };
 
 test('a spoken answer is graded from its transcript on four criteria', async () => {
   const text = buildOpenSpeakingPrompt(job().payload);
-  for (const part of ['Task level (CEFR): B1', 'up to 60 seconds; the learner spoke for 21 seconds', '- why', 'Transcript (13 words)', transcript]) assert.ok(text.includes(part), part);
+  for (const part of ['Task level: Intermediate, for learners aiming at TOEIC Speaking 110-150 (0-200 scale)', 'up to 60 seconds; the learner spoke for 21 seconds', '- why', 'Transcript (13 words)', transcript]) assert.ok(text.includes(part), part);
   assert.deepEqual(OPEN_SCHEMA.properties.criteria.required, ['task', 'vocabulary', 'grammar', 'coherence']);
   const parsed = parseOpenSpeakingResult(raw, transcript);
   assert.deepEqual(parsed.criteria, { task: 4, vocabulary: 3, grammar: 3, coherence: 4 });
   assert.deepEqual(parsed.errors.map((error) => error.text), ['like travel']);
   assert.equal('scores' in parsed, false);
+  assert.equal(parsed.feedbackVi, 'Bạn đã nêu nơi chốn và lý do.');
+  assert.equal(parsed.errors[0].explanationVi, 'Dùng -ing sau like.');
+  assert.ok(OPEN_SCHEMA.required.includes('feedbackVi'));
+  assert.ok(OPEN_SCHEMA.properties.errors.items.required.includes('explanationVi'));
+  assert.ok(text.includes('"feedbackVi"'));
   const requests = [];
   const answer = await gradeWriting(job(), { gemini: { generateJson: async (key, request) => (requests.push(request), raw) }, secret });
   assert.equal(answer.status, 'DONE');
@@ -49,7 +55,7 @@ test('an ETS task adds its TOEIC scoring guide and an etsScore to the same reque
   const text = buildOpenSpeakingPrompt(payload);
   assert.match(text, /TOEIC Speaking scoring guide for this task \(respond questions, whole number 0-3\)/);
   assert.match(text, /3 = a full, relevant, socially appropriate reply/);
-  assert.deepEqual(openSchema('respond_questions').required, ['criteria', 'feedback', 'errors', 'rewrite', 'etsScore']);
+  assert.deepEqual(openSchema('respond_questions').required, ['criteria', 'feedback', 'errors', 'rewrite', 'feedbackVi', 'etsScore']);
   assert.equal(openSchema(null), OPEN_SCHEMA);
   assert.doesNotMatch(buildOpenSpeakingPrompt(job().payload), /etsScore/);
   assert.match(buildOpenSpeakingPrompt({ ...payload, etsTask: 'describe_picture' }), /cannot see the picture/);

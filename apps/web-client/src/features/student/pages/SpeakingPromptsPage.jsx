@@ -12,7 +12,6 @@ export function SpeakingPromptsPage() {
       kindLabel={(prompt) => kindLabels[prompt.kind]}
       basePath="/student/practice/speaking"
       load={listSpeakingPrompts}
-      skill="speaking"
     />
   );
 }

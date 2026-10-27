@@ -7,7 +7,6 @@ import { cn } from '../../../lib/utils.js';
 import { Button } from '../../../components/ui';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
-import { CefrProfileCard } from '../components/CefrProfileCard.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { getProgress, getXp } from '../api/progress-api.js';
 import { ScoreRing } from '../components/ScoreRing.jsx';
@@ -69,8 +68,6 @@ export function ProgressPage() {
   return (
     <section className="space-y-6">
       {header}
-
-      <CefrProfileCard />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <RingCard

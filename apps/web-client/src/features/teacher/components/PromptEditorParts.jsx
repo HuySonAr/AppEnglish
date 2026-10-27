@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AudioLines, Timer } from 'lucide-react';
-import { PRACTICE_LIMITS } from '@appenglish/content-contracts';
+import { PRACTICE_LIMITS, VoiceSpeed } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { cn } from '../../../lib/utils.js';
@@ -116,10 +116,28 @@ export function TaskTypePicker({ tasks, current, onPick, fixed = false }) {
   );
 }
 
-export function QuestionRows({ questions, media, onMedia, onQuestion: update, busy, onVoice }) {
+const VOICE_SPEED_LABELS = { [VoiceSpeed.SLOW]: 'Slow', [VoiceSpeed.NORMAL]: 'Normal', [VoiceSpeed.NATURAL]: 'Natural' };
+
+export function VoiceSpeedPicker({ speed, onPick }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-sm text-muted-foreground">Machine voice speed</span>
+      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Machine voice speed">
+        {Object.values(VoiceSpeed).map((value) => (
+          <Choice key={value} value={value} current={speed} onPick={onPick}>
+            {VOICE_SPEED_LABELS[value]}
+          </Choice>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function QuestionRows({ questions, media, onMedia, onQuestion: update, busy, onVoice, voiceSpeed, onVoiceSpeed }) {
   return (
     <div className="space-y-3">
       <Label>Questions</Label>
+      {questions.some((question) => !question.audioMediaId) ? <VoiceSpeedPicker speed={voiceSpeed} onPick={onVoiceSpeed} /> : null}
       {questions.map((question, index) => (
         <div key={index} className="space-y-3 rounded-xl border bg-background p-3">
           <div className="flex items-center gap-2">

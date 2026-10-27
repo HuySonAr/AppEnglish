@@ -63,7 +63,7 @@ export const scored = {
   heard: 'The train',
 };
 
-export function speakingHarness() {
+export function speakingHarness({ key = null } = {}) {
   let clock = new Date('2026-10-23T08:00:00Z');
   const eventRepository = createEventRepository();
   const transport = fakeTransport();
@@ -90,7 +90,8 @@ export function speakingHarness() {
       return { deleted: recordings.map((item) => item.storageId).filter((id) => id !== 'rec-2'), failed: ['rec-2'] };
     },
   };
-  const service = new SpeakingService(repository, content, { now: () => clock, events });
+  const keys = { findKey: async (accountId) => (key ? { accountId, ...key } : null) };
+  const service = new SpeakingService(repository, content, { now: () => clock, events, keys });
   return { service, repository, eventRepository, transport, events, readAloud, writing, stored, removed, setClock: (value) => (clock = value) };
 }
 

@@ -39,6 +39,12 @@ test('lookup asks speech-service for both accents and returns the audio bytes', 
   assert.equal((await new SpeechPronunciationSource(brokerAnswering(both), { ipaAccent: 'us' }).lookup('x')).phonetic, '/us/');
 });
 
+test('a machine voice speed and a longer wait go with the request', async () => {
+  const broker = brokerAnswering({ status: 'DONE', phonetic: {}, audio: { uk: mp3('uk').toString('base64') } });
+  await new SpeechPronunciationSource(broker, { timeoutMs: 5000 }).lookup('Hello.', { accents: ['uk'], speed: { wordsPerMinute: 130, sentencePauseSeconds: 0.8 }, timeoutMs: 55000 });
+  assert.deepEqual(broker.calls, [{ queue: SpeechQueue.PRONOUNCE_REQUESTS, message: { word: 'Hello.', accents: ['uk'], wordsPerMinute: 130, sentencePauseSeconds: 0.8 }, timeoutMs: 55000 }]);
+});
+
 test('a broker that is away or a failed answer is reported as unavailable', async () => {
   await assert.rejects(() => new SpeechPronunciationSource(brokerAnswering(new Error('RabbitMQ is not connected'))).lookup('x'), { name: 'PronunciationUnavailableError' });
   await assert.rejects(() => new SpeechPronunciationSource(brokerAnswering({ status: 'FAILED', error: 'voice missing' })).lookup('x'), { name: 'PronunciationUnavailableError', message: 'voice missing' });

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@appenglish/backend-common": "workspace:*",
+    "@appenglish/content-contracts": "workspace:*",
     "@appenglish/learning-contracts": "workspace:*",
     "amqplib": "^0.10.9"
   }

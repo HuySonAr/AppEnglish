@@ -3,6 +3,7 @@ import { open } from '@appenglish/backend-common/secret-box';
 import { GeminiError, GeminiFailure } from './gemini.js';
 import { OPEN_SYSTEM, SYSTEM, buildOpenSpeakingPrompt, openSchema, writingSchema, buildWritingPrompt, parseOpenSpeakingResult, parseWritingResult } from './rubric.js';
 import { ETS_SCHEMA, ETS_SYSTEM, buildEtsPrompt, etsMaxScore, hasGuide, parseEtsResult } from './ets-rubric.js';
+import { READ_ALOUD_SCHEMA, READ_ALOUD_SYSTEM, buildReadAloudPrompt, parseReadAloudResult } from './read-aloud.js';
 
 const failed = (submissionId, error) => ({ submissionId, status: SubmissionStatus.FAILED, error });
 
@@ -17,7 +18,8 @@ export const failureText = {
 
 export const isSpeakingJob = (message) => message?.type === LearningEventType.SPEAKING_GRADING_REQUESTED;
 export const isSwJob = (message) => message?.type === LearningEventType.SW_GRADING_REQUESTED;
-export const jobTask = (message) => (isSwJob(message) ? 'sw_test' : isSpeakingJob(message) ? 'open_speaking' : 'writing');
+export const isReadAloudJob = (message) => isSpeakingJob(message) && Boolean((message.payload || message).readAloud);
+export const jobTask = (message) => (isSwJob(message) ? 'sw_test' : isReadAloudJob(message) ? 'read_aloud' : isSpeakingJob(message) ? 'open_speaking' : 'writing');
 
 export async function gradeWriting(message, { gemini, secret, defaultModel = gemini.model }) {
   const payload = message?.payload && typeof message.payload === 'object' ? message.payload : message || {};
@@ -31,14 +33,17 @@ export async function gradeWriting(message, { gemini, secret, defaultModel = gem
   }
   const speaking = isSpeakingJob(message);
   const ets = isSwJob(message);
+  const readAloud = speaking && payload.readAloud && typeof payload.readAloud.text === 'string';
   if (ets && !hasGuide(payload.task)) return failed(submissionId, 'The task type cannot be scored.');
   const maxScore = ets ? etsMaxScore(payload.task, payload.maxScore) : null;
   const request = ets
     ? { system: ETS_SYSTEM, prompt: buildEtsPrompt({ ...payload, maxScore }), schema: ETS_SCHEMA }
-    : speaking
-      ? { system: OPEN_SYSTEM, prompt: buildOpenSpeakingPrompt(payload), schema: openSchema(payload.etsTask) }
-      : { system: SYSTEM, prompt: buildWritingPrompt(payload), schema: writingSchema(payload.etsTask) };
-  const parse = ets ? (raw) => parseEtsResult(raw, maxScore) : speaking ? (raw, answer) => parseOpenSpeakingResult(raw, answer, payload.etsTask) : (raw, answer) => parseWritingResult(raw, answer, payload.etsTask);
+    : readAloud
+      ? { system: READ_ALOUD_SYSTEM, prompt: buildReadAloudPrompt(payload), schema: READ_ALOUD_SCHEMA }
+      : speaking
+        ? { system: OPEN_SYSTEM, prompt: buildOpenSpeakingPrompt(payload), schema: openSchema(payload.etsTask) }
+        : { system: SYSTEM, prompt: buildWritingPrompt(payload), schema: writingSchema(payload.etsTask) };
+  const parse = ets ? (raw) => parseEtsResult(raw, maxScore) : readAloud ? (raw) => parseReadAloudResult(raw, payload.readAloud.text) : speaking ? (raw, answer) => parseOpenSpeakingResult(raw, answer, payload.etsTask) : (raw, answer) => parseWritingResult(raw, answer, payload.etsTask);
   const choice = geminiChoice(payload.model, payload.thinkingLevel) || { model: defaultModel, thinkingLevel: null };
   for (let attempt = 1; ; attempt++) {
     try {

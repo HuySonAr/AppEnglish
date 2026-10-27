@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CEFR_LEVELS, ETS_SET_QUESTIONS, ETS_SET_TASKS, EtsSpeakingTask, EtsWritingTask, PRACTICE_LIMITS, PracticePromptKind, WritingTaskType } from '@appenglish/content-contracts';
+import { DEFAULT_PRACTICE_LEVEL, ETS_SET_QUESTIONS, ETS_SET_TASKS, EtsSpeakingTask, EtsWritingTask, PRACTICE_LIMITS, PRACTICE_LEVELS, PracticePromptKind, VoiceSpeed, WritingTaskType, practiceLevelOf } from '@appenglish/content-contracts';
 
 const text = (max) => z.string().trim().max(max).default('');
 const mediaId = z.string().uuid().nullable().default(null);
@@ -15,7 +15,7 @@ const openTasks = Object.values(EtsSpeakingTask).filter((task) => task !== EtsSp
 
 const common = {
   title: text(PRACTICE_LIMITS.title),
-  level: z.enum(CEFR_LEVELS).default('A2'),
+  level: z.preprocess((value) => practiceLevelOf(value) ?? value, z.enum(PRACTICE_LEVELS)).default(DEFAULT_PRACTICE_LEVEL),
   topic: text(PRACTICE_LIMITS.topic),
 };
 
@@ -102,7 +102,7 @@ export function practiceMediaIds(content) {
   return [content?.audioMediaId, content?.imageMediaId, ...(content?.questions || []).map((question) => question.audioMediaId)].filter(Boolean);
 }
 
-export const practiceMachineAudioSchema = z.object({ text: z.string().trim().min(1).max(PRACTICE_LIMITS.readAloudText) }).strict();
+export const practiceMachineAudioSchema = z.object({ text: z.string().trim().min(1).max(PRACTICE_LIMITS.readAloudText), speed: z.enum(Object.values(VoiceSpeed)).default(VoiceSpeed.NORMAL) }).strict();
 
 export const learnerRecordingsSchema = z
   .object({

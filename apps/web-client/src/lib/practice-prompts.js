@@ -1,14 +1,16 @@
 import {
-  CEFR_LEVELS,
   ETS_SET_QUESTIONS,
   ETS_SET_TASKS,
   ETS_TASK_TIMING,
   EtsSpeakingTask,
   EtsWritingTask,
+  PRACTICE_LEVELS,
+  PRACTICE_LEVEL_INFO,
   PRACTICE_LIMITS,
   PracticePromptKind,
   PracticePromptStatus,
   WritingTaskType,
+  practiceLevelOf,
 } from '@appenglish/content-contracts';
 
 export const kindLabels = {
@@ -39,7 +41,11 @@ export const statusInfo = {
   [PracticePromptStatus.UNPUBLISHED]: { label: 'Taken down', variant: 'destructive' },
 };
 
-export const levelOptions = [{ value: 'all', label: 'All levels' }, ...CEFR_LEVELS.map((level) => ({ value: level, label: level }))];
+const levelInfo = (level) => PRACTICE_LEVEL_INFO[practiceLevelOf(level)] || null;
+export const levelLabel = (level) => levelInfo(level)?.label || '—';
+export const levelShort = (level) => levelInfo(level)?.short || '—';
+export const levelScores = (level) => (levelInfo(level) ? `TOEIC ${levelInfo(level).scores.replace('-', '–')}` : '');
+export const levelOptions = [{ value: 'all', label: 'All levels' }, ...PRACTICE_LEVELS.map((level) => ({ value: level, label: levelLabel(level) }))];
 export const kindOptions = [{ value: 'all', label: 'All kinds' }, ...Object.entries(kindLabels).map(([value, label]) => ({ value, label }))];
 
 export function countWords(text) {
@@ -88,7 +94,7 @@ export function filterPrompts(prompts, { search = '', kind = 'all', level = 'all
   return prompts.filter(
     (prompt) =>
       (kind === 'all' || prompt.kind === kind) &&
-      (level === 'all' || prompt.level === level) &&
+      (level === 'all' || practiceLevelOf(prompt.level) === level) &&
       (status === 'all' || prompt.status === status) &&
       matchesEtsTask(prompt, etsTask) &&
       (!query || `${prompt.title} ${prompt.topic}`.toLowerCase().includes(query)),

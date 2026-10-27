@@ -13,6 +13,3 @@ export async function getStreak() {
 export async function getLeaderboard() {
   return (await httpClient.get('/progress/leaderboard')).data;
 }
-export async function getCefrProfile() {
-  return (await httpClient.get('/learning/cefr-profile')).data;
-}

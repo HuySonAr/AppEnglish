@@ -1,7 +1,7 @@
 import { CheckCircle2, Clock, FileText, Timer } from 'lucide-react';
 import { PracticePromptKind } from '@appenglish/content-contracts';
 import { Badge } from '../ui/badge.jsx';
-import { countWords, etsFields, etsTaskLabel, etsTaskOf, etsTimingParts, kindLabels, taskTypeLabels } from '../../lib/practice-prompts.js';
+import { countWords, etsFields, etsTaskLabel, etsTaskOf, etsTimingParts, kindLabels, levelLabel, taskTypeLabels } from '../../lib/practice-prompts.js';
 import { PassageText } from './PassageText.jsx';
 
 function Section({ title, children }) {
@@ -35,7 +35,7 @@ export function PracticePromptView({ kind, content, media = {} }) {
       <div className="space-y-1.5">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{kindLabels[kind]}</Badge>
-          <Badge variant="outline">{content.level}</Badge>
+          <Badge variant="outline">{levelLabel(content.level)}</Badge>
           {task ? <Badge variant="info">{etsTaskLabel(task)}</Badge> : <Badge variant="warning">No task type</Badge>}
           {content.topic ? <span className="text-sm text-muted-foreground">{content.topic}</span> : null}
           {kind === PracticePromptKind.WRITING && !task && content.taskType ? <span className="text-sm text-muted-foreground">· {taskTypeLabels[content.taskType]}</span> : null}

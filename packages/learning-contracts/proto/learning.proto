@@ -86,7 +86,6 @@ service LearningService {
   rpc GetReview(LearningRequest) returns (LearningReply);
   rpc ReleaseReview(LearningRequest) returns (LearningReply);
   rpc CompleteReview(LearningRequest) returns (LearningReply);
-  rpc GetCefrProfile(LearningRequest) returns (LearningReply);
 }
 
 message Actor {

@@ -31,7 +31,7 @@ Code: `apps/speech-service/` (Python 3.12).
 | Queue | Producer → consumer | Body (JSON) |
 |---|---|---|
 | `speech.autotime.requests` | content-service → speech-service | `{ jobId, task, audioUrl, language: "en", kind, lines }`: task `align` (Auto-time) with `lines: [{ id, text }]` (song lines without their brackets); task `transcribe` (D98) with no lines |
-| `speech.pronounce.requests` | content-service → speech-service (D123) | `{ word, accents?: ["uk", "us"] }` with `reply_to` and `correlation_id` set; the answer goes to `reply_to` with the same `correlation_id`: `{ status: "DONE", word, phonetic: { uk, us }, audio: { uk, us } }` (IPA with slashes; MP3 as base64) or `{ status: "FAILED", error }` |
+| `speech.pronounce.requests` | content-service → speech-service (D123) | `{ word, accents?: ["uk", "us"], wordsPerMinute?, sentencePauseSeconds? }` with `reply_to` and `correlation_id` set; the answer goes to `reply_to` with the same `correlation_id`: `{ status: "DONE", word, phonetic: { uk, us }, audio: { uk, us } }` (IPA with slashes; MP3 as base64) or `{ status: "FAILED", error }` |
 | `speech.autotime.results` | speech-service → content-service | `{ jobId, status: "RUNNING" \| "DONE" \| "FAILED", lines?, error? }`. align: `lines: [{ id, start, end, matched }]`, times in seconds (one decimal) or null when the line was not heard, `matched` the share (0–1) of the line's words heard. transcribe: `lines: [{ text, start, end }]` |
 
 Queue names and statuses are in `@appenglish/content-contracts` (`SpeechQueue`,
@@ -62,6 +62,7 @@ consonants that can begin an English syllable move with it, so "enjoy" is
 /enˈdʒɔɪ/), and one-syllable words carry no mark, `wav_to_mp3` encodes with
 PyAV (libmp3lame, 64 kbit/s mono), `process_pronounce` answers one request.
 A word takes well under a second after the first load.
+With `wordsPerMinute` (clamped 60–220) and `sentencePauseSeconds` (0–2), `Pronouncer` reads sentence by sentence, joins them with that pause, and tunes Piper `length_scale` (0.8–1.5, at most `SPEED_PASSES` = 3 passes) until the whole clip is near the rate (D200); without them it reads as before.
 
 ## Commands
 

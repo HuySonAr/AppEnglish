@@ -41,8 +41,20 @@ const line = z.string().max(300);
 export const openGradingSchema = z.object({
   criteria: z.object({ task: band, vocabulary: band, grammar: band, coherence: band }),
   feedback: z.string().max(2000),
-  errors: z.array(z.object({ text: line.min(1), suggestion: line, explanation: line })).max(30),
+  errors: z.array(z.object({ text: line.min(1), suggestion: line, explanation: line, explanationVi: line.optional() })).max(30),
   rewrite: z.string().max(6000),
+  feedbackVi: z.string().max(2000).optional(),
   etsScore: z.number().int().min(0).max(5).optional(),
+  model: z.string().max(60).optional(),
+});
+
+const point = z.string().max(300);
+
+export const readAloudFeedbackSchema = z.object({
+  feedback: z.string().min(1).max(2000),
+  strengths: z.array(point).max(3),
+  improvements: z.array(point).max(3),
+  practiceWords: z.array(z.string().max(200)).max(8),
+  vi: z.object({ feedback: z.string().max(2000), strengths: z.array(point).max(3), improvements: z.array(point).max(3) }).nullable().optional(),
   model: z.string().max(60).optional(),
 });

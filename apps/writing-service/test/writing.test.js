@@ -33,7 +33,7 @@ const raw = {
 
 test('the prompt carries the level, key points, sample answer and the learner text', () => {
   const text = buildWritingPrompt({ prompt, answer });
-  for (const part of ['Task level (CEFR): A2', 'an email', '20-80 words', '- the reason', 'Sample answer (reference only)', 'Learner text (22 words)', answer]) assert.ok(text.includes(part), part);
+  for (const part of ['Task level: Basic, for learners aiming at TOEIC Writing below 110 (0-200 scale)', 'an email', '20-80 words', '- the reason', 'Sample answer (reference only)', 'Learner text (22 words)', answer]) assert.ok(text.includes(part), part);
   assert.deepEqual(SCHEMA.properties.criteria.required, ['cohesion', 'syntax', 'vocabulary', 'phraseology', 'grammar', 'conventions', 'task']);
   assert.ok(buildWritingPrompt({ prompt: { ...prompt, keyPoints: [] }, answer }).includes('Key points: none given'));
 });

@@ -284,39 +284,6 @@ export function vietnamWeekStart(date = new Date()) {
   return local.toISOString().slice(0, 10);
 }
 
-export const CEFR_ORDER = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
-export const BELOW_A1 = 'BELOW_A1';
-export const TOEIC_CEFR_MINIMUMS = Object.freeze({
-  listening: Object.freeze({ A1: 60, A2: 110, B1: 275, B2: 400, C1: 490 }),
-  reading: Object.freeze({ A1: 60, A2: 115, B1: 275, B2: 385, C1: 455 }),
-});
-export const PRODUCTIVE_CEFR_RULES = Object.freeze({
-  speaking: Object.freeze({ kinds: Object.freeze(['open_speaking']), pass: 7, max: 10 }),
-  writing: Object.freeze({ kinds: Object.freeze(['writing']), pass: 3.5, max: 5 }),
-  recent: 5,
-  needed: 3,
-});
-
-export function toeicCefr(skill, score) {
-  if (!Number.isFinite(score)) return null;
-  const minimums = TOEIC_CEFR_MINIMUMS[skill];
-  let level = BELOW_A1;
-  for (const [name, minimum] of Object.entries(minimums)) if (score >= minimum) level = name;
-  return level;
-}
-
-export function productiveCefr(results, rule, { recent = PRODUCTIVE_CEFR_RULES.recent, needed = PRODUCTIVE_CEFR_RULES.needed } = {}) {
-  const levels = CEFR_ORDER.map((level) => {
-    const latest = results
-      .filter((result) => result.level === level && Number.isFinite(result.total))
-      .sort((a, b) => String(b.at).localeCompare(String(a.at)))
-      .slice(0, recent);
-    return { level, considered: latest.length, passed: latest.filter((result) => result.total >= rule.pass).length };
-  }).filter((entry) => entry.considered > 0);
-  const reached = levels.filter((entry) => entry.passed >= needed).map((entry) => entry.level);
-  return { level: reached.length ? reached.at(-1) : null, levels };
-}
-
 export const GEMINI_MODELS = Object.freeze([
   Object.freeze({ id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash', defaultLevel: 'medium', levels: Object.freeze(['low', 'medium', 'high']) }),
   Object.freeze({ id: 'gemini-3.6-flash', label: 'Gemini 3.6 Flash', defaultLevel: 'medium', levels: Object.freeze(['minimal', 'low', 'medium', 'high']) }),

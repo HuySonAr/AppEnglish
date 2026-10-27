@@ -248,7 +248,7 @@ speech-service has no database.
 
 ## Speaking read aloud (F12, D177)
 
-- HTTP: `/learning/speaking/prompts`, `/learning/speaking/prompts/:id`, `POST /learning/speaking/prompts/:id/submissions` (multipart `audio`), `/learning/speaking/submissions/:id`; `POST /content/practice-prompts/machine-audio`.
+- HTTP: `/learning/speaking/prompts`, `/learning/speaking/prompts/:id`, `POST /learning/speaking/prompts/:id/submissions` (multipart `audio`), `/learning/speaking/submissions/:id`; `POST /content/practice-prompts/machine-audio` (`{ text, speed? }`, D200).
 - gRPC internal (learning → content): `ListPublishedPracticePrompts`, `GetPracticePaper`, `StoreLearnerRecording`, `DeleteLearnerRecordings`.
 - RabbitMQ: `speech.speaking.requests` (learning outbox → speech-service), `speech.speaking.results` (speech-service → learning, retry `.retry.1|2|3` and `.dead`), `learning.results` event types `speaking.scored` and `activity.recorded` with activity `speaking`.
 - progress-service: `speaking.scored` → notification `SPEAKING_RESULT` (key `speaking:<submissionId>`).
@@ -262,17 +262,13 @@ speech-service has no database.
 
 ## Speaking open answers (F14, D179)
 
-- RabbitMQ: `speech.speaking.requests` with `kind: open_speaking` and empty `text`; `writing.grading.requests` also carries `speaking.grading.requested` jobs; `writing.open-speaking.results` (writing-service → learning-service, retry and `.dead`). `speaking.grading.requested` carries `etsTask`; the answer may carry `etsScore`; practice submissions expose `result.ets` (D199).
+- RabbitMQ: `speech.speaking.requests` with `kind: open_speaking` and empty `text`; `writing.grading.requests` also carries `speaking.grading.requested` jobs; `writing.open-speaking.results` (writing-service → learning-service, retry and `.dead`). `speaking.grading.requested` carries `etsTask`; the answer may carry `etsScore`; practice submissions expose `result.ets` (D199). A read-aloud job is the same type with `readAloud` and the heard text as `answer`; its answer is `{ feedback, strengths, improvements, practiceWords }`, stored as `result.gemini` (or `result.geminiError`) without changing the score (D202).
 - `speaking.scored` may have `total: null` (open answer without a key); progress-service shows "Your speaking answer is ready".
 
 ## Teacher reviews (F15, D180)
 
 - HTTP: `/learning/reviews/quota`, `POST /learning/reviews`, `/learning/reviews/queue`, `/learning/reviews/:id` with `claim`, `release`, `complete` (fixed paths are declared before `:id`).
 - `learning.results` events `review.completed` and `review.expired`; progress-service notifications `TEACHER_REVIEWED` and `REVIEW_RETURNED`.
-
-## CEFR profile (F16, D181)
-
-- HTTP: `GET /learning/cefr-profile` (students); computed in learning-service from its own mock attempts and practice submissions, no new table or event.
 
 ## Follow-ups (D182)
 

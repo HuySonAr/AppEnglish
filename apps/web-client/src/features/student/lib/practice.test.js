@@ -11,7 +11,8 @@ const prompts = [
 test('speaking prompts are filtered by level, topic and tried, and sorted', () => {
   const ids = (options) => filterPracticePrompts(prompts, options).map((prompt) => prompt.id);
   assert.deepEqual(ids({}), ['3', '1', '2']);
-  assert.deepEqual(ids({ level: 'A2' }), ['1']);
+  assert.deepEqual(ids({ level: 'basic' }), ['3', '1']);
+  assert.deepEqual(ids({ level: 'intermediate' }), ['2']);
   assert.deepEqual(ids({ topic: 'Travel', sort: 'title' }), ['3', '1']);
   assert.deepEqual(ids({ tried: 'new' }), ['2']);
   assert.deepEqual(ids({ tried: 'tried', sort: 'best' }), ['3', '1']);
@@ -35,13 +36,11 @@ test('scores, words and recording helpers', () => {
 
 test('the list opens on a level that has prompts', () => {
   const at = (...levels) => levels.map((level) => ({ level }));
-  assert.deepEqual(levelCounts(at('B1', 'A1', 'B1')), [{ level: 'A1', count: 1 }, { level: 'B1', count: 2 }]);
-  assert.equal(defaultPracticeLevel(at('A2', 'B1'), 'B1'), 'B1');
-  assert.equal(defaultPracticeLevel(at('A2', 'B1'), 'C1'), 'A2');
-  assert.equal(defaultPracticeLevel(at('A2', 'B1'), null), 'A2');
-  assert.equal(defaultPracticeLevel(at('B1', 'C1'), 'BELOW_A1'), 'B1');
-  assert.equal(defaultPracticeLevel(at('A1', 'B1'), null), 'A1');
-  assert.equal(defaultPracticeLevel([], 'B1'), 'all');
+  assert.deepEqual(levelCounts(at('advanced', 'basic', 'advanced', 'B1')), [{ level: 'basic', count: 1 }, { level: 'intermediate', count: 1 }, { level: 'advanced', count: 2 }]);
+  assert.equal(defaultPracticeLevel(at('basic', 'intermediate')), 'intermediate');
+  assert.equal(defaultPracticeLevel(at('basic', 'advanced')), 'basic');
+  assert.equal(defaultPracticeLevel(at('C1')), 'advanced');
+  assert.equal(defaultPracticeLevel([]), 'all');
 });
 
 test('practice prompts are filtered by task type', () => {

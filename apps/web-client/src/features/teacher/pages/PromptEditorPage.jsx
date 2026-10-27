@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AudioLines, Eye, Plus, Send, Trash2, Undo2, X } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CEFR_LEVELS, ContentResponseCode, PRACTICE_LIMITS, PracticePromptKind, PracticePromptStatus } from '@appenglish/content-contracts';
+import { ContentResponseCode, PRACTICE_LEVELS, PRACTICE_LIMITS, PracticePromptKind, PracticePromptStatus, VoiceSpeed } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { hasTable } from '../../../lib/passage.js';
@@ -36,8 +36,8 @@ import {
   createPracticeMachineAudio,
   withdrawPracticePrompt,
 } from '../../../lib/api/practice-prompts-api.js';
-import { applyEtsTask, countWords, etsFields, etsTaskLabel, etsTaskOf, etsTasksOf, fieldLabel, kindFromSlug, kindLabels, statusInfo, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
-import { Choice, Field, MediaInput, QuestionRows, TaskTypePicker } from '../components/PromptEditorParts.jsx';
+import { applyEtsTask, countWords, etsFields, etsTaskLabel, etsTaskOf, etsTasksOf, fieldLabel, kindFromSlug, kindLabels, levelLabel, levelScores, statusInfo, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
+import { Choice, Field, MediaInput, QuestionRows, TaskTypePicker, VoiceSpeedPicker } from '../components/PromptEditorParts.jsx';
 import { kindPages } from './TeacherPromptsPage.jsx';
 
 const EDITABLE = new Set([PracticePromptStatus.DRAFT, PracticePromptStatus.RETURNED, PracticePromptStatus.PUBLISHED, PracticePromptStatus.ARCHIVED, PracticePromptStatus.UNPUBLISHED]);
@@ -54,6 +54,7 @@ export function PromptEditorPage() {
   const [issues, setIssues] = useState([]);
   const [previewing, setPreviewing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [voiceSpeed, setVoiceSpeed] = useState(VoiceSpeed.NORMAL);
 
   function apply(result) {
     setData(result);
@@ -128,7 +129,7 @@ export function PromptEditorPage() {
   async function makeVoice(text, onMade, label = 'voice') {
     setBusy(label);
     try {
-      const { media: made } = (await createPracticeMachineAudio(text)).data;
+      const { media: made } = (await createPracticeMachineAudio(text, voiceSpeed)).data;
       addMedia(made.id, { kind: 'audio', fileName: made.fileName, url: made.url });
       onMade(made.id);
       notify({ title: 'Audio made' });
@@ -177,7 +178,7 @@ export function PromptEditorPage() {
           <h1 className="truncate text-lg font-semibold sm:text-xl">{content.title || 'Untitled prompt'}</h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             <span>
-              {etsTaskLabel(task, kindLabels[kind])} · {content.level} · version {data.latest.versionNumber}
+              {etsTaskLabel(task, kindLabels[kind])} · {levelLabel(content.level)} · version {data.latest.versionNumber}
             </span>
             <Badge variant={statusInfo[status].variant}>{statusInfo[status].label}</Badge>
             {data.published && data.published.id !== data.latest.id ? <Badge variant="success">Live v{data.published.versionNumber}</Badge> : null}
@@ -242,11 +243,11 @@ export function PromptEditorPage() {
             <Input id="prompt-topic" maxLength={PRACTICE_LIMITS.topic} placeholder="Work, travel…" value={content.topic} onChange={(event) => set('topic')(event.target.value)} />
           </Field>
           <div className="space-y-2 md:col-span-2">
-            <Label>CEFR level</Label>
+            <Label>Level</Label>
             <div className="flex flex-wrap gap-1.5">
-              {CEFR_LEVELS.map((level) => (
+              {PRACTICE_LEVELS.map((level) => (
                 <Choice key={level} value={level} current={content.level} onPick={set('level')}>
-                  {level}
+                  {levelLabel(level)} <span className="ml-1 font-normal opacity-75">{levelScores(level)}</span>
                 </Choice>
               ))}
             </div>
@@ -271,10 +272,13 @@ export function PromptEditorPage() {
               }}
             />
             {!content.audioMediaId ? (
-              <Button type="button" variant="outline" className="gap-1.5" loading={busy === 'voice'} disabled={Boolean(busy) || !content.text.trim()} onClick={() => makeVoice(content.text.trim(), set('audioMediaId'))}>
-                <AudioLines className="h-4 w-4" />
-                Make it with the machine voice
-              </Button>
+              <div className="space-y-3">
+                <VoiceSpeedPicker speed={voiceSpeed} onPick={setVoiceSpeed} />
+                <Button type="button" variant="outline" className="gap-1.5" loading={busy === 'voice'} disabled={Boolean(busy) || !content.text.trim()} onClick={() => makeVoice(content.text.trim(), set('audioMediaId'))}>
+                  <AudioLines className="h-4 w-4" />
+                  Make it with the machine voice
+                </Button>
+              </div>
             ) : null}
           </div>
         ) : (
@@ -329,7 +333,7 @@ export function PromptEditorPage() {
                 </div>
               </div>
             ) : null}
-            {show('questions') ? <QuestionRows questions={content.questions || []} media={media} onMedia={addMedia} onQuestion={setQuestion} busy={busy} onVoice={makeVoice} /> : null}
+            {show('questions') ? <QuestionRows questions={content.questions || []} media={media} onMedia={addMedia} onQuestion={setQuestion} busy={busy} onVoice={makeVoice} voiceSpeed={voiceSpeed} onVoiceSpeed={setVoiceSpeed} /> : null}
             {kind === PracticePromptKind.WRITING ? (
               <div className="flex flex-wrap gap-4">
                 <Field id="prompt-min" label="Fewest words">

@@ -17,15 +17,25 @@ export function ResultCard({ submission, title = 'Result', children }) {
   );
 }
 
-export function PracticeTabs({ tab, onTab, practiceLabel, practice, submissions, viewing, onOpen, renderResult, quota, onReview, maxScore = 10, history = null, historyCount }) {
+export function PracticeTabs({ tab, onTab, practiceLabel, practice, submissions, viewing, onOpen, renderResult, quota, onReview, maxScore = 10, history = null, historyCount, toolbar = null }) {
+  const list = (
+    <TabsList className="shrink-0">
+      <TabsTrigger value="practice">{practiceLabel}</TabsTrigger>
+      <TabsTrigger value="history">
+        History <span className="ml-1.5 tabular-nums text-muted-foreground">{historyCount ?? submissions.length}</span>
+      </TabsTrigger>
+    </TabsList>
+  );
   return (
-    <Tabs value={tab} onValueChange={onTab} className="space-y-5">
-      <TabsList>
-        <TabsTrigger value="practice">{practiceLabel}</TabsTrigger>
-        <TabsTrigger value="history">
-          History <span className="ml-1.5 tabular-nums text-muted-foreground">{historyCount ?? submissions.length}</span>
-        </TabsTrigger>
-      </TabsList>
+    <Tabs value={tab} onValueChange={onTab} className={toolbar ? 'space-y-4' : 'space-y-5'}>
+      {toolbar ? (
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          {toolbar}
+          {list}
+        </div>
+      ) : (
+        list
+      )}
 
       <TabsContent value="practice" className="mt-0">
         {practice}
