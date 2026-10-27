@@ -10,10 +10,13 @@ import { ReviewService } from './review.service.js';
 
 const idSchema = z.string().uuid();
 const requestSchema = z.object({ submissionId: z.string().uuid() }).strict();
+const swRequestSchema = z.object({ swTestId: z.string().uuid(), section: z.enum(['speaking', 'writing']), attemptNumber: z.number().int().min(1).optional() }).strict();
+const swItemScore = z.union([z.number(), z.object({ pronunciation: z.number(), intonation: z.number() }).strict()]);
 const completeSchema = z
   .object({
     action: z.enum(Object.values(ReviewAction)),
     scores: z.record(z.number()).optional().default({}),
+    items: z.record(z.string().regex(/^\d{1,2}$/), swItemScore).optional().default({}),
     note: z.string().max(TEACHER_REVIEW_LIMITS.note).optional().default(''),
   })
   .strict();
@@ -21,6 +24,7 @@ const completeSchema = z
 const rpcs = {
   GetReviewQuota: { run: (service, { actor }) => service.getQuota(actor) },
   RequestReview: { payload: requestSchema, run: (service, { actor, payload }) => service.request(actor, payload) },
+  RequestSwReview: { payload: swRequestSchema, run: (service, { actor, payload }) => service.requestSw(actor, payload) },
   WithdrawReview: { payload: requestSchema, run: (service, { actor, payload }) => service.withdraw(actor, payload) },
   ListReviewQueue: { run: (service, { actor }) => service.listQueue(actor) },
   ClaimReview: { id: true, run: (service, { actor, id }) => service.claim(actor, id) },

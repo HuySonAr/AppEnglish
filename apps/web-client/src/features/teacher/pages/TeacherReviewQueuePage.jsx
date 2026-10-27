@@ -14,7 +14,7 @@ import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
 import { claimReview, listReviewQueue } from '../api/review-api.js';
-import { hoursLeft, reviewKindLabels } from '../lib/review.js';
+import { hoursLeft, isWrittenKind, reviewKindLabels } from '../lib/review.js';
 
 const PAGE_SIZE = 15;
 const DEFAULTS = { kind: 'all', ai: 'all' };
@@ -111,11 +111,11 @@ export function TeacherReviewQueuePage() {
               <ul className="divide-y">
                 {shown.items.map((item) => (
                   <li key={item.id} className="flex items-center gap-4 px-4 py-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">{item.kind === 'writing' ? <PenLine className="h-4 w-4" /> : <Mic className="h-4 w-4" />}</span>
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">{isWrittenKind(item.kind) ? <PenLine className="h-4 w-4" /> : <Mic className="h-4 w-4" />}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium">{item.title || 'Untitled prompt'}</span>
                       <span className="block truncate text-xs text-muted-foreground">
-                        {reviewKindLabels[item.kind]} · {item.level} · sent {timeAgo(item.requestedAt)} · {hoursLeft(item.expiresAt)} h left
+                        {[reviewKindLabels[item.kind], item.level].filter(Boolean).join(' · ')} · sent {timeAgo(item.requestedAt)} · {hoursLeft(item.expiresAt)} h left
                       </span>
                     </span>
                     <span className="hidden shrink-0 gap-1.5 sm:flex">

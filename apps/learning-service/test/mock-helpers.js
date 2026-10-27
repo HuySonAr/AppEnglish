@@ -94,8 +94,8 @@ export function createMockRepository() {
 
 export async function harness({ startUnit = null } = {}) {
   const tests = [
-    { id: randomUUID(), title: 'Level 1 test', level: 1, durationMinutes: 120 },
-    { id: randomUUID(), title: 'Level 2 test', level: 2, durationMinutes: 60 },
+    { id: randomUUID(), title: 'Level 1 test', level: 1, durationMinutes: 120, format: 'full' },
+    { id: randomUUID(), title: 'Level 2 test', level: 2, durationMinutes: 60, format: 'practice' },
   ];
   const papers = new Map();
   const versions = new Map();

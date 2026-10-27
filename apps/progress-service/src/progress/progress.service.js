@@ -6,7 +6,7 @@ import { progressErrors } from './progress.errors.js';
 import { completion, skillMastery } from './progress.rules.js';
 import { learnerIdSchema, payloadSchemas, resultMessageSchema } from './progress.schemas.js';
 import { dayOf, streakView } from './streak.rules.js';
-import { levelUpNotification, mockResultNotification, needsStreakReminder, notificationView, practiceResultNotification, reviewNotification, streakReminderKey, unitOpenedNotification } from './notification.rules.js';
+import { swResultNotification, mockResultNotification, needsStreakReminder, notificationView, practiceResultNotification, reviewNotification, streakReminderKey, unitOpenedNotification } from './notification.rules.js';
 import { earnsXp, rankTotals, xpOf } from './xp.rules.js';
 
 const logger = new Logger('ProgressService');
@@ -92,12 +92,12 @@ export class ProgressService {
       await this.repository.saveStudyDay({ accountId: data.accountId, day: dayOf(at), activity: data.activity, at });
     } else if (type === LearningEventType.UNIT_REVIEW_PASSED) {
       await this.repository.addNotification(unitOpenedNotification(data));
-    } else if (type === LearningEventType.COURSE_LEVEL_UP) {
-      await this.repository.addNotification(levelUpNotification(data));
     } else if (type === LearningEventType.SPEAKING_SCORED) {
       await this.repository.addNotification(practiceResultNotification(data, NotificationKind.SPEAKING_RESULT));
     } else if (type === LearningEventType.WRITING_SCORED) {
       await this.repository.addNotification(practiceResultNotification(data, NotificationKind.WRITING_RESULT));
+    } else if (type === LearningEventType.SW_SCORED) {
+      await this.repository.addNotification(swResultNotification(data));
     } else if (type === LearningEventType.REVIEW_COMPLETED) {
       await this.repository.addNotification(reviewNotification(data, NotificationKind.TEACHER_REVIEWED));
     } else if (type === LearningEventType.REVIEW_EXPIRED) {
@@ -114,7 +114,7 @@ export class ProgressService {
         ...counts(data),
       });
       const previous = await this.repository.latestMockNotification(data.accountId, data.mockTestId);
-      if (previous?.key !== `mock:${data.attemptId}`) await this.repository.addNotification(mockResultNotification(data, previous));
+      if (data.format !== 'practice' && previous?.key !== `mock:${data.attemptId}`) await this.repository.addNotification(mockResultNotification(data, previous));
       if (earnsXp(data)) {
         await this.repository.saveXp({
           id: data.attemptId,

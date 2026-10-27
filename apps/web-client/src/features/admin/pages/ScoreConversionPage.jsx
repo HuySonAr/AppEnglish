@@ -4,7 +4,9 @@ import { notify } from '../../../lib/notify.js';
 import { Badge, Button, Label, Skeleton } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
-import { getScoreConversion, updateScoreConversion } from '../api/placement-settings-api.js';
+import { swDefaultConversion } from '@appenglish/learning-contracts';
+import { getScoreConversion, getSwScoreConversion, updateScoreConversion } from '../api/placement-settings-api.js';
+import { SwConversionForm } from '../components/SwConversionForm.jsx';
 import { FormPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
 const sections = [
@@ -28,6 +30,7 @@ export function ScoreConversionPage() {
   const [isDefault, setIsDefault] = useState(true);
   const [text, setText] = useState({ listening: '', reading: '' });
   const [busy, setBusy] = useState(false);
+  const [sw, setSw] = useState(null);
 
   function apply(data) {
     setSaved(data.conversion);
@@ -38,7 +41,9 @@ export function ScoreConversionPage() {
   async function load() {
     setState('loading');
     try {
-      apply((await getScoreConversion()).data);
+      const [lr, swTable] = await Promise.all([getScoreConversion(), getSwScoreConversion()]);
+      apply(lr.data);
+      setSw({ ...swTable.data, defaults: swTable.data.defaults || swDefaultConversion() });
       setState('ready');
     } catch (error) {
       setState('error');
@@ -50,7 +55,7 @@ export function ScoreConversionPage() {
     load();
   }, []);
 
-  if (state === 'loading') return <FormPageSkeleton />;
+  if (state === 'loading') return <FormPageSkeleton fields={4} />;
   if (state === 'error')
     return (
       <Button variant="outline" onClick={load}>
@@ -81,10 +86,16 @@ export function ScoreConversionPage() {
       <PageHeader
         eyebrow="Admin"
         title="Estimated score table"
-        description="Correct answers of a full mock test to an estimated TOEIC section score (5–495)."
-        actions={isDefault ? <Badge variant="outline">Default table</Badge> : <Badge variant="info">Edited</Badge>}
+        description="Set how raw results turn into estimated TOEIC scores."
       />
       <form onSubmit={onSubmit} className="space-y-5 rounded-xl border bg-card p-6 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-semibold">Listening & Reading</h2>
+            <p className="text-sm text-muted-foreground">Correct answers of a full mock test to a section score (5–495).</p>
+          </div>
+          {isDefault ? <Badge variant="outline">Default table</Badge> : <Badge variant="info">Edited</Badge>}
+        </div>
         {sections.map(({ key, label }) => (
           <div key={key} className="space-y-2">
             <Label htmlFor={`table-${key}`}>
@@ -118,6 +129,7 @@ export function ScoreConversionPage() {
           {busy ? 'Saving…' : 'Save'}
         </Button>
       </form>
+      <SwConversionForm initial={sw} />
     </section>
   );
 }

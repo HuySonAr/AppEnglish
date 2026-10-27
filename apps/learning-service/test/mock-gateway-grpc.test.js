@@ -102,7 +102,9 @@ test('Gateway HTTP to learning-service gRPC contract for mock tests', async () =
     assert.deepEqual((await call('GET', `${mock}/review?kind=FULL&attemptNumber=4`)).json.data, { attempt: null, parts: [] });
 
     assert.equal((await call('GET', '/mock-tests/goal')).json.data.estimate.total, 990);
-    assert.deepEqual((await call('PUT', '/mock-tests/goal', { body: { targetScore: 700 } })).json.data.goal, { targetScore: 700, examDate: null });
+    assert.deepEqual((await call('PUT', '/mock-tests/goal', { body: { lr: { targetScore: 700 } } })).json.data.goal, { lr: { targetScore: 700, examDate: null }, sw: null });
+    assert.equal((await call('PUT', '/mock-tests/goal', { body: { sw: { speakingTarget: 155 } } })).status, 400);
+    assert.equal((await call('PUT', '/mock-tests/goal', { body: {} })).status, 400);
     assert.equal((await call('GET', '/mock-tests/mistakes')).json.data.total, 0);
     assert.deepEqual((await call('GET', '/mock-tests/mistakes/practice?partKey=part5')).json.data.questions, []);
     assert.equal((await call('POST', '/mock-tests/mistakes/answer', { body: { questionId: '00000000-0000-4000-8000-000000000000', optionId: null } })).json.code, 57);

@@ -17,13 +17,13 @@ export function ResultCard({ submission, title = 'Result', children }) {
   );
 }
 
-export function PracticeTabs({ tab, onTab, practiceLabel, practice, submissions, viewing, onOpen, renderResult, quota, onReview, maxScore = 10 }) {
+export function PracticeTabs({ tab, onTab, practiceLabel, practice, submissions, viewing, onOpen, renderResult, quota, onReview, maxScore = 10, history = null, historyCount }) {
   return (
     <Tabs value={tab} onValueChange={onTab} className="space-y-5">
       <TabsList>
         <TabsTrigger value="practice">{practiceLabel}</TabsTrigger>
         <TabsTrigger value="history">
-          History <span className="ml-1.5 tabular-nums text-muted-foreground">{submissions.length}</span>
+          History <span className="ml-1.5 tabular-nums text-muted-foreground">{historyCount ?? submissions.length}</span>
         </TabsTrigger>
       </TabsList>
 
@@ -32,7 +32,9 @@ export function PracticeTabs({ tab, onTab, practiceLabel, practice, submissions,
       </TabsContent>
 
       <TabsContent value="history" className="mt-0">
-        {submissions.length ? (
+        {submissions.length && history ? (
+          history
+        ) : submissions.length ? (
           <div className="grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
             <PracticeAttempts submissions={submissions} currentId={viewing?.id} onOpen={onOpen} maxScore={maxScore} />
             <div className="space-y-4">

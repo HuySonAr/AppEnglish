@@ -9,6 +9,9 @@ import {
   MOCK_GRAPHIC_SET_INDEXES,
   MOCK_SET_QUESTION_COUNT,
   MOCK_TEST_PART_COUNTS,
+  MOCK_FULL_GROUPS,
+  MOCK_FULL_PART7,
+  MockFormat,
   MOCK_QUESTION_AUDIO_PARTS,
   MOCK_TEST_LEVELS,
   UNIT_REVIEW_PARTS,
@@ -176,10 +179,14 @@ const mockMeta = {
   title: requiredText(200),
   level: z.number().int().refine((value) => MOCK_TEST_LEVELS.includes(value), { message: 'Level must be 1, 2 or 3' }),
   durationMinutes: z.number().int().min(1).max(300),
+  format: z.enum(Object.values(MockFormat)),
 };
-export const mockCreateSchema = z.object({ ...mockMeta, examTypeId: z.string().uuid() }).strict();
+export const mockCreateSchema = z
+  .object({ title: mockMeta.title, level: mockMeta.level, durationMinutes: mockMeta.durationMinutes.optional(), format: mockMeta.format.default(MockFormat.FULL), examTypeId: z.string().uuid() })
+  .strict()
+  .refine((value) => value.format === MockFormat.FULL || value.durationMinutes !== undefined, { message: 'A practice set needs a duration', path: ['durationMinutes'] });
 export const mockUpdateSchema = z
-  .object({ title: mockMeta.title.optional(), level: mockMeta.level.optional(), durationMinutes: mockMeta.durationMinutes.optional() })
+  .object({ title: mockMeta.title.optional(), level: mockMeta.level.optional(), durationMinutes: mockMeta.durationMinutes.optional(), format: mockMeta.format.optional() })
   .strict()
   .refine((value) => Object.values(value).some((field) => field !== undefined), {
     message: 'At least one field is required',
@@ -436,3 +443,34 @@ export function unitReviewIssues(content) {
   return issues;
 }
 
+export function mockFullStructureIssues(test) {
+  const issues = [];
+  const add = (path, message) => issues.push({ path, message });
+  const numberOf = (key) => LESSON_TEST_PARTS.find((spec) => spec.key === key).number;
+  for (const [key, count] of Object.entries(MOCK_TEST_PART_COUNTS)) {
+    const found = test[key].questions.length;
+    if (found !== count) add(`test.${key}.questions`, `A full test needs exactly ${count} questions in Part ${numberOf(key)}; it has ${found}`);
+  }
+  const sizes = (key) => test[key].groups.map((group) => test[key].questions.filter((question) => question.groupId === group.id).length);
+  for (const [key, spec] of Object.entries(MOCK_FULL_GROUPS)) {
+    const found = sizes(key);
+    const noun = key === 'part6' ? 'passages' : key === 'part3' ? 'conversations' : 'talks';
+    if (found.length !== spec.groups || found.some((size) => size !== spec.questions))
+      add(`test.${key}.groups`, `A full test needs ${spec.groups} ${noun} of ${spec.questions} questions in Part ${numberOf(key)}`);
+  }
+  const part7 = sizes('part7');
+  const singles = part7.slice(0, MOCK_FULL_PART7.singles);
+  const sets = part7.slice(MOCK_FULL_PART7.singles);
+  const singleTotal = singles.reduce((sum, size) => sum + size, 0);
+  if (
+    part7.length !== MOCK_FULL_PART7.singles + MOCK_FULL_PART7.sets ||
+    singles.some((size) => size < MOCK_FULL_PART7.singleMin || size > MOCK_FULL_PART7.singleMax) ||
+    singleTotal !== MOCK_FULL_PART7.singleQuestions ||
+    sets.some((size) => size !== MOCK_FULL_PART7.setQuestions)
+  )
+    add(
+      'test.part7.groups',
+      `A full test needs ${MOCK_FULL_PART7.singles} single passages (${MOCK_FULL_PART7.singleMin}–${MOCK_FULL_PART7.singleMax} questions each, ${MOCK_FULL_PART7.singleQuestions} in all) followed by ${MOCK_FULL_PART7.sets} sets of ${MOCK_FULL_PART7.setQuestions} questions in Part 7`,
+    );
+  return issues;
+}

@@ -29,10 +29,13 @@ export function PracticeAttempts({ submissions, currentId, onOpen, maxScore = 10
               >
                 <span className="min-w-0 flex-1">
                   <span className="block font-medium">Attempt {submissions.length - index}</span>
-                  <span className="block text-xs text-muted-foreground">{timeAgo(item.submittedAt)}</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {timeAgo(item.submittedAt)}
+                    {item.note ? ` · ${item.note}` : ''}
+                  </span>
                 </span>
                 {item.status === SubmissionStatus.DONE ? (
-                  <span className={cn('font-semibold tabular-nums', toneText[scoreTone(item.total, maxScore)])}>{item.total.toFixed(1)}</span>
+                  <span className={cn('font-semibold tabular-nums', toneText[scoreTone(item.total, maxScore)])}>{item.total === null || item.total === undefined ? '—' : item.total.toFixed(1)}</span>
                 ) : (
                   <Badge variant={statusBadges[item.status]?.variant || 'outline'}>{statusBadges[item.status]?.label || item.status}</Badge>
                 )}

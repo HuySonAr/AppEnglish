@@ -20,6 +20,7 @@ import { shiftTimes, timedImportPlan } from '../lib/timed-import.js';
 import { ExportTimedDialog } from './ExportTimedDialog.jsx';
 import { MediaField } from './MediaField.jsx';
 import { PasteDialog } from './PasteDialog.jsx';
+import { useReadOnly } from './ReadOnly.jsx';
 
 const saveErrorMessage = (error) => `${error?.fileName ? `${error.fileName}: ` : ''}${getApiErrorMessage(error)}`;
 const toolButton = 'w-full justify-start gap-2';
@@ -34,7 +35,7 @@ const pasteExample = {
   song: 'I [walked] across an [empty] land\nI knew the pathway like the back of my [hand]',
 };
 
-function TimeInput({ id, label, value, onChange }) {
+function TimeInput({ id, label, value, onChange, readOnly }) {
   const [text, setText] = useState(formatSeconds(value));
   const [invalid, setInvalid] = useState(false);
   useEffect(() => {
@@ -46,6 +47,7 @@ function TimeInput({ id, label, value, onChange }) {
       id={id}
       aria-label={label}
       inputMode="decimal"
+      readOnly={readOnly}
       placeholder="m:ss.s"
       value={text}
       className={cn('h-8 w-20 rounded-r-none px-2 text-sm tabular-nums', invalid && 'border-destructive')}
@@ -59,17 +61,19 @@ function TimeInput({ id, label, value, onChange }) {
   );
 }
 
-function TimeField({ id, label, name, value, onChange, onHere, canHere }) {
+function TimeField({ id, label, name, value, onChange, onHere, canHere, readOnly }) {
   return (
     <div className="flex items-center gap-1.5">
       <Label htmlFor={id} className="w-9 text-xs text-muted-foreground">
         {name}
       </Label>
       <div className="flex">
-        <TimeInput id={id} label={label} value={value} onChange={onChange} />
-        <Button variant="outline" size="sm" className="h-8 rounded-l-none border-l-0 px-2 text-xs" disabled={!canHere} onClick={onHere}>
-          Here
-        </Button>
+        <TimeInput id={id} label={label} value={value} onChange={onChange} readOnly={readOnly} />
+        {readOnly ? null : (
+          <Button variant="outline" size="sm" className="h-8 rounded-l-none border-l-0 px-2 text-xs" disabled={!canHere} onClick={onHere}>
+            Here
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -94,6 +98,7 @@ function ToolGroup({ label, children }) {
 }
 
 export function RecordingEditor({ ownerId, kind, content, title, edit, setSegments, draftMedia, jobs, beforeJob, heading, hint, audioLabel, segmentExtra, tools, aside }) {
+  const readOnly = useReadOnly();
   const [now, setNow] = useState(0);
   const [shift, setShift] = useState('');
   const [job, setJob] = useState(null);
@@ -103,11 +108,12 @@ export function RecordingEditor({ ownerId, kind, content, title, edit, setSegmen
   const stopAt = useRef(null);
 
   useEffect(() => {
+    if (readOnly) return;
     jobs
       .get()
       .then((found) => setJob(found))
       .catch(() => {});
-  }, [ownerId]);
+  }, [ownerId, readOnly]);
 
   const jobActive = job?.status === 'QUEUED' || job?.status === 'RUNNING';
   useEffect(() => {
@@ -202,7 +208,7 @@ export function RecordingEditor({ ownerId, kind, content, title, edit, setSegmen
   const taskName = job?.task === 'transcribe' ? 'Transcribe' : 'Auto-time';
   const timedCount = segments.filter((segment) => segment.start !== null && segment.end !== null && segment.end > segment.start).length;
   const blankCount = song ? segments.reduce((sum, segment) => sum + lyricBlankCount(segment.text), 0) : 0;
-  const canAdd = !fixed && segments.length < LISTENING_MAX_SEGMENTS;
+  const canAdd = !readOnly && !fixed && segments.length < LISTENING_MAX_SEGMENTS;
 
   const jobStatus =
     job && job.status !== 'DONE' ? (
@@ -283,89 +289,93 @@ export function RecordingEditor({ ownerId, kind, content, title, edit, setSegmen
         </Panel>
 
         <Panel title="Tools">
-          {jobStatus}
-          <ToolGroup label="Text">
-            <PasteDialog
-              id={`paste-transcript-${ownerId}`}
-              button="Paste transcript"
-              triggerClassName={toolButton}
-              title="Paste the transcript"
-              description={
-                fixed
-                  ? `One sentence per line: ${kind.labels.join(', ')}.`
-                  : song
-                    ? 'One lyric line per line, blanks in [brackets].'
-                    : 'One sentence per line; “Man: …” sets the speaker.'
-              }
-              label={song ? 'Lyrics' : 'Transcript'}
-              placeholder={pasteExample[kind.key]}
-              notFound="No sentence found."
-              noun="sentence"
-              done="written into the recording"
-              planFor={(text) => listeningPastePlan(segments, text, kind)}
-              onApply={(plan) => setSegments(() => plan.segments)}
-            />
-            <Button variant="outline" size="sm" className={toolButton} disabled={jobBusy || jobActive || !content.audioMediaId} onClick={() => startJob('transcribe', 'Could not start transcribe')}>
-              <AudioLines className="h-4 w-4" />
-              Transcribe from audio
-            </Button>
-            {tools}
-          </ToolGroup>
-
-          <ToolGroup label="Timing">
-            <Button
-              variant="outline"
-              size="sm"
-              className={toolButton}
-              loading={jobBusy}
-              disabled={jobBusy || jobActive || !content.audioMediaId || !segments.some((segment) => segment.text.trim())}
-              onClick={() => startJob('align', 'Could not start auto-time')}
-            >
-              <Wand2 className="h-4 w-4" />
-              Auto-time
-            </Button>
-            <PasteDialog
-              id={`import-timed-${ownerId}`}
-              icon={FileClock}
-              button="Import timed file"
-              triggerClassName={toolButton}
-              title="Import a timed file"
-              description={fixed ? `An .srt, .vtt or .lrc file with ${kind.segmentCount} lines.` : 'An .srt, .vtt or .lrc file made for this recording.'}
-              label="File content"
-              placeholder={'1\n00:00:12,500 --> 00:00:16,900\nFirst line\n\nor\n\n[00:12.50]First line'}
-              notFound="No timed line found."
-              noun={song ? 'line' : 'sentence'}
-              done="imported with their times"
-              fileAccept=".srt,.vtt,.lrc,.txt,text/plain"
-              planFor={(text) => timedImportPlan(segments, text, kind, { duration: recordingLength() })}
-              onApply={(plan) => setSegments(() => plan.segments)}
-            />
-            <div className="flex gap-1.5">
-              <Input
-                id={`shift-times-${ownerId}`}
-                aria-label="Shift all times by seconds"
-                inputMode="decimal"
-                placeholder="± seconds"
-                className="h-9 min-w-0 flex-1"
-                value={shift}
-                onChange={(event) => setShift(event.target.value)}
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-9 gap-1.5"
-                disabled={!canShift}
-                onClick={() => {
-                  setSegments((current) => shiftTimes(current, shiftSeconds));
-                  notify({ title: `Times moved ${shiftSeconds > 0 ? 'later' : 'earlier'} by ${Math.abs(shiftSeconds)} s` });
-                  setShift('');
-                }}
-              >
-                <MoveHorizontal className="h-4 w-4" />
-                Shift all
-              </Button>
-            </div>
-          </ToolGroup>
+          {readOnly ? null : jobStatus}
+          {readOnly ? null : (
+            <>
+              <ToolGroup label="Text">
+                <PasteDialog
+                  id={`paste-transcript-${ownerId}`}
+                  button="Paste transcript"
+                  triggerClassName={toolButton}
+                  title="Paste the transcript"
+                  description={
+                    fixed
+                      ? `One sentence per line: ${kind.labels.join(', ')}.`
+                      : song
+                        ? 'One lyric line per line, blanks in [brackets].'
+                        : 'One sentence per line; “Man: …” sets the speaker.'
+                  }
+                  label={song ? 'Lyrics' : 'Transcript'}
+                  placeholder={pasteExample[kind.key]}
+                  notFound="No sentence found."
+                  noun="sentence"
+                  done="written into the recording"
+                  planFor={(text) => listeningPastePlan(segments, text, kind)}
+                  onApply={(plan) => setSegments(() => plan.segments)}
+                />
+                <Button variant="outline" size="sm" className={toolButton} disabled={jobBusy || jobActive || !content.audioMediaId} onClick={() => startJob('transcribe', 'Could not start transcribe')}>
+                  <AudioLines className="h-4 w-4" />
+                  Transcribe from audio
+                </Button>
+                {tools}
+              </ToolGroup>
+    
+              <ToolGroup label="Timing">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={toolButton}
+                  loading={jobBusy}
+                  disabled={jobBusy || jobActive || !content.audioMediaId || !segments.some((segment) => segment.text.trim())}
+                  onClick={() => startJob('align', 'Could not start auto-time')}
+                >
+                  <Wand2 className="h-4 w-4" />
+                  Auto-time
+                </Button>
+                <PasteDialog
+                  id={`import-timed-${ownerId}`}
+                  icon={FileClock}
+                  button="Import timed file"
+                  triggerClassName={toolButton}
+                  title="Import a timed file"
+                  description={fixed ? `An .srt, .vtt or .lrc file with ${kind.segmentCount} lines.` : 'An .srt, .vtt or .lrc file made for this recording.'}
+                  label="File content"
+                  placeholder={'1\n00:00:12,500 --> 00:00:16,900\nFirst line\n\nor\n\n[00:12.50]First line'}
+                  notFound="No timed line found."
+                  noun={song ? 'line' : 'sentence'}
+                  done="imported with their times"
+                  fileAccept=".srt,.vtt,.lrc,.txt,text/plain"
+                  planFor={(text) => timedImportPlan(segments, text, kind, { duration: recordingLength() })}
+                  onApply={(plan) => setSegments(() => plan.segments)}
+                />
+                <div className="flex gap-1.5">
+                  <Input
+                    id={`shift-times-${ownerId}`}
+                    aria-label="Shift all times by seconds"
+                    inputMode="decimal"
+                    placeholder="± seconds"
+                    className="h-9 min-w-0 flex-1"
+                    value={shift}
+                    onChange={(event) => setShift(event.target.value)}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 gap-1.5"
+                    disabled={!canShift}
+                    onClick={() => {
+                      setSegments((current) => shiftTimes(current, shiftSeconds));
+                      notify({ title: `Times moved ${shiftSeconds > 0 ? 'later' : 'earlier'} by ${Math.abs(shiftSeconds)} s` });
+                      setShift('');
+                    }}
+                  >
+                    <MoveHorizontal className="h-4 w-4" />
+                    Shift all
+                  </Button>
+                </div>
+              </ToolGroup>
+            </>
+          )}
 
           <ToolGroup label="File">
             <ExportTimedDialog segments={segments} kind={kind} title={title} disabled={!canExport} triggerClassName={toolButton} />
@@ -428,6 +438,7 @@ export function RecordingEditor({ ownerId, kind, content, title, edit, setSegmen
                             placeholder="Speaker"
                             className="h-8 w-36 text-sm"
                             maxLength={40}
+                            readOnly={readOnly}
                             value={segment.speaker}
                             onChange={(event) => edit([...path, 'speaker'], event.target.value)}
                           />
@@ -437,7 +448,7 @@ export function RecordingEditor({ ownerId, kind, content, title, edit, setSegmen
                             {lyricBlankCount(segment.text)} blank{lyricBlankCount(segment.text) === 1 ? '' : 's'}
                           </span>
                         ) : null}
-                        {fixed ? null : (
+                        {fixed || readOnly ? null : (
                           <Button
                             variant="ghost"
                             size="icon"
@@ -449,7 +460,7 @@ export function RecordingEditor({ ownerId, kind, content, title, edit, setSegmen
                           </Button>
                         )}
                       </div>
-                      <Textarea aria-label={`${label} text`} rows={2} maxLength={500} value={segment.text} onChange={(event) => edit([...path, 'text'], event.target.value)} />
+                      <Textarea aria-label={`${label} text`} readOnly={readOnly} rows={2} maxLength={500} value={segment.text} onChange={(event) => edit([...path, 'text'], event.target.value)} />
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                         <TimeField
                           id={`${id}-start`}
@@ -458,6 +469,7 @@ export function RecordingEditor({ ownerId, kind, content, title, edit, setSegmen
                           value={segment.start}
                           onChange={(value) => edit([...path, 'start'], value)}
                           canHere={Boolean(audioUrl)}
+                          readOnly={readOnly}
                           onHere={() => edit([...path, 'start'], playerTime())}
                         />
                         <TimeField
@@ -467,6 +479,7 @@ export function RecordingEditor({ ownerId, kind, content, title, edit, setSegmen
                           value={segment.end}
                           onChange={(value) => edit([...path, 'end'], value)}
                           canHere={Boolean(audioUrl)}
+                          readOnly={readOnly}
                           onHere={() => setSegments((current) => withEnd(current, index, playerTime()))}
                         />
                         <Button variant={playing ? 'default' : 'ghost'} size="sm" className="h-8 gap-1.5" disabled={!audioUrl || !timed} onClick={() => playSegment(segment)}>

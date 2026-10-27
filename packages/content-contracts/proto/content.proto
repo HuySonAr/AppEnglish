@@ -53,6 +53,16 @@ service ContentService {
   rpc ListMockTranscribe(ContentRequest) returns (ContentReply);
   rpc ListContentNotifications(ContentRequest) returns (ContentReply);
   rpc ListPracticePrompts(ContentRequest) returns (ContentReply);
+  rpc ListSwTests(ContentRequest) returns (ContentReply);
+  rpc CreateSwTest(ContentRequest) returns (ContentReply);
+  rpc UpdateSwTest(ContentRequest) returns (ContentReply);
+  rpc GetSwTest(ContentRequest) returns (ContentReply);
+  rpc SaveSwTestDraft(ContentRequest) returns (ContentReply);
+  rpc PublishSwTest(ContentRequest) returns (ContentReply);
+  rpc UnpublishSwTest(ContentRequest) returns (ContentReply);
+  rpc DeleteSwTest(ContentRequest) returns (ContentReply);
+  rpc ListPublishedSwTests(ContentRequest) returns (ContentReply);
+  rpc GetSwTestPaper(ContentRequest) returns (ContentReply);
   rpc CreatePracticePrompt(ContentRequest) returns (ContentReply);
   rpc GetPracticePrompt(ContentRequest) returns (ContentReply);
   rpc SavePracticePromptDraft(ContentRequest) returns (ContentReply);
@@ -83,24 +93,16 @@ service ContentService {
   rpc RequestListeningAutoTime(ContentRequest) returns (ContentReply);
   rpc GetListeningAutoTime(ContentRequest) returns (ContentReply);
   rpc RequestListeningTranscribe(ContentRequest) returns (ContentReply);
-  rpc ListListeningCourse(ContentRequest) returns (ContentReply);
-  rpc CreateCourseItem(ContentRequest) returns (ContentReply);
-  rpc UpdateCourseItem(ContentRequest) returns (ContentReply);
-  rpc GetCourseItem(ContentRequest) returns (ContentReply);
-  rpc SaveCourseItemDraft(ContentRequest) returns (ContentReply);
-  rpc PublishCourseItem(ContentRequest) returns (ContentReply);
-  rpc UnpublishCourseItem(ContentRequest) returns (ContentReply);
-  rpc DeleteCourseItem(ContentRequest) returns (ContentReply);
-  rpc RequestCourseAutoTime(ContentRequest) returns (ContentReply);
-  rpc RequestCourseTranscribe(ContentRequest) returns (ContentReply);
-  rpc GetCourseAutoTime(ContentRequest) returns (ContentReply);
-  rpc ListPublishedCourse(ContentRequest) returns (ContentReply);
-  rpc GetCoursePaper(ContentRequest) returns (ContentReply);
   rpc ListContentVersions(ContentRequest) returns (ContentReply);
   rpc GetContentVersion(ContentRequest) returns (ContentReply);
   rpc RestoreContentVersion(ContentRequest) returns (ContentReply);
   rpc DiscardContentDraft(ContentRequest) returns (ContentReply);
   rpc DeleteContentVersion(ContentRequest) returns (ContentReply);
+  rpc ListContentReviews(ContentRequest) returns (ContentReply);
+  rpc SubmitContentReview(ContentRequest) returns (ContentReply);
+  rpc WithdrawContentReview(ContentRequest) returns (ContentReply);
+  rpc ApproveContentReview(ContentRequest) returns (ContentReply);
+  rpc ReturnContentReview(ContentRequest) returns (ContentReply);
 }
 
 message Actor {

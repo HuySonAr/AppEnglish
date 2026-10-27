@@ -27,6 +27,7 @@ export const writingResultSchema = z.object({
   feedback: z.string().max(WRITING_LIMITS.feedbackChars),
   errors: z.array(z.object({ text: line.min(1), suggestion: line, explanation: line })).max(WRITING_LIMITS.errors),
   rewrite: z.string().max(WRITING_LIMITS.rewriteChars),
+  etsScore: z.number().int().min(0).max(5).optional(),
   model: z.string().max(60).optional(),
 });
 

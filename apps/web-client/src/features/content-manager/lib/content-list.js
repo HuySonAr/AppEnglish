@@ -124,3 +124,23 @@ export function filterListeningExercises(exercises, { search, topic, level, kind
     )
     .sort(compare);
 }
+
+export const SwSort = Object.freeze({ NEWEST: 'newest', OLDEST: 'oldest', TITLE_ASC: 'title-asc', TITLE_DESC: 'title-desc' });
+export const swSortOptions = [
+  { value: SwSort.NEWEST, label: 'Newest first' },
+  { value: SwSort.OLDEST, label: 'Oldest first' },
+  { value: SwSort.TITLE_ASC, label: 'Title A–Z' },
+  { value: SwSort.TITLE_DESC, label: 'Title Z–A' },
+];
+
+export function filterSwTests(tests, { search, status, sort }) {
+  const byTitle = (a, b) => compareText(a.title, b.title);
+  const byDate = (a, b) => new Date(a.createdAt) - new Date(b.createdAt) || byTitle(a, b);
+  const compare = {
+    [SwSort.NEWEST]: (a, b) => byDate(b, a),
+    [SwSort.OLDEST]: byDate,
+    [SwSort.TITLE_ASC]: byTitle,
+    [SwSort.TITLE_DESC]: (a, b) => byTitle(b, a),
+  }[sort] || ((a, b) => byDate(b, a));
+  return tests.filter((test) => matchesSearch(test.title, search) && hasStatus(test, status)).sort(compare);
+}

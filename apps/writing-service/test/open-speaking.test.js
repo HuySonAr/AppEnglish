@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { seal } from '@appenglish/backend-common/secret-box';
 import { WritingBroker } from '../src/broker.js';
 import { GeminiError, GeminiFailure } from '../src/gemini.js';
-import { OPEN_SCHEMA, buildOpenSpeakingPrompt, parseOpenSpeakingResult } from '../src/rubric.js';
+import { OPEN_SCHEMA, buildOpenSpeakingPrompt, openSchema, parseOpenSpeakingResult } from '../src/rubric.js';
 import { gradeWriting } from '../src/worker.js';
 
 const secret = 's'.repeat(40);
@@ -42,4 +42,23 @@ test('speaking results go to their own queue, also when Gemini gives up', async 
   await busy.handleGrading(channel, delivered(3));
   assert.deepEqual(sent.slice(1).map((item) => item.queue), ['writing.open-speaking.results', 'writing.grading.requests.dead']);
   assert.equal(sent[1].body.status, 'FAILED');
+});
+
+test('an ETS task adds its TOEIC scoring guide and an etsScore to the same request', async () => {
+  const payload = { ...job().payload, etsTask: 'respond_questions' };
+  const text = buildOpenSpeakingPrompt(payload);
+  assert.match(text, /TOEIC Speaking scoring guide for this task \(respond questions, whole number 0-3\)/);
+  assert.match(text, /3 = a full, relevant, socially appropriate reply/);
+  assert.deepEqual(openSchema('respond_questions').required, ['criteria', 'feedback', 'errors', 'rewrite', 'etsScore']);
+  assert.equal(openSchema(null), OPEN_SCHEMA);
+  assert.doesNotMatch(buildOpenSpeakingPrompt(job().payload), /etsScore/);
+  assert.match(buildOpenSpeakingPrompt({ ...payload, etsTask: 'describe_picture' }), /cannot see the picture/);
+  assert.equal(parseOpenSpeakingResult({ ...raw, etsScore: 7 }, transcript, 'express_opinion').etsScore, 5);
+  assert.equal(parseOpenSpeakingResult({ ...raw, etsScore: 2.4 }, transcript, 'respond_questions').etsScore, 2);
+  assert.equal('etsScore' in parseOpenSpeakingResult({ ...raw, etsScore: 2 }, transcript), false);
+  assert.throws(() => parseOpenSpeakingResult(raw, transcript, 'respond_questions'), (error) => error.kind === GeminiFailure.BAD_OUTPUT);
+  const requests = [];
+  const answer = await gradeWriting({ ...job(), payload }, { gemini: { generateJson: async (key, request) => (requests.push(request), { ...raw, etsScore: 2 }) }, secret });
+  assert.equal(answer.result.etsScore, 2);
+  assert.ok(requests[0].schema.properties.etsScore);
 });

@@ -16,7 +16,7 @@ const rpcs = {
     id: true,
     payload: submitSpeakingSchema,
     upload: true,
-    run: (service, { actor, id, payload, upload }) => service.submit(actor, id, { ...upload, durationSeconds: payload.durationSeconds }),
+    run: (service, { actor, id, payload, upload }) => service.submit(actor, id, { ...upload, ...payload }),
   },
 };
 

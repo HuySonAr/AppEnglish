@@ -5,6 +5,7 @@ import { cn } from '../../../lib/utils.js';
 import { scoreTone, toneBar, toneText } from '../lib/practice.js';
 import { writingGroups } from '../lib/writing.js';
 import { AnnotatedText, BetterVersion, CorrectionList } from './PracticeFeedback.jsx';
+import { EtsScore } from './PracticeScore.jsx';
 
 function Notice({ tone = 'muted', icon: Icon, spin = false, title, children }) {
   return (
@@ -72,7 +73,12 @@ export function WritingResult({ submission }) {
         </Notice>
       ) : null}
 
-      {status === SubmissionStatus.DONE ? <Scores scores={result.scores} /> : null}
+      {status === SubmissionStatus.DONE ? (
+        <>
+          <Scores scores={result.scores} />
+          <EtsScore ets={result.ets} />
+        </>
+      ) : null}
 
       {result?.feedback ? (
         <div className="flex gap-3 rounded-xl border bg-muted/30 p-4">

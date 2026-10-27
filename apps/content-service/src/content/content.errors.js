@@ -41,20 +41,19 @@ export const contentErrors = Object.freeze({
     ),
   autoTimeInvalid: (reason, message) =>
     new ContentError(ContentResponseCode.CONTENT_INVALID_STATE, message, 409, { reason }),
-  courseItemNotFound: () =>
-    new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Course unit or level test was not found', 404),
-  courseItemInvalid: (reason, message) =>
-    new ContentError(ContentResponseCode.CONTENT_INVALID_STATE, message, 409, { reason }),
   listeningExerciseNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Listening exercise was not found', 404),
   inUse: (reason, message) =>
     new ContentError(ContentResponseCode.CONTENT_IN_USE, message, 409, { reason }),
+  swTestNotFound: () => new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Speaking and Writing test was not found', 404),
   practicePromptNotFound: () => new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Practice prompt was not found', 404),
   practicePromptState: (reason, message) => new ContentError(ContentResponseCode.CONTENT_INVALID_STATE, message, 409, { reason }),
   mockNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Mock test was not found', 404),
   placementNotFound: () =>
     new ContentError(ContentResponseCode.CONTENT_NOT_FOUND, 'Placement test is not published', 404),
+  reviewState: (reason, message) =>
+    new ContentError(ContentResponseCode.CONTENT_INVALID_STATE, message, 409, { reason }),
   versionIsDraft: () =>
     new ContentError(ContentResponseCode.CONTENT_INVALID_STATE, 'This version is the current draft', 409),
   versionIsCurrent: () =>

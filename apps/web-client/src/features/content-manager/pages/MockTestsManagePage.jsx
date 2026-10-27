@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ChevronRight, Clock, FileText, Plus, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MOCK_TEST_DURATION_MINUTES, MOCK_TEST_LEVELS } from '@appenglish/content-contracts';
+import { LessonVersionStatus, MOCK_TEST_DURATION_MINUTES, MOCK_TEST_LEVELS, MockFormat } from '@appenglish/content-contracts';
+import { ReviewStatusBadge } from '../components/ContentReview.jsx';
+import { MockFormatBadge, formatOf, mockFormatLabels as formatLabels } from '../components/MockFormatBadge.jsx';
+import { useContentArea } from '../hooks/use-content-area.js';
 import { listExamTypes } from '../../../lib/api/exam-types-api.js';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -30,6 +33,7 @@ import { useListState } from '../../../hooks/use-list-state.js';
 
 const PAGE_SIZE = 10;
 const DEFAULTS = { search: '', examType: 'all', level: 'all', status: StatusFilter.ALL, sort: MockSort.LEVEL };
+const PRACTICE_MINUTES = 60;
 const levelOptions = [{ value: 'all', label: 'All levels' }, ...MOCK_TEST_LEVELS.map((level) => ({ value: String(level), label: `Level ${level}` }))];
 
 function ChoiceButton({ selected, onClick, className, children }) {
@@ -49,26 +53,33 @@ function ChoiceButton({ selected, onClick, className, children }) {
   );
 }
 
-function NewMockTestDialog({ open, onOpenChange, examTypes }) {
+function NewMockTestDialog({ open, onOpenChange, examTypes, base }) {
   const navigate = useNavigate();
   const writable = examTypes.filter((type) => type.hasEditor);
-  const [form, setForm] = useState({ title: '', examTypeId: '', level: '1', durationMinutes: String(MOCK_TEST_DURATION_MINUTES) });
+  const [form, setForm] = useState({ title: '', examTypeId: '', level: '1', format: MockFormat.FULL, durationMinutes: String(PRACTICE_MINUTES) });
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (open) setForm({ title: '', examTypeId: writable[0]?.id || '', level: '1', durationMinutes: String(MOCK_TEST_DURATION_MINUTES) });
+    if (open) setForm({ title: '', examTypeId: writable[0]?.id || '', level: '1', format: MockFormat.FULL, durationMinutes: String(PRACTICE_MINUTES) });
   }, [open]);
 
+  const full = form.format === MockFormat.FULL;
   const minutes = Number(form.durationMinutes);
-  const valid = form.title.trim() && form.examTypeId && Number.isInteger(minutes) && minutes >= 1 && minutes <= 300;
+  const valid = form.title.trim() && form.examTypeId && (full || (Number.isInteger(minutes) && minutes >= 1 && minutes <= 300));
 
   async function onCreate(event) {
     event.preventDefault();
     setBusy(true);
     try {
-      const result = await createMockTest({ title: form.title.trim(), examTypeId: form.examTypeId, level: Number(form.level), durationMinutes: minutes });
+      const result = await createMockTest({
+        title: form.title.trim(),
+        examTypeId: form.examTypeId,
+        level: Number(form.level),
+        format: form.format,
+        ...(full ? {} : { durationMinutes: minutes }),
+      });
       notify({ title: 'Mock test created' });
-      navigate(`/content-manager/mock-tests/${result.data.mockTest.id}`);
+      navigate(`${base}/mock-tests/${result.data.mockTest.id}`);
     } catch (error) {
       notify({ title: 'Could not create the mock test', description: getApiErrorMessage(error), variant: 'destructive' });
       setBusy(false);
@@ -98,6 +109,20 @@ function NewMockTestDialog({ open, onOpenChange, examTypes }) {
           ) : null}
 
           <div className="space-y-2">
+            <Label>Type</Label>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[MockFormat.FULL, MockFormat.PRACTICE].map((format) => (
+                <ChoiceButton key={format} className="h-10" selected={form.format === format} onClick={() => setForm({ ...form, format })}>
+                  {formatLabels[format]}
+                </ChoiceButton>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {full ? `200 questions in the exam layout, ${MOCK_TEST_DURATION_MINUTES} minutes.` : 'Any number of questions per part, your own time limit.'}
+            </p>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="mock-title">Title</Label>
             <Input id="mock-title" autoFocus value={form.title} maxLength={200} onChange={(event) => setForm({ ...form, title: event.target.value })} />
           </div>
@@ -115,7 +140,11 @@ function NewMockTestDialog({ open, onOpenChange, examTypes }) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="mock-minutes">Minutes</Label>
-              <Input id="mock-minutes" className="w-24" inputMode="numeric" value={form.durationMinutes} onChange={(event) => setForm({ ...form, durationMinutes: event.target.value.trim() })} />
+              {full ? (
+                <Input id="mock-minutes" className="w-24" value={String(MOCK_TEST_DURATION_MINUTES)} disabled readOnly />
+              ) : (
+                <Input id="mock-minutes" className="w-24" inputMode="numeric" value={form.durationMinutes} onChange={(event) => setForm({ ...form, durationMinutes: event.target.value.trim() })} />
+              )}
             </div>
           </div>
 
@@ -133,11 +162,11 @@ function NewMockTestDialog({ open, onOpenChange, examTypes }) {
   );
 }
 
-function MockTestRow({ mockTest }) {
+function MockTestRow({ mockTest, base }) {
   return (
     <li>
       <Link
-        to={`/content-manager/mock-tests/${mockTest.id}`}
+        to={`${base}/mock-tests/${mockTest.id}`}
         className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span className="flex h-10 w-12 shrink-0 flex-col items-center justify-center rounded-md bg-muted leading-none">
@@ -154,7 +183,8 @@ function MockTestRow({ mockTest }) {
           </span>
         </span>
         <span className="flex shrink-0 flex-wrap justify-end gap-1.5">
-          {mockTest.hasDraft ? <Badge variant="warning">Draft</Badge> : null}
+          <MockFormatBadge format={formatOf(mockTest)} />
+          {mockTest.hasDraft ? <ReviewStatusBadge status={mockTest.draftStatus || LessonVersionStatus.DRAFT} /> : null}
           {mockTest.publishedVersionNumber ? <Badge variant="success">Published v{mockTest.publishedVersionNumber}</Badge> : <Badge variant="outline">Not published</Badge>}
         </span>
         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
@@ -164,6 +194,7 @@ function MockTestRow({ mockTest }) {
 }
 
 export function MockTestsManagePage() {
+  const { base, eyebrow, canAuthor } = useContentArea();
   const [state, setState] = useState('loading');
   const [mockTests, setMockTests] = useState([]);
   const [examTypes, setExamTypes] = useState([]);
@@ -191,16 +222,16 @@ export function MockTestsManagePage() {
   const examTypeOptions = [{ value: 'all', label: 'All exam types' }, ...examTypes.map((type) => ({ value: type.id, label: type.name }))];
   const narrowed = filters.search || filters.examType !== 'all' || filters.level !== 'all' || filters.status !== StatusFilter.ALL;
   const canCreate = state === 'ready' && examTypes.some((type) => type.hasEditor);
-  const newButton = (
+  const newButton = canAuthor ? (
     <Button className="gap-2" disabled={!canCreate} onClick={() => setCreating(true)}>
       <Plus className="h-4 w-4" />
       New mock test
     </Button>
-  );
+  ) : null;
 
   return (
     <section className="space-y-6">
-      <PageHeader eyebrow="Content Manager" title="Mock tests" description="Full TOEIC-style tests, also taken one part at a time." actions={newButton} />
+      <PageHeader eyebrow={eyebrow} title="Mock tests" description="Full TOEIC-style tests, also taken one part at a time." actions={newButton} />
 
       {state === 'loading' ? (
         <RowsSkeleton rows={5} />
@@ -209,7 +240,7 @@ export function MockTestsManagePage() {
           Try again
         </Button>
       ) : mockTests.length === 0 ? (
-        <EmptyState icon={FileText} title="No mock tests yet" description="Create the first mock test." action={newButton} />
+        <EmptyState icon={FileText} title="No mock tests yet" description={canAuthor ? 'Create the first mock test.' : 'Mock tests appear here once teachers create them.'} action={newButton} />
       ) : (
         <div className="space-y-4">
           <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
@@ -242,7 +273,7 @@ export function MockTestsManagePage() {
             ) : (
               <ul className="divide-y">
                 {shown.items.map((mockTest) => (
-                  <MockTestRow key={mockTest.id} mockTest={mockTest} />
+                  <MockTestRow key={mockTest.id} mockTest={mockTest} base={base} />
                 ))}
               </ul>
             )}
@@ -251,7 +282,7 @@ export function MockTestsManagePage() {
         </div>
       )}
 
-      <NewMockTestDialog open={creating} onOpenChange={setCreating} examTypes={examTypes} />
+      {canAuthor ? <NewMockTestDialog open={creating} onOpenChange={setCreating} examTypes={examTypes} base={base} /> : null}
     </section>
   );
 }

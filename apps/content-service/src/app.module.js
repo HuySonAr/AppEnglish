@@ -5,9 +5,6 @@ import { ContentGrpcController } from './content/content.grpc.controller.js';
 import { ContentRepository } from './content/content.repository.js';
 import { ContentService } from './content/content.service.js';
 import { createContentDataSource } from './database/database.config.js';
-import { CourseGrpcController } from './course/course.grpc.controller.js';
-import { CourseRepository } from './course/course.repository.js';
-import { CourseService } from './course/course.service.js';
 import { ListeningGrpcController } from './listening/listening.grpc.controller.js';
 import { ListeningRepository } from './listening/listening.repository.js';
 import { ListeningService } from './listening/listening.service.js';
@@ -18,6 +15,11 @@ import { PracticeRepository } from './practice/practice.repository.js';
 import { PracticeService } from './practice/practice.service.js';
 import { VersionGrpcController } from './versions/version.grpc.controller.js';
 import { ContentVersionService } from './versions/version.service.js';
+import { ReviewGrpcController } from './review/review.grpc.controller.js';
+import { SwTestGrpcController } from './swtest/swtest.grpc.controller.js';
+import { SwTestRepository } from './swtest/swtest.repository.js';
+import { SwTestService } from './swtest/swtest.service.js';
+import { ContentReviewService } from './review/review.service.js';
 import {
   CONTENT_DATA_SOURCE,
   CONTENT_REPOSITORY,
@@ -32,7 +34,7 @@ import { SpeechPronunciationSource } from './pronunciation/speech-pronunciation.
 
 export class AppModule {}
 Module({
-  controllers: [MetricsController, HealthController, ContentGrpcController, ListeningGrpcController, CourseGrpcController, VersionGrpcController, PracticeGrpcController],
+  controllers: [MetricsController, HealthController, ContentGrpcController, ListeningGrpcController, VersionGrpcController, ReviewGrpcController, PracticeGrpcController, SwTestGrpcController],
   providers: [
     { provide: MEDIA_STORAGE, useFactory: () => createMediaStorage() },
     { provide: SpeechBroker, useFactory: () => new SpeechBroker(process.env.RABBITMQ_URL || 'amqp://localhost:5672') },
@@ -75,16 +77,23 @@ Module({
       inject: [CONTENT_DATA_SOURCE, ContentService],
     },
     {
-      provide: CourseService,
-      useFactory: (dataSource, contentService, listeningService) =>
-        new CourseService(new CourseRepository(dataSource), contentService, listeningService),
-      inject: [CONTENT_DATA_SOURCE, ContentService, ListeningService],
+      provide: SwTestService,
+      useFactory: (dataSource, contentService) => new SwTestService(new SwTestRepository(dataSource), contentService),
+      inject: [CONTENT_DATA_SOURCE, ContentService],
     },
     {
       provide: ContentVersionService,
-      useFactory: (repository, contentService, listeningService, courseService) =>
-        new ContentVersionService(repository, contentService, listeningService, courseService),
-      inject: [CONTENT_REPOSITORY, ContentService, ListeningService, CourseService],
+      useFactory: (repository, contentService, listeningService, swTestService) => new ContentVersionService(repository, contentService, listeningService, swTestService),
+      inject: [CONTENT_REPOSITORY, ContentService, ListeningService, SwTestService],
+    },
+    {
+      provide: ContentReviewService,
+      useFactory: (contentService, listeningService, dataSource, swTestService) => {
+        const reviews = new ContentReviewService(contentService, listeningService, { practiceRepository: new PracticeRepository(dataSource), swTestService });
+        listeningService.useReviewNotices(reviews);
+        return reviews;
+      },
+      inject: [ContentService, ListeningService, CONTENT_DATA_SOURCE, SwTestService],
     },
   ],
   exports: [MEDIA_STORAGE],

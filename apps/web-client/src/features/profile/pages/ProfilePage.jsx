@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, CalendarDays, CheckCircle2, GraduationCap, Headphones, KeyRound, Lock, Mail, Pencil, Shield, Timer, TrendingUp, Trophy } from 'lucide-react';
+import { BookOpen, CalendarDays, CheckCircle2, KeyRound, Mail, Pencil, Shield, Timer, TrendingUp, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { displayNameOf } from '@appenglish/auth-contracts';
 import { RoleLabels, Roles } from '../../../constants/auth.js';
@@ -13,12 +13,11 @@ import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx'
 import { useAuth } from '../../auth/context/AuthContext.jsx';
 import { getProgress, getStreak, getXp } from '../../student/api/progress-api.js';
 import { StreakCalendar } from '../../student/components/Streak.jsx';
-import { getCourseProgress } from '../../student/api/course-api.js';
 import { ChangePasswordDialog } from '../components/ChangePasswordDialog.jsx';
 import { GeminiKeyCard } from '../../student/components/GeminiKeyCard.jsx';
 import { EditProfileDialog } from '../components/EditProfileDialog.jsx';
 import { LessonsRing, SkillsChart, XpChart } from '../components/ProfileCharts.jsx';
-import { lessonRing, LevelStep, levelSteps, memberFor, skillBars, xpBars } from '../lib/profile-charts.js';
+import { lessonRing, memberFor, skillBars, xpBars } from '../lib/profile-charts.js';
 
 const eyebrows = {
   [Roles.STUDENT]: 'Student',
@@ -58,42 +57,11 @@ function Panel({ title, description, action, children, className }) {
   );
 }
 
-function LevelSteps({ steps, currentLevel }) {
-  if (!steps.length) return <p className="text-sm text-muted-foreground">The listening course has no level yet.</p>;
-  return (
-    <ol className="flex flex-wrap gap-2">
-      {steps.map((step) => {
-        const done = step.state === LevelStep.DONE;
-        const current = step.state === LevelStep.CURRENT || step.level === currentLevel;
-        return (
-          <li
-            key={step.level}
-            className={cn(
-              'flex min-w-[4.5rem] flex-1 flex-col items-center gap-1 rounded-xl border px-3 py-2 text-sm',
-              done && 'border-success/40 bg-success/10',
-              current && !done && 'border-primary bg-primary/10 font-semibold text-primary',
-              !done && !current && 'text-muted-foreground opacity-70',
-            )}
-          >
-            <span className="font-semibold">{step.level}</span>
-            {done ? <CheckCircle2 className="h-4 w-4 text-success" aria-label="Passed" /> : current ? <span className="text-[10px] uppercase tracking-wide">Now</span> : <Lock className="h-3.5 w-3.5" aria-label="Locked" />}
-            {step.topics?.total ? (
-              <span className="text-[11px] tabular-nums text-muted-foreground">
-                {step.topics.done}/{step.topics.total}
-              </span>
-            ) : null}
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
-
 function StandingSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2">
-        {[0, 1, 2, 3].map((item) => <Skeleton key={item} className="h-20 rounded-xl" />)}
+      <div className="grid gap-3 sm:grid-cols-3">
+        {[0, 1, 2].map((item) => <Skeleton key={item} className="h-20 rounded-xl" />)}
       </div>
       <div className="grid gap-6 lg:grid-cols-[1fr_16rem]">
         <Skeleton className="h-52 rounded-xl" />
@@ -111,8 +79,8 @@ function Standing() {
   async function load() {
     setState('loading');
     try {
-      const [progress, xp, course, streak] = await Promise.all([getProgress(), getXp().catch(() => null), getCourseProgress().catch(() => null), getStreak().catch(() => null)]);
-      setData({ progress: progress.data, xp: xp?.data ?? null, course: course?.data ?? null, streak: streak?.data ?? null });
+      const [progress, xp, streak] = await Promise.all([getProgress(), getXp().catch(() => null), getStreak().catch(() => null)]);
+      setData({ progress: progress.data, xp: xp?.data ?? null, streak: streak?.data ?? null });
       setState('ready');
     } catch (error) {
       setData({ error: getApiErrorMessage(error) });
@@ -140,21 +108,18 @@ function Standing() {
       </Card>
     );
 
-  const { progress, xp, course, streak } = data;
+  const { progress, xp, streak } = data;
   const ring = lessonRing(progress);
   const bars = skillBars(progress);
   const xpData = xpBars(xp);
-  const steps = levelSteps(course);
   const tests = (progress.attempts?.lessonTests || 0) + (progress.attempts?.mockTests || 0);
   const nothingYet = ring.completed === 0 && tests === 0 && !xpData.length;
-  const listeningLevel = course ? course.currentLevel || '—' : '—';
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
         <Stat icon={BookOpen} label="Lessons completed" value={ring.total ? `${ring.completed}/${ring.total}` : '—'} detail={ring.percent === null ? 'No lesson published yet' : `${ring.percent}% of the course`} />
         <Stat icon={Trophy} label="XP" value={xp ? `${xp.totalXp} XP` : '—'} detail={xp ? (xp.rank ? `#${xp.rank} of ${xp.learnerCount} learners` : 'Finish a full mock test to earn XP') : 'XP not available'} tone="text-warning bg-warning/10" />
-        <Stat icon={Headphones} label="Listening level" value={listeningLevel} detail={course ? `${course.topics?.done ?? 0}/${course.topics?.total ?? 0} course topics done` : 'Course not available'} tone="text-chart-2 bg-chart-2/10" />
         <Stat icon={Timer} label="Tests taken" value={tests} detail={`${plural(progress.attempts?.lessonTests || 0, 'lesson test')}, ${plural(progress.attempts?.mockTests || 0, 'full mock test')}`} />
       </div>
 
@@ -170,20 +135,12 @@ function Standing() {
           title="Your story starts here"
           description="Pass a lesson test or take a full mock test."
           action={
-            <div className="flex flex-wrap justify-center gap-2">
-              <Button asChild>
-                <Link to="/student/lessons">
-                  <BookOpen className="h-4 w-4" />
-                  Go to lessons
-                </Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link to="/student/listening-course">
-                  <GraduationCap className="h-4 w-4" />
-                  Listening course
-                </Link>
-              </Button>
-            </div>
+            <Button asChild>
+              <Link to="/student/lessons">
+                <BookOpen className="h-4 w-4" />
+                Go to lessons
+              </Link>
+            </Button>
           }
         />
       ) : (
@@ -220,20 +177,6 @@ function Standing() {
                 to earn your first points.
               </p>
             )}
-          </Panel>
-
-          <Panel
-            title="Listening course"
-            action={
-              <Button asChild variant="ghost" size="sm">
-                <Link to="/student/listening-course/progress">
-                  <GraduationCap className="h-4 w-4" />
-                  Course progress
-                </Link>
-              </Button>
-            }
-          >
-            {course ? <LevelSteps steps={steps} currentLevel={course.currentLevel} /> : <p className="text-sm text-muted-foreground">The listening course could not be loaded right now.</p>}
           </Panel>
         </>
       )}

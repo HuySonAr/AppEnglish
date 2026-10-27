@@ -37,16 +37,17 @@ enforcing the exact package-manager version in CI.
 **TBD:** proto/RPC contracts, RabbitMQ exchanges/queues, Redis usage, domain
 entities and migrations are intentionally not implemented in F00.
 
-## Dự kiến cho hiệu ứng giao diện (chưa áp dụng)
-Ghi ngày 2026-10-24 theo yêu cầu người dùng; chưa cài, chưa có code dùng. Hiện tại hiệu ứng chỉ dùng CSS `@keyframes` trong `apps/web-client/src/styles/index.css` (trang đăng nhập, tắt khi `prefers-reduced-motion`).
+## Hiệu ứng giao diện (D187)
+Áp dụng từ 2026-10-24 theo yêu cầu người dùng. Mỗi loại hiệu ứng chỉ dùng một thư viện.
 
-| Thư viện | Ghi chú khi áp dụng |
-|---|---|
-| anime.js | Hiệu ứng theo dòng thời gian, SVG, đếm số |
-| Framer Motion | Nay phát hành dưới tên gói `motion` (`motion/react`); hiệu ứng vào/ra, chuyển trang, kéo thả trong React |
-| MicroKit UI (https://microkit.co/) | Bộ microinteraction React + CSS/Tailwind dạng copy-paste, giấy phép MIT, không phải gói npm; một số component thêm được qua shadcn CLI (`npx shadcn@latest add @microkit/<tên>`). Chọn bản JavaScript + Tailwind (chạy được với Tailwind v3 của repo); icon dùng lucide-react đã có. Code chép vào phải bỏ comment (D149) và bỏ hiệu ứng chuyển màu/phát sáng mờ trang trí (D153); đặt trong `src/components/shared` |
+| Thư viện | Phiên bản | Dùng cho |
+|---|---|---|
+| CSS `@keyframes` + transition Tailwind | — | Hiệu ứng trang auth, `PublishButton`, mở nhóm sidebar (giữ như cũ) |
+| `motion` (Framer Motion, import `motion/react`) | 13.5.1 | Phần tử React xuất hiện lần lượt (`RevealGroup`/`RevealItem`), hover nâng thẻ, thanh tiến độ (`ProgressBar`), danh sách xuất hiện |
+| `animejs` | 4.5.0 | Giá trị số và SVG: `CountUp`, vẽ vòng `ScoreRing` |
+| MicroKit UI (https://microkit.co/, MIT) | chép mã, không phải gói npm | Microinteraction: `CircleSwapLink`, `ArrowLink`, `GlideCards`; viết lại bằng JavaScript, dùng token màu, bỏ comment (D149), không dùng biến thể glow/gradient (D153). Giấy phép: `apps/web-client/THIRD_PARTY_NOTICES.md` |
 
-Khi áp dụng: ghi quyết định vào decisions.md, chốt phiên bản cụ thể, tôn trọng `prefers-reduced-motion`, không dùng nền chuyển màu hay đốm mờ (D153), và tránh dùng hai thư viện cho cùng một loại hiệu ứng.
+`MotionConfig reducedMotion="user"` bọc ứng dụng trong `main.jsx`; anime.js gọi `prefersReducedMotion()` trong `src/lib/motion.js`; CSS có khối `prefers-reduced-motion`.
 
 ## Phiên bản và chi tiết cần xác minh
 - pnpm được pin ở 9.0.0 theo project setup; kiểm tra package.json/packageManager và lockfile.

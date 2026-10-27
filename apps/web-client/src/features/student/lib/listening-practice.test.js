@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterListeningPractice, isTimed, maskedWords, isTried, kindLabel, lineAnswers, lineBlanks, resultOf, runningScore, sentenceLabel, topicModes } from './listening-practice.js';
+import { activeSentence, filterListeningPractice, isTimed, maskedWords, isTried, kindLabel, lineAnswers, lineBlanks, resultOf, runningScore, sentenceLabel, topicModes } from './listening-practice.js';
 
 test('listening exercises are filtered by topic, searched and sorted', () => {
   const exercises = [
@@ -80,3 +80,11 @@ test('a checked sentence hides the wrong and missing words behind asterisks', ()
   ]);
 });
 
+test('the transcript follows the sentence being played', () => {
+  const sentences = [{ start: 0 }, { start: 2.5 }, { start: null }, { start: 6 }];
+  assert.equal(activeSentence(sentences, 0), 0);
+  assert.equal(activeSentence(sentences, 2.46), 1);
+  assert.equal(activeSentence(sentences, 5.9), 1);
+  assert.equal(activeSentence(sentences, 7), 3);
+  assert.equal(activeSentence([], 3), -1);
+});

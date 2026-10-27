@@ -7,7 +7,6 @@ import { createLearningDataSource } from './database/database.config.js';
 import {
   CONTENT_CLIENT,
   CONTENT_GRPC_CLIENT,
-  COURSE_REPOSITORY,
   EVENT_REPOSITORY,
   LEARNING_DATA_SOURCE,
   LESSON_REPOSITORY,
@@ -18,9 +17,6 @@ import {
   AI_KEY_REPOSITORY,
   REVIEW_REPOSITORY,
 } from './database/database.tokens.js';
-import { CourseGrpcController } from './course/course.grpc.controller.js';
-import { CourseRepository } from './course/course.repository.js';
-import { CourseLessonService } from './course/course.service.js';
 import { EventRepository } from './events/events.repository.js';
 import { LearningEvents } from './events/learning-events.js';
 import { LessonGrpcController } from './lesson/lesson.grpc.controller.js';
@@ -37,6 +33,9 @@ import { PlacementGrpcController } from './placement/placement.grpc.controller.j
 import { PlacementRepository } from './placement/placement.repository.js';
 import { PlacementService } from './placement/placement.service.js';
 import { SpeakingGrpcController } from './speaking/speaking.grpc.controller.js';
+import { SwTestGrpcController } from './swtest/swtest.grpc.controller.js';
+import { SwTestRepository } from './swtest/swtest.repository.js';
+import { SwTestService } from './swtest/swtest.service.js';
 import { SpeakingRepository } from './speaking/speaking.repository.js';
 import { PracticeResults } from './speaking/practice-results.js';
 import { LearningQueue } from '@appenglish/learning-contracts';
@@ -63,7 +62,7 @@ Module({
       { name: CONTENT_GRPC_CLIENT, transport: Transport.GRPC, options: contentGrpcOptions() },
     ]),
   ],
-  controllers: [MetricsController, HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, CourseGrpcController, UsageGrpcController, SpeakingGrpcController, WritingGrpcController, ReviewGrpcController, CefrGrpcController],
+  controllers: [MetricsController, HealthController, PlacementGrpcController, LessonGrpcController, MockGrpcController, ListeningGrpcController, UsageGrpcController, SpeakingGrpcController, WritingGrpcController, ReviewGrpcController, CefrGrpcController, SwTestGrpcController],
   providers: [
     { provide: LEARNING_DATA_SOURCE, useFactory: createLearningDataSource },
     {
@@ -127,16 +126,6 @@ Module({
       inject: [LISTENING_REPOSITORY, CONTENT_CLIENT, LearningEvents],
     },
     {
-      provide: COURSE_REPOSITORY,
-      useFactory: (dataSource) => new CourseRepository(dataSource),
-      inject: [LEARNING_DATA_SOURCE],
-    },
-    {
-      provide: CourseLessonService,
-      useFactory: (repository, contentClient, events) => new CourseLessonService(repository, contentClient, { events }),
-      inject: [COURSE_REPOSITORY, CONTENT_CLIENT, LearningEvents],
-    },
-    {
       provide: CefrService,
       useFactory: (mockRepository, submissions) => new CefrService(mockRepository, submissions),
       inject: [MOCK_REPOSITORY, SPEAKING_REPOSITORY],
@@ -148,14 +137,27 @@ Module({
     },
     {
       provide: ReviewService,
-      useFactory: (repository, events) => {
-        const service = new ReviewService(repository, { events });
+      useFactory: (repository, events, swTests) => {
+        const service = new ReviewService(repository, { events, swTests });
+        swTests.useReviews(service);
         const expire = () => service.expireDue().catch(() => {});
         setTimeout(expire, 30_000).unref?.();
         setInterval(expire, EXPIRE_EVERY_MS).unref?.();
         return service;
       },
-      inject: [REVIEW_REPOSITORY, LearningEvents],
+      inject: [REVIEW_REPOSITORY, LearningEvents, SwTestService],
+    },
+    {
+      provide: SwTestService,
+      useFactory: (dataSource, contentClient, events, keys) => {
+        const service = new SwTestService(new SwTestRepository(dataSource), contentClient, { events, keys });
+        new PracticeResults(process.env.RABBITMQ_URL || 'amqp://localhost:5672', (answer) => service.applyGrading(answer), { queue: LearningQueue.SW_RESULTS, requests: LearningQueue.WRITING_REQUESTS }).start();
+        const purge = () => service.purgeRecordings().catch(() => {});
+        setTimeout(purge, 90_000).unref?.();
+        setInterval(purge, PURGE_EVERY_MS).unref?.();
+        return service;
+      },
+      inject: [LEARNING_DATA_SOURCE, CONTENT_CLIENT, LearningEvents, AI_KEY_REPOSITORY],
     },
     {
       provide: SPEAKING_REPOSITORY,
@@ -164,17 +166,20 @@ Module({
     },
     {
       provide: SpeakingService,
-      useFactory: (repository, contentClient, events, keys, reviews) => {
+      useFactory: (repository, contentClient, events, keys, reviews, swTests) => {
         const url = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
         const service = new SpeakingService(repository, contentClient, { events, keys, reviews });
-        new PracticeResults(url, (answer) => service.applyResult(answer)).start();
+        new PracticeResults(url, async (answer) => {
+          const outcome = await service.applyResult(answer);
+          return outcome === 'unknown' ? swTests.applyWhisper(answer) : outcome;
+        }).start();
         new PracticeResults(url, (answer) => service.applyGrading(answer), { queue: LearningQueue.OPEN_SPEAKING_RESULTS, requests: LearningQueue.WRITING_REQUESTS }).start();
         const purge = () => service.purgeRecordings().catch(() => {});
         setTimeout(purge, 60_000).unref?.();
         setInterval(purge, PURGE_EVERY_MS).unref?.();
         return service;
       },
-      inject: [SPEAKING_REPOSITORY, CONTENT_CLIENT, LearningEvents, AI_KEY_REPOSITORY, ReviewService],
+      inject: [SPEAKING_REPOSITORY, CONTENT_CLIENT, LearningEvents, AI_KEY_REPOSITORY, ReviewService, SwTestService],
     },
     {
       provide: AI_KEY_REPOSITORY,
@@ -195,9 +200,9 @@ Module({
     },
     {
       provide: MockService,
-      useFactory: (repository, placementRepository, contentClient, events) =>
-        new MockService(repository, placementRepository, contentClient, { events }),
-      inject: [MOCK_REPOSITORY, PLACEMENT_REPOSITORY, CONTENT_CLIENT, LearningEvents],
+      useFactory: (repository, placementRepository, contentClient, events, dataSource, practice) =>
+        new MockService(repository, placementRepository, contentClient, { events, swAttempts: new SwTestRepository(dataSource), practice }),
+      inject: [MOCK_REPOSITORY, PLACEMENT_REPOSITORY, CONTENT_CLIENT, LearningEvents, LEARNING_DATA_SOURCE, SPEAKING_REPOSITORY],
     },
   ],
 })(AppModule);

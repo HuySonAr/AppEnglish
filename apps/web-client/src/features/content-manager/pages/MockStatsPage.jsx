@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { MockFormat } from '@appenglish/content-contracts';
 import { BarChart3, Check, PenLine, Users } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts';
@@ -14,6 +15,7 @@ import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx'
 import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
 import { getMockStats, getMockTest } from '../api/content-api.js';
+import { MockFormatBadge, formatOf } from '../components/MockFormatBadge.jsx';
 import { StatSort, filterStatQuestions, flagInfo, flaggedQuestions, statSortOptions } from '../lib/mock-stats.js';
 
 const PAGE_SIZE = 20;
@@ -83,6 +85,7 @@ export function MockStatsPage() {
   const [state, setState] = useState('loading');
   const [stats, setStats] = useState(null);
   const [title, setTitle] = useState('');
+  const [format, setFormat] = useState(null);
   const { filters, setFilter, page, setPage } = useListState({ search: '', part: 'all', sort: StatSort.NUMBER });
   const editorPath = `/content-manager/mock-tests/${mockTestId}`;
 
@@ -92,6 +95,7 @@ export function MockStatsPage() {
       const [result, mock] = await Promise.all([getMockStats(mockTestId), getMockTest(mockTestId).catch(() => null)]);
       setStats(result.data);
       setTitle(mock?.data?.mockTest?.title || 'Mock test');
+      setFormat(mock?.data?.mockTest ? formatOf(mock.data.mockTest) : null);
       setState('ready');
     } catch (error) {
       setState('error');
@@ -116,6 +120,7 @@ export function MockStatsPage() {
       </section>
     );
 
+  const practice = format === MockFormat.PRACTICE;
   const flagged = flaggedQuestions(stats.questions);
   const shown = paginate(filterStatQuestions(stats.questions, filters), page, PAGE_SIZE);
   const partOptions = [{ value: 'all', label: 'All parts' }, ...stats.parts.map((part) => ({ value: part.key, label: `Part ${part.number}` }))];
@@ -128,7 +133,10 @@ export function MockStatsPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">Results</p>
-          <h1 className="truncate text-2xl font-bold">{title}</h1>
+          <h1 className="flex flex-wrap items-center gap-2 text-2xl font-bold">
+            <span className="truncate">{title}</span>
+            {format ? <MockFormatBadge format={format} /> : null}
+          </h1>
           {stats.versionNumber ? <p className="text-sm text-muted-foreground">Questions as in published version {stats.versionNumber}.</p> : null}
         </div>
         <Button asChild variant="outline" className="gap-1.5">
@@ -139,15 +147,17 @@ export function MockStatsPage() {
         </Button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className={cn('grid gap-3 sm:grid-cols-2', practice ? 'lg:grid-cols-3' : 'lg:grid-cols-4')}>
         <Stat label="Learners" value={stats.learners} />
-        <Stat label="Full tests taken" value={stats.fullAttempts} />
+        <Stat label={practice ? 'Full sets taken' : 'Full tests taken'} value={stats.fullAttempts} />
         <Stat label="Mini tests taken" value={stats.miniAttempts} />
-        <Stat
-          label="Average estimated score"
-          value={stats.averageScore ? `${stats.averageScore.total} / 990` : '—'}
-          note={stats.averageScore ? `Listening ${stats.averageScore.listening} · Reading ${stats.averageScore.reading}` : null}
-        />
+        {practice ? null : (
+          <Stat
+            label="Average estimated score"
+            value={stats.averageScore ? `${stats.averageScore.total} / 990` : '—'}
+            note={stats.averageScore ? `Listening ${stats.averageScore.listening} · Reading ${stats.averageScore.reading}` : null}
+          />
+        )}
       </div>
 
       {!stats.published ? (

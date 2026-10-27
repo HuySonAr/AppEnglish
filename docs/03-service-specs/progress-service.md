@@ -100,7 +100,7 @@ with a stand-in for auth-service. Results are in
 
 The consumer applies `activity.recorded` (`{ accountId, activity, occurredAt }`, `activity` in `StudyActivity`) by upserting `study_days` for the day of `occurredAt` in `Asia/Ho_Chi_Minh` and adding the activity to that day's list. `GetStreak` reads the learner's days and computes the streak; nothing is precomputed.
 
-Notifications (D163): the consumer also turns results into rows of `notifications`: a full `mock.submitted` into `MOCK_RESULT` (`total`, `listening`, `reading`, `change` from the previous notified attempt of the same test), `unit-review.passed` into `UNIT_OPENED`, `course.level-up` into `COURSE_LEVEL_UP`. `ListNotifications` (student) first deletes rows older than 30 days, adds today's `STREAK_REMINDER` from 18:00 Vietnam time when the streak is live and today is not studied (or marks it read once studied), then returns the 30 latest and the unread count; rules in `src/progress/notification.rules.js`.
+Notifications (D163): the consumer also turns results into rows of `notifications`: a full `mock.submitted` into `MOCK_RESULT` (`total`, `listening`, `reading`, `change` from the previous notified attempt of the same test), `unit-review.passed` into `UNIT_OPENED`. `ListNotifications` (student) first deletes rows older than 30 days, adds today's `STREAK_REMINDER` from 18:00 Vietnam time when the streak is live and today is not studied (or marks it read once studied), then returns the 30 latest and the unread count; rules in `src/progress/notification.rules.js`.
 
 | Method | Gateway route | RPC | Role | Purpose |
 |---|---|---|---|---|

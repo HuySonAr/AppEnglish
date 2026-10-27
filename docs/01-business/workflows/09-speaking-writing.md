@@ -27,6 +27,45 @@ Mỗi đề có: loại, cấp CEFR (A1–C2), chủ đề, tiêu đề, ngườ
 - Ý chính là danh sách các ý đề yêu cầu (ví dụ "nêu lý do xin nghỉ, đề xuất ngày bù, lời cảm ơn"); khi có, AI và giáo viên chấm mức hoàn thành yêu cầu đề theo danh sách này.
 - Bài mẫu và ý chính chỉ dùng làm đầu vào cho AI chấm và để giáo viên tham khảo; học viên không bao giờ thấy, kể cả sau khi nộp (D185).
 
+## Dạng câu ETS (D195)
+
+Mỗi đề có dạng câu ETS và vẫn giữ cấp CEFR.
+
+| Kỹ năng | Dạng | Nội dung đề | Thời gian luyện mặc định |
+|---|---|---|---|
+| Speaking | Read a text aloud | đoạn văn, audio mẫu | chuẩn bị 45 giây, đọc 45 giây |
+| Speaking | Describe a picture | hình (bắt buộc), yêu cầu, bài mẫu | 45 / 30 giây |
+| Speaking | Respond to questions | bối cảnh + đúng 3 câu hỏi (chữ, bài mẫu, audio tuỳ chọn) | mỗi câu chuẩn bị 3 giây, trả lời 15 / 15 / 30 giây |
+| Speaking | Respond using information provided | bảng thông tin + đúng 3 câu hỏi | đọc 45 giây; 3 giây chuẩn bị; 15 / 15 / 30 giây; câu 3 phát hai lần |
+| Speaking | Express an opinion | câu hỏi, bài mẫu | 45 / 60 giây |
+| Writing | Write a sentence based on a picture | hình + 2 từ bắt buộc, một câu | 96 giây (8 phút cho 5 câu như đề thật) |
+| Writing | Respond to a written request | email đề bài + yêu cầu | 10 phút |
+| Writing | Write an opinion essay | câu hỏi | 30 phút, khuyến nghị từ 300 từ |
+
+- Audio câu hỏi: giáo viên tải lên hoặc tạo bằng giọng máy Piper.
+- Dạng 3 câu: học viên ghi âm 3 câu trả lời; mỗi câu là một bài nộp con có chung mã bộ (`setId`), chấm như đề nói mở (Whisper + Gemini) với chính câu hỏi và bài mẫu của câu đó; gửi giáo viên chấm tính theo từng bài nộp.
+- Khi luyện, mặc định đếm giờ theo ETS: ghi âm tự bắt đầu sau thời gian chuẩn bị và tự dừng; Writing khoá ô viết khi hết giờ. "Practice without timer" bỏ đếm giờ (vẫn theo giới hạn ghi âm và số từ của đề). Giới hạn ghi âm đọc to nâng lên 45 giây.
+- Đề cũ: đọc to, email, bài luận được xếp dạng tự động; đề khác giáo viên chọn dạng khi sửa. Gửi duyệt cần có dạng câu. Học viên lọc đề theo dạng câu và cấp CEFR.
+- Chấm theo rubric ETS chưa áp dụng (bàn ở feature chấm).
+- Giao diện: chọn dạng câu thì đề tự đặt sẵn giới hạn hợp lý (câu tả tranh 1–40 từ, bài luận từ 300 từ; thời gian nói ít nhất bằng thời gian trả lời dài nhất của dạng). Có giờ thì bản ghi dài tối đa bằng thời gian ETS và không quá thời gian nói của đề; bấm Start mới bắt đầu tính giờ, được bỏ qua thời gian chuẩn bị/đọc; bài đơn có giờ được thử lại một lần trước khi nộp; trong bộ 3 câu, mỗi câu gửi ngay khi dừng ghi (lỗi thì có "Send again"). Writing hết giờ thì khoá ô viết, vẫn nộp được nếu đủ số từ. Lịch sử đề dạng bộ hiện mỗi lượt một dòng với điểm trung bình 3 câu.
+
+## Bài thi Speaking/Writing (D196)
+
+- Một đề thi có tên và hai phần. Speaking 11 câu: 1–2 đọc to, 3–4 mô tả tranh, 5–7 trả lời câu hỏi theo một bối cảnh, 8–10 trả lời theo bảng thông tin, 11 nêu quan điểm. Writing 8 câu: 1–5 viết câu tả tranh với 2 từ, 6–7 trả lời email, 8 bài luận.
+- Giáo viên soạn trực tiếp trong đề, Content Manager duyệt như mọi nội dung (D191). Gửi duyệt khi đủ câu; câu 5–10 cần audio câu hỏi (tải lên hoặc giọng máy), câu 3–4 và Writing 1–5 cần hình, mỗi câu tả tranh có đúng 2 từ, mỗi email có nội dung và yêu cầu.
+- Học viên thi riêng từng phần, mỗi phần một lượt. Speaking: kiểm tra micro, rồi từng câu theo đúng thứ tự và thời gian ETS, không dừng, không quay lại; mỗi câu ghi âm xong là gửi và bị khoá (micro lỗi thì câu được đóng không có bản ghi). Writing: câu 1–5 chung 8 phút, được Back/Next; câu 6, 7 mỗi câu 10 phút; câu 8 30 phút; sang nhóm sau thì nhóm trước bị khoá; hết giờ tự chuyển. Server tự nộp khi quá giới hạn an toàn (Speaking 30 phút, Writing 70 phút).
+- Bắt đầu lại hoặc rời trang giữa chừng thì lượt dở bị huỷ cùng bản ghi. Làm lại không giới hạn, không XP; nộp bài tính một ngày học.
+- Chưa chấm: kết quả hiện "Not scored yet" kèm bản ghi và câu trả lời từng câu. Bản ghi giữ 180 ngày như bản ghi luyện tập.
+- Giao diện: câu 8–10 không hiện chữ câu hỏi (chỉ bảng thông tin và audio, như đề thật); câu 5–7 và 11 hiện chữ. Speaking không có nút dừng, mỗi câu ghi đủ thời gian trả lời. Kiểm tra micro trước khi bắt đầu tính giờ; Writing hỏi xác nhận trước khi bắt đầu.
+
+## Chấm bài thi Speaking/Writing (D198)
+
+- Nộp bài thi là AI tự chấm từng câu bằng key Gemini của học viên. Speaking câu 1–2: Whisper cho điểm phát âm 0–3 (từ độ chính xác) và ngữ điệu/trọng âm 0–3 (ước lượng từ tốc độ và chỗ ngừng, gần đúng), điểm câu là trung bình hai điểm. Câu 3–11: Whisper chuyển chữ, Gemini chấm theo hướng dẫn chấm của sổ tay ETS (câu 3–10 thang 0–3, câu 11 thang 0–5; câu tả tranh chấm theo lời nói vì Gemini không xem hình). Writing: câu 1–5 thang 0–3, câu 6–7 thang 0–4, câu 8 thang 0–5. Câu không có bản ghi, không nghe được lời hoặc bỏ trống được 0.
+- Điểm thô Speaking tối đa 35, Writing tối đa 28; quy ra thang 0–200 bước 10 bằng bảng quy đổi (mặc định tuyến tính, Admin sửa được), ghi là ước tính. Kết quả hiện khoảng năng lực ETS; Speaking thêm mức phát âm và ngữ điệu (Low/Medium/High).
+- Không có key: bài chưa chấm, học viên gửi giáo viên hoặc thêm key rồi chấm lại. Gemini lỗi: báo lý do, cho chấm lại.
+- Gửi giáo viên: cả phần (Speaking hoặc Writing) là 1 lượt trong 3 lượt/tuần, cùng hàng chờ, khoá 2 giờ, hết hạn 48 giờ. Giáo viên xác nhận điểm AI, sửa điểm từng câu hoặc chấm từ đầu (khi không có điểm AI), nhận xét bắt buộc khi sửa hoặc chấm từ đầu. Điểm giáo viên thay điểm AI.
+- Có điểm thì học viên nhận thông báo; thẻ mục tiêu S&W hiện điểm Speaking/Writing của lượt chấm gần nhất. Đề luyện giữ cách chấm cũ.
+
 ## Duyệt và xuất bản đề
 
 1. Giáo viên soạn nháp (chỉ người soạn thấy và sửa), rồi bấm "Gửi duyệt".
@@ -44,7 +83,7 @@ Trạng thái một bản đề: `DRAFT` → `PENDING_REVIEW` → `PUBLISHED` ho
 
 - Practice có thêm hai mục: Speaking và Writing. Danh sách đề có tìm kiếm, lọc theo cấp CEFR, chủ đề, loại, trạng thái (chưa làm, đã làm, điểm cao nhất) và phân trang.
 - Mặc định mở ở cấp CEFR hiện tại của kỹ năng đó trong hồ sơ năng lực (chưa có thì A2); nếu cấp đó chưa có đề thì mở cấp gần nhất có đề, không bao giờ mở một danh sách trống khi đã có đề (D183).
-- Speaking – đọc to: nghe mẫu, ghi âm trên trình duyệt (tối đa 30 giây), nộp.
+- Speaking – đọc to: nghe mẫu, ghi âm trên trình duyệt (tối đa 45 giây, D195), nộp.
 - Speaking – nói mở: đọc yêu cầu, ghi âm (tối đa theo đề, không quá 2 phút), nộp.
 - Writing: viết trong ô soạn có đếm từ; nộp khi đủ số từ tối thiểu và không quá số từ tối đa.
 - Trang đề có hai tab: làm bài (đề, chỗ làm, kết quả lần vừa nộp) và lịch sử (danh sách các lần nộp và kết quả từng lần) (D185).
@@ -66,6 +105,7 @@ Trạng thái một bản đề: `DRAFT` → `PENDING_REVIEW` → `PUBLISHED` ho
 - Speaking nói mở: điểm 1–5 cho Hoàn thành đề, Từ vựng, Ngữ pháp, Mạch lạc; Fluency/Pronunciation 0–10 từ Whisper; điểm tổng 0–10 = 60% Gemini (quy về thang 10) + 20% Fluency + 20% Pronunciation (D179).
 - Nhận xét: một đoạn nhận xét chung; danh sách lỗi (đoạn sai, gợi ý sửa, giải thích ngắn) tô ngay trong bài; có thể kèm bản viết lại tốt hơn.
 - Gemini nhận xét theo kỳ vọng của cấp đề (bài A2 không bị đòi cấu trúc C1), nhưng điểm vẫn theo thang cố định để so được với dữ liệu chuyên gia.
+- Điểm theo rubric ETS cho bài luyện (D199): đề có dạng câu ETS hiện thêm "TOEIC score estimate" — nói mở 0–3 (nêu quan điểm 0–5) do Gemini chấm theo hướng dẫn chấm ETS trong cùng lần gọi; đọc to 0–3 là trung bình phát âm và ngữ điệu quy từ Accuracy, Fluency như câu 1–2 bài thi. Chỉ để tham khảo, không thay điểm 0–10. Writing luyện tập cũng vậy: câu tả tranh 0–3, trả lời email 0–4, bài luận 0–5, Gemini chấm trong cùng lần gọi; không thay điểm 1–5.
 - Rubric cố định. Học viên tự chọn model Gemini (trong danh sách Flash ổn định) và mức suy nghĩ cho key của mình; mỗi kết quả ghi model đã chấm (D184).
 
 ### Key Gemini của học viên

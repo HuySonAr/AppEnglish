@@ -82,7 +82,7 @@ export function OrphanMediaPanel() {
             <HardDrive className="h-4 w-4" aria-hidden="true" />
             Storage clean-up
           </CardTitle>
-          <CardDescription>Uploaded files that no lesson, test, recording or course version uses any more. Files uploaded in the last hour are not listed.</CardDescription>
+          <CardDescription>Uploaded files that no lesson, test or recording uses any more. Files uploaded in the last hour are not listed.</CardDescription>
         </div>
         <Button variant="ghost" size="icon" aria-label="Check again" onClick={load} disabled={state === 'loading'}>
           <RefreshCw className={cn('h-4 w-4', state === 'loading' && 'animate-spin')} />

@@ -1,11 +1,11 @@
 # Phạm vi sản phẩm
 
-AppEnglish hỗ trợ học viên học và luyện Reading/Listening qua unit, lesson, bài luyện và mock test; luyện Speaking và Writing theo đề cấp CEFR có chấm tự động và giáo viên chấm (D169); xem kết quả, tiến độ, hồ sơ năng lực CEFR và bảng xếp hạng XP.
+AppEnglish hỗ trợ học viên học và luyện TOEIC đủ 4 kỹ năng (D190): Reading/Listening qua unit, lesson, bài luyện và mock test; bài thi thật theo đúng quy chuẩn ETS; luyện Speaking và Writing theo đề cấp CEFR có chấm tự động và giáo viên chấm (D169); xem kết quả, tiến độ, hồ sơ năng lực CEFR và bảng xếp hạng XP.
 
 ## Actors
 - Student: placement, lesson, practice/mock, xem tiến độ và XP.
-- Content Manager: quản lý unit, lesson, từ vựng, bài tập, câu hỏi và đề; duyệt và xuất bản đề Speaking/Writing do giáo viên gửi (D170).
-- Teacher: soạn đề Speaking và Writing theo cấp CEFR, gửi duyệt; chấm bài học viên gửi qua hàng chờ chung (D170, D173). Không có lớp học.
+- Content Manager: duyệt, xuất bản, trả lại và gỡ xuất bản mọi nội dung do giáo viên gửi; không soạn nội dung (D190).
+- Teacher: soạn mọi nội dung (unit, lesson, từ vựng, bài tập, lesson test, placement, bài nghe, mock test, đề luyện Reading, đề Speaking/Writing) rồi gửi duyệt; chấm bài học viên gửi qua hàng chờ chung (D170, D173, D190). Không có lớp học.
 - Admin: quản lý tài khoản, vai trò và cấu hình chung.
 
 ## Nội dung
@@ -22,7 +22,7 @@ AppEnglish hỗ trợ học viên học và luyện Reading/Listening qua unit, 
 - Điểm lần làm đầu tiên của lesson test dùng để xếp hạng học viên trong chính lesson đó, tách khỏi XP.
 - Mock test và lesson test xáo ngẫu nhiên thứ tự lựa chọn A/B/C/D mỗi lần làm.
 - Tiến độ gồm mức hoàn thành lesson và mức thành thạo Reading/Listening, tính từ điểm cao nhất của lesson test và mock test; không tính placement và practice.
-- Practice luyện tự do theo kỹ năng từ câu hỏi của lesson đã hoàn thành, có đáp án và giải thích ngay sau mỗi câu.
+- Practice gồm Word memory, Listening, Speaking và Writing; không có luyện Reading riêng, học viên luyện Reading bằng mock test hoặc mini test Part 5–7 (D84, D194).
 - Chỉ mock test cộng XP; lesson, placement, practice thường không cộng.
 
 ## Speaking, Writing, giáo viên, CEFR (D169–D174)

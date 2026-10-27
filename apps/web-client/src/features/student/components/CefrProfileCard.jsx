@@ -5,7 +5,7 @@ import { Skeleton } from '../../../components/ui';
 import { getCefrProfile } from '../api/progress-api.js';
 import { cefrLabel, productiveDetail, receptiveDetail } from '../lib/cefr.js';
 
-export function CefrProfileCard() {
+export function CefrProfileCard({ bare = false }) {
   const [profile, setProfile] = useState(null);
   const [failed, setFailed] = useState(false);
 
@@ -30,15 +30,15 @@ export function CefrProfileCard() {
     : [];
 
   return (
-    <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+    <div className={bare ? 'space-y-3' : 'space-y-3 rounded-3xl border bg-card p-5 sm:p-6'}>
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="font-semibold">CEFR level by skill</h2>
+        {bare ? <h3 className="text-sm font-medium text-muted-foreground">CEFR level by skill</h3> : <h2 className="font-semibold">CEFR level by skill</h2>}
         <span className="text-xs text-muted-foreground">Your TOEIC goal stays the same.</span>
       </div>
       {!profile ? (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {[0, 1, 2, 3].map((index) => (
-            <Skeleton key={index} className="h-24 rounded-xl" />
+            <Skeleton key={index} className="h-24 rounded-2xl" />
           ))}
         </div>
       ) : (
@@ -46,7 +46,7 @@ export function CefrProfileCard() {
           {skills.map((skill) => {
             const level = profile[skill.key].level;
             return (
-              <div key={skill.key} className="space-y-1 rounded-xl border p-3">
+              <div key={skill.key} className="space-y-1 rounded-2xl border bg-background p-3.5">
                 <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
                   <skill.icon className="h-4 w-4" />
                   {skill.label}

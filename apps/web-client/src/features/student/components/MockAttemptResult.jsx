@@ -7,7 +7,7 @@ const TOTAL_MAX = 990;
 const SECTION_MAX = 495;
 const share = (value, min, max) => `${Math.max(0, Math.min(100, ((value - min) * 100) / (max - min)))}%`;
 
-function SectionScore({ icon: Icon, label, score, correct, total }) {
+function SectionScore({ icon: Icon, label, score, margin, correct, total }) {
   return (
     <div className="space-y-2 rounded-xl border bg-background p-4">
       <div className="flex items-center justify-between gap-2">
@@ -23,6 +23,7 @@ function SectionScore({ icon: Icon, label, score, correct, total }) {
       </div>
       <p className="text-3xl font-bold tabular-nums">
         {score}
+        {margin ? <span className="text-base font-semibold text-primary"> ±{margin}</span> : null}
         <span className="text-base font-normal text-muted-foreground"> / {SECTION_MAX}</span>
       </p>
       <div className="h-2 overflow-hidden rounded-full bg-muted" aria-hidden="true">
@@ -66,8 +67,8 @@ function ToeicScore({ label, attempt }) {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <SectionScore icon={Headphones} label="Listening" score={estimated.listeningScore} correct={attempt.listeningCorrect} total={attempt.listeningTotal} />
-          <SectionScore icon={BookOpen} label="Reading" score={estimated.readingScore} correct={attempt.readingCorrect} total={attempt.readingTotal} />
+          <SectionScore icon={Headphones} label="Listening" score={estimated.listeningScore} margin={estimated.margin} correct={attempt.listeningCorrect} total={attempt.listeningTotal} />
+          <SectionScore icon={BookOpen} label="Reading" score={estimated.readingScore} margin={estimated.margin} correct={attempt.readingCorrect} total={attempt.readingTotal} />
         </div>
         <p className="text-xs text-muted-foreground">An estimate on the TOEIC scale, not an official score.</p>
       </div>

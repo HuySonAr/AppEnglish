@@ -226,35 +226,30 @@ so the best never goes down and concurrent checks all count.
 Student only (26). 59 `LISTENING_EXERCISE_NOT_FOUND` for an exercise that is
 not published. Scoring rules: D86.
 
-## Listening course (F05C, D143–D147)
+## Listening course
 
-The learner side of the course. Levels A1–C2 come from content-service
-`ListPublishedCourse` (topics in order and, for A1–C1, the level test). A1 is
-open; each later level opens once the level test of the level before is
-passed (`course.rules.js` `courseMap`). Inside an open level every topic can
-be studied in any order. Nothing in a topic is scored: questions and the
-ordering task are checked on the page from the answers the topic carries;
-dictation sentences are checked by the service but not kept. A topic marked
-done is stored in `course_lesson_results` with the topic id as `unitId` and
-`lessonId` (score 100). Level-test attempts are stored in
-`course_test_results` (best score kept, first pass kept). There is no
-placement and no mistakes notebook (D145); their tables were dropped (D146).
-The recording, sentences, translations and blanks come from the topic's own
-content (`audioMediaId`, `segments`) and the paper's `media` URLs (D147); a
-level-test section's `transcript` text is returned after the test as lines,
-"Man: …" at the start of a line being the speaker.
+Removed by D190 (2026-10-26): the `course` module, its RPCs (`GetListeningCourse`, `GetCourseTopic`, `CheckCourseSentence`, `CompleteCourseTopic`, `GetCourseTest`, `SubmitCourseTest`, `GetCourseProgress`), the `/learning/listening-course…` routes, the `course.level-up` event, the study activities `courseTopic`/`courseTest`, codes 60/61 and the tables `course_lesson_results`, `course_test_results` are gone.
 
-| Method | Gateway route | RPC | Purpose |
-|---|---|---|---|
-| GET | `/learning/listening-course` | `GetListeningCourse` | Levels with `state` (`OPEN`/`LOCKED`), topics with `done`, level test with `nextLevel`, best score, attempts, `passed`; `currentLevel` (highest open level); `passPercent.levelTest` |
-| GET | `/learning/listening-course/topics/:id` | `GetCourseTopic` | One topic of an open level: audio URL, vocabulary (IPA, meaning, pronunciation URL), questions with `correctOptionId` and explanation, ordering (`items` shuffled per learner, `order`), sentences (speaker, text, times, translation, blank `pieces`), previous/next topic, `done`, `versionId`. 409 code 61 in a locked level, 404 code 60 when not published |
-| POST | `/learning/listening-course/topics/:id/check` | `CheckCourseSentence` (not called by the web client since D150, which checks as the learner types) | `{ versionId?, segmentId, mode: full|blanks, text?, blanks? }`: full → words marked (D86) and accuracy; blanks → each blank right or wrong. Nothing kept. 400 when the sentence has no blanks in the blanks mode |
-| POST | `/learning/listening-course/topics/:id/complete` | `CompleteCourseTopic` | Marks the topic done; returns `done` and the progress |
-| GET | `/learning/listening-course/tests/:id` | `GetCourseTest` | A level test of an open level without its answers |
-| POST | `/learning/listening-course/tests/:id/submit` | `SubmitCourseTest` | `{ versionId?, answers }`: score, `passed`, best score, `levelUp` when the next level opened, review with answers, explanations and transcripts |
-| GET | `/learning/listening-course/progress` | `GetCourseProgress` | `currentLevel`, `openLevels`, topics done/total, by level topics done/total and the level test result |
+## Speaking/Writing ETS tasks (D195)
+
+Learner prompt views add `etsTask` and `timing` (`ETS_TASK_TIMING`), open speaking adds `context`, `info`, `questions` [{ text, audioUrl }], writing adds `keywords`, `email`. `SubmitSpeaking` takes `questionIndex` and `setId` (required for `respond_questions`/`respond_info`, else 400 code 67 reason `SET_ANSWER`); the submission's prompt snapshot then carries `setId`, `questionIndex`, `question`, `instructions` = context or information + the question, and that question's `sampleAnswer`, so Whisper/Gemini scoring is unchanged. Summaries add `setId` and `questionIndex`. Writing grading instructions add the two words (`picture_sentence`) or the email text (`respond_email`). `RECORDING_LIMITS.readAloudSeconds` is 45.
+
+## S&W test scoring (D198)
+
+`sw_attempts.scoring` (status SCORING/DONE/FAILED/NO_KEY, per-question items with stage, score, pronunciation/intonation, transcript, feedback, error, and `final` = raw, rawMax, scaled, band, levels) and `sw_attempts.teacherReview`; `sw_score_jobs` maps a job id to an attempt question; `sw_score_conversion` holds the Admin table (migration `1730000023000-sw-scoring.js`). Submitting (or the automatic submit) starts scoring: speaking questions with a recording go to speech-service on `speech.speaking.requests` (`read_aloud` with the text for questions 1–2, `open_speaking` otherwise) with the job id as `submissionId`; the speaking result consumer tries practice submissions first, then `SwTestService.applyWhisper`. Transcripts and writing answers go to writing-service as `sw.grading.requested` on `writing.grading.requests`; answers come back on `writing.sw.results` (`applyGrading`). When every question is final the attempt gets `final` from the conversion and emits `sw.scored` (progress-service notice `SW_TEST_RESULT`). Routes: `POST /learning/sw-tests/:id/result/retry`, `GET|PUT /learning/sw-tests/score-conversion` (Admin), `POST /learning/reviews/sw-test` (teacher review of a whole part, review kinds `sw_speaking`/`sw_writing`, completed with per-question scores; `review.completed` carries `swTestId`, `section`, `attemptNumber` and the 0–200 total). The study goal returns `sw.estimate` (latest scored part, teacher score first).
+
+## Study goal by skill group (D197)
+
+`learner_goals` gets `lrEnabled`, `swEnabled`, `speakingTarget`, `writingTarget`, `swExamDate`; `targetScore` becomes nullable (migration `1730000022000-goal-tracks.js`, applied locally). `SaveStudyGoal` (`PUT /mock-tests/goal`) takes `{ lr: { targetScore, examDate } | null, sw: { speakingTarget, writingTarget, examDate } | null }` (at least one group; S&W at least one target, 10–200 step 10, `SW_GOAL_SCORE`). `GetStudyGoal` returns `goal: { lr, sw }` and `sw: { lastTest: { speaking, writing }, practiced: { [etsTask]: iso }, estimate: null }` from `sw_attempts` and practice submissions.
+
+## Speaking & Writing tests (D196)
+
+`sw_attempts` (`accountId`, `testId`, `versionId`, `section` speaking/writing, `attemptNumber`, `status` IN_PROGRESS/SUBMITTED, `startedAt`, `expiresAt` = start + 30/70 min, `submittedAt`, `answers`, `recordings`, `lockedThrough`, `recordingDeletedAt`; one open attempt per learner, test and section) — migration `1730000021000-create-sw-attempts.js`. Routes under `/learning/sw-tests`: list, detail, `attempt/start` (discards an open attempt), `attempt/recordings` (multipart `audio`, `questionNumber`, `durationSeconds`; closes questions up to that number; longer than the ETS answer time + 2 s is 400 code 67 `DURATION`), `attempt/skip`, `attempt/answers` (writing; `lockThrough` 5/6/7/8), `attempt/submit`, `attempt/discard`, `result`. Codes 76 not found, 77 not in progress, 78 question closed. Expired open attempts are submitted on the next read. Submitting records a SPEAKING/WRITING study day. Recordings are purged after `RECORDING_KEEP_DAYS` like practice recordings. Usage kinds `swTest`, `swTestVersion` count `sw_attempts`. Not scored yet.
 
 ## Mock tests (F05A, D63, D64)
+
+D193: `mock_attempts` gets `format` (`full`/`practice`, copied from the content mock test at start; mini attempts are `practice`), `readingStartedAt` and `listeningPosition` (migration `1730000020000-mock-phases.js`). A FULL attempt of a Full test starts in Listening with `expiresAt = startedAt + 60 + 75 min`; `FinishMockListening` (`POST /mock-tests/:id/attempt/listening/finish`, `{ kind: 'FULL' }`) or the 60-minute cap (applied lazily on read/save) sets `readingStartedAt` and `expiresAt = readingStartedAt + 75 min`. Once in Reading, saves and submits keep the stored Listening answers. `SaveMockAnswers` accepts `listeningPosition` during Listening. The attempt view adds `format`, `phase`, `listeningPosition`, `listeningClosesAt`, `readingStartedAt`. Practice-set attempts keep the teacher's duration, get no estimate (`estimated: null`, `countsForXp: false`) and are left out of the level suggestion, `latestTotalScore` and the study goal; summaries add `format` and `estimated.margin` (25); `progression` adds `listeningScoreChange`, `readingScoreChange`, `listeningTrend`, `readingTrend` (`up`/`down`/`same`, 35-point threshold). `mock.submitted` carries `format`; progress-service gives XP and the `MOCK_RESULT` notice only when it is not `practice`.
+
 
 Workflow `06-practice-mock.md`. Code in `apps/learning-service/src/mock/`.
 
@@ -328,7 +323,6 @@ and never by sharing a database. Three events, constants `LearningQueue` and
 | `mock.submitted` | Every finished **full** mock attempt (`MockService.complete`); mini tests are never sent | `attemptId`, `accountId`, `accountEmail` (for the XP leaderboard, D112), `mockTestId`, `mockTestTitle`, `mockVersionId`, `kind`, `attemptNumber`, counts per skill, `listeningScore`, `readingScore`, `submittedAt` |
 | `activity.recorded` | D154, for the streak: a vocabulary studied, a word quiz or fill-in passed, a lesson test or unit review submitted, a course topic completed or level test submitted, a listening practice checked, a word memory round finished (`POST /learning/practice/vocabulary/complete`, RPC `CompleteVocabularyPractice`), any mock attempt submitted | `accountId`, `activity` (`StudyActivity`), `occurredAt` |
 | `unit-review.passed` | D163: the first passed attempt of a unit review (the next unit opens) | `accountId`, `unitId`, `unitTitle`, `nextUnitId`, `nextUnitTitle`, `passedAt` |
-| `course.level-up` | D163: a level test passed that moves the learner's current Listening course level | `accountId`, `from`, `to`, `reachedAt` |
 
 Delivery is an outbox (`src/events/learning-events.js`, repository
 `src/events/events.repository.js`, table `learning_events`, migration
@@ -392,7 +386,7 @@ contract with a stand-in for auth-service. Results are in
 
 ## Content usage (D118, D128)
 
-`GetContentUsage` (gateway-internal, no learner route): `payloadJson = { kind, ids[] }` with `kind` in `ContentUsageKind` (`lesson`, `mockTest`, `listeningExercise`, `courseTopic`, `courseTest`, and the version kinds of D128). Answers `{ kind, counts: { [id]: n }, total }` from `lesson_test_attempts` + `lesson_progress`, `mock_attempts`, `listening_results`, `course_lesson_results` (by `unitId`, which holds the topic id) and `course_test_results` (by `itemId`). The gateway refuses to delete content whose total is above 0. Code in `apps/learning-service/src/usage/`.
+`GetContentUsage` (gateway-internal, no learner route): `payloadJson = { kind, ids[] }` with `kind` in `ContentUsageKind` (`lesson`, `mockTest`, `listeningExercise`, and the version kinds of D128). Answers `{ kind, counts: { [id]: n }, total }` from `lesson_test_attempts` + `lesson_progress`, `mock_attempts`, `listening_results`. The gateway refuses to delete content whose total is above 0. Code in `apps/learning-service/src/usage/`.
 
 ## Speaking read aloud (F12, D177)
 
@@ -427,11 +421,11 @@ Migration `1730000016000-create-ai-keys-and-writing.js`: `ai_keys` (`accountId` 
 | GET | `/learning/writing/submissions/:id` | `GetWritingSubmission` | Own writing submissions; adds the answer, word count, sample answer and key points |
 
 ### Rules
-`WritingService` writes the submission and the `writing.requested` outbox row (queue `writing.grading.requests`) in one transaction and records `activity.recorded` (`writing`). `PracticeResults` (shared with speaking) consumes `writing.grading.results`; `applyResult` changes only a `SCORING` submission, validates with Zod, recomputes the groups and total with `writingScores`, and writes `writing.scored`. `AiKeyChecker` sends `writing.key-checks` with a reply queue. `RabbitTransport` declares `writing.grading.requests` so outbox messages are never unroutable. Tests: `test/writing.test.js`.
+`WritingService` writes the submission and the `writing.requested` outbox row (queue `writing.grading.requests`) in one transaction and records `activity.recorded` (`writing`). `PracticeResults` (shared with speaking) consumes `writing.grading.results`; `applyResult` changes only a `SCORING` submission, validates with Zod, recomputes the groups and total with `writingScores`, stores an `etsScore` as `result.ets = { task, score, max }` (null without an ETS task, D199), and writes `writing.scored`. The job carries the prompt `etsTask`. `AiKeyChecker` sends `writing.key-checks` with a reply queue. `RabbitTransport` declares `writing.grading.requests` so outbox messages are never unroutable. Tests: `test/writing.test.js`.
 
 ## Speaking open answers (F14, D179)
 
-`SpeakingService` now serves `read_aloud` and `open_speaking`. Open prompts show the instructions, image and `maxSeconds` (≤ 120; the upload is refused above it plus 1 s) and `hasKey`; submissions keep the instructions, sample answer and key points in the snapshot and show them after submitting; `stage` is `listening` or `grading` while `SCORING`. `applyResult` (Whisper) validates `openWhisperSchema`; with a key it stores the transcript and Whisper scores with `stage: "grading"` and writes the `speaking.grading.requested` outbox row (queue `writing.grading.requests`) in the same transaction; without a key, or with an empty transcript, it finishes `DONE` with `total: null`. `applyGrading` (consumer of `writing.open-speaking.results`) validates `openGradingSchema`, computes the total with `openSpeakingScores` (learning-contracts) and writes `speaking.scored`; a FAILED answer keeps the transcript and Whisper scores. Repeated answers at either step are no-ops. Tests: `test/open-speaking.test.js`.
+`SpeakingService` now serves `read_aloud` and `open_speaking`. Open prompts show the instructions, image and `maxSeconds` (≤ 120; the upload is refused above it plus 1 s) and `hasKey`; submissions keep the instructions, sample answer and key points in the snapshot and show them after submitting; `stage` is `listening` or `grading` while `SCORING`. `applyResult` (Whisper) validates `openWhisperSchema`; with a key it stores the transcript and Whisper scores with `stage: "grading"` and writes the `speaking.grading.requested` outbox row (queue `writing.grading.requests`) in the same transaction; without a key, or with an empty transcript, it finishes `DONE` with `total: null`. `applyGrading` (consumer of `writing.open-speaking.results`) validates `openGradingSchema`, computes the total with `openSpeakingScores` (learning-contracts) and writes `speaking.scored`; the job carries the snapshot `etsTask`, and an `etsScore` in the answer is stored as `result.ets = { task, score, max }` (null without an ETS task). Read-aloud results get `result.ets = { task: 'read_aloud', pronunciation, intonation, score, max: 3 }` from `readAloudItem` (D199); a FAILED answer keeps the transcript and Whisper scores. Repeated answers at either step are no-ops. Tests: `test/open-speaking.test.js`.
 
 ## Teacher reviews (F15, D180)
 

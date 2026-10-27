@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { AccountRole } from '@appenglish/auth-contracts';
-import { PracticePromptKind } from '@appenglish/content-contracts';
+import { ETS_TASK_TIMING, EtsWritingTask, PracticePromptKind } from '@appenglish/content-contracts';
 import { seal } from '@appenglish/backend-common/secret-box';
 import { currentRequestId } from '@appenglish/backend-common/observability';
 import {
@@ -16,6 +16,7 @@ import {
   WRITING_LIMITS,
   countWords,
   writingScores,
+  SW_ITEM_MAX,
 } from '@appenglish/learning-contracts';
 import { noEvents, recordActivity } from '../events/learning-events.js';
 import { placementErrors } from '../placement/placement.errors.js';
@@ -23,6 +24,14 @@ import { writingErrors } from './writing.errors.js';
 import { writingResultSchema } from './writing.schemas.js';
 
 const iso = (value) => (value ? new Date(value).toISOString() : null);
+const etsOf = (task, score) => (score === undefined || !SW_ITEM_MAX[task] ? null : { task, score: Math.min(score, SW_ITEM_MAX[task]), max: SW_ITEM_MAX[task] });
+
+function gradingInstructions(content) {
+  if (content.etsTask === EtsWritingTask.PICTURE_SENTENCE)
+    return [content.instructions, `Write ONE sentence about the picture using both words: ${(content.keywords || []).join(', ')}.`].filter(Boolean).join('\n\n');
+  if (content.etsTask === EtsWritingTask.RESPOND_EMAIL) return [content.instructions, `Email:\n${content.email || ''}`].filter(Boolean).join('\n\n');
+  return content.instructions;
+}
 const MODEL_LIST_TTL_MS = 10 * 60 * 1000;
 
 export class WritingService {
@@ -58,6 +67,10 @@ export class WritingService {
       level: content.level,
       topic: content.topic,
       taskType: content.taskType,
+      etsTask: content.etsTask || null,
+      timing: ETS_TASK_TIMING[content.etsTask] || null,
+      keywords: content.keywords || [],
+      email: content.email || '',
       instructions: content.instructions,
       imageUrl: (content.imageMediaId && media[content.imageMediaId]?.url) || null,
       minWords: content.minWords,
@@ -193,6 +206,7 @@ export class WritingService {
             title: prompt.title,
             level: prompt.level,
             topic: prompt.topic,
+            etsTask: prompt.etsTask || null,
             attempts: mine?.attempts || 0,
             bestTotal: mine?.bestTotal ?? null,
             lastSubmittedAt: iso(mine?.lastSubmittedAt),
@@ -249,12 +263,13 @@ export class WritingService {
                 title: content.title,
                 level: content.level,
                 taskType: content.taskType,
-                instructions: content.instructions,
+                instructions: gradingInstructions(content),
                 minWords,
                 maxWords,
                 sampleAnswer: content.sampleAnswer,
                 keyPoints: content.keyPoints || [],
               },
+              etsTask: content.etsTask || null,
               answer,
               key: key.sealed,
               model: key.model || null,
@@ -285,7 +300,8 @@ export class WritingService {
     if (answer.status !== SubmissionStatus.DONE && answer.status !== SubmissionStatus.FAILED) return 'ignored';
     const parsed = answer.status === SubmissionStatus.DONE ? writingResultSchema.safeParse(answer.result) : null;
     const done = Boolean(parsed?.success);
-    const result = done ? { ...parsed.data, scores: writingScores(parsed.data.criteria) } : null;
+    const { etsScore, ...graded } = done ? parsed.data : {};
+    const result = done ? { ...graded, ets: etsOf(submission.prompt.etsTask, etsScore), scores: writingScores(graded.criteria) } : null;
     const error = parsed && !done ? 'The scoring result was not valid' : answer.error || 'The text could not be scored';
     const at = this.now();
     const finished = { ...submission, status: done ? SubmissionStatus.DONE : SubmissionStatus.FAILED, result, error: done ? null : String(error).slice(0, 500), scoredAt: at };

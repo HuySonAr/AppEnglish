@@ -1,11 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { authFormSchema } from '../schemas/auth-schemas.js';
+import { loginFormSchema } from '../schemas/auth-schemas.js';
 import { AuthCard, AuthFields, AuthLink, FieldError, FieldLabel, authButton, authInput } from '../components/AuthCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { errorReason, getApiErrorMessage } from '../../../lib/api/response.js';
-import { dashboardPathForRole, isVerificationRequiredError } from '../flow/auth-flow.js';
+import { dashboardPathForRole, focusOnEnter, isVerificationRequiredError } from '../flow/auth-flow.js';
 import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui/button.jsx';
 import { Input } from '../../../components/ui/input.jsx';
@@ -16,7 +16,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const form = useForm({
-    resolver: zodResolver(authFormSchema),
+    resolver: zodResolver(loginFormSchema),
     defaultValues: { email: location.state?.email || '', password: '' },
   });
   const pending = form.formState.isSubmitting;
@@ -50,7 +50,7 @@ export function LoginPage() {
         <AuthFields>
           <div className="space-y-1.5">
             <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input id="email" type="email" autoComplete="email" placeholder="you@example.com" className={authInput} {...form.register('email')} disabled={pending} />
+            <Input id="email" type="email" autoComplete="email" placeholder="you@example.com" className={authInput} {...form.register('email')} onKeyDown={focusOnEnter('password')} disabled={pending} />
             <FieldError>{form.formState.errors.email?.message}</FieldError>
           </div>
           <div className="space-y-1.5">

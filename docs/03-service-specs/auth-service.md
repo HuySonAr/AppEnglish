@@ -66,7 +66,7 @@ D27); auth-service itself serves no HTTP `/auth/*` route.
 | — | (gateway-internal) | `GetProfiles` | `{ accountIds[] }` → `{ profiles: [{ id, displayName, avatarUrl }] }`; `displayName` falls back to the email local part; never returns the email. Used by the gateway to decorate `/learning/lessons/:id/ranking` and `/progress/leaderboard` |
 
 Registration accepts `{ email, password }`, creates `PENDING_VERIFICATION`, and
-sends a six-digit OTP. A public request cannot select `CONTENT_MANAGER` or
+sends a six-digit OTP. OTP and invitation emails are sent as HTML with a plain-text part (`email-templates.js`, D189). A public request cannot select `CONTENT_MANAGER` or
 `ADMIN`. OTPs expire after five minutes, allow five attempts, and resend is
 limited to once per minute and five per hour per account/purpose. Controllers
 relay service envelopes without re-wrapping, so `ADDITIONAL` responses keep

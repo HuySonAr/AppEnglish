@@ -1,12 +1,11 @@
 import { In } from 'typeorm';
 import { ContentUsageKind } from '@appenglish/content-contracts';
 import {
-  CourseLessonResultEntity,
-  CourseTestResultEntity,
   LessonProgressEntity,
   LessonTestAttemptEntity,
   ListeningResultEntity,
   MockAttemptEntity,
+  SwAttemptEntity,
   UnitReviewAttemptEntity,
 } from '../database/learning.entities.js';
 
@@ -15,7 +14,6 @@ const sources = Object.freeze({
   [ContentUsageKind.LESSON_VERSION]: [{ entity: LessonTestAttemptEntity, column: 'lessonVersionId' }],
   [ContentUsageKind.MOCK_VERSION]: [{ entity: MockAttemptEntity, column: 'mockVersionId' }],
   [ContentUsageKind.UNIT_REVIEW_VERSION]: [{ entity: UnitReviewAttemptEntity, column: 'reviewVersionId' }],
-  [ContentUsageKind.COURSE_VERSION]: [],
   [ContentUsageKind.LISTENING_VERSION]: [],
   [ContentUsageKind.LESSON]: [
     { entity: LessonTestAttemptEntity, column: 'lessonId' },
@@ -23,8 +21,8 @@ const sources = Object.freeze({
   ],
   [ContentUsageKind.MOCK_TEST]: [{ entity: MockAttemptEntity, column: 'mockTestId' }],
   [ContentUsageKind.LISTENING_EXERCISE]: [{ entity: ListeningResultEntity, column: 'exerciseId' }],
-  [ContentUsageKind.COURSE_TOPIC]: [{ entity: CourseLessonResultEntity, column: 'unitId' }],
-  [ContentUsageKind.COURSE_TEST]: [{ entity: CourseTestResultEntity, column: 'itemId' }],
+  [ContentUsageKind.SW_TEST]: [{ entity: SwAttemptEntity, column: 'testId' }],
+  [ContentUsageKind.SW_TEST_VERSION]: [{ entity: SwAttemptEntity, column: 'versionId' }],
 });
 
 export class UsageRepository {

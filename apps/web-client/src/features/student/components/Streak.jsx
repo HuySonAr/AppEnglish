@@ -1,6 +1,8 @@
 import { Check, Flame } from 'lucide-react';
 import { StreakDayState } from '@appenglish/progress-contracts';
+import { motion } from 'motion/react';
 import { cn } from '../../../lib/utils.js';
+import { CountUp } from '../../../components/shared/CountUp.jsx';
 
 const weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const stateLabels = {
@@ -23,16 +25,22 @@ function dayClass(state, size) {
   );
 }
 
-export function StreakWeek({ week }) {
+export function StreakWeek({ week, animated = false }) {
   return (
     <ol className="flex gap-1.5" aria-label="This week">
       {week.map((item, index) => (
-        <li key={item.day} className="flex flex-col items-center gap-1">
+        <motion.li
+          key={item.day}
+          className="flex flex-col items-center gap-1"
+          initial={animated ? { opacity: 0, scale: 0.6 } : false}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 420, damping: 22, delay: 0.3 + index * 0.05 }}
+        >
           <span className={dayClass(item.state)} title={`${item.day}: ${stateLabels[item.state]}`}>
             {item.state === StreakDayState.STUDIED ? <Check className="h-4 w-4" /> : null}
           </span>
           <span className="text-[10px] text-muted-foreground">{weekdays[index]}</span>
-        </li>
+        </motion.li>
       ))}
     </ol>
   );
@@ -46,7 +54,7 @@ export function StreakNumber({ streak }) {
       </span>
       <div>
         <p className="text-2xl font-bold tabular-nums leading-tight">
-          {streak.current} <span className="text-base font-medium">day{streak.current === 1 ? '' : 's'}</span>
+          <CountUp value={streak.current} /> <span className="text-base font-medium">day{streak.current === 1 ? '' : 's'}</span>
         </p>
         <p className="text-xs text-muted-foreground">Best {streak.longest}</p>
       </div>
@@ -54,15 +62,19 @@ export function StreakNumber({ streak }) {
   );
 }
 
-export function StreakStrip({ streak }) {
+export function StreakCard({ streak, className }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border bg-card p-4 shadow-sm">
+    <section className={cn('flex flex-col gap-4 rounded-3xl border bg-card p-5 sm:p-6', className)}>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-semibold">Your streak</h2>
+        <span className={cn('rounded-full px-3 py-1 text-xs font-medium', streak.studiedToday ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground')}>
+          {streak.studiedToday ? 'Done today' : 'Not yet today'}
+        </span>
+      </div>
       <StreakNumber streak={streak} />
-      <StreakWeek week={streak.week} />
-      <p className={cn('text-sm sm:ml-auto', streak.studiedToday ? 'font-medium text-success' : 'text-muted-foreground')}>
-        {streak.studiedToday ? 'Done for today.' : 'Study one step today to keep your streak.'}
-      </p>
-    </div>
+      <StreakWeek week={streak.week} animated />
+      <p className="mt-auto text-sm text-muted-foreground">{streak.studiedToday ? 'Come back tomorrow to keep it going.' : 'Study one step today to keep your streak.'}</p>
+    </section>
   );
 }
 

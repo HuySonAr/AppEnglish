@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { filterListeningExercises, filterMockTests, filterUnits, isReorderable } from './content-list.js';
+import { filterListeningExercises, filterMockTests, filterSwTests, filterUnits, isReorderable } from './content-list.js';
 
 const lesson = (title, publishedVersionNumber = null, hasDraft = false) => ({ id: title, title, publishedVersionNumber, hasDraft });
 const units = [
@@ -82,4 +82,17 @@ test('listening exercises are searched, filtered by topic, level, part and statu
   assert.deepEqual(titles({ level: 'A2', status: 'published' }), ['Photo']);
   assert.deepEqual(titles({ kind: 'part3' }), ['Airport']);
   assert.deepEqual(titles({ status: 'draft', sort: 'title-desc' }), ['Photo', 'Office talk']);
+});
+
+test('S&W tests are searched, filtered by status and sorted', () => {
+  const tests = [
+    { id: 'a', title: 'Set Á', createdAt: '2026-10-01T00:00:00Z', publishedVersionNumber: 1, hasDraft: false },
+    { id: 'b', title: 'Set B', createdAt: '2026-10-03T00:00:00Z', publishedVersionNumber: null, hasDraft: true },
+    { id: 'c', title: 'Other', createdAt: '2026-10-02T00:00:00Z', publishedVersionNumber: 2, hasDraft: true },
+  ];
+  const ids = (list) => list.map((test) => test.id);
+  assert.deepEqual(ids(filterSwTests(tests, { search: '', status: 'all', sort: 'newest' })), ['b', 'c', 'a']);
+  assert.deepEqual(ids(filterSwTests(tests, { search: 'set a', status: 'all', sort: 'newest' })), ['a']);
+  assert.deepEqual(ids(filterSwTests(tests, { search: '', status: 'published', sort: 'title-asc' })), ['c', 'a']);
+  assert.deepEqual(ids(filterSwTests(tests, { search: '', status: 'draft', sort: 'oldest' })), ['c', 'b']);
 });

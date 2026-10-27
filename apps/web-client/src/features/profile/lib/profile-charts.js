@@ -35,15 +35,6 @@ export function xpBars(xp, { maxTitle = 18 } = {}) {
   });
 }
 
-export const LevelStep = Object.freeze({ DONE: 'DONE', CURRENT: 'CURRENT', OPEN: 'OPEN', LOCKED: 'LOCKED' });
-export function levelSteps(course) {
-  return (course?.levels || []).map((level) => ({
-    level: level.level,
-    state: level.levelTest?.passed ? LevelStep.DONE : level.level === course.currentLevel ? LevelStep.CURRENT : level.state === 'OPEN' ? LevelStep.OPEN : LevelStep.LOCKED,
-    topics: level.topics || null,
-  }));
-}
-
 export function memberFor(createdAt, now = new Date()) {
   const start = new Date(createdAt);
   if (Number.isNaN(start.getTime())) return '';

@@ -2,7 +2,7 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 import { SubmissionStatus } from '@appenglish/learning-contracts';
 import { cn } from '../../../lib/utils.js';
 import { wordCounts, wordLabels, wordStyles } from '../lib/practice.js';
-import { ScoreSummary } from './PracticeScore.jsx';
+import { EtsScore, ScoreSummary } from './PracticeScore.jsx';
 import { OpenSpeakingResult } from './OpenSpeakingResult.jsx';
 
 const metrics = [
@@ -38,6 +38,7 @@ export function SpeakingResult({ submission }) {
   return (
     <div className="space-y-5">
       <ScoreSummary total={result.scores.total} bars={metrics.map((metric) => ({ label: metric.label, value: result.scores[metric.key] }))} />
+      <EtsScore ets={result.ets} />
 
       <div className="space-y-2">
         <p className="text-lg leading-loose">

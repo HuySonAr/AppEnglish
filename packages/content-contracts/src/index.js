@@ -5,8 +5,24 @@ export const UnitStatus = Object.freeze({
 
 export const LessonVersionStatus = Object.freeze({
   DRAFT: 'DRAFT',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  RETURNED: 'RETURNED',
   PUBLISHED: 'PUBLISHED',
 });
+
+export const WORKING_VERSION_STATUSES = Object.freeze([LessonVersionStatus.DRAFT, LessonVersionStatus.PENDING_REVIEW, LessonVersionStatus.RETURNED]);
+
+export const ContentReviewKind = Object.freeze({
+  LESSON: 'lesson',
+  UNIT_REVIEW: 'unitReview',
+  PLACEMENT: 'placement',
+  MOCK_TEST: 'mockTest',
+  LISTENING_EXERCISE: 'listeningExercise',
+  SW_TEST: 'swTest',
+});
+
+export const PLACEMENT_REVIEW_ID = 'main';
+export const CONTENT_REVIEW_NOTE_MAX = 1000;
 
 export const Skill = Object.freeze({
   READING: 'READING',
@@ -47,9 +63,41 @@ export const PRACTICE_LIMITS = Object.freeze({
   keyPoints: 10,
   keyPoint: 200,
   reviewNote: 1000,
-  readAloudSeconds: 30,
+  readAloudSeconds: 45,
   speakingSeconds: Object.freeze({ min: 15, max: 120 }),
   words: Object.freeze({ min: 1, max: 600 }),
+  context: 1500,
+  info: 3000,
+  question: 300,
+  keywords: 2,
+  keyword: 40,
+  email: 3000,
+});
+
+export const EtsSpeakingTask = Object.freeze({
+  READ_ALOUD: 'read_aloud',
+  DESCRIBE_PICTURE: 'describe_picture',
+  RESPOND_QUESTIONS: 'respond_questions',
+  RESPOND_INFO: 'respond_info',
+  EXPRESS_OPINION: 'express_opinion',
+});
+export const EtsWritingTask = Object.freeze({ PICTURE_SENTENCE: 'picture_sentence', RESPOND_EMAIL: 'respond_email', OPINION_ESSAY: 'opinion_essay' });
+export const SwSection = Object.freeze({ SPEAKING: 'speaking', WRITING: 'writing' });
+export const SW_SPEAKING_LAYOUT = Object.freeze({ readAloud: 2, pictures: 2, setQuestions: 3, opinion: 1, total: 11 });
+export const SW_WRITING_LAYOUT = Object.freeze({ pictureSentences: 5, emails: 2, essay: 1, total: 8 });
+export const SW_WRITING_GROUPS = Object.freeze([Object.freeze([1, 2, 3, 4, 5]), Object.freeze([6]), Object.freeze([7]), Object.freeze([8])]);
+export const SW_SECTION_MAX_MINUTES = Object.freeze({ speaking: 30, writing: 70 });
+export const ETS_SET_TASKS = Object.freeze([EtsSpeakingTask.RESPOND_QUESTIONS, EtsSpeakingTask.RESPOND_INFO]);
+export const ETS_SET_QUESTIONS = 3;
+export const ETS_TASK_TIMING = Object.freeze({
+  [EtsSpeakingTask.READ_ALOUD]: Object.freeze({ prepareSeconds: 45, respondSeconds: Object.freeze([45]) }),
+  [EtsSpeakingTask.DESCRIBE_PICTURE]: Object.freeze({ prepareSeconds: 45, respondSeconds: Object.freeze([30]) }),
+  [EtsSpeakingTask.RESPOND_QUESTIONS]: Object.freeze({ prepareSeconds: 3, respondSeconds: Object.freeze([15, 15, 30]) }),
+  [EtsSpeakingTask.RESPOND_INFO]: Object.freeze({ readSeconds: 45, prepareSeconds: 3, respondSeconds: Object.freeze([15, 15, 30]), playTwice: Object.freeze([2]) }),
+  [EtsSpeakingTask.EXPRESS_OPINION]: Object.freeze({ prepareSeconds: 45, respondSeconds: Object.freeze([60]) }),
+  [EtsWritingTask.PICTURE_SENTENCE]: Object.freeze({ writeSeconds: 96 }),
+  [EtsWritingTask.RESPOND_EMAIL]: Object.freeze({ writeSeconds: 600 }),
+  [EtsWritingTask.OPINION_ESSAY]: Object.freeze({ writeSeconds: 1800, recommendedWords: 300 }),
 });
 
 export const Accent = Object.freeze({ UK: 'uk', US: 'us' });
@@ -170,6 +218,18 @@ export const MOCK_TEST_PART_COUNTS = Object.freeze({
   part7: 54,
 });
 export const MOCK_TEST_DURATION_MINUTES = 120;
+export const MockFormat = Object.freeze({ FULL: 'full', PRACTICE: 'practice' });
+export const MOCK_FULL_GROUPS = Object.freeze({
+  part3: Object.freeze({ groups: 13, questions: 3 }),
+  part4: Object.freeze({ groups: 10, questions: 3 }),
+  part6: Object.freeze({ groups: 4, questions: 4 }),
+});
+export const MOCK_FULL_PART7 = Object.freeze({ singles: 10, singleMin: 2, singleMax: 4, singleQuestions: 29, sets: 5, setQuestions: 5 });
+export const MOCK_READING_MINUTES = 75;
+export const MOCK_LISTENING_MAX_MINUTES = 60;
+export const MOCK_ANSWER_SECONDS = Object.freeze({ part1: 5, part2: 5, part3: 8, part4: 8 });
+export const TOEIC_SECTION_SEM = 25;
+export const TOEIC_SECTION_SEDIFF = 35;
 
 export const ExamFormat = Object.freeze({ TOEIC: 'toeic' });
 export const MOCK_TEST_LEVELS = Object.freeze([1, 2, 3]);
@@ -246,26 +306,6 @@ export const AutoTimeStatus = Object.freeze({
 export const LISTENING_MAX_SEGMENTS = 80;
 export const LISTENING_SEGMENT_MAX_LENGTH = 500;
 
-export const COURSE_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
-export const COURSE_TEST_LEVELS = Object.freeze(COURSE_LEVELS.slice(0, -1));
-export const CourseItemType = Object.freeze({ TOPIC: 'topic', LEVEL_TEST: 'level_test' });
-export const CourseSkill = Object.freeze({ GIST: 'gist', DETAIL: 'detail', INFERENCE: 'inference' });
-export const COURSE_PASS_PERCENT = Object.freeze({ levelTest: 70 });
-export const COURSE_LIMITS = Object.freeze({
-  vocabulary: Object.freeze({ min: 4, max: 6 }),
-  questions: Object.freeze({ min: 1, max: 10 }),
-  options: Object.freeze({ min: 2, max: 4 }),
-  ordering: Object.freeze({ min: 3, max: 8 }),
-  sections: 12,
-  questionsPerSection: 10,
-  levelTestQuestions: 8,
-  transcript: 10000,
-  testPlays: 2,
-});
-export const courseGapText = (gap) => String(gap || '').replace(/\[([^\[\]]*)\]/g, '$1');
-export const courseGapCount = (gap) => (String(gap || '').match(/\[[^\[\]]*\]/g) || []).length;
-export const COURSE_RECORDING_KIND = 'part3';
-
 export const LESSON_TEST_QUESTION_COUNT = LESSON_TEST_PARTS.reduce((total, part) => total + part.questionCount, 0);
 
 export const MEDIA_MAX_FILE_SIZE_BYTES = 40 * 1024 * 1024;
@@ -293,13 +333,12 @@ export const ContentUsageKind = Object.freeze({
   LESSON_VERSION: 'lessonVersion',
   MOCK_VERSION: 'mockVersion',
   UNIT_REVIEW_VERSION: 'unitReviewVersion',
-  COURSE_VERSION: 'courseVersion',
   LISTENING_VERSION: 'listeningVersion',
   LESSON: 'lesson',
   MOCK_TEST: 'mockTest',
   LISTENING_EXERCISE: 'listeningExercise',
-  COURSE_TOPIC: 'courseTopic',
-  COURSE_TEST: 'courseTest'
+  SW_TEST: 'swTest',
+  SW_TEST_VERSION: 'swTestVersion'
 });
 
 export const ORPHAN_MEDIA_GRACE_MS = 60 * 60 * 1000;
@@ -308,6 +347,6 @@ export const ContentVersionKind = Object.freeze({
   LESSON: 'lesson',
   MOCK_TEST: 'mockTest',
   LISTENING_EXERCISE: 'listeningExercise',
-  COURSE_ITEM: 'courseItem',
   UNIT_REVIEW: 'unitReview',
+  SW_TEST: 'swTest',
 });

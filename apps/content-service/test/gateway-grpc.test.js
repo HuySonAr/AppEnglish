@@ -11,7 +11,8 @@ import { ContentGrpcController } from '../src/content/content.grpc.controller.js
 import { ContentService } from '../src/content/content.service.js';
 import { ListeningGrpcController } from '../src/listening/listening.grpc.controller.js';
 import { ListeningService } from '../src/listening/listening.service.js';
-import { CourseService } from '../src/course/course.service.js';
+import { ReviewGrpcController } from '../src/review/review.grpc.controller.js';
+import { ContentReviewService } from '../src/review/review.service.js';
 import { VersionGrpcController } from '../src/versions/version.grpc.controller.js';
 import { ContentVersionService } from '../src/versions/version.service.js';
 import { LocalMediaStorageAdapter } from '../src/media/local-media-storage.adapter.js';
@@ -22,7 +23,7 @@ import { AUTH_GRPC_CLIENT } from '../../api-gateway/src/auth/auth-gateway.contro
 import { CONTENT_GRPC_CLIENT, ContentGatewayController } from '../../api-gateway/src/content/content-gateway.controller.js';
 import { LEARNING_GRPC_CLIENT } from '../../api-gateway/src/learning/learning-gateway.controller.js';
 import { learningGrpcOptions } from '@appenglish/learning-contracts/grpc';
-import { admin, createMemoryRepository, manager, publishableContent, student, toeicTopicId } from './memory-repository.js';
+import { admin, createMemoryRepository, manager, publishableContent, student, teacher, toeicTopicId } from './memory-repository.js';
 
 function freePort() {
   return new Promise((resolve, reject) => {
@@ -35,8 +36,15 @@ function freePort() {
   });
 }
 
-const accounts = { manager, student, admin };
+const accounts = { manager, student, admin, teacher };
 class FakeAuthController {
+  getProfiles({ accountIds }) {
+    const profiles = Object.entries(accounts)
+      .filter(([, account]) => accountIds.includes(account.id))
+      .map(([name, account]) => ({ id: account.id, displayName: name, avatarUrl: null }));
+    return { httpStatus: 200, code: 0, msg: 'success', dataJson: JSON.stringify({ profiles }), setCookies: [] };
+  }
+
   me({ accessToken }) {
     const account = accounts[accessToken];
     return account
@@ -46,6 +54,7 @@ class FakeAuthController {
 }
 Controller()(FakeAuthController);
 GrpcMethod(AUTH_GRPC_SERVICE, 'Me')(FakeAuthController.prototype, 'me', Object.getOwnPropertyDescriptor(FakeAuthController.prototype, 'me'));
+GrpcMethod(AUTH_GRPC_SERVICE, 'GetProfiles')(FakeAuthController.prototype, 'getProfiles', Object.getOwnPropertyDescriptor(FakeAuthController.prototype, 'getProfiles'));
 
 test('Gateway HTTP to content-service gRPC contract', async (t) => {
   const mediaRoot = await mkdtemp(path.join(os.tmpdir(), 'appenglish-content-'));
@@ -58,13 +67,13 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
   Module({ controllers: [FakeAuthController] })(TestAuthModule);
   class TestContentModule {}
   const listening = new ListeningService(repository.listening, service);
-  const course = new CourseService(repository.course, service, listening);
   Module({
-    controllers: [ContentGrpcController, ListeningGrpcController, VersionGrpcController],
+    controllers: [ContentGrpcController, ListeningGrpcController, VersionGrpcController, ReviewGrpcController],
     providers: [
       { provide: ContentService, useValue: service },
       { provide: ListeningService, useValue: listening },
-      { provide: ContentVersionService, useValue: new ContentVersionService(repository, service, listening, course) },
+      { provide: ContentVersionService, useValue: new ContentVersionService(repository, service, listening) },
+      { provide: ContentReviewService, useValue: new ContentReviewService(service, listening) },
     ],
   })(TestContentModule);
   class TestGatewayModule {}
@@ -113,19 +122,19 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
         assert.equal(response.json.code, 21, url);
       }
     });
-    await t.test('only a Content Manager can create content', async () => {
-      for (const as of ['student', 'admin']) {
+    await t.test('only a teacher can create content', async () => {
+      for (const as of ['student', 'admin', 'manager']) {
         const response = await call('POST', '/content/units', { as, body: { title: 'Unit 1' } });
         assert.equal(response.status, 403);
         assert.equal(response.json.code, 26);
       }
-      const created = await call('POST', '/content/units', { as: 'manager', body: { title: ' Unit 1 ' } });
+      const created = await call('POST', '/content/units', { as: 'teacher', body: { title: ' Unit 1 ' } });
       assert.equal(created.status, 201);
       assert.equal(created.json.code, 0);
       assert.equal(created.json.data.unit.title, 'Unit 1');
       assert.equal(created.json.data.unit.status, 'DRAFT');
       unitId = created.json.data.unit.id;
-      assert.equal(repository.tables.units[0].createdBy, manager.id);
+      assert.equal(repository.tables.units[0].createdBy, teacher.id);
     });
     await t.test('payloads and ids are validated by content-service', async () => {
       for (const [method, url, body] of [
@@ -136,7 +145,7 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
         ['PUT', '/content/lessons/not-a-uuid/draft', {}],
         ['PUT', `/content/lessons/${unitId}/draft`, { vocabulary: [{ word: 'x', unknown: true }] }],
       ]) {
-        const response = await call(method, url, { as: 'manager', body });
+        const response = await call(method, url, { as: 'teacher', body });
         assert.equal(response.status, 400, `${method} ${url}`);
         assert.equal(response.json.code, 30);
         assert.ok(response.json.data.issues.length);
@@ -152,12 +161,16 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
       const empty = await call('GET', url, { as: 'manager' });
       assert.equal(empty.status, 200);
       assert.deepEqual([empty.json.data.questionCount, empty.json.data.draft, empty.json.data.published], [19, null, null]);
-      const saved = await call('PUT', `${url}/draft`, { as: 'manager', body: { test: { part5: { questions: [{ prompt: 'A _____ sentence.' }] } } } });
+      assert.equal((await call('PUT', `${url}/draft`, { as: 'manager', body: { test: {} } })).status, 403);
+      const saved = await call('PUT', `${url}/draft`, { as: 'teacher', body: { test: { part5: { questions: [{ prompt: 'A _____ sentence.' }] } } } });
       assert.equal(saved.status, 200);
       assert.equal(saved.json.data.draft.versionNumber, 1);
-      const bad = await call('PUT', `${url}/draft`, { as: 'manager', body: { test: { part1: {} } } });
+      assert.deepEqual([saved.json.data.draft.status, saved.json.data.draft.editedBy], ['DRAFT', teacher.id]);
+      const bad = await call('PUT', `${url}/draft`, { as: 'teacher', body: { test: { part1: {} } } });
       assert.equal(bad.status, 400);
-      const refused = await call('POST', `${url}/publish`, { as: 'manager' });
+      const notInReview = await call('POST', `${url}/publish`, { as: 'manager' });
+      assert.deepEqual([notInReview.status, notInReview.json.code, notInReview.json.data.reason], [409, 41, 'NOT_IN_REVIEW']);
+      const refused = await call('POST', `/content/reviews/unitReview/${unitId}/submit`, { as: 'teacher' });
       assert.equal(refused.status, 409);
       assert.equal(refused.json.code, 42);
       assert.ok(refused.json.data.issues.some((issue) => issue.path === 'test.part6.groups'));
@@ -168,31 +181,33 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
       assert.deepEqual(history.json.data.versions.map((version) => [version.versionNumber, version.status, version.current]), [[1, 'DRAFT', false]]);
       assert.equal((await call('GET', `/content/versions/lesson/${unitId}`, { as: 'manager' })).json.code, 40);
       assert.equal((await call('GET', `/content/versions/other/${unitId}`, { as: 'manager' })).status, 400);
-      assert.equal((await call('POST', `/content/versions/unitReview/${unitId}/${history.json.data.versions[0].id}/restore`, { as: 'manager' })).json.code, 41);
-      const discarded = await call('DELETE', `/content/versions/unitReview/${unitId}/draft`, { as: 'manager' });
+      assert.equal((await call('POST', `/content/versions/unitReview/${unitId}/${history.json.data.versions[0].id}/restore`, { as: 'teacher' })).json.code, 41);
+      assert.equal((await call('DELETE', `/content/versions/unitReview/${unitId}/draft`, { as: 'manager' })).status, 403);
+      const discarded = await call('DELETE', `/content/versions/unitReview/${unitId}/draft`, { as: 'teacher' });
       assert.equal(discarded.status, 200);
       assert.deepEqual([discarded.json.data.discarded.versionNumber, discarded.json.data.removedMedia], [1, 0]);
-      assert.equal((await call('DELETE', `/content/versions/unitReview/${unitId}/draft`, { as: 'manager' })).json.code, 41);
+      assert.equal((await call('DELETE', `/content/versions/unitReview/${unitId}/draft`, { as: 'teacher' })).json.code, 41);
       assert.deepEqual((await call('GET', `/content/versions/unitReview/${unitId}`, { as: 'manager' })).json.data.versions, []);
     });
     await t.test('media upload goes through multipart, gRPC bytes and storage validation', async () => {
       const forbidden = await upload('student', 'audio', 'q.mp3', 'audio/mpeg', new Uint8Array([1, 2, 3]));
       assert.equal(forbidden.status, 403);
-      const wrongType = await upload('manager', 'audio', 'q.wav', 'audio/wav', new Uint8Array([1, 2, 3]));
+      assert.equal((await upload('manager', 'audio', 'q.mp3', 'audio/mpeg', new Uint8Array([1, 2, 3]))).status, 403);
+      const wrongType = await upload('teacher', 'audio', 'q.wav', 'audio/wav', new Uint8Array([1, 2, 3]));
       assert.equal(wrongType.status, 400);
       assert.equal(wrongType.json.code, 43);
-      const tooLarge = await upload('manager', 'audio', 'q.mp3', 'audio/mpeg', new Uint8Array(2048));
+      const tooLarge = await upload('teacher', 'audio', 'q.mp3', 'audio/mpeg', new Uint8Array(2048));
       assert.equal(tooLarge.status, 400);
       assert.equal(tooLarge.json.data.reason, 'MEDIA_FILE_TOO_LARGE');
-      const ok = await upload('manager', 'audio', 'q.mp3', 'audio/mpeg', new Uint8Array([1, 2, 3]));
+      const ok = await upload('teacher', 'audio', 'q.mp3', 'audio/mpeg', new Uint8Array([1, 2, 3]));
       assert.equal(ok.status, 201);
       assert.equal(ok.json.data.media.sizeBytes, 3);
       assert.equal('url' in ok.json.data.media, false);
-      const image = await upload('manager', 'image', 'photo.png', 'image/png', new Uint8Array([1, 2, 3, 4]));
+      const image = await upload('teacher', 'image', 'photo.png', 'image/png', new Uint8Array([1, 2, 3, 4]));
       assert.equal(image.status, 201);
       assert.equal(image.json.data.media.kind, 'image');
       assert.equal(repository.tables.media.length, 2);
-      const spare = (await upload('manager', 'image', 'spare.png', 'image/png', new Uint8Array([9]))).json.data.media.id;
+      const spare = (await upload('teacher', 'image', 'spare.png', 'image/png', new Uint8Array([9]))).json.data.media.id;
       const refused = await call('DELETE', `/content/media/${spare}`, { as: 'student' });
       assert.equal(refused.status, 403);
       const gone = await call('DELETE', `/content/media/${spare}`, { as: 'manager' });
@@ -206,14 +221,14 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
       const audioId = repository.tables.media[0].id;
       const imageId = repository.tables.media[1].id;
       for (let index = 1; index <= 5; index++) {
-        const created = await call('POST', `/content/units/${unitId}/lessons`, { as: 'manager', body: { title: `Lesson ${index}` } });
+        const created = await call('POST', `/content/units/${unitId}/lessons`, { as: 'teacher', body: { title: `Lesson ${index}` } });
         assert.equal(created.status, 201);
         const id = created.json.data.lesson.id;
         lessonId ??= id;
-        const empty = await call('POST', `/content/lessons/${id}/publish`, { as: 'manager' });
+        const empty = await call('POST', `/content/reviews/lesson/${id}/submit`, { as: 'teacher' });
         assert.equal(empty.status, 409);
         assert.equal(empty.json.code, 42);
-        const saved = await call('PUT', `/content/lessons/${id}/draft`, { as: 'manager', body: publishableContent({ audioId, imageId }) });
+        const saved = await call('PUT', `/content/lessons/${id}/draft`, { as: 'teacher', body: publishableContent({ audioId, imageId }) });
         assert.equal(saved.status, 200);
         assert.equal(saved.json.data.draft.content.test.part5.questions.length, 6);
         if (index === 1) {
@@ -221,10 +236,30 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
           assert.equal(early.status, 409);
           assert.equal(early.json.code, 42);
         }
-        const published = await call('POST', `/content/lessons/${id}/publish`, { as: 'manager' });
-        assert.equal(published.status, 201);
-        assert.equal(published.json.data.published.versionNumber, 1);
+        const submitted = await call('POST', `/content/reviews/lesson/${id}/submit`, { as: 'teacher' });
+        assert.equal(submitted.json.code, 0);
+        assert.equal(submitted.json.data.status, 'PENDING_REVIEW');
+        if (index === 1) {
+          assert.equal((await call('POST', `/content/reviews/lesson/${id}/approve`, { as: 'teacher' })).status, 403);
+          assert.equal((await call('GET', '/content/reviews', { as: 'student' })).status, 403);
+          const queue = await call('GET', '/content/reviews', { as: 'manager' });
+          assert.equal(queue.status, 200);
+          const [item] = queue.json.data.items;
+          assert.deepEqual([item.kind, item.id, item.title, item.status, item.submittedBy], ['lesson', id, 'Lesson 1', 'PENDING_REVIEW', teacher.id]);
+          assert.equal(item.editor.displayName, 'teacher');
+          assert.equal((await call('POST', `/content/reviews/lesson/${id}/return`, { as: 'manager', body: {} })).status, 400);
+          const returned = await call('POST', `/content/reviews/lesson/${id}/return`, { as: 'manager', body: { note: 'Check part 5.' } });
+          assert.deepEqual([returned.json.data.status, returned.json.data.reviewNote], ['RETURNED', 'Check part 5.']);
+          const fixed = await call('PUT', `/content/lessons/${id}/draft`, { as: 'teacher', body: publishableContent({ audioId, imageId }) });
+          assert.deepEqual([fixed.json.data.draft.status, fixed.json.data.draft.reviewNote], ['DRAFT', 'Check part 5.']);
+          assert.equal((await call('POST', `/content/reviews/lesson/${id}/submit`, { as: 'teacher' })).json.data.status, 'PENDING_REVIEW');
+        }
+        const published = await call('POST', `/content/reviews/lesson/${id}/approve`, { as: 'manager' });
+        assert.equal(published.json.code, 0);
+        assert.deepEqual(published.json.data, { kind: 'lesson', id, status: 'PUBLISHED' });
+        assert.equal((await call('GET', `/content/lessons/${id}`, { as: 'teacher' })).json.data.published.versionNumber, 1);
       }
+      assert.deepEqual((await call('GET', '/content/reviews', { as: 'manager' })).json.data.items, []);
       assert.deepEqual((await call('GET', '/content/units', { as: 'student' })).json.data.units, []);
       const unit = await call('POST', `/content/units/${unitId}/publish`, { as: 'manager' });
       assert.equal(unit.json.data.unit.status, 'PUBLISHED');
@@ -240,6 +275,7 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
       const managed = await call('GET', `/content/lessons/${lessonId}`, { as: 'manager' });
       assert.equal(managed.json.data.published.content.test.part3.audioMediaId, audioId);
       assert.equal(managed.json.data.published.content.test.part1.questions[0].imageMediaId, imageId);
+      assert.equal((await call('PATCH', `/content/lessons/${lessonId}`, { as: 'teacher', body: { position: 5 } })).status, 403);
       const moved = await call('PATCH', `/content/lessons/${lessonId}`, { as: 'manager', body: { position: 5 } });
       assert.equal(moved.json.data.lesson.position, 5);
     });
@@ -251,14 +287,19 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
       assert.equal((await call('POST', '/content/listening-topics', { as: 'admin', body: { name: 'Pop', format: 'jazz' } })).status, 400);
       assert.equal((await call('PATCH', `/content/listening-topics/${topic.json.data.topic.id}`, { as: 'admin', body: { format: 'song' } })).json.data.topic.hasEditor, true);
       assert.equal((await call('PATCH', `/content/listening-topics/${topic.json.data.topic.id}`, { as: 'manager', body: { name: 'Music' } })).json.data.topic.name, 'Music');
-      assert.equal((await call('POST', '/content/listening-exercises', { as: 'manager', body: { topicId: toeicTopicId, title: 'X', level: 'D1', kind: 'part1' } })).status, 400);
-      const created = await call('POST', '/content/listening-exercises', { as: 'manager', body: { topicId: toeicTopicId, title: 'Photo 1', level: 'A2', kind: 'part1' } });
+      assert.equal((await call('POST', '/content/listening-exercises', { as: 'teacher', body: { topicId: toeicTopicId, title: 'X', level: 'D1', kind: 'part1' } })).status, 400);
+      const exercise = { topicId: toeicTopicId, title: 'Photo 1', level: 'A2', kind: 'part1' };
+      assert.equal((await call('POST', '/content/listening-exercises', { as: 'manager', body: exercise })).status, 403);
+      const created = await call('POST', '/content/listening-exercises', { as: 'teacher', body: exercise });
       const id = created.json.data.exercise.id;
-      const saved = await call('PUT', `/content/listening-exercises/${id}/draft`, { as: 'manager', body: { audioMediaId: null, segments: [{ text: 'A man is reading.' }] } });
+      const saved = await call('PUT', `/content/listening-exercises/${id}/draft`, { as: 'teacher', body: { audioMediaId: null, segments: [{ text: 'A man is reading.' }] } });
       assert.equal(saved.json.data.draft.content.segments.length, 1);
-      const refused = await call('POST', `/content/listening-exercises/${id}/publish`, { as: 'manager' });
+      const notInReview = await call('POST', `/content/listening-exercises/${id}/publish`, { as: 'manager' });
+      assert.deepEqual([notInReview.status, notInReview.json.code], [409, 41]);
+      const refused = await call('POST', `/content/reviews/listeningExercise/${id}/submit`, { as: 'teacher' });
       assert.deepEqual([refused.status, refused.json.code], [409, 42]);
-      assert.equal((await call('PATCH', `/content/listening-exercises/${id}`, { as: 'manager', body: { title: 'Photo one' } })).json.data.exercise.title, 'Photo one');
+      assert.equal((await call('POST', `/content/reviews/other/${id}/submit`, { as: 'teacher' })).status, 400);
+      assert.equal((await call('PATCH', `/content/listening-exercises/${id}`, { as: 'teacher', body: { title: 'Photo one' } })).json.data.exercise.title, 'Photo one');
       assert.equal((await call('GET', `/content/listening-exercises/${id}`, { as: 'manager' })).json.data.draft.versionNumber, 1);
       assert.deepEqual((await call('GET', '/content/listening-exercises', { as: 'manager' })).json.data.exercises.map((item) => item.title), ['Photo one']);
       assert.equal((await call('GET', '/content/listening-exercises', { as: 'student' })).status, 403);

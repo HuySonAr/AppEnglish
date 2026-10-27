@@ -338,8 +338,7 @@ stores the MP3s as lesson media exactly as it stored the dictionary files.
 `found` is always true (a phrase is pronounced like a word); a broker that is
 away or a FAILED answer is code 46 (unavailable). `PRONUNCIATION_SOURCE=dictionary`
 restores the dictionary source below; `PRONUNCIATION_IPA_ACCENT` (`uk`
-default since D148, or `us`) picks which IPA is shown. The Listening course
-editor asks for the British audio only (D148). `scripts/pronounce-600-words.mjs`
+default since D148, or `us`) picks which IPA is shown. `scripts/pronounce-600-words.mjs`
 (`pnpm pronounce:600-words`) fills every empty phonetic/audio field of the
 lesson drafts through `AutofillPronunciation` and saves the drafts.
 
@@ -422,67 +421,35 @@ draft by the editor ("Apply times"), never by the service.
 Migration `1720000007000-listening-timing-job-task` adds `task` (default `align`).
 One job at a time per exercise, whatever its task.
 
-## Listening course (F05C, D143–D147)
+## Listening course
 
-`listening_course_items` holds topics (`type = topic`, level A1–C2,
-`position` within the level) and level tests (`type = level_test`, level
-A1–C1, one per level); `section` is always null (migration `1720000012000`).
-Each item has versions in `listening_course_versions` like mock tests.
+Removed by D190 (2026-10-26): the `course` module, its RPCs (`ListListeningCourse`, `CreateCourseItem`, `UpdateCourseItem`, `GetCourseItem`, `SaveCourseItemDraft`, `PublishCourseItem`, `UnpublishCourseItem`, `DeleteCourseItem`, `RequestCourseAutoTime`, `RequestCourseTranscribe`, `GetCourseAutoTime`, `ListPublishedCourse`, `GetCoursePaper`), the `/content/listening-course…` routes, `ContentVersionKind.COURSE_ITEM` and the usage kinds `courseVersion`, `courseTopic`, `courseTest` are gone; the course tables were dropped (database-allocation.md).
 
-A topic's content (D147): its own recording `audioMediaId` (uploaded in the
-editor, section `listening`), `segments` (each sentence: `id`, `speaker`,
-`text`, `start`, `end`, Vietnamese `translation`, `gap` = the sentence with
-the words to write in `[brackets]` or empty), `vocabulary` (4–6 words: word,
-IPA, meaning, `audioMediaId` made with the speech-service pronunciation),
-`questions` (multiple choice, at least 1), `ordering` (`enabled`, `prompt`,
-3–8 `items` in the order heard). Publishing needs the audio, at least one
-sentence, a start and end and a translation for every sentence, sentences in
-the order of the recording, and at least one blank. A level test: `sections`,
-each with its own `audioMediaId`, a `transcript` (text, one sentence per line,
-shown after the test) and multiple-choice questions; at least 8 questions.
-Saving a draft removes the files it dropped when no other version uses them;
-deleting an item removes its recordings, pronunciations and speech jobs.
+## Speaking & Writing tests (D196)
 
-Content Manager RPCs (gateway `/content/listening-course…`): `ListListeningCourse`
-(levels with topics and level test), `CreateCourseItem` (`{ level, type,
-title, description }`), `UpdateCourseItem` (`title`, `description`,
-`position`), `GetCourseItem` (with `media` of the draft and published version:
-kind, file name, URL), `SaveCourseItemDraft`, `PublishCourseItem` (issues
-listed when not ready), `UnpublishCourseItem`, `DeleteCourseItem` (refused
-while learners completed the topic or took the test).
+`sw_tests` (`id`, `title`, `publishedVersionId`, `createdBy`) and `sw_test_versions` (same columns as mock versions, `swTestId`; one working version) — migration `1720000023000-create-sw-tests.js`. Module `src/swtest` (`SwTestService`, `swTestContentSchema`, `swTestIssues`, `swTestMediaIds`). Routes `/content/sw-tests…` (list, create, update title, get, save draft, publish, unpublish, delete with the learner-usage check `swTest`), RPCs `ListSwTests`, `CreateSwTest`, `UpdateSwTest`, `GetSwTest`, `SaveSwTestDraft`, `PublishSwTest`, `UnpublishSwTest`, `DeleteSwTest`, internal `ListPublishedSwTests`, `GetSwTestPaper`. Review kind and version kind `swTest`; media references include S&W test versions.
 
-Speech jobs on a topic's recording (D147), stored in `listening_timing_jobs`
-with `courseItemId` and answered like the library's:
+## Mock test format (D193)
 
-| Method | Gateway route | RPC | Purpose |
+`mock_tests.format` is `full` or `practice` (migration `1720000021000-mock-format.js`: published mocks that miss the ETS structure became `practice`). Create takes `format` (default `full`; `durationMinutes` required only for `practice`, a Full test is always 120 minutes); update may change `format` only while the test was never published (409 reason `PUBLISHED_BEFORE`). Submitting/publishing a Full test adds `mockFullStructureIssues` (exact part counts, Part 3 13×3, Part 4 10×3, Part 6 4×4, Part 7 ten single passages of 2–4 questions totalling 29 followed by five sets of 5). Mock views (managed, published list, paper) include `format`.
+
+## Review flow (D191)
+
+Teachers author, Content Managers review. Working versions of `lesson_versions`, `unit_review_versions`, `placement_versions`, `mock_test_versions` and `listening_exercise_versions` have status `DRAFT`, `PENDING_REVIEW` or `RETURNED` (`WORKING_VERSION_STATUSES`; one working version per item, migration `1720000020000-content-review.js`) and the columns `editedBy`, `submittedBy`, `submittedAt`, `reviewedBy`, `reviewedAt`, `reviewNote`. Managed views return `draft` as `{ versionNumber, content, status, reviewNote, editedBy, submittedAt, reviewedAt }`; list summaries add `draftStatus`.
+
+Roles: TEACHER creates units, lessons, mock tests and listening exercises, edits titles and metadata, saves drafts, uploads media, uses Pronounce/Transcribe/Auto-time, restores and discards drafts. CONTENT_MANAGER reorders (position), publishes/unpublishes units, approves (the `Publish…` RPCs now require `PENDING_REVIEW`), unpublishes, deletes versions and orphan media. Both read managed views. Delete: Content Manager always; Teacher only when the item was never published (409 reason `PUBLISHED_BEFORE`). Saving while pending is 409 reason `PENDING_REVIEW`. Practice prompts keep their own flow (D170).
+
+| Method | Path | RPC | Notes |
 |---|---|---|---|
-| POST | `/content/listening-course/items/:id/auto-time` | `RequestCourseAutoTime` | Times the saved sentences (kind `part3`); 409 `NO_AUDIO` / `NO_LINES`, 409 `NOT_A_TOPIC` for a level test; queued through the outbox (D168). A job still waiting or running is returned |
-| POST | `/content/listening-course/items/:id/transcribe` | `RequestCourseTranscribe` | Writes the sentences from the recording alone |
-| GET | `/content/listening-course/items/:id/auto-time` | `GetCourseAutoTime` | The latest job of the topic, or null |
+| GET | `/content/reviews` | `ListContentReviews` | Staff. Every working version: `kind`, `id`, `title`, `context`, `live`, `versionId`, `versionNumber`, `status`, `editedBy`/`editor`, `submittedBy`/`submitter` (gateway adds `displayName`, `avatarUrl`), `submittedAt`, `reviewedBy`, `reviewedAt`, `reviewNote`, `updatedAt` |
+| POST | `/content/reviews/:kind/:id/submit` | `SubmitContentReview` | Teacher; same checks as publishing (code 42 with issues) |
+| POST | `/content/reviews/:kind/:id/withdraw` | `WithdrawContentReview` | Teacher; back to `DRAFT` |
+| POST | `/content/reviews/:kind/:id/approve` | `ApproveContentReview` | Content Manager; publishes |
+| POST | `/content/reviews/:kind/:id/return` | `ReturnContentReview` | Content Manager; `{ note }` 1–1000 characters |
 
-Transcribe on a mock test recording (D161), stored in `listening_timing_jobs` with `mockTestId` and `audioMediaId`:
+`kind` is one of `lesson`, `unitReview`, `placement` (id `main`), `mockTest`, `listeningExercise` (`ContentReviewKind`).
 
-| Method | Gateway route | RPC | Purpose |
-|---|---|---|---|
-| POST | `/content/mock-tests/:id/transcribe` | `RequestMockTranscribe` | Content Manager; body `{ audioMediaId }`, a recording of Part 1–4 in the saved draft (or the published version); kind sent is the part key; 409 `NO_AUDIO` when the recording is not in the test or not downloadable; queued through the outbox (D168). A job still waiting or running for that recording is returned |
-| GET | `/content/mock-tests/:id/transcribe` | `ListMockTranscribe` | `{ jobs }`: the latest job of each recording of the test, each with `audioMediaId` |
-
-Speech-job notices for the Content Manager (D163), read from `listening_timing_jobs` requested by the caller in the last 7 days that are done or failed (a job past the timeout counts as failed):
-
-| Method | Gateway route | RPC | Purpose |
-|---|---|---|---|
-| GET | `/content/notifications` | `ListContentNotifications` | Content Manager; `{ notifications: [{ id, kind: 'SPEECH_JOB', data: { task, status, error, lineCount, owner: { type, id, title } }, createdAt, read }], unread }`, 30 latest |
-| POST | `/content/notifications/read` | `MarkContentNotificationsRead` | Body `{ ids? }`; sets `seenAt`; returns `{ unread }` |
-
-Admin notices (D164): `CONTENT_UNPUBLISHED` rows written by every unpublish that takes a published unit, unit review, lesson, mock test, listening exercise or course item down (`data { type, id, title, by }`), kept 30 days, and `SPEECH_FAILURES` computed per Vietnam day from the failed (or timed-out) speech jobs of the last 7 days (`id` `speech:<day>:<count>`, `data { day, count, lastError }`).
-
-| Method | Gateway route | RPC | Purpose |
-|---|---|---|---|
-| GET | `/content/admin/notifications` | `ListAdminContentNotifications` | Admin; `{ notifications: [{ id, kind, data, createdAt, read }], unread }` |
-| POST | `/content/admin/notifications/read` | `MarkAdminContentNotificationsRead` | Admin; body `{ ids? }` (keys; all listed when left out); returns `{ unread }` |
-
-learning-service reads `ListPublishedCourse` and `GetCoursePaper` (the content
-with answers and `media`: id → URL of the recordings and pronunciations).
+Notifications (D192): `ListContentNotifications` (staff) adds review notices from `ContentReviewService.notices` to the speech-job notices. Content Manager: `REVIEW_PENDING` for each `PENDING_REVIEW` version of the five kinds and of practice prompts (`data`: `kind`, `id`, `title`, `context`, `byId`, prompts add `promptKind`; the gateway adds `data.by` with `displayName`). Teacher: `REVIEW_DONE` for versions they submitted (prompts: they author) reviewed in the last 30 days, `data.outcome` `approved` or `returned` with `note`. Ids are `review-pending:<versionId>:<ms>` / `review-done:<versionId>:<ms>`; `MarkContentNotificationsRead` takes job uuids and notice keys (read keys stored per account in `admin_notice_reads`); no ids marks everything. Computed on read; `PracticeRepository.listReviewActivity` and `ContentRepository.listReviewActivity` load pending or recently reviewed versions.
 
 ## Unpublish, delete and orphan media (D118)
 
@@ -496,14 +463,14 @@ with answers and `media`: id → URL of the recordings and pronunciations).
 | DELETE | `/content/mock-tests/:id` | `DeleteMockTest` | Usage check (`mock_attempts`) |
 | POST | `/content/listening-exercises/:id/unpublish` | `UnpublishListeningExercise` | |
 | DELETE | `/content/listening-exercises/:id` | `DeleteListeningExercise` | Usage check (`listening_results`); refused with `reason COURSE_REFERENCE` while any course version names the exercise; removes timing jobs, versions, unused recording |
-| POST | `/content/listening-course/items/:id/unpublish` | `UnpublishCourseItem` | |
-| DELETE | `/content/listening-course/items/:id` | `DeleteCourseItem` | Usage check by type (topic → `courseTopic`: learners who completed it; level test → `courseTest`: attempts, D145); removes the pronunciations only the topic used |
 | GET | `/content/media/orphans` | `ListOrphanMedia` | Media not referenced by any version (lesson, placement, mock, listening, course) and older than one hour |
 | DELETE | `/content/media/orphans` | `DeleteOrphanMedia` | `{ ids[] }`; re-checks references; returns `{ deleted[], skipped[] }` |
 
-`isMediaReferenced` now also scans `listening_course_versions`. The main placement test has no unpublish or delete.
+The main placement test has no unpublish or delete.
 
 ## Speaking/Writing prompt bank (F11, D170, D176)
+
+D195: prompt content gains `etsTask` (read_aloud fixed; open speaking `describe_picture`/`respond_questions`/`respond_info`/`express_opinion`; writing `picture_sentence`/`respond_email`/`opinion_essay`; null for old prompts), and `context`, `info`, `questions` (≤3 { text, sampleAnswer, audioMediaId }) for open speaking, `keywords` (2) and `email` for writing. `practiceIssues` requires the task type and the fields of each type; question audio counts as prompt media. Migration `1720000022000-practice-ets-task.js` tags old read-aloud, email and essay versions. Lists and the published list include `etsTask`.
 
 Code: `src/practice/` (`practice.schemas.js`, `practice.repository.js`, `practice.service.js`, `practice.grpc.controller.js`); tables in `database-allocation.md`.
 

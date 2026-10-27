@@ -25,7 +25,8 @@ import {
   DialogTitle,
   Skeleton,
 } from '../../../components/ui';
-import { ContentResponseCode } from '@appenglish/content-contracts';
+import { ContentResponseCode, WORKING_VERSION_STATUSES } from '@appenglish/content-contracts';
+import { reviewStatusInfo } from '../lib/content-area.js';
 import { errorCode } from '../../../lib/api/response.js';
 import { deleteContentVersion, getContentVersion, listContentVersions, restoreContentVersion } from '../api/content-api.js';
 import { versionOutline } from '../lib/version-outline.js';
@@ -39,13 +40,15 @@ function deleteVersionMessage(error) {
   return getApiErrorMessage(error);
 }
 
+const isWorking = (version) => WORKING_VERSION_STATUSES.includes(version.status);
+
 function statusOf(version) {
-  if (version.status === 'DRAFT') return { label: 'Draft', variant: 'warning' };
+  if (isWorking(version)) return reviewStatusInfo[version.status];
   if (version.current) return { label: 'Published · live', variant: 'success' };
   return { label: 'Published · taken down', variant: 'outline' };
 }
 
-export function VersionHistory({ kind, id, refreshKey, onRestored, noun = 'content' }) {
+export function VersionHistory({ kind, id, refreshKey, onRestored, noun = 'content', canRestore = true, canDiscard = true, canDeleteVersion = true }) {
   const [state, setState] = useState('loading');
   const [versions, setVersions] = useState([]);
   const [viewing, setViewing] = useState(null);
@@ -100,7 +103,7 @@ export function VersionHistory({ kind, id, refreshKey, onRestored, noun = 'conte
     setBusy(true);
     try {
       await restoreContentVersion(kind, id, restoring.id);
-      notify({ title: `Version ${restoring.versionNumber} restored as the draft`, description: 'Edit it if you like, then publish to make it the next version.' });
+      notify({ title: `Version ${restoring.versionNumber} restored as the draft`, description: 'Edit it if you like, then submit it for review.' });
       setRestoring(null);
       setViewing(null);
       await onRestored?.();
@@ -122,7 +125,7 @@ export function VersionHistory({ kind, id, refreshKey, onRestored, noun = 'conte
           Version history
         </CardTitle>
         <CardDescription>
-          Restoring copies a version into the draft.
+          {canRestore ? 'Restoring copies a version into the draft.' : 'Open a version to see what it held.'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -150,25 +153,29 @@ export function VersionHistory({ kind, id, refreshKey, onRestored, noun = 'conte
                   <Button variant="outline" size="sm" disabled={busy} onClick={() => view(version)}>
                     View
                   </Button>
-                  {version.status === 'DRAFT' ? (
-                    <DiscardDraftButton
-                      size="icon"
-                      kind={kind}
-                      id={id}
-                      noun={noun}
-                      disabled={busy}
-                      onDiscarded={async () => {
-                        await onRestored?.();
-                        await load();
-                      }}
-                    />
+                  {isWorking(version) ? (
+                    canDiscard ? (
+                      <DiscardDraftButton
+                        size="icon"
+                        kind={kind}
+                        id={id}
+                        noun={noun}
+                        disabled={busy}
+                        onDiscarded={async () => {
+                          await onRestored?.();
+                          await load();
+                        }}
+                      />
+                    ) : null
                   ) : (
                     <>
-                      <Button variant="ghost" size="sm" className="gap-1.5" disabled={busy} onClick={() => setRestoring(version)}>
-                        <RotateCcw className="h-4 w-4" />
-                        Restore as draft
-                      </Button>
-                      {version.current ? null : (
+                      {canRestore ? (
+                        <Button variant="ghost" size="sm" className="gap-1.5" disabled={busy} onClick={() => setRestoring(version)}>
+                          <RotateCcw className="h-4 w-4" />
+                          Restore as draft
+                        </Button>
+                      ) : null}
+                      {version.current || !canDeleteVersion ? null : (
                         <Button
                           variant="ghost"
                           size="icon"
@@ -214,7 +221,7 @@ export function VersionHistory({ kind, id, refreshKey, onRestored, noun = 'conte
                   </div>
                 ))}
               </div>
-              {viewing.meta.status === 'DRAFT' ? null : (
+              {isWorking(viewing.meta) || !canRestore ? null : (
                 <div className="flex justify-end">
                   <Button variant="outline" className="gap-1.5" disabled={busy} onClick={() => setRestoring(viewing.meta)}>
                     <RotateCcw className="h-4 w-4" />
@@ -256,7 +263,7 @@ export function VersionHistory({ kind, id, refreshKey, onRestored, noun = 'conte
           <AlertDialogHeader>
             <AlertDialogTitle>Restore version {restoring?.versionNumber} as the draft?</AlertDialogTitle>
             <AlertDialogDescription>
-              The current draft of this {noun} is replaced by a copy of version {restoring?.versionNumber}. Nothing learners see changes until you publish.
+              The current draft of this {noun} is replaced by a copy of version {restoring?.versionNumber}. Nothing learners see changes until it is approved.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

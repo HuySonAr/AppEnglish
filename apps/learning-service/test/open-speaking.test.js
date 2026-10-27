@@ -119,3 +119,52 @@ test('a Gemini failure keeps the transcript and the Whisper scores', async () =>
   await service.applyResult({ submissionId: second.id, status: 'DONE', result: { transcript: 'x' } });
   assert.equal((await service.getSubmission(student, second.id)).submission.error, 'The scoring result was not valid');
 });
+
+test('a three-question set saves one submission per answer with its own question and sample answer (D195)', async () => {
+  const { service, repository, open } = harness();
+  Object.assign(open.content, {
+    etsTask: 'respond_questions',
+    context: 'A marketing firm is asking about your travel.',
+    instructions: '',
+    sampleAnswer: '',
+    questions: [
+      { text: 'How often do you travel?', sampleAnswer: 'About twice a year.', audioMediaId: 'q1' },
+      { text: 'Who do you travel with?', sampleAnswer: 'With my family.', audioMediaId: null },
+      { text: 'Describe your last trip.', sampleAnswer: 'I went to Hue last spring.', audioMediaId: null },
+    ],
+  });
+  open.media.q1 = { kind: 'audio', url: 'https://media.test/q1.mp3' };
+  const opened = (await service.getPrompt(student, open.id)).prompt;
+  assert.deepEqual([opened.etsTask, opened.timing.respondSeconds, opened.questions.map((question) => question.audioUrl)], ['respond_questions', [15, 15, 30], ['https://media.test/q1.mp3', null, null]]);
+  assert.equal(JSON.stringify(opened).includes('About twice a year'), false);
+  await assert.rejects(() => service.submit(student, open.id, recording(10)), (error) => error.code === 67 && error.data.reason === 'SET_ANSWER');
+  const setId = randomUUID();
+  const { submission } = await service.submit(student, open.id, { ...recording(12), questionIndex: 2, setId });
+  assert.deepEqual([submission.setId, submission.questionIndex, submission.prompt.question], [setId, 2, 'Describe your last trip.']);
+  const stored = await repository.findSubmission(submission.id);
+  assert.equal(stored.prompt.sampleAnswer, 'I went to Hue last spring.');
+  assert.match(stored.prompt.instructions, /Question 3: Describe your last trip\./);
+});
+
+test('a practice answer of an ETS task also keeps the TOEIC score from the same Gemini call', async () => {
+  const { service, open, eventRepository } = harness();
+  open.content.etsTask = 'express_opinion';
+  const { submission } = await service.submit(student, open.id, recording());
+  await service.applyResult({ submissionId: submission.id, status: 'DONE', result: heard });
+  const job = eventRepository.tables.events.find((event) => event.type === LearningEventType.SPEAKING_GRADING_REQUESTED);
+  assert.equal(job.payload.etsTask, 'express_opinion');
+  await service.applyGrading({ submissionId: submission.id, status: 'DONE', result: { ...graded, etsScore: 4 } });
+  const done = (await service.getSubmission(student, submission.id)).submission;
+  assert.deepEqual(done.result.ets, { task: 'express_opinion', score: 4, max: 5 });
+  assert.equal('etsScore' in done.result.gemini, false);
+  assert.equal(done.total, 7.6);
+});
+
+test('an answer without an ETS task has no TOEIC score', async () => {
+  const { service, open, eventRepository } = harness();
+  const { submission } = await service.submit(student, open.id, recording());
+  await service.applyResult({ submissionId: submission.id, status: 'DONE', result: heard });
+  assert.equal(eventRepository.tables.events.find((event) => event.type === LearningEventType.SPEAKING_GRADING_REQUESTED).payload.etsTask, null);
+  await service.applyGrading({ submissionId: submission.id, status: 'DONE', result: graded });
+  assert.equal((await service.getSubmission(student, submission.id)).submission.result.ets, null);
+});

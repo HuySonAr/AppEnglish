@@ -5,7 +5,7 @@ import { cn } from '../../../lib/utils.js';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui';
 import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { getListeningTranscript } from '../api/practice-api.js';
-import { activeSentence } from '../lib/listening-course.js';
+import { activeSentence } from '../lib/listening-practice.js';
 import { useAudioState } from './RecordingPanel.jsx';
 
 const clock = (seconds) => {

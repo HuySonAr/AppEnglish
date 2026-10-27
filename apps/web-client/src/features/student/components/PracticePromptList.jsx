@@ -13,6 +13,7 @@ import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { ListPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
+import { etsTaskLabel, etsTaskOptions } from '../../../lib/practice-prompts.js';
 import { getCefrProfile } from '../api/progress-api.js';
 import {
   PracticeSort,
@@ -28,8 +29,8 @@ import {
 } from '../lib/practice.js';
 
 const PAGE_SIZE = 12;
-const DEFAULTS = { search: '', level: '', topic: 'all', kind: 'all', tried: PracticeTried.ALL, sort: PracticeSort.LEVEL };
-const labelOf = (kindLabel, prompt) => (typeof kindLabel === 'function' ? kindLabel(prompt) : kindLabel);
+const DEFAULTS = { search: '', level: '', topic: 'all', kind: 'all', etsTask: 'all', tried: PracticeTried.ALL, sort: PracticeSort.LEVEL };
+const labelOf = (kindLabel, prompt) => etsTaskLabel(prompt.etsTask, typeof kindLabel === 'function' ? kindLabel(prompt) : kindLabel);
 
 export function PracticePromptList({ title, description, icon, kindLabel, basePath, load: loadPrompts, skill, maxScore = 10, notice }) {
   const [state, setState] = useState('loading');
@@ -69,8 +70,6 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
   const prompts = data.prompts;
   const level = filters.level || defaultPracticeLevel(prompts, profileLevel);
   const levels = levelCounts(prompts);
-  const kinds = [...new Set(prompts.map((prompt) => prompt.kind))];
-  const kindOptions = [{ value: 'all', label: 'All kinds' }, ...kinds.map((kind) => ({ value: kind, label: labelOf(kindLabel, { kind }) }))];
   const shown = paginate(filterPracticePrompts(prompts, { ...filters, level }), page, PAGE_SIZE);
   const narrowed = Object.entries(DEFAULTS).some(([key, value]) => key !== 'level' && filters[key] !== value);
 
@@ -100,7 +99,7 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search by title or topic" />
             <FilterSelect label="Topic" value={filters.topic} onChange={setFilter('topic')} options={practiceTopicOptions(prompts)} className="w-full sm:w-40" />
-            {kinds.length > 1 ? <FilterSelect label="Kind" value={filters.kind} onChange={setFilter('kind')} options={kindOptions} className="w-full sm:w-40" /> : null}
+            <FilterSelect label="Task type" value={filters.etsTask} onChange={setFilter('etsTask')} options={etsTaskOptions(prompts)} className="w-full sm:w-52" />
             <FilterSelect label="Tried" value={filters.tried} onChange={setFilter('tried')} options={practiceTriedOptions} />
             <FilterSelect label="Sort by" value={filters.sort} onChange={setFilter('sort')} options={practiceSortOptions} />
           </div>

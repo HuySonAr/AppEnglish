@@ -8,7 +8,7 @@
     "dev": "vite",
     "start": "vite",
     "lint": "vite build",
-    "test": "node --test src/lib/*.test.js src/lib/api/*.test.js src/features/auth/flow/*.test.js src/features/admin/api/*.test.js src/features/admin/lib/*.test.js src/features/content-manager/lib/*.test.js src/features/student/lib/*.test.js src/features/profile/lib/*.test.js src/features/teacher/lib/*.test.js"
+    "test": "node --test src/lib/*.test.js src/lib/api/*.test.js src/features/auth/flow/*.test.js src/features/auth/schemas/*.test.js src/features/admin/api/*.test.js src/features/admin/lib/*.test.js src/features/content-manager/lib/*.test.js src/features/student/lib/*.test.js src/features/profile/lib/*.test.js src/features/teacher/lib/*.test.js"
   },
   "dependencies": {
     "@appenglish/auth-contracts": "workspace:*",
@@ -25,10 +25,12 @@
     "@radix-ui/react-switch": "^1.3.8",
     "@radix-ui/react-tabs": "^1.1.22",
     "@tanstack/react-query": "^5.90.2",
+    "animejs": "4.5.0",
     "axios": "^1.12.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.545.0",
+    "motion": "13.5.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.63.0",

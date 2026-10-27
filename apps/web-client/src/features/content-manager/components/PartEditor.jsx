@@ -7,6 +7,7 @@ import { MediaField } from './MediaField.jsx';
 import { QuestionCard } from './MockPartEditor.jsx';
 import { PasteQuestionsDialog } from './PasteQuestionsDialog.jsx';
 import { TextField } from './TextField.jsx';
+import { useReadOnly } from './ReadOnly.jsx';
 
 const skillLabels = { [Skill.LISTENING]: 'Listening', [Skill.READING]: 'Reading' };
 
@@ -23,6 +24,7 @@ export function PartEditor({ spec, part, edit, media }) {
   const base = ['test', spec.key];
   const lettersOnly = !spec.option.text;
   const answered = partAnswered(part);
+  const readOnly = useReadOnly();
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-start gap-3 rounded-xl border bg-card p-4 shadow-sm">
@@ -39,7 +41,7 @@ export function PartEditor({ spec, part, edit, media }) {
           <Badge variant={answered === part.questions.length ? 'success' : 'outline'} className="tabular-nums">
             {answered}/{part.questions.length} answered
           </Badge>
-          {LESSON_PASTE_PARTS.includes(spec.key) ? (
+          {LESSON_PASTE_PARTS.includes(spec.key) && !readOnly ? (
             <PasteQuestionsDialog
               spec={spec}
               part={part}

@@ -3,6 +3,7 @@ import { EyeOff, Trash2 } from 'lucide-react';
 import { ContentResponseCode } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
+import { reviewReasonMessage } from '../lib/content-area.js';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,9 +17,10 @@ import {
 } from '../../../components/ui';
 
 export function deleteRefusalMessage(error) {
+  const reason = reviewReasonMessage(error?.response?.data?.data?.reason);
+  if (reason) return reason;
   if (errorCode(error) !== ContentResponseCode.CONTENT_IN_USE) return getApiErrorMessage(error);
   const data = error?.response?.data?.data || {};
-  if (data.reason === 'COURSE_REFERENCE') return 'A listening course unit, level test or placement still uses this recording. Remove it there first.';
   const results = data.results ? `${data.results} learner result${data.results === 1 ? '' : 's'}` : 'learner results';
   return `Learners already have ${results} for this. It cannot be deleted; unpublish it instead so nobody new can open it.`;
 }
@@ -33,7 +35,7 @@ export function ContentDangerActions({ noun, published, busy = false, onUnpublis
     try {
       if (confirm === 'unpublish') {
         await onUnpublish();
-        notify({ title: `${capitalized} unpublished`, description: 'Learners no longer see it; publish again to bring it back.' });
+        notify({ title: `${capitalized} unpublished`, description: 'Learners no longer see it.' });
       } else {
         await onDelete();
         notify({ title: `${capitalized} deleted` });
@@ -75,7 +77,7 @@ export function ContentDangerActions({ noun, published, busy = false, onUnpublis
             <AlertDialogDescription>
               {confirm === 'delete'
                 ? `The ${noun}, its versions and the files only it used are removed for good. This is only possible while no learner has results for it; otherwise unpublish it instead. ${deleteNote || ''}`
-                : `Learners stop seeing the ${noun} right away; results they already have are kept. Nothing is lost here: your versions stay, and publishing again makes it live.`}
+                : `Learners stop seeing the ${noun} right away; results they already have are kept. Nothing is lost here: the versions stay.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, CheckCircle2, ChevronRight, Circle, ClipboardCheck, FileText, GraduationCap, Headphones, Library, PenLine, Tags } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ChevronRight, Circle, ClipboardCheck, FileText, Headphones, Inbox, Library, Tags } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from 'recharts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
@@ -8,9 +8,11 @@ import { cn } from '../../../lib/utils.js';
 import { Badge, Button, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, Skeleton } from '../../../components/ui';
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { greeting } from '../../student/lib/home.js';
-import { getPlacementTest, listListeningCourse, listListeningExercises, listMockTests, listUnits } from '../api/content-api.js';
+import { getPlacementTest, listContentReviews, listListeningExercises, listMockTests, listUnits } from '../api/content-api.js';
+import { MANAGER_BASE, contentItemPath, filterReviews, ReviewSort, ReviewTab, reviewKindLabels, reviewTitle } from '../lib/content-area.js';
+import { timeAgo } from '../../../lib/notifications.js';
 import { lessonState } from '../lib/lesson-draft.js';
-import { contentSummary, courseCoverage, exercisesByLevel, lessonsByUnit, pendingDrafts, readinessChecks } from '../lib/dashboard.js';
+import { contentSummary, exercisesByLevel, lessonsByUnit, readinessChecks } from '../lib/dashboard.js';
 import { OrphanMediaPanel } from '../components/OrphanMediaPanel.jsx';
 
 const chartConfig = {
@@ -19,10 +21,10 @@ const chartConfig = {
 };
 
 const tools = [
+  { icon: Inbox, title: 'Review queue', to: '/content-manager/reviews' },
   { icon: Library, title: 'Units and lessons', to: '/content-manager/units' },
   { icon: ClipboardCheck, title: 'Placement test', to: '/content-manager/placement' },
   { icon: FileText, title: 'Mock tests', to: '/content-manager/mock-tests' },
-  { icon: GraduationCap, title: 'Listening course', to: '/content-manager/listening-course' },
   { icon: Headphones, title: 'Listening exercises', to: '/content-manager/listening' },
   { icon: Tags, title: 'Listening topics', to: '/content-manager/listening-topics' },
 ];
@@ -111,34 +113,6 @@ function ExercisesChart({ rows }) {
   );
 }
 
-const testBadge = {
-  published: { variant: 'success', label: 'Test live' },
-  draft: { variant: 'warning', label: 'Test draft' },
-  missing: { variant: 'outline', label: 'No test' },
-  none: { variant: 'secondary', label: 'Last level' },
-};
-
-function CourseLevels({ rows }) {
-  return (
-    <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-      {rows.map((row) => (
-        <li key={row.level} className={cn('space-y-2 rounded-lg border p-3', row.publishedTopics === 0 && 'border-dashed')}>
-          <p className="flex items-baseline justify-between gap-2">
-            <span className="text-lg font-bold">{row.level}</span>
-            <span className="text-xs tabular-nums text-muted-foreground">
-              {row.publishedTopics}/{row.topics} topics
-            </span>
-          </p>
-          <span className="block h-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-            <span className="block h-full rounded-full bg-success" style={{ width: `${row.topics ? (row.publishedTopics * 100) / row.topics : 0}%` }} />
-          </span>
-          <Badge variant={testBadge[row.levelTest].variant}>{testBadge[row.levelTest].label}</Badge>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
 function DashboardSkeleton() {
   return (
     <div className="space-y-6">
@@ -146,8 +120,8 @@ function DashboardSkeleton() {
         <Skeleton className="h-72 rounded-xl" />
         <Skeleton className="h-72 rounded-xl" />
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {[0, 1, 2, 3].map((item) => (
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {[0, 1, 2].map((item) => (
           <Skeleton key={item} className="h-[132px] rounded-xl" />
         ))}
       </div>
@@ -163,20 +137,20 @@ export function ContentManagerDashboardPage() {
   async function load() {
     setState('loading');
     try {
-      const [unitsResult, mocks, listening, course, placement] = await Promise.all([
+      const [unitsResult, mocks, listening, placement, reviews] = await Promise.all([
         listUnits(),
         listMockTests().catch(() => null),
         listListeningExercises().catch(() => null),
-        listListeningCourse().catch(() => null),
         getPlacementTest().catch(() => null),
+        listContentReviews().catch(() => null),
       ]);
       setData({
         units: unitsResult.data.units || [],
         mockTests: mocks?.data?.mockTests || [],
         exercises: listening?.data?.exercises || [],
-        course: course?.data || null,
         placement: placement ? lessonState(placement.data) : null,
-        partial: !mocks || !listening || !course || !placement,
+        reviews: reviews?.data?.items || [],
+        partial: !mocks || !listening || !placement || !reviews,
       });
       setState('ready');
     } catch (error) {
@@ -189,7 +163,7 @@ export function ContentManagerDashboardPage() {
     load();
   }, []);
 
-  const header = <PageHeader eyebrow="Content Manager" title={`${greeting()}.`} description="What learners still miss and what is waiting to be published." />;
+  const header = <PageHeader eyebrow="Content Manager" title={`${greeting()}.`} description="What is waiting for review and what learners still miss." />;
 
   if (state === 'loading')
     return (
@@ -209,7 +183,7 @@ export function ContentManagerDashboardPage() {
     );
 
   const summary = contentSummary(data);
-  const drafts = pendingDrafts(data);
+  const waiting = filterReviews(data.reviews, { tab: ReviewTab.WAITING, search: '', sort: ReviewSort.OLDEST });
   const checks = readinessChecks(data);
   const open = checks.filter((check) => !check.ok);
   const next = open[0];
@@ -263,44 +237,45 @@ export function ContentManagerDashboardPage() {
         </div>
 
         <div className="space-y-3 rounded-xl border bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="font-semibold">Drafts waiting</h2>
-            <Badge variant={drafts.length ? 'warning' : 'secondary'} className="tabular-nums">
-              {drafts.length}
-            </Badge>
-          </div>
-          {drafts.length ? (
+          <Link to={`${MANAGER_BASE}/reviews`} className="group flex items-center justify-between gap-2">
+            <span className="min-w-0">
+              <span className="block font-semibold">Waiting for review</span>
+              <span className="block text-2xl font-bold tabular-nums">{waiting.length}</span>
+            </span>
+            <span className="flex items-center gap-1 text-sm text-primary">
+              Review queue
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </Link>
+          {waiting.length ? (
             <ul className="divide-y">
-              {drafts.slice(0, 8).map((draft) => (
-                <li key={`${draft.kind}-${draft.id}`}>
-                  <Link to={draft.to} className="group -mx-2 flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-accent">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-warning/10 text-warning">
-                      <PenLine className="h-4 w-4" aria-hidden="true" />
-                    </span>
+              {waiting.slice(0, 6).map((item) => (
+                <li key={`${item.kind}-${item.id}`}>
+                  <Link to={contentItemPath(MANAGER_BASE, item.kind, item.id)} className="group -mx-2 flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-accent">
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium">{draft.title}</span>
+                      <span className="block truncate text-sm font-medium">{reviewTitle(item)}</span>
                       <span className="block truncate text-xs text-muted-foreground">
-                        {draft.kind}
-                        {draft.context ? ` · ${draft.context}` : ''}
+                        {reviewKindLabels[item.kind]}
+                        {item.context ? ` · ${item.context}` : ''}
+                        {item.submittedAt ? ` · ${timeAgo(item.submittedAt)}` : ''}
                       </span>
                     </span>
-                    <Badge variant={draft.published ? 'warning' : 'outline'}>{draft.published ? 'Update' : 'New'}</Badge>
+                    <Badge variant={item.live ? 'success' : 'outline'}>{item.live ? 'Live' : 'New'}</Badge>
                   </Link>
                 </li>
               ))}
-              {drafts.length > 8 ? <li className="pt-2 text-xs text-muted-foreground">and {drafts.length - 8} more</li> : null}
+              {waiting.length > 6 ? <li className="pt-2 text-xs text-muted-foreground">and {waiting.length - 6} more</li> : null}
             </ul>
           ) : (
-            <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">Every change is published.</p>
+            <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">Nothing waiting for review.</p>
           )}
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-3">
         <Stat icon={Library} label="Lessons" published={summary.lessons.published} total={summary.lessons.total} note={`${summary.units.published}/${summary.units.total} units published`} to="/content-manager/units" />
         <Stat icon={FileText} label="Mock tests" published={summary.mockTests.published} total={summary.mockTests.total} to="/content-manager/mock-tests" />
         <Stat icon={Headphones} label="Listening exercises" published={summary.exercises.published} total={summary.exercises.total} to="/content-manager/listening" />
-        <Stat icon={GraduationCap} label="Course topics" published={summary.courseTopics.published} total={summary.courseTopics.total} note={`${summary.levelTests.published}/${summary.levelTests.total} level tests published`} to="/content-manager/listening-course" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -311,10 +286,6 @@ export function ContentManagerDashboardPage() {
           {summary.exercises.total ? <ExercisesChart rows={exercisesByLevel(data.exercises)} /> : <p className="text-sm text-muted-foreground">No listening exercise yet.</p>}
         </Panel>
       </div>
-
-      <Panel title="Listening course by level" description="Published topics and the level test of each level." to="/content-manager/listening-course" linkLabel="Course">
-        <CourseLevels rows={courseCoverage(data.course)} />
-      </Panel>
 
       <OrphanMediaPanel />
 

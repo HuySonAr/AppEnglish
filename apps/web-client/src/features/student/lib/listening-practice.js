@@ -83,3 +83,11 @@ export function maskedWords(words = []) {
   });
 }
 
+
+export function activeSentence(sentences, time) {
+  let found = -1;
+  sentences.forEach((sentence, index) => {
+    if (sentence.start !== null && sentence.start <= time + 0.05) found = index;
+  });
+  return found;
+}

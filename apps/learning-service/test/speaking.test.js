@@ -14,7 +14,7 @@ test('learners see published read-aloud prompts without the open kinds, with the
   assert.deepEqual(listed.prompts.map((item) => [item.id, item.attempts, item.bestTotal]), [[readAloud.id, 0, null]]);
   const opened = await service.getPrompt(student, readAloud.id);
   assert.equal(opened.prompt.audioUrl, 'https://media.test/model.mp3');
-  assert.equal(opened.prompt.maxSeconds, 30);
+  assert.equal(opened.prompt.maxSeconds, 45);
   assert.equal('sampleAnswer' in opened.prompt, false);
   assert.deepEqual(opened.submissions, []);
 });
@@ -24,7 +24,7 @@ test('a submission stores the recording, queues scoring through the outbox and c
   await assert.rejects(() => service.submit(student, writing.id, audio()), { code: 65 });
   await assert.rejects(() => service.submit(student, readAloud.id, { ...audio(), mimeType: 'text/plain' }), { code: 67 });
   await assert.rejects(() => service.submit(student, readAloud.id, audio(0)), { code: 67 });
-  await assert.rejects(() => service.submit(student, readAloud.id, { ...audio(), durationSeconds: 45 }), { code: 67 });
+  await assert.rejects(() => service.submit(student, readAloud.id, { ...audio(), durationSeconds: 60 }), { code: 67 });
   await assert.rejects(() => service.submit(student, readAloud.id, audio(6 * 1024 * 1024)), { code: 67 });
 
   const { submission } = await service.submit(student, readAloud.id, audio());
@@ -64,6 +64,7 @@ test('a scoring answer is applied once, then the learner sees the words and scor
   assert.equal(view.status, 'DONE');
   assert.equal(view.total, 8.1);
   assert.equal(view.result.words[1].status, 'mispronounced');
+  assert.deepEqual(view.result.ets, { task: 'read_aloud', pronunciation: 2, intonation: 3, score: 2.5, max: 3 });
   const scoredEvents = eventRepository.tables.events.filter((event) => event.type === LearningEventType.SPEAKING_SCORED);
   assert.equal(scoredEvents.length, 1);
   assert.equal(scoredEvents[0].queue, null);

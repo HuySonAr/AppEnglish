@@ -9,13 +9,16 @@ import { Badge, Button } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import {
   discardMockAttempt,
+  finishMockListening,
   getMockAttempt,
   getMockTest,
   saveMockAnswers,
   startMockAttempt,
   submitMockAttempt,
 } from '../api/mock-api.js';
+import { ListeningExam } from '../components/ListeningExam.jsx';
 import { TestExam } from '../components/TestExam.jsx';
+import { MockPhase, isPracticeSet, readingParts } from '../lib/mock-exam.js';
 import { TestStartCard } from '../components/TestStartCard.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 
@@ -111,6 +114,26 @@ export function MockTestPage() {
     return true;
   }
 
+  async function onFinishListening() {
+    try {
+      setExam((await finishMockListening(mockTestId, FULL)).data);
+      window.scrollTo({ top: 0 });
+    } catch (error) {
+      const attempt = await getMockAttempt(mockTestId, FULL).then((result) => result.data).catch(() => null);
+      if (attempt?.status === 'IN_PROGRESS' && attempt.phase === MockPhase.READING) {
+        setExam(attempt);
+        return;
+      }
+      notify({ title: 'Could not open Reading', description: getApiErrorMessage(error), variant: 'destructive' });
+      if (attempt && attempt.status !== 'IN_PROGRESS') {
+        setExam(null);
+        await load({ quiet: true });
+        return;
+      }
+      throw error;
+    }
+  }
+
   async function onResume(reference) {
     setBusy(true);
     try {
@@ -139,12 +162,26 @@ export function MockTestPage() {
       </div>
     );
 
+  if (exam?.phase === MockPhase.LISTENING)
+    return (
+      <ListeningExam
+        key={`${exam.attemptNumber}-listening`}
+        attempt={exam}
+        title={exam.title}
+        saveAnswers={(answers, listeningPosition) => saveMockAnswers(mockTestId, FULL, answers, listeningPosition)}
+        onFinish={onFinishListening}
+        onDiscard={() => onLeave(true)}
+      />
+    );
+
   if (exam)
     return (
       <TestExam
+        key={`${exam.attemptNumber}-${exam.phase || 'test'}`}
         name={exam.partKey ? 'mini test' : 'mock test'}
         retakeAllowed
-        attempt={exam}
+        phaseLabel={exam.phase === MockPhase.READING ? 'Reading' : undefined}
+        attempt={exam.phase === MockPhase.READING ? { ...exam, parts: readingParts(exam.parts) } : exam}
         saveAnswers={(answers) => saveMockAnswers(mockTestId, exam.partKey ? mini(exam.partKey) : FULL, answers)}
         submitting={busy}
         onSubmit={onSubmit}
@@ -155,6 +192,7 @@ export function MockTestPage() {
 
   const { mockTest, full, parts } = data;
   const latestFull = full.attempts.at(-1);
+  const practice = isPracticeSet(mockTest);
   const groups = ['LISTENING', 'READING'].map((skill) => ({ skill, parts: parts.filter((part) => part.skill === skill) })).filter((group) => group.parts.length);
 
   return (
@@ -163,24 +201,37 @@ export function MockTestPage() {
 
       <TestStartCard
         icon={FileText}
-        eyebrow={`Level ${mockTest.level} · full test`}
+        eyebrow={`Level ${mockTest.level} · ${practice ? 'practice set' : 'full test'}`}
         title={mockTest.title}
-        badges={full.inProgress ? <Badge variant="warning">In progress</Badge> : null}
+        badges={
+          practice || full.inProgress ? (
+          <>
+            {practice ? <Badge variant="secondary">Practice set</Badge> : null}
+            {full.inProgress ? <Badge variant="warning">In progress</Badge> : null}
+          </>
+          ) : null
+        }
         stats={[
           { icon: ListChecks, label: 'Questions', value: mockTest.questionCount },
           { icon: Clock, label: 'Minutes', value: mockTest.durationMinutes },
           { icon: History, label: 'Attempts', value: full.attempts.length },
-          { icon: Sigma, label: 'Latest estimate', value: latestFull?.estimated ? latestFull.estimated.totalScore : '—' },
+          practice
+            ? { icon: Sigma, label: 'Latest', value: latestFull ? `${latestFull.scorePercent}%` : '—' }
+            : { icon: Sigma, label: 'Latest estimate', value: latestFull?.estimated ? latestFull.estimated.totalScore : '—' },
         ]}
-        note="Scores on the 990 scale are estimates. Your first full attempt counts for XP."
+        note={
+          practice
+            ? 'Scored by correct answers.'
+            : 'Recordings play once; Reading then has 75 minutes.'
+        }
       >
         {full.inProgress ? (
           <Button size="lg" disabled={busy} onClick={() => onResume(FULL)}>
-            Resume the full test
+            Resume the {practice ? 'practice set' : 'full test'}
           </Button>
         ) : (
           <Button size="lg" disabled={busy} onClick={() => onStart(FULL)}>
-            {full.attempts.length ? 'Take the full test again' : 'Start the full test'}
+            {`${full.attempts.length ? 'Take the' : 'Start the'} ${practice ? 'practice set' : 'full test'}${full.attempts.length ? ' again' : ''}`}
           </Button>
         )}
         {full.attempts.length ? (

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { AudioLines, Eye, Plus, Send, Trash2, Undo2, X } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { CEFR_LEVELS, ContentResponseCode, PRACTICE_LIMITS, PracticePromptKind, PracticePromptStatus, WritingTaskType } from '@appenglish/content-contracts';
+import { CEFR_LEVELS, ContentResponseCode, PRACTICE_LIMITS, PracticePromptKind, PracticePromptStatus } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { cn } from '../../../lib/utils.js';
+import { hasTable } from '../../../lib/passage.js';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,87 +24,23 @@ import {
   Label,
 } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
-import { FileDropzone } from '../../../components/shared/FileDropzone.jsx';
-import { FileRow } from '../../../components/shared/FileRow.jsx';
 import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { PassageText } from '../../../components/shared/PassageText.jsx';
 import { PracticePromptView } from '../../../components/shared/PracticePromptView.jsx';
 import {
   deletePracticePrompt,
   getPracticePrompt,
   savePracticePromptDraft,
   submitPracticePrompt,
-  uploadPracticeMedia,
   createPracticeMachineAudio,
   withdrawPracticePrompt,
 } from '../../../lib/api/practice-prompts-api.js';
-import { countWords, fieldLabel, kindFromSlug, kindLabels, statusInfo, taskTypeLabels, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
+import { applyEtsTask, countWords, etsFields, etsTaskLabel, etsTaskOf, etsTasksOf, fieldLabel, kindFromSlug, kindLabels, statusInfo, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
+import { Choice, Field, MediaInput, QuestionRows, TaskTypePicker } from '../components/PromptEditorParts.jsx';
 import { kindPages } from './TeacherPromptsPage.jsx';
 
 const EDITABLE = new Set([PracticePromptStatus.DRAFT, PracticePromptStatus.RETURNED, PracticePromptStatus.PUBLISHED, PracticePromptStatus.ARCHIVED, PracticePromptStatus.UNPUBLISHED]);
-
-function Field({ id, label, hint, children }) {
-  return (
-    <div className="space-y-2">
-      <div className="flex items-baseline justify-between gap-2">
-        <Label htmlFor={id}>{label}</Label>
-        {hint ? <span className="text-xs tabular-nums text-muted-foreground">{hint}</span> : null}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function Choice({ value, current, onPick, children }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={value === current}
-      onClick={() => onPick(value)}
-      className={cn(
-        'h-9 rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        value === current ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-function MediaInput({ id, label, kind, mediaId, media, onChange }) {
-  const [uploading, setUploading] = useState(false);
-  const asset = mediaId ? media[mediaId] : null;
-  async function choose(file) {
-    setUploading(true);
-    try {
-      const result = (await uploadPracticeMedia(kind, file)).data.media;
-      onChange(result.id, { kind, fileName: result.fileName, url: result.url });
-    } catch (error) {
-      notify({ title: 'Could not upload the file', description: getApiErrorMessage(error), variant: 'destructive' });
-    } finally {
-      setUploading(false);
-    }
-  }
-  return (
-    <Field id={id} label={label}>
-      {mediaId ? (
-        <FileRow name={asset?.fileName || 'File attached'} status="done" note="Uploaded" onRemove={() => onChange(null)}>
-          {asset?.url && kind === 'audio' ? <audio controls src={asset.url} className="w-full" /> : null}
-          {asset?.url && kind === 'image' ? <img src={asset.url} alt="" className="max-h-48 rounded-md" /> : null}
-        </FileRow>
-      ) : (
-        <FileDropzone
-          id={id}
-          compact
-          disabled={uploading}
-          accept={kind === 'audio' ? '.mp3,.m4a,.mp4,audio/mpeg,audio/mp4' : '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp'}
-          kindLabel={uploading ? 'Uploading…' : kind === 'audio' ? 'MP3, MP4 or M4A' : 'JPEG, PNG or WebP'}
-          onFile={choose}
-        />
-      )}
-    </Field>
-  );
-}
 
 export function PromptEditorPage() {
   const { promptId, kindSlug } = useParams();
@@ -176,13 +112,26 @@ export function PromptEditorPage() {
   }
 
   const save = () => run('save', () => savePracticePromptDraft(promptId, content), 'Draft saved');
-  async function makeVoice() {
-    setBusy('voice');
+  const addMedia = (id, asset) => setMedia((current) => ({ ...current, [id]: asset }));
+  const setQuestion = (index, patch) => {
+    setContent((current) => ({ ...current, questions: current.questions.map((question, at) => (at === index ? { ...question, ...patch } : question)) }));
+    setDirty(true);
+  };
+  const setKeyword = (index, value) => {
+    setContent((current) => ({ ...current, keywords: current.keywords.map((word, at) => (at === index ? value : word)) }));
+    setDirty(true);
+  };
+  const pickTask = (task) => {
+    setContent((current) => applyEtsTask(kind, current, task));
+    setDirty(true);
+  };
+  async function makeVoice(text, onMade, label = 'voice') {
+    setBusy(label);
     try {
-      const { media: made } = (await createPracticeMachineAudio(content.text.trim())).data;
-      setMedia((current) => ({ ...current, [made.id]: { kind: 'audio', fileName: made.fileName, url: made.url } }));
-      set('audioMediaId')(made.id);
-      notify({ title: 'Model audio made' });
+      const { media: made } = (await createPracticeMachineAudio(text)).data;
+      addMedia(made.id, { kind: 'audio', fileName: made.fileName, url: made.url });
+      onMade(made.id);
+      notify({ title: 'Audio made' });
     } catch (error) {
       notify({ title: 'Could not make the audio', description: getApiErrorMessage(error), variant: 'destructive' });
     } finally {
@@ -215,6 +164,9 @@ export function PromptEditorPage() {
   const canSubmit = status === PracticePromptStatus.DRAFT || status === PracticePromptStatus.RETURNED || (dirty && editable);
   const neverPublished = !data.published && !data.prompt.publishedVersionNumber;
   const words = countWords(content.sampleAnswer);
+  const task = etsTaskOf(kind, content);
+  const fields = kind === PracticePromptKind.READ_ALOUD ? null : task ? etsFields(kind, task) : null;
+  const show = (name) => (fields ? fields[name] : !['context', 'info', 'questions', 'keywords', 'email'].includes(name));
 
   return (
     <section className="space-y-5">
@@ -225,7 +177,7 @@ export function PromptEditorPage() {
           <h1 className="truncate text-lg font-semibold sm:text-xl">{content.title || 'Untitled prompt'}</h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             <span>
-              {kindLabels[kind]} · {content.level} · version {data.latest.versionNumber}
+              {etsTaskLabel(task, kindLabels[kind])} · {content.level} · version {data.latest.versionNumber}
             </span>
             <Badge variant={statusInfo[status].variant}>{statusInfo[status].label}</Badge>
             {data.published && data.published.id !== data.latest.id ? <Badge variant="success">Live v{data.published.versionNumber}</Badge> : null}
@@ -303,6 +255,7 @@ export function PromptEditorPage() {
 
         {kind === PracticePromptKind.READ_ALOUD ? (
           <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
+            <TaskTypePicker tasks={etsTasksOf[kind]} current={task} fixed />
             <Field id="prompt-text" label="Text to read" hint={`${content.text.length}/${PRACTICE_LIMITS.readAloudText}`}>
               <Textarea id="prompt-text" rows={4} maxLength={PRACTICE_LIMITS.readAloudText} value={content.text} onChange={(event) => set('text')(event.target.value)} />
             </Field>
@@ -313,12 +266,12 @@ export function PromptEditorPage() {
               mediaId={content.audioMediaId}
               media={media}
               onChange={(id, asset) => {
-                if (asset) setMedia((current) => ({ ...current, [id]: asset }));
+                if (asset) addMedia(id, asset);
                 set('audioMediaId')(id);
               }}
             />
             {!content.audioMediaId ? (
-              <Button type="button" variant="outline" className="gap-1.5" loading={busy === 'voice'} disabled={Boolean(busy) || !content.text.trim()} onClick={makeVoice}>
+              <Button type="button" variant="outline" className="gap-1.5" loading={busy === 'voice'} disabled={Boolean(busy) || !content.text.trim()} onClick={() => makeVoice(content.text.trim(), set('audioMediaId'))}>
                 <AudioLines className="h-4 w-4" />
                 Make it with the machine voice
               </Button>
@@ -326,32 +279,57 @@ export function PromptEditorPage() {
           </div>
         ) : (
           <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
-            {kind === PracticePromptKind.WRITING ? (
+            <TaskTypePicker tasks={etsTasksOf[kind]} current={task} onPick={pickTask} />
+            <Field id="prompt-instructions" label={fields && !fields.instructionsRequired ? 'Instructions (optional)' : 'Instructions'} hint={`${content.instructions.length}/${PRACTICE_LIMITS.instructions}`}>
+              <Textarea id="prompt-instructions" rows={4} maxLength={PRACTICE_LIMITS.instructions} value={content.instructions} onChange={(event) => set('instructions')(event.target.value)} />
+            </Field>
+            {show('context') ? (
+              <Field id="prompt-context" label="Context" hint={`${(content.context || '').length}/${PRACTICE_LIMITS.context}`}>
+                <Textarea id="prompt-context" rows={3} maxLength={PRACTICE_LIMITS.context} placeholder="Imagine a friend is asking you about…" value={content.context || ''} onChange={(event) => set('context')(event.target.value)} />
+              </Field>
+            ) : null}
+            {show('info') ? (
               <div className="space-y-2">
-                <Label>Task type</Label>
-                <div className="flex flex-wrap gap-1.5">
-                  {Object.values(WritingTaskType).map((type) => (
-                    <Choice key={type} value={type} current={content.taskType} onPick={set('taskType')}>
-                      {taskTypeLabels[type]}
-                    </Choice>
+                <Field id="prompt-info" label="Information" hint={`${(content.info || '').length}/${PRACTICE_LIMITS.info}`}>
+                  <Textarea id="prompt-info" rows={8} maxLength={PRACTICE_LIMITS.info} className="font-mono text-sm" placeholder="| Time | Event |" value={content.info || ''} onChange={(event) => set('info')(event.target.value)} />
+                </Field>
+                <p className="text-xs text-muted-foreground">Write table rows as | cell | cell |.</p>
+                {hasTable(content.info) ? (
+                  <div className="rounded-lg border bg-background p-3 text-sm">
+                    <PassageText text={content.info} />
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+            {show('email') ? (
+              <Field id="prompt-email" label="Email to reply to" hint={`${(content.email || '').length}/${PRACTICE_LIMITS.email}`}>
+                <Textarea id="prompt-email" rows={8} maxLength={PRACTICE_LIMITS.email} value={content.email || ''} onChange={(event) => set('email')(event.target.value)} />
+              </Field>
+            ) : null}
+            {show('image') ? (
+              <MediaInput
+                id="prompt-image"
+                label={fields?.imageRequired ? 'Picture' : 'Image (optional)'}
+                kind="image"
+                mediaId={content.imageMediaId}
+                media={media}
+                onChange={(id, asset) => {
+                  if (asset) addMedia(id, asset);
+                  set('imageMediaId')(id);
+                }}
+              />
+            ) : null}
+            {show('keywords') ? (
+              <div className="space-y-2">
+                <Label>Words to use</Label>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {(content.keywords || []).map((word, index) => (
+                    <Input key={index} aria-label={`Word ${index + 1}`} maxLength={PRACTICE_LIMITS.keyword} value={word} onChange={(event) => setKeyword(index, event.target.value)} />
                   ))}
                 </div>
               </div>
             ) : null}
-            <Field id="prompt-instructions" label="Instructions" hint={`${content.instructions.length}/${PRACTICE_LIMITS.instructions}`}>
-              <Textarea id="prompt-instructions" rows={4} maxLength={PRACTICE_LIMITS.instructions} value={content.instructions} onChange={(event) => set('instructions')(event.target.value)} />
-            </Field>
-            <MediaInput
-              id="prompt-image"
-              label="Image (optional)"
-              kind="image"
-              mediaId={content.imageMediaId}
-              media={media}
-              onChange={(id, asset) => {
-                if (asset) setMedia((current) => ({ ...current, [id]: asset }));
-                set('imageMediaId')(id);
-              }}
-            />
+            {show('questions') ? <QuestionRows questions={content.questions || []} media={media} onMedia={addMedia} onQuestion={setQuestion} busy={busy} onVoice={makeVoice} /> : null}
             {kind === PracticePromptKind.WRITING ? (
               <div className="flex flex-wrap gap-4">
                 <Field id="prompt-min" label="Fewest words">
@@ -362,7 +340,7 @@ export function PromptEditorPage() {
                 </Field>
               </div>
             ) : (
-              <Field id="prompt-seconds" label="Speaking time (seconds)">
+              <Field id="prompt-seconds" label={task ? 'Speaking time without timer (seconds)' : 'Speaking time (seconds)'}>
                 <Input
                   id="prompt-seconds"
                   type="number"
@@ -377,41 +355,45 @@ export function PromptEditorPage() {
           </div>
         )}
 
-        {kind !== PracticePromptKind.READ_ALOUD ? (
+        {kind !== PracticePromptKind.READ_ALOUD && (show('sampleAnswer') || show('keyPoints')) ? (
           <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
-            <Field
-              id="prompt-sample"
-              label="Sample answer"
-              hint={kind === PracticePromptKind.WRITING ? `${words} words (${content.minWords}–${content.maxWords})` : `${words} words`}
-            >
-              <Textarea id="prompt-sample" rows={6} maxLength={PRACTICE_LIMITS.sampleAnswer} value={content.sampleAnswer} onChange={(event) => set('sampleAnswer')(event.target.value)} />
-            </Field>
-            <div className="space-y-2">
-              <div className="flex items-baseline justify-between gap-2">
-                <Label>Key points (optional)</Label>
-                <span className="text-xs tabular-nums text-muted-foreground">
-                  {content.keyPoints.length}/{PRACTICE_LIMITS.keyPoints}
-                </span>
-              </div>
-              {content.keyPoints.map((point, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-muted text-xs font-semibold">{index + 1}</span>
-                  <Input
-                    aria-label={`Key point ${index + 1}`}
-                    maxLength={PRACTICE_LIMITS.keyPoint}
-                    value={point}
-                    onChange={(event) => set('keyPoints')(content.keyPoints.map((item, at) => (at === index ? event.target.value : item)))}
-                  />
-                  <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" aria-label={`Remove key point ${index + 1}`} onClick={() => set('keyPoints')(content.keyPoints.filter((_, at) => at !== index))}>
-                    <X className="h-4 w-4" />
-                  </Button>
+            {show('sampleAnswer') ? (
+              <Field
+                id="prompt-sample"
+                label="Sample answer"
+                hint={kind === PracticePromptKind.WRITING ? `${words} words (${content.minWords}–${content.maxWords})` : `${words} words`}
+              >
+                <Textarea id="prompt-sample" rows={6} maxLength={PRACTICE_LIMITS.sampleAnswer} value={content.sampleAnswer} onChange={(event) => set('sampleAnswer')(event.target.value)} />
+              </Field>
+            ) : null}
+            {show('keyPoints') ? (
+              <div className="space-y-2">
+                <div className="flex items-baseline justify-between gap-2">
+                  <Label>Key points (optional)</Label>
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    {content.keyPoints.length}/{PRACTICE_LIMITS.keyPoints}
+                  </span>
                 </div>
-              ))}
-              <Button type="button" variant="outline" className="w-full gap-1.5 border-dashed" disabled={content.keyPoints.length >= PRACTICE_LIMITS.keyPoints} onClick={() => set('keyPoints')([...content.keyPoints, ''])}>
-                <Plus className="h-4 w-4" />
-                Add a key point
-              </Button>
-            </div>
+                {content.keyPoints.map((point, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-muted text-xs font-semibold">{index + 1}</span>
+                    <Input
+                      aria-label={`Key point ${index + 1}`}
+                      maxLength={PRACTICE_LIMITS.keyPoint}
+                      value={point}
+                      onChange={(event) => set('keyPoints')(content.keyPoints.map((item, at) => (at === index ? event.target.value : item)))}
+                    />
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" aria-label={`Remove key point ${index + 1}`} onClick={() => set('keyPoints')(content.keyPoints.filter((_, at) => at !== index))}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" className="w-full gap-1.5 border-dashed" disabled={content.keyPoints.length >= PRACTICE_LIMITS.keyPoints} onClick={() => set('keyPoints')([...content.keyPoints, ''])}>
+                  <Plus className="h-4 w-4" />
+                  Add a key point
+                </Button>
+              </div>
+            ) : null}
           </div>
         ) : null}
       </fieldset>

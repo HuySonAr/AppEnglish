@@ -1,4 +1,5 @@
 import { In, MoreThan } from 'typeorm';
+import { ContentReviewKind, WORKING_VERSION_STATUSES } from '@appenglish/content-contracts';
 import {
   PracticePromptVersionEntity,
   AdminNoticeEntity,
@@ -6,12 +7,12 @@ import {
   ExamTypeEntity,
   LessonEntity,
   LessonVersionEntity,
-  ListeningCourseVersionEntity,
   ListeningExerciseVersionEntity,
   MediaAssetEntity,
   MockTestEntity,
   MockTestVersionEntity,
   PlacementVersionEntity,
+  SwTestVersionEntity,
   UnitEntity,
   UnitReviewVersionEntity,
 } from '../database/content.entities.js';
@@ -109,7 +110,7 @@ export class ContentRepository {
 
   async findDraft(lessonId) {
     return (await this.repo(LessonVersionEntity)).findOne({
-      where: { lessonId, status: 'DRAFT' },
+      where: { lessonId, status: In(WORKING_VERSION_STATUSES) },
     });
   }
 
@@ -146,7 +147,7 @@ export class ContentRepository {
   }
 
   async isMediaReferenced(id) {
-    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity, ListeningExerciseVersionEntity, ListeningCourseVersionEntity, PracticePromptVersionEntity]) {
+    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity, ListeningExerciseVersionEntity, PracticePromptVersionEntity, SwTestVersionEntity]) {
       const count = await (await this.repo(entity))
         .createQueryBuilder('version')
         .where('CAST(version.content AS text) LIKE :pattern', { pattern: `%${id}%` })
@@ -159,7 +160,7 @@ export class ContentRepository {
   async listReferencedMediaIds() {
     const referenced = new Set();
     const uuid = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
-    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity, ListeningExerciseVersionEntity, ListeningCourseVersionEntity, UnitReviewVersionEntity, PracticePromptVersionEntity]) {
+    for (const entity of [LessonVersionEntity, PlacementVersionEntity, MockTestVersionEntity, ListeningExerciseVersionEntity, UnitReviewVersionEntity, PracticePromptVersionEntity, SwTestVersionEntity]) {
       const rows = await (await this.repo(entity)).createQueryBuilder('version').select('version.content', 'content').getRawMany();
       for (const row of rows) for (const match of JSON.stringify(row.content).matchAll(uuid)) referenced.add(match[0].toLowerCase());
     }
@@ -213,7 +214,7 @@ export class ContentRepository {
   }
 
   async findReviewDraft(unitId) {
-    return (await this.repo(UnitReviewVersionEntity)).findOne({ where: { unitId, status: 'DRAFT' } });
+    return (await this.repo(UnitReviewVersionEntity)).findOne({ where: { unitId, status: In(WORKING_VERSION_STATUSES) } });
   }
 
   async findReviewVersion(id) {
@@ -275,7 +276,7 @@ export class ContentRepository {
   }
 
   async findMockDraft(mockTestId) {
-    return (await this.repo(MockTestVersionEntity)).findOne({ where: { mockTestId, status: 'DRAFT' } });
+    return (await this.repo(MockTestVersionEntity)).findOne({ where: { mockTestId, status: In(WORKING_VERSION_STATUSES) } });
   }
 
   async findMockVersion(id) {
@@ -303,7 +304,43 @@ export class ContentRepository {
   }
 
   async findPlacementDraft() {
-    return (await this.repo(PlacementVersionEntity)).findOne({ where: { status: 'DRAFT' } });
+    return (await this.repo(PlacementVersionEntity)).findOne({ where: { status: In(WORKING_VERSION_STATUSES) } });
+  }
+
+  async listWorkingVersions() {
+    const sources = [
+      [ContentReviewKind.LESSON, LessonVersionEntity, 'lessonId'],
+      [ContentReviewKind.UNIT_REVIEW, UnitReviewVersionEntity, 'unitId'],
+      [ContentReviewKind.PLACEMENT, PlacementVersionEntity, null],
+      [ContentReviewKind.MOCK_TEST, MockTestVersionEntity, 'mockTestId'],
+      [ContentReviewKind.LISTENING_EXERCISE, ListeningExerciseVersionEntity, 'exerciseId'],
+    ];
+    const fields = ['id', 'versionNumber', 'status', 'createdBy', 'editedBy', 'submittedBy', 'submittedAt', 'reviewedBy', 'reviewedAt', 'reviewNote', 'updatedAt'];
+    const rows = [];
+    for (const [kind, entity, owner] of sources) {
+      const select = Object.fromEntries([...fields, ...(owner ? [owner] : [])].map((field) => [field, true]));
+      for (const row of await (await this.repo(entity)).find({ where: { status: In(WORKING_VERSION_STATUSES) }, select }))
+        rows.push({ ...row, kind, ownerId: owner ? row[owner] : null });
+    }
+    return rows;
+  }
+
+  async listReviewActivity(since) {
+    const sources = [
+      [ContentReviewKind.LESSON, LessonVersionEntity, 'lessonId'],
+      [ContentReviewKind.UNIT_REVIEW, UnitReviewVersionEntity, 'unitId'],
+      [ContentReviewKind.PLACEMENT, PlacementVersionEntity, null],
+      [ContentReviewKind.MOCK_TEST, MockTestVersionEntity, 'mockTestId'],
+      [ContentReviewKind.LISTENING_EXERCISE, ListeningExerciseVersionEntity, 'exerciseId'],
+    ];
+    const fields = ['id', 'versionNumber', 'status', 'submittedBy', 'submittedAt', 'reviewedBy', 'reviewedAt', 'reviewNote'];
+    const rows = [];
+    for (const [kind, entity, owner] of sources) {
+      const select = Object.fromEntries([...fields, ...(owner ? [owner] : [])].map((field) => [field, true]));
+      const where = [{ status: 'PENDING_REVIEW' }, { reviewedAt: MoreThan(since) }];
+      for (const row of await (await this.repo(entity)).find({ where, select })) rows.push({ ...row, kind, ownerId: owner ? row[owner] : null });
+    }
+    return rows;
   }
 
   async findPlacementVersion(id) {

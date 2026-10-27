@@ -77,9 +77,22 @@ export function VerifyEmailPage() {
   }
 
   return (
-    <AuthCard title="Check your inbox" description="Enter the 6-digit code we sent you." footer={<AuthLink to="/login">Back to sign in</AuthLink>}>
+    <AuthCard
+      title="Check your inbox"
+      description="Enter the 6-digit code we sent you."
+      footer={
+        <>
+          Didn&apos;t get it?{' '}
+          <button type="button" className="font-medium text-foreground underline underline-offset-4 transition-colors hover:text-primary disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline" disabled={resendPending || cooldown > 0 || !email} onClick={resend}>
+            {resendPending ? 'Sending…' : cooldown ? `Resend in ${cooldown}s` : 'Resend code'}
+          </button>
+          <span className="mx-2">·</span>
+          <AuthLink to="/login">Back to sign in</AuthLink>
+        </>
+      }
+    >
       <form
-        className="space-y-6"
+        className="space-y-5 short:space-y-4"
         onSubmit={(event) => {
           event.preventDefault();
           verify(otp);
@@ -105,12 +118,6 @@ export function VerifyEmailPage() {
           {pending ? 'Verifying…' : 'Verify email'}
         </Button>
       </form>
-      <p className="mt-5 text-center text-sm text-muted-foreground">
-        Didn&apos;t get it?{' '}
-        <button type="button" className="font-medium text-primary underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline" disabled={resendPending || cooldown > 0 || !email} onClick={resend}>
-          {resendPending ? 'Sending…' : cooldown ? `Resend in ${cooldown}s` : 'Resend code'}
-        </button>
-      </p>
     </AuthCard>
   );
 }

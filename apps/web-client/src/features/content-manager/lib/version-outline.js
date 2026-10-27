@@ -1,4 +1,6 @@
-import { ContentVersionKind, LESSON_TEST_PARTS } from '@appenglish/content-contracts';
+import { ContentReviewKind, ContentVersionKind, LESSON_TEST_PARTS } from '@appenglish/content-contracts';
+import { etsTaskLabels } from '../../../lib/practice-prompts.js';
+import { normalizeSwContent, sectionLabels, swBlocks } from './sw-test-draft.js';
 
 const count = (list) => (Array.isArray(list) ? list.length : 0);
 const plural = (number, noun) => `${number} ${noun}${number === 1 ? '' : 's'}`;
@@ -6,6 +8,7 @@ const excerpt = (text, max = 160) => {
   const flat = (text || '').replace(/\s+/g, ' ').trim();
   return flat.length > max ? `${flat.slice(0, max - 1)}…` : flat;
 };
+const UNIT_REVIEW_PARTS = LESSON_TEST_PARTS.filter((spec) => ['part5', 'part6'].includes(spec.key));
 
 function testOutline(test, { parts = LESSON_TEST_PARTS, prompts = true } = {}) {
   return parts.map((spec) => {
@@ -21,6 +24,47 @@ function testOutline(test, { parts = LESSON_TEST_PARTS, prompts = true } = {}) {
       title: `Part ${spec.number}: ${plural(questions.length, 'question')}${sets ? `, ${plural(sets, 'set')}` : ''}`,
       lines,
     };
+  });
+}
+
+const testSources = (test, parts = LESSON_TEST_PARTS) => parts.map((spec) => test?.[spec.key] ?? null);
+
+function sectionSources(kind, content) {
+  switch (kind) {
+    case ContentVersionKind.LESSON:
+      return [content.vocabulary ?? null, content.fillIn ?? null, ...testSources(content.test)];
+    case ContentVersionKind.MOCK_TEST:
+    case ContentReviewKind.PLACEMENT:
+      return testSources(content.test);
+    case ContentVersionKind.UNIT_REVIEW:
+      return testSources(content.test, UNIT_REVIEW_PARTS);
+    case ContentVersionKind.LISTENING_EXERCISE:
+      return [content.audioMediaId ?? null, { segments: content.segments ?? null, source: content.source ?? null }];
+    case ContentVersionKind.SW_TEST: {
+      const sw = normalizeSwContent(content);
+      return swBlocks.map((block) => sw[block.section][block.key]);
+    }
+    default:
+      return [];
+  }
+}
+
+function swOutline(content) {
+  const { speaking, writing } = normalizeSwContent(content);
+  const asked = (set) => set.questions.map((item) => excerpt(item.text, 120)).filter(Boolean);
+  const lines = {
+    readAloud: speaking.readAloud.map((item) => excerpt(item.text, 120)).filter(Boolean),
+    pictures: [],
+    respondQuestions: [excerpt(speaking.respondQuestions.context), ...asked(speaking.respondQuestions)].filter(Boolean),
+    respondInfo: [excerpt(speaking.respondInfo.info), ...asked(speaking.respondInfo)].filter(Boolean),
+    opinion: [excerpt(speaking.opinion.text)].filter(Boolean),
+    pictureSentences: writing.pictureSentences.map((item) => item.keywords.filter(Boolean).join(' / ')).filter(Boolean),
+    emails: writing.emails.flatMap((item) => [excerpt(item.email, 120), excerpt(item.instructions, 120)]).filter(Boolean),
+    essay: [excerpt(writing.essay.question)].filter(Boolean),
+  };
+  return swBlocks.map((block) => {
+    const last = block.first + block.count - 1;
+    return { title: `${sectionLabels[block.section]} ${block.first}${last > block.first ? `–${last}` : ''}: ${etsTaskLabels[block.task]}`, lines: lines[block.key] };
   });
 }
 
@@ -41,27 +85,54 @@ export function versionOutline(kind, content) {
       ];
     case ContentVersionKind.MOCK_TEST:
       return testOutline(content.test, { prompts: false });
+    case ContentReviewKind.PLACEMENT:
+      return testOutline(content.test);
     case ContentVersionKind.UNIT_REVIEW:
-      return testOutline(content.test, { parts: LESSON_TEST_PARTS.filter((spec) => ['part5', 'part6'].includes(spec.key)) });
+      return testOutline(content.test, { parts: UNIT_REVIEW_PARTS });
     case ContentVersionKind.LISTENING_EXERCISE:
       return [
         { title: content.audioMediaId ? 'Recording: yes' : 'Recording: none', lines: [] },
         { title: `Sentences: ${count(content.segments)}`, lines: (content.segments || []).map((segment) => excerpt(segment.text, 120)) },
       ];
-    case ContentVersionKind.COURSE_ITEM: {
-      const sections = (list) => (list || []).map((section, index) => `Recording ${index + 1}: ${plural(count(section.questions), 'question')}`);
-      if (content.vocabulary)
-        return [
-          { title: content.audioMediaId ? 'Recording: yes' : 'Recording: none', lines: [] },
-          { title: `Sentences: ${count(content.segments)}`, lines: (content.segments || []).map((segment) => excerpt(segment.text, 120)) },
-          { title: `Words: ${count(content.vocabulary)}`, lines: content.vocabulary.map((item) => item.word || '(empty)') },
-          { title: `Questions: ${count(content.questions)}`, lines: (content.questions || []).map((question) => excerpt(question.prompt || '(empty)', 120)) },
-          { title: content.ordering?.enabled ? `Ordering: ${plural(count(content.ordering.items), 'idea')}` : 'Ordering: off', lines: [] },
-          { title: `Translated sentences: ${count((content.segments || []).filter((segment) => segment.translation))}`, lines: [] },
-        ];
-      return [{ title: `Recordings: ${count(content.sections)}`, lines: sections(content.sections) }];
-    }
+    case ContentVersionKind.SW_TEST:
+      return swOutline(content);
     default:
       return [];
   }
+}
+
+export const OTHER_DETAILS_CHANGED = 'Options, answers, times, audio or images changed.';
+
+function without(lines, other) {
+  const left = [...other];
+  return lines.filter((line) => {
+    const at = left.indexOf(line);
+    if (at === -1) return true;
+    left.splice(at, 1);
+    return false;
+  });
+}
+
+export function outlineChanges(kind, draftContent, publishedContent) {
+  if (!draftContent || !publishedContent) return [];
+  const after = versionOutline(kind, draftContent);
+  const before = versionOutline(kind, publishedContent);
+  const afterSources = sectionSources(kind, draftContent);
+  const beforeSources = sectionSources(kind, publishedContent);
+  const changes = [];
+  after.forEach((section, index) => {
+    const old = before[index] || { title: '', lines: [] };
+    const added = without(section.lines, old.lines);
+    const removed = without(old.lines, section.lines);
+    const sourceChanged = JSON.stringify(afterSources[index] ?? null) !== JSON.stringify(beforeSources[index] ?? null);
+    if (section.title === old.title && !added.length && !removed.length && !sourceChanged) return;
+    changes.push({
+      title: section.title,
+      before: section.title === old.title ? null : old.title,
+      added,
+      removed,
+      other: sourceChanged && !added.length && !removed.length && section.title === old.title ? OTHER_DETAILS_CHANGED : null,
+    });
+  });
+  return changes;
 }

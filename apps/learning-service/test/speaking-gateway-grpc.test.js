@@ -81,7 +81,7 @@ test('Gateway HTTP to learning-service gRPC contract for speaking, including the
     assert.equal((await call('GET', `/learning/speaking/prompts/${readAloud.id}`)).json.data.prompt.text, 'The train leaves at nine.');
 
     assert.equal((await call('POST', `/learning/speaking/prompts/${readAloud.id}/submissions`, { body: recording('text/plain') })).json.code, 67);
-    assert.equal((await call('POST', `/learning/speaking/prompts/${readAloud.id}/submissions`, { body: recording('audio/webm', '40') })).json.code, 67);
+    assert.equal((await call('POST', `/learning/speaking/prompts/${readAloud.id}/submissions`, { body: recording('audio/webm', '60') })).json.code, 67);
     const submitted = await call('POST', `/learning/speaking/prompts/${readAloud.id}/submissions`, { body: recording() });
     assert.equal(submitted.status, 201);
     assert.equal(submitted.json.data.submission.status, 'SCORING');

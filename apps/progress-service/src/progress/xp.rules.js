@@ -5,7 +5,7 @@ export function xpOf(correctCount, totalCount) {
   return Math.max(0, Math.min(XP_MAX_PER_MOCK, Math.round((correctCount * XP_MAX_PER_MOCK) / totalCount)));
 }
 
-export const earnsXp = (payload) => payload.attemptNumber === 1;
+export const earnsXp = (payload) => payload.attemptNumber === 1 && payload.format !== 'practice';
 
 export function rankTotals(totals) {
   return [...totals]

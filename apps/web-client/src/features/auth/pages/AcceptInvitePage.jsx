@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { acceptInvite } from '../api/auth-api.js';
-import { AuthCard, AuthLink, FieldLabel, authButton, authInput } from '../components/AuthCard.jsx';
+import { AuthCard, AuthLink, FieldLabel, NewPasswordFields, authButton } from '../components/AuthCard.jsx';
+import { PASSWORD_MIN } from '../schemas/auth-schemas.js';
 import { CodeSentTo } from '../components/CodeSentTo.jsx';
 import { dashboardPathForRole, verifyOtpAndRestoreSession } from '../flow/auth-flow.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -10,7 +11,6 @@ import { notify } from '../../../lib/notify.js';
 import { isComplete } from '../../../lib/otp.js';
 import { Button } from '../../../components/ui/button.jsx';
 import { OtpInput } from '../../../components/shared/OtpInput.jsx';
-import { PasswordInput } from '../../../components/shared/PasswordInput.jsx';
 
 export function AcceptInvitePage() {
   const [params] = useSearchParams();
@@ -19,8 +19,9 @@ export function AcceptInvitePage() {
   const [email, setEmail] = useState(params.get('email') || '');
   const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [pending, setPending] = useState(false);
-  const ready = email && isComplete(otp) && password.length >= 8;
+  const ready = email && isComplete(otp) && password.length >= PASSWORD_MIN && confirm === password;
 
   async function submit(event) {
     event.preventDefault();
@@ -49,6 +50,7 @@ export function AcceptInvitePage() {
 
   return (
     <AuthCard
+      className="max-w-md"
       title="Join AppEnglish"
       description="Enter the code from your invitation and choose a password."
       footer={
@@ -57,17 +59,20 @@ export function AcceptInvitePage() {
         </>
       }
     >
-      <form className="space-y-6" onSubmit={submit}>
+      <form className="space-y-5 short:space-y-4" onSubmit={submit}>
         <CodeSentTo email={email} onEmail={setEmail} disabled={pending} />
         <div className="space-y-2">
           <FieldLabel htmlFor="otp">Invitation code</FieldLabel>
           <OtpInput id="otp" label="Invitation code" value={otp} onChange={setOtp} disabled={pending} autoFocus={Boolean(email)} />
         </div>
-        <div className="space-y-2">
-          <FieldLabel htmlFor="password">Choose a password</FieldLabel>
-          <PasswordInput id="password" className={authInput} value={password} onChange={(event) => setPassword(event.target.value)} required minLength={8} maxLength={128} autoComplete="new-password" disabled={pending} />
-          <p className="text-xs text-muted-foreground">At least 8 characters.</p>
-        </div>
+        <NewPasswordFields
+          min={PASSWORD_MIN}
+          label="Choose a password"
+          password={password}
+          confirm={confirm}
+          passwordProps={{ value: password, onChange: (event) => setPassword(event.target.value), minLength: PASSWORD_MIN, maxLength: 128, required: true, disabled: pending }}
+          confirmProps={{ value: confirm, onChange: (event) => setConfirm(event.target.value), maxLength: 128, required: true, disabled: pending }}
+        />
         <Button loading={pending} className={authButton} disabled={pending || !ready} type="submit">
           {pending ? 'Setting up…' : 'Set password and sign in'}
         </Button>

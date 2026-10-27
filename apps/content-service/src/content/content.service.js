@@ -7,9 +7,12 @@ import {
   LessonVersionStatus,
   MIN_PUBLISHED_LESSONS_PER_UNIT,
   MediaSection,
+  MOCK_TEST_DURATION_MINUTES,
+  MockFormat,
   ORPHAN_MEDIA_GRACE_MS,
   UNIT_REVIEW_QUESTION_COUNT,
   UnitStatus,
+  WORKING_VERSION_STATUSES,
   countBlanks,
 } from '@appenglish/content-contracts';
 import { contentErrors } from './content.errors.js';
@@ -17,6 +20,7 @@ import {
   contentMediaIds,
   lessonContentSchema,
   mockContentSchema,
+  mockFullStructureIssues,
   mockIssues,
   placementContentSchema,
   placementIssues,
@@ -26,6 +30,9 @@ import {
 } from './content.schemas.js';
 
 const emptyContent = () => lessonContentSchema.parse({});
+const isWorking = (version) => WORKING_VERSION_STATUSES.includes(version.status);
+const everPublished = (versions) => versions.some((version) => version.status === LessonVersionStatus.PUBLISHED);
+const isoOrNull = (value) => (value ? new Date(value).toISOString() : null);
 const logger = new Logger('ContentService');
 
 function lessonMediaFolder(kind, unit, lesson, section) {
@@ -77,8 +84,77 @@ export class ContentService {
     if (!this.isManager(actor)) throw contentErrors.forbiddenRole();
   }
 
+  isTeacher(actor) {
+    return actor.role === AccountRole.TEACHER;
+  }
+
+  assertTeacher(actor) {
+    if (!this.isTeacher(actor)) throw contentErrors.forbiddenRole();
+  }
+
+  isStaff(actor) {
+    return this.isManager(actor) || this.isTeacher(actor);
+  }
+
+  assertStaff(actor) {
+    if (!this.isStaff(actor)) throw contentErrors.forbiddenRole();
+  }
+
+  openDraft(draft, actor) {
+    if (draft.status === LessonVersionStatus.PENDING_REVIEW)
+      throw contentErrors.reviewState('PENDING_REVIEW', 'Withdraw it from review before editing');
+    draft.status = LessonVersionStatus.DRAFT;
+    draft.editedBy = actor.id;
+    return draft;
+  }
+
+  newDraft(actor, fields) {
+    return { ...fields, status: LessonVersionStatus.DRAFT, createdBy: actor.id, editedBy: actor.id };
+  }
+
+  draftFrom(published, fields) {
+    const author = published.editedBy || published.createdBy;
+    return { ...fields, content: structuredClone(published.content), status: LessonVersionStatus.DRAFT, createdBy: author, editedBy: author };
+  }
+
+  assertInReview(draft) {
+    if (!draft) throw contentErrors.noDraft();
+    if (draft.status !== LessonVersionStatus.PENDING_REVIEW)
+      throw contentErrors.reviewState('NOT_IN_REVIEW', 'It is not waiting for review');
+  }
+
+  approve(draft, actor) {
+    const at = new Date();
+    Object.assign(draft, { status: LessonVersionStatus.PUBLISHED, publishedAt: at, publishedBy: actor.id, reviewedBy: actor.id, reviewedAt: at, reviewNote: null });
+    return draft;
+  }
+
+  assertCanDelete(actor, published) {
+    if (this.isManager(actor)) return;
+    this.assertTeacher(actor);
+    if (published) throw contentErrors.reviewState('PUBLISHED_BEFORE', 'Only a Content Manager can delete content that was published');
+  }
+
+  draftView(draft) {
+    return draft
+      ? {
+          versionNumber: draft.versionNumber,
+          content: draft.content,
+          status: draft.status,
+          reviewNote: draft.reviewNote || null,
+          editedBy: draft.editedBy || draft.createdBy || null,
+          submittedAt: isoOrNull(draft.submittedAt),
+          reviewedAt: isoOrNull(draft.reviewedAt),
+        }
+      : null;
+  }
+
+  draftStatus(versions) {
+    return versions.find(isWorking)?.status ?? null;
+  }
+
   async listUnits(actor) {
-    const manager = this.isManager(actor);
+    const manager = this.isStaff(actor);
     const [units, lessons, versions, reviews] = await Promise.all([
       this.repository.listUnits(),
       this.repository.listLessons(),
@@ -105,7 +181,7 @@ export class ContentService {
   }
 
   async createUnit(actor, input) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const units = await this.repository.listUnits();
     const unit = await this.repository.saveUnit({
       title: input.title,
@@ -118,7 +194,8 @@ export class ContentService {
   }
 
   async updateUnit(actor, unitId, changes) {
-    this.assertManager(actor);
+    if (changes.position !== undefined) this.assertManager(actor);
+    if (changes.title !== undefined || changes.description !== undefined) this.assertTeacher(actor);
     const units = await this.repository.listUnits();
     const unit = units.find((item) => item.id === unitId);
     if (!unit) throw contentErrors.unitNotFound();
@@ -167,7 +244,8 @@ export class ContentService {
     const own = summaries.filter((version) => version.unitId === unit.id);
     return {
       publishedVersionNumber: own.find((version) => version.id === unit.reviewVersionId)?.versionNumber ?? null,
-      hasDraft: own.some((version) => version.status === LessonVersionStatus.DRAFT),
+      hasDraft: own.some(isWorking),
+      draftStatus: this.draftStatus(own),
     };
   }
 
@@ -185,7 +263,7 @@ export class ContentService {
     return {
       unit: this.unitView(unit),
       questionCount: UNIT_REVIEW_QUESTION_COUNT,
-      draft: draft ? { versionNumber: draft.versionNumber, content: draft.content } : null,
+      draft: this.draftView(draft),
       published: published
         ? {
             versionId: published.id,
@@ -198,39 +276,39 @@ export class ContentService {
   }
 
   async getUnitReview(actor, unitId) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     const unit = await this.findUnitOrThrow(unitId);
     return this.managedReviewView(unit, await this.repository.findReviewDraft(unitId), await this.publishedReviewVersion(unit));
   }
 
   async saveUnitReviewDraft(actor, unitId, content) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const unit = await this.findUnitOrThrow(unitId);
     let draft = await this.repository.findReviewDraft(unitId);
-    if (draft) draft.content = withIds(content);
+    if (draft) this.openDraft(draft, actor).content = withIds(content);
     else
-      draft = {
+      draft = this.newDraft(actor, {
         unitId,
         versionNumber: (await this.repository.maxReviewVersionNumber(unitId)) + 1,
-        status: LessonVersionStatus.DRAFT,
         content: withIds(content),
-        createdBy: actor.id,
-      };
+      });
     draft = await this.repository.saveReviewVersion(draft);
     return this.managedReviewView(unit, draft, await this.publishedReviewVersion(unit));
+  }
+
+  async reviewDraftIssues(draft) {
+    draft.content = unitReviewContentSchema.parse(draft.content);
+    return unitReviewIssues(draft.content);
   }
 
   async publishUnitReview(actor, unitId) {
     this.assertManager(actor);
     const unit = await this.findUnitOrThrow(unitId);
     const draft = await this.repository.findReviewDraft(unitId);
-    if (!draft) throw contentErrors.noDraft();
-    draft.content = unitReviewContentSchema.parse(draft.content);
-    const issues = unitReviewIssues(draft.content);
+    this.assertInReview(draft);
+    const issues = await this.reviewDraftIssues(draft);
     if (issues.length) throw contentErrors.notPublishable(issues);
-    draft.status = LessonVersionStatus.PUBLISHED;
-    draft.publishedAt = new Date();
-    draft.publishedBy = actor.id;
+    this.approve(draft, actor);
     unit.reviewVersionId = draft.id;
     await this.repository.publishReviewVersion(unit, draft);
     return this.managedReviewView(unit, null, draft);
@@ -247,13 +325,10 @@ export class ContentService {
     }
     let draft = await this.repository.findReviewDraft(unitId);
     if (!draft && published)
-      draft = await this.repository.saveReviewVersion({
+      draft = await this.repository.saveReviewVersion(this.draftFrom(published, {
         unitId,
         versionNumber: (await this.repository.maxReviewVersionNumber(unitId)) + 1,
-        status: LessonVersionStatus.DRAFT,
-        content: structuredClone(published.content),
-        createdBy: actor.id,
-      });
+      }));
     return this.managedReviewView(unit, draft, null);
   }
 
@@ -272,10 +347,18 @@ export class ContentService {
   }
 
   async deleteUnit(actor, unitId) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     const unit = await this.repository.findUnit(unitId);
     if (!unit) throw contentErrors.unitNotFound();
     const lessons = await this.repository.listLessonsByUnit(unitId);
+    const lessonIds = new Set(lessons.map((lesson) => lesson.id));
+    const [lessonVersions, reviewVersions] = await Promise.all([this.repository.listVersionSummaries(), this.repository.listReviewVersionSummaries()]);
+    this.assertCanDelete(
+      actor,
+      Boolean(unit.publishedAt) ||
+        everPublished(lessonVersions.filter((version) => lessonIds.has(version.lessonId))) ||
+        everPublished(reviewVersions.filter((version) => version.unitId === unitId)),
+    );
     const mediaIds = await this.mediaIdsOfLessons(lessons.map((lesson) => lesson.id));
     await this.repository.deleteUnitWithLessons(unitId, lessons.map((lesson) => lesson.id));
     const units = (await this.repository.listUnits()).filter((item) => item.id !== unitId);
@@ -296,7 +379,7 @@ export class ContentService {
   }
 
   async createLesson(actor, unitId, input) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     if (!(await this.repository.findUnit(unitId))) throw contentErrors.unitNotFound();
     const siblings = await this.repository.listLessonsByUnit(unitId);
     const { lesson, draft } = await this.repository.createLessonWithDraft(
@@ -307,18 +390,14 @@ export class ContentService {
         publishedVersionId: null,
         createdBy: actor.id,
       },
-      {
-        versionNumber: 1,
-        status: LessonVersionStatus.DRAFT,
-        content: emptyContent(),
-        createdBy: actor.id,
-      },
+      this.newDraft(actor, { versionNumber: 1, content: emptyContent() }),
     );
     return this.managedLessonView(lesson, draft, null);
   }
 
   async updateLesson(actor, lessonId, changes) {
-    this.assertManager(actor);
+    if (changes.position !== undefined) this.assertManager(actor);
+    if (changes.title !== undefined) this.assertTeacher(actor);
     const lesson = await this.repository.findLesson(lessonId);
     if (!lesson) throw contentErrors.lessonNotFound();
     if (changes.title !== undefined) lesson.title = changes.title;
@@ -340,7 +419,7 @@ export class ContentService {
     const published = lesson.publishedVersionId
       ? await this.repository.findVersion(lesson.publishedVersionId)
       : null;
-    if (this.isManager(actor))
+    if (this.isStaff(actor))
       return this.managedLessonView(
         lesson,
         await this.repository.findDraft(lessonId),
@@ -353,21 +432,19 @@ export class ContentService {
   }
 
   async saveLessonDraft(actor, lessonId, content) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const lesson = await this.repository.findLesson(lessonId);
     if (!lesson) throw contentErrors.lessonNotFound();
     let draft = await this.repository.findDraft(lessonId);
     const previous = draft ? lessonContentSchema.safeParse(draft.content) : null;
     const previousMediaIds = previous?.success ? contentMediaIds(previous.data) : [];
-    if (draft) draft.content = withIds(content);
+    if (draft) this.openDraft(draft, actor).content = withIds(content);
     else
-      draft = {
+      draft = this.newDraft(actor, {
         lessonId,
         versionNumber: (await this.repository.maxVersionNumber(lessonId)) + 1,
-        status: LessonVersionStatus.DRAFT,
         content: withIds(content),
-        createdBy: actor.id,
-      };
+      });
     draft = await this.repository.saveVersion(draft);
     const kept = new Set(contentMediaIds(draft.content));
     await this.removeUnusedMedia(previousMediaIds.filter((id) => !kept.has(id)));
@@ -377,23 +454,25 @@ export class ContentService {
     return this.managedLessonView(lesson, draft, published);
   }
 
+  async mediaMapOf(mediaIds) {
+    const media = mediaIds.length ? await this.repository.findMediaByIds(mediaIds) : [];
+    return new Map(media.map((asset) => [asset.id, asset]));
+  }
+
+  async lessonDraftIssues(draft) {
+    draft.content = lessonContentSchema.parse(draft.content);
+    return publishIssues(draft.content, await this.mediaMapOf(contentMediaIds(draft.content)));
+  }
+
   async publishLesson(actor, lessonId) {
     this.assertManager(actor);
     const lesson = await this.repository.findLesson(lessonId);
     if (!lesson) throw contentErrors.lessonNotFound();
     const draft = await this.repository.findDraft(lessonId);
-    if (!draft) throw contentErrors.noDraft();
-    draft.content = lessonContentSchema.parse(draft.content);
-    const mediaIds = contentMediaIds(draft.content);
-    const media = mediaIds.length ? await this.repository.findMediaByIds(mediaIds) : [];
-    const issues = publishIssues(
-      draft.content,
-      new Map(media.map((asset) => [asset.id, asset])),
-    );
+    this.assertInReview(draft);
+    const issues = await this.lessonDraftIssues(draft);
     if (issues.length) throw contentErrors.notPublishable(issues);
-    draft.status = LessonVersionStatus.PUBLISHED;
-    draft.publishedAt = new Date();
-    draft.publishedBy = actor.id;
+    this.approve(draft, actor);
     lesson.publishedVersionId = draft.id;
     await this.repository.publishVersion(lesson, draft);
     return this.managedLessonView(lesson, null, draft);
@@ -411,20 +490,18 @@ export class ContentService {
     }
     let draft = await this.repository.findDraft(lessonId);
     if (!draft && published)
-      draft = await this.repository.saveVersion({
+      draft = await this.repository.saveVersion(this.draftFrom(published, {
         lessonId,
         versionNumber: (await this.repository.maxVersionNumber(lessonId)) + 1,
-        status: LessonVersionStatus.DRAFT,
-        content: structuredClone(published.content),
-        createdBy: actor.id,
-      });
+      }));
     return this.managedLessonView(lesson, draft, null);
   }
 
   async deleteLesson(actor, lessonId) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     const lesson = await this.repository.findLesson(lessonId);
     if (!lesson) throw contentErrors.lessonNotFound();
+    this.assertCanDelete(actor, everPublished((await this.repository.listVersionSummaries()).filter((version) => version.lessonId === lessonId)));
     const mediaIds = await this.mediaIdsOfLessons([lessonId]);
     await this.repository.deleteLessonWithVersions(lessonId);
     const rest = (await this.repository.listLessonsByUnit(lesson.unitId)).filter((item) => item.id !== lessonId);
@@ -434,7 +511,7 @@ export class ContentService {
   }
 
   async autofillPronunciation(actor, { word, accents, lessonId }) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     let entry;
     try {
       entry = await this.pronunciationSource.lookup(word);
@@ -460,9 +537,7 @@ export class ContentService {
   }
 
   async uploadMedia(actor, input) {
-    if (input.section === MediaSection.PRACTICE) {
-      if (actor.role !== AccountRole.TEACHER) throw contentErrors.forbiddenRole();
-    } else this.assertManager(actor);
+    this.assertTeacher(actor);
     let folder;
     if (input.section === MediaSection.PRACTICE) folder = `${input.kind}/practice`;
     else if (input.section === MediaSection.PLACEMENT) folder = `${input.kind}/placement`;
@@ -511,7 +586,7 @@ export class ContentService {
   }
 
   async getPlacement(actor) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     return this.managedPlacementView(
       await this.repository.findPlacementDraft(),
       await this.repository.findPublishedPlacement(),
@@ -519,36 +594,34 @@ export class ContentService {
   }
 
   async savePlacementDraft(actor, content) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     let draft = await this.repository.findPlacementDraft();
     const previous = draft ? placementContentSchema.safeParse(draft.content) : null;
     const previousMediaIds = previous?.success ? contentMediaIds(previous.data) : [];
-    if (draft) draft.content = withIds(content);
+    if (draft) this.openDraft(draft, actor).content = withIds(content);
     else
-      draft = {
+      draft = this.newDraft(actor, {
         versionNumber: (await this.repository.maxPlacementVersionNumber()) + 1,
-        status: LessonVersionStatus.DRAFT,
         content: withIds(content),
-        createdBy: actor.id,
-      };
+      });
     draft = await this.repository.savePlacementVersion(draft);
     const kept = new Set(contentMediaIds(draft.content));
     await this.removeUnusedMedia(previousMediaIds.filter((id) => !kept.has(id)));
     return this.managedPlacementView(draft, await this.repository.findPublishedPlacement());
   }
 
+  async placementDraftIssues(draft) {
+    draft.content = placementContentSchema.parse(draft.content);
+    return placementIssues(draft.content, await this.mediaMapOf(contentMediaIds(draft.content)));
+  }
+
   async publishPlacement(actor) {
     this.assertManager(actor);
     const draft = await this.repository.findPlacementDraft();
-    if (!draft) throw contentErrors.noDraft();
-    draft.content = placementContentSchema.parse(draft.content);
-    const mediaIds = contentMediaIds(draft.content);
-    const media = mediaIds.length ? await this.repository.findMediaByIds(mediaIds) : [];
-    const issues = placementIssues(draft.content, new Map(media.map((asset) => [asset.id, asset])));
+    this.assertInReview(draft);
+    const issues = await this.placementDraftIssues(draft);
     if (issues.length) throw contentErrors.notPublishable(issues);
-    draft.status = LessonVersionStatus.PUBLISHED;
-    draft.publishedAt = new Date();
-    draft.publishedBy = actor.id;
+    this.approve(draft, actor);
     return this.managedPlacementView(null, await this.repository.savePlacementVersion(draft));
   }
 
@@ -633,6 +706,7 @@ export class ContentService {
       title: mockTest.title,
       level: mockTest.level,
       durationMinutes: mockTest.durationMinutes,
+      format: mockTest.format || MockFormat.FULL,
       examType: examType ? { id: examType.id, code: examType.code, name: examType.name } : null,
     };
   }
@@ -642,7 +716,7 @@ export class ContentService {
   }
 
   async listMockTests(actor) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     const [mockTests, versions] = await Promise.all([
       this.repository.listMockTests(),
       this.repository.listMockVersionSummaries(),
@@ -655,26 +729,23 @@ export class ContentService {
           createdAt: mockTest.createdAt ? new Date(mockTest.createdAt).toISOString() : null,
           publishedVersionNumber:
             own.find((version) => version.id === mockTest.publishedVersionId)?.versionNumber ?? null,
-          hasDraft: own.some((version) => version.status === LessonVersionStatus.DRAFT),
+          hasDraft: own.some(isWorking),
+          draftStatus: this.draftStatus(own),
         };
       })),
     };
   }
 
   async createMockTest(actor, input) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const examType = await this.repository.findExamType(input.examTypeId);
     if (!examType) throw contentErrors.examTypeNotFound();
     if (examType.format !== ExamFormat.TOEIC)
       throw contentErrors.examTypeInvalid('NO_EDITOR', 'Tests cannot be written for this exam type yet');
-    const mockTest = await this.repository.saveMockTest({ ...input, publishedVersionId: null, createdBy: actor.id });
-    const draft = await this.repository.saveMockVersion({
-      mockTestId: mockTest.id,
-      versionNumber: 1,
-      status: LessonVersionStatus.DRAFT,
-      content: mockContentSchema.parse({}),
-      createdBy: actor.id,
-    });
+    const format = input.format || MockFormat.FULL;
+    const durationMinutes = format === MockFormat.FULL ? MOCK_TEST_DURATION_MINUTES : input.durationMinutes;
+    const mockTest = await this.repository.saveMockTest({ ...input, format, durationMinutes, publishedVersionId: null, createdBy: actor.id });
+    const draft = await this.repository.saveMockVersion(this.newDraft(actor, { mockTestId: mockTest.id, versionNumber: 1, content: mockContentSchema.parse({}) }));
     return this.managedMockView(mockTest, draft, null);
   }
 
@@ -685,9 +756,14 @@ export class ContentService {
   }
 
   async updateMockTest(actor, mockTestId, changes) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const mockTest = await this.findMockOrThrow(mockTestId);
+    if (changes.format !== undefined && changes.format !== mockTest.format) {
+      const versions = (await this.repository.listMockVersionSummaries()).filter((version) => version.mockTestId === mockTestId);
+      if (everPublished(versions)) throw contentErrors.reviewState('PUBLISHED_BEFORE', 'The test type cannot change after it was published');
+    }
     for (const [field, value] of Object.entries(changes)) if (value !== undefined) mockTest[field] = value;
+    if (mockTest.format === MockFormat.FULL) mockTest.durationMinutes = MOCK_TEST_DURATION_MINUTES;
     await this.repository.saveMockTest(mockTest);
     return { mockTest: await this.mockView(mockTest) };
   }
@@ -697,7 +773,7 @@ export class ContentService {
   }
 
   async getMockTest(actor, mockTestId) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     const mockTest = await this.findMockOrThrow(mockTestId);
     return this.managedMockView(
       mockTest,
@@ -707,39 +783,38 @@ export class ContentService {
   }
 
   async saveMockTestDraft(actor, mockTestId, content) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const mockTest = await this.findMockOrThrow(mockTestId);
     let draft = await this.repository.findMockDraft(mockTestId);
     const previous = draft ? mockContentSchema.safeParse(draft.content) : null;
     const previousMediaIds = previous?.success ? contentMediaIds(previous.data) : [];
-    if (draft) draft.content = withIds(content);
+    if (draft) this.openDraft(draft, actor).content = withIds(content);
     else
-      draft = {
+      draft = this.newDraft(actor, {
         mockTestId,
         versionNumber: (await this.repository.maxMockVersionNumber(mockTestId)) + 1,
-        status: LessonVersionStatus.DRAFT,
         content: withIds(content),
-        createdBy: actor.id,
-      };
+      });
     draft = await this.repository.saveMockVersion(draft);
     const kept = new Set(contentMediaIds(draft.content));
     await this.removeUnusedMedia(previousMediaIds.filter((id) => !kept.has(id)));
     return this.managedMockView(mockTest, draft, await this.publishedMockVersion(mockTest));
   }
 
+  async mockDraftIssues(draft, mockTest) {
+    draft.content = mockContentSchema.parse(draft.content);
+    const issues = mockIssues(draft.content, await this.mediaMapOf(contentMediaIds(draft.content)));
+    return mockTest.format === MockFormat.PRACTICE ? issues : [...issues, ...mockFullStructureIssues(draft.content.test)];
+  }
+
   async publishMockTest(actor, mockTestId) {
     this.assertManager(actor);
     const mockTest = await this.findMockOrThrow(mockTestId);
     const draft = await this.repository.findMockDraft(mockTestId);
-    if (!draft) throw contentErrors.noDraft();
-    draft.content = mockContentSchema.parse(draft.content);
-    const mediaIds = contentMediaIds(draft.content);
-    const media = mediaIds.length ? await this.repository.findMediaByIds(mediaIds) : [];
-    const issues = mockIssues(draft.content, new Map(media.map((asset) => [asset.id, asset])));
+    this.assertInReview(draft);
+    const issues = await this.mockDraftIssues(draft, mockTest);
     if (issues.length) throw contentErrors.notPublishable(issues);
-    draft.status = LessonVersionStatus.PUBLISHED;
-    draft.publishedAt = new Date();
-    draft.publishedBy = actor.id;
+    this.approve(draft, actor);
     mockTest.publishedVersionId = draft.id;
     await this.repository.publishMockVersion(mockTest, draft);
     return this.managedMockView(mockTest, null, draft);
@@ -756,20 +831,18 @@ export class ContentService {
     }
     let draft = await this.repository.findMockDraft(mockTestId);
     if (!draft && published)
-      draft = await this.repository.saveMockVersion({
+      draft = await this.repository.saveMockVersion(this.draftFrom(published, {
         mockTestId,
         versionNumber: (await this.repository.maxMockVersionNumber(mockTestId)) + 1,
-        status: LessonVersionStatus.DRAFT,
-        content: structuredClone(published.content),
-        createdBy: actor.id,
-      });
+      }));
     return this.managedMockView(mockTest, draft, null);
   }
 
   async deleteMockTest(actor, mockTestId) {
-    this.assertManager(actor);
-    const mockTest = await this.findMockOrThrow(mockTestId);
+    this.assertStaff(actor);
+    await this.findMockOrThrow(mockTestId);
     const summaries = (await this.repository.listMockVersionSummaries()).filter((version) => version.mockTestId === mockTestId);
+    this.assertCanDelete(actor, everPublished(summaries));
     const mediaIds = [];
     for (const summary of summaries) {
       const version = await this.repository.findMockVersion(summary.id);
@@ -785,7 +858,7 @@ export class ContentService {
     return {
       mockTest: await this.mockView(mockTest),
       media: await this.mediaOf([draft, published], mockContentSchema),
-      draft: draft ? { versionNumber: draft.versionNumber, content: draft.content } : null,
+      draft: this.draftView(draft),
       published: published
         ? {
             versionId: published.id,
@@ -872,7 +945,7 @@ export class ContentService {
   async managedPlacementView(draft, published) {
     return {
       media: await this.mediaOf([draft, published], placementContentSchema),
-      draft: draft ? { versionNumber: draft.versionNumber, content: draft.content } : null,
+      draft: this.draftView(draft),
       published: published
         ? {
             versionId: published.id,
@@ -885,7 +958,7 @@ export class ContentService {
   }
 
   async deleteMedia(actor, mediaId) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     if (!(await this.repository.findMediaByIds([mediaId])).length) throw contentErrors.mediaNotFound();
     return { deleted: (await this.removeUnusedMedia([mediaId])).includes(mediaId) };
   }
@@ -964,7 +1037,8 @@ export class ContentService {
       position: lesson.position,
       publishedVersionNumber:
         own.find((version) => version.id === lesson.publishedVersionId)?.versionNumber ?? null,
-      hasDraft: own.some((version) => version.status === LessonVersionStatus.DRAFT),
+      hasDraft: own.some(isWorking),
+      draftStatus: this.draftStatus(own),
     };
   }
 
@@ -986,7 +1060,7 @@ export class ContentService {
     return {
       media: await this.mediaOf([draft, published], lessonContentSchema),
       lesson: this.lessonView(lesson),
-      draft: draft ? { versionNumber: draft.versionNumber, content: draft.content } : null,
+      draft: this.draftView(draft),
       published: published
         ? {
             versionId: published.id,

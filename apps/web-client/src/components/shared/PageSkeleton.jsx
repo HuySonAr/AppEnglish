@@ -152,3 +152,32 @@ export function FormPageSkeleton({ fields = 2 }) {
     </Frame>
   );
 }
+
+export function DashboardPageSkeleton() {
+  return (
+    <Frame label="Loading your home page">
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-8 w-72 max-w-full" />
+      </div>
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem]">
+        <Skeleton className="h-60 w-full rounded-[2rem]" />
+        <Skeleton className="h-60 w-full rounded-3xl" />
+      </div>
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem]">
+        <div className="space-y-2 rounded-3xl border bg-card p-6">
+          <Skeleton className="h-6 w-36" />
+          {Array.from({ length: 3 }, (_, index) => (
+            <Skeleton key={index} className="h-14 w-full rounded-2xl" />
+          ))}
+        </div>
+        <Skeleton className="h-64 w-full rounded-3xl" />
+      </div>
+      <div className="grid gap-3 rounded-3xl border bg-card p-6 sm:grid-cols-3">
+        {Array.from({ length: 3 }, (_, index) => (
+          <Skeleton key={index} className="h-24 w-full rounded-2xl" />
+        ))}
+      </div>
+    </Frame>
+  );
+}

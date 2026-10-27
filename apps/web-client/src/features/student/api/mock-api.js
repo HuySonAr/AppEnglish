@@ -14,8 +14,12 @@ export async function getMockAttempt(id, reference) {
 export async function startMockAttempt(id, reference) {
   return (await httpClient.post(`${mock(id)}/attempt/start`, reference)).data;
 }
-export async function saveMockAnswers(id, reference, answers) {
-  return (await httpClient.put(`${mock(id)}/attempt/answers`, { ...reference, answers })).data;
+export async function saveMockAnswers(id, reference, answers, listeningPosition) {
+  const position = Number.isInteger(listeningPosition) ? { listeningPosition } : {};
+  return (await httpClient.put(`${mock(id)}/attempt/answers`, { ...reference, answers, ...position })).data;
+}
+export async function finishMockListening(id, reference) {
+  return (await httpClient.post(`${mock(id)}/attempt/listening/finish`, reference)).data;
 }
 export async function submitMockAttempt(id, reference, answers) {
   return (await httpClient.post(`${mock(id)}/attempt/submit`, { ...reference, answers })).data;

@@ -5,7 +5,7 @@ import {
   DictionaryPronunciationSource,
   PronunciationUnavailableError,
 } from '../src/pronunciation/dictionary-pronunciation.source.js';
-import { createMemoryRepository, manager, student } from './memory-repository.js';
+import { createMemoryRepository, manager, student, teacher } from './memory-repository.js';
 
 const base = 'https://dictionary.test/api/v2/entries/en';
 const media = (name) => `https://dictionary.test/media/${name}`;
@@ -96,7 +96,8 @@ test('auto-fill stores the audio it finds and reports what is missing', async ()
     },
   });
   await assert.rejects(() => service.autofillPronunciation(student, { word: 'abide by', accents: ['uk', 'us'] }), { code: 26 });
-  const result = await service.autofillPronunciation(manager, { word: 'Abide By', accents: ['uk', 'us'] });
+  await assert.rejects(() => service.autofillPronunciation(manager, { word: 'abide by', accents: ['uk', 'us'] }), { code: 26 });
+  const result = await service.autofillPronunciation(teacher, { word: 'Abide By', accents: ['uk', 'us'] });
   assert.equal(result.found, true);
   assert.equal(result.phonetic, '/əˈbaɪd baɪ/');
   assert.equal(result.audio.us, null);
@@ -107,7 +108,7 @@ test('auto-fill stores the audio it finds and reports what is missing', async ()
   assert.equal(repository.tables.media[0].id, result.audio.uk.id);
 
   downloads.length = 0;
-  const onlyUs = await service.autofillPronunciation(manager, { word: 'ticket', accents: ['us'] });
+  const onlyUs = await service.autofillPronunciation(teacher, { word: 'ticket', accents: ['us'] });
   assert.deepEqual(downloads, []);
   assert.deepEqual(onlyUs.audio, { us: null });
 });
@@ -120,15 +121,15 @@ test('auto-fill survives a failed download and maps an unavailable dictionary to
       return Buffer.from([1]);
     },
   });
-  const result = await service.autofillPronunciation(manager, { word: 'x', accents: ['uk', 'us'] });
+  const result = await service.autofillPronunciation(teacher, { word: 'x', accents: ['uk', 'us'] });
   assert.equal(result.audio.uk, null);
   assert.equal(result.audio.us.fileName, 'x-us.mp3');
   assert.equal(repository.tables.media.length, 1);
 
   ({ service } = serviceWith({ async lookup() { throw new PronunciationUnavailableError('down'); } }));
-  await assert.rejects(() => service.autofillPronunciation(manager, { word: 'x', accents: ['uk'] }), { code: 44, status: 503 });
+  await assert.rejects(() => service.autofillPronunciation(teacher, { word: 'x', accents: ['uk'] }), { code: 44, status: 503 });
   ({ service } = serviceWith({ async lookup() { return { found: false, phonetic: '', audio: { uk: null, us: null } }; } }));
-  assert.deepEqual(await service.autofillPronunciation(manager, { word: 'zzzz', accents: ['uk', 'us'] }), { found: false, phonetic: '', audio: { uk: null, us: null } });
+  assert.deepEqual(await service.autofillPronunciation(teacher, { word: 'zzzz', accents: ['uk', 'us'] }), { found: false, phonetic: '', audio: { uk: null, us: null } });
 });
 
 test('auto-fill answers with the address of each stored pronunciation', async () => {
@@ -143,6 +144,6 @@ test('auto-fill answers with the address of each stored pronunciation', async ()
     },
     'r2',
   );
-  const result = await service.autofillPronunciation(manager, { word: 'ticket', accents: ['us'] });
+  const result = await service.autofillPronunciation(teacher, { word: 'ticket', accents: ['us'] });
   assert.equal(result.audio.us.url, 'https://media.test/ticket-us.mp3');
 });

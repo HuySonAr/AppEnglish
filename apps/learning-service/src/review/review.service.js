@@ -1,6 +1,8 @@
 import { AccountRole } from '@appenglish/auth-contracts';
 import { currentRequestId } from '@appenglish/backend-common/observability';
 import {
+  SW_REVIEW_KINDS,
+  SwScoringStatus,
   LearningEventType,
   LearningResponseCode,
   REVIEW_CRITERIA,
@@ -38,7 +40,8 @@ export function aiScoresOf(submission) {
 }
 
 export class ReviewService {
-  constructor(repository, { now = () => new Date(), events = noEvents } = {}) {
+  constructor(repository, { now = () => new Date(), events = noEvents, swTests = null } = {}) {
+    this.swTests = swTests;
     this.repository = repository;
     this.now = now;
     this.events = events;
@@ -103,6 +106,43 @@ export class ReviewService {
     return { review: this.statusOf(saved), quota: await this.quotaOf(actor.id) };
   }
 
+  isSw(kind) {
+    return kind === SW_REVIEW_KINDS.speaking || kind === SW_REVIEW_KINDS.writing;
+  }
+
+  async requestSw(actor, { swTestId, section, attemptNumber }) {
+    this.assertRole(actor, AccountRole.STUDENT);
+    const attempt = this.swTests ? await this.swTests.attemptFor(actor.id, swTestId, section, attemptNumber) : null;
+    if (!attempt) throw reviewErrors.notFound();
+    if (attempt.scoring?.status === SwScoringStatus.SCORING) throw reviewErrors.notAllowed('NOT_READY', 'Wait until the test is scored');
+    if (section === 'speaking' && attempt.recordingDeletedAt) throw reviewErrors.notAllowed('NO_RECORDING', 'The recordings are no longer kept');
+    const existing = await this.repository.findBySubmission(attempt.id);
+    if (existing && existing.status !== ReviewStatus.EXPIRED) throw reviewErrors.notAllowed('ALREADY_SENT', 'This test was already sent to a teacher');
+    const at = this.now();
+    const saved = await this.repository.reserve(
+      {
+        submissionId: attempt.id,
+        accountId: actor.id,
+        kind: SW_REVIEW_KINDS[section],
+        weekStart: vietnamWeekStart(at),
+        status: ReviewStatus.WAITING,
+        requestedAt: at,
+        expiresAt: new Date(at.getTime() + TEACHER_REVIEW_LIMITS.expireHours * HOUR_MS),
+        teacherId: null,
+        claimedAt: null,
+        lockedUntil: null,
+        completedAt: null,
+        action: null,
+        before: null,
+        after: null,
+        note: null,
+      },
+      TEACHER_REVIEW_LIMITS.weekly,
+    );
+    if (!saved) throw reviewErrors.limit(0);
+    return { review: this.statusOf(saved), quota: await this.quotaOf(actor.id) };
+  }
+
   async withdraw(actor, { submissionId }) {
     this.assertRole(actor, AccountRole.STUDENT);
     if (!(await this.repository.withdraw(submissionId, actor.id, this.now()))) {
@@ -118,16 +158,17 @@ export class ReviewService {
     const at = this.now();
     const waiting = await this.repository.listWaiting(at);
     const visible = waiting.filter((review) => !review.lockedUntil || new Date(review.lockedUntil) <= at || review.teacherId === actor.id);
-    const submissions = await Promise.all(visible.map((review) => this.repository.findSubmission(review.submissionId)));
+    const subjects = await Promise.all(visible.map((review) => (this.isSw(review.kind) ? this.swTests?.reviewSubject(review.submissionId) : this.repository.findSubmission(review.submissionId))));
     return {
       reviews: visible.map((review, index) => {
-        const submission = submissions[index];
+        const submission = subjects[index];
+        const sw = this.isSw(review.kind);
         return {
           id: review.id,
           kind: review.kind,
-          title: submission?.prompt?.title || '',
-          level: submission?.prompt?.level || null,
-          hasAi: Boolean(submission && aiScoresOf(submission)),
+          title: sw ? submission?.title || '' : submission?.prompt?.title || '',
+          level: sw ? null : submission?.prompt?.level || null,
+          hasAi: sw ? Boolean(submission?.ai) : Boolean(submission && aiScoresOf(submission)),
           requestedAt: iso(review.requestedAt),
           expiresAt: iso(review.expiresAt),
           mine: review.teacherId === actor.id && Boolean(review.lockedUntil) && new Date(review.lockedUntil) > at,
@@ -146,6 +187,13 @@ export class ReviewService {
   }
 
   async detail(review) {
+    if (this.isSw(review.kind)) {
+      const subject = await this.swTests.reviewSubject(review.submissionId);
+      return {
+        review: { id: review.id, kind: review.kind, requestedAt: iso(review.requestedAt), expiresAt: iso(review.expiresAt), claimedAt: iso(review.claimedAt), lockedUntil: iso(review.lockedUntil) },
+        sw: subject,
+      };
+    }
     const submission = await this.repository.findSubmission(review.submissionId);
     const prompt = submission.prompt;
     const ai = aiScoresOf(submission);
@@ -213,9 +261,36 @@ export class ReviewService {
     return clean;
   }
 
-  async complete(actor, reviewId, { action, scores, note }) {
+  async completeSw(actor, review, { action, items, note }) {
+    const subject = await this.swTests.reviewSubject(review.submissionId);
+    const text = String(note || '').trim();
+    if (!subject.ai && action !== ReviewAction.FROM_SCRATCH) throw reviewErrors.invalid('There is no AI score to keep; grade it from the start', ['action']);
+    if (subject.ai && action === ReviewAction.FROM_SCRATCH) throw reviewErrors.invalid('This test has an AI score; confirm or change it', ['action']);
+    if (action !== ReviewAction.CONFIRM && !text) throw reviewErrors.invalid('Write a comment for the learner', ['note']);
+    const at = this.now();
+    const graded = action === ReviewAction.CONFIRM ? null : this.swTests.checkTeacherItems(subject, items);
+    const teacherReview = await this.swTests.teacherReviewOf(subject, { action, items: graded, note: text || null, teacherId: actor.id, reviewedAt: at.toISOString() });
+    await this.repository.completeSw(
+      { ...review, status: ReviewStatus.DONE, completedAt: at, lockedUntil: null, action, before: subject.ai, after: teacherReview.final, note: text || null },
+      review.submissionId,
+      teacherReview,
+      {
+        type: LearningEventType.REVIEW_COMPLETED,
+        queue: null,
+        payload: { accountId: subject.accountId, submissionId: review.submissionId, promptId: subject.swTestId, swTestId: subject.swTestId, section: subject.section, attemptNumber: subject.attemptNumber, kind: review.kind, title: subject.title, total: teacherReview.final.scaled, reviewedAt: at.toISOString() },
+        requestId: currentRequestId(),
+        createdAt: at,
+        publishedAt: null,
+      },
+    );
+    this.events.flush?.().catch(() => {});
+    return { review: { id: review.id, status: ReviewStatus.DONE, action, final: teacherReview.final } };
+  }
+
+  async complete(actor, reviewId, { action, scores, items, note }) {
     this.assertRole(actor, AccountRole.TEACHER);
     const review = await this.ownClaim(actor, reviewId);
+    if (this.isSw(review.kind)) return this.completeSw(actor, review, { action, items, note });
     const submission = await this.repository.findSubmission(review.submissionId);
     const ai = aiScoresOf(submission);
     const text = String(note || '').trim();
@@ -245,11 +320,14 @@ export class ReviewService {
     const at = this.now();
     let expired = 0;
     for (const review of await this.repository.listExpired(at, limit)) {
-      const submission = await this.repository.findSubmission(review.submissionId);
+      const sw = this.isSw(review.kind) ? await this.swTests?.reviewSubject(review.submissionId).catch(() => null) : null;
+      const submission = sw ? null : await this.repository.findSubmission(review.submissionId);
       const done = await this.repository.expire(review, {
         type: LearningEventType.REVIEW_EXPIRED,
         queue: null,
-        payload: { accountId: review.accountId, submissionId: review.submissionId, promptId: submission?.promptId || review.submissionId, kind: review.kind, title: submission?.prompt?.title || '', expiredAt: at.toISOString() },
+        payload: sw
+          ? { accountId: review.accountId, submissionId: review.submissionId, promptId: sw.swTestId, swTestId: sw.swTestId, section: sw.section, attemptNumber: sw.attemptNumber, kind: review.kind, title: sw.title, expiredAt: at.toISOString() }
+          : { accountId: review.accountId, submissionId: review.submissionId, promptId: submission?.promptId || review.submissionId, kind: review.kind, title: submission?.prompt?.title || '', expiredAt: at.toISOString() },
         requestId: null,
         createdAt: at,
         publishedAt: null,

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { SpeechQueue } from '@appenglish/content-contracts';
 import { ContentService } from '../src/content/content.service.js';
 import { SpeechPronunciationSource } from '../src/pronunciation/speech-pronunciation.source.js';
-import { createMemoryRepository, manager } from './memory-repository.js';
+import { createMemoryRepository, teacher } from './memory-repository.js';
 
 const mp3 = (accent) => Buffer.from(`mp3-${accent}`);
 function brokerAnswering(reply) {
@@ -62,15 +62,15 @@ test('the editor call stores the generated audio as lesson media and reports it'
     })),
   );
   const service = new ContentService(repository, storage, source);
-  const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
-  const { lesson } = await service.createLesson(manager, unit.id, { title: 'Lesson' });
-  const result = await service.autofillPronunciation(manager, { word: 'schedule', accents: ['uk', 'us'], lessonId: lesson.id });
+  const { unit } = await service.createUnit(teacher, { title: 'Unit', description: '' });
+  const { lesson } = await service.createLesson(teacher, unit.id, { title: 'Lesson' });
+  const result = await service.autofillPronunciation(teacher, { word: 'schedule', accents: ['uk', 'us'], lessonId: lesson.id });
   assert.equal(result.found, true);
   assert.equal(result.phonetic, '/ˈskɛdjuːl/');
   assert.deepEqual([result.audio.uk.fileName, result.audio.us.fileName], ['schedule-uk.mp3', 'schedule-us.mp3']);
   assert.equal(repository.tables.media.length, 2);
   assert.equal(repository.tables.media[0].sizeBytes, 6);
-  const one = await service.autofillPronunciation(manager, { word: 'get in touch', accents: ['us'], lessonId: lesson.id });
+  const one = await service.autofillPronunciation(teacher, { word: 'get in touch', accents: ['us'], lessonId: lesson.id });
   assert.deepEqual(Object.keys(one.audio), ['us']);
   assert.equal(one.audio.us.fileName, 'get-in-touch-us.mp3');
 });

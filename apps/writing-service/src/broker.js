@@ -4,7 +4,7 @@ import { LearningQueue, SubmissionStatus } from '@appenglish/learning-contracts'
 import { RETRY_DELAYS_MS, assertRetryTopology, attemptOf, countMessage, retryOrDead, sendToDead } from '@appenglish/backend-common/messaging';
 import { REQUEST_ID_HEADER, runWithRequestId } from '@appenglish/backend-common/observability';
 import { gradingJobs, gradingWork, keyChecks } from './status-server.js';
-import { checkKey, failureText, gradeWriting, isSpeakingJob, listModels } from './worker.js';
+import { checkKey, failureText, gradeWriting, isSpeakingJob, isSwJob, jobTask, listModels } from './worker.js';
 
 const RETRY_MS = 10_000;
 
@@ -12,6 +12,7 @@ export const DEFAULT_QUEUES = Object.freeze({
   requests: LearningQueue.WRITING_REQUESTS,
   results: LearningQueue.WRITING_RESULTS,
   openResults: LearningQueue.OPEN_SPEAKING_RESULTS,
+  swResults: LearningQueue.SW_RESULTS,
   keyChecks: LearningQueue.AI_KEY_CHECKS,
   modelLists: LearningQueue.AI_MODEL_LISTS,
 });
@@ -56,8 +57,8 @@ export class WritingBroker {
     }
     const requestId = body?.requestId || message.properties?.headers?.[REQUEST_ID_HEADER];
     const submissionId = body?.payload?.submissionId;
-    const results = isSpeakingJob(body) ? this.queues.openResults : this.queues.results;
-    const task = isSpeakingJob(body) ? 'open_speaking' : 'writing';
+    const results = isSwJob(body) ? this.queues.swResults : isSpeakingJob(body) ? this.queues.openResults : this.queues.results;
+    const task = jobTask(body);
     const started = Date.now();
     return runWithRequestId(requestId, async () => {
       try {
@@ -110,7 +111,7 @@ export class WritingBroker {
 
   async connect() {
     if (this.stopped) return;
-    const { requests, results, openResults, keyChecks, modelLists } = this.queues;
+    const { requests, results, openResults, swResults, keyChecks, modelLists } = this.queues;
     try {
       const connection = await amqp.connect(this.config.rabbitmqUrl);
       connection.on('error', (error) => this.logger.warn(`RabbitMQ connection error: ${error.message}`));
@@ -125,6 +126,7 @@ export class WritingBroker {
       await assertRetryTopology(grading, requests, this.delays);
       await grading.assertQueue(results, { durable: true });
       await grading.assertQueue(openResults, { durable: true });
+      await grading.assertQueue(swResults, { durable: true });
       await grading.prefetch(this.config.concurrency);
       await grading.consume(requests, (message) => message && this.handleGrading(grading, message).catch((error) => this.logger.warn(`Job left for redelivery: ${error.message}`)));
       const checks = await connection.createChannel();

@@ -154,32 +154,11 @@ export class LessonGatewayController extends LearningRelay {
   checkListeningPractice(id, body, request) {
     return this.forward('CheckListeningPractice', request, { id, body });
   }
-  getListeningCourse(request) {
-    return this.forward('GetListeningCourse', request);
-  }
-  getCourseTopic(id, request) {
-    return this.forward('GetCourseTopic', request, { id });
-  }
-  checkCourseSentence(id, body, request) {
-    return this.forward('CheckCourseSentence', request, { id, body });
-  }
-  completeCourseTopic(id, request) {
-    return this.forward('CompleteCourseTopic', request, { id });
-  }
-  getCourseProgress(request) {
-    return this.forward('GetCourseProgress', request);
-  }
   getUnitReview(id, request) {
     return this.forward('GetUnitReview', request, { id });
   }
   submitUnitReview(id, body, request) {
     return this.forward('SubmitUnitReview', request, { id, body });
-  }
-  getCourseTest(itemId, request) {
-    return this.forward('GetCourseTest', request, { id: itemId });
-  }
-  submitCourseTest(itemId, body, request) {
-    return this.forward('SubmitCourseTest', request, { id: itemId, body });
   }
   async getLessonRanking(id, request) {
     const payload = await this.forward('GetLessonRanking', request, { id });
@@ -249,9 +228,65 @@ export class LessonGatewayController extends LearningRelay {
   completeReview(id, body, request) {
     return this.forward('CompleteReview', request, { id, body });
   }
+  listSwTests(request) {
+    return this.forward('ListSwTests', request);
+  }
+  getSwTest(id, request) {
+    return this.forward('GetSwTest', request, { id });
+  }
+  startSwAttempt(id, body, request) {
+    return this.forward('StartSwAttempt', request, { id, body });
+  }
+  skipSwQuestion(id, body, request) {
+    return this.forward('SkipSwQuestion', request, { id, body });
+  }
+  saveSwAnswers(id, body, request) {
+    return this.forward('SaveSwAnswers', request, { id, body });
+  }
+  submitSwAttempt(id, body, request) {
+    return this.forward('SubmitSwAttempt', request, { id, body });
+  }
+  discardSwAttempt(id, body, request) {
+    return this.forward('DiscardSwAttempt', request, { id, body });
+  }
+  getSwResult(id, query, request) {
+    return this.forward('GetSwResult', request, { id, body: { section: query?.section, ...(query?.attemptNumber ? { attemptNumber: Number(query.attemptNumber) } : {}) } });
+  }
+  requestSwReview(body, request) {
+    return this.forward('RequestSwReview', request, { body });
+  }
+  retrySwScoring(id, body, request) {
+    return this.forward('RetrySwScoring', request, { id, body });
+  }
+  getSwScoreConversion(request) {
+    return this.forward('GetSwScoreConversion', request);
+  }
+  updateSwScoreConversion(body, request) {
+    return this.forward('UpdateSwScoreConversion', request, { body });
+  }
+  async saveSwRecording(id, file, body, request) {
+    const { id: accountId, role, email } = await resolveSession(this.auth, request);
+    const durationSeconds = Number(body?.durationSeconds);
+    const { status, payload } = await callService(
+      this.learning,
+      'SaveSwRecording',
+      {
+        actor: { id: accountId, role, email: email || '' },
+        id,
+        mimeType: file?.mimetype || '',
+        data: file?.buffer || Buffer.alloc(0),
+        payloadJson: JSON.stringify({ section: 'speaking', questionNumber: Number(body?.questionNumber), durationSeconds: Number.isFinite(durationSeconds) ? durationSeconds : 0 }),
+      },
+      'Learning',
+    );
+    if (status >= 400) throw new HttpException(payload, status);
+    return payload;
+  }
   async submitSpeaking(id, file, body, request) {
     const { id: accountId, role, email } = await resolveSession(this.auth, request);
     const durationSeconds = Number(body?.durationSeconds);
+    const questionIndex = body?.questionIndex === undefined || body?.questionIndex === '' ? undefined : Number(body.questionIndex);
+    const setId = body?.setId || undefined;
     const { status, payload } = await callService(
       this.learning,
       'SubmitSpeaking',
@@ -260,7 +295,7 @@ export class LessonGatewayController extends LearningRelay {
         id,
         mimeType: file?.mimetype || '',
         data: file?.buffer || Buffer.alloc(0),
-        payloadJson: JSON.stringify({ durationSeconds: Number.isFinite(durationSeconds) ? durationSeconds : 0 }),
+        payloadJson: JSON.stringify({ durationSeconds: Number.isFinite(durationSeconds) ? durationSeconds : 0, questionIndex, setId }),
       },
       'Learning',
     );
@@ -296,15 +331,21 @@ const lessonRoutes = [
   [Get, 'practice/listening/:id/transcript', 'getListeningTranscript', [Param('id'), Req()]],
   [Post, 'practice/listening/:id/check', 'checkListeningPractice', [Param('id'), Body(), Req()]],
   [Post, 'practice/listening/:id/check-line', 'checkListeningLine', [Param('id'), Body(), Req()]],
-  [Get, 'listening-course', 'getListeningCourse', [Req()]],
-  [Get, 'listening-course/topics/:id', 'getCourseTopic', [Param('id'), Req()]],
-  [Post, 'listening-course/topics/:id/check', 'checkCourseSentence', [Param('id'), Body(), Req()]],
-  [Post, 'listening-course/topics/:id/complete', 'completeCourseTopic', [Param('id'), Req()]],
-  [Get, 'listening-course/progress', 'getCourseProgress', [Req()]],
-  [Get, 'listening-course/tests/:itemId', 'getCourseTest', [Param('itemId'), Req()]],
   [Get, 'speaking/prompts', 'listSpeakingPrompts', [Req()]],
   [Get, 'speaking/prompts/:id', 'getSpeakingPrompt', [Param('id'), Req()]],
   [Post, 'speaking/prompts/:id/submissions', 'submitSpeaking', [Param('id'), UploadedFile(), Body(), Req()]],
+  [Get, 'sw-tests', 'listSwTests', [Req()]],
+  [Get, 'sw-tests/score-conversion', 'getSwScoreConversion', [Req()]],
+  [Put, 'sw-tests/score-conversion', 'updateSwScoreConversion', [Body(), Req()]],
+  [Post, 'sw-tests/:id/result/retry', 'retrySwScoring', [Param('id'), Body(), Req()]],
+  [Get, 'sw-tests/:id', 'getSwTest', [Param('id'), Req()]],
+  [Post, 'sw-tests/:id/attempt/start', 'startSwAttempt', [Param('id'), Body(), Req()]],
+  [Post, 'sw-tests/:id/attempt/recordings', 'saveSwRecording', [Param('id'), UploadedFile(), Body(), Req()]],
+  [Post, 'sw-tests/:id/attempt/skip', 'skipSwQuestion', [Param('id'), Body(), Req()]],
+  [Put, 'sw-tests/:id/attempt/answers', 'saveSwAnswers', [Param('id'), Body(), Req()]],
+  [Post, 'sw-tests/:id/attempt/submit', 'submitSwAttempt', [Param('id'), Body(), Req()]],
+  [Post, 'sw-tests/:id/attempt/discard', 'discardSwAttempt', [Param('id'), Body(), Req()]],
+  [Get, 'sw-tests/:id/result', 'getSwResult', [Param('id'), Query(), Req()]],
   [Get, 'speaking/submissions/:id', 'getSpeakingSubmission', [Param('id'), Req()]],
   [Get, 'writing/prompts', 'listWritingPrompts', [Req()]],
   [Get, 'writing/prompts/:id', 'getWritingPrompt', [Param('id'), Req()]],
@@ -320,17 +361,22 @@ const lessonRoutes = [
   [Get, 'reviews/queue', 'listReviewQueue', [Req()]],
   [Post, 'reviews', 'requestReview', [Body(), Req()]],
   [Post, 'reviews/withdraw', 'withdrawReview', [Body(), Req()]],
+  [Post, 'reviews/sw-test', 'requestSwReview', [Body(), Req()]],
   [Get, 'reviews/:id', 'getReview', [Param('id'), Req()]],
   [Post, 'reviews/:id/claim', 'claimReview', [Param('id'), Req()]],
   [Post, 'reviews/:id/release', 'releaseReview', [Param('id'), Req()]],
   [Post, 'reviews/:id/complete', 'completeReview', [Param('id'), Body(), Req()]],
-  [Post, 'listening-course/tests/:itemId/submit', 'submitCourseTest', [Param('itemId'), Body(), Req()]],
 ];
 for (const [verb, path, method, params] of lessonRoutes) {
   const descriptor = Object.getOwnPropertyDescriptor(LessonGatewayController.prototype, method);
   verb(path)(LessonGatewayController.prototype, method, descriptor);
   params.forEach((decorator, index) => decorator(LessonGatewayController.prototype, method, index));
 }
+UseInterceptors(FileInterceptor('audio', { limits: { fileSize: RECORDING_LIMITS.maxBytes } }))(
+  LessonGatewayController.prototype,
+  'saveSwRecording',
+  Object.getOwnPropertyDescriptor(LessonGatewayController.prototype, 'saveSwRecording'),
+);
 UseInterceptors(FileInterceptor('audio', { limits: { fileSize: RECORDING_LIMITS.maxBytes } }))(
   LessonGatewayController.prototype,
   'submitSpeaking',
@@ -385,6 +431,9 @@ export class MockGatewayController extends LearningRelay {
   saveMockAnswers(id, body, request) {
     return this.forward('SaveMockAnswers', request, { id, body });
   }
+  finishMockListening(id, body, request) {
+    return this.forward('FinishMockListening', request, { id, body });
+  }
   submitMockAttempt(id, body, request) {
     return this.forward('SubmitMockAttempt', request, { id, body });
   }
@@ -416,6 +465,7 @@ const mockRoutes = [
   [Get, ':id/attempt', 'getMockAttempt', [Param('id'), Query(), Req()]],
   [Post, ':id/attempt/start', 'startMockAttempt', [Param('id'), Body(), Req()]],
   [Put, ':id/attempt/answers', 'saveMockAnswers', [Param('id'), Body(), Req()]],
+  [Post, ':id/attempt/listening/finish', 'finishMockListening', [Param('id'), Body(), Req()]],
   [Post, ':id/attempt/submit', 'submitMockAttempt', [Param('id'), Body(), Req()]],
   [Post, ':id/attempt/discard', 'discardMockAttempt', [Param('id'), Body(), Req()]],
   [Get, ':id/review', 'getMockReview', [Param('id'), Query(), Req()]],

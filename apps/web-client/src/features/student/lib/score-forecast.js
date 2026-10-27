@@ -24,9 +24,10 @@ function slopePerDay(points) {
 }
 
 export function scoreForecast(data) {
-  if (!data?.goal) return null;
-  const target = data.goal.targetScore;
-  const examDate = data.goal.examDate || null;
+  const lr = data?.goal?.lr;
+  if (!lr) return null;
+  const target = lr.targetScore;
+  const examDate = lr.examDate || null;
   const history = data.history || [];
   const base = { target, examDate, history, date: null, perWeek: null, projection: [] };
   if (!history.length) return { ...base, status: ForecastStatus.NO_SCORE };

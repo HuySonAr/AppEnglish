@@ -9,6 +9,7 @@ import {
   SpeechQueue,
   SpeechTask,
   LessonVersionStatus,
+  WORKING_VERSION_STATUSES,
   listeningKind,
   lyricBlankCount,
   lyricText,
@@ -19,6 +20,7 @@ import { contentErrors } from '../content/content.errors.js';
 import { SPEECH_JOB_REQUESTED } from '../speech/content-events.js';
 import { autoTimeResultSchema, listeningContentSchema, listeningIssues, listeningMediaIds } from './listening.schemas.js';
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const logger = new Logger('ListeningService');
 const AUTOTIME_TIMEOUT_MS = 30 * 60 * 1000;
 const speechJobs = metrics.counter('speech_jobs_total', 'Speech jobs finished, by task and status.');
@@ -49,6 +51,14 @@ export class ListeningService {
 
   assertManager(actor) {
     this.contentService.assertManager(actor);
+  }
+
+  assertTeacher(actor) {
+    this.contentService.assertTeacher(actor);
+  }
+
+  assertStaff(actor) {
+    this.contentService.assertStaff(actor);
   }
 
   assertTopicEditor(actor) {
@@ -125,7 +135,7 @@ export class ListeningService {
   }
 
   async listExercises(actor) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     const [exercises, topics, versions] = await Promise.all([
       this.repository.listExercises(),
       this.repository.listTopics(),
@@ -139,7 +149,8 @@ export class ListeningService {
             ...(await this.exerciseView(exercise, topics)),
             createdAt: iso(exercise.createdAt),
             publishedVersionNumber: own.find((version) => version.id === exercise.publishedVersionId)?.versionNumber ?? null,
-            hasDraft: own.some((version) => version.status === LessonVersionStatus.DRAFT),
+            hasDraft: own.some((version) => WORKING_VERSION_STATUSES.includes(version.status)),
+            draftStatus: this.contentService.draftStatus(own),
           };
         }),
       ),
@@ -147,7 +158,7 @@ export class ListeningService {
   }
 
   async createExercise(actor, input) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const topic = await this.repository.findTopic(input.topicId);
     if (!topic) throw contentErrors.listeningTopicNotFound();
     const kinds = LISTENING_KINDS[topic.format];
@@ -155,13 +166,7 @@ export class ListeningService {
     if (!kinds.some((kind) => kind.key === input.kind))
       throw contentErrors.listeningTopicInvalid('KIND_MISMATCH', 'This kind of exercise does not belong to the topic');
     const exercise = await this.repository.saveExercise({ ...input, publishedVersionId: null, createdBy: actor.id });
-    const draft = await this.repository.saveVersion({
-      exerciseId: exercise.id,
-      versionNumber: 1,
-      status: LessonVersionStatus.DRAFT,
-      content: listeningContentSchema.parse({}),
-      createdBy: actor.id,
-    });
+    const draft = await this.repository.saveVersion(this.contentService.newDraft(actor, { exerciseId: exercise.id, versionNumber: 1, content: listeningContentSchema.parse({}) }));
     return this.managedView(exercise, draft, null);
   }
 
@@ -172,7 +177,7 @@ export class ListeningService {
   }
 
   async updateExercise(actor, exerciseId, changes) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const exercise = await this.findExerciseOrThrow(exerciseId);
     for (const [field, value] of Object.entries(changes)) if (value !== undefined) exercise[field] = value;
     await this.repository.saveExercise(exercise);
@@ -184,45 +189,43 @@ export class ListeningService {
   }
 
   async getExercise(actor, exerciseId) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     const exercise = await this.findExerciseOrThrow(exerciseId);
     return this.managedView(exercise, await this.repository.findDraft(exerciseId), await this.publishedVersion(exercise));
   }
 
   async saveDraft(actor, exerciseId, content) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const exercise = await this.findExerciseOrThrow(exerciseId);
     let draft = await this.repository.findDraft(exerciseId);
     const previous = draft ? listeningContentSchema.safeParse(draft.content) : null;
     const previousMediaIds = previous?.success ? listeningMediaIds(previous.data) : [];
-    if (draft) draft.content = withIds(content);
+    if (draft) this.contentService.openDraft(draft, actor).content = withIds(content);
     else
-      draft = {
+      draft = this.contentService.newDraft(actor, {
         exerciseId,
         versionNumber: (await this.repository.maxVersionNumber(exerciseId)) + 1,
-        status: LessonVersionStatus.DRAFT,
         content: withIds(content),
-        createdBy: actor.id,
-      };
+      });
     draft = await this.repository.saveVersion(draft);
     const kept = new Set(listeningMediaIds(draft.content));
     await this.contentService.removeUnusedMedia(previousMediaIds.filter((id) => !kept.has(id)));
     return this.managedView(exercise, draft, await this.publishedVersion(exercise));
   }
 
+  async draftIssues(exercise, draft) {
+    draft.content = listeningContentSchema.parse(draft.content);
+    return listeningIssues(draft.content, listeningKind(exercise.kind), await this.contentService.mediaMapOf(listeningMediaIds(draft.content)));
+  }
+
   async publish(actor, exerciseId) {
     this.assertManager(actor);
     const exercise = await this.findExerciseOrThrow(exerciseId);
     const draft = await this.repository.findDraft(exerciseId);
-    if (!draft) throw contentErrors.noDraft();
-    draft.content = listeningContentSchema.parse(draft.content);
-    const mediaIds = listeningMediaIds(draft.content);
-    const media = mediaIds.length ? await this.contentService.repository.findMediaByIds(mediaIds) : [];
-    const issues = listeningIssues(draft.content, listeningKind(exercise.kind), new Map(media.map((asset) => [asset.id, asset])));
+    this.contentService.assertInReview(draft);
+    const issues = await this.draftIssues(exercise, draft);
     if (issues.length) throw contentErrors.notPublishable(issues);
-    draft.status = LessonVersionStatus.PUBLISHED;
-    draft.publishedAt = new Date();
-    draft.publishedBy = actor.id;
+    this.contentService.approve(draft, actor);
     exercise.publishedVersionId = draft.id;
     await this.repository.publishVersion(exercise, draft);
     return this.managedView(exercise, null, draft);
@@ -239,20 +242,18 @@ export class ListeningService {
     }
     let draft = await this.repository.findDraft(exerciseId);
     if (!draft && published)
-      draft = await this.repository.saveVersion({
+      draft = await this.repository.saveVersion(this.contentService.draftFrom(published, {
         exerciseId,
         versionNumber: (await this.repository.maxVersionNumber(exerciseId)) + 1,
-        status: LessonVersionStatus.DRAFT,
-        content: structuredClone(published.content),
-        createdBy: actor.id,
-      });
+      }));
     return this.managedView(exercise, draft, null);
   }
 
   async delete(actor, exerciseId) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     await this.findExerciseOrThrow(exerciseId);
     const summaries = (await this.repository.listVersionSummaries()).filter((version) => version.exerciseId === exerciseId);
+    this.contentService.assertCanDelete(actor, summaries.some((version) => version.status === LessonVersionStatus.PUBLISHED));
     const mediaIds = [];
     for (const summary of summaries) {
       const version = await this.repository.findVersion(summary.id);
@@ -280,7 +281,7 @@ export class ListeningService {
   }
 
   async startSpeechJob(actor, exerciseId, task) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const exercise = await this.findExerciseOrThrow(exerciseId);
     const version = (await this.repository.findDraft(exerciseId)) || (await this.publishedVersion(exercise));
     const content = version ? listeningContentSchema.parse(version.content) : null;
@@ -331,15 +332,15 @@ export class ListeningService {
   }
 
   async listNotifications(actor) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     const since = new Date(this.now().getTime() - SPEECH_NOTICE_DAYS * 86400000);
     const jobs = (await this.repository.listJobsRequestedBy(actor.id, since, SPEECH_NOTICE_LIMIT))
       .map((job) => ({ job, view: this.timingJobView(job) }))
       .filter(({ view }) => view.status === AutoTimeStatus.DONE || view.status === AutoTimeStatus.FAILED);
     const ids = (field) => [...new Set(jobs.map(({ job }) => job[field]).filter(Boolean))];
-    const titles = await this.repository.titlesOf({ exerciseIds: ids('exerciseId'), courseItemIds: ids('courseItemId'), mockTestIds: ids('mockTestId') });
+    const titles = await this.repository.titlesOf({ exerciseIds: ids('exerciseId'), mockTestIds: ids('mockTestId') });
     const ownerOf = (job) =>
-      job.exerciseId ? { type: 'exercise', id: job.exerciseId } : job.courseItemId ? { type: 'courseItem', id: job.courseItemId } : { type: 'mockTest', id: job.mockTestId };
+      job.exerciseId ? { type: 'exercise', id: job.exerciseId } : { type: 'mockTest', id: job.mockTestId };
     const notifications = jobs.map(({ job, view }) => {
       const owner = ownerOf(job);
       return {
@@ -350,12 +351,26 @@ export class ListeningService {
         read: Boolean(job.seenAt),
       };
     });
+    const notices = await this.reviewNoticesOf(actor);
+    const read = await this.contentService.repository.readNoticeKeys(actor.id, notices.map((notice) => notice.id));
+    notifications.push(...notices.map((notice) => ({ ...notice, read: read.has(notice.id) })));
+    notifications.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
     return { notifications, unread: notifications.filter((item) => !item.read).length };
   }
 
+  useReviewNotices(source) {
+    this.reviewNotices = source;
+  }
+
+  async reviewNoticesOf(actor) {
+    return this.reviewNotices ? this.reviewNotices.notices(actor) : [];
+  }
+
   async markNotificationsRead(actor, { ids } = {}) {
-    this.assertManager(actor);
-    await this.repository.markJobsSeen(actor.id, ids || null, this.now());
+    this.assertStaff(actor);
+    const keys = ids ? ids.filter((id) => !UUID.test(id)) : (await this.reviewNoticesOf(actor)).map((notice) => notice.id);
+    await this.repository.markJobsSeen(actor.id, ids ? ids.filter((id) => UUID.test(id)) : null, this.now());
+    await this.contentService.repository.markNoticesRead(actor.id, keys, this.now());
     return { unread: (await this.listNotifications(actor)).unread };
   }
 
@@ -398,7 +413,7 @@ export class ListeningService {
   }
 
   async requestMockTranscribe(actor, mockTestId, { audioMediaId }) {
-    this.assertManager(actor);
+    this.assertTeacher(actor);
     const mockTest = await this.contentService.findMockOrThrow(mockTestId);
     const version = (await this.contentService.repository.findMockDraft(mockTestId)) || (await this.contentService.publishedMockVersion(mockTest));
     const kind = this.mockRecordingKind(version?.content, audioMediaId);
@@ -407,7 +422,7 @@ export class ListeningService {
   }
 
   async listMockTranscribe(actor, mockTestId) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     await this.contentService.findMockOrThrow(mockTestId);
     const latest = new Map();
     for (const job of await this.repository.listTimingJobs({ mockTestId })) latest.set(job.audioMediaId, job);
@@ -423,7 +438,7 @@ export class ListeningService {
   }
 
   async getAutoTime(actor, exerciseId) {
-    this.assertManager(actor);
+    this.assertStaff(actor);
     await this.findExerciseOrThrow(exerciseId);
     return this.latestSpeechJob({ exerciseId });
   }
@@ -517,7 +532,7 @@ export class ListeningService {
     return {
       exercise: await this.exerciseView(exercise),
       media: await this.mediaOf([draft, published]),
-      draft: draft ? { versionNumber: draft.versionNumber, content: draft.content } : null,
+      draft: this.contentService.draftView(draft),
       published: published
         ? {
             versionId: published.id,

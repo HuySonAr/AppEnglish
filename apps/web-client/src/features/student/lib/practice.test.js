@@ -43,3 +43,12 @@ test('the list opens on a level that has prompts', () => {
   assert.equal(defaultPracticeLevel(at('A1', 'B1'), null), 'A1');
   assert.equal(defaultPracticeLevel([], 'B1'), 'all');
 });
+
+test('practice prompts are filtered by task type', () => {
+  const typed = [
+    { id: 'a', title: 'A', level: 'A2', topic: 'Work', etsTask: 'describe_picture', attempts: 0 },
+    { id: 'b', title: 'B', level: 'A2', topic: 'Work', etsTask: null, attempts: 0 },
+  ];
+  assert.deepEqual(filterPracticePrompts(typed, { etsTask: 'describe_picture' }).map((prompt) => prompt.id), ['a']);
+  assert.deepEqual(filterPracticePrompts(typed, { etsTask: 'none' }).map((prompt) => prompt.id), ['b']);
+});

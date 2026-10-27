@@ -9,3 +9,6 @@ export async function requestReview(submissionId) {
 export async function withdrawReview(submissionId) {
   return (await httpClient.post('/learning/reviews/withdraw', { submissionId })).data;
 }
+export async function requestSwReview(swTestId, section, attemptNumber) {
+  return (await httpClient.post('/learning/reviews/sw-test', { swTestId, section, ...(attemptNumber ? { attemptNumber } : {}) })).data;
+}

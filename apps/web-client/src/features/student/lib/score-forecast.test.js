@@ -3,10 +3,11 @@ import assert from 'node:assert/strict';
 import { ForecastStatus, scoreForecast } from './score-forecast.js';
 
 const point = (day, total) => ({ at: `2026-10-${String(day).padStart(2, '0')}T03:00:00.000Z`, total });
-const goal = (targetScore, examDate = null) => ({ targetScore, examDate });
+const goal = (targetScore, examDate = null) => ({ lr: { targetScore, examDate }, sw: null });
 
 test('the forecast needs a goal, a score and two scores a few days apart', () => {
   assert.equal(scoreForecast({ goal: null, history: [point(1, 500)] }), null);
+  assert.equal(scoreForecast({ goal: { lr: null, sw: { speakingTarget: 150, writingTarget: null, examDate: null } }, history: [point(1, 500)] }), null);
   assert.equal(scoreForecast({ goal: goal(650), history: [] }).status, ForecastStatus.NO_SCORE);
   assert.equal(scoreForecast({ goal: goal(650), history: [point(1, 500)] }).status, ForecastStatus.NEED_MORE);
   assert.equal(scoreForecast({ goal: goal(650), history: [point(1, 500), point(2, 520)] }).status, ForecastStatus.NEED_MORE);

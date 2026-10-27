@@ -1,6 +1,16 @@
 import { NextAction } from '@appenglish/auth-contracts';
 import { errorNextAction } from '../../../lib/api/response.js';
 
+export function focusOnEnter(next) {
+  return (event) => {
+    if (event.key !== 'Enter' || event.nativeEvent?.isComposing) return;
+    const target = document.getElementById(next);
+    if (!target || target.value) return;
+    event.preventDefault();
+    target.focus();
+  };
+}
+
 export function accountFromEnvelope(result) {
   return result?.data?.account ?? null;
 }

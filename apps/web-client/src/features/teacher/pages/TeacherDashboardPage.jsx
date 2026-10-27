@@ -10,8 +10,11 @@ import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx'
 import { greeting } from '../../student/lib/home.js';
 import { listPracticePrompts } from '../../../lib/api/practice-prompts-api.js';
 import { listReviewQueue } from '../api/review-api.js';
-import { kindLabels, statusCounts, statusInfo, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
+import { etsTaskLabel, etsTaskOf, kindLabels, statusCounts, statusInfo, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
 import { kindPages } from './TeacherPromptsPage.jsx';
+import { listContentReviews } from '../../content-manager/api/content-api.js';
+import { ReviewStatusBadge } from '../../content-manager/components/ContentReview.jsx';
+import { TEACHER_BASE, contentInProgress, contentItemPath, reviewKindLabels, reviewTitle } from '../../content-manager/lib/content-area.js';
 
 const states = [
   { key: 'RETURNED', label: 'Returned' },
@@ -25,13 +28,15 @@ export function TeacherDashboardPage() {
   const [state, setState] = useState('loading');
   const [prompts, setPrompts] = useState([]);
   const [queue, setQueue] = useState(null);
+  const [content, setContent] = useState(null);
 
   async function load() {
     setState('loading');
     try {
-      const [promptData, queueData] = await Promise.all([listPracticePrompts(), listReviewQueue()]);
+      const [promptData, queueData, contentData] = await Promise.all([listPracticePrompts(), listReviewQueue(), listContentReviews().catch(() => null)]);
       setPrompts(promptData.data.prompts);
       setQueue(queueData.data);
+      setContent(contentData ? contentData.data.items : null);
       setState('ready');
     } catch (error) {
       setState('error');
@@ -43,7 +48,7 @@ export function TeacherDashboardPage() {
     load();
   }, []);
 
-  const header = <PageHeader eyebrow="Teacher" title={`${greeting()}.`} description="Your prompts and what needs your attention." />;
+  const header = <PageHeader eyebrow="Teacher" title={`${greeting()}.`} description="Your content, prompts and what needs your attention." />;
   if (state === 'loading') return <DetailPageSkeleton />;
   if (state === 'error')
     return (
@@ -59,6 +64,7 @@ export function TeacherDashboardPage() {
     .filter((prompt) => prompt.status in urgency)
     .sort((a, b) => urgency[a.status] - urgency[b.status] || String(b.updatedAt).localeCompare(String(a.updatedAt)))
     .slice(0, 6);
+  const inProgress = content ? contentInProgress(content, 5) : [];
 
   return (
     <section className="space-y-6">
@@ -71,6 +77,38 @@ export function TeacherDashboardPage() {
         <span className="text-sm text-muted-foreground">{queue?.doneThisWeek ?? 0} graded by you this week</span>
         <ArrowRight className="h-4 w-4 text-muted-foreground" />
       </Link>
+
+      {content ? (
+        <div className="space-y-3 rounded-xl border bg-card p-5 shadow-sm">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="font-semibold">Content in progress</h2>
+            <Link to={`${TEACHER_BASE}/units`} className="text-sm text-primary underline-offset-4 hover:underline">
+              Units and lessons
+            </Link>
+          </div>
+          {inProgress.length ? (
+            <ul className="divide-y">
+              {inProgress.map((item) => (
+                <li key={`${item.kind}-${item.id}`}>
+                  <Link to={contentItemPath(TEACHER_BASE, item.kind, item.id)} className="group -mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-accent">
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium">{reviewTitle(item)}</span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {reviewKindLabels[item.kind]}
+                        {item.context ? ` · ${item.context}` : ''} · v{item.versionNumber}
+                      </span>
+                    </span>
+                    <ReviewStatusBadge status={item.status} />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">No content in progress.</p>
+          )}
+        </div>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-3">
         {Object.entries(kindPages).map(([kind, page]) => {
@@ -110,7 +148,7 @@ export function TeacherDashboardPage() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium">{prompt.title || 'Untitled prompt'}</span>
                       <span className="block truncate text-xs text-muted-foreground">
-                        {kindLabels[prompt.kind]} · {prompt.level}
+                        {etsTaskLabel(etsTaskOf(prompt.kind, prompt), kindLabels[prompt.kind])} · {prompt.level}
                       </span>
                     </span>
                     <Badge variant={statusInfo[prompt.status].variant}>{statusInfo[prompt.status].label}</Badge>

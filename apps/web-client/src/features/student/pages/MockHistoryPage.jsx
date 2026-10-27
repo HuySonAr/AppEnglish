@@ -13,6 +13,7 @@ import { AttemptList } from '../components/AttemptList.jsx';
 import { MockAttemptResult } from '../components/MockAttemptResult.jsx';
 import { TestProgression } from '../components/TestProgression.jsx';
 import { TestStartCard } from '../components/TestStartCard.jsx';
+import { isPracticeSet } from '../lib/mock-exam.js';
 
 const skillLabels = { LISTENING: 'Listening', READING: 'Reading' };
 
@@ -21,10 +22,11 @@ function seriesOf(data, partKey) {
     const { mockTest, full } = data;
     const latest = full.attempts.at(-1);
     const best = full.attempts.length ? Math.max(...full.attempts.map((attempt) => attempt.scorePercent)) : null;
+    const practice = isPracticeSet(mockTest);
     return {
       reference: { kind: MockAttemptKind.FULL },
-      label: 'Full test',
-      eyebrow: `Level ${mockTest.level} · full test history`,
+      label: practice ? 'Practice set' : 'Full test',
+      eyebrow: `Level ${mockTest.level} · ${practice ? 'practice set' : 'full test'} history`,
       title: mockTest.title,
       attempts: full.attempts,
       progression: full.progression,
@@ -34,10 +36,12 @@ function seriesOf(data, partKey) {
       stats: [
         { label: 'Attempts', value: full.attempts.length },
         { label: 'Best', value: best === null ? '—' : `${best}%` },
-        { label: 'Latest estimate', value: latest?.estimated ? latest.estimated.totalScore : '—' },
+        practice
+          ? { label: 'Latest', value: latest ? `${latest.scorePercent}%` : '—' }
+          : { label: 'Latest estimate', value: latest?.estimated ? latest.estimated.totalScore : '—' },
         { label: 'Minutes', value: mockTest.durationMinutes },
       ],
-      action: full.inProgress ? 'Resume the full test' : full.attempts.length ? 'Take the full test again' : 'Start the full test',
+      action: `${full.inProgress ? 'Resume' : full.attempts.length ? 'Take' : 'Start'} the ${practice ? 'practice set' : 'full test'}${!full.inProgress && full.attempts.length ? ' again' : ''}`,
     };
   }
   const part = data.parts.find((item) => item.key === partKey);

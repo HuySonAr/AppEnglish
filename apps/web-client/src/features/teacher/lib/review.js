@@ -1,6 +1,7 @@
 import { ReviewAction, reviewScores } from '@appenglish/learning-contracts';
 
-export const reviewKindLabels = { read_aloud: 'Read aloud', open_speaking: 'Open speaking', writing: 'Writing' };
+export const reviewKindLabels = { read_aloud: 'Read aloud', open_speaking: 'Open speaking', writing: 'Writing', sw_speaking: 'S&W Speaking', sw_writing: 'S&W Writing' };
+export const isWrittenKind = (kind) => kind === 'writing' || kind === 'sw_writing';
 
 export function initialScores(criteria, ai) {
   return Object.fromEntries(criteria.map(({ key, min }) => [key, ai && typeof ai[key] === 'number' ? ai[key] : min]));

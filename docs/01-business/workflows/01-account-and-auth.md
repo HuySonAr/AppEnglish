@@ -9,6 +9,7 @@ Không tự giả định OTP/OAuth, cookie/token, TTL hoặc reset password. Ki
 
 ## F01 đã triển khai
 
+- Form đăng ký, đặt lại mật khẩu và nhận lời mời có ô nhập lại mật khẩu, chỉ kiểm ở client (D189).
 - `POST /auth/register` qua API Gateway tạo tài khoản Student trong `app_identity`.
   Email PENDING_VERIFICATION đăng ký lại trả `ADDITIONAL` + `nextAction: VERIFY_EMAIL`
   (không tạo account trùng, không đổi password, không gửi lại OTP tự động);

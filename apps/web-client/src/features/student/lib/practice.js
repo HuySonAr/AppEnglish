@@ -1,6 +1,7 @@
 import { CEFR_LEVELS } from '@appenglish/content-contracts';
 import { SpokenWordStatus, SubmissionStatus } from '@appenglish/learning-contracts';
 import { compareText, matchesSearch } from '../../../lib/list.js';
+import { matchesEtsTask } from '../../../lib/practice-prompts.js';
 
 export const DEFAULT_PRACTICE_LEVEL = 'A2';
 export const SCORING_POLL_MS = 2000;
@@ -25,7 +26,7 @@ export function practiceTopicOptions(prompts) {
   return [{ value: 'all', label: 'All topics' }, ...topics.map((topic) => ({ value: topic, label: topic }))];
 }
 
-export function filterPracticePrompts(prompts, { search = '', level = 'all', topic = 'all', kind = 'all', tried = PracticeTried.ALL, sort = PracticeSort.LEVEL }) {
+export function filterPracticePrompts(prompts, { search = '', level = 'all', topic = 'all', kind = 'all', etsTask = 'all', tried = PracticeTried.ALL, sort = PracticeSort.LEVEL }) {
   const byTitle = (a, b) => compareText(a.title, b.title);
   const compare = {
     [PracticeSort.LEVEL]: (a, b) => CEFR_LEVELS.indexOf(a.level) - CEFR_LEVELS.indexOf(b.level) || byTitle(a, b),
@@ -40,6 +41,7 @@ export function filterPracticePrompts(prompts, { search = '', level = 'all', top
         (level === 'all' || prompt.level === level) &&
         (topic === 'all' || prompt.topic === topic) &&
         (kind === 'all' || prompt.kind === kind) &&
+        matchesEtsTask(prompt, etsTask) &&
         (tried === PracticeTried.ALL || (tried === PracticeTried.NEW ? prompt.attempts === 0 : prompt.attempts > 0)),
     )
     .sort(compare);

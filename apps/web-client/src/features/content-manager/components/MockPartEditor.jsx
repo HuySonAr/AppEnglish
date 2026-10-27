@@ -21,6 +21,7 @@ import { MOCK_FIRST_QUESTION_NUMBERS, MOCK_PASTE_PARTS, graphicQuestion, mockQue
 import { MediaField } from './MediaField.jsx';
 import { PasteQuestionsDialog } from './PasteQuestionsDialog.jsx';
 import { TextField } from './TextField.jsx';
+import { useReadOnly } from './ReadOnly.jsx';
 
 const optionLetters = ['A', 'B', 'C', 'D'];
 const skillLabels = { [Skill.LISTENING]: 'Listening', [Skill.READING]: 'Reading' };
@@ -62,6 +63,7 @@ function TranscribeStatus({ job, onUse, onDismiss }) {
 
 function Recording({ id, label, path, item, edit, media, speech }) {
   const [starting, setStarting] = useState(false);
+  const readOnly = useReadOnly();
   const job = speech?.jobOf(item.audioMediaId);
   const active = job?.status === 'QUEUED' || job?.status === 'RUNNING';
   async function transcribe() {
@@ -75,15 +77,15 @@ function Recording({ id, label, path, item, edit, media, speech }) {
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
           <Label htmlFor={`${id}-transcript`}>Transcript</Label>
-          {speech ? (
+          {speech && !readOnly ? (
             <Button variant="outline" size="sm" className="h-7 gap-1.5 px-2" loading={starting} disabled={starting || active || !item.audioMediaId} onClick={transcribe}>
               <AudioLines className="h-3.5 w-3.5" />
               Transcribe
             </Button>
           ) : null}
         </div>
-        <Textarea id={`${id}-transcript`} value={item.transcript} maxLength={TRANSCRIPT_MAX_LENGTH} rows={4} onChange={(event) => edit([...path, 'transcript'], event.target.value)} />
-        {job ? (
+        <Textarea id={`${id}-transcript`} readOnly={readOnly} value={item.transcript} maxLength={TRANSCRIPT_MAX_LENGTH} rows={4} onChange={(event) => edit([...path, 'transcript'], event.target.value)} />
+        {job && !readOnly ? (
           <TranscribeStatus
             job={job}
             onDismiss={() => speech.dismiss(job)}
@@ -101,6 +103,7 @@ function Recording({ id, label, path, item, edit, media, speech }) {
 export function QuestionCard({ spec, question, number, path, edit, media, speech, onRemove, graphicAction = null, recording = MOCK_QUESTION_AUDIO_PARTS.includes(spec.key), lettersOnly = !spec.option.text, subtitle = null }) {
   const id = `${spec.key}-${question.id}`;
   const answered = question.options.some((option) => option.isCorrect);
+  const readOnly = useReadOnly();
   return (
     <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
       <div className="flex items-center gap-3">
@@ -111,7 +114,7 @@ export function QuestionCard({ spec, question, number, path, edit, media, speech
         </p>
         {answered ? null : <Badge variant="outline">No answer</Badge>}
         {graphicAction}
-        {onRemove ? (
+        {onRemove && !readOnly ? (
           <Button variant="ghost" size="icon" className="ml-auto h-8 w-8 text-muted-foreground hover:text-destructive" aria-label={`Remove question ${number}`} onClick={onRemove}>
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -138,6 +141,7 @@ export function QuestionCard({ spec, question, number, path, edit, media, speech
                   type="button"
                   role="radio"
                   aria-checked={option.isCorrect}
+                  disabled={readOnly}
                   aria-label={`Option ${letter} is correct`}
                   onClick={() => edit(path, withCorrectOption(question, option.id))}
                   className={cn(
@@ -152,6 +156,7 @@ export function QuestionCard({ spec, question, number, path, edit, media, speech
                   <Input
                     className="h-8 flex-1 border-0 bg-transparent px-1 shadow-none focus-visible:ring-1"
                     aria-label={`Option ${letter} text`}
+                    readOnly={readOnly}
                     placeholder={`Option ${letter}`}
                     value={option.text}
                     maxLength={300}
@@ -170,6 +175,7 @@ export function QuestionCard({ spec, question, number, path, edit, media, speech
 
 export function MockPartEditor({ spec, part, edit, updatePart, media, speech, target: targetProp, firstNumber: firstNumberProp, maxSets: maxSetsProp, setQuestionLimit, hint, paste = true }) {
   const base = ['test', spec.key];
+  const readOnly = useReadOnly();
   const grouped = MOCK_GROUPED_PARTS.includes(spec.key);
   const groupAudio = MOCK_GROUP_AUDIO_PARTS.includes(spec.key);
   const setName = groupAudio ? (spec.key === 'part3' ? 'Conversation' : 'Talk') : 'Passage';
@@ -203,7 +209,7 @@ export function MockPartEditor({ spec, part, edit, updatePart, media, speech, ta
       graphicAction={
         !graphic?.imageMediaId ? null : graphic === question ? (
           <Badge variant="secondary">Look at the graphic</Badge>
-        ) : (
+        ) : readOnly ? null : (
           <Button variant="outline" size="sm" className="h-7" onClick={() => updatePart((current) => withGraphicOn(current, question.groupId, question.id))}>
             Move graphic here
           </Button>
@@ -211,7 +217,7 @@ export function MockPartEditor({ spec, part, edit, updatePart, media, speech, ta
       }
     />
   );
-  const addButton = (label, onClick, disabled) => (
+  const addButton = (label, onClick, disabled) => readOnly ? null : (
     <Button variant="outline" className="w-full gap-1.5 border-dashed" disabled={disabled} onClick={onClick}>
       <Plus className="h-4 w-4" />
       {label}
@@ -234,7 +240,7 @@ export function MockPartEditor({ spec, part, edit, updatePart, media, speech, ta
           <Badge variant={part.questions.length >= target ? 'success' : 'outline'} className="tabular-nums">
             {part.questions.length}/{target} questions
           </Badge>
-          {paste && MOCK_PASTE_PARTS.includes(spec.key) ? (
+          {paste && !readOnly && MOCK_PASTE_PARTS.includes(spec.key) ? (
             <PasteQuestionsDialog spec={spec} part={part} setName={groupAudio ? setName : null} onApply={(pasted) => updatePart(() => pasted)} />
           ) : null}
         </div>
@@ -260,10 +266,12 @@ export function MockPartEditor({ spec, part, edit, updatePart, media, speech, ta
                     {Number.isFinite(setLimit) ? `/${setLimit}` : ''} questions
                   </Badge>
                   {graphicSet ? <Badge variant="info">Graphic</Badge> : null}
-                  <Button variant="ghost" size="sm" className="ml-auto h-8 gap-1.5 text-muted-foreground hover:text-destructive" onClick={() => updatePart((current) => withoutGroup(current, group.id))}>
-                    <Trash2 className="h-4 w-4" />
-                    Remove {setNoun}
-                  </Button>
+                  {readOnly ? null : (
+                    <Button variant="ghost" size="sm" className="ml-auto h-8 gap-1.5 text-muted-foreground hover:text-destructive" onClick={() => updatePart((current) => withoutGroup(current, group.id))}>
+                      <Trash2 className="h-4 w-4" />
+                      Remove {setNoun}
+                    </Button>
+                  )}
                 </div>
                 <div className="space-y-3 p-4">
                   {groupAudio ? (

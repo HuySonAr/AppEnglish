@@ -14,8 +14,6 @@ const requiredText = (max) => text(max).min(1);
 const seconds = z.number().min(0).max(3 * 60 * 60).nullable().default(null);
 
 const topicFormat = z.enum(Object.values(ListeningFormat)).nullable();
-export const markJobsSeenSchema = z.object({ ids: z.array(z.string().uuid()).max(100).optional() }).strict();
-
 export const markNoticesReadSchema = z.object({ ids: z.array(z.string().min(1).max(160)).max(100).optional() }).strict();
 
 export const mockTranscribeSchema = z.object({ audioMediaId: z.string().uuid() }).strict();

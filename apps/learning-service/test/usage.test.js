@@ -38,11 +38,9 @@ test('usage counts learner rows per content id across the tables of its kind', a
     lesson_test_attempts: [{ lessonId: lessonA }, { lessonId: lessonA }],
     lesson_progress: [{ lessonId: lessonA }, { lessonId: lessonB }],
     mock_attempts: [{ mockTestId: lessonA }],
-    course_lesson_results: [{ unitId: lessonA }],
   }));
   assert.deepEqual(await repository.countUsage('lesson', [lessonA, lessonB]), { [lessonA]: 3, [lessonB]: 1 });
   assert.deepEqual(await repository.countUsage('mockTest', [lessonB]), { [lessonB]: 0 });
-  assert.deepEqual(await repository.countUsage('courseTopic', [lessonA, lessonB]), { [lessonA]: 1, [lessonB]: 0 });
 });
 
 test('a stored version counts the attempts taken on it (D128)', async () => {
@@ -54,7 +52,6 @@ test('a stored version counts the attempts taken on it (D128)', async () => {
   assert.deepEqual(await repository.countUsage('lessonVersion', [lessonA, lessonB]), { [lessonA]: 2, [lessonB]: 1 });
   assert.deepEqual(await repository.countUsage('mockVersion', [lessonA]), { [lessonA]: 1 });
   assert.deepEqual(await repository.countUsage('unitReviewVersion', [lessonB]), { [lessonB]: 1 });
-  assert.deepEqual(await repository.countUsage('courseVersion', [lessonA, lessonB]), { [lessonA]: 0, [lessonB]: 0 });
   assert.deepEqual(await repository.countUsage('listeningVersion', [lessonA]), { [lessonA]: 0 });
 });
 

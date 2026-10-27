@@ -43,15 +43,9 @@ import { ListeningExercisePage } from '../features/student/pages/ListeningExerci
 import { ListeningPracticePage } from '../features/student/pages/ListeningPracticePage.jsx';
 import { ListeningExerciseListPage } from '../features/student/pages/ListeningExerciseListPage.jsx';
 import { ListeningTopicPage } from '../features/student/pages/ListeningTopicPage.jsx';
-import { ListeningCoursePage } from '../features/student/pages/ListeningCoursePage.jsx';
-import { CourseTopicPage } from '../features/student/pages/CourseTopicPage.jsx';
-import { CourseTestPage } from '../features/student/pages/CourseTestPage.jsx';
-import { CourseProgressPage } from '../features/student/pages/CourseProgressPage.jsx';
 import { ProgressPage } from '../features/student/pages/ProgressPage.jsx';
 import { LeaderboardPage } from '../features/student/pages/LeaderboardPage.jsx';
 import { ListeningExerciseEditorPage } from '../features/content-manager/pages/ListeningExerciseEditorPage.jsx';
-import { CourseItemEditorPage } from '../features/content-manager/pages/CourseItemEditorPage.jsx';
-import { CourseManagePage } from '../features/content-manager/pages/CourseManagePage.jsx';
 import { ListeningExercisesPage } from '../features/content-manager/pages/ListeningExercisesPage.jsx';
 import { ListeningTopicsPage } from '../features/content-manager/pages/ListeningTopicsPage.jsx';
 import { VocabularyPracticePage } from '../features/student/pages/VocabularyPracticePage.jsx';
@@ -67,6 +61,12 @@ import { TeacherReviewQueuePage } from '../features/teacher/pages/TeacherReviewQ
 import { TeacherReviewPage } from '../features/teacher/pages/TeacherReviewPage.jsx';
 import { PracticeReviewPage } from '../features/content-manager/pages/PracticeReviewPage.jsx';
 import { PracticeReviewDetailPage } from '../features/content-manager/pages/PracticeReviewDetailPage.jsx';
+import { ContentReviewQueuePage } from '../features/content-manager/pages/ContentReviewQueuePage.jsx';
+import { SwTestsManagePage } from '../features/content-manager/pages/SwTestsManagePage.jsx';
+import { SwTestEditorPage } from '../features/content-manager/pages/SwTestEditorPage.jsx';
+import { SwTestsPage } from '../features/student/pages/SwTestsPage.jsx';
+import { SwTestPage } from '../features/student/pages/SwTestPage.jsx';
+import { SwResultPage } from '../features/student/pages/SwResultPage.jsx';
 import { Roles } from '../constants/auth.js';
 import { dashboardPathForRole } from '../features/auth/flow/auth-flow.js';
 import { useAuth } from '../features/auth/context/AuthContext.jsx';
@@ -110,10 +110,9 @@ export function AppRouter() {
             <Route path="mock-tests/:mockTestId" element={<MockTestPage />} />
             <Route path="mock-tests/:mockTestId/history" element={<MockHistoryPage />} />
             <Route path="mock-tests/:mockTestId/mini/:partKey" element={<MockHistoryPage />} />
-            <Route path="listening-course" element={<ListeningCoursePage />} />
-            <Route path="listening-course/topics/:topicId" element={<CourseTopicPage />} />
-            <Route path="listening-course/tests/:itemId" element={<CourseTestPage />} />
-            <Route path="listening-course/progress" element={<CourseProgressPage />} />
+            <Route path="sw-tests" element={<SwTestsPage />} />
+            <Route path="sw-tests/:swTestId" element={<SwTestPage />} />
+            <Route path="sw-tests/:swTestId/result" element={<SwResultPage />} />
             <Route path="progress" element={<ProgressPage />} />
             <Route path="leaderboard" element={<LeaderboardPage />} />
             <Route path="practice" element={<PracticePage />} />
@@ -149,17 +148,18 @@ export function AppRouter() {
         >
           <Route element={<SidebarLayout role={Roles.CONTENT_MANAGER} />}>
             <Route index element={<ContentManagerDashboardPage />} />
+            <Route path="reviews" element={<ContentReviewQueuePage />} />
             <Route path="units" element={<ContentUnitsPage />} />
             <Route path="units/:unitId/review" element={<UnitReviewEditorPage />} />
             <Route path="placement" element={<PlacementEditorPage />} />
             <Route path="mock-tests" element={<MockTestsManagePage />} />
             <Route path="mock-tests/:mockTestId" element={<MockTestEditorPage />} />
+            <Route path="sw-tests" element={<SwTestsManagePage />} />
+            <Route path="sw-tests/:swTestId" element={<SwTestEditorPage />} />
             <Route path="mock-tests/:mockTestId/results" element={<MockStatsPage />} />
             <Route path="listening" element={<ListeningExercisesPage />} />
             <Route path="listening/:exerciseId" element={<ListeningExerciseEditorPage />} />
             <Route path="listening-topics" element={<ListeningTopicsPage eyebrow="Content Manager" />} />
-            <Route path="listening-course" element={<CourseManagePage />} />
-            <Route path="listening-course/:itemId" element={<CourseItemEditorPage />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
             <Route path="speaking-prompts" element={<PracticeReviewPage key="speaking" area="speaking" />} />
             <Route path="writing-prompts" element={<PracticeReviewPage key="writing" area="writing" />} />
@@ -173,6 +173,16 @@ export function AppRouter() {
         <Route path="/teacher" element={<RoleRoute allowedRole={Roles.TEACHER} />}>
           <Route element={<SidebarLayout role={Roles.TEACHER} />}>
             <Route index element={<TeacherDashboardPage />} />
+            <Route path="units" element={<ContentUnitsPage />} />
+            <Route path="units/:unitId/review" element={<UnitReviewEditorPage />} />
+            <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
+            <Route path="placement" element={<PlacementEditorPage />} />
+            <Route path="mock-tests" element={<MockTestsManagePage />} />
+            <Route path="mock-tests/:mockTestId" element={<MockTestEditorPage />} />
+            <Route path="sw-tests" element={<SwTestsManagePage />} />
+            <Route path="sw-tests/:swTestId" element={<SwTestEditorPage />} />
+            <Route path="listening" element={<ListeningExercisesPage />} />
+            <Route path="listening/:exerciseId" element={<ListeningExerciseEditorPage />} />
             <Route path="read-aloud" element={<TeacherPromptsPage key="read_aloud" kind="read_aloud" />} />
             <Route path="open-speaking" element={<TeacherPromptsPage key="open_speaking" kind="open_speaking" />} />
             <Route path="writing" element={<TeacherPromptsPage key="writing" kind="writing" />} />

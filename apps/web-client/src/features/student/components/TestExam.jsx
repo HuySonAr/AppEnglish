@@ -20,7 +20,7 @@ import { AnswerProgress } from './AnswerProgress.jsx';
 const optionLetters = ['A', 'B', 'C', 'D'];
 const skillLabels = { LISTENING: 'Listening', READING: 'Reading' };
 
-function Question({ question, chosen, onChoose, blankNumber }) {
+export function Question({ question, chosen, onChoose, blankNumber, showAudio = true }) {
   return (
     <fieldset
       id={`question-${question.number}`}
@@ -33,7 +33,7 @@ function Question({ question, chosen, onChoose, blankNumber }) {
         </span>
         <span className="pt-1">{question.prompt || (blankNumber ? `Blank (${question.number})` : 'Choose the best answer.')}</span>
       </p>
-      {question.audioUrl ? <audio controls src={question.audioUrl} className="mt-4 w-full" /> : null}
+      {showAudio && question.audioUrl ? <audio controls src={question.audioUrl} className="mt-4 w-full" /> : null}
       {question.imageUrl ? <img src={question.imageUrl} alt="" className="mt-4 max-h-80 rounded-xl border" /> : null}
       <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
         {question.options.map((option, index) => {
@@ -70,7 +70,37 @@ function Question({ question, chosen, onChoose, blankNumber }) {
   );
 }
 
-export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, retakeAllowed = false, onDiscard, onLeaveForLater }) {
+export function useExamLeaveGuard(onLeave) {
+  const leaveRef = useRef(onLeave);
+  leaveRef.current = onLeave;
+  useEffect(() => {
+    const removeGuard = setLeaveGuard(() => leaveRef.current());
+    const onClick = (event) => {
+      const link = event.target.closest?.('a[href]');
+      if (!link || link.target === '_blank') return;
+      event.preventDefault();
+      event.stopPropagation();
+      leaveRef.current();
+    };
+    window.history.pushState(null, '', window.location.href);
+    const onBack = () => {
+      window.history.pushState(null, '', window.location.href);
+      leaveRef.current();
+    };
+    const onUnload = (event) => event.preventDefault();
+    document.addEventListener('click', onClick, true);
+    window.addEventListener('popstate', onBack);
+    window.addEventListener('beforeunload', onUnload);
+    return () => {
+      removeGuard();
+      document.removeEventListener('click', onClick, true);
+      window.removeEventListener('popstate', onBack);
+      window.removeEventListener('beforeunload', onUnload);
+    };
+  }, []);
+}
+
+export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, retakeAllowed = false, onDiscard, onLeaveForLater, phaseLabel }) {
   const [answers, setAnswers] = useState(attempt.answers || {});
   const [partIndex, setPartIndex] = useState(0);
   const [confirming, setConfirming] = useState(false);
@@ -117,31 +147,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
     setTarget({ number });
   }
 
-  useEffect(() => {
-    const removeGuard = setLeaveGuard(() => setLeaving(true));
-    const onClick = (event) => {
-      const link = event.target.closest?.('a[href]');
-      if (!link || link.target === '_blank') return;
-      event.preventDefault();
-      event.stopPropagation();
-      setLeaving(true);
-    };
-    window.history.pushState(null, '', window.location.href);
-    const onBack = () => {
-      window.history.pushState(null, '', window.location.href);
-      setLeaving(true);
-    };
-    const onUnload = (event) => event.preventDefault();
-    document.addEventListener('click', onClick, true);
-    window.addEventListener('popstate', onBack);
-    window.addEventListener('beforeunload', onUnload);
-    return () => {
-      removeGuard();
-      document.removeEventListener('click', onClick, true);
-      window.removeEventListener('popstate', onBack);
-      window.removeEventListener('beforeunload', onUnload);
-    };
-  }, []);
+  useExamLeaveGuard(() => setLeaving(true));
 
   async function discard() {
     submitted.current = true;
@@ -182,6 +188,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
   return (
     <section className="space-y-6">
       <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
+        {phaseLabel ? <span className="rounded-full border px-3 py-1.5 text-sm font-semibold">{phaseLabel}</span> : null}
         {attempt.expiresAt ? (
           <span
             role="timer"

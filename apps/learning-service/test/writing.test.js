@@ -221,3 +221,23 @@ test('when the list cannot be fetched, only known models can be chosen', async (
   assert.equal((await service.saveSettings(student, { model: 'gemini-3.6-flash', thinkingLevel: 'low' })).key.model, 'gemini-3.6-flash');
   await assert.rejects(() => service.saveSettings(student, { model: 'gemini-4-argon', thinkingLevel: null }), { code: 70 });
 });
+
+test('a practice text of an ETS task also keeps the TOEIC score from the same Gemini call (D199)', async () => {
+  const { service, writing, eventRepository } = harness();
+  writing.content.etsTask = 'respond_email';
+  writing.content.email = 'Can you join the meeting on Friday?';
+  await service.saveKey(student, { key: goodKey });
+  const { submission } = await service.submit(student, writing.id, { text: 'Dear Ms Lee, I want take Friday off. Thanks.' });
+  const job = eventRepository.tables.events.find((event) => event.type === 'writing.requested');
+  assert.equal(job.payload.etsTask, 'respond_email');
+  await service.applyResult({ submissionId: submission.id, status: 'DONE', result: { ...result, etsScore: 3 } });
+  const view = (await service.getSubmission(student, submission.id)).submission;
+  assert.deepEqual(view.result.ets, { task: 'respond_email', score: 3, max: 4 });
+  assert.equal('etsScore' in view.result, false);
+  assert.equal(view.total, 3.6);
+
+  writing.content.etsTask = null;
+  const plain = (await service.submit(student, writing.id, { text: 'Dear Ms Lee, I want take Friday off. Thanks.' })).submission;
+  await service.applyResult({ submissionId: plain.id, status: 'DONE', result });
+  assert.equal((await service.getSubmission(student, plain.id)).submission.result.ets, null);
+});

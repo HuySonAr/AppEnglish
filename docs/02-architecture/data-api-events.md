@@ -262,7 +262,7 @@ speech-service has no database.
 
 ## Speaking open answers (F14, D179)
 
-- RabbitMQ: `speech.speaking.requests` with `kind: open_speaking` and empty `text`; `writing.grading.requests` also carries `speaking.grading.requested` jobs; `writing.open-speaking.results` (writing-service → learning-service, retry and `.dead`).
+- RabbitMQ: `speech.speaking.requests` with `kind: open_speaking` and empty `text`; `writing.grading.requests` also carries `speaking.grading.requested` jobs; `writing.open-speaking.results` (writing-service → learning-service, retry and `.dead`). `speaking.grading.requested` carries `etsTask`; the answer may carry `etsScore`; practice submissions expose `result.ets` (D199).
 - `speaking.scored` may have `total: null` (open answer without a key); progress-service shows "Your speaking answer is ready".
 
 ## Teacher reviews (F15, D180)

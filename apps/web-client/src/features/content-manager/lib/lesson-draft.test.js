@@ -79,8 +79,15 @@ test('the editor works on the draft, else on a copy of the published version', (
   copy.vocabulary[0].word = 'changed';
   assert.equal(published.content.vocabulary[0].word, 'ticket');
   assert.equal(workingContent(null).test.part5.questions.length, 6);
-  assert.deepEqual(lessonState({ draft, published }), { hasDraft: true, draftVersion: 2, publishedVersion: 1 });
-  assert.deepEqual(lessonState({ draft: null, published: null }), { hasDraft: false, draftVersion: null, publishedVersion: null });
+  assert.deepEqual(lessonState({ draft, published }), { hasDraft: true, draftVersion: 2, publishedVersion: 1, draftStatus: null, reviewNote: null });
+  assert.deepEqual(lessonState({ draft: { ...draft, status: 'RETURNED', reviewNote: 'Fix word 2.' }, published }), {
+    hasDraft: true,
+    draftVersion: 2,
+    publishedVersion: 1,
+    draftStatus: 'RETURNED',
+    reviewNote: 'Fix word 2.',
+  });
+  assert.deepEqual(lessonState({ draft: null, published: null }), { hasDraft: false, draftVersion: null, publishedVersion: null, draftStatus: null, reviewNote: null });
 });
 
 test('publish issue paths become readable labels and locations', () => {

@@ -35,6 +35,11 @@ const rpcs = {
     payload: attemptAnswersSchema,
     run: (service, { actor, id, payload }) => service.saveMockAnswers(actor, id, payload),
   },
+  FinishMockListening: {
+    id: true,
+    payload: attemptReferenceSchema,
+    run: (service, { actor, id, payload }) => service.finishMockListening(actor, id, payload),
+  },
   SubmitMockAttempt: {
     id: true,
     payload: attemptAnswersSchema,

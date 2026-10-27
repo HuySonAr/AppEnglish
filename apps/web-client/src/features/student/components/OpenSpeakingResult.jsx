@@ -2,7 +2,7 @@ import { AlertCircle, KeyRound, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SubmissionStatus, geminiModelLabel } from '@appenglish/learning-contracts';
 import { AnnotatedText, BetterVersion, CorrectionList } from './PracticeFeedback.jsx';
-import { ScoreBar, ScoreSummary } from './PracticeScore.jsx';
+import { EtsScore, ScoreBar, ScoreSummary } from './PracticeScore.jsx';
 
 const geminiBars = [
   { key: 'task', label: 'Task' },
@@ -54,6 +54,7 @@ export function OpenSpeakingResult({ submission }) {
         <>
           <ScoreSummary total={scores.total} bars={geminiBars.map((bar) => ({ label: bar.label, value: scores[bar.key], max: 5 }))} />
           <WhisperBars scores={scores} />
+          <EtsScore ets={result.ets} />
         </>
       ) : scores ? (
         <WhisperBars scores={scores} />

@@ -6,7 +6,7 @@ import { ListeningService } from '../src/listening/listening.service.js';
 import { listeningContentSchema } from '../src/listening/listening.schemas.js';
 import { ContentEvents } from '../src/speech/content-events.js';
 import { SpeechBroker } from '../src/speech/speech.broker.js';
-import { createMemoryRepository, manager, toeicTopicId } from './memory-repository.js';
+import { createMemoryRepository, teacher, toeicTopicId } from './memory-repository.js';
 
 test('a speech job and its request are stored together; the relay sends it once the broker is up (outbox)', async () => {
   const repository = createMemoryRepository();
@@ -15,11 +15,11 @@ test('a speech job and its request are stored together; the relay sends it once 
   const broker = { ready: false, send: async (queue, message, options) => sent.push({ queue, message, options }) };
   const relay = new ContentEvents(repository.listening, broker);
   const service = new ListeningService(repository.listening, content, { broker, relay });
-  const { exercise } = await service.createExercise(manager, { topicId: toeicTopicId, title: 'Talk', level: 'B1', kind: 'part4' });
-  const audioId = (await content.uploadMedia(manager, { kind: 'audio', fileName: 't.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1]), section: 'listening' })).media.id;
-  await service.saveDraft(manager, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [] }));
+  const { exercise } = await service.createExercise(teacher, { topicId: toeicTopicId, title: 'Talk', level: 'B1', kind: 'part4' });
+  const audioId = (await content.uploadMedia(teacher, { kind: 'audio', fileName: 't.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1]), section: 'listening' })).media.id;
+  await service.saveDraft(teacher, exercise.id, listeningContentSchema.parse({ audioMediaId: audioId, segments: [] }));
 
-  const { job } = await runWithRequestId('req-7', () => service.requestTranscribe(manager, exercise.id));
+  const { job } = await runWithRequestId('req-7', () => service.requestTranscribe(teacher, exercise.id));
   assert.equal(job.status, 'QUEUED');
   await relay.flush();
   assert.equal(sent.length, 0, 'nothing is sent while the broker is down, and the job is not lost');

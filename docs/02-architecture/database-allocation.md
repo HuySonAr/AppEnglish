@@ -99,6 +99,8 @@ foreign key; `accountEmail` is a copy taken when the attempt starts.
 
 ## F05C Listening course schema
 
+Removed by D190 on 2026-10-26: `1720000019000-drop-listening-course.js` deletes the course timing jobs, drops `listening_timing_jobs.courseItemId` (the CHECK keeps exactly one of `exerciseId`, `mockTestId`) and drops `listening_course_versions` and `listening_course_items`; `1730000019000-drop-course-results.js` drops `course_lesson_results` and `course_test_results`. The history below is kept for reference.
+
 `content-service` adds `listening_course_items` and `listening_course_versions`
 to `app_content` (migration `1720000008000-create-listening-course.js`).
 Migration `1720000009000-listening-course-placement.js` lets an item of type
@@ -182,3 +184,19 @@ content-service over gRPC and never another database.
 ## Teacher reviews (F15, D180)
 
 `learning-service` adds `review_requests` and `practice_submissions.teacherReview` to `app_learning` (migration `1730000017000-create-review-requests.js`, applied locally 2026-10-23). `teacherId` is an auth account id without a foreign key.
+
+## Content review (D191)
+
+`content-service` migration `1720000020000-content-review.js` (applied locally 2026-10-26) lets `lesson_versions`, `placement_versions`, `mock_test_versions`, `listening_exercise_versions` and `unit_review_versions` hold `PENDING_REVIEW` and `RETURNED`, adds `editedBy`, `submittedBy`, `submittedAt`, `reviewedBy`, `reviewedAt`, `reviewNote`, and widens each `UQ_*_one_draft` index to the three working statuses (placement keeps one working version overall).
+
+## Mock format and phases (D193)
+
+`content-service` migration `1720000021000-mock-format.js` adds `mock_tests.format` (`full`/`practice`, CHECK) and classifies published mocks by the ETS structure. `learning-service` migration `1730000020000-mock-phases.js` adds `mock_attempts.format`, `readingStartedAt` and `listeningPosition`. Both applied locally on 2026-10-26.
+
+## Speaking & Writing tests (D196)
+
+`content-service` migration `1720000023000-create-sw-tests.js` adds `sw_tests` and `sw_test_versions` to `app_content`; `learning-service` migration `1730000021000-create-sw-attempts.js` adds `sw_attempts` to `app_learning` (`testId`/`versionId` are content-service ids without a foreign key). Both applied locally on 2026-10-27.
+
+## S&W scoring (D198)
+
+`learning-service` migration `1730000023000-sw-scoring.js` adds `sw_attempts.scoring`, `sw_attempts.teacherReview`, `sw_score_jobs` and `sw_score_conversion` to `app_learning` (applied locally on 2026-10-27).

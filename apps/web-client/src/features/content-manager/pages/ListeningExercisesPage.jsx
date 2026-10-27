@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { ChevronRight, Headphones, Plus, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LISTENING_KINDS, LISTENING_LEVELS } from '@appenglish/content-contracts';
+import { LISTENING_KINDS, LISTENING_LEVELS, LessonVersionStatus } from '@appenglish/content-contracts';
+import { ReviewStatusBadge } from '../components/ContentReview.jsx';
+import { useContentArea } from '../hooks/use-content-area.js';
 import { listListeningTopics } from '../../../lib/api/listening-topics-api.js';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -54,7 +56,7 @@ const kindLabel = (key) => {
 };
 const kindsOf = (topic) => LISTENING_KINDS[topic?.format] || [];
 
-function NewExerciseDialog({ open, onOpenChange, topics, initialTopicId }) {
+function NewExerciseDialog({ open, onOpenChange, topics, initialTopicId, base }) {
   const navigate = useNavigate();
   const writable = topics.filter((topic) => topic.hasEditor);
   const [form, setForm] = useState({ title: '', topicId: '', level: 'B1', kind: '' });
@@ -76,7 +78,7 @@ function NewExerciseDialog({ open, onOpenChange, topics, initialTopicId }) {
     try {
       const result = await createListeningExercise({ ...form, title: form.title.trim() });
       notify({ title: 'Listening exercise created' });
-      navigate(`/content-manager/listening/${result.data.exercise.id}`);
+      navigate(`${base}/listening/${result.data.exercise.id}`);
     } catch (error) {
       notify({ title: 'Could not create the exercise', description: getApiErrorMessage(error), variant: 'destructive' });
       setBusy(false);
@@ -169,11 +171,11 @@ function NewExerciseDialog({ open, onOpenChange, topics, initialTopicId }) {
   );
 }
 
-function ExerciseRow({ exercise, showTopic }) {
+function ExerciseRow({ exercise, showTopic, base }) {
   return (
     <li>
       <Link
-        to={`/content-manager/listening/${exercise.id}`}
+        to={`${base}/listening/${exercise.id}`}
         className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-md bg-muted text-sm font-semibold tabular-nums">{exercise.level}</span>
@@ -185,7 +187,7 @@ function ExerciseRow({ exercise, showTopic }) {
           </span>
         </span>
         <span className="flex shrink-0 flex-wrap justify-end gap-1.5">
-          {exercise.hasDraft ? <Badge variant="warning">Draft</Badge> : null}
+          {exercise.hasDraft ? <ReviewStatusBadge status={exercise.draftStatus || LessonVersionStatus.DRAFT} /> : null}
           {exercise.publishedVersionNumber ? <Badge variant="success">Published v{exercise.publishedVersionNumber}</Badge> : <Badge variant="outline">Not published</Badge>}
         </span>
         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
@@ -195,6 +197,7 @@ function ExerciseRow({ exercise, showTopic }) {
 }
 
 export function ListeningExercisesPage() {
+  const { base, eyebrow, canAuthor } = useContentArea();
   const [state, setState] = useState('loading');
   const [exercises, setExercises] = useState([]);
   const [topics, setTopics] = useState([]);
@@ -230,14 +233,16 @@ export function ListeningExercisesPage() {
   return (
     <section className="space-y-6">
       <PageHeader
-        eyebrow="Content Manager"
+        eyebrow={eyebrow}
         title="Listening exercises"
         description="Dictation exercises for the listening practice."
         actions={
-          <Button className="gap-2" disabled={state !== 'ready' || !topics.some((topic) => topic.hasEditor)} onClick={() => setCreating(true)}>
-            <Plus className="h-4 w-4" />
-            New exercise
-          </Button>
+          canAuthor ? (
+            <Button className="gap-2" disabled={state !== 'ready' || !topics.some((topic) => topic.hasEditor)} onClick={() => setCreating(true)}>
+              <Plus className="h-4 w-4" />
+              New exercise
+            </Button>
+          ) : null
         }
       />
 
@@ -251,12 +256,14 @@ export function ListeningExercisesPage() {
         <EmptyState
           icon={Headphones}
           title="No listening exercises yet"
-          description="Create the first exercise."
+          description={canAuthor ? 'Create the first exercise.' : 'Exercises appear here once teachers create them.'}
           action={
-            <Button className="gap-2" onClick={() => setCreating(true)}>
-              <Plus className="h-4 w-4" />
-              New exercise
-            </Button>
+            canAuthor ? (
+              <Button className="gap-2" onClick={() => setCreating(true)}>
+                <Plus className="h-4 w-4" />
+                New exercise
+              </Button>
+            ) : null
           }
         />
       ) : (
@@ -303,7 +310,7 @@ export function ListeningExercisesPage() {
             ) : (
               <ul className="divide-y">
                 {shown.items.map((exercise) => (
-                  <ExerciseRow key={exercise.id} exercise={exercise} showTopic={filters.topic === 'all'} />
+                  <ExerciseRow key={exercise.id} exercise={exercise} showTopic={filters.topic === 'all'} base={base} />
                 ))}
               </ul>
             )}
@@ -313,7 +320,7 @@ export function ListeningExercisesPage() {
         </div>
       )}
 
-      <NewExerciseDialog open={creating} onOpenChange={setCreating} topics={topics} initialTopicId={filters.topic} />
+      {canAuthor ? <NewExerciseDialog open={creating} onOpenChange={setCreating} topics={topics} initialTopicId={filters.topic} base={base} /> : null}
     </section>
   );
 }

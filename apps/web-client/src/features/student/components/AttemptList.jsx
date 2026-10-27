@@ -2,6 +2,7 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 import { Badge, Button } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import { formatRemaining } from '../lib/placement.js';
+import { withMargin } from '../lib/mock-exam.js';
 
 function Change({ value, unit }) {
   if (!value) return null;
@@ -22,7 +23,7 @@ export function AttemptList({ attempts, shownNumber, busy, onReview }) {
         const before = attempts[index - 1];
         const shown = shownNumber === attempt.attemptNumber;
         const toeic = attempt.estimated;
-        const change = before ? (toeic && before.estimated ? toeic.totalScore - before.estimated.totalScore : attempt.correctCount - before.correctCount) : 0;
+        const change = before && !toeic && !before.estimated ? attempt.correctCount - before.correctCount : 0;
         return (
           <li key={attempt.attemptNumber} className={cn('flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3', shown && 'bg-primary/5')}>
             <div className="w-24 shrink-0">
@@ -34,7 +35,7 @@ export function AttemptList({ attempts, shownNumber, busy, onReview }) {
               ) : (
                 <p className="text-2xl font-bold tabular-nums">{attempt.scorePercent}%</p>
               )}
-              <Change value={change} unit={toeic && before?.estimated ? '' : ' right'} />
+              <Change value={change} unit=" right" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="flex flex-wrap items-center gap-2 font-medium">
@@ -42,7 +43,7 @@ export function AttemptList({ attempts, shownNumber, busy, onReview }) {
                 {attempt.countsForXp ? <Badge variant="info">Counts for XP</Badge> : null}
               </p>
               <p className="text-xs text-muted-foreground tabular-nums">
-                {toeic ? `Listening ${toeic.listeningScore} · Reading ${toeic.readingScore} · ` : ''}
+                {toeic ? `Listening ${withMargin(toeic.listeningScore, toeic.margin)} · Reading ${withMargin(toeic.readingScore, toeic.margin)} · ` : ''}
                 {attempt.correctCount}/{attempt.totalCount} correct{toeic ? ` (${attempt.scorePercent}%)` : ''} · {formatRemaining(attempt.durationSeconds * 1000)} ·{' '}
                 {new Date(attempt.submittedAt).toLocaleDateString()}
               </p>

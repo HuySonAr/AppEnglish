@@ -1,8 +1,8 @@
 import { In, IsNull, MoreThan } from 'typeorm';
+import { WORKING_VERSION_STATUSES } from '@appenglish/content-contracts';
 import {
   ContentEventEntity,
   ProcessedMessageEntity,
-  ListeningCourseItemEntity,
   ListeningExerciseEntity,
   ListeningExerciseVersionEntity,
   ListeningTimingJobEntity,
@@ -55,7 +55,7 @@ export class ListeningRepository {
   }
 
   async findDraft(exerciseId) {
-    return (await this.repo(ListeningExerciseVersionEntity)).findOne({ where: { exerciseId, status: 'DRAFT' } });
+    return (await this.repo(ListeningExerciseVersionEntity)).findOne({ where: { exerciseId, status: In(WORKING_VERSION_STATUSES) } });
   }
 
   async findVersion(id) {
@@ -134,9 +134,9 @@ export class ListeningRepository {
     await query.execute();
   }
 
-  async titlesOf({ exerciseIds, courseItemIds, mockTestIds }) {
+  async titlesOf({ exerciseIds, mockTestIds }) {
     const find = async (entity, ids) => (ids.length ? (await this.repo(entity)).find({ where: { id: In(ids) }, select: { id: true, title: true } }) : []);
-    const rows = [...(await find(ListeningExerciseEntity, exerciseIds)), ...(await find(ListeningCourseItemEntity, courseItemIds)), ...(await find(MockTestEntity, mockTestIds))];
+    const rows = [...(await find(ListeningExerciseEntity, exerciseIds)), ...(await find(MockTestEntity, mockTestIds))];
     return new Map(rows.map((row) => [row.id, row.title]));
   }
 

@@ -31,21 +31,20 @@ test('results become notifications once; the learner lists and reads them (D163)
   const opened = { accountId: student.id, unitId, unitTitle: 'Unit 1', nextUnitId: randomUUID(), nextUnitTitle: 'Unit 2', passedAt: '2026-10-21T09:00:00.000Z' };
   await service.applyResult(message('unit-review.passed', opened));
   await service.applyResult(message('unit-review.passed', opened));
-  await service.applyResult(message('course.level-up', { accountId: student.id, from: 'A1', to: 'A2', reachedAt: '2026-10-21T10:00:00.000Z' }));
 
   await assert.rejects(() => service.listNotifications(manager), { code: 26 });
   const listed = await service.listNotifications(student);
-  assert.equal(listed.unread, 4);
-  assert.deepEqual(listed.notifications.map((item) => item.kind), ['COURSE_LEVEL_UP', 'UNIT_OPENED', 'MOCK_RESULT', 'MOCK_RESULT']);
+  assert.equal(listed.unread, 3);
+  assert.deepEqual(listed.notifications.map((item) => item.kind), ['UNIT_OPENED', 'MOCK_RESULT', 'MOCK_RESULT']);
   const results = listed.notifications.filter((item) => item.kind === 'MOCK_RESULT').map((item) => [item.data.attemptNumber, item.data.total, item.data.change]);
   assert.deepEqual(results, [[1, first.listeningScore + first.readingScore, null], [2, 650, 650 - first.listeningScore - first.readingScore]].sort((a, b) => b[0] - a[0]));
-  assert.deepEqual(listed.notifications[1].data, { unitId, unitTitle: 'Unit 1', nextUnitId: opened.nextUnitId, nextUnitTitle: 'Unit 2' });
+  assert.deepEqual(listed.notifications[0].data, { unitId, unitTitle: 'Unit 1', nextUnitId: opened.nextUnitId, nextUnitTitle: 'Unit 2' });
 
   const one = listed.notifications[0].id;
-  assert.deepEqual(await service.markNotificationsRead(student, { ids: [one] }), { unread: 3 });
+  assert.deepEqual(await service.markNotificationsRead(student, { ids: [one] }), { unread: 2 });
   assert.deepEqual(await service.markNotificationsRead(student, {}), { unread: 0 });
   assert.equal((await service.listNotifications(student)).notifications.every((item) => item.read), true);
-  assert.equal(repository.tables.notifications.length, 4);
+  assert.equal(repository.tables.notifications.length, 3);
 });
 
 test('the evening reminder appears once a day and is read once the learner studies; old ones go after 30 days', async () => {
@@ -99,3 +98,22 @@ test('a teacher review and a returned review become notifications (F15)', async 
   const listed = await service.listNotifications(student);
   assert.deepEqual(listed.notifications.map((item) => [item.kind, item.data.total]), [['REVIEW_RETURNED', null], ['TEACHER_REVIEWED', 3.6]]);
 });
+
+test('a practice set counts for mastery but earns no XP and no score notice (D193)', async () => {
+  const { service, repository } = progressHarness([1]);
+  const practice = { ...mockTest(student.id, randomUUID(), { listening: 5, listeningTotal: 10, reading: 5, readingTotal: 10 }), format: 'practice', listeningScore: null, readingScore: null };
+  await service.applyResult(message('mock.submitted', practice));
+  assert.deepEqual([repository.tables.results.length, repository.tables.xp.length, repository.tables.notifications.length], [1, 0, 0]);
+  await service.applyResult(message('mock.submitted', { ...mockTest(student.id, randomUUID(), { listening: 5, listeningTotal: 10, reading: 5, readingTotal: 10 }), format: 'full' }));
+  assert.deepEqual([repository.tables.results.length, repository.tables.xp.length, repository.tables.notifications.length], [2, 1, 1]);
+});
+
+test('a scored Speaking or Writing test becomes a notice with its 0–200 score (D198)', async () => {
+  const { service, repository } = progressHarness([1]);
+  const payload = { accountId: student.id, attemptId: randomUUID(), swTestId: randomUUID(), section: 'speaking', attemptNumber: 2, title: 'S&W 1', scaled: 150, scoredAt: '2026-10-27T09:00:00.000Z' };
+  await service.applyResult(message('sw.scored', payload));
+  await service.applyResult(message('sw.scored', payload));
+  assert.equal(repository.tables.notifications.length, 1);
+  assert.deepEqual(repository.tables.notifications[0].data, { swTestId: payload.swTestId, section: 'speaking', attemptNumber: 2, title: 'S&W 1', scaled: 150 });
+});
+

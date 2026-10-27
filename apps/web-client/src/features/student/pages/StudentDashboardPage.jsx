@@ -1,45 +1,51 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, BookOpen, CheckCircle2, ClipboardCheck, Dumbbell, GraduationCap, Headphones, PlayCircle, Sparkles, Timer, TrendingUp, Trophy } from 'lucide-react';
+import { BookOpen, Brain, CheckCircle2, ClipboardCheck, Compass, Dumbbell, Headphones, Mic, PenLine, PlayCircle, Sparkles, Timer, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { LessonState, PlacementStatus } from '@appenglish/learning-contracts';
 import { Badge, Button } from '../../../components/ui';
-import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { DashboardPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
+import { CircleSwapLink } from '../../../components/shared/CircleSwapLink.jsx';
+import { CountUp } from '../../../components/shared/CountUp.jsx';
+import { GlideCards } from '../../../components/shared/GlideCards.jsx';
+import { GridPattern } from '../../../components/shared/GridPattern.jsx';
+import { ProgressBar } from '../../../components/shared/ProgressBar.jsx';
+import { RevealGroup, RevealItem } from '../../../components/shared/Reveal.jsx';
+import { SectionCard } from '../../../components/shared/SectionCard.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { cn } from '../../../lib/utils.js';
 import { useAuth } from '../../auth/context/AuthContext.jsx';
-import { getListeningCourse } from '../api/course-api.js';
 import { getCurriculum } from '../api/lessons-api.js';
 import { listMockTests } from '../api/mock-api.js';
 import { getPlacement } from '../api/placement-api.js';
 import { getProgress, getStreak } from '../api/progress-api.js';
 import { getStudyGoal } from '../api/goal-api.js';
-import { GoalPlanCard } from '../components/GoalPlanCard.jsx';
+import { GoalCard, TodayPlanCard } from '../components/GoalCards.jsx';
 import { CefrProfileCard } from '../components/CefrProfileCard.jsx';
-import { ScoreForecastCard } from '../components/ScoreForecastCard.jsx';
+import { ScoreForecastCard, SwForecastCard } from '../components/ScoreForecastCard.jsx';
 import { dailyPlan } from '../lib/study-plan.js';
 import { ScoreRing } from '../components/ScoreRing.jsx';
-import { StreakStrip } from '../components/Streak.jsx';
+import { StreakCard } from '../components/Streak.jsx';
 import { bestMockPercent, greeting, lessonStats, nextLessonStep, suggestedMockTest } from '../lib/home.js';
-import { nextKind, nextStep } from '../lib/listening-course.js';
 
 const sources = {
   curriculum: getCurriculum,
   placement: getPlacement,
-  course: getListeningCourse,
   mocks: listMockTests,
   progress: getProgress,
   streak: getStreak,
   goal: getStudyGoal,
 };
 
-function Bar({ value, total, className }) {
-  return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-muted" aria-hidden="true">
-      <div className={cn('h-full rounded-full bg-primary transition-all', className)} style={{ width: `${total ? Math.min(100, (value * 100) / total) : 0}%` }} />
-    </div>
-  );
-}
+const practiceLinks = [
+  { to: '/student/practice/vocabulary', label: 'Word memory', detail: 'Review lesson words', icon: Brain },
+  { to: '/student/practice/listening', label: 'Listening', detail: 'Write what you hear', icon: Headphones, tone: 'info' },
+  { to: '/student/practice/speaking', label: 'Speaking', detail: 'Speak and get a score', icon: Mic, tone: 'success' },
+  { to: '/student/practice/writing', label: 'Writing', detail: 'Write and get feedback', icon: PenLine, tone: 'warning' },
+];
+
+const asPercent = (value) => `${value}%`;
 
 function heroOf(step, placement) {
   if (!step) return null;
@@ -68,26 +74,105 @@ function heroOf(step, placement) {
       icon: Trophy,
       eyebrow: 'All lessons completed',
       title: 'You finished every published lesson',
-      detail: 'Keep practising with mock tests and the listening course.',
+      detail: 'Keep practising with mock tests.',
       to: '/student/mock-tests',
       action: 'Take a mock test',
-      done: true,
     };
-  return { icon: Sparkles, eyebrow: 'Welcome', title: 'No lessons are published yet', detail: 'Meanwhile, try the listening course.', to: '/student/listening-course', action: 'Open the listening course' };
+  return { icon: Sparkles, eyebrow: 'Welcome', title: 'No lessons are published yet', detail: 'Meanwhile, practise listening.', to: '/student/practice/listening', action: 'Open listening practice' };
 }
 
-function Tile({ icon: Icon, label, value, detail, children }) {
+function Stat({ icon: Icon, label, value, detail, bar }) {
   return (
-    <div className="rounded-2xl border bg-card p-4 shadow-sm">
+    <motion.div whileHover={{ y: -3 }} transition={{ type: 'spring', stiffness: 380, damping: 26 }} className="rounded-2xl border bg-background p-4">
       <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <Icon className="h-3.5 w-3.5" />
         {label}
       </p>
       <p className="mt-1 text-2xl font-bold tabular-nums">{value}</p>
       {detail ? <p className="truncate text-xs text-muted-foreground">{detail}</p> : null}
-      {children}
+      {bar !== undefined ? <ProgressBar value={bar} className="mt-2.5 h-1.5" /> : null}
+    </motion.div>
+  );
+}
+
+function percentValue(percent) {
+  return percent === null || percent === undefined ? '—' : <CountUp value={percent} format={asPercent} />;
+}
+
+function Hero({ hero, lessons, lessonPercent, failed, onRetry }) {
+  return (
+    <div className="relative h-full overflow-hidden rounded-[2rem] bg-primary p-6 text-primary-foreground sm:p-8">
+      <GridPattern className="text-primary-foreground/[0.07]" />
+      <div className="relative flex h-full flex-col gap-6 sm:flex-row sm:items-center">
+        <div className="min-w-0 flex-1 space-y-4">
+          {failed ? (
+            <div className="space-y-3">
+              <p className="text-2xl font-bold">Your lessons could not be loaded</p>
+              <Button variant="secondary" className="rounded-full" onClick={onRetry}>
+                Try again
+              </Button>
+            </div>
+          ) : hero ? (
+            <>
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-medium">
+                <hero.icon className="h-3.5 w-3.5" />
+                <span className="truncate">{hero.eyebrow}</span>
+              </span>
+              <h2 className="text-2xl font-bold leading-tight sm:text-3xl">{hero.title}</h2>
+              <p className="max-w-lg text-sm text-primary-foreground/80">{hero.detail}</p>
+              <CircleSwapLink to={hero.to} className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                {hero.action}
+              </CircleSwapLink>
+            </>
+          ) : null}
+        </div>
+        {lessons.total ? (
+          <motion.div className="self-center" initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.2 }}>
+            <ScoreRing percent={lessonPercent} tone="inverse" size={136} label={`${lessons.completed}/${lessons.total} lessons`} />
+          </motion.div>
+        ) : null}
+      </div>
     </div>
   );
+}
+
+function UnitList({ curriculum, failed, currentUnitId }) {
+  if (failed) return <p className="text-sm text-muted-foreground">Could not load this part.</p>;
+  if (!curriculum?.units?.length) return <p className="text-sm text-muted-foreground">No lessons are published yet.</p>;
+  return (
+    <ol className="grid gap-2.5 sm:grid-cols-2">
+      {curriculum.units.map((unit) => {
+        const done = unit.lessons.filter((lesson) => lesson.state === LessonState.COMPLETED).length;
+        const current = currentUnitId === unit.id;
+        const finished = unit.lessons.length > 0 && done === unit.lessons.length;
+        return (
+          <li key={unit.id} className={cn('flex items-center gap-3 rounded-2xl border bg-background p-3', current && 'border-primary/40 bg-primary/5')}>
+            <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold', finished ? 'bg-success/15 text-success' : current ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground')}>
+              {finished ? <CheckCircle2 className="h-5 w-5" /> : unit.number}
+            </span>
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="truncate text-sm font-medium">{unit.title}</span>
+                {current ? <Badge variant="info">Now</Badge> : null}
+              </div>
+              <div className="flex items-center gap-2">
+                <ProgressBar value={done} total={unit.lessons.length} className="h-1.5" barClassName={finished ? 'bg-success' : undefined} />
+                <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                  {done}/{unit.lessons.length}
+                </span>
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function placementText(placement) {
+  if (placement.status === PlacementStatus.COMPLETED) return `Placement: ${placement.scorePercent}%, unit ${placement.startUnit}`;
+  if (placement.status === PlacementStatus.SKIPPED) return 'Placement skipped';
+  return 'Placement in progress';
 }
 
 export function StudentDashboardPage() {
@@ -121,7 +206,7 @@ export function StudentDashboardPage() {
     load();
   }, []);
 
-  if (state === 'loading') return <DetailPageSkeleton aside />;
+  if (state === 'loading') return <DashboardPageSkeleton />;
   if (state === 'error')
     return (
       <section className="space-y-4">
@@ -132,176 +217,75 @@ export function StudentDashboardPage() {
       </section>
     );
 
-  const { curriculum, placement, course, mocks, progress, streak } = data;
+  const { curriculum, placement, mocks, progress, streak } = data;
   const step = nextLessonStep(curriculum);
   const hero = heroOf(step, placement);
   const lessons = lessonStats(curriculum);
   const suggested = suggestedMockTest(mocks);
   const bestMock = bestMockPercent(mocks);
   const name = account?.email?.split('@')[0] || 'learner';
-  const courseNext = failed.course ? null : nextStep(course);
   const lessonPercent = lessons.total ? Math.round((lessons.completed * 100) / lessons.total) : 0;
+  const skills = failed.progress ? null : progress?.skills;
+  const today = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
 
   return (
-    <section className="space-y-6">
-      <div className="rounded-2xl border bg-card p-6 shadow-sm sm:p-8">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-          <div className="min-w-0 flex-1 space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {greeting()}, <span className="font-medium text-foreground">{name}</span>.
-            </p>
-            {failed.curriculum ? (
-              <div className="space-y-3">
-                <p className="text-xl font-bold">Your lessons could not be loaded</p>
-                <Button variant="outline" onClick={load}>
-                  Try again
-                </Button>
-              </div>
-            ) : hero ? (
-              <div className="flex items-start gap-4">
-                <span className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm', hero.done ? 'bg-success' : 'bg-primary')}>
-                  <hero.icon className="h-6 w-6" />
-                </span>
-                <div className="min-w-0 space-y-1">
-                  <p className={cn('text-xs font-semibold uppercase tracking-widest', hero.done ? 'text-success' : 'text-primary')}>{hero.eyebrow}</p>
-                  <p className="text-xl font-bold sm:text-2xl">{hero.title}</p>
-                  <p className="text-sm text-muted-foreground">{hero.detail}</p>
-                  <Button asChild size="lg" className="mt-3 gap-2">
-                    <Link to={hero.to}>
-                      {hero.action}
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            ) : null}
-          </div>
-          {lessons.total ? (
-            <div className="flex flex-col items-center gap-1 self-center">
-              <ScoreRing percent={lessonPercent} tone={lessonPercent === 100 ? 'success' : 'primary'} size={128} label={`${lessons.completed}/${lessons.total} lessons`} />
-            </div>
-          ) : null}
+    <RevealGroup className="space-y-5">
+      <RevealItem className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <p className="text-sm text-muted-foreground">{today}</p>
+          <h1 className="text-2xl font-bold sm:text-3xl">
+            {greeting()}, <span className="text-primary">{name}</span>
+          </h1>
         </div>
-      </div>
+      </RevealItem>
 
-      <GoalPlanCard data={data.goal} tasks={dailyPlan({ goal: data.goal, curriculum, course: failed.course ? null : course, mocks })} failed={Boolean(failed.goal)} onChange={(goal) => setData((current) => ({ ...current, goal }))} />
-      {data.goal?.goal ? <ScoreForecastCard data={data.goal} /> : null}
+      <RevealItem className={cn('grid gap-5', streak && 'lg:grid-cols-[minmax(0,1fr)_21rem]')}>
+        <Hero hero={hero} lessons={lessons} lessonPercent={lessonPercent} failed={Boolean(failed.curriculum)} onRetry={load} />
+        {streak ? <StreakCard streak={streak} /> : null}
+      </RevealItem>
 
-      {streak ? <StreakStrip streak={streak} /> : null}
-      <CefrProfileCard />
+      <RevealItem className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem]">
+        <TodayPlanCard tasks={dailyPlan({ goal: data.goal, curriculum, mocks })} />
+        <GoalCard data={data.goal} failed={Boolean(failed.goal)} onChange={(goal) => setData((current) => ({ ...current, goal }))} />
+      </RevealItem>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Tile icon={BookOpen} label="Lessons" value={`${lessons.completed}/${lessons.total}`} detail={lessons.currentUnit ? `Unit ${lessons.currentUnit.number}: ${lessons.currentUnit.title}` : 'completed'}>
-          <div className="mt-2">
-            <Bar value={lessons.completed} total={lessons.total} />
+      {data.goal?.goal?.lr ? (
+        <RevealItem>
+          <ScoreForecastCard data={data.goal} />
+        </RevealItem>
+      ) : data.goal?.goal?.sw ? (
+        <RevealItem>
+          <SwForecastCard />
+        </RevealItem>
+      ) : null}
+
+      <RevealItem>
+        <SectionCard title="Where you stand" icon={Compass} action={{ to: '/student/progress', label: 'Progress' }}>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Stat icon={Timer} label="Best full mock" value={percentValue(bestMock)} detail={suggested ? `Suggested: level ${suggested.level}` : 'Mock tests'} />
+            <Stat icon={Headphones} label="Listening skill" value={percentValue(skills?.listening?.percent)} bar={skills?.listening?.percent ?? 0} />
+            <Stat icon={BookOpen} label="Reading skill" value={percentValue(skills?.reading?.percent)} bar={skills?.reading?.percent ?? 0} />
           </div>
-        </Tile>
-        <Tile icon={GraduationCap} label="Listening level" value={failed.course ? '—' : course?.currentLevel || '—'} detail={courseNext ? `${nextKind[courseNext.type]}: ${courseNext.title}` : 'Listening course'} />
-        <Tile icon={Timer} label="Best full mock" value={bestMock === null ? '—' : `${bestMock}%`} detail={suggested ? `Suggested: level ${suggested.level}` : 'Mock tests'} />
-        <Tile
-          icon={TrendingUp}
-          label="Listening skill"
-          value={progress?.skills?.listening?.percent == null ? '—' : `${progress.skills.listening.percent}%`}
-          detail={`Reading: ${progress?.skills?.reading?.percent == null ? '—' : `${progress.skills.reading.percent}%`}`}
-        />
-      </div>
+          <div className="mt-5 border-t pt-5">
+            <CefrProfileCard bare />
+          </div>
+        </SectionCard>
+      </RevealItem>
 
-
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 font-semibold">
-              <BookOpen className="h-4 w-4 text-primary" />
-              Your units
-            </h2>
-            <Link to="/student/lessons" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-              All lessons
-              <ArrowRight className="h-3.5 w-3.5" />
+      <RevealItem className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem]">
+        <SectionCard title="Your units" icon={BookOpen} action={{ to: '/student/lessons', label: 'All lessons' }}>
+          <UnitList curriculum={curriculum} failed={Boolean(failed.curriculum)} currentUnitId={lessons.currentUnit?.id} />
+        </SectionCard>
+        <SectionCard title="Practice" icon={Dumbbell} action={{ to: '/student/practice', label: 'All' }}>
+          <GlideCards items={practiceLinks} label="Practice" />
+          {placement && placement.status !== PlacementStatus.NOT_STARTED ? (
+            <Link to="/student/placement" className="mt-3 flex items-center gap-2 rounded-full bg-muted px-3 py-2 text-xs text-muted-foreground transition-colors hover:text-foreground">
+              <ClipboardCheck className="h-3.5 w-3.5" />
+              {placementText(placement)}
             </Link>
-          </div>
-          {failed.curriculum ? (
-            <p className="text-sm text-muted-foreground">Could not load this part.</p>
-          ) : curriculum?.units?.length ? (
-            <ol className="grid gap-3 sm:grid-cols-2">
-              {curriculum.units.map((unit) => {
-                const done = unit.lessons.filter((lesson) => lesson.state === LessonState.COMPLETED).length;
-                const current = lessons.currentUnit?.id === unit.id;
-                const finished = unit.lessons.length > 0 && done === unit.lessons.length;
-                return (
-                  <li key={unit.id} className={cn('flex items-center gap-3 rounded-xl border p-3', current && 'border-primary/40 bg-primary/5')}>
-                    <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold', finished ? 'bg-success/15 text-success' : current ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground')}>
-                      {finished ? <CheckCircle2 className="h-5 w-5" /> : unit.number}
-                    </span>
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="truncate text-sm font-medium">{unit.title}</span>
-                        {current ? <Badge variant="info">Now</Badge> : null}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Bar value={done} total={unit.lessons.length} className={finished ? 'bg-success' : undefined} />
-                        <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-                          {done}/{unit.lessons.length}
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          ) : (
-            <p className="text-sm text-muted-foreground">No lessons are published yet.</p>
-          )}
-        </div>
-
-        <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 font-semibold">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              Your skills
-            </h2>
-            <Link to="/student/progress" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-              Progress
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-          {failed.progress ? (
-            <p className="text-sm text-muted-foreground">Could not load this part.</p>
-          ) : progress ? (
-            [
-              ['Listening', progress.skills.listening, Headphones],
-              ['Reading', progress.skills.reading, BookOpen],
-            ].map(([label, skill, Icon]) => (
-              <div key={label} className="space-y-1.5">
-                <div className="flex items-baseline justify-between text-sm">
-                  <span className="flex items-center gap-1.5">
-                    <Icon className="h-4 w-4 text-muted-foreground" />
-                    {label}
-                  </span>
-                  <span className="font-semibold tabular-nums">{skill.percent === null ? 'No data yet' : `${skill.percent}%`}</span>
-                </div>
-                <Bar value={skill.percent ?? 0} total={100} />
-              </div>
-            ))
           ) : null}
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2 text-sm">
-        <Link to="/student/practice" className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1.5 text-muted-foreground shadow-sm transition-colors hover:text-foreground">
-          <Dumbbell className="h-4 w-4" />
-          Practice words and listening
-        </Link>
-        {placement && placement.status !== PlacementStatus.NOT_STARTED ? (
-          <Link to="/student/placement" className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1.5 text-muted-foreground shadow-sm transition-colors hover:text-foreground">
-            <ClipboardCheck className="h-4 w-4" />
-            {placement.status === PlacementStatus.COMPLETED
-              ? `Placement: ${placement.scorePercent}%, unit ${placement.startUnit}`
-              : placement.status === PlacementStatus.SKIPPED
-                ? 'Placement skipped'
-                : 'Placement in progress'}
-          </Link>
-        ) : null}
-      </div>
-    </section>
+        </SectionCard>
+      </RevealItem>
+    </RevealGroup>
   );
 }

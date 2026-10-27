@@ -108,33 +108,6 @@ export async function requestListeningTranscribe(id) {
 export async function getListeningAutoTime(id) {
   return (await httpClient.get(`/content/listening-exercises/${id}/auto-time`)).data;
 }
-export async function listListeningCourse() {
-  return (await httpClient.get('/content/listening-course')).data;
-}
-export async function createCourseItem(payload) {
-  return (await httpClient.post('/content/listening-course/items', payload)).data;
-}
-export async function updateCourseItem(id, payload) {
-  return (await httpClient.patch(`/content/listening-course/items/${id}`, payload)).data;
-}
-export async function getCourseItem(id) {
-  return (await httpClient.get(`/content/listening-course/items/${id}`)).data;
-}
-export async function saveCourseItemDraft(id, content) {
-  return (await httpClient.put(`/content/listening-course/items/${id}/draft`, content, { timeout: 30000 })).data;
-}
-export async function requestCourseAutoTime(id) {
-  return (await httpClient.post(`/content/listening-course/items/${id}/auto-time`)).data;
-}
-export async function requestCourseTranscribe(id) {
-  return (await httpClient.post(`/content/listening-course/items/${id}/transcribe`)).data;
-}
-export async function getCourseAutoTime(id) {
-  return (await httpClient.get(`/content/listening-course/items/${id}/auto-time`)).data;
-}
-export async function publishCourseItem(id) {
-  return (await httpClient.post(`/content/listening-course/items/${id}/publish`, undefined, { timeout: 30000 })).data;
-}
 export async function getPlacementTest() {
   return (await httpClient.get('/content/placement')).data;
 }
@@ -183,15 +156,45 @@ export async function unpublishListeningExercise(id) {
 export async function deleteListeningExercise(id) {
   return (await httpClient.delete(`/content/listening-exercises/${id}`)).data;
 }
-export async function unpublishCourseItem(id) {
-  return (await httpClient.post(`/content/listening-course/items/${id}/unpublish`)).data;
-}
-export async function deleteCourseItem(id) {
-  return (await httpClient.delete(`/content/listening-course/items/${id}`)).data;
-}
 export async function listOrphanMedia() {
   return (await httpClient.get('/content/media/orphans')).data;
 }
 export async function deleteOrphanMedia(ids) {
   return (await httpClient.delete('/content/media/orphans', { data: { ids } })).data;
+}
+export async function listContentReviews() {
+  return (await httpClient.get('/content/reviews')).data;
+}
+export async function submitContentReview(kind, id) {
+  return (await httpClient.post(`/content/reviews/${kind}/${id}/submit`, undefined, { timeout: 30000 })).data;
+}
+export async function withdrawContentReview(kind, id) {
+  return (await httpClient.post(`/content/reviews/${kind}/${id}/withdraw`)).data;
+}
+export async function approveContentReview(kind, id) {
+  return (await httpClient.post(`/content/reviews/${kind}/${id}/approve`, undefined, { timeout: 30000 })).data;
+}
+export async function returnContentReview(kind, id, note) {
+  return (await httpClient.post(`/content/reviews/${kind}/${id}/return`, { note })).data;
+}
+export async function listSwTests() {
+  return (await httpClient.get('/content/sw-tests')).data;
+}
+export async function createSwTest(payload) {
+  return (await httpClient.post('/content/sw-tests', payload)).data;
+}
+export async function updateSwTest(id, payload) {
+  return (await httpClient.patch(`/content/sw-tests/${id}`, payload)).data;
+}
+export async function getSwTest(id) {
+  return (await httpClient.get(`/content/sw-tests/${id}`)).data;
+}
+export async function saveSwTestDraft(id, content) {
+  return (await httpClient.put(`/content/sw-tests/${id}/draft`, content, { timeout: 30000 })).data;
+}
+export async function unpublishSwTest(id) {
+  return (await httpClient.post(`/content/sw-tests/${id}/unpublish`)).data;
+}
+export async function deleteSwTest(id) {
+  return (await httpClient.delete(`/content/sw-tests/${id}`)).data;
 }

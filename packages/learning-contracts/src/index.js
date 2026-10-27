@@ -9,6 +9,30 @@ export const PLACEMENT_DURATION_MINUTES = 25;
 
 export const MOCK_STATS_MIN_LEARNERS = 5;
 export const GOAL_SCORE = Object.freeze({ min: 10, max: 990, step: 5 });
+export const SwScoringStatus = Object.freeze({ SCORING: 'SCORING', DONE: 'DONE', FAILED: 'FAILED', NO_KEY: 'NO_KEY' });
+export const SW_RAW_MAX = Object.freeze({ speaking: 35, writing: 28 });
+export const SW_ITEM_MAX = Object.freeze({
+  read_aloud: 3,
+  describe_picture: 3,
+  respond_questions: 3,
+  respond_info: 3,
+  express_opinion: 5,
+  picture_sentence: 3,
+  respond_email: 4,
+  opinion_essay: 5,
+});
+export const SW_LEVEL_BANDS = Object.freeze({
+  speaking: Object.freeze([[0, 30], [40, 50], [60, 70], [80, 100], [110, 120], [130, 150], [160, 180], [190, 200]]),
+  writing: Object.freeze([[0, 30], [40, 40], [50, 60], [70, 80], [90, 100], [110, 130], [140, 160], [170, 190], [200, 200]]),
+});
+export const SW_REVIEW_KINDS = Object.freeze({ speaking: 'sw_speaking', writing: 'sw_writing' });
+export const swScaledOf = (raw, max) => Math.min(200, Math.max(0, Math.round((raw / max) * 20) * 10));
+export const swDefaultConversion = () => ({
+  speaking: Array.from({ length: SW_RAW_MAX.speaking + 1 }, (_, raw) => swScaledOf(raw, SW_RAW_MAX.speaking)),
+  writing: Array.from({ length: SW_RAW_MAX.writing + 1 }, (_, raw) => swScaledOf(raw, SW_RAW_MAX.writing)),
+});
+export const swBandOf = (section, scaled) => (SW_LEVEL_BANDS[section] || []).findIndex(([low, high]) => scaled >= low && scaled <= high);
+export const SW_GOAL_SCORE = Object.freeze({ min: 10, max: 200, step: 10 });
 export const GOAL_RECENT_ATTEMPTS = 5;
 export const GOAL_MIN_ANSWERED = 3;
 export const GOAL_STALE_DAYS = 14;
@@ -71,8 +95,6 @@ export const MockAttemptKind = Object.freeze({ FULL: 'FULL', MINI: 'MINI' });
 
 export const VOCABULARY_PRACTICE_SIZE = 20;
 export const ListeningMode = Object.freeze({ FULL: 'full', BLANKS: 'blanks' });
-export const CourseLevelState = Object.freeze({ OPEN: 'OPEN', LOCKED: 'LOCKED' });
-export const CourseDictationMode = Object.freeze({ BLANKS: 'blanks', FULL: 'full' });
 export const PracticeDirection = Object.freeze({ MEANING: 'MEANING', WORD: 'WORD' });
 
 export const LESSON_TEST_DURATION_MINUTES = 25;
@@ -97,8 +119,6 @@ export const LearningResponseCode = Object.freeze({
   MOCK_TEST_NOT_FOUND: 57,
   MOCK_TEST_NOT_IN_PROGRESS: 58,
   LISTENING_EXERCISE_NOT_FOUND: 59,
-  COURSE_LESSON_NOT_FOUND: 60,
-  COURSE_ITEM_LOCKED: 61,
   UNIT_REVIEW_NOT_FOUND: 63,
   UNIT_REVIEW_LOCKED: 64,
   PRACTICE_PROMPT_NOT_FOUND: 65,
@@ -112,6 +132,9 @@ export const LearningResponseCode = Object.freeze({
   REVIEW_NOT_ALLOWED: 73,
   REVIEW_NOT_FOUND: 74,
   REVIEW_LOCKED: 75,
+  SW_TEST_NOT_FOUND: 76,
+  SW_ATTEMPT_NOT_IN_PROGRESS: 77,
+  SW_ANSWER_LOCKED: 78,
 });
 
 export const LearningQueue = Object.freeze({
@@ -123,6 +146,7 @@ export const LearningQueue = Object.freeze({
   AI_KEY_CHECKS: 'writing.key-checks',
   OPEN_SPEAKING_RESULTS: 'writing.open-speaking.results',
   AI_MODEL_LISTS: 'writing.model-lists',
+  SW_RESULTS: 'writing.sw.results',
 });
 
 export const LearningEventType = Object.freeze({
@@ -131,12 +155,13 @@ export const LearningEventType = Object.freeze({
   MOCK_SUBMITTED: 'mock.submitted',
   ACTIVITY_RECORDED: 'activity.recorded',
   UNIT_REVIEW_PASSED: 'unit-review.passed',
-  COURSE_LEVEL_UP: 'course.level-up',
   SPEAKING_REQUESTED: 'speaking.requested',
   SPEAKING_SCORED: 'speaking.scored',
   WRITING_REQUESTED: 'writing.requested',
   WRITING_SCORED: 'writing.scored',
   SPEAKING_GRADING_REQUESTED: 'speaking.grading.requested',
+  SW_GRADING_REQUESTED: 'sw.grading.requested',
+  SW_SCORED: 'sw.scored',
   REVIEW_COMPLETED: 'review.completed',
   REVIEW_EXPIRED: 'review.expired',
 });
@@ -145,8 +170,6 @@ export const StudyActivity = Object.freeze({
   LESSON_STEP: 'lessonStep',
   LESSON_TEST: 'lessonTest',
   UNIT_REVIEW: 'unitReview',
-  COURSE_TOPIC: 'courseTopic',
-  COURSE_TEST: 'courseTest',
   LISTENING_PRACTICE: 'listeningPractice',
   WORD_MEMORY: 'wordMemory',
   MOCK_TEST: 'mockTest',
@@ -166,7 +189,7 @@ export const READ_ALOUD_SCORING = Object.freeze({
 });
 export const RECORDING_LIMITS = Object.freeze({
   maxBytes: 5 * 1024 * 1024,
-  readAloudSeconds: 30,
+  readAloudSeconds: 45,
   openSpeakingSeconds: 120,
   mimeTypes: Object.freeze(['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/mpeg', 'audio/wav', 'audio/x-wav']),
 });

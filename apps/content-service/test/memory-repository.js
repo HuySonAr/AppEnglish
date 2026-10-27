@@ -1,9 +1,13 @@
 import { randomUUID } from 'node:crypto';
+import { WORKING_VERSION_STATUSES } from '@appenglish/content-contracts';
+import { ContentReviewService } from '../src/review/review.service.js';
+
+const working = (version) => WORKING_VERSION_STATUSES.includes(version.status);
 
 export function createMemoryRepository() {
   const tables = {
     units: [], lessons: [], versions: [], reviewVersions: [], media: [], placement: [], mockTests: [], mockVersions: [],
-    listeningExercises: [], listeningVersions: [], timingJobs: [], courseItems: [], courseVersions: [], adminNotices: [], noticeReads: [], contentEvents: [], processed: [], practicePrompts: [], practiceVersions: [],
+    listeningExercises: [], listeningVersions: [], timingJobs: [], adminNotices: [], noticeReads: [], contentEvents: [], processed: [], practicePrompts: [], practiceVersions: [],
     listeningTopics: [{ id: toeicTopicId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
     examTypes: [{ id: toeicExamTypeId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
   };
@@ -13,7 +17,6 @@ export function createMemoryRepository() {
     LessonVersion: 'versions',
     MockTestVersion: 'mockVersions',
     ListeningExerciseVersion: 'listeningVersions',
-    ListeningCourseVersion: 'courseVersions',
     UnitReviewVersion: 'reviewVersions',
   };
   function save(table, row) {
@@ -36,7 +39,7 @@ export function createMemoryRepository() {
       return tables.listeningVersions.map(({ id, exerciseId, versionNumber, status }) => ({ id, exerciseId, versionNumber, status }));
     },
     async findDraft(exerciseId) {
-      return copy(tables.listeningVersions.find((version) => version.exerciseId === exerciseId && version.status === 'DRAFT'));
+      return copy(tables.listeningVersions.find((version) => version.exerciseId === exerciseId && working(version)));
     },
     async findVersion(id) { return copy(tables.listeningVersions.find((version) => version.id === id)); },
     async maxVersionNumber(exerciseId) {
@@ -77,47 +80,19 @@ export function createMemoryRepository() {
     async markJobsSeen(requestedBy, ids, at) {
       for (const job of tables.timingJobs) if (job.requestedBy === requestedBy && !job.seenAt && (!ids || ids.includes(job.id))) job.seenAt = at;
     },
-    async titlesOf({ exerciseIds, courseItemIds, mockTestIds }) {
-      const rows = [...tables.listeningExercises.filter((row) => exerciseIds.includes(row.id)), ...tables.courseItems.filter((row) => courseItemIds.includes(row.id)), ...tables.mockTests.filter((row) => mockTestIds.includes(row.id))];
+    async titlesOf({ exerciseIds, mockTestIds }) {
+      const rows = [...tables.listeningExercises.filter((row) => exerciseIds.includes(row.id)), ...tables.mockTests.filter((row) => mockTestIds.includes(row.id))];
       return new Map(rows.map((row) => [row.id, row.title]));
     },
     async listTimingJobs(owner) {
       return tables.timingJobs.filter((job) => Object.entries(owner).every(([field, value]) => job[field] === value)).map(copy);
     },
   };
-  const course = {
-    async listItems() {
-      return tables.courseItems.map(copy).sort((a, b) => (a.level || '').localeCompare(b.level || '') || a.position - b.position);
-    },
-    async findItem(id) { return copy(tables.courseItems.find((item) => item.id === id)); },
-    async saveItem(item) { return save('courseItems', item); },
-    async saveItems(items) { return items.map((item) => save('courseItems', item)); },
-    async createItemWithDraft(item, draft) {
-      if (item.type === 'level_test' && tables.courseItems.some((other) => other.type === 'level_test' && other.level === item.level)) return null;
-      if (item.type === 'placement' && tables.courseItems.some((other) => other.type === 'placement')) return null;
-      const saved = save('courseItems', item);
-      return { item: saved, draft: save('courseVersions', { ...draft, itemId: saved.id }) };
-    },
-    async deleteItemWithVersions(itemId) {
-      tables.timingJobs = tables.timingJobs.filter((job) => job.courseItemId !== itemId);
-      tables.courseVersions = tables.courseVersions.filter((version) => version.itemId !== itemId);
-      tables.courseItems = tables.courseItems.filter((item) => item.id !== itemId);
-    },
-    async listVersionSummaries() {
-      return tables.courseVersions.map(({ id, itemId, versionNumber, status }) => ({ id, itemId, versionNumber, status }));
-    },
-    async findDraft(itemId) { return copy(tables.courseVersions.find((version) => version.itemId === itemId && version.status === 'DRAFT')); },
-    async findVersion(id) { return copy(tables.courseVersions.find((version) => version.id === id)); },
-    async maxVersionNumber(itemId) {
-      return Math.max(0, ...tables.courseVersions.filter((version) => version.itemId === itemId).map((version) => version.versionNumber));
-    },
-    async saveVersion(version) { return save('courseVersions', version); },
-    async publishVersion(item, version) {
-      save('courseVersions', version);
-      save('courseItems', item);
-    },
-  };
   const practice = {
+    async listReviewActivity(since) {
+      const versions = tables.practiceVersions.filter((row) => row.status === 'PENDING_REVIEW' || (row.reviewedAt && new Date(row.reviewedAt) > since)).map(copy);
+      return { versions, prompts: tables.practicePrompts.filter((row) => versions.some((version) => version.promptId === row.id)).map(copy) };
+    },
     async listPrompts(where = {}) {
       return tables.practicePrompts.filter((row) => Object.entries(where).every(([key, value]) => row[key] === value)).map(copy).reverse();
     },
@@ -145,7 +120,6 @@ export function createMemoryRepository() {
   return {
     tables,
     listening,
-    course,
     practice,
     async addAdminNotice(notice) {
       if (!tables.adminNotices.some((row) => row.key === notice.key)) tables.adminNotices.push({ id: randomUUID(), ...structuredClone(notice) });
@@ -178,7 +152,7 @@ export function createMemoryRepository() {
       return tables.versions.map(({ id, lessonId, versionNumber, status }) => ({ id, lessonId, versionNumber, status }));
     },
     async findDraft(lessonId) {
-      return copy(tables.versions.find((version) => version.lessonId === lessonId && version.status === 'DRAFT'));
+      return copy(tables.versions.find((version) => version.lessonId === lessonId && working(version)));
     },
     async findVersion(id) { return copy(tables.versions.find((version) => version.id === id)); },
     async maxVersionNumber(lessonId) {
@@ -221,7 +195,7 @@ export function createMemoryRepository() {
       return tables.reviewVersions.map(({ id, unitId, versionNumber, status }) => ({ id, unitId, versionNumber, status }));
     },
     async findReviewDraft(unitId) {
-      return copy(tables.reviewVersions.find((version) => version.unitId === unitId && version.status === 'DRAFT'));
+      return copy(tables.reviewVersions.find((version) => version.unitId === unitId && working(version)));
     },
     async findReviewVersion(id) { return copy(tables.reviewVersions.find((version) => version.id === id)); },
     async maxReviewVersionNumber(unitId) {
@@ -239,12 +213,12 @@ export function createMemoryRepository() {
     async listReferencedMediaIds() {
       const uuid = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
       const referenced = new Set();
-      for (const version of [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions, ...tables.courseVersions, ...tables.reviewVersions, ...tables.practiceVersions])
+      for (const version of [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions, ...tables.reviewVersions, ...tables.practiceVersions])
         for (const match of JSON.stringify(version.content).matchAll(uuid)) referenced.add(match[0].toLowerCase());
       return referenced;
     },
     async isMediaReferenced(id) {
-      return [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions, ...tables.courseVersions, ...tables.practiceVersions].some((version) => JSON.stringify(version.content).includes(id));
+      return [...tables.versions, ...tables.placement, ...tables.mockVersions, ...tables.listeningVersions, ...tables.practiceVersions].some((version) => JSON.stringify(version.content).includes(id));
     },
     async listExamTypes() { return tables.examTypes.map(copy); },
     async findExamType(id) { return copy(tables.examTypes.find((item) => item.id === id)); },
@@ -256,7 +230,7 @@ export function createMemoryRepository() {
       return tables.mockVersions.map(({ id, mockTestId, versionNumber, status }) => ({ id, mockTestId, versionNumber, status }));
     },
     async findMockDraft(mockTestId) {
-      return copy(tables.mockVersions.find((version) => version.mockTestId === mockTestId && version.status === 'DRAFT'));
+      return copy(tables.mockVersions.find((version) => version.mockTestId === mockTestId && working(version)));
     },
     async findMockVersion(id) { return copy(tables.mockVersions.find((version) => version.id === id)); },
     async maxMockVersionNumber(mockTestId) {
@@ -268,13 +242,26 @@ export function createMemoryRepository() {
       save('mockTests', mockTest);
     },
     async countPublishedUnits() { return tables.units.filter((unit) => unit.status === 'PUBLISHED').length; },
-    async findPlacementDraft() { return copy(tables.placement.find((version) => version.status === 'DRAFT')); },
+    async findPlacementDraft() { return copy(tables.placement.find(working)); },
     async findPlacementVersion(id) { return copy(tables.placement.find((version) => version.id === id)); },
     async findPublishedPlacement() {
       return copy(tables.placement.filter((version) => version.status === 'PUBLISHED').sort((a, b) => b.versionNumber - a.versionNumber)[0]);
     },
     async maxPlacementVersionNumber() { return Math.max(0, ...tables.placement.map((version) => version.versionNumber)); },
     async savePlacementVersion(version) { return save('placement', version); },
+    async listWorkingVersions() {
+      const sources = [['lesson', 'versions', 'lessonId'], ['unitReview', 'reviewVersions', 'unitId'], ['placement', 'placement', null], ['mockTest', 'mockVersions', 'mockTestId'], ['listeningExercise', 'listeningVersions', 'exerciseId']];
+      return sources.flatMap(([kind, table, owner]) =>
+        tables[table].filter(working).map(({ content, ...row }) => ({ ...copy(row), kind, ownerId: owner ? row[owner] : null })),
+      );
+    },
+    async listReviewActivity(since) {
+      const sources = [['lesson', 'versions', 'lessonId'], ['unitReview', 'reviewVersions', 'unitId'], ['placement', 'placement', null], ['mockTest', 'mockVersions', 'mockTestId'], ['listeningExercise', 'listeningVersions', 'exerciseId']];
+      const active = (row) => row.status === 'PENDING_REVIEW' || (row.reviewedAt && new Date(row.reviewedAt) > since);
+      return sources.flatMap(([kind, table, owner]) =>
+        tables[table].filter(active).map(({ content, ...row }) => ({ ...copy(row), kind, ownerId: owner ? row[owner] : null })),
+      );
+    },
   };
 }
 
@@ -283,6 +270,12 @@ export const toeicTopicId = '77777777-7777-4777-8777-777777777777';
 export const manager = { id: '11111111-1111-4111-8111-111111111111', role: 'CONTENT_MANAGER' };
 export const student = { id: '22222222-2222-4222-8222-222222222222', role: 'STUDENT' };
 export const admin = { id: '33333333-3333-4333-8333-333333333333', role: 'ADMIN' };
+export const teacher = { id: '55555555-5555-4555-8555-555555555555', role: 'TEACHER' };
+export const otherTeacher = { id: '88888888-8888-4888-8888-888888888888', role: 'TEACHER' };
+
+export function submitted(content, listening, kind, id, actor = teacher) {
+  return new ContentReviewService(content, listening).submit(actor, { kind, id });
+}
 
 export function publishableContent({ audioId, imageId }) {
   const textOptions = (correct) =>

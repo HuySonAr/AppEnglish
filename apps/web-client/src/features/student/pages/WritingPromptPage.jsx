@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Check, ClipboardList, KeyRound, PenLine, Send } from 'lucide-react';
+import { Check, ClipboardList, KeyRound, Lock, PenLine, Play, Send } from 'lucide-react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { countWords } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { taskTypeLabels } from '../../../lib/practice-prompts.js';
+import { durationText, etsTaskLabel, taskTypeLabels } from '../../../lib/practice-prompts.js';
 import { Badge, Button } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
@@ -17,6 +17,11 @@ import { WritingResult } from '../components/WritingResult.jsx';
 import { useSubmission } from '../hooks/use-submission.js';
 import { WordMeter } from '../components/WordMeter.jsx';
 import { wordRangeState, writingGroups } from '../lib/writing.js';
+import { Countdown, TimerSwitch, TimingBadges } from '../components/EtsTimer.jsx';
+import { useCountdown } from '../hooks/use-recorder.js';
+import { useNoTimer } from '../hooks/use-no-timer.js';
+import { hasTimer, writingLocked } from '../lib/ets-practice.js';
+import { formatClock } from '../lib/practice.js';
 
 const draftKey = (promptId) => `writing-draft:${promptId}`;
 const readDraft = (promptId) => {
@@ -42,6 +47,15 @@ export function WritingPromptPage() {
   const [data, setData] = useState(null);
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [started, setStarted] = useState(false);
+  const [noTimer, setNoTimerValue] = useNoTimer();
+  const timed = Boolean(data && hasTimer(data.prompt) && data.prompt.timing.writeSeconds && !noTimer);
+  const writeSeconds = data?.prompt?.timing?.writeSeconds || 0;
+  const left = useCountdown(writeSeconds, timed && started, () => {});
+  const setNoTimer = (value) => {
+    setNoTimerValue(value);
+    setStarted(false);
+  };
   const refresh = async () => setData((await getWritingPrompt(promptId)).data);
   const latest = useSubmission(getWritingSubmission, { onSettled: () => refresh().catch(() => {}) });
   const viewing = useSubmission(getWritingSubmission, { onSettled: () => refresh().catch(() => {}) });
@@ -69,6 +83,7 @@ export function WritingPromptPage() {
     latest.setSubmission(null);
     viewing.setSubmission(null);
     setText(typeof window === 'undefined' ? '' : readDraft(promptId));
+    setStarted(false);
     load();
   }, [promptId]);
 
@@ -84,6 +99,7 @@ export function WritingPromptPage() {
       const { submission } = (await submitWriting(promptId, text)).data;
       latest.setSubmission(submission);
       change('');
+      setStarted(false);
       refresh().catch(() => {});
     } catch (error) {
       notify({ title: 'Could not submit your text', description: getApiErrorMessage(error), variant: 'destructive' });
@@ -120,6 +136,10 @@ export function WritingPromptPage() {
   const words = countWords(text);
   const fit = wordRangeState(words, prompt.minWords, prompt.maxWords);
   const current = latest.submission;
+  const typeLabel = etsTaskLabel(prompt.etsTask, taskTypeLabels[prompt.taskType] || 'Writing');
+  const locked = writingLocked(prompt, timed, started ? left : null);
+  const waiting = timed && !started;
+  const recommended = prompt.timing?.recommendedWords;
 
   const practice = (
     <div className="space-y-6">
@@ -134,8 +154,26 @@ export function WritingPromptPage() {
             </div>
             <p className="whitespace-pre-line text-[15px] leading-7">{prompt.instructions}</p>
             {prompt.imageUrl ? <img src={prompt.imageUrl} alt="" className="w-full rounded-xl border object-cover" /> : null}
+            {prompt.etsTask === 'picture_sentence' && prompt.keywords?.length ? (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Use these words</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {prompt.keywords.map((word) => (
+                    <span key={word} className="rounded-lg border bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+                      {word}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {prompt.etsTask === 'respond_email' && prompt.email ? (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email</p>
+                <p className="whitespace-pre-line rounded-xl border bg-background p-4 text-sm leading-6">{prompt.email}</p>
+              </div>
+            ) : null}
             <div className="flex flex-wrap gap-1.5">
-              <Badge variant="outline">{taskTypeLabels[prompt.taskType] || 'Writing'}</Badge>
+              <Badge variant="outline">{typeLabel}</Badge>
               <Badge variant="outline">
                 {prompt.minWords}–{prompt.maxWords} words
               </Badge>
@@ -170,31 +208,53 @@ export function WritingPromptPage() {
             <label htmlFor="writing-text" className="font-semibold">
               Your text
             </label>
-            {text ? (
+            {timed && started ? (
+              <span className={`flex items-center gap-1.5 text-sm font-semibold tabular-nums ${locked ? 'text-destructive' : left <= 60 ? 'text-warning' : 'text-primary'}`} role="timer">
+                {locked ? <Lock className="h-3.5 w-3.5" /> : null}
+                {locked ? 'Time is up' : formatClock(Math.ceil(left))}
+              </span>
+            ) : text ? (
               <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Check className="h-3.5 w-3.5 text-success" />
                 Draft kept on this device
               </span>
             ) : null}
           </div>
+          {waiting ? (
+            <div className="flex min-h-[22rem] flex-col items-center justify-center gap-3 px-5 py-8 text-center">
+              <Countdown label="Time to write" left={writeSeconds} total={writeSeconds} />
+              <Button size="lg" className="gap-2" onClick={() => setStarted(true)}>
+                <Play className="h-4 w-4" />
+                Start writing
+              </Button>
+              <p className="text-sm text-muted-foreground">You have {durationText(writeSeconds)}.</p>
+            </div>
+          ) : (
           <Textarea
             id="writing-text"
             value={text}
             onChange={(event) => change(event.target.value)}
             disabled={submitting}
+            readOnly={locked}
+            autoFocus={timed && started}
             placeholder="Start writing here…"
             spellCheck
             className="min-h-[22rem] resize-y rounded-none border-0 bg-transparent px-5 py-4 text-base leading-7 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
           />
+          )}
+          {locked ? <p className="border-t bg-destructive/10 px-5 py-2 text-sm">Time is up. Submit your text.</p> : null}
           <div className="flex flex-col gap-3 border-t bg-muted/30 px-5 py-3 sm:flex-row sm:items-center">
-            <WordMeter words={words} min={prompt.minWords} max={prompt.maxWords} />
+            <div className="min-w-0 flex-1 space-y-1">
+              <WordMeter words={words} min={prompt.minWords} max={prompt.maxWords} />
+              {recommended ? <p className="text-xs text-muted-foreground">Aim for {recommended}+ words.</p> : null}
+            </div>
             <div className="flex shrink-0 justify-end gap-2">
-              {text ? (
+              {text && !locked ? (
                 <Button type="button" variant="ghost" disabled={submitting} onClick={() => change('')}>
                   Clear
                 </Button>
               ) : null}
-              <Button type="submit" className="gap-2" loading={submitting} disabled={fit !== 'ok'}>
+              <Button type="submit" className="gap-2" loading={submitting} disabled={fit !== 'ok' || waiting}>
                 <Send className="h-4 w-4" />
                 {hasKey ? 'Submit for scoring' : 'Save'}
               </Button>
@@ -221,10 +281,16 @@ export function WritingPromptPage() {
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           <Badge variant="secondary">{prompt.level}</Badge>
           <span>
-            {taskTypeLabels[prompt.taskType] || 'Writing'} · {prompt.topic}
+            {typeLabel} · {prompt.topic}
           </span>
         </div>
         <h1 className="text-2xl font-semibold tracking-tight">{prompt.title}</h1>
+        {hasTimer(prompt) ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+            {timed ? <TimingBadges task={prompt.etsTask} /> : <span />}
+            <TimerSwitch checked={noTimer} onChange={setNoTimer} />
+          </div>
+        ) : null}
       </div>
 
       <PracticeTabs

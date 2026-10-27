@@ -12,9 +12,9 @@ test('the latest speech job is found by its owner', async () => {
     },
   };
   const repository = new ListeningRepository(dataSource);
-  assert.deepEqual(await repository.findLatestTimingJob({ courseItemId: 'c-1' }), { id: 'job-1' });
+  assert.deepEqual(await repository.findLatestTimingJob({ mockTestId: 'm-1' }), { id: 'job-1' });
   await repository.findLatestTimingJob({ exerciseId: 'e-1' });
   assert.equal(seen[0].entity, ListeningTimingJobEntity);
-  assert.deepEqual(seen.map((call) => call.options.where), [{ courseItemId: 'c-1' }, { exerciseId: 'e-1' }]);
+  assert.deepEqual(seen.map((call) => call.options.where), [{ mockTestId: 'm-1' }, { exerciseId: 'e-1' }]);
   assert.deepEqual(seen[0].options.order, { createdAt: 'DESC' });
 });

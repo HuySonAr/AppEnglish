@@ -4,13 +4,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ReviewAction, TEACHER_REVIEW_LIMITS } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { taskTypeLabels } from '../../../lib/practice-prompts.js';
+import { etsTaskLabel, taskTypeLabels } from '../../../lib/practice-prompts.js';
 import { Badge, Button, Input, Label } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { AnnotatedText, FeedbackSection, PromptReference } from '../../student/components/PracticeFeedback.jsx';
 import { completeReview, getReview, releaseReview } from '../api/review-api.js';
+import { SwReviewView } from '../components/SwReviewParts.jsx';
 import { actionFor, initialScores, previewTotal, reviewKindLabels, scoresChanged } from '../lib/review.js';
 
 function LearnerWork({ data }) {
@@ -30,7 +31,7 @@ function LearnerWork({ data }) {
             <p className="whitespace-pre-line leading-relaxed">{prompt.instructions}</p>
             {prompt.imageUrl ? <img src={prompt.imageUrl} alt="" className="max-h-60 rounded-lg border" /> : null}
             <p className="text-sm text-muted-foreground">
-              {review.kind === 'writing' ? `${taskTypeLabels[prompt.taskType] || 'Writing'} · ${prompt.minWords}–${prompt.maxWords} words` : `Up to ${prompt.maxSeconds} seconds`}
+              {review.kind === 'writing' ? `${etsTaskLabel(prompt.etsTask, taskTypeLabels[prompt.taskType] || 'Writing')} · ${prompt.minWords}–${prompt.maxWords} words` : `${prompt.etsTask ? `${etsTaskLabel(prompt.etsTask)} · ` : ''}Up to ${prompt.maxSeconds} seconds`}
             </p>
           </>
         )}
@@ -82,7 +83,7 @@ export function TeacherReviewPage() {
     try {
       const next = (await getReview(reviewId)).data;
       setData(next);
-      setScores(initialScores(next.criteria, next.ai.scores));
+      if (!next.sw) setScores(initialScores(next.criteria, next.ai.scores));
       setState('ready');
     } catch (error) {
       setState('error');
@@ -117,7 +118,7 @@ export function TeacherReviewPage() {
     }
   }
 
-  const back = <PageBreadcrumb items={[{ label: 'Grading', to: '/teacher/reviews' }, data ? { label: data.prompt.title } : null]} />;
+  const back = <PageBreadcrumb items={[{ label: 'Grading', to: '/teacher/reviews' }, data ? { label: data.sw ? data.sw.title : data.prompt.title } : null]} />;
   if (state === 'loading') return <DetailPageSkeleton aside />;
   if (state === 'error')
     return (
@@ -128,6 +129,8 @@ export function TeacherReviewPage() {
         </Link>
       </div>
     );
+
+  if (data.sw) return <SwReviewView key={reviewId} reviewId={reviewId} data={data} back={back} releasing={busy === 'release'} onRelease={release} />;
 
   const ai = data.ai.scores;
   const changed = scoresChanged(data.criteria, ai, scores);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowUp, ChevronRight, ClipboardCheck, Library, Pencil, Plus, X } from 'lucide-react';
-import { UnitStatus } from '@appenglish/content-contracts';
+import { LessonVersionStatus, UnitStatus } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import {
@@ -15,6 +15,8 @@ import {
   updateUnit,
 } from '../api/content-api.js';
 import { ContentDangerActions } from '../components/ContentDangerActions.jsx';
+import { ReviewStatusBadge } from '../components/ContentReview.jsx';
+import { useContentArea } from '../hooks/use-content-area.js';
 import { PublishButton, usePublishAction } from '../../../components/shared/PublishButton.jsx';
 import {
   Badge,
@@ -59,23 +61,23 @@ function MoveButtons({ label, index, count, onMove, disabled }) {
   );
 }
 
-function LessonRow({ lesson, index, count, linkState, unitId, busy, reorderable, onMove }) {
+function LessonRow({ lesson, index, count, linkState, unitId, busy, reorderable, onMove, base, canManage }) {
   return (
     <li className="group flex items-center gap-2 pr-2 transition-colors hover:bg-accent">
       <Link
-        to={`/content-manager/lessons/${lesson.id}`}
+        to={`${base}/lessons/${lesson.id}`}
         state={linkState(unitId)}
         className="flex min-w-0 flex-1 items-center gap-3 px-4 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-muted px-1.5 text-xs font-semibold tabular-nums text-muted-foreground">{lesson.position}</span>
         <span className="min-w-0 flex-1 truncate font-medium">{lesson.title}</span>
         <span className="flex shrink-0 flex-wrap justify-end gap-1.5">
-          {lesson.hasDraft ? <Badge variant="warning">Draft</Badge> : null}
+          {lesson.hasDraft ? <ReviewStatusBadge status={lesson.draftStatus || LessonVersionStatus.DRAFT} /> : null}
           {lesson.publishedVersionNumber ? <Badge variant="success">Published v{lesson.publishedVersionNumber}</Badge> : <Badge variant="outline">Not published</Badge>}
         </span>
         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
       </Link>
-      <MoveButtons label={`lesson ${lesson.title}`} index={index} count={count} disabled={busy || !reorderable} onMove={onMove} />
+      {canManage ? <MoveButtons label={`lesson ${lesson.title}`} index={index} count={count} disabled={busy || !reorderable} onMove={onMove} /> : null}
     </li>
   );
 }
@@ -112,6 +114,7 @@ const UNITS_PER_PAGE = 5;
 const DEFAULTS = { search: '', status: StatusFilter.ALL, sort: LessonSort.ORDER };
 
 export function ContentUnitsPage() {
+  const { base, eyebrow, canAuthor, canManage } = useContentArea();
   const [units, setUnits] = useState([]);
   const [state, setState] = useState('loading');
   const [busy, setBusy] = useState(false);
@@ -171,16 +174,21 @@ export function ContentUnitsPage() {
   const shown = paginate(filterUnits(units, filters), page, UNITS_PER_PAGE);
   const narrowed = filters.search || filters.status !== StatusFilter.ALL || filters.sort !== LessonSort.ORDER;
   const lessonTotal = units.reduce((sum, unit) => sum + unit.lessonCount, 0);
-  const newButton = (
+  const newButton = canAuthor ? (
     <Button className="gap-2" disabled={state !== 'ready'} onClick={() => setCreating('')}>
       <Plus className="h-4 w-4" />
       New unit
     </Button>
-  );
+  ) : null;
 
   return (
     <section className="space-y-6">
-      <PageHeader eyebrow="Content Manager" title="Units and lessons" description="Create, order and publish units and their lessons." actions={newButton} />
+      <PageHeader
+        eyebrow={eyebrow}
+        title="Units and lessons"
+        description={canAuthor ? 'Write units and their lessons, then submit them for review.' : 'Review, order and publish units and their lessons.'}
+        actions={newButton}
+      />
 
       {state === 'loading' ? (
         <RowsSkeleton rows={5} tall />
@@ -189,7 +197,7 @@ export function ContentUnitsPage() {
           Try again
         </Button>
       ) : units.length === 0 ? (
-        <EmptyState icon={Library} title="No units yet" description="Create the first unit." action={newButton} />
+        <EmptyState icon={Library} title="No units yet" description={canAuthor ? 'Create the first unit.' : 'Units appear here once teachers create them.'} action={newButton} />
       ) : (
         <>
           <div className="space-y-3 rounded-xl border bg-card p-3 shadow-sm">
@@ -203,7 +211,7 @@ export function ContentUnitsPage() {
             <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
               <span className="tabular-nums">
                 {units.length} unit{units.length === 1 ? '' : 's'} · {lessonTotal} lesson{lessonTotal === 1 ? '' : 's'}
-                {reorderable ? '' : ' · reordering is off while filtering'}
+                {reorderable || !canManage ? '' : ' · reordering is off while filtering'}
               </span>
               {narrowed ? (
                 <Button variant="ghost" size="sm" className="h-7 gap-1 px-2" onClick={() => setFilters(DEFAULTS)}>
@@ -245,17 +253,21 @@ export function ContentUnitsPage() {
                         </div>
                       </div>
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <MoveButtons
-                          label={`unit ${unit.title}`}
-                          index={unitIndex}
-                          count={units.length}
-                          disabled={busy || !reorderable}
-                          onMove={(position) => run(() => updateUnit(unit.id, { position }), { failure: 'Could not move the unit' })}
-                        />
-                        <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Edit unit ${unit.title}`} onClick={() => setEditing({ id: unit.id, title: unit.title, description: unit.description || '' })}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        {isPublished ? null : (
+                        {canManage ? (
+                          <MoveButtons
+                            label={`unit ${unit.title}`}
+                            index={unitIndex}
+                            count={units.length}
+                            disabled={busy || !reorderable}
+                            onMove={(position) => run(() => updateUnit(unit.id, { position }), { failure: 'Could not move the unit' })}
+                          />
+                        ) : null}
+                        {canAuthor ? (
+                          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`Edit unit ${unit.title}`} onClick={() => setEditing({ id: unit.id, title: unit.title, description: unit.description || '' })}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        ) : null}
+                        {isPublished || !canManage ? null : (
                           <PublishButton
                             size="sm"
                             label="Publish unit"
@@ -271,14 +283,22 @@ export function ContentUnitsPage() {
                           noun="unit"
                           published={isPublished}
                           busy={busy}
-                          onUnpublish={async () => {
-                            await unpublishUnit(unit.id);
-                            await load({ quiet: true });
-                          }}
-                          onDelete={async () => {
-                            await deleteUnit(unit.id);
-                            await load({ quiet: true });
-                          }}
+                          onUnpublish={
+                            canManage
+                              ? async () => {
+                                  await unpublishUnit(unit.id);
+                                  await load({ quiet: true });
+                                }
+                              : undefined
+                          }
+                          onDelete={
+                            canManage || (canAuthor && !isPublished)
+                              ? async () => {
+                                  await deleteUnit(unit.id);
+                                  await load({ quiet: true });
+                                }
+                              : undefined
+                          }
                           deleteNote="Every lesson of the unit goes with it."
                         />
                       </div>
@@ -300,12 +320,14 @@ export function ContentUnitsPage() {
                               busy={busy}
                               reorderable={reorderable}
                               onMove={(position) => run(() => updateLesson(lesson.id, { position }), { failure: 'Could not move the lesson' })}
+                              base={base}
+                              canManage={canManage}
                             />
                           ))}
                         </ul>
                       )}
                       <Link
-                        to={`/content-manager/units/${unit.id}/review`}
+                        to={`${base}/units/${unit.id}/review`}
                         state={linkState(unit.id)}
                         className="group flex items-center gap-3 border-t px-4 py-2.5 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                       >
@@ -315,18 +337,19 @@ export function ContentUnitsPage() {
                         <span className="flex-1 font-medium">Unit review</span>
                         {unit.review?.publishedVersionNumber ? (
                           <Badge variant="success">Published v{unit.review.publishedVersionNumber}</Badge>
-                        ) : unit.review?.hasDraft ? (
-                          <Badge variant="warning">Draft</Badge>
-                        ) : (
+                        ) : unit.review?.hasDraft ? null : (
                           <Badge variant="outline">Not written</Badge>
                         )}
+                        {unit.review?.hasDraft ? <ReviewStatusBadge status={unit.review.draftStatus || LessonVersionStatus.DRAFT} /> : null}
                         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                       </Link>
-                      <AddLessonForm
-                        unit={unit}
-                        busy={busy}
-                        onAdd={(title) => run(() => createLesson(unit.id, { title }), { success: 'Lesson created', failure: 'Could not create the lesson' })}
-                      />
+                      {canAuthor ? (
+                        <AddLessonForm
+                          unit={unit}
+                          busy={busy}
+                          onAdd={(title) => run(() => createLesson(unit.id, { title }), { success: 'Lesson created', failure: 'Could not create the lesson' })}
+                        />
+                      ) : null}
                     </div>
                   </article>
                 );

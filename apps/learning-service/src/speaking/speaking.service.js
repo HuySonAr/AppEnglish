@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { AccountRole } from '@appenglish/auth-contracts';
-import { PracticePromptKind } from '@appenglish/content-contracts';
+import { ETS_SET_TASKS, ETS_TASK_TIMING, EtsSpeakingTask, PracticePromptKind } from '@appenglish/content-contracts';
 import { currentRequestId } from '@appenglish/backend-common/observability';
 import {
   LearningEventType,
@@ -11,9 +11,11 @@ import {
   StudyActivity,
   SUBMISSION_HISTORY_SIZE,
   SubmissionStatus,
+  SW_ITEM_MAX,
 } from '@appenglish/learning-contracts';
 import { noEvents, recordActivity } from '../events/learning-events.js';
 import { placementErrors } from '../placement/placement.errors.js';
+import { readAloudItem } from '../swtest/swtest.scoring.js';
 import { speakingErrors } from './speaking.errors.js';
 import { openGradingSchema, openWhisperSchema, readAloudResultSchema } from './speaking.schemas.js';
 
@@ -22,6 +24,8 @@ const isOpen = (kind) => kind === PracticePromptKind.OPEN_SPEAKING;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const iso = (value) => (value ? new Date(value).toISOString() : null);
 const mimeOf = (value) => String(value || '').split(';')[0].trim().toLowerCase();
+const etsOf = (task, score) => (score === undefined || !SW_ITEM_MAX[task] ? null : { task, score: Math.min(score, SW_ITEM_MAX[task]), max: SW_ITEM_MAX[task] });
+const readAloudEts = (scores) => ({ task: EtsSpeakingTask.READ_ALOUD, ...readAloudItem(scores), max: SW_ITEM_MAX[EtsSpeakingTask.READ_ALOUD] });
 
 export class SpeakingService {
   constructor(repository, contentClient, { now = () => new Date(), events = noEvents, keys = null, reviews = null } = {}) {
@@ -49,11 +53,15 @@ export class SpeakingService {
 
   learnerPrompt(prompt) {
     const { content, media = {} } = prompt;
-    const common = { id: prompt.id, kind: prompt.kind, versionNumber: prompt.versionNumber, title: content.title, level: content.level, topic: content.topic };
+    const etsTask = isOpen(prompt.kind) ? content.etsTask || null : EtsSpeakingTask.READ_ALOUD;
+    const common = { id: prompt.id, kind: prompt.kind, versionNumber: prompt.versionNumber, title: content.title, level: content.level, topic: content.topic, etsTask, timing: ETS_TASK_TIMING[etsTask] || null };
     if (isOpen(prompt.kind))
       return {
         ...common,
         instructions: content.instructions,
+        context: content.context || '',
+        info: content.info || '',
+        questions: (content.questions || []).map((question) => ({ text: question.text, audioUrl: (question.audioMediaId && media[question.audioMediaId]?.url) || null })),
         imageUrl: (content.imageMediaId && media[content.imageMediaId]?.url) || null,
         maxSeconds: Math.min(RECORDING_LIMITS.openSpeakingSeconds, content.maxSeconds || RECORDING_LIMITS.openSpeakingSeconds),
       };
@@ -68,6 +76,8 @@ export class SpeakingService {
   summary(submission) {
     return {
       id: submission.id,
+      setId: submission.prompt?.setId || null,
+      questionIndex: submission.prompt?.questionIndex ?? null,
       status: submission.status,
       total: submission.teacherReview?.scores?.total ?? submission.result?.scores?.total ?? null,
       reviewed: Boolean(submission.teacherReview),
@@ -91,7 +101,9 @@ export class SpeakingService {
         ? {
             title: submission.prompt.title,
             level: submission.prompt.level,
+            etsTask: submission.prompt.etsTask || null,
             instructions: submission.prompt.instructions,
+            question: submission.prompt.question || null,
           }
         : { title: submission.prompt.title, level: submission.prompt.level, text: submission.prompt.text },
       result: submission.result || null,
@@ -118,6 +130,7 @@ export class SpeakingService {
             title: prompt.title,
             level: prompt.level,
             topic: prompt.topic,
+            etsTask: prompt.etsTask || (prompt.kind === PracticePromptKind.READ_ALOUD ? EtsSpeakingTask.READ_ALOUD : null),
             attempts: mine?.attempts || 0,
             bestTotal: mine?.bestTotal ?? null,
             lastSubmittedAt: iso(mine?.lastSubmittedAt),
@@ -140,16 +153,28 @@ export class SpeakingService {
     if (durationSeconds > maxSeconds + 1) throw speakingErrors.recordingInvalid('TOO_LONG', `Record at most ${maxSeconds} seconds`);
   }
 
-  async submit(actor, promptId, { mimeType, data, durationSeconds }) {
+  async submit(actor, promptId, { mimeType, data, durationSeconds, questionIndex, setId }) {
     this.assertStudent(actor);
     const type = mimeOf(mimeType);
     const prompt = await this.paperOf(promptId);
+    const isSet = isOpen(prompt.kind) && ETS_SET_TASKS.includes(prompt.content.etsTask);
+    const question = isSet ? prompt.content.questions?.[questionIndex] : null;
+    if (isSet && (!question || !setId)) throw speakingErrors.recordingInvalid('SET_ANSWER', 'Say which question of the set this answer is for');
     this.checkRecording(type, data, durationSeconds, this.learnerPrompt(prompt).maxSeconds);
     const { recording } = await this.contentClient.storeLearnerRecording(type, data);
     const at = this.now();
     const id = randomUUID();
     const view = this.learnerPrompt(prompt);
     const snapshot = { ...prompt.content, versionId: prompt.versionId, versionNumber: prompt.versionNumber, audioUrl: view.audioUrl || null, imageUrl: view.imageUrl || null, maxSeconds: view.maxSeconds };
+    if (isSet)
+      Object.assign(snapshot, {
+        setId,
+        questionIndex,
+        question: question.text,
+        instructions: [prompt.content.context || prompt.content.info, `Question ${questionIndex + 1}: ${question.text}`].filter(Boolean).join('\n\n'),
+        sampleAnswer: question.sampleAnswer,
+        keyPoints: [],
+      });
     const saved = await this.repository.saveWithEvent(
       {
         id,
@@ -219,7 +244,7 @@ export class SpeakingService {
     const schema = isOpen(submission.kind) ? openWhisperSchema : readAloudResultSchema;
     const parsed = answer.status === SubmissionStatus.DONE ? schema.safeParse(answer.result) : null;
     if (!parsed?.success) return this.finish(submission, { status: SubmissionStatus.FAILED, result: null, error: parsed ? 'The scoring result was not valid' : answer.error });
-    if (!isOpen(submission.kind)) return this.finish(submission, { status: SubmissionStatus.DONE, result: parsed.data });
+    if (!isOpen(submission.kind)) return this.finish(submission, { status: SubmissionStatus.DONE, result: { ...parsed.data, ets: readAloudEts(parsed.data.scores) } });
     const heard = { ...parsed.data, scores: openSpeakingScores(parsed.data.scores), gemini: null };
     const key = await this.keyOf(submission.accountId);
     if (!key || !heard.transcript.trim()) return this.finish(submission, { status: SubmissionStatus.DONE, result: heard });
@@ -234,6 +259,7 @@ export class SpeakingService {
           submissionId: submission.id,
           accountId: submission.accountId,
           prompt: { title: prompt.title, level: prompt.level, instructions: prompt.instructions, maxSeconds: prompt.maxSeconds, sampleAnswer: prompt.sampleAnswer, keyPoints: prompt.keyPoints || [] },
+          etsTask: prompt.etsTask || null,
           answer: heard.transcript,
           durationSeconds: submission.recording?.durationSeconds ?? null,
           key: key.sealed,
@@ -258,9 +284,10 @@ export class SpeakingService {
     const parsed = answer.status === SubmissionStatus.DONE ? openGradingSchema.safeParse(answer.result) : null;
     if (!parsed?.success) return this.finish(submission, { status: SubmissionStatus.FAILED, result: heard, error: parsed ? 'The scoring result was not valid' : answer.error });
     const { fluency, pronunciation } = heard.scores;
+    const { etsScore, ...gemini } = parsed.data;
     return this.finish(submission, {
       status: SubmissionStatus.DONE,
-      result: { ...heard, gemini: parsed.data, scores: openSpeakingScores({ criteria: parsed.data.criteria, fluency, pronunciation }) },
+      result: { ...heard, gemini, ets: etsOf(submission.prompt.etsTask, etsScore), scores: openSpeakingScores({ criteria: gemini.criteria, fluency, pronunciation }) },
     });
   }
 

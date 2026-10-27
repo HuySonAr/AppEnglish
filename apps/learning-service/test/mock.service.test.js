@@ -51,7 +51,8 @@ test('a full mock test is timed, shuffled, scored and estimated', async () => {
 
   const started = await service.startMockAttempt(student, first.id, FULL);
   assert.equal(started.kind, 'FULL');
-  assert.equal(started.expiresAt, '2026-10-11T10:00:00.000Z');
+  assert.equal(started.expiresAt, '2026-10-11T10:15:00.000Z');
+  assert.deepEqual([started.format, started.phase, started.listeningPosition, started.listeningClosesAt], ['full', 'listening', 0, '2026-10-11T09:00:00.000Z']);
   assert.deepEqual(started.parts.flatMap((part) => part.questions.map((question) => question.number)), Array.from({ length: 13 }, (_, index) => index + 1));
   assert.equal(started.parts[5].groups.length, 1);
   assert.equal(started.parts[5].questions[0].groupId, started.parts[5].groups[0].id);
@@ -71,8 +72,8 @@ test('a full mock test is timed, shuffled, scored and estimated', async () => {
   assert.deepEqual({ ...result.attempt, submittedAt: null }, {
     attemptNumber: 1, correctCount: 9, totalCount: 13, scorePercent: 69,
     listeningCorrect: 6, listeningTotal: 6, readingCorrect: 3, readingTotal: 7,
-    durationSeconds: 1800, submittedAt: null,
-    estimated: { listeningScore: listening[100], readingScore: reading[43], totalScore: listening[100] + reading[43] },
+    durationSeconds: 1800, submittedAt: null, format: 'full',
+    estimated: { listeningScore: listening[100], readingScore: reading[43], totalScore: listening[100] + reading[43], margin: 25 },
     countsForXp: true,
   });
   assert.equal(result.parts[0].questions[0].transcript, 'Secret transcript');
@@ -88,6 +89,7 @@ test('a full mock test is timed, shuffled, scored and estimated', async () => {
   assert.equal(detail.mockTest.questionCount, 13);
   assert.deepEqual(detail.full.attempts.map((attempt) => attempt.scorePercent), [69, 100]);
   assert.equal(detail.full.progression.trend, 'IMPROVED');
+  assert.deepEqual([detail.full.progression.listeningTrend, detail.full.progression.readingTrend], ['same', 'up']);
   assert.equal(detail.full.inProgress, false);
   assert.equal((await service.getMockReview(student, first.id, { ...FULL, attemptNumber: 1 })).attempt.scorePercent, 69);
   assert.equal((await service.getMockReview(student, first.id, FULL)).attempt.attemptNumber, 2);
@@ -99,15 +101,44 @@ test('a full mock test is timed, shuffled, scored and estimated', async () => {
   assert.equal((await service.listMockTests(otherStudent)).recommendedLevel, 1);
 });
 
-test('the full test clock is kept by the server', async () => {
+test('a practice set keeps its own clock and gets no estimate or XP (D193)', async () => {
   const { service, tests, answers, advance } = await harness();
   const second = tests[1];
-  await service.startMockAttempt(student, second.id, FULL);
+  const started = await service.startMockAttempt(student, second.id, FULL);
+  assert.deepEqual([started.format, started.phase, started.expiresAt], ['practice', null, '2026-10-11T09:00:00.000Z']);
+  await assert.rejects(() => service.finishMockListening(student, second.id, FULL), { code: 58 });
   await service.saveMockAnswers(student, second.id, { ...FULL, answers: answers(second.id, 4) });
   advance(61);
   await assert.rejects(() => service.saveMockAnswers(student, second.id, { ...FULL, answers: {} }), { code: 58 });
   const detail = await service.getMockTest(student, second.id);
-  assert.deepEqual(detail.full.attempts.map((attempt) => [attempt.correctCount, attempt.durationSeconds]), [[4, 3600]]);
+  assert.deepEqual(detail.full.attempts.map((attempt) => [attempt.correctCount, attempt.durationSeconds, attempt.estimated, attempt.countsForXp]), [[4, 3600, null, false]]);
+  assert.equal((await service.listMockTests(student)).mockTests[1].latestTotalScore, null);
+});
+
+test('a full test plays Listening first, then locks it and gives Reading 75 minutes (D193)', async () => {
+  const { service, tests, answers, advance, content } = await harness();
+  const [first] = tests;
+  const paper = content.paperOf(first.id);
+  const listeningIds = new Set(['part1', 'part2', 'part3', 'part4'].flatMap((key) => paper.test[key].questions.map((question) => question.id)));
+  await service.startMockAttempt(student, first.id, FULL);
+  const all = answers(first.id, 13);
+  const listeningOnly = Object.fromEntries(Object.entries(all).filter(([id]) => listeningIds.has(id)));
+  await service.saveMockAnswers(student, first.id, { ...FULL, answers: listeningOnly, listeningPosition: 3 });
+  advance(20);
+  const reading = await service.finishMockListening(student, first.id, FULL);
+  assert.deepEqual([reading.phase, reading.listeningPosition, reading.readingStartedAt, reading.expiresAt, reading.listeningClosesAt], ['reading', 3, '2026-10-11T08:20:00.000Z', '2026-10-11T09:35:00.000Z', null]);
+  await service.saveMockAnswers(student, first.id, { ...FULL, answers: Object.fromEntries(Object.entries(all).filter(([id]) => !listeningIds.has(id))) });
+  const kept = (await service.getMockAttempt(student, first.id, FULL)).answers;
+  assert.equal(Object.keys(kept).length, 13);
+  assert.equal(Object.keys(kept).filter((id) => listeningIds.has(id)).length, listeningIds.size);
+  advance(76);
+  await assert.rejects(() => service.saveMockAnswers(student, first.id, { ...FULL, answers: {} }), { code: 58 });
+  assert.equal((await service.getMockTest(student, first.id)).full.attempts[0].correctCount, 13);
+
+  await service.startMockAttempt(student, first.id, FULL);
+  advance(61);
+  const settled = await service.getMockAttempt(student, first.id, FULL);
+  assert.deepEqual([settled.phase, settled.readingStartedAt], ['reading', '2026-10-11T10:36:00.000Z']);
 });
 
 test('a mini test is one part, untimed, repeatable and without XP', async () => {
@@ -129,7 +160,7 @@ test('a mini test is one part, untimed, repeatable and without XP', async () => 
   assert.deepEqual({ ...result.attempt, submittedAt: null, durationSeconds: null }, {
     attemptNumber: 1, correctCount: 1, totalCount: 2, scorePercent: 50,
     listeningCorrect: 0, listeningTotal: 0, readingCorrect: 1, readingTotal: 2,
-    durationSeconds: null, submittedAt: null, estimated: null, countsForXp: false,
+    durationSeconds: null, submittedAt: null, format: 'practice', estimated: null, countsForXp: false,
   });
   assert.deepEqual(result.parts.map((part) => part.key), ['part6']);
   assert.equal(result.parts[0].questions[0].options.some((option) => option.isCorrect), true);
@@ -227,7 +258,7 @@ test('study goal (D165): a student sets a target, sees the latest estimate and t
   await assert.rejects(() => service.getStudyGoal(manager), { code: 26 });
   const empty = await service.getStudyGoal(student);
   assert.deepEqual([empty.goal, empty.estimate, empty.weakestPart], [null, null, null]);
-  await assert.rejects(() => service.saveStudyGoal(student, { targetScore: 650, examDate: '2020-01-01' }), { code: 30 });
+  await assert.rejects(() => service.saveStudyGoal(student, { lr: { targetScore: 650, examDate: '2020-01-01' }, sw: null }), { code: 30 });
 
   const id = tests[0].id;
   await service.startMockAttempt(student, id, FULL);
@@ -237,8 +268,12 @@ test('study goal (D165): a student sets a target, sees the latest estimate and t
   for (const question of paper.test.part5.questions) right[question.id] = question.options[1].id;
   await service.submitMockAttempt(student, id, { ...FULL, answers: right });
 
-  const saved = await service.saveStudyGoal(student, { targetScore: 650, examDate: '2026-12-20' });
-  assert.deepEqual(saved.goal, { targetScore: 650, examDate: '2026-12-20' });
+  const saved = await service.saveStudyGoal(student, { lr: { targetScore: 650, examDate: '2026-12-20' }, sw: null });
+  assert.deepEqual(saved.goal, { lr: { targetScore: 650, examDate: '2026-12-20' }, sw: null });
+  assert.deepEqual(saved.sw, { lastTest: { speaking: null, writing: null }, practiced: {}, estimate: null });
+  const both = await service.saveStudyGoal(student, { lr: null, sw: { speakingTarget: 150, writingTarget: null, examDate: '2026-12-30' } });
+  assert.deepEqual(both.goal, { lr: null, sw: { speakingTarget: 150, writingTarget: null, examDate: '2026-12-30' } });
+  await service.saveStudyGoal(student, { lr: { targetScore: 650, examDate: '2026-12-20' }, sw: null });
   assert.equal(typeof saved.estimate.total, 'number');
   assert.equal(saved.estimate.mockTestId, id);
   assert.deepEqual(saved.history.map((point) => [point.total, point.mockTestId]), [[saved.estimate.total, id]]);
@@ -285,4 +320,25 @@ test('mock mistakes (D167): wrong answers wait for review and leave after two ri
   await service.startMockAttempt(student, id, mini('part5'));
   await service.submitMockAttempt(student, id, { ...mini('part5'), answers: { [first.id]: first.options[0].id, [second.id]: second.options[0].id } });
   assert.equal((await service.getMockMistakes(student)).total, 1, 'one right answer in a test counts toward the two');
+});
+
+test('S&W activity for the plan: the last test of each part and the last practice of each task type (D197)', async () => {
+  const { swActivity } = await import('../src/mock/goal.rules.js');
+  const activity = swActivity(
+    [
+      { section: 'speaking', status: 'SUBMITTED', submittedAt: '2026-10-20T08:00:00Z' },
+      { section: 'speaking', status: 'SUBMITTED', submittedAt: '2026-10-25T08:00:00Z' },
+      { section: 'writing', status: 'IN_PROGRESS', submittedAt: null },
+    ],
+    [
+      { kind: 'read_aloud', prompt: {}, submittedAt: '2026-10-21T08:00:00Z' },
+      { kind: 'open_speaking', prompt: { etsTask: 'describe_picture' }, submittedAt: '2026-10-22T08:00:00Z' },
+      { kind: 'open_speaking', prompt: { etsTask: 'describe_picture' }, submittedAt: '2026-10-23T08:00:00Z' },
+      { kind: 'writing', prompt: { etsTask: null }, submittedAt: '2026-10-23T08:00:00Z' },
+    ],
+  );
+  assert.deepEqual(activity, {
+    lastTest: { speaking: '2026-10-25T08:00:00.000Z', writing: null },
+    practiced: { read_aloud: '2026-10-21T08:00:00.000Z', describe_picture: '2026-10-23T08:00:00.000Z' },
+  });
 });

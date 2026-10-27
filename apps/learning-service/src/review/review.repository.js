@@ -1,5 +1,5 @@
 import { In } from 'typeorm';
-import { LearningEventEntity, PracticeSubmissionEntity, ReviewRequestEntity } from '../database/learning.entities.js';
+import { SwAttemptEntity, LearningEventEntity, PracticeSubmissionEntity, ReviewRequestEntity } from '../database/learning.entities.js';
 
 export class ReviewRepository {
   constructor(dataSource) {
@@ -84,6 +84,15 @@ export class ReviewRepository {
     return (await this.source()).transaction(async (manager) => {
       const saved = await manager.save(ReviewRequestEntity, review);
       await manager.update(PracticeSubmissionEntity, { id: submission.id }, { teacherReview: submission.teacherReview });
+      await manager.save(LearningEventEntity, event);
+      return saved;
+    });
+  }
+
+  async completeSw(review, attemptId, teacherReview, event) {
+    return (await this.source()).transaction(async (manager) => {
+      const saved = await manager.save(ReviewRequestEntity, review);
+      await manager.update(SwAttemptEntity, { id: attemptId }, { teacherReview });
       await manager.save(LearningEventEntity, event);
       return saved;
     });

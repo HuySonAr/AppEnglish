@@ -143,6 +143,7 @@ test('a full mock test is reported with its counts and estimate; a mini test is 
     mockTestTitle: 'Level 1 test',
     mockVersionId: content.paperOf(first.id).versionId,
     kind: 'FULL',
+    format: 'full',
     attemptNumber: 1,
     correctCount: 9,
     totalCount: 13,

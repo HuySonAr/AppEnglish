@@ -11,7 +11,7 @@
 Chỉ lượt full đầu tiên của mỗi đề mock được tính XP (D63, D112): XP = số câu đúng / tổng số câu × 100, làm tròn thành số nguyên, tối đa 100 XP trên đề; làm lại đề không đổi XP. Không XP cho mini test, placement, lesson test, practice thường hoặc hoạt động học (D10, D14). XP được ghi khi progress-service nhận sự kiện `mock.submitted` của lượt đầu; học viên xem XP và các đề đã cộng ở trang Progress.
 
 ## Streak (D154)
-- Streak là số ngày học liên tiếp. Một ngày học là ngày học viên làm xong ít nhất một việc: một bước lesson (vocabulary, word quiz, fill-in đạt), nộp lesson test hoặc unit review, đánh dấu xong một chủ đề Listening course hoặc nộp bài test cấp, bấm "Check my answers" một bài luyện nghe, làm xong một lượt Word memory, nộp một mock test (full hoặc mini), trả lời một câu khi ôn câu sai mock test (D167). Chỉ mở app không tính.
+- Streak là số ngày học liên tiếp. Một ngày học là ngày học viên làm xong ít nhất một việc: một bước lesson (vocabulary, word quiz, fill-in đạt), nộp lesson test hoặc unit review, bấm "Check my answers" một bài luyện nghe, làm xong một lượt Word memory, nộp một mock test (full hoặc mini), trả lời một câu khi ôn câu sai mock test (D167). Chỉ mở app không tính.
 - Ngày tính theo giờ Việt Nam, cắt lúc 0 giờ.
 - Mỗi tuần (thứ 2 đến chủ nhật) được nghỉ một ngày mà chuỗi không đứt; nghỉ ngày thứ hai trong tuần thì chuỗi về 0. Hôm nay chưa học không làm đứt chuỗi. Lưu chuỗi dài nhất.
 - Không XP, không phần thưởng, không phạt, không bảng xếp hạng. Chỉ học viên tự xem: dashboard (số ngày, 7 chấm của tuần, nhắc nhẹ khi hôm nay chưa học), Profile (chuỗi hiện tại, dài nhất, lịch 8 tuần).
@@ -22,12 +22,12 @@ Chỉ lượt full đầu tiên của mỗi đề mock được tính XP (D63, D
 - Học viên:
   - Kết quả full mock test: điểm TOEIC ước tính và mức tăng/giảm so với lượt trước của cùng đề (mini test không báo). Mở lịch sử đúng lượt đó.
   - Qua unit review lần đầu: unit kế tiếp đã mở. Mở trang Lessons.
-  - Qua Level test của Listening course: đã lên cấp mới. Mở Listening course.
   - Nhắc streak: từ 18 giờ (giờ Việt Nam), khi chuỗi đang có và hôm nay chưa học; tối đa 1 lần mỗi ngày; học xong trong ngày thì nhắc tự thành đã đọc. Tạo khi học viên mở app, không có job chạy nền.
-- Content Manager: Transcribe hoặc Auto-time của chính mình xong hoặc lỗi (bài nghe, topic Listening course, mock test) trong 7 ngày gần nhất. Mở trình soạn của nội dung đó.
+- Content Manager: Transcribe hoặc Auto-time của chính mình xong hoặc lỗi (bài nghe, mock test) trong 7 ngày gần nhất. Mở trình soạn của nội dung đó.
+- Luồng duyệt nội dung (D192): Content Manager nhận "Waiting for review" cho mỗi bài đang chờ duyệt (mọi loại nội dung và đề Speaking/Writing), kèm người gửi; giáo viên nhận "Approved" hoặc "Returned" (kèm góp ý) cho bài mình gửi, và thông báo Transcribe/Auto-time của mình. Bấm mở đúng trang.
 - Admin (D164), mỗi Admin có trạng thái đã đọc riêng:
   - Số học viên mới của tuần trước (thứ 2 đến chủ nhật, giờ Việt Nam) và chênh lệch so với tuần trước nữa. Mở trang Accounts.
-  - Content Manager gỡ xuất bản một unit, unit review, lesson, mock test, bài nghe hay item Listening course.
+  - Content Manager gỡ xuất bản một unit, unit review, lesson, mock test hay bài nghe.
   - Speech job lỗi trong ngày (gồm job quá hạn và lỗi gửi RabbitMQ): số job lỗi và lỗi gần nhất, mỗi ngày một thông báo; có lỗi mới thì thành chưa đọc lại.
   - Đăng nhập sai nhiều lần chưa báo: giới hạn đăng nhập (D117) đếm ở gateway bằng Redis với email đã băm và không lưu lại.
 - Chưa có tùy chọn tắt từng loại.

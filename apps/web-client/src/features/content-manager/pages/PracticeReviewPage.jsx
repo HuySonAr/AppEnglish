@@ -14,10 +14,10 @@ import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
 import { timeAgo } from '../../../lib/notifications.js';
 import { listPracticePrompts } from '../../../lib/api/practice-prompts-api.js';
-import { ReviewArea, authorOptions, filterPrompts, kindLabels, levelOptions, reviewAreaKinds, reviewPromptPath, statusInfo } from '../../../lib/practice-prompts.js';
+import { ReviewArea, authorOptions, etsTaskLabel, etsTaskOf, etsTaskOptions, filterPrompts, kindLabels, levelOptions, reviewAreaKinds, reviewPromptPath, statusInfo } from '../../../lib/practice-prompts.js';
 
 const PAGE_SIZE = 10;
-const DEFAULTS = { search: '', kind: 'all', level: 'all', status: 'PENDING_REVIEW', author: 'all' };
+const DEFAULTS = { search: '', kind: 'all', etsTask: 'all', level: 'all', status: 'PENDING_REVIEW', author: 'all' };
 const statusTabs = [
   { value: 'PENDING_REVIEW', label: 'Waiting' },
   { value: 'PUBLISHED', label: 'Published' },
@@ -42,7 +42,7 @@ export function PracticeReviewPage({ area }) {
   async function load() {
     setState('loading');
     try {
-      setPrompts((await listPracticePrompts()).data.prompts.filter((prompt) => kinds.includes(prompt.kind)));
+      setPrompts((await listPracticePrompts()).data.prompts.filter((prompt) => kinds.includes(prompt.kind)).map((prompt) => ({ ...prompt, etsTask: etsTaskOf(prompt.kind, prompt) })));
       setState('ready');
     } catch (error) {
       setState('error');
@@ -93,6 +93,7 @@ export function PracticeReviewPage({ area }) {
                 <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                   <FilterSelect label="Teacher" value={filters.author} onChange={setFilter('author')} options={authorOptions(prompts)} className="w-full sm:w-44" />
                   {kinds.length > 1 ? <FilterSelect label="Kind" value={filters.kind} onChange={setFilter('kind')} options={kindOptions} className="w-full sm:w-40" /> : null}
+                  <FilterSelect label="Task type" value={filters.etsTask} onChange={setFilter('etsTask')} options={etsTaskOptions(prompts)} className="w-full sm:w-52" />
                   <FilterSelect label="Level" value={filters.level} onChange={setFilter('level')} options={levelOptions} className="w-full sm:w-32" />
                 </div>
               </div>
@@ -124,7 +125,7 @@ export function PracticeReviewPage({ area }) {
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-medium">{prompt.title || 'Untitled prompt'}</span>
                         <span className="block truncate text-xs text-muted-foreground">
-                          {kindLabels[prompt.kind]}
+                          {etsTaskLabel(prompt.etsTask, kindLabels[prompt.kind])}
                           {prompt.topic ? ` · ${prompt.topic}` : ''} · version {prompt.versionNumber}
                           {prompt.submittedAt && prompt.status === 'PENDING_REVIEW' ? ` · sent ${timeAgo(prompt.submittedAt)}` : ''}
                         </span>
@@ -135,6 +136,7 @@ export function PracticeReviewPage({ area }) {
                       </span>
                       <span className="flex shrink-0 flex-wrap justify-end gap-1.5">
                         {prompt.publishedVersionNumber && prompt.status !== 'PUBLISHED' ? <Badge variant="success">Live v{prompt.publishedVersionNumber}</Badge> : null}
+                        {!prompt.etsTask ? <Badge variant="outline">No task type</Badge> : null}
                         <Badge variant={statusInfo[prompt.status].variant}>{statusInfo[prompt.status].label}</Badge>
                       </span>
                       <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />

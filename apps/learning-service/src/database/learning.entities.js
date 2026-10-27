@@ -124,6 +124,9 @@ export const MockAttemptEntity = new EntitySchema({
     startedAt: { type: 'timestamptz' },
     expiresAt: { type: 'timestamptz', nullable: true },
     submittedAt: { type: 'timestamptz', nullable: true },
+    format: { type: 'varchar', length: 16, default: 'full' },
+    readingStartedAt: { type: 'timestamptz', nullable: true },
+    listeningPosition: { type: 'int', default: 0 },
     optionOrder: { type: 'jsonb', default: {} },
     answers: { type: 'jsonb', default: {} },
     totalCount: { type: 'int', nullable: true },
@@ -169,8 +172,13 @@ export const LearnerGoalEntity = new EntitySchema({
   tableName: 'learner_goals',
   columns: {
     accountId: { type: 'uuid', primary: true },
-    targetScore: { type: 'int' },
+    targetScore: { type: 'int', nullable: true },
     examDate: { type: 'date', nullable: true },
+    lrEnabled: { type: 'boolean', default: true },
+    swEnabled: { type: 'boolean', default: false },
+    speakingTarget: { type: 'int', nullable: true },
+    writingTarget: { type: 'int', nullable: true },
+    swExamDate: { type: 'date', nullable: true },
     createdAt: { type: 'timestamptz', createDate: true },
     updatedAt: { type: 'timestamptz', updateDate: true },
   },
@@ -186,45 +194,6 @@ export const ScoreConversionEntity = new EntitySchema({
     updatedBy: { type: 'uuid', nullable: true },
     updatedAt: { type: 'timestamptz', updateDate: true },
   },
-});
-
-export const CourseLessonResultEntity = new EntitySchema({
-  name: 'CourseLessonResult',
-  tableName: 'course_lesson_results',
-  columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    accountId: { type: 'uuid' },
-    unitId: { type: 'uuid' },
-    lessonId: { type: 'uuid' },
-    bestScore: { type: 'int' },
-    lastScore: { type: 'int' },
-    attemptCount: { type: 'int' },
-    passedAt: { type: 'timestamptz', nullable: true },
-    lastAttemptAt: { type: 'timestamptz' },
-    createdAt: { type: 'timestamptz', createDate: true },
-    updatedAt: { type: 'timestamptz', updateDate: true },
-  },
-  indices: [{ name: 'UQ_course_lesson_results_account_lesson', columns: ['accountId', 'lessonId'], unique: true }],
-});
-
-export const CourseTestResultEntity = new EntitySchema({
-  name: 'CourseTestResult',
-  tableName: 'course_test_results',
-  columns: {
-    id: { type: 'uuid', primary: true, generated: 'uuid' },
-    accountId: { type: 'uuid' },
-    itemId: { type: 'uuid' },
-    kind: { type: 'varchar', length: 12 },
-    level: { type: 'varchar', length: 2 },
-    bestScore: { type: 'int' },
-    lastScore: { type: 'int' },
-    attemptCount: { type: 'int' },
-    passedAt: { type: 'timestamptz', nullable: true },
-    lastAttemptAt: { type: 'timestamptz' },
-    createdAt: { type: 'timestamptz', createDate: true },
-    updatedAt: { type: 'timestamptz', updateDate: true },
-  },
-  indices: [{ name: 'UQ_course_test_results_account_item', columns: ['accountId', 'itemId'], unique: true }],
 });
 
 export const ListeningResultEntity = new EntitySchema({
@@ -333,3 +302,52 @@ export const ReviewRequestEntity = new EntitySchema({
     { name: 'IDX_review_requests_week', columns: ['accountId', 'weekStart'] },
   ],
 });
+
+export const SwAttemptEntity = new EntitySchema({
+  name: 'SwAttempt',
+  tableName: 'sw_attempts',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    accountId: { type: 'uuid' },
+    testId: { type: 'uuid' },
+    versionId: { type: 'uuid' },
+    section: { type: 'varchar', length: 16 },
+    attemptNumber: { type: 'int' },
+    status: { type: 'varchar', length: 16 },
+    startedAt: { type: 'timestamptz' },
+    expiresAt: { type: 'timestamptz' },
+    submittedAt: { type: 'timestamptz', nullable: true },
+    answers: { type: 'jsonb', default: {} },
+    recordings: { type: 'jsonb', default: {} },
+    lockedThrough: { type: 'int', default: 0 },
+    recordingDeletedAt: { type: 'timestamptz', nullable: true },
+    scoring: { type: 'jsonb', nullable: true },
+    teacherReview: { type: 'jsonb', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+});
+
+export const SwScoreJobEntity = new EntitySchema({
+  name: 'SwScoreJob',
+  tableName: 'sw_score_jobs',
+  columns: {
+    id: { type: 'uuid', primary: true },
+    attemptId: { type: 'uuid' },
+    number: { type: 'int' },
+    createdAt: { type: 'timestamptz', createDate: true },
+  },
+});
+
+export const SwScoreConversionEntity = new EntitySchema({
+  name: 'SwScoreConversion',
+  tableName: 'sw_score_conversion',
+  columns: {
+    id: { type: 'int', primary: true },
+    speaking: { type: 'jsonb' },
+    writing: { type: 'jsonb' },
+    updatedBy: { type: 'uuid', nullable: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+});
+

@@ -9,7 +9,7 @@ import { ScoreSummary } from './PracticeScore.jsx';
 
 const SPOKEN = new Set(['read_aloud', 'open_speaking']);
 
-function Waiting({ status, busy, onWithdraw }) {
+export function Waiting({ status, busy, onWithdraw }) {
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-muted/40 p-4 text-sm">
       <Clock className="h-4 w-4 text-primary" />

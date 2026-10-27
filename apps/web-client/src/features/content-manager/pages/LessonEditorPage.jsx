@@ -5,23 +5,27 @@ import { Plus } from 'lucide-react';
 import {
   Accent,
   ContentResponseCode,
+  ContentReviewKind,
   FILL_IN_BLANK,
   LESSON_TEST_PARTS,
+  LessonVersionStatus,
   MediaSection,
 } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { ContentDangerActions } from '../components/ContentDangerActions.jsx';
 import { DiscardDraftButton } from '../components/DiscardDraftButton.jsx';
-import { deleteLesson, unpublishLesson } from '../api/content-api.js';
 import { notify } from '../../../lib/notify.js';
 import {
   autofillPronunciation,
+  deleteLesson,
   getLesson,
-  publishLesson,
   saveLessonDraft,
+  submitContentReview,
+  unpublishLesson,
   updateLesson,
 } from '../api/content-api.js';
 import { useDraftMedia } from '../hooks/use-draft-media.js';
+import { useContentArea } from '../hooks/use-content-area.js';
 import {
   issueLabel,
   issueLocation,
@@ -40,26 +44,36 @@ import { ImportExportJson } from '../components/ImportExportJson.jsx';
 import { exportLesson, jsonFileName, planLessonImport } from '../lib/authoring-import.js';
 import { TextField } from '../components/TextField.jsx';
 import { VocabularyCard } from '../components/VocabularyCard.jsx';
+import { ReadOnlyProvider } from '../components/ReadOnly.jsx';
+import {
+  ChangesFromPublished,
+  ManagerReviewActions,
+  ReviewBanner,
+  ReviewStatusBadge,
+  SubmitForReviewButton,
+  reviewErrorMessage,
+} from '../components/ContentReview.jsx';
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { VersionHistory } from '../components/VersionHistory.jsx';
-import { PublishButton, usePublishAction } from '../../../components/shared/PublishButton.jsx';
-import { useFocusReturn, useListLinkState, useReturnTo } from '../../../hooks/use-return-to.js';
+import { useReturnTo } from '../../../hooks/use-return-to.js';
 
+const KIND = ContentReviewKind.LESSON;
 const saveErrorMessage = (error) =>
-  `${error?.fileName ? `${error.fileName}: ` : ''}${getApiErrorMessage(error)}`;
+  `${error?.fileName ? `${error.fileName}: ` : ''}${reviewErrorMessage(error)}`;
 
 export function LessonEditorPage() {
   const { lessonId } = useParams();
-  const back = useReturnTo('/content-manager/units');
+  const { base, canAuthor, canManage } = useContentArea();
+  const back = useReturnTo(`${base}/units`);
   const [state, setState] = useState('loading');
   const [lesson, setLesson] = useState(null);
   const navigate = useNavigate();
   const [status, setStatus] = useState(lessonState(null));
   const [title, setTitle] = useState('');
   const [content, setContent] = useState(null);
+  const [compare, setCompare] = useState({ draft: null, published: null });
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
-  const publish = usePublishAction();
   const [issues, setIssues] = useState([]);
   const [tab, setTab] = useState('vocabulary');
   const [partTab, setPartTab] = useState(LESSON_TEST_PARTS[0].key);
@@ -71,14 +85,19 @@ export function LessonEditorPage() {
     draftMedia.setStored(data.media || {});
     setStatus(lessonState(data));
     setContent(workingContent(data));
+    setCompare({ draft: data.draft?.content ?? null, published: data.published?.content ?? null });
     setDirty(false);
+  }
+
+  async function refresh() {
+    apply((await getLesson(lessonId)).data);
+    setIssues([]);
   }
 
   async function load() {
     setState('loading');
     try {
-      apply((await getLesson(lessonId)).data);
-      setIssues([]);
+      await refresh();
       setState('ready');
     } catch (error) {
       setState('error');
@@ -197,7 +216,7 @@ export function LessonEditorPage() {
   }
 
   async function onSave() {
-    setBusy(true);
+    setBusy('save');
     try {
       await saveDraft();
       setIssues([]);
@@ -212,15 +231,13 @@ export function LessonEditorPage() {
     }
   }
 
-  async function onPublish() {
-    setBusy(true);
+  async function onSubmit() {
+    setBusy('submit');
     try {
       if (dirty) await saveDraft({ quiet: true });
-      const data = (await publishLesson(lessonId)).data;
-      apply(data);
-      setIssues([]);
-      notify({ title: `Published version ${data.published.versionNumber}` });
-      return true;
+      await submitContentReview(KIND, lessonId);
+      await refresh();
+      notify({ title: 'Sent for review' });
     } catch (error) {
       const found = error?.response?.data?.data?.issues;
       if (
@@ -230,13 +247,13 @@ export function LessonEditorPage() {
         setIssues(found);
         showIssue(found[0].path);
         notify({
-          title: 'Lesson cannot be published yet',
+          title: 'Lesson cannot be sent yet',
           description: `${found.length} item${found.length === 1 ? '' : 's'} to fix. The draft was saved.`,
           variant: 'destructive',
         });
       } else {
         notify({
-          title: 'Could not publish the lesson',
+          title: 'Could not submit the lesson',
           description: saveErrorMessage(error),
           variant: 'destructive',
         });
@@ -247,7 +264,7 @@ export function LessonEditorPage() {
   }
 
   async function onRename() {
-    setBusy(true);
+    setBusy('rename');
     try {
       const data = (await updateLesson(lessonId, { title: title.trim() })).data;
       setLesson(data.lesson);
@@ -280,7 +297,9 @@ export function LessonEditorPage() {
       </div>
     );
 
-  const canPublish = dirty || status.hasDraft;
+  const locked = status.draftStatus === LessonVersionStatus.PENDING_REVIEW;
+  const readOnly = !canAuthor || locked;
+  const canSubmit = dirty || status.hasDraft;
   const issueCount = (match) => issues.filter((issue) => match(issueLocation(issue.path))).length;
   const blanks = content.fillIn.answers.length;
   const blanksFilled = content.fillIn.answers.filter((answer) => answer.trim()).length;
@@ -315,6 +334,10 @@ export function LessonEditorPage() {
       }),
     },
   ];
+  const removeLesson = async () => {
+    await deleteLesson(lessonId);
+    navigate(back.to, { replace: true, state: back.state });
+  };
 
   return (
     <section className="space-y-5">
@@ -327,61 +350,71 @@ export function LessonEditorPage() {
           </h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             {status.publishedVersion ? <Badge variant="success">Published v{status.publishedVersion}</Badge> : <Badge variant="outline">Not published</Badge>}
-            {status.hasDraft ? <Badge variant="warning">Draft v{status.draftVersion}</Badge> : null}
+            {status.hasDraft ? <ReviewStatusBadge status={status.draftStatus} version={status.draftVersion} /> : null}
             {dirty ? <Badge variant="info">Unsaved</Badge> : null}
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <ImportExportJson
-            noun="lesson"
-            disabled={busy}
-            plan={(text) => planLessonImport(text, content)}
-            onImport={(imported) => {
-              setContent(imported);
-              setDirty(true);
-              setIssues([]);
-            }}
-            exportData={() => exportLesson(content, { number: lesson.position, title: lesson.title })}
-            fileName={jsonFileName(lesson.title)}
-          />
-          <Button loading={busy} variant="outline" disabled={busy || !dirty} onClick={onSave}>
-            {busy ? 'Working…' : 'Save draft'}
-          </Button>
-          <PublishButton state={publish.state} disabled={busy || !canPublish} onClick={() => publish.run(onPublish)} />
-          {status.hasDraft ? <DiscardDraftButton kind="lesson" id={lessonId} noun="lesson" disabled={busy} onDiscarded={load} size="icon" /> : null}
+          {canAuthor && !locked ? (
+            <>
+              <ImportExportJson
+                noun="lesson"
+                disabled={Boolean(busy)}
+                plan={(text) => planLessonImport(text, content)}
+                onImport={(imported) => {
+                  setContent(imported);
+                  setDirty(true);
+                  setIssues([]);
+                }}
+                exportData={() => exportLesson(content, { number: lesson.position, title: lesson.title })}
+                fileName={jsonFileName(lesson.title)}
+              />
+              <Button loading={busy === 'save'} variant="outline" disabled={Boolean(busy) || !dirty} onClick={onSave}>
+                Save draft
+              </Button>
+              <SubmitForReviewButton loading={busy === 'submit'} disabled={Boolean(busy) || !canSubmit} onClick={onSubmit} />
+              {status.hasDraft ? <DiscardDraftButton kind="lesson" id={lessonId} noun="lesson" disabled={Boolean(busy)} onDiscarded={load} size="icon" /> : null}
+            </>
+          ) : null}
+          {canManage && locked ? <ManagerReviewActions kind={KIND} id={lessonId} disabled={Boolean(busy)} onChanged={refresh} /> : null}
           <ContentDangerActions
             noun="lesson"
             published={Boolean(status.publishedVersion)}
-            busy={busy}
-            onUnpublish={async () => setStatus(lessonState((await unpublishLesson(lessonId)).data))}
-            onDelete={async () => {
-              await deleteLesson(lessonId);
-              navigate(back.to, { replace: true, state: back.state });
-            }}
+            busy={Boolean(busy)}
+            onUnpublish={canManage ? async () => { await unpublishLesson(lessonId); await refresh(); } : undefined}
+            onDelete={canManage || (canAuthor && !status.publishedVersion) ? removeLesson : undefined}
             deleteNote="Later lessons of the unit move up one place."
           />
         </div>
       </div>
 
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          onRename();
-        }}
-        className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-end"
-      >
-        <div className="min-w-0 flex-1 space-y-2">
-          <Label htmlFor="lesson-title">Title</Label>
-          <Input id="lesson-title" value={title} maxLength={200} onChange={(event) => setTitle(event.target.value)} />
-        </div>
-        <Button type="submit" variant="outline" disabled={busy || !title.trim() || title.trim() === lesson.title}>
-          Rename
-        </Button>
-      </form>
+      <ReviewBanner kind={KIND} id={lessonId} status={status.draftStatus} note={status.reviewNote} canAuthor={canAuthor} disabled={Boolean(busy)} onChanged={refresh} />
+
+      {canManage ? <ChangesFromPublished kind={KIND} draft={compare.draft} published={compare.published} /> : null}
+
+      {canAuthor ? (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!locked) onRename();
+          }}
+          className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-end"
+        >
+          <div className="min-w-0 flex-1 space-y-2">
+            <Label htmlFor="lesson-title">Title</Label>
+            <Input id="lesson-title" value={title} maxLength={200} readOnly={locked} onChange={(event) => setTitle(event.target.value)} />
+          </div>
+          {locked ? null : (
+            <Button type="submit" variant="outline" loading={busy === 'rename'} disabled={Boolean(busy) || !title.trim() || title.trim() === lesson.title}>
+              Rename
+            </Button>
+          )}
+        </form>
+      ) : null}
 
       {issues.length ? (
         <div role="alert" className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
-          <p className="font-medium">Fix these before publishing ({issues.length}):</p>
+          <p className="font-medium">Fix these before submitting ({issues.length}):</p>
           <ul className="mt-2 max-h-64 list-disc space-y-1 overflow-y-auto pl-5">
             {issues.map((issue, index) => (
               <li key={index}>
@@ -395,80 +428,94 @@ export function LessonEditorPage() {
         </div>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start">
-        <SectionNav label="Lesson sections" groups={navItems} active={section} onChoose={choose} />
+      <ReadOnlyProvider value={readOnly}>
+        <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start">
+          <SectionNav label="Lesson sections" groups={navItems} active={section} onChoose={choose} />
 
-        <div className="min-w-0 space-y-4">
-          {tab === 'vocabulary' ? (
-            <>
-              <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card p-4 shadow-sm">
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-lg font-semibold">Vocabulary</h2>
-                  <p className="text-sm text-muted-foreground">Auto-fill adds the IPA and audio a word is missing.</p>
+          <div className="min-w-0 space-y-4">
+            {tab === 'vocabulary' ? (
+              <>
+                <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card p-4 shadow-sm">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-lg font-semibold">Vocabulary</h2>
+                    {readOnly ? null : <p className="text-sm text-muted-foreground">Auto-fill adds the IPA and audio a word is missing.</p>}
+                  </div>
+                  {readOnly ? null : <PasteVocabularyDialog vocabulary={content.vocabulary} onApply={(vocabulary) => update((current) => ({ ...current, vocabulary }))} />}
                 </div>
-                <PasteVocabularyDialog vocabulary={content.vocabulary} onApply={(vocabulary) => update((current) => ({ ...current, vocabulary }))} />
-              </div>
-              {content.vocabulary.length === 0 ? <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">No word yet.</p> : null}
-              {content.vocabulary.map((item, index) => (
-                <VocabularyCard key={item.id} item={item} index={index} edit={edit} update={update} media={media} filling={filling} onAutofill={onAutofill} />
-              ))}
-              <Button variant="outline" className="w-full gap-1.5 border-dashed" onClick={() => update((current) => ({ ...current, vocabulary: [...current.vocabulary, newVocabulary()] }))}>
-                <Plus className="h-4 w-4" />
-                Add word
-              </Button>
-            </>
-          ) : null}
+                {content.vocabulary.length === 0 ? <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">No word yet.</p> : null}
+                {content.vocabulary.map((item, index) => (
+                  <VocabularyCard key={item.id} item={item} index={index} edit={edit} update={update} media={media} filling={filling} onAutofill={onAutofill} />
+                ))}
+                {readOnly ? null : (
+                  <Button variant="outline" className="w-full gap-1.5 border-dashed" onClick={() => update((current) => ({ ...current, vocabulary: [...current.vocabulary, newVocabulary()] }))}>
+                    <Plus className="h-4 w-4" />
+                    Add word
+                  </Button>
+                )}
+              </>
+            ) : null}
 
-          {tab === 'fillIn' ? (
-            <>
-              <div className="rounded-xl border bg-card p-4 shadow-sm">
-                <h2 className="text-lg font-semibold">Fill-in</h2>
-                <p className="text-sm text-muted-foreground">Type {FILL_IN_BLANK} for each blank, then its answer.</p>
-              </div>
-              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_16rem]">
+            {tab === 'fillIn' ? (
+              <>
                 <div className="rounded-xl border bg-card p-4 shadow-sm">
-                  <TextField
-                    id="fill-in-passage"
-                    label="Passage"
-                    value={content.fillIn.passage}
-                    maxLength={5000}
-                    multiline
-                    rows={12}
-                    onChange={(value) => update((current) => ({ ...current, fillIn: withFillInPassage(current.fillIn, value) }))}
-                  />
+                  <h2 className="text-lg font-semibold">Fill-in</h2>
+                  {readOnly ? null : <p className="text-sm text-muted-foreground">Type {FILL_IN_BLANK} for each blank, then its answer.</p>}
                 </div>
-                <div className="space-y-2 rounded-xl border bg-card p-4 shadow-sm">
-                  <p className="text-sm font-medium">Answers</p>
-                  {blanks === 0 ? (
-                    <p className="text-sm text-muted-foreground">No blank yet.</p>
-                  ) : (
-                    content.fillIn.answers.map((answer, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <Label htmlFor={`blank-${index}`} className="flex h-7 min-w-7 items-center justify-center rounded-full bg-muted text-xs font-semibold tabular-nums">
-                          {index + 1}
-                        </Label>
-                        <Input
-                          id={`blank-${index}`}
-                          value={answer}
-                          maxLength={100}
-                          placeholder="Answer"
-                          autoComplete="off"
-                          className={cn(answer.trim() ? '' : 'border-dashed')}
-                          onChange={(event) => edit(['fillIn', 'answers', index], event.target.value)}
-                        />
-                      </div>
-                    ))
-                  )}
+                <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_16rem]">
+                  <div className="rounded-xl border bg-card p-4 shadow-sm">
+                    <TextField
+                      id="fill-in-passage"
+                      label="Passage"
+                      value={content.fillIn.passage}
+                      maxLength={5000}
+                      multiline
+                      rows={12}
+                      onChange={(value) => update((current) => ({ ...current, fillIn: withFillInPassage(current.fillIn, value) }))}
+                    />
+                  </div>
+                  <div className="space-y-2 rounded-xl border bg-card p-4 shadow-sm">
+                    <p className="text-sm font-medium">Answers</p>
+                    {blanks === 0 ? (
+                      <p className="text-sm text-muted-foreground">No blank yet.</p>
+                    ) : (
+                      content.fillIn.answers.map((answer, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <Label htmlFor={`blank-${index}`} className="flex h-7 min-w-7 items-center justify-center rounded-full bg-muted text-xs font-semibold tabular-nums">
+                            {index + 1}
+                          </Label>
+                          <Input
+                            id={`blank-${index}`}
+                            value={answer}
+                            maxLength={100}
+                            placeholder="Answer"
+                            autoComplete="off"
+                            readOnly={readOnly}
+                            className={cn(answer.trim() ? '' : 'border-dashed')}
+                            onChange={(event) => edit(['fillIn', 'answers', index], event.target.value)}
+                          />
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-            </>
-          ) : null}
+              </>
+            ) : null}
 
-          {tab === 'test' ? <PartEditor key={partTab} spec={LESSON_TEST_PARTS.find((spec) => spec.key === partTab)} part={content.test[partTab]} edit={edit} media={media} /> : null}
+            {tab === 'test' ? <PartEditor key={partTab} spec={LESSON_TEST_PARTS.find((spec) => spec.key === partTab)} part={content.test[partTab]} edit={edit} media={media} /> : null}
+          </div>
         </div>
-      </div>
+      </ReadOnlyProvider>
 
-      <VersionHistory kind="lesson" id={lessonId} noun="lesson" refreshKey={`${status.publishedVersion}-${status.draftVersion}`} onRestored={load} />
+      <VersionHistory
+        kind="lesson"
+        id={lessonId}
+        noun="lesson"
+        refreshKey={`${status.publishedVersion}-${status.draftVersion}-${status.draftStatus}`}
+        onRestored={load}
+        canRestore={canAuthor && !locked}
+        canDiscard={canAuthor && !locked}
+        canDeleteVersion={canManage}
+      />
     </section>
   );
 }

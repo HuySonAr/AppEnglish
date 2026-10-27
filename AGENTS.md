@@ -21,6 +21,7 @@
 - Không viết comment trong code (JS/JSX/MJS, Python, proto, CSS), kể cả docstring; chỉ giữ chỉ thị công cụ như `eslint-disable`. Lý do và nghiệp vụ ghi trong docs (D149).
 
 ## Giao diện web client
+- Trước khi viết hoặc sửa giao diện, đọc thêm docs/02-architecture/design-system.md (token, bố cục, thành phần, chuyển động, icon) và làm theo; đổi phong cách thì cập nhật file đó cùng lượt.
 - Trước khi viết hoặc sửa giao diện, đọc mục "Quy ước giao diện bắt buộc" trong docs/02-architecture/frontend-architecture.md và làm theo: skeleton theo hình dạng trang, `<Button loading>`, bốn trạng thái của trang, tìm kiếm/sắp xếp/phân trang cho danh sách, `notify()` cho thông báo.
 - Dùng lại component trong src/components/shared và hàm trong src/lib; không tạo biến thể riêng cho cùng một việc.
 - Chữ trên giao diện ngắn gọn: description, chú thích và hướng dẫn tối đa một câu ngắn, chỉ nói cần làm gì; không giải thích nghiệp vụ, không ghi mã quyết định (Dxx) (D149).

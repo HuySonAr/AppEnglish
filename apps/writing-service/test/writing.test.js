@@ -4,7 +4,7 @@ import { seal } from '@appenglish/backend-common/secret-box';
 import { WritingBroker, outcomeOf } from '../src/broker.js';
 import { loadConfig } from '../src/config.js';
 import { GeminiClient, GeminiError, GeminiFailure, classify } from '../src/gemini.js';
-import { SCHEMA, buildWritingPrompt, parseWritingResult } from '../src/rubric.js';
+import { SCHEMA, buildWritingPrompt, parseWritingResult, writingSchema } from '../src/rubric.js';
 import { checkKey, gradeWriting, listModels } from '../src/worker.js';
 
 const secret = 's'.repeat(40);
@@ -178,4 +178,19 @@ test('the models a key can use are listed for grading only, and a missing model 
   assert.equal((await client.listModels('KEY')).length, 2);
   assert.ok(pages[1].includes('pageToken=p2'));
   assert.equal((await checkKey({ key: box }, { gemini: { checkKey: async () => { throw new GeminiError(GeminiFailure.MODEL, 'x'); } }, secret })).status, 'VALID');
+});
+
+test('a writing ETS task adds its TOEIC scoring guide and an etsScore to the same request (D199)', async () => {
+  const text = buildWritingPrompt({ ...job().payload, etsTask: 'respond_email' });
+  assert.match(text, /TOEIC Writing scoring guide for this task \(respond email, whole number 0-4\)/);
+  assert.match(buildWritingPrompt({ ...job().payload, etsTask: 'picture_sentence' }), /cannot see the picture/);
+  assert.doesNotMatch(buildWritingPrompt(job().payload), /etsScore/);
+  assert.deepEqual(writingSchema('opinion_essay').required, ['criteria', 'feedback', 'errors', 'rewrite', 'etsScore']);
+  assert.equal(writingSchema('express_opinion'), SCHEMA);
+  assert.equal(parseWritingResult({ ...raw, etsScore: 9 }, answer, 'opinion_essay').etsScore, 5);
+  assert.throws(() => parseWritingResult(raw, answer, 'picture_sentence'), (error) => error.kind === GeminiFailure.BAD_OUTPUT);
+  const requests = [];
+  const graded = await gradeWriting(job({ etsTask: 'respond_email' }), { gemini: { generateJson: async (key, request) => (requests.push(request), { ...raw, etsScore: 3 }) }, secret });
+  assert.equal(graded.result.etsScore, 3);
+  assert.ok(requests[0].schema.properties.etsScore);
 });

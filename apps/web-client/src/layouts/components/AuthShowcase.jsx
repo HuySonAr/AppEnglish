@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { GridPattern } from '../../components/shared/GridPattern.jsx';
 
 const BAR_HEIGHTS = [14, 26, 18, 34, 22, 40, 28, 18, 32, 20, 12];
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -40,19 +41,6 @@ function FlameGlyph(props) {
   );
 }
 
-function Pattern() {
-  return (
-    <svg className="absolute inset-0 h-full w-full text-primary-foreground/[0.07]" aria-hidden="true">
-      <defs>
-        <pattern id="auth-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-          <path d="M32 0H0V32" fill="none" stroke="currentColor" strokeWidth="1" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#auth-grid)" />
-    </svg>
-  );
-}
-
 function Initial({ letter, tone, className }) {
   return <span className={`flex h-11 w-11 items-center justify-center rounded-full border-[3px] border-primary text-sm font-semibold ${tone} ${className || ''}`}>{letter}</span>;
 }
@@ -70,8 +58,8 @@ export function AuthShowcase() {
   }, []);
 
   return (
-    <div className="relative flex h-full min-h-[34rem] overflow-hidden rounded-[2rem] bg-primary text-primary-foreground">
-      <Pattern />
+    <div className="relative flex h-full overflow-hidden rounded-[2rem] bg-primary text-primary-foreground">
+      <GridPattern className="text-primary-foreground/[0.07]" />
 
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="relative flex h-56 w-56 items-center justify-center">

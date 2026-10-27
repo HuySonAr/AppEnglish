@@ -1,4 +1,4 @@
-import { In } from 'typeorm';
+import { In, MoreThan } from 'typeorm';
 import { PracticePromptEntity, PracticePromptVersionEntity } from '../database/content.entities.js';
 
 export class PracticeRepository {
@@ -13,6 +13,13 @@ export class PracticeRepository {
 
   async listPrompts(where = {}) {
     return (await this.repo(PracticePromptEntity)).find({ where, order: { createdAt: 'DESC' } });
+  }
+
+  async listReviewActivity(since) {
+    const versions = await (await this.repo(PracticePromptVersionEntity)).find({ where: [{ status: 'PENDING_REVIEW' }, { reviewedAt: MoreThan(since) }] });
+    const ids = [...new Set(versions.map((version) => version.promptId))];
+    const prompts = ids.length ? await (await this.repo(PracticePromptEntity)).find({ where: { id: In(ids) } }) : [];
+    return { versions, prompts };
   }
 
   async findPrompt(id) {

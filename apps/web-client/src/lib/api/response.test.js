@@ -33,3 +33,10 @@ test('an answer without a code never borrows another message', () => {
   assert.equal(getApiErrorMessage({ response: { status: 500, data: { statusCode: 500, message: 'Internal server error' } } }), 'Something went wrong. Please try again.');
   assert.equal(getApiErrorMessage({ response: { status: 502, data: '<html>bad gateway</html>' } }), 'Something went wrong. Please try again.');
 });
+
+test('a content state refusal explains its reason (D191, D193)', () => {
+  const refused = (reason) => ({ response: { status: 409, data: { code: 41, data: reason ? { reason } : {} } } });
+  assert.equal(getApiErrorMessage(refused('PUBLISHED_BEFORE')), 'This is not allowed once it has been published.');
+  assert.equal(getApiErrorMessage(refused('PENDING_REVIEW')), 'It is waiting for review. Withdraw it first to change it.');
+  assert.equal(getApiErrorMessage(refused()), 'There is no draft to publish.');
+});

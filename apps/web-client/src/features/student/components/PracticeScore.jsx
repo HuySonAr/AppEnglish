@@ -30,3 +30,24 @@ export function ScoreSummary({ total, max = 10, bars }) {
     </div>
   );
 }
+
+export function EtsScore({ ets }) {
+  if (!ets) return null;
+  const score = Number.isInteger(ets.score) ? ets.score : ets.score.toFixed(1);
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-xl border bg-muted/40 px-4 py-3">
+      <div>
+        <p className="text-sm font-medium">TOEIC score estimate</p>
+        {ets.pronunciation !== undefined ? (
+          <p className="text-xs text-muted-foreground">
+            Pronunciation {ets.pronunciation}/3 · Intonation {ets.intonation}/3
+          </p>
+        ) : null}
+      </div>
+      <p className="tabular-nums">
+        <span className="text-2xl font-bold">{score}</span>
+        <span className="text-sm text-muted-foreground"> / {ets.max}</span>
+      </p>
+    </div>
+  );
+}

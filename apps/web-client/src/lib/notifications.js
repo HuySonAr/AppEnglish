@@ -1,18 +1,40 @@
 import { AccountRole } from '@appenglish/auth-contracts';
 import { NotificationKind } from '@appenglish/progress-contracts';
+import { MANAGER_BASE, TEACHER_BASE, contentItemPath, reviewKindLabels } from '../features/content-manager/lib/content-area.js';
+import { swResultPath } from '../features/student/lib/sw-score.js';
 
 const ownerPaths = {
-  exercise: (id) => `/content-manager/listening/${id}`,
-  courseItem: (id) => `/content-manager/listening-course/${id}`,
-  mockTest: (id) => `/content-manager/mock-tests/${id}`,
+  exercise: (id) => `/teacher/listening/${id}`,
+  mockTest: (id) => `/teacher/mock-tests/${id}`,
 };
 
 const sourcesByRole = {
   [AccountRole.STUDENT]: ['progress'],
   [AccountRole.CONTENT_MANAGER]: ['content'],
+  [AccountRole.TEACHER]: ['content'],
   [AccountRole.ADMIN]: ['auth-admin', 'content-admin'],
 };
-const unpublishedNames = { unit: 'Unit', unitReview: 'Unit review', lesson: 'Lesson', mockTest: 'Mock test', exercise: 'Listening exercise', courseItem: 'Listening course item' };
+const promptSlugs = { read_aloud: 'read-aloud', open_speaking: 'open-speaking', writing: 'writing' };
+const promptNames = { read_aloud: 'Read-aloud prompt', open_speaking: 'Speaking prompt', writing: 'Writing prompt' };
+
+function reviewTarget(data, base) {
+  if (data.kind === 'prompt') {
+    if (base === MANAGER_BASE) return `${MANAGER_BASE}/${data.promptKind === 'writing' ? 'writing' : 'speaking'}-prompts/${data.id}`;
+    return `${TEACHER_BASE}/${promptSlugs[data.promptKind] || 'writing'}/${data.id}`;
+  }
+  return contentItemPath(base, data.kind, data.id);
+}
+
+function reviewName(data) {
+  const label = data.kind === 'prompt' ? promptNames[data.promptKind] || 'Prompt' : reviewKindLabels[data.kind] || 'Content';
+  return data.title ? `${label}: ${data.title}` : label;
+}
+
+const swSections = { sw_speaking: 'speaking', sw_writing: 'writing' };
+const swSectionLabels = { speaking: 'Speaking', writing: 'Writing' };
+const swPath = (data, section) => swResultPath(data.swTestId, section, data.attemptNumber);
+
+const unpublishedNames = { unit: 'Unit', unitReview: 'Unit review', lesson: 'Lesson', mockTest: 'Mock test', exercise: 'Listening exercise', swTest: 'S&W test' };
 
 export const notificationSources = (role) => sourcesByRole[role] || [];
 
@@ -42,8 +64,6 @@ export function describeNotification({ kind, data }) {
       detail: `You passed the review of ${data.unitTitle}.`,
       to: '/student/lessons',
     };
-  if (kind === NotificationKind.COURSE_LEVEL_UP)
-    return { tone: 'success', title: `You reached ${data.to} in the Listening course`, detail: `${data.from} level test passed.`, to: '/student/listening-course' };
   if (kind === NotificationKind.SPEAKING_RESULT)
     return {
       tone: data.status === 'DONE' ? 'success' : 'destructive',
@@ -58,6 +78,23 @@ export function describeNotification({ kind, data }) {
       detail: data.title || 'Writing',
       to: `/student/practice/writing/${data.promptId}?submission=${data.submissionId}`,
     };
+  if (kind === NotificationKind.SW_TEST_RESULT) {
+    const label = swSectionLabels[data.section] || 'S&W';
+    const scored = data.scaled !== null && data.scaled !== undefined;
+    return {
+      tone: scored ? 'success' : 'info',
+      title: `${scored ? `${label} score: ${data.scaled}` : `${label} result is ready`}${data.title ? ` · ${data.title}` : ''}`,
+      detail: data.attemptNumber ? `Attempt ${data.attemptNumber}` : 'S&W test',
+      to: swPath(data, data.section),
+    };
+  }
+  if ((kind === NotificationKind.TEACHER_REVIEWED || kind === NotificationKind.REVIEW_RETURNED) && swSections[data.kind]) {
+    const section = swSections[data.kind];
+    const to = swPath(data, section);
+    const detail = data.title || `S&W ${swSectionLabels[section]}`;
+    if (kind === NotificationKind.REVIEW_RETURNED) return { tone: 'warning', title: 'No teacher was free; your review turn is back', detail, to };
+    return { tone: 'success', title: `A teacher reviewed your ${swSectionLabels[section]}: ${data.total} / 200`, detail, to };
+  }
   if (kind === NotificationKind.TEACHER_REVIEWED || kind === NotificationKind.REVIEW_RETURNED) {
     const area = data.kind === 'writing' ? 'writing' : 'speaking';
     const to = `/student/practice/${area}/${data.promptId}?submission=${data.submissionId}`;
@@ -73,7 +110,18 @@ export function describeNotification({ kind, data }) {
       tone: failed ? 'destructive' : 'success',
       title: `${task} ${failed ? 'failed' : 'finished'}${data.owner.title ? ` · ${data.owner.title}` : ''}`,
       detail: failed ? data.error || 'Try again later.' : 'Open the editor to check and apply it.',
-      to: ownerPaths[data.owner.type]?.(data.owner.id) || '/content-manager',
+      to: ownerPaths[data.owner.type]?.(data.owner.id) || '/teacher',
+    };
+  }
+  if (kind === 'REVIEW_PENDING')
+    return { tone: 'info', title: `Waiting for review · ${reviewName(data)}`, detail: data.by?.displayName ? `Sent by ${data.by.displayName}.` : 'Open it to approve or return.', to: reviewTarget(data, MANAGER_BASE) };
+  if (kind === 'REVIEW_DONE') {
+    const approved = data.outcome === 'approved';
+    return {
+      tone: approved ? 'success' : 'warning',
+      title: `${approved ? 'Approved' : 'Returned'} · ${reviewName(data)}`,
+      detail: approved ? 'Learners can see it now.' : data.note || 'Open it to see what to change.',
+      to: reviewTarget(data, TEACHER_BASE),
     };
   }
   if (kind === 'NEW_LEARNERS') {

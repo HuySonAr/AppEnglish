@@ -1,5 +1,6 @@
-import { OPEN_SPEAKING_CRITERIA, WRITING_CRITERIA, WRITING_LIMITS, countWords, writingScores } from '@appenglish/learning-contracts';
+import { OPEN_SPEAKING_CRITERIA, SW_ITEM_MAX, WRITING_CRITERIA, WRITING_LIMITS, countWords, writingScores } from '@appenglish/learning-contracts';
 import { GeminiError, GeminiFailure } from './gemini.js';
+import { spokenGuide, writtenGuide } from './ets-rubric.js';
 
 const CRITERIA = {
   cohesion: 'Cohesion: how well ideas are organised and linked (paragraphing, linking words, reference).',
@@ -51,7 +52,31 @@ export const SCHEMA = {
   required: ['criteria', 'feedback', 'errors', 'rewrite'],
 };
 
-export function buildWritingPrompt({ prompt, answer }) {
+const PICTURE_TASKS = new Set(['describe_picture', 'picture_sentence']);
+
+function withEtsScore(schema, guide) {
+  if (!guide) return schema;
+  return { ...schema, properties: { ...schema.properties, etsScore: { type: 'INTEGER' } }, required: [...schema.required, 'etsScore'] };
+}
+
+function etsLines(etsTask, guide, skill) {
+  if (!guide) return [];
+  return [
+    `TOEIC ${skill} scoring guide for this task (${etsTask.replace(/_/g, ' ')}, whole number 0-${SW_ITEM_MAX[etsTask]}):\n${guide.join('\n')}`,
+    PICTURE_TASKS.has(etsTask) ? 'You cannot see the picture: judge whether the answer plausibly fits a picture, and judge the language.' : '',
+    `Also give "etsScore": the score on this scoring guide, judged on its own and not from the 1-5 criteria.`,
+  ].filter(Boolean);
+}
+
+function readEtsScore(raw, etsTask) {
+  const score = Number(raw?.etsScore);
+  if (!Number.isFinite(score)) throw new GeminiError(GeminiFailure.BAD_OUTPUT, 'Gemini left out the ETS score');
+  return Math.min(SW_ITEM_MAX[etsTask], Math.max(0, Math.round(score)));
+}
+
+export const writingSchema = (etsTask) => withEtsScore(SCHEMA, writtenGuide(etsTask));
+
+export function buildWritingPrompt({ prompt, answer, etsTask }) {
   const keyPoints = (prompt.keyPoints || []).filter(Boolean);
   return [
     `Task level (CEFR): ${prompt.level}`,
@@ -63,6 +88,7 @@ export function buildWritingPrompt({ prompt, answer }) {
     `Criteria:\n${WRITING_CRITERIA.map((key) => `- ${key}: ${CRITERIA[key]}`).join('\n')}`,
     `Scale:\n${SCALE.join('\n')}`,
     `Also give: "feedback" (one short paragraph), "errors" (at most ${WRITING_LIMITS.errors}; each with the exact wrong text, a corrected version and a one-sentence explanation), and "rewrite" (a better version of the learner text at the task level).`,
+    ...etsLines(etsTask, writtenGuide(etsTask), 'Writing'),
     `Learner text (${countWords(answer)} words):\n"""\n${answer}\n"""`,
   ].join('\n\n');
 }
@@ -95,7 +121,7 @@ function readCriteria(raw, keys) {
   return criteria;
 }
 
-export function parseWritingResult(raw, answer) {
+export function parseWritingResult(raw, answer, etsTask = null) {
   const criteria = readCriteria(raw, WRITING_CRITERIA);
   return {
     criteria,
@@ -103,6 +129,7 @@ export function parseWritingResult(raw, answer) {
     feedback: clip(raw?.feedback, WRITING_LIMITS.feedbackChars),
     errors: readErrors(raw, answer),
     rewrite: clip(raw?.rewrite, WRITING_LIMITS.rewriteChars),
+    ...(writtenGuide(etsTask) ? { etsScore: readEtsScore(raw, etsTask) } : {}),
   };
 }
 
@@ -128,7 +155,9 @@ export const OPEN_SCHEMA = {
   properties: { ...SCHEMA.properties, criteria: { type: 'OBJECT', properties: Object.fromEntries(OPEN_SPEAKING_CRITERIA.map((key) => [key, score])), required: [...OPEN_SPEAKING_CRITERIA] } },
 };
 
-export function buildOpenSpeakingPrompt({ prompt, answer, durationSeconds }) {
+export const openSchema = (etsTask) => withEtsScore(OPEN_SCHEMA, spokenGuide(etsTask));
+
+export function buildOpenSpeakingPrompt({ prompt, answer, durationSeconds, etsTask }) {
   const keyPoints = (prompt.keyPoints || []).filter(Boolean);
   return [
     `Task level (CEFR): ${prompt.level}`,
@@ -139,15 +168,17 @@ export function buildOpenSpeakingPrompt({ prompt, answer, durationSeconds }) {
     `Criteria:\n${OPEN_SPEAKING_CRITERIA.map((key) => `- ${key}: ${SPOKEN_CRITERIA[key]}`).join('\n')}`,
     `Scale:\n${SCALE.join('\n')}`,
     `Also give: "feedback" (one short paragraph), "errors" (at most ${WRITING_LIMITS.errors}; each with the exact wrong words from the transcript, a corrected version and a one-sentence explanation), and "rewrite" (a better spoken answer at the task level).`,
+    ...etsLines(etsTask, spokenGuide(etsTask), 'Speaking'),
     `Transcript (${countWords(answer)} words):\n"""\n${answer}\n"""`,
   ].join('\n\n');
 }
 
-export function parseOpenSpeakingResult(raw, transcript) {
+export function parseOpenSpeakingResult(raw, transcript, etsTask = null) {
   return {
     criteria: readCriteria(raw, OPEN_SPEAKING_CRITERIA),
     feedback: clip(raw?.feedback, WRITING_LIMITS.feedbackChars),
     errors: readErrors(raw, transcript),
     rewrite: clip(raw?.rewrite, WRITING_LIMITS.rewriteChars),
+    ...(spokenGuide(etsTask) ? { etsScore: readEtsScore(raw, etsTask) } : {}),
   };
 }

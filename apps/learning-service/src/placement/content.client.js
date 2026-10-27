@@ -49,13 +49,7 @@ export class ContentClient {
     return this.call('getListeningPaper', { id: exerciseId, payloadJson: '{}' });
   }
 
-  listPublishedCourse() {
-    return this.call('listPublishedCourse', {});
-  }
 
-  getCoursePaper(itemId, versionId) {
-    return this.call('getCoursePaper', { id: itemId, payloadJson: JSON.stringify(versionId ? { versionId } : {}) });
-  }
 
   listPublishedPracticePrompts() {
     return this.call('listPublishedPracticePrompts', {});
@@ -71,6 +65,14 @@ export class ContentClient {
 
   deleteLearnerRecordings(recordings) {
     return this.call('deleteLearnerRecordings', { payloadJson: JSON.stringify({ recordings }) });
+  }
+
+  listPublishedSwTests() {
+    return this.call('listPublishedSwTests', {});
+  }
+
+  getSwTestPaper(testId, versionId) {
+    return this.call('getSwTestPaper', { id: testId, payloadJson: JSON.stringify(versionId ? { versionId } : {}) });
   }
 
   getMockPaper(mockTestId, versionId) {

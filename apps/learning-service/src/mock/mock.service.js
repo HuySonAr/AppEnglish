@@ -1,5 +1,5 @@
 import { AccountRole } from '@appenglish/auth-contracts';
-import { LESSON_TEST_PARTS } from '@appenglish/content-contracts';
+import { LESSON_TEST_PARTS, MOCK_LISTENING_MAX_MINUTES, MOCK_READING_MINUTES, MockFormat, Skill, TOEIC_SECTION_SEDIFF, TOEIC_SECTION_SEM } from '@appenglish/content-contracts';
 import { GOAL_HISTORY_SIZE, GOAL_RECENT_ATTEMPTS, MOCK_MISTAKE_CLEAR_STREAK, MOCK_MISTAKE_SESSION, LearningEventType, MOCK_STATS_MIN_LEARNERS, MockAttemptKind, PlacementStatus, StudyActivity } from '@appenglish/learning-contracts';
 import {
   scoreTest,
@@ -14,9 +14,14 @@ import { mockErrors } from './mock.errors.js';
 import { defaultScoreConversion, estimatedScores, recommendedLevel } from './mock.rules.js';
 import { mockStats, numberOf } from './mock.stats.js';
 import { mistakeSummary, mistakesOf } from './mistakes.rules.js';
-import { goalView, partRates, weakestPart } from './goal.rules.js';
+import { goalView, partRates, swActivity, swEstimate, weakestPart } from './goal.rules.js';
 
 const SUBMIT_GRACE_MS = 30 * 1000;
+const MINUTE_MS = 60 * 1000;
+const LISTENING_KEYS = LESSON_TEST_PARTS.filter((spec) => spec.skill === Skill.LISTENING).map((spec) => spec.key);
+const isStrict = (attempt) => attempt.kind === MockAttemptKind.FULL && (attempt.format || MockFormat.FULL) === MockFormat.FULL;
+const sectionTrend = (change) => (change >= TOEIC_SECTION_SEDIFF ? 'up' : change <= -TOEIC_SECTION_SEDIFF ? 'down' : 'same');
+const listeningIdsOf = (test) => new Set(LISTENING_KEYS.flatMap((key) => test[key].questions.map((question) => question.id)));
 const IN_PROGRESS = 'IN_PROGRESS';
 const COMPLETED = 'COMPLETED';
 
@@ -26,11 +31,13 @@ const sameAttemptSeries = (attempt, kind, partKey) =>
   attempt.kind === kind && attempt.partKey === (partKey || '');
 
 export class MockService {
-  constructor(repository, placementRepository, contentClient, { now = () => new Date(), random = Math.random, events = noEvents } = {}) {
+  constructor(repository, placementRepository, contentClient, { now = () => new Date(), random = Math.random, events = noEvents, swAttempts = null, practice = null } = {}) {
     this.repository = repository;
     this.placementRepository = placementRepository;
     this.contentClient = contentClient;
     this.events = events;
+    this.swAttempts = swAttempts;
+    this.practice = practice;
     this.now = now;
     this.random = random;
   }
@@ -52,7 +59,8 @@ export class MockService {
       this.placementRepository.findAttempt(actor.id),
     ]);
     const full = attempts.filter((attempt) => attempt.kind === MockAttemptKind.FULL);
-    const latest = full.at(-1);
+    const scored = full.filter(isStrict);
+    const latest = scored.at(-1);
     const level = recommendedLevel({
       latestTotalScore: latest ? latest.listeningScore + latest.readingScore : null,
       startUnit: placement && placement.status !== PlacementStatus.IN_PROGRESS ? placement.startUnit : null,
@@ -68,7 +76,7 @@ export class MockService {
           bestPercent: own.length
             ? Math.max(...own.map((attempt) => percent(attempt.correctCount, attempt.totalCount)))
             : null,
-          latestTotalScore: own.length ? own.at(-1).listeningScore + own.at(-1).readingScore : null,
+          latestTotalScore: own.length && isStrict(own.at(-1)) ? own.at(-1).listeningScore + own.at(-1).readingScore : null,
         };
       }),
     };
@@ -82,10 +90,34 @@ export class MockService {
 
   async attempts(actor, mockTestId) {
     const attempts = await this.repository.listTestAttempts(actor.id, mockTestId);
-    for (const [index, attempt] of attempts.entries())
-      if (attempt.status === IN_PROGRESS && this.isExpired(attempt))
-        attempts[index] = await this.complete(attempt, attempt.answers, actor);
+    for (const [index, attempt] of attempts.entries()) {
+      if (attempt.status !== IN_PROGRESS) continue;
+      if (this.isExpired(attempt)) attempts[index] = await this.complete(attempt, attempt.answers, actor);
+      else attempts[index] = await this.settlePhase(attempt);
+    }
     return attempts;
+  }
+
+  listeningCap(attempt) {
+    return new Date(new Date(attempt.startedAt).getTime() + MOCK_LISTENING_MAX_MINUTES * MINUTE_MS);
+  }
+
+  async settlePhase(attempt) {
+    if (!isStrict(attempt) || attempt.readingStartedAt || this.now() < this.listeningCap(attempt)) return attempt;
+    return this.startReading(attempt, this.listeningCap(attempt));
+  }
+
+  async startReading(attempt, at) {
+    attempt.readingStartedAt = at;
+    attempt.expiresAt = new Date(at.getTime() + MOCK_READING_MINUTES * MINUTE_MS);
+    return this.repository.saveAttempt(attempt);
+  }
+
+  async lockedAnswers(attempt, answers) {
+    if (!isStrict(attempt) || !attempt.readingStartedAt) return answers;
+    const listening = listeningIdsOf((await this.paper(attempt.mockTestId, attempt.mockVersionId)).test);
+    const kept = Object.fromEntries(Object.entries(attempt.answers || {}).filter(([id]) => listening.has(id)));
+    return { ...Object.fromEntries(Object.entries(answers).filter(([id]) => !listening.has(id))), ...kept };
   }
 
   isExpired(attempt) {
@@ -96,8 +128,9 @@ export class MockService {
   }
 
   summary(attempt) {
-    const full = attempt.kind === MockAttemptKind.FULL;
+    const full = isStrict(attempt) && attempt.listeningScore !== null && attempt.listeningScore !== undefined;
     return {
+      format: attempt.format || MockFormat.FULL,
       attemptNumber: attempt.attemptNumber,
       correctCount: attempt.correctCount,
       totalCount: attempt.totalCount,
@@ -113,6 +146,7 @@ export class MockService {
             listeningScore: attempt.listeningScore,
             readingScore: attempt.readingScore,
             totalScore: attempt.listeningScore + attempt.readingScore,
+            margin: TOEIC_SECTION_SEM,
           }
         : null,
       countsForXp: full && attempt.attemptNumber === 1,
@@ -122,9 +156,17 @@ export class MockService {
   series(attempts, kind, partKey) {
     const own = attempts.filter((attempt) => sameAttemptSeries(attempt, kind, partKey));
     const finished = own.filter((attempt) => attempt.status === COMPLETED);
+    const progression = testProgression(finished);
+    const [previous, latest] = finished.slice(-2);
+    const scored = (attempt) => isStrict(attempt) && attempt?.listeningScore !== null && attempt?.listeningScore !== undefined;
+    if (progression && scored(previous) && scored(latest)) {
+      const listeningScoreChange = latest.listeningScore - previous.listeningScore;
+      const readingScoreChange = latest.readingScore - previous.readingScore;
+      Object.assign(progression, { listeningScoreChange, readingScoreChange, listeningTrend: sectionTrend(listeningScoreChange), readingTrend: sectionTrend(readingScoreChange) });
+    }
     return {
       attempts: finished.map((attempt) => this.summary(attempt)),
-      progression: testProgression(finished),
+      progression,
       inProgress: own.some((attempt) => attempt.status === IN_PROGRESS),
     };
   }
@@ -151,9 +193,15 @@ export class MockService {
   }
 
   attemptView(attempt, paper) {
+    const strict = isStrict(attempt);
     return {
       status: IN_PROGRESS,
       kind: attempt.kind,
+      format: attempt.format || MockFormat.FULL,
+      phase: strict ? (attempt.readingStartedAt ? 'reading' : 'listening') : null,
+      listeningPosition: strict ? attempt.listeningPosition || 0 : null,
+      listeningClosesAt: strict && !attempt.readingStartedAt ? this.listeningCap(attempt).toISOString() : null,
+      readingStartedAt: attempt.readingStartedAt ? new Date(attempt.readingStartedAt).toISOString() : null,
       partKey: attempt.partKey || null,
       attemptNumber: attempt.attemptNumber,
       title: paper.mockTest.title,
@@ -187,6 +235,8 @@ export class MockService {
     const partKeys = partKey ? [partKey] : undefined;
     if (partKey && !paper.test[partKey].questions.length) throw mockErrors.notFound();
     const startedAt = this.now();
+    const format = kind === MockAttemptKind.FULL ? paper.mockTest.format || MockFormat.FULL : MockFormat.PRACTICE;
+    const strict = kind === MockAttemptKind.FULL && format === MockFormat.FULL;
     const created = await this.repository.createAttempt({
       accountId: actor.id,
       mockTestId,
@@ -196,9 +246,13 @@ export class MockService {
       attemptNumber: own.length + 1,
       status: IN_PROGRESS,
       startedAt,
-      expiresAt:
-        kind === MockAttemptKind.FULL
-          ? new Date(startedAt.getTime() + paper.mockTest.durationMinutes * 60 * 1000)
+      format,
+      readingStartedAt: null,
+      listeningPosition: 0,
+      expiresAt: strict
+        ? new Date(startedAt.getTime() + (MOCK_LISTENING_MAX_MINUTES + MOCK_READING_MINUTES) * MINUTE_MS)
+        : kind === MockAttemptKind.FULL
+          ? new Date(startedAt.getTime() + paper.mockTest.durationMinutes * MINUTE_MS)
           : null,
       optionOrder: shuffledOptionOrder(paper.test, this.random, partKeys),
       answers: {},
@@ -216,15 +270,33 @@ export class MockService {
     return attempt;
   }
 
-  async saveMockAnswers(actor, mockTestId, { answers, ...reference }) {
-    const attempt = await this.openAttempt(actor, mockTestId, reference);
+  async saveMockAnswers(actor, mockTestId, { answers, listeningPosition, ...reference }) {
+    let attempt = await this.openAttempt(actor, mockTestId, reference);
     if (this.isExpired(attempt)) {
       await this.complete(attempt, attempt.answers, actor);
       throw mockErrors.notInProgress();
     }
-    attempt.answers = answers;
+    attempt = await this.settlePhase(attempt);
+    attempt.answers = await this.lockedAnswers(attempt, answers);
+    if (isStrict(attempt) && !attempt.readingStartedAt && listeningPosition !== undefined)
+      attempt.listeningPosition = Math.max(attempt.listeningPosition || 0, listeningPosition);
     await this.repository.saveAttempt(attempt);
     return { saved: true };
+  }
+
+  async finishMockListening(actor, mockTestId, reference) {
+    let attempt = await this.openAttempt(actor, mockTestId, reference);
+    if (!isStrict(attempt)) throw mockErrors.notInProgress();
+    if (this.isExpired(attempt)) {
+      await this.complete(attempt, attempt.answers, actor);
+      throw mockErrors.notInProgress();
+    }
+    attempt = await this.settlePhase(attempt);
+    if (!attempt.readingStartedAt) {
+      const cap = this.listeningCap(attempt);
+      attempt = await this.startReading(attempt, this.now() < cap ? this.now() : cap);
+    }
+    return this.attemptView(attempt, await this.paper(mockTestId, attempt.mockVersionId));
   }
 
   async discardMockAttempt(actor, mockTestId, reference) {
@@ -239,7 +311,7 @@ export class MockService {
 
   async submitMockAttempt(actor, mockTestId, { answers, ...reference }) {
     const attempt = await this.openAttempt(actor, mockTestId, reference);
-    const finished = await this.complete(attempt, this.isExpired(attempt) ? attempt.answers : answers, actor);
+    const finished = await this.complete(attempt, this.isExpired(attempt) ? attempt.answers : await this.lockedAnswers(await this.settlePhase(attempt), answers), actor);
     return this.reviewView(finished);
   }
 
@@ -260,7 +332,7 @@ export class MockService {
       readingTotal: totals.reading,
       durationSeconds: Math.max(0, Math.round((end - new Date(attempt.startedAt).getTime()) / 1000)),
     });
-    if (attempt.kind === MockAttemptKind.FULL) {
+    if (isStrict(attempt)) {
       const { listeningScore, readingScore } = estimatedScores(score, totals, await this.conversion());
       Object.assign(attempt, { listeningScore, readingScore });
     }
@@ -277,8 +349,8 @@ export class MockService {
         mockVersionId: saved.mockVersionId,
         kind: saved.kind,
         ...counts,
-        listeningScore: estimated.listeningScore,
-        readingScore: estimated.readingScore,
+        listeningScore: estimated?.listeningScore ?? null,
+        readingScore: estimated?.readingScore ?? null,
       });
     }
     return saved;
@@ -388,10 +460,12 @@ export class MockService {
 
   async getStudyGoal(actor) {
     this.assertRole(actor, AccountRole.STUDENT);
-    const [goal, finished, recent] = await Promise.all([
+    const [goal, finished, recent, swRows, practiceRows] = await Promise.all([
       this.repository.findGoal(actor.id),
       this.repository.listFinishedAttempts(actor.id),
       this.repository.listRecentAttempts(actor.id, GOAL_RECENT_ATTEMPTS),
+      this.swAttempts ? this.swAttempts.listAttempts(actor.id) : [],
+      this.practice ? this.practice.listScored(actor.id, ['read_aloud', 'open_speaking', 'writing']) : [],
     ]);
     const scored = finished.filter((attempt) => attempt.kind === MockAttemptKind.FULL && attempt.listeningScore !== null && attempt.listeningScore !== undefined);
     const latest = scored.at(-1);
@@ -407,14 +481,25 @@ export class MockService {
       history: scored.slice(-GOAL_HISTORY_SIZE).map((attempt) => ({ at: new Date(attempt.submittedAt).toISOString(), total: attempt.listeningScore + attempt.readingScore, mockTestId: attempt.mockTestId })),
       parts,
       weakestPart: weakestPart(parts)?.key || null,
+      sw: { ...swActivity(swRows, practiceRows), estimate: swEstimate(swRows) },
       today: this.now().toISOString(),
     };
   }
 
-  async saveStudyGoal(actor, { targetScore, examDate }) {
+  async saveStudyGoal(actor, { lr, sw }) {
     this.assertRole(actor, AccountRole.STUDENT);
-    if (examDate && examDate < this.now().toISOString().slice(0, 10)) throw mockErrors.goalInvalid('The exam date is in the past');
-    await this.repository.saveGoal({ accountId: actor.id, targetScore, examDate: examDate || null });
+    const today = this.now().toISOString().slice(0, 10);
+    if ((lr?.examDate && lr.examDate < today) || (sw?.examDate && sw.examDate < today)) throw mockErrors.goalInvalid('The exam date is in the past');
+    await this.repository.saveGoal({
+      accountId: actor.id,
+      lrEnabled: Boolean(lr),
+      targetScore: lr?.targetScore ?? null,
+      examDate: lr?.examDate || null,
+      swEnabled: Boolean(sw),
+      speakingTarget: sw?.speakingTarget ?? null,
+      writingTarget: sw?.writingTarget ?? null,
+      swExamDate: sw?.examDate || null,
+    });
     return this.getStudyGoal(actor);
   }
 

@@ -44,16 +44,6 @@ export function unitOpenedNotification(data) {
   };
 }
 
-export function levelUpNotification(data) {
-  return {
-    accountId: data.accountId,
-    kind: NotificationKind.COURSE_LEVEL_UP,
-    key: `level:${data.to}`,
-    data: { from: data.from, to: data.to },
-    createdAt: new Date(data.reachedAt),
-  };
-}
-
 export function practiceResultNotification(data, kind = NotificationKind.SPEAKING_RESULT) {
   return {
     accountId: data.accountId,
@@ -70,8 +60,18 @@ export function reviewNotification(data, kind) {
     accountId: data.accountId,
     kind,
     key: `${returned ? 'review-returned' : 'review'}:${data.submissionId}:${returned ? data.expiredAt : 'done'}`,
-    data: { submissionId: data.submissionId, promptId: data.promptId, kind: data.kind, title: data.title, total: returned ? null : data.total },
+    data: { submissionId: data.submissionId, promptId: data.promptId, kind: data.kind, title: data.title, total: returned ? null : data.total, ...(data.swTestId ? { swTestId: data.swTestId, section: data.section, attemptNumber: data.attemptNumber } : {}) },
     createdAt: new Date(returned ? data.expiredAt : data.reviewedAt),
+  };
+}
+
+export function swResultNotification(data) {
+  return {
+    accountId: data.accountId,
+    kind: NotificationKind.SW_TEST_RESULT,
+    key: `sw:${data.attemptId}:${data.scoredAt}`,
+    data: { swTestId: data.swTestId, section: data.section, attemptNumber: data.attemptNumber, title: data.title, scaled: data.scaled },
+    createdAt: new Date(data.scoredAt),
   };
 }
 

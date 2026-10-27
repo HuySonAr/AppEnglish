@@ -1,15 +1,15 @@
-import { AccountRole } from '@appenglish/auth-contracts';
-import { ContentVersionKind, LessonVersionStatus } from '@appenglish/content-contracts';
+import { ContentVersionKind, LessonVersionStatus, WORKING_VERSION_STATUSES } from '@appenglish/content-contracts';
 import {
   LessonVersionEntity,
-  ListeningCourseVersionEntity,
   ListeningExerciseVersionEntity,
   MockTestVersionEntity,
+  SwTestVersionEntity,
   UnitReviewVersionEntity,
 } from '../database/content.entities.js';
 import { contentErrors } from '../content/content.errors.js';
 import { contentMediaIds, lessonContentSchema, mockContentSchema, unitReviewContentSchema } from '../content/content.schemas.js';
 import { listeningContentSchema, listeningMediaIds } from '../listening/listening.schemas.js';
+import { swTestContentSchema, swTestMediaIds } from '../swtest/swtest.schemas.js';
 
 const mediaIdsBy = (schema, extract) => (content) => {
   const parsed = schema.safeParse(content);
@@ -17,7 +17,7 @@ const mediaIdsBy = (schema, extract) => (content) => {
 };
 
 export class ContentVersionService {
-  constructor(repository, contentService, listeningService, courseService) {
+  constructor(repository, contentService, listeningService, swTestService = null) {
     this.repository = repository;
     this.contentService = contentService;
     this.kinds = {
@@ -48,14 +48,19 @@ export class ContentVersionService {
         mediaIds: mediaIdsBy(listeningContentSchema, listeningMediaIds),
         restore: (actor, id, content) => listeningService.saveDraft(actor, id, listeningContentSchema.parse(content)),
       },
-      [ContentVersionKind.COURSE_ITEM]: {
-        entity: ListeningCourseVersionEntity,
-        owner: 'itemId',
-        find: (id) => courseService.repository.findItem(id),
-        publishedId: (owner) => owner.publishedVersionId,
-        notFound: contentErrors.courseItemNotFound,
-        restore: (actor, id, content) => courseService.saveDraft(actor, id, content),
-      },
+      ...(swTestService
+        ? {
+            [ContentVersionKind.SW_TEST]: {
+              entity: SwTestVersionEntity,
+              owner: 'swTestId',
+              find: (id) => swTestService.repository.findTest(id),
+              publishedId: (owner) => owner.publishedVersionId,
+              notFound: contentErrors.swTestNotFound,
+              mediaIds: mediaIdsBy(swTestContentSchema, swTestMediaIds),
+              restore: (actor, id, content) => swTestService.saveDraft(actor, id, swTestContentSchema.parse(content)),
+            },
+          }
+        : {}),
       [ContentVersionKind.UNIT_REVIEW]: {
         entity: UnitReviewVersionEntity,
         owner: 'unitId',
@@ -67,12 +72,10 @@ export class ContentVersionService {
     };
   }
 
-  assertManager(actor) {
-    if (actor.role !== AccountRole.CONTENT_MANAGER) throw contentErrors.forbiddenRole();
-  }
-
-  async owner(actor, { kind, id }) {
-    this.assertManager(actor);
+  async owner(actor, { kind, id }, role = 'staff') {
+    if (role === 'teacher') this.contentService.assertTeacher(actor);
+    else if (role === 'manager') this.contentService.assertManager(actor);
+    else this.contentService.assertStaff(actor);
     const spec = this.kinds[kind];
     const owner = await spec.find(id);
     if (!owner) throw spec.notFound();
@@ -111,10 +114,12 @@ export class ContentVersionService {
   }
 
   async discardDraft(actor, { kind, id }) {
-    const { spec, owner } = await this.owner(actor, { kind, id });
+    const { spec, owner } = await this.owner(actor, { kind, id }, 'teacher');
     const rows = await this.repository.listVersionsOf(spec.entity, spec.owner, owner.id);
-    const summary = rows.find((version) => version.status === LessonVersionStatus.DRAFT);
+    const summary = rows.find((version) => WORKING_VERSION_STATUSES.includes(version.status));
     if (!summary) throw contentErrors.noDraft();
+    if (summary.status === LessonVersionStatus.PENDING_REVIEW)
+      throw contentErrors.reviewState('PENDING_REVIEW', 'Withdraw it from review before discarding');
     const draft = await this.repository.findVersionOf(spec.entity, summary.id);
     const mediaIds = spec.mediaIds ? spec.mediaIds(draft.content) : [];
     await this.repository.deleteVersionOf(spec.entity, draft.id);
@@ -123,9 +128,9 @@ export class ContentVersionService {
   }
 
   async deleteVersion(actor, { kind, id, versionId }) {
-    const { spec, owner } = await this.owner(actor, { kind, id });
+    const { spec, owner } = await this.owner(actor, { kind, id }, 'manager');
     const version = await this.version(spec, owner, id, versionId);
-    if (version.status === LessonVersionStatus.DRAFT) throw contentErrors.versionIsDraft();
+    if (WORKING_VERSION_STATUSES.includes(version.status)) throw contentErrors.versionIsDraft();
     if (version.id === spec.publishedId(owner)) throw contentErrors.versionIsCurrent();
     const mediaIds = spec.mediaIds ? spec.mediaIds(version.content) : [];
     await this.repository.deleteVersionOf(spec.entity, version.id);
@@ -134,9 +139,9 @@ export class ContentVersionService {
   }
 
   async restoreVersion(actor, { kind, id, versionId }) {
-    const { spec, owner } = await this.owner(actor, { kind, id });
+    const { spec, owner } = await this.owner(actor, { kind, id }, 'teacher');
     const version = await this.version(spec, owner, id, versionId);
-    if (version.status === LessonVersionStatus.DRAFT) throw contentErrors.versionIsDraft();
+    if (WORKING_VERSION_STATUSES.includes(version.status)) throw contentErrors.versionIsDraft();
     const view = await spec.restore(actor, id, structuredClone(version.content));
     return { restoredFrom: this.versionView(spec, owner, version), ...view };
   }

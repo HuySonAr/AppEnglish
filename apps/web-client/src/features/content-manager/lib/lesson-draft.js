@@ -87,6 +87,8 @@ export function lessonState(lessonData) {
     hasDraft: Boolean(lessonData?.draft),
     draftVersion: lessonData?.draft?.versionNumber ?? null,
     publishedVersion: lessonData?.published?.versionNumber ?? null,
+    draftStatus: lessonData?.draft?.status ?? null,
+    reviewNote: lessonData?.draft?.reviewNote ?? null,
   };
 }
 

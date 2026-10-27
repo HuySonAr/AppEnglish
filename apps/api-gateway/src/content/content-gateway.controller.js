@@ -17,8 +17,8 @@ const VERSION_USAGE_KINDS = Object.freeze({
   lesson: ContentUsageKind.LESSON_VERSION,
   mockTest: ContentUsageKind.MOCK_VERSION,
   unitReview: ContentUsageKind.UNIT_REVIEW_VERSION,
-  courseItem: ContentUsageKind.COURSE_VERSION,
   listeningExercise: ContentUsageKind.LISTENING_VERSION,
+  swTest: ContentUsageKind.SW_TEST_VERSION,
 });
 
 export class ContentGatewayController {
@@ -64,6 +64,52 @@ export class ContentGatewayController {
     if (usageKind) await this.assertUnused(actor, usageKind, [versionId]);
     return this.respond(await callService(this.content, 'DeleteContentVersion', { actor, id, payloadJson: JSON.stringify({ kind, versionId }) }, 'Content'));
   }
+  listSwTests(request) {
+    return this.forward('ListSwTests', request);
+  }
+  createSwTest(body, request) {
+    return this.forward('CreateSwTest', request, { body });
+  }
+  updateSwTest(id, body, request) {
+    return this.forward('UpdateSwTest', request, { id, body });
+  }
+  getSwTest(id, request) {
+    return this.forward('GetSwTest', request, { id });
+  }
+  saveSwTestDraft(id, body, request) {
+    return this.forward('SaveSwTestDraft', request, { id, body });
+  }
+  publishSwTest(id, request) {
+    return this.forward('PublishSwTest', request, { id });
+  }
+  unpublishSwTest(id, request) {
+    return this.forward('UnpublishSwTest', request, { id });
+  }
+  deleteSwTest(id, request) {
+    return this.deleteUnused('DeleteSwTest', ContentUsageKind.SW_TEST, id, request);
+  }
+  async listContentReviews(request) {
+    const payload = await this.forward('ListContentReviews', request);
+    const people = [];
+    for (const item of payload.data?.items || []) {
+      if (item.editedBy) people.push((item.editor = { accountId: item.editedBy }));
+      if (item.submittedBy) people.push((item.submitter = { accountId: item.submittedBy }));
+    }
+    await attachProfiles(this.auth, people);
+    return payload;
+  }
+  submitContentReview(kind, id, request) {
+    return this.forward('SubmitContentReview', request, { id, body: { kind } });
+  }
+  withdrawContentReview(kind, id, request) {
+    return this.forward('WithdrawContentReview', request, { id, body: { kind } });
+  }
+  approveContentReview(kind, id, request) {
+    return this.forward('ApproveContentReview', request, { id, body: { kind } });
+  }
+  returnContentReview(kind, id, body, request) {
+    return this.forward('ReturnContentReview', request, { id, body: { kind, note: body?.note } });
+  }
   getUnitReview(id, request) {
     return this.forward('GetUnitReview', request, { id });
   }
@@ -93,17 +139,6 @@ export class ContentGatewayController {
   }
   deleteListeningExercise(id, request) {
     return this.deleteUnused('DeleteListeningExercise', ContentUsageKind.LISTENING_EXERCISE, id, request);
-  }
-  unpublishCourseItem(id, request) {
-    return this.forward('UnpublishCourseItem', request, { id });
-  }
-  async deleteCourseItem(id, request) {
-    const actor = await this.actor(request);
-    const item = await this.call('GetCourseItem', actor, id);
-    const type = item.data.item?.type;
-    const kind = type === 'topic' ? ContentUsageKind.COURSE_TOPIC : ContentUsageKind.COURSE_TEST;
-    await this.assertUnused(actor, kind, [id]);
-    return this.respond(await callService(this.content, 'DeleteCourseItem', { actor, id, payloadJson: '' }, 'Content'));
   }
   listOrphanMedia(request) {
     return this.forward('ListOrphanMedia', request);
@@ -252,8 +287,11 @@ export class ContentGatewayController {
   createPracticeMachineAudio(body, request) {
     return this.forward('CreatePracticeMachineAudio', request, { body });
   }
-  listContentNotifications(request) {
-    return this.forward('ListContentNotifications', request);
+  async listContentNotifications(request) {
+    const payload = await this.forward('ListContentNotifications', request);
+    const people = (payload.data?.notifications || []).filter((item) => item.data?.byId).map((item) => (item.data.by = { accountId: item.data.byId }));
+    await attachProfiles(this.auth, people);
+    return payload;
   }
   markContentNotificationsRead(body, request) {
     return this.forward('MarkContentNotificationsRead', request, { body: body || {} });
@@ -290,33 +328,6 @@ export class ContentGatewayController {
   }
   requestListeningTranscribe(id, request) {
     return this.forward('RequestListeningTranscribe', request, { id });
-  }
-  listListeningCourse(request) {
-    return this.forward('ListListeningCourse', request);
-  }
-  createCourseItem(body, request) {
-    return this.forward('CreateCourseItem', request, { body });
-  }
-  updateCourseItem(id, body, request) {
-    return this.forward('UpdateCourseItem', request, { id, body });
-  }
-  getCourseItem(id, request) {
-    return this.forward('GetCourseItem', request, { id });
-  }
-  saveCourseItemDraft(id, body, request) {
-    return this.forward('SaveCourseItemDraft', request, { id, body });
-  }
-  publishCourseItem(id, request) {
-    return this.forward('PublishCourseItem', request, { id });
-  }
-  requestCourseAutoTime(id, request) {
-    return this.forward('RequestCourseAutoTime', request, { id });
-  }
-  getCourseAutoTime(id, request) {
-    return this.forward('GetCourseAutoTime', request, { id });
-  }
-  requestCourseTranscribe(id, request) {
-    return this.forward('RequestCourseTranscribe', request, { id });
   }
   deleteMedia(id, request) {
     return this.forward('DeleteMedia', request, { id });
@@ -426,20 +437,24 @@ const routes = [
   [Post, 'listening-exercises/:id/auto-time', 'requestListeningAutoTime', [Param('id'), Req()]],
   [Get, 'listening-exercises/:id/auto-time', 'getListeningAutoTime', [Param('id'), Req()]],
   [Post, 'listening-exercises/:id/transcribe', 'requestListeningTranscribe', [Param('id'), Req()]],
-  [Get, 'listening-course', 'listListeningCourse', [Req()]],
-  [Post, 'listening-course/items', 'createCourseItem', [Body(), Req()]],
-  [Patch, 'listening-course/items/:id', 'updateCourseItem', [Param('id'), Body(), Req()]],
-  [Get, 'listening-course/items/:id', 'getCourseItem', [Param('id'), Req()]],
-  [Put, 'listening-course/items/:id/draft', 'saveCourseItemDraft', [Param('id'), Body(), Req()]],
-  [Post, 'listening-course/items/:id/publish', 'publishCourseItem', [Param('id'), Req()]],
-  [Post, 'listening-course/items/:id/auto-time', 'requestCourseAutoTime', [Param('id'), Req()]],
-  [Get, 'listening-course/items/:id/auto-time', 'getCourseAutoTime', [Param('id'), Req()]],
-  [Post, 'listening-course/items/:id/transcribe', 'requestCourseTranscribe', [Param('id'), Req()]],
   [Get, 'placement', 'getPlacement', [Req()]],
   [Put, 'placement/draft', 'savePlacementDraft', [Body(), Req()]],
   [Post, 'placement/publish', 'publishPlacement', [Req()]],
   [Post, 'units/:id/unpublish', 'unpublishUnit', [Param('id'), Req()]],
   [Delete, 'units/:id', 'deleteUnit', [Param('id'), Req()]],
+  [Get, 'reviews', 'listContentReviews', [Req()]],
+  [Get, 'sw-tests', 'listSwTests', [Req()]],
+  [Post, 'sw-tests', 'createSwTest', [Body(), Req()]],
+  [Patch, 'sw-tests/:id', 'updateSwTest', [Param('id'), Body(), Req()]],
+  [Get, 'sw-tests/:id', 'getSwTest', [Param('id'), Req()]],
+  [Put, 'sw-tests/:id/draft', 'saveSwTestDraft', [Param('id'), Body(), Req()]],
+  [Post, 'sw-tests/:id/publish', 'publishSwTest', [Param('id'), Req()]],
+  [Post, 'sw-tests/:id/unpublish', 'unpublishSwTest', [Param('id'), Req()]],
+  [Delete, 'sw-tests/:id', 'deleteSwTest', [Param('id'), Req()]],
+  [Post, 'reviews/:kind/:id/submit', 'submitContentReview', [Param('kind'), Param('id'), Req()]],
+  [Post, 'reviews/:kind/:id/withdraw', 'withdrawContentReview', [Param('kind'), Param('id'), Req()]],
+  [Post, 'reviews/:kind/:id/approve', 'approveContentReview', [Param('kind'), Param('id'), Req()]],
+  [Post, 'reviews/:kind/:id/return', 'returnContentReview', [Param('kind'), Param('id'), Body(), Req()]],
   [Get, 'versions/:kind/:id', 'listContentVersions', [Param('kind'), Param('id'), Req()]],
   [Get, 'versions/:kind/:id/:versionId', 'getContentVersion', [Param('kind'), Param('id'), Param('versionId'), Req()]],
   [Post, 'versions/:kind/:id/:versionId/restore', 'restoreContentVersion', [Param('kind'), Param('id'), Param('versionId'), Req()]],
@@ -455,8 +470,6 @@ const routes = [
   [Delete, 'mock-tests/:id', 'deleteMockTest', [Param('id'), Req()]],
   [Post, 'listening-exercises/:id/unpublish', 'unpublishListeningExercise', [Param('id'), Req()]],
   [Delete, 'listening-exercises/:id', 'deleteListeningExercise', [Param('id'), Req()]],
-  [Post, 'listening-course/items/:id/unpublish', 'unpublishCourseItem', [Param('id'), Req()]],
-  [Delete, 'listening-course/items/:id', 'deleteCourseItem', [Param('id'), Req()]],
   [Get, 'media/orphans', 'listOrphanMedia', [Req()]],
   [Delete, 'media/orphans', 'deleteOrphanMedia', [Body(), Req()]],
   [Delete, 'media/:id', 'deleteMedia', [Param('id'), Req()]],

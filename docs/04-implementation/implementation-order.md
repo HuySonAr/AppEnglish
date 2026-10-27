@@ -9,7 +9,7 @@
 | F04 | Lesson flow | Review bắt buộc, gate >=80%, tuần tự |
 | F05A | Mock tests (full + mini) | Soạn đề, làm bài, chấm, điểm ước tính, lịch sử |
 | F05B | Practice | Luyện nhớ từ (F05B-1) và luyện nghe chép theo chủ đề/cấp độ (F05B-2 đến F05B-4) theo D84 |
-| F05C | Listening course | Giáo trình nghe A1 → C1 theo D100, D141: soạn, học 5 bước, kiểm tra lên cấp, placement nghe, sổ lỗi |
+| F05C | Listening course | Đã bỏ theo D190 |
 | F06 | Progress | Reading/Listening theo policy đã chốt |
 | F07 | XP/leaderboard | Mock best score, không XP trùng |
 | F08 | Client integration/e2e | Luồng đầu cuối đạt acceptance |

@@ -12,6 +12,7 @@ import { MockListSort, filterStudentMocks, mockListSortOptions } from '../lib/st
 import { PageHeader } from '../../../components/shared/PageHeader.jsx';
 import { cn } from '../../../lib/utils.js';
 import { listMockTests } from '../api/mock-api.js';
+import { isPracticeSet } from '../lib/mock-exam.js';
 import { CardGridPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
 
@@ -129,6 +130,7 @@ export function MockTestsPage() {
                       <h2 className="truncate font-semibold">{mockTest.title}</h2>
                       <div className="mt-1 flex flex-wrap gap-1.5">
                         {mockTest.examType ? <Badge variant="outline">{mockTest.examType.name}</Badge> : null}
+                        {isPracticeSet(mockTest) ? <Badge variant="secondary">Practice set</Badge> : null}
                         {mockTest.recommended ? <Badge variant="info">For you</Badge> : null}
                       </div>
                     </div>
@@ -146,15 +148,17 @@ export function MockTestsPage() {
                       </span>
                     </p>
                     {mockTest.attemptCount ? (
-                      <div className="mt-auto grid grid-cols-3 gap-2 text-center">
+                      <div className={cn('mt-auto grid gap-2 text-center', isPracticeSet(mockTest) ? 'grid-cols-2' : 'grid-cols-3')}>
                         <div className="rounded-xl bg-muted/50 p-2">
                           <p className="text-lg font-bold tabular-nums">{mockTest.bestPercent}%</p>
                           <p className="text-[11px] text-muted-foreground">best</p>
                         </div>
-                        <div className="rounded-xl bg-muted/50 p-2">
-                          <p className="text-lg font-bold tabular-nums">{mockTest.latestTotalScore ?? '—'}</p>
-                          <p className="text-[11px] text-muted-foreground">latest score</p>
-                        </div>
+                        {isPracticeSet(mockTest) ? null : (
+                          <div className="rounded-xl bg-muted/50 p-2">
+                            <p className="text-lg font-bold tabular-nums">{mockTest.latestTotalScore ?? '—'}</p>
+                            <p className="text-[11px] text-muted-foreground">latest score</p>
+                          </div>
+                        )}
                         <div className="rounded-xl bg-muted/50 p-2">
                           <p className="text-lg font-bold tabular-nums">{mockTest.attemptCount}</p>
                           <p className="text-[11px] text-muted-foreground">taken</p>

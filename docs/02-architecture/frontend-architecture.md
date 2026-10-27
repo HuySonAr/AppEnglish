@@ -81,6 +81,8 @@ Không cài toàn bộ đề xuất một cách máy móc. Trước tiên kiểm
 Áp dụng cho mọi trang và component mới của web client. Trước khi viết giao
 diện, đọc mục này và dùng lại các thành phần đã có; không tự tạo biến thể riêng.
 
+Ngôn ngữ thiết kế (token, bo góc, bố cục, thành phần, chuyển động, icon): xem [design-system.md](design-system.md).
+
 ### Chữ trên giao diện (D149)
 - Description của trang, phần, hộp thoại và dòng hướng dẫn tối đa một câu
   ngắn, chỉ nói cần làm gì. Không giải thích nghiệp vụ (ai thấy gì, cách chấm,
@@ -162,6 +164,22 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
   (không phải draft, không phải live) có nút thùng rác xóa version (D128) với
   xác nhận; 409 CONTENT_IN_USE được giải thích bằng số lượt làm bài.
 
+### Soạn và duyệt nội dung (D191)
+- Các trang nội dung (units/lessons, Unit review, placement, mock test, bài nghe) dùng chung cho hai khu vực: giáo viên ở `/teacher/...`, Content Manager ở `/content-manager/...`. `useContentArea()` (`features/content-manager/hooks/use-content-area.js`, helper thuần trong `lib/content-area.js`) cho đường dẫn gốc, `canAuthor` (giáo viên) và `canManage` (Content Manager); link trong trang dùng đường dẫn gốc này.
+- Content Manager xem trình soạn ở chế độ chỉ đọc qua `ReadOnlyProvider`/`useReadOnly` (`components/ReadOnly.jsx`); các thành phần soạn (TextField, MediaField, PartEditor, MockPartEditor, VocabularyCard, RecordingEditor) tự khoá theo context, không tạo bản sao trang.
+- `components/ContentReview.jsx`: nhãn trạng thái (Draft, In review, Returned), nút "Submit for review", dải "Waiting for review" kèm Withdraw hoặc "Returned with a note", Approve/Return (ghi chú bắt buộc) cho Content Manager và khung "Changes from published" dùng `outlineChanges()` của `lib/version-outline.js`.
+- Hàng chờ duyệt của Content Manager: `/content-manager/reviews` (tab Waiting for review / Returned / Drafts, tìm kiếm, sắp xếp, phân trang). Dashboard giáo viên có thẻ "Content in progress".
+- `VersionHistory` nhận `canRestore`, `canDiscard`, `canDeleteVersion` theo vai trò.
+
+### Luyện Speaking/Writing theo dạng ETS (D195)
+- `features/student/lib/ets-practice.js` (helper thuần, có test): đề dạng bộ, thời gian từng câu, câu phát hai lần, nhóm lịch sử theo `setId`, khoá ô viết, lưu lựa chọn "Practice without timer" theo tài khoản (localStorage có try/catch, `hooks/use-no-timer.js`).
+- `hooks/use-recorder.js` (micro, ghi âm, đếm ngược) dùng chung cho `SpeakingRecorder` và `components/EtsSpeaking.jsx` (bài đơn có giờ, bộ 3 câu, kết quả theo bộ); `components/EtsTimer.jsx` cho công tắc, nhãn thời gian và đồng hồ.
+- Nhãn dạng câu, trường theo dạng và mặc định khi chọn dạng nằm trong `src/lib/practice-prompts.js`; trình soạn giáo viên dùng `features/teacher/components/PromptEditorParts.jsx`; `PracticePromptView` hiện đủ trường mới ở chế độ chỉ đọc.
+
+### Bài thi Speaking/Writing (D196)
+- Trang nội dung dùng chung hai khu vực: `SwTestsManagePage`, `SwTestEditorPage` (menu bên trái theo khối câu đánh số như đề thật; helper `features/content-manager/lib/sw-test-draft.js`).
+- Học viên: `SwTestsPage`, `SwTestPage`, `SwResultPage`; bộ chạy bài `SwSpeakingExam` (kiểm tra micro, rồi từng câu: đọc → nghe → chuẩn bị → ghi âm đủ thời gian, không có nút dừng) và `SwWritingExam` (4 nhóm 480/600/600/1800 giây, tự lưu sau 800 ms, gửi `lockThrough` khi hết nhóm); thứ tự và thời gian nằm trong helper thuần `features/student/lib/sw-exam.js`.
+
 ### Chọn file (D125)
 - Mọi chỗ nhận file dùng `FileDropzone` (`components/shared/FileDropzone.jsx`):
   vùng kéo-thả có `accept`, `maxBytes`, `kindLabel`, biến thể `compact` cho ô
@@ -178,7 +196,7 @@ diện, đọc mục này và dùng lại các thành phần đã có; không t�
   định, `destructive` cho lỗi, `info`, `warning`, `loading`.
 - Tiêu đề trang dùng `PageHeader`; danh sách rỗng dùng `EmptyState`; ô dashboard
   dùng `FeatureCard`.
-- Trang có nhiều bước (lesson, chủ đề Listening course) dùng `StepNav` cho dải bước.
+- Trang có nhiều bước (lesson) dùng `StepNav` cho dải bước.
 - Trang con (chi tiết, trình soạn, bài làm) mở đầu bằng `PageBreadcrumb` (dựa trên `components/ui/breadcrumb.jsx`, theo shadcn Breadcrumb) cho đường dẫn từ trang cha tới trang hiện tại, thay cho link "← Quay lại"; bước cuối là trang hiện tại, bước giữa không có trang riêng hiện chữ thường.
 - Thẻ từ vựng lật dùng `features/student/components/WordFlipCard.jsx`; màn hình bắt đầu bài test (lesson test, unit review, mock test, mini test) dùng `TestStartCard.jsx`; vòng điểm kết quả dùng `ScoreRing.jsx`.
 - Ô mật khẩu dùng `PasswordInput` (`components/shared/PasswordInput.jsx`): nút

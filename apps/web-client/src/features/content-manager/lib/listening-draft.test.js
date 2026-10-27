@@ -4,6 +4,7 @@ import {
   translationPastePlan,
   applyAutoTime,
   formatSeconds,
+  keepSentenceExtras,
   listeningPastePlan,
   listeningIssueLabel,
   listeningKindOf,
@@ -103,3 +104,18 @@ test('pasted translations fill the sentences in order (D157)', () => {
   assert.equal(long.lines[2].errors.length, 1);
 });
 
+test('replaced sentences keep their translation by id, or by place when the words are the same', () => {
+  const previous = [
+    { id: 's1', speaker: '', text: 'Hello there.', start: null, end: null, translation: 'Xin chào.' },
+    { id: 's2', speaker: '', text: 'Nice to meet you.', start: null, end: null, translation: 'Rất vui.' },
+  ];
+  const pasted = [
+    { id: 'p1', speaker: '', text: 'Hello  there.', start: null, end: null },
+    { id: 'p2', speaker: '', text: 'Nice to see you.', start: null, end: null },
+  ];
+  const kept = keepSentenceExtras(previous, pasted);
+  assert.deepEqual(kept.map((segment) => [segment.id, segment.translation]), [['p1', 'Xin chào.'], ['p2', '']]);
+  assert.deepEqual(kept[0], { id: 'p1', speaker: '', text: 'Hello  there.', start: null, end: null, translation: 'Xin chào.' });
+  const timed = keepSentenceExtras(previous, previous.map((segment) => ({ ...segment, start: 1 })));
+  assert.equal(timed[0].translation, 'Xin chào.');
+});

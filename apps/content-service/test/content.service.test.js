@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { ContentService } from '../src/content/content.service.js';
 import { lessonContentSchema } from '../src/content/content.schemas.js';
 import { MediaValidationError } from '../src/media/media.errors.js';
-import { admin, createMemoryRepository, manager, publishableContent, student } from './memory-repository.js';
+import { admin, createMemoryRepository, manager, publishableContent, student, submitted, teacher } from './memory-repository.js';
 
 async function harness() {
   const repository = createMemoryRepository();
@@ -22,23 +22,24 @@ async function harness() {
     },
   };
   const service = new ContentService(repository, storage);
-  const audioId = (await service.uploadMedia(manager, { kind: 'audio', fileName: 'a.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1, 2, 3]) })).media.id;
-  const imageId = (await service.uploadMedia(manager, { kind: 'image', fileName: 'a.png', mimeType: 'image/png', data: Buffer.from([1, 2]) })).media.id;
+  const audioId = (await service.uploadMedia(teacher, { kind: 'audio', fileName: 'a.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1, 2, 3]) })).media.id;
+  const imageId = (await service.uploadMedia(teacher, { kind: 'image', fileName: 'a.png', mimeType: 'image/png', data: Buffer.from([1, 2]) })).media.id;
   const content = (change = (value) => value) =>
     lessonContentSchema.parse(change(publishableContent({ audioId, imageId })));
   return { service, repository, uploads, removed, audioId, imageId, content };
 }
 
 async function publishedLesson({ service, content }, unitId, title = 'Lesson') {
-  const { lesson } = await service.createLesson(manager, unitId, { title });
-  await service.saveLessonDraft(manager, lesson.id, content());
+  const { lesson } = await service.createLesson(teacher, unitId, { title });
+  await service.saveLessonDraft(teacher, lesson.id, content());
+  await submitted(service, null, 'lesson', lesson.id);
   await service.publishLesson(manager, lesson.id);
   return lesson;
 }
 
 async function issuePaths(service, lessonId) {
   let paths = [];
-  await assert.rejects(() => service.publishLesson(manager, lessonId), (error) => {
+  await assert.rejects(() => submitted(service, null, 'lesson', lessonId), (error) => {
     assert.equal(error.code, 42);
     assert.equal(error.status, 409);
     paths = error.data.issues.map((issue) => issue.path);
@@ -47,53 +48,67 @@ async function issuePaths(service, lessonId) {
   return paths;
 }
 
-test('only a Content Manager can manage content', async () => {
+test('teachers author content and Content Managers order and publish it', async () => {
   const { service } = await harness();
-  for (const actor of [student, admin]) {
+  for (const actor of [student, admin, manager]) {
     await assert.rejects(() => service.createUnit(actor, { title: 'Unit', description: '' }), { code: 26, status: 403 });
     await assert.rejects(() => service.uploadMedia(actor, { kind: 'audio', fileName: 'a.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1]) }), { code: 26 });
   }
-  const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
+  const { unit } = await service.createUnit(teacher, { title: 'Unit', description: '' });
+  const { lesson } = await service.createLesson(teacher, unit.id, { title: 'L' });
   for (const call of [
     () => service.updateUnit(student, unit.id, { title: 'X' }),
     () => service.publishUnit(student, unit.id),
     () => service.createLesson(student, unit.id, { title: 'L' }),
+    () => service.updateUnit(manager, unit.id, { title: 'X' }),
+    () => service.createLesson(manager, unit.id, { title: 'L' }),
+    () => service.saveLessonDraft(manager, lesson.id, lessonContentSchema.parse({})),
+    () => service.updateLesson(manager, lesson.id, { title: 'X' }),
+    () => service.updateUnit(teacher, unit.id, { position: 1 }),
+    () => service.updateLesson(teacher, lesson.id, { position: 1 }),
+    () => service.publishUnit(teacher, unit.id),
+    () => service.publishLesson(teacher, lesson.id),
+    () => service.unpublishLesson(teacher, lesson.id),
+    () => service.listOrphanMedia(teacher),
   ]) await assert.rejects(call, { code: 26 });
+  assert.equal((await service.getLesson(manager, lesson.id)).draft.versionNumber, 1);
+  assert.equal((await service.listUnits(teacher)).units[0].lessons[0].draftStatus, 'DRAFT');
 });
 
 test('units and lessons are appended in order and can be moved', async () => {
   const { service } = await harness();
-  const a = (await service.createUnit(manager, { title: 'A', description: '' })).unit;
-  const b = (await service.createUnit(manager, { title: 'B', description: '' })).unit;
-  const c = (await service.createUnit(manager, { title: 'C', description: '' })).unit;
+  const a = (await service.createUnit(teacher, { title: 'A', description: '' })).unit;
+  const b = (await service.createUnit(teacher, { title: 'B', description: '' })).unit;
+  const c = (await service.createUnit(teacher, { title: 'C', description: '' })).unit;
   assert.deepEqual([a.position, b.position, c.position], [1, 2, 3]);
   await service.updateUnit(manager, c.id, { position: 1 });
-  let { units } = await service.listUnits(manager);
+  let { units } = await service.listUnits(teacher);
   assert.deepEqual(units.map((unit) => [unit.title, unit.position]), [['C', 1], ['A', 2], ['B', 3]]);
-  await service.updateUnit(manager, c.id, { position: 99, title: 'C2' });
-  ({ units } = await service.listUnits(manager));
+  await service.updateUnit(manager, c.id, { position: 99 });
+  await service.updateUnit(teacher, c.id, { title: 'C2' });
+  ({ units } = await service.listUnits(teacher));
   assert.deepEqual(units.map((unit) => unit.title), ['A', 'B', 'C2']);
 
-  const first = (await service.createLesson(manager, a.id, { title: 'L1' })).lesson;
-  const second = (await service.createLesson(manager, a.id, { title: 'L2' })).lesson;
+  const first = (await service.createLesson(teacher, a.id, { title: 'L1' })).lesson;
+  const second = (await service.createLesson(teacher, a.id, { title: 'L2' })).lesson;
   assert.deepEqual([first.position, second.position], [1, 2]);
   await service.updateLesson(manager, second.id, { position: 1 });
-  ({ units } = await service.listUnits(manager));
+  ({ units } = await service.listUnits(teacher));
   assert.deepEqual(units[0].lessons.map((lesson) => lesson.title), ['L2', 'L1']);
-  await assert.rejects(() => service.updateUnit(manager, '00000000-0000-4000-8000-000000000000', { title: 'x' }), { code: 40, status: 404 });
+  await assert.rejects(() => service.updateUnit(teacher, '00000000-0000-4000-8000-000000000000', { title: 'x' }), { code: 40, status: 404 });
 });
 
 test('a new lesson starts with an empty seven-part draft and drafts may be incomplete', async () => {
   const { service } = await harness();
-  const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
-  const created = await service.createLesson(manager, unit.id, { title: 'Lesson' });
+  const { unit } = await service.createUnit(teacher, { title: 'Unit', description: '' });
+  const created = await service.createLesson(teacher, unit.id, { title: 'Lesson' });
   assert.equal(created.draft.versionNumber, 1);
   assert.deepEqual(created.draft.content.vocabulary, []);
   assert.deepEqual(created.draft.content.fillIn, { passage: '', answers: [] });
   assert.deepEqual(Object.keys(created.draft.content.test), ['part1', 'part2', 'part3', 'part4', 'part5', 'part6', 'part7']);
   assert.equal(created.published, null);
 
-  const saved = await service.saveLessonDraft(manager, created.lesson.id, lessonContentSchema.parse({ vocabulary: [{ word: 'ticket' }] }));
+  const saved = await service.saveLessonDraft(teacher, created.lesson.id, lessonContentSchema.parse({ vocabulary: [{ word: 'ticket' }] }));
   assert.match(saved.draft.content.vocabulary[0].id, /^[0-9a-f-]{36}$/);
   const paths = await issuePaths(service, created.lesson.id);
   for (const path of [
@@ -110,24 +125,24 @@ test('a complete lesson has 23 questions and publishes', async () => {
   const { service, content } = context;
   const total = Object.values(content().test).reduce((sum, part) => sum + part.questions.length, 0);
   assert.equal(total, 23);
-  const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
+  const { unit } = await service.createUnit(teacher, { title: 'Unit', description: '' });
   const lesson = await publishedLesson(context, unit.id);
-  const view = await service.getLesson(manager, lesson.id);
+  const view = await service.getLesson(teacher, lesson.id);
   assert.equal(view.published.versionNumber, 1);
   assert.equal(view.draft, null);
   assert.equal(view.published.content.test.part2.questions[0].options.length, 3);
   assert.deepEqual(Object.keys(view.media).sort(), [context.audioId, context.imageId].sort());
   assert.deepEqual(view.media[context.audioId], { kind: 'audio', fileName: 'a.mp3', url: null });
   context.repository.tables.media.find((asset) => asset.id === context.imageId).storage = 'imagekit';
-  assert.equal((await service.getLesson(manager, lesson.id)).media[context.imageId].url, 'http://localhost:3002/media/file');
-  assert.equal('media' in (await service.getLesson(manager, (await service.createLesson(manager, unit.id, { title: 'Empty' })).lesson.id)), true);
+  assert.equal((await service.getLesson(teacher, lesson.id)).media[context.imageId].url, 'http://localhost:3002/media/file');
+  assert.equal('media' in (await service.getLesson(teacher, (await service.createLesson(teacher, unit.id, { title: 'Empty' })).lesson.id)), true);
 });
 
 test('vocabulary and fill-in publishing rules', async () => {
   const { service, content, imageId } = await harness();
-  const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
-  const { lesson } = await service.createLesson(manager, unit.id, { title: 'Lesson' });
-  await service.saveLessonDraft(manager, lesson.id, content((value) => {
+  const { unit } = await service.createUnit(teacher, { title: 'Unit', description: '' });
+  const { lesson } = await service.createLesson(teacher, unit.id, { title: 'Lesson' });
+  await service.saveLessonDraft(teacher, lesson.id, content((value) => {
     value.vocabulary[0].partOfSpeech = 'thing';
     value.vocabulary[0].audioUkMediaId = imageId;
     value.vocabulary[0].audioUsMediaId = '00000000-0000-4000-8000-000000000000';
@@ -139,7 +154,7 @@ test('vocabulary and fill-in publishing rules', async () => {
   for (const path of ['vocabulary[0].partOfSpeech', 'vocabulary[0].audioUkMediaId', 'vocabulary[0].audioUsMediaId', 'vocabulary', 'fillIn.answers', 'fillIn.answers[1]'])
     assert.ok(paths.includes(path), path);
 
-  await service.saveLessonDraft(manager, lesson.id, content((value) => {
+  await service.saveLessonDraft(teacher, lesson.id, content((value) => {
     value.vocabulary.push({ ...value.vocabulary[0], partOfSpeech: 'verb', meaning: 'phạt vé' });
     value.fillIn = { passage: 'No blank here.', answers: [] };
     return value;
@@ -149,9 +164,9 @@ test('vocabulary and fill-in publishing rules', async () => {
 
 test('lesson test publishing rules per part', async () => {
   const { service, content, imageId, audioId } = await harness();
-  const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
-  const { lesson } = await service.createLesson(manager, unit.id, { title: 'Lesson' });
-  await service.saveLessonDraft(manager, lesson.id, content((value) => {
+  const { unit } = await service.createUnit(teacher, { title: 'Unit', description: '' });
+  const { lesson } = await service.createLesson(teacher, unit.id, { title: 'Lesson' });
+  await service.saveLessonDraft(teacher, lesson.id, content((value) => {
     const { part1, part2, part3, part4, part5, part6, part7 } = value.test;
     part1.questions[0].imageMediaId = audioId;
     part1.audioMediaId = null;
@@ -183,44 +198,46 @@ test('lesson test publishing rules per part', async () => {
     'test.part6.passage', 'test.part7.passage', 'test.part7.imageMediaId', 'test.part7.questions',
   ]) assert.ok(paths.includes(path), path);
 
-  await service.saveLessonDraft(manager, lesson.id, content((value) => {
+  await service.saveLessonDraft(teacher, lesson.id, content((value) => {
     value.test.part7.imageMediaId = imageId;
     return value;
   }));
+  await submitted(service, null, 'lesson', lesson.id);
   assert.equal((await service.publishLesson(manager, lesson.id)).published.versionNumber, 1);
 });
 
 test('a published version is immutable and edits create the next version', async () => {
   const context = await harness();
   const { service, repository } = context;
-  const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
+  const { unit } = await service.createUnit(teacher, { title: 'Unit', description: '' });
   const lesson = await publishedLesson(context, unit.id);
-  const v1 = (await service.getLesson(manager, lesson.id)).published;
+  const v1 = (await service.getLesson(teacher, lesson.id)).published;
   await assert.rejects(() => service.publishLesson(manager, lesson.id), { code: 41, status: 409 });
 
   const edited = structuredClone(v1.content);
   edited.vocabulary[0].meaning = 'vé tàu';
-  const draft = await service.saveLessonDraft(manager, lesson.id, lessonContentSchema.parse(edited));
+  const draft = await service.saveLessonDraft(teacher, lesson.id, lessonContentSchema.parse(edited));
   assert.equal(draft.draft.versionNumber, 2);
   assert.equal(draft.draft.content.vocabulary[0].id, v1.content.vocabulary[0].id);
   assert.equal(draft.draft.content.test.part5.questions[0].options[0].id, v1.content.test.part5.questions[0].options[0].id);
   assert.equal(draft.published.content.vocabulary[0].meaning, 'vé');
 
+  await submitted(service, null, 'lesson', lesson.id);
   const v2 = (await service.publishLesson(manager, lesson.id)).published;
   assert.equal(v2.versionNumber, 2);
   assert.notEqual(v2.versionId, v1.versionId);
   const stored = await repository.findVersion(v1.versionId);
   assert.equal(stored.status, 'PUBLISHED');
   assert.equal(stored.content.vocabulary[0].meaning, 'vé');
-  const { units } = await service.listUnits(manager);
-  assert.deepEqual(units[0].lessons[0], { id: lesson.id, title: 'Lesson', position: 1, publishedVersionNumber: 2, hasDraft: false });
+  const { units } = await service.listUnits(teacher);
+  assert.deepEqual(units[0].lessons[0], { id: lesson.id, title: 'Lesson', position: 1, publishedVersionNumber: 2, hasDraft: false, draftStatus: null });
 });
 
 test('a unit needs a published lesson and learners only see published content', async () => {
   const context = await harness();
   const { service } = context;
-  const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
-  const draftOnly = (await service.createLesson(manager, unit.id, { title: 'Draft only' })).lesson;
+  const { unit } = await service.createUnit(teacher, { title: 'Unit', description: '' });
+  const draftOnly = (await service.createLesson(teacher, unit.id, { title: 'Draft only' })).lesson;
   await assert.rejects(() => service.publishUnit(manager, unit.id), (error) => {
     assert.equal(error.code, 42);
     assert.match(error.data.issues[0].message, /at least 1 published lesson; it has 0/);
@@ -256,63 +273,64 @@ test('a unit needs a published lesson and learners only see published content', 
 test('media upload stores the asset and maps storage validation errors', async () => {
   const { service, repository, uploads } = await harness();
   const before = repository.tables.media.length;
-  const { media } = await service.uploadMedia(manager, { kind: 'audio', fileName: 'q.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1, 2, 3]) });
+  const { media } = await service.uploadMedia(teacher, { kind: 'audio', fileName: 'q.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1, 2, 3]) });
   assert.deepEqual(Object.keys(media), ['id', 'kind', 'fileName', 'mimeType', 'sizeBytes']);
   assert.equal(uploads.at(-1).sizeBytes, 3);
   const row = repository.tables.media.at(-1);
   assert.equal(row.storageId, `stored-${uploads.length}`);
-  assert.equal(row.uploadedBy, manager.id);
+  assert.equal(row.uploadedBy, teacher.id);
   await assert.rejects(
-    () => service.uploadMedia(manager, { kind: 'audio', fileName: 'q.mp3', mimeType: 'audio/wav', data: Buffer.from([1]) }),
+    () => service.uploadMedia(teacher, { kind: 'audio', fileName: 'q.mp3', mimeType: 'audio/wav', data: Buffer.from([1]) }),
     (error) => error.code === 43 && error.status === 400 && error.data.reason === 'MEDIA_MIME_TYPE_NOT_ALLOWED',
   );
   assert.equal(repository.tables.media.length, before + 1);
 
-  const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
-  await service.createLesson(manager, unit.id, { title: 'First' });
-  const { lesson } = await service.createLesson(manager, unit.id, { title: 'Second' });
+  const { unit } = await service.createUnit(teacher, { title: 'Unit', description: '' });
+  await service.createLesson(teacher, unit.id, { title: 'First' });
+  const { lesson } = await service.createLesson(teacher, unit.id, { title: 'Second' });
   const file = { kind: 'audio', fileName: 'q.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1]) };
-  await service.uploadMedia(manager, { ...file, lessonId: lesson.id, section: 'vocabulary' });
+  await service.uploadMedia(teacher, { ...file, lessonId: lesson.id, section: 'vocabulary' });
   assert.equal(uploads.at(-1).folder, 'audio/unit1-lesson2/vocabulary');
-  await service.uploadMedia(manager, { ...file, kind: 'image', fileName: 'p.png', mimeType: 'image/png', lessonId: lesson.id });
+  await service.uploadMedia(teacher, { ...file, kind: 'image', fileName: 'p.png', mimeType: 'image/png', lessonId: lesson.id });
   assert.equal(uploads.at(-1).folder, 'image/unit1-lesson2/test');
-  await assert.rejects(() => service.uploadMedia(manager, { ...file, lessonId: '00000000-0000-4000-8000-000000000000' }), { code: 40 });
+  await assert.rejects(() => service.uploadMedia(teacher, { ...file, lessonId: '00000000-0000-4000-8000-000000000000' }), { code: 40 });
 });
 
 test('removing media deletes the stored file only when no saved version uses it', async () => {
   const { service, repository, removed, audioId, imageId, content } = await harness();
   const upload = async (fileName) =>
-    (await service.uploadMedia(manager, { kind: 'audio', fileName, mimeType: 'audio/mpeg', data: Buffer.from([1]) })).media.id;
+    (await service.uploadMedia(teacher, { kind: 'audio', fileName, mimeType: 'audio/mpeg', data: Buffer.from([1]) })).media.id;
   const storageIdOf = (id) => repository.tables.media.find((asset) => asset.id === id)?.storageId;
-  const { unit } = await service.createUnit(manager, { title: 'Unit', description: '' });
-  const { lesson } = await service.createLesson(manager, unit.id, { title: 'Lesson' });
+  const { unit } = await service.createUnit(teacher, { title: 'Unit', description: '' });
+  const { lesson } = await service.createLesson(teacher, unit.id, { title: 'Lesson' });
 
   const unsaved = await upload('unsaved.mp3');
   const unsavedStorageId = storageIdOf(unsaved);
   await assert.rejects(() => service.deleteMedia(student, unsaved), { code: 26 });
-  assert.deepEqual(await service.deleteMedia(manager, unsaved), { deleted: true });
+  assert.deepEqual(await service.deleteMedia(teacher, unsaved), { deleted: true });
   assert.deepEqual(removed, [unsavedStorageId]);
   assert.equal(storageIdOf(unsaved), undefined);
-  await assert.rejects(() => service.deleteMedia(manager, unsaved), { code: 40, status: 404 });
+  await assert.rejects(() => service.deleteMedia(teacher, unsaved), { code: 40, status: 404 });
 
   const british = await upload('uk.mp3');
   const britishStorageId = storageIdOf(british);
-  await service.saveLessonDraft(manager, lesson.id, content((value) => {
+  await service.saveLessonDraft(teacher, lesson.id, content((value) => {
     value.vocabulary[0].audioUkMediaId = british;
     return value;
   }));
-  assert.deepEqual(await service.deleteMedia(manager, british), { deleted: false });
-  await service.saveLessonDraft(manager, lesson.id, content());
+  assert.deepEqual(await service.deleteMedia(teacher, british), { deleted: false });
+  await service.saveLessonDraft(teacher, lesson.id, content());
   assert.deepEqual(removed, [unsavedStorageId, britishStorageId]);
   assert.equal(storageIdOf(british), undefined);
 
+  await submitted(service, null, 'lesson', lesson.id);
   await service.publishLesson(manager, lesson.id);
   const replacement = await upload('new.mp3');
-  await service.saveLessonDraft(manager, lesson.id, content((value) => {
+  await service.saveLessonDraft(teacher, lesson.id, content((value) => {
     value.test.part3.audioMediaId = replacement;
     return value;
   }));
-  await service.saveLessonDraft(manager, lesson.id, content((value) => {
+  await service.saveLessonDraft(teacher, lesson.id, content((value) => {
     value.test.part1.questions[0].imageMediaId = null;
     return value;
   }));
@@ -321,6 +339,6 @@ test('removing media deletes the stored file only when no saved version uses it'
   assert.ok(storageIdOf(audioId) && storageIdOf(imageId));
 
   const stuck = await upload('stuck.mp3');
-  assert.deepEqual(await service.deleteMedia(manager, stuck), { deleted: false });
+  assert.deepEqual(await service.deleteMedia(teacher, stuck), { deleted: false });
   assert.ok(storageIdOf(stuck));
 });

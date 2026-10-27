@@ -3,23 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ResponseCode } from '@appenglish/auth-contracts';
-import { authFormSchema } from '../schemas/auth-schemas.js';
+import { PASSWORD_MIN, registerFormSchema } from '../schemas/auth-schemas.js';
 import { registerAccount } from '../api/auth-api.js';
-import { AuthCard, AuthFields, AuthLink, FieldError, FieldLabel, authButton, authInput } from '../components/AuthCard.jsx';
+import { AuthCard, AuthFields, AuthLink, FieldError, FieldLabel, NewPasswordFields, authButton, authInput } from '../components/AuthCard.jsx';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
-import { registerOutcome } from '../flow/auth-flow.js';
+import { focusOnEnter, registerOutcome } from '../flow/auth-flow.js';
 import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui/button.jsx';
 import { Input } from '../../../components/ui/input.jsx';
-import { PasswordInput } from '../../../components/shared/PasswordInput.jsx';
 import { AUTH_SIDE_RIGHT } from '../../../layouts/AuthLayout.jsx';
 
 export function RegisterPage() {
   const navigate = useNavigate();
   const [existingEmail, setExistingEmail] = useState('');
-  const form = useForm({ resolver: zodResolver(authFormSchema), defaultValues: { email: '', password: '' } });
-  const pending = form.formState.isSubmitting;
-  const submit = form.handleSubmit(async (values) => {
+  const form = useForm({ resolver: zodResolver(registerFormSchema), defaultValues: { email: '', password: '', confirmPassword: '' } });
+  const [passwordValue, confirmValue] = form.watch(['password', 'confirmPassword']);  const pending = form.formState.isSubmitting;
+  const submit = form.handleSubmit(async ({ email, password }) => {
+    const values = { email, password };
     try {
       const result = await registerAccount(values);
       if (registerOutcome(result) !== 'verify-email') {
@@ -37,6 +37,7 @@ export function RegisterPage() {
 
   return (
     <AuthCard
+      className="max-w-md"
       title="Create an account"
       description="Sign up and start learning for free."
       footer={
@@ -65,14 +66,18 @@ export function RegisterPage() {
         <AuthFields>
           <div className="space-y-1.5">
             <FieldLabel htmlFor="email">Email</FieldLabel>
-            <Input id="email" type="email" autoComplete="email" placeholder="you@example.com" className={authInput} {...form.register('email')} disabled={pending} />
+            <Input id="email" type="email" autoComplete="email" placeholder="you@example.com" className={authInput} {...form.register('email')} onKeyDown={focusOnEnter('password')} disabled={pending} />
             <FieldError>{form.formState.errors.email?.message}</FieldError>
           </div>
-          <div className="space-y-1.5">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
-            <PasswordInput id="password" autoComplete="new-password" placeholder="At least 8 characters" className={authInput} {...form.register('password')} disabled={pending} />
-            <FieldError>{form.formState.errors.password?.message}</FieldError>
-          </div>
+          <NewPasswordFields
+            min={PASSWORD_MIN}
+            password={passwordValue}
+            confirm={confirmValue}
+            passwordProps={{ ...form.register('password'), disabled: pending }}
+            confirmProps={{ ...form.register('confirmPassword'), disabled: pending }}
+            passwordInvalid={Boolean(form.formState.errors.password)}
+            confirmInvalid={Boolean(form.formState.errors.confirmPassword)}
+          />
           <Button loading={pending} className={`${authButton} mt-2`} disabled={pending} type="submit">
             {pending ? 'Creating account…' : 'Create account'}
           </Button>

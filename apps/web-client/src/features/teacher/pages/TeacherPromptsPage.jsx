@@ -13,10 +13,10 @@ import { RowsSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { Pagination } from '../../../components/shared/Pagination.jsx';
 import { useListState } from '../../../hooks/use-list-state.js';
 import { createPracticePrompt, listPracticePrompts } from '../../../lib/api/practice-prompts-api.js';
-import { filterPrompts, levelOptions, statusInfo, teacherPromptPath } from '../../../lib/practice-prompts.js';
+import { etsTaskLabel, etsTaskOf, etsTaskOptions, filterPrompts, levelOptions, statusInfo, teacherPromptPath } from '../../../lib/practice-prompts.js';
 
 const PAGE_SIZE = 10;
-const DEFAULTS = { search: '', level: 'all', status: 'all' };
+const DEFAULTS = { search: '', etsTask: 'all', level: 'all', status: 'all' };
 const statusOptions = [
   { value: 'all', label: 'All states' },
   { value: 'DRAFT', label: 'Draft' },
@@ -28,8 +28,8 @@ const statusOptions = [
 
 export const kindPages = {
   [PracticePromptKind.READ_ALOUD]: { title: 'Read-aloud prompts', description: 'Write a sentence or short passage for learners to read.', create: 'New read-aloud prompt', empty: 'No read-aloud prompts yet', icon: AudioLines },
-  [PracticePromptKind.OPEN_SPEAKING]: { title: 'Open speaking prompts', description: 'Ask a question or show a picture for learners to talk about.', create: 'New open speaking prompt', empty: 'No open speaking prompts yet', icon: Mic },
-  [PracticePromptKind.WRITING]: { title: 'Writing prompts', description: 'Set an email, paragraph or short essay with a sample answer.', create: 'New writing prompt', empty: 'No writing prompts yet', icon: PenLine },
+  [PracticePromptKind.OPEN_SPEAKING]: { title: 'Open speaking prompts', description: 'Set a speaking task with a sample answer.', create: 'New open speaking prompt', empty: 'No open speaking prompts yet', icon: Mic },
+  [PracticePromptKind.WRITING]: { title: 'Writing prompts', description: 'Set a writing task with a sample answer.', create: 'New writing prompt', empty: 'No writing prompts yet', icon: PenLine },
 };
 
 export function TeacherPromptsPage({ kind }) {
@@ -43,7 +43,7 @@ export function TeacherPromptsPage({ kind }) {
   async function load() {
     setState('loading');
     try {
-      setPrompts((await listPracticePrompts()).data.prompts.filter((prompt) => prompt.kind === kind));
+      setPrompts((await listPracticePrompts()).data.prompts.filter((prompt) => prompt.kind === kind).map((prompt) => ({ ...prompt, etsTask: etsTaskOf(prompt.kind, prompt) })));
       setState('ready');
     } catch (error) {
       setState('error');
@@ -94,6 +94,7 @@ export function TeacherPromptsPage({ kind }) {
               <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
                 <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search by title or topic" />
                 <div className="grid grid-cols-2 gap-2 sm:flex">
+                  {kind !== PracticePromptKind.READ_ALOUD ? <FilterSelect label="Task type" value={filters.etsTask} onChange={setFilter('etsTask')} options={etsTaskOptions(prompts)} className="w-full sm:w-52" /> : null}
                   <FilterSelect label="Level" value={filters.level} onChange={setFilter('level')} options={levelOptions} className="w-full sm:w-32" />
                   <FilterSelect label="State" value={filters.status} onChange={setFilter('status')} options={statusOptions} className="w-full sm:w-36" />
                 </div>
@@ -125,7 +126,10 @@ export function TeacherPromptsPage({ kind }) {
                       <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-md bg-muted text-sm font-semibold">{prompt.level || '—'}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-medium">{prompt.title || 'Untitled prompt'}</span>
-                        <span className="block truncate text-xs text-muted-foreground">{prompt.topic || 'No topic yet'}</span>
+                        <span className="block truncate text-xs text-muted-foreground">
+                          {kind !== PracticePromptKind.READ_ALOUD ? `${etsTaskLabel(prompt.etsTask, 'No task type')} · ` : ''}
+                          {prompt.topic || 'No topic yet'}
+                        </span>
                       </span>
                       <span className="flex shrink-0 flex-wrap justify-end gap-1.5">
                         {prompt.publishedVersionNumber && prompt.status !== 'PUBLISHED' ? <Badge variant="success">Live v{prompt.publishedVersionNumber}</Badge> : null}

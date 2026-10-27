@@ -21,7 +21,7 @@ F13 (D172, D175, D178). App Node mới, không database, không framework; gọi
 ## Messages
 | Queue | Hướng | Nội dung |
 |---|---|---|
-| `writing.grading.requests` | learning-service (outbox) → writing-service | `{ id, type: "writing.requested", occurredAt, requestId?, payload: { submissionId, accountId, prompt: { title, level, taskType, instructions, minWords, maxWords, sampleAnswer, keyPoints }, answer, key: { v, iv, data, tag } } }` |
+| `writing.grading.requests` | learning-service (outbox) → writing-service | `{ id, type: "writing.requested", occurredAt, requestId?, payload: { submissionId, accountId, prompt: { title, level, taskType, instructions, minWords, maxWords, sampleAnswer, keyPoints }, etsTask, answer, key: { v, iv, data, tag } } }`; with a written ETS task (`picture_sentence`, `respond_email`, `opinion_essay`) the prompt adds its TOEIC scoring guide (`writtenGuide`), `writingSchema(etsTask)` requires an integer `etsScore` and the result adds it clamped to 0–`SW_ITEM_MAX` (D199) |
 | `writing.grading.results` | writing-service → learning-service | `{ submissionId, status: "DONE" \| "FAILED", result?, error?, requestId? }`; `result`: `{ criteria{7}, scores: { vocabulary, grammar, coherence, task, total }, feedback, errors: [{ text, suggestion, explanation }], rewrite }` |
 | `writing.key-checks` | learning-service → writing-service (request/reply, hết hạn 25 s) | `{ key: { v, iv, data, tag } }` → `{ status: "VALID" \| "INVALID" \| "UNAVAILABLE", reason? }` |
 | `writing.model-lists` | learning-service → writing-service (request/reply, D186) | `{ key }` → `{ status, models: [{ id, label, thinking }] }` (model `gemini-*` hỗ trợ `generateContent`, lọc theo `isGradingModel`) |
@@ -38,7 +38,7 @@ pnpm --filter @appenglish/writing-service test   # không gọi Gemini thật, k
 
 ## Speaking open answers (F14, D179)
 
-A job with `type: "speaking.grading.requested"` on `writing.grading.requests` carries `{ submissionId, accountId, prompt: { title, level, instructions, maxSeconds, sampleAnswer, keyPoints }, answer: <transcript>, durationSeconds, key }`. It is graded with `OPEN_SYSTEM` (a transcript, not audio: ignore punctuation and fillers, do not judge pronunciation), `OPEN_SCHEMA` and `buildOpenSpeakingPrompt` on four criteria (task, vocabulary, grammar, coherence); `parseOpenSpeakingResult` returns `{ criteria, feedback, errors, rewrite }` without a total. Results, including the final FAILED after the last retry, go to `writing.open-speaking.results`. Tests: `test/open-speaking.test.js`.
+A job with `type: "speaking.grading.requested"` on `writing.grading.requests` carries `{ submissionId, accountId, prompt: { title, level, instructions, maxSeconds, sampleAnswer, keyPoints }, answer: <transcript>, durationSeconds, key, etsTask }`. It is graded with `OPEN_SYSTEM` (a transcript, not audio: ignore punctuation and fillers, do not judge pronunciation), `OPEN_SCHEMA` and `buildOpenSpeakingPrompt` on four criteria (task, vocabulary, grammar, coherence); `parseOpenSpeakingResult` returns `{ criteria, feedback, errors, rewrite }` without a total. When `etsTask` is a spoken ETS task (D199), `buildOpenSpeakingPrompt` appends that task's TOEIC scoring guide (`spokenGuide` in `ets-rubric.js`), `openSchema(etsTask)` requires an integer `etsScore`, and the parsed result adds `etsScore` clamped to 0–`SW_ITEM_MAX[etsTask]`; a missing `etsScore` is a bad output (one retry). Results, including the final FAILED after the last retry, go to `writing.open-speaking.results`. Tests: `test/open-speaking.test.js`.
 
 ## Evaluation and load test (F16, D181)
 
@@ -58,3 +58,7 @@ Jobs carry `model` and `thinkingLevel` from the learner's settings; `geminiChoic
 The list of models learners may pick, their labels and thinking levels, and the default model live only in `GEMINI_MODELS` and `DEFAULT_GEMINI_MODEL` (`packages/learning-contracts/src/index.js`); learning-service validation, writing-service and the web settings and result labels all read them. Adding a model is one entry there.
 
 Since D186 the picker shows every grading model on the learner's own key (`listModels` pages Gemini `models.list`, 20 s timeout). Models outside `GEMINI_MODELS` run with the model's default thinking. A 404 from Gemini is `GeminiFailure.MODEL`: the job fails with "The chosen Gemini model is not available for your key", and a key check treats it (and quota) as a valid key.
+
+## S&W test grading (D198)
+
+A message of type `sw.grading.requested` on `writing.grading.requests` carries `submissionId` (the scoring job id), `section`, `number`, `task`, `maxScore`, `prompt` (task, text, context, info, keywords, email, instructions, respondSeconds), `answer` (written answer or transcript), optional `durationSeconds`, and the sealed learner key with the model choice. `src/ets-rubric.js` builds the prompt from the ETS scoring guide of the task (handbook wording, whole-number scores 0–3, 0–4 for emails, 0–5 for the opinion tasks) and parses `{ score, feedback }`, clamping the score. The answer goes to `writing.sw.results` as `{ submissionId, status, result: { score, feedback, model } }`; unknown task types fail without calling Gemini.

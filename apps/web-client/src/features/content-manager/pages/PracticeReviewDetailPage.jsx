@@ -32,7 +32,7 @@ import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { PracticePromptView } from '../../../components/shared/PracticePromptView.jsx';
 import { approvePracticePrompt, getPracticePrompt, returnPracticePrompt, unpublishPracticePrompt } from '../../../lib/api/practice-prompts-api.js';
-import { changedFields, kindLabels, reviewAreaOf, reviewListPath, reviewPromptPath, statusInfo } from '../../../lib/practice-prompts.js';
+import { changedFields, etsTaskLabel, etsTaskOf, kindLabels, reviewAreaOf, reviewListPath, reviewPromptPath, statusInfo } from '../../../lib/practice-prompts.js';
 import { Avatar } from '../../../components/shared/Avatar.jsx';
 
 export function PracticeReviewDetailPage() {
@@ -105,7 +105,7 @@ export function PracticeReviewDetailPage() {
           <h1 className="truncate text-lg font-semibold sm:text-xl">{latest.content.title || 'Untitled prompt'}</h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             <span>
-              {kindLabels[prompt.kind]} · version {latest.versionNumber}
+              {kindLabels[prompt.kind]} · {etsTaskLabel(etsTaskOf(prompt.kind, latest.content), 'No task type')} · version {latest.versionNumber}
             </span>
             <span className="flex items-center gap-1.5">
               · by

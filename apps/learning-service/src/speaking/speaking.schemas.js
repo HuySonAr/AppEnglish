@@ -3,7 +3,9 @@ import { SpokenWordStatus } from '@appenglish/learning-contracts';
 
 export const promptIdSchema = z.string().uuid();
 
-export const submitSpeakingSchema = z.object({ durationSeconds: z.number().min(0).max(600) }).strict();
+export const submitSpeakingSchema = z
+  .object({ durationSeconds: z.number().min(0).max(600), questionIndex: z.number().int().min(0).max(2).optional(), setId: z.string().uuid().optional() })
+  .strict();
 
 const score = z.number().min(0).max(10);
 
@@ -41,5 +43,6 @@ export const openGradingSchema = z.object({
   feedback: z.string().max(2000),
   errors: z.array(z.object({ text: line.min(1), suggestion: line, explanation: line })).max(30),
   rewrite: z.string().max(6000),
+  etsScore: z.number().int().min(0).max(5).optional(),
   model: z.string().max(60).optional(),
 });

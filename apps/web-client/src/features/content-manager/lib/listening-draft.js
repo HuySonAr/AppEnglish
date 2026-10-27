@@ -139,3 +139,14 @@ export function translationPastePlan(segments, text) {
   return { segments: usable ? next : segments, count: pasted.length, lines };
 }
 
+
+const sameText = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+
+export function keepSentenceExtras(previous, next, fields = ['translation']) {
+  const byId = new Map(previous.map((segment) => [segment.id, segment]));
+  return next.map((segment, index) => {
+    if (fields.every((field) => field in segment)) return segment;
+    const before = byId.get(segment.id) || (sameText(previous[index]?.text) === sameText(segment.text) ? previous[index] : null);
+    return { ...segment, ...Object.fromEntries(fields.map((field) => [field, before?.[field] || ''])) };
+  });
+}

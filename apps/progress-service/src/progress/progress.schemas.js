@@ -80,15 +80,6 @@ export const unitReviewPassedSchema = z
   })
   .passthrough();
 
-export const courseLevelUpSchema = z
-  .object({
-    accountId: z.string().uuid(),
-    from: z.string().min(1).max(4),
-    to: z.string().min(1).max(4),
-    reachedAt: isoDate,
-  })
-  .passthrough();
-
 export const practiceScoredSchema = z
   .object({
     accountId: z.string().uuid(),
@@ -109,7 +100,7 @@ export const reviewCompletedSchema = z
     promptId: z.string().uuid(),
     kind: z.string().min(1).max(20),
     title: z.string().max(200).optional().default(''),
-    total: z.number().min(0).max(10),
+    total: z.number().min(0).max(200),
     reviewedAt: isoDate,
   })
   .passthrough();
@@ -125,6 +116,19 @@ export const reviewExpiredSchema = z
   })
   .passthrough();
 
+export const swScoredSchema = z
+  .object({
+    accountId: z.string().uuid(),
+    attemptId: z.string().uuid(),
+    swTestId: z.string().uuid(),
+    section: z.enum(['speaking', 'writing']),
+    attemptNumber: z.number().int().min(1),
+    title: z.string().max(200).optional().default(''),
+    scaled: z.number().int().min(0).max(200),
+    scoredAt: isoDate,
+  })
+  .passthrough();
+
 export const markReadSchema = z.object({ ids: z.array(z.string().uuid()).max(100).optional() }).strict();
 
 export const payloadSchemas = Object.freeze({
@@ -133,9 +137,9 @@ export const payloadSchemas = Object.freeze({
   [LearningEventType.MOCK_SUBMITTED]: mockSubmittedSchema,
   [LearningEventType.ACTIVITY_RECORDED]: activityRecordedSchema,
   [LearningEventType.UNIT_REVIEW_PASSED]: unitReviewPassedSchema,
-  [LearningEventType.COURSE_LEVEL_UP]: courseLevelUpSchema,
   [LearningEventType.SPEAKING_SCORED]: practiceScoredSchema,
   [LearningEventType.WRITING_SCORED]: practiceScoredSchema,
   [LearningEventType.REVIEW_COMPLETED]: reviewCompletedSchema,
+  [LearningEventType.SW_SCORED]: swScoredSchema,
   [LearningEventType.REVIEW_EXPIRED]: reviewExpiredSchema,
 });

@@ -32,7 +32,7 @@ export function ScoreForecastCard({ data }) {
   const high = Math.min(990, Math.ceil((Math.max(...values) + 50) / 50) * 50);
 
   return (
-    <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+    <div className="space-y-3 rounded-3xl border bg-card p-5 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="flex items-center gap-2 font-semibold">
@@ -67,6 +67,18 @@ export function ScoreForecastCard({ data }) {
           </LineChart>
         </ChartContainer>
       ) : null}
+    </div>
+  );
+}
+
+export function SwForecastCard() {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-3xl border bg-card p-5 sm:p-6">
+      <h2 className="flex items-center gap-2 font-semibold">
+        <LineIcon className="h-4 w-4 text-primary" />
+        Speaking & Writing score path
+      </h2>
+      <p className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">Appears after scoring</p>
     </div>
   );
 }

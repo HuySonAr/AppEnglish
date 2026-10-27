@@ -38,8 +38,9 @@ const messages = Object.freeze({
   [LearningResponseCode.LESSON_TEST_NOT_IN_PROGRESS]: 'There is no lesson test in progress.',
   [LearningResponseCode.MOCK_TEST_NOT_FOUND]: 'This mock test is not available.',
   [LearningResponseCode.MOCK_TEST_NOT_IN_PROGRESS]: 'There is no mock test in progress.',
-  [LearningResponseCode.COURSE_LESSON_NOT_FOUND]: 'This part of the listening course is not available.',
-  [LearningResponseCode.COURSE_ITEM_LOCKED]: 'This part of the listening course is still locked. Pass the one before it first.',
+  [LearningResponseCode.SW_TEST_NOT_FOUND]: 'This Speaking and Writing test is not available.',
+  [LearningResponseCode.SW_ATTEMPT_NOT_IN_PROGRESS]: 'There is no test in progress. The time may be over.',
+  [LearningResponseCode.SW_ANSWER_LOCKED]: 'This question is already closed.',
   [LearningResponseCode.UNIT_REVIEW_NOT_FOUND]: 'This unit has no review.',
   [LearningResponseCode.UNIT_REVIEW_LOCKED]: 'The unit review opens once every lesson of the unit is completed.',
   [LearningResponseCode.PRACTICE_PROMPT_NOT_FOUND]: 'This prompt is not available.',
@@ -94,8 +95,16 @@ function waitText(seconds) {
   return ` Try again in ${minutes} minute${minutes === 1 ? '' : 's'}.`;
 }
 
+const stateReasons = {
+  PENDING_REVIEW: 'It is waiting for review. Withdraw it first to change it.',
+  NOT_IN_REVIEW: 'It is no longer waiting for review. Reload to see its state.',
+  PUBLISHED_BEFORE: 'This is not allowed once it has been published.',
+};
+
 export function getApiErrorMessage(error) {
   const code = errorCode(error);
+  const stateReason = stateReasons[error?.response?.data?.data?.reason];
+  if (code === ContentResponseCode.CONTENT_INVALID_STATE && stateReason) return stateReason;
   if (code === ResponseCode.RATE_LIMITED || error?.response?.status === 429)
     return `Too many attempts.${waitText(error?.response?.data?.data?.retryAfterSeconds)}`;
   if (error?.response?.status === 413) return mediaReasons.MEDIA_FILE_TOO_LARGE;
