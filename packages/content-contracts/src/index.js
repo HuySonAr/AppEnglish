@@ -61,6 +61,11 @@ export const PRACTICE_LEVEL_INFO = Object.freeze({
   [PracticeLevel.INTERMEDIATE]: Object.freeze({ label: 'Intermediate', short: '110+', scores: '110-150', minScore: 110, maxScore: 150 }),
   [PracticeLevel.ADVANCED]: Object.freeze({ label: 'Advanced', short: '150+', scores: 'above 150', minScore: 151 }),
 });
+export const LISTENING_TEST_SCORES = Object.freeze({
+  [PracticeLevel.BASIC]: 'TOEIC Listening below 250',
+  [PracticeLevel.INTERMEDIATE]: 'TOEIC Listening 250–400',
+  [PracticeLevel.ADVANCED]: 'TOEIC Listening above 400',
+});
 const LEVEL_FROM_CEFR = Object.freeze({ A1: PracticeLevel.BASIC, A2: PracticeLevel.BASIC, B1: PracticeLevel.INTERMEDIATE, B2: PracticeLevel.ADVANCED, C1: PracticeLevel.ADVANCED, C2: PracticeLevel.ADVANCED });
 export const practiceLevelOf = (value) => (PRACTICE_LEVELS.includes(value) ? value : LEVEL_FROM_CEFR[value] || null);
 export const PRACTICE_LIMITS = Object.freeze({

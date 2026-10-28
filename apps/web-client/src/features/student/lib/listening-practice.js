@@ -1,5 +1,5 @@
-import { ListeningFormat, listeningKind } from '@appenglish/content-contracts';
-import { ListeningMode } from '@appenglish/learning-contracts';
+import { LISTENING_TEST_SCORES, LISTENING_TOEIC_KINDS, ListeningFormat, PRACTICE_LEVEL_INFO, listeningKind } from '@appenglish/content-contracts';
+import { LISTENING_HIDE_SHARE, ListeningMode } from '@appenglish/learning-contracts';
 import { compareText, matchesSearch } from '../../../lib/list.js';
 
 export const listeningKindOf = listeningKind;
@@ -16,12 +16,23 @@ export function sentenceLabel(kindKey, index, speaker) {
   return `${kindKey === 'song' ? 'Line' : 'Sentence'} ${index + 1}${speaker ? ` · ${speaker}` : ''}`;
 }
 
-export const isTried = (exercise) => exercise.checkCount > 0 || exercise.blanks?.checkCount > 0;
+export const isTried = (exercise) => exercise.checkCount > 0 || exercise.blanks?.checkCount > 0 || exercise.hide30?.checkCount > 0 || exercise.hide50?.checkCount > 0 || exercise.hide100?.checkCount > 0;
+
+export const TOEIC_MODES = Object.freeze([ListeningMode.HIDE_30, ListeningMode.HIDE_50, ListeningMode.HIDE_100]);
+export const toeicModeLabels = { [ListeningMode.HIDE_30]: '30%', [ListeningMode.HIDE_50]: '50%', [ListeningMode.HIDE_100]: '100%' };
+export const toeicModeOf = (value) => (TOEIC_MODES.includes(value) ? value : ListeningMode.HIDE_30);
+export const isHideMode = (mode) => mode in LISTENING_HIDE_SHARE;
+export const fillsBlanks = (mode) => mode === ListeningMode.BLANKS || isHideMode(mode);
+export const testLevel = (level) => (PRACTICE_LEVEL_INFO[level] ? { label: PRACTICE_LEVEL_INFO[level].label, scores: LISTENING_TEST_SCORES[level] } : null);
+
+export function partGroups(exercises) {
+  return LISTENING_TOEIC_KINDS.map((kind) => ({ kind, exercises: exercises.filter((exercise) => exercise.kind === kind.key) })).filter((group) => group.exercises.length);
+}
 
 export const topicModes = (topic) =>
   topic?.format === ListeningFormat.SONG ? [ListeningMode.BLANKS, ListeningMode.FULL] : [ListeningMode.FULL];
 
-export const resultOf = (exercise, mode) => (mode === ListeningMode.BLANKS ? exercise.blanks : exercise) || { bestAccuracy: null, checkCount: 0 };
+export const resultOf = (exercise, mode) => (mode === ListeningMode.BLANKS || isHideMode(mode) ? exercise[mode] : exercise) || { bestAccuracy: null, checkCount: 0 };
 
 export const modeLabels = { [ListeningMode.BLANKS]: 'Fill in the blanks', [ListeningMode.FULL]: 'Write every line' };
 
@@ -66,7 +77,7 @@ export function filterListeningPractice(exercises, { topic, mode = ListeningMode
 export const lineBlanks = (segment) => (segment.pieces || []).filter((piece) => 'blank' in piece).map((piece) => piece.blank);
 
 export function lineAnswers(mode, segment, answers) {
-  if (mode !== ListeningMode.BLANKS) return { [segment.id]: answers[segment.id] || '' };
+  if (!fillsBlanks(mode)) return { [segment.id]: answers[segment.id] || '' };
   return Object.fromEntries(lineBlanks(segment).map((blank) => [String(blank), answers[blank] || '']));
 }
 

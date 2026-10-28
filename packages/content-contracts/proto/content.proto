@@ -49,6 +49,10 @@ service ContentService {
   rpc CreateListeningTopic(ContentRequest) returns (ContentReply);
   rpc UpdateListeningTopic(ContentRequest) returns (ContentReply);
   rpc DeleteListeningTopic(ContentRequest) returns (ContentReply);
+  rpc ListListeningTests(ContentRequest) returns (ContentReply);
+  rpc CreateListeningTest(ContentRequest) returns (ContentReply);
+  rpc UpdateListeningTest(ContentRequest) returns (ContentReply);
+  rpc DeleteListeningTest(ContentRequest) returns (ContentReply);
   rpc RequestMockTranscribe(ContentRequest) returns (ContentReply);
   rpc ListMockTranscribe(ContentRequest) returns (ContentReply);
   rpc ListContentNotifications(ContentRequest) returns (ContentReply);

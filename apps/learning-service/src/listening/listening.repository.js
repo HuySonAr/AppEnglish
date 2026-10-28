@@ -18,6 +18,23 @@ export class ListeningRepository {
     return (await this.repo()).findOne({ where: { accountId, exerciseId, mode } });
   }
 
+  async listLines(accountId, exerciseId) {
+    const repository = await this.repo();
+    return repository.query(
+      `SELECT "exerciseId", "segmentId", "status" FROM "listening_line_results" WHERE "accountId" = $1${exerciseId ? ' AND "exerciseId" = $2' : ''}`,
+      exerciseId ? [accountId, exerciseId] : [accountId],
+    );
+  }
+
+  async recordLine(accountId, exerciseId, segmentId, status, at) {
+    const repository = await this.repo();
+    await repository.query(
+      `INSERT INTO "listening_line_results" ("accountId", "exerciseId", "segmentId", "status", "updatedAt") VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT ("accountId", "exerciseId", "segmentId") DO UPDATE SET "status" = EXCLUDED."status", "updatedAt" = EXCLUDED."updatedAt"`,
+      [accountId, exerciseId, segmentId, status, at],
+    );
+  }
+
   async recordCheck(accountId, exerciseId, mode, accuracy, checkedAt) {
     const repository = await this.repo();
     await repository.query(

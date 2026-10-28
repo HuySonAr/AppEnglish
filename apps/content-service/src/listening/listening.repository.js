@@ -7,6 +7,7 @@ import {
   ListeningExerciseVersionEntity,
   ListeningTimingJobEntity,
   ListeningTopicEntity,
+  ListeningTestEntity,
   MockTestEntity,
 } from '../database/content.entities.js';
 
@@ -34,6 +35,22 @@ export class ListeningRepository {
 
   async deleteTopic(id) {
     await (await this.repo(ListeningTopicEntity)).delete({ id });
+  }
+
+  async listTests() {
+    return (await this.repo(ListeningTestEntity)).find({ order: { createdAt: 'ASC' } });
+  }
+
+  async findTest(id) {
+    return (await this.repo(ListeningTestEntity)).findOne({ where: { id } });
+  }
+
+  async saveTest(test) {
+    return (await this.repo(ListeningTestEntity)).save(test);
+  }
+
+  async deleteTest(id) {
+    await (await this.repo(ListeningTestEntity)).delete({ id });
   }
 
   async listExercises() {

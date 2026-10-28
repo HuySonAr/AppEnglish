@@ -119,6 +119,7 @@ function NewExerciseDialog({ open, onOpenChange, topics, initialTopicId, base })
             <Input id="listening-title" autoFocus value={form.title} maxLength={200} onChange={(event) => setForm({ ...form, title: event.target.value })} />
           </div>
 
+          {topics.find((topic) => topic.id === form.topicId)?.format === 'toeic' ? null : (
           <div className="space-y-2">
             <Label>Level</Label>
             <div className="flex flex-wrap gap-1.5">
@@ -138,6 +139,7 @@ function NewExerciseDialog({ open, onOpenChange, topics, initialTopicId, base })
               ))}
             </div>
           </div>
+          )}
 
           {topicKinds.length > 1 ? (
             <div className="space-y-2">

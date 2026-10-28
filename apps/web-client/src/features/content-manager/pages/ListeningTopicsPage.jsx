@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { ContentResponseCode } from '@appenglish/content-contracts';
+import { ContentResponseCode, LISTENING_TEST_SCORES, PRACTICE_LEVELS, PRACTICE_LEVEL_INFO } from '@appenglish/content-contracts';
 import { createListeningTopic, deleteListeningTopic, listListeningTopics, updateListeningTopic } from '../../../lib/api/listening-topics-api.js';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -39,6 +39,8 @@ const formats = [
   { value: 'none', label: 'Not yet' },
 ];
 const formatLabel = (format) => formats.find((item) => item.value === (format || 'none')).label;
+const levels = [{ value: 'none', label: 'No level' }, ...PRACTICE_LEVELS.map((level) => ({ value: level, label: `${PRACTICE_LEVEL_INFO[level].label} · ${LISTENING_TEST_SCORES[level].replace('TOEIC Listening ', '')}` }))];
+const levelValue = (value) => (value === 'none' ? null : value);
 
 const failure = (error) => {
   if (errorCode(error) !== ContentResponseCode.LISTENING_TOPIC_INVALID) return getApiErrorMessage(error);
@@ -54,16 +56,16 @@ const deleteFailure = (error) => {
   return `It still has ${count ? `${count} exercise${count === 1 ? '' : 's'}` : 'exercises'}. Delete or move them first.`;
 };
 
-function FormatSelect({ id, value, onChange }) {
+function OptionSelect({ id, value, onChange, options }) {
   return (
     <Select value={value} onValueChange={(next) => next && onChange(next)}>
       <SelectTrigger id={id}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {formats.map((format) => (
-          <SelectItem key={format.value} value={format.value}>
-            {format.label}
+        {options.map((option) => (
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
           </SelectItem>
         ))}
       </SelectContent>
@@ -71,11 +73,15 @@ function FormatSelect({ id, value, onChange }) {
   );
 }
 
+const FormatSelect = (props) => <OptionSelect {...props} options={formats} />;
+const LevelSelect = (props) => <OptionSelect {...props} options={levels} />;
+
 export function ListeningTopicsPage({ eyebrow }) {
   const [state, setState] = useState('loading');
   const [topics, setTopics] = useState([]);
   const [name, setName] = useState('');
-  const [format, setFormat] = useState('song');
+  const [format, setFormat] = useState('toeic');
+  const [level, setLevel] = useState('none');
   const [editing, setEditing] = useState(null);
   const [removing, setRemoving] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -112,12 +118,12 @@ export function ListeningTopicsPage({ eyebrow }) {
 
   async function onAdd(event) {
     event.preventDefault();
-    const added = await run(() => createListeningTopic(name.trim(), format === 'none' ? null : format), 'Topic added', 'Could not add the topic');
+    const added = await run(() => createListeningTopic(name.trim(), format === 'none' ? null : format, format === 'toeic' ? levelValue(level) : null), 'Topic added', 'Could not add the topic');
     if (added) setName('');
   }
 
   async function onSaveEdit() {
-    const changes = { name: editing.name.trim(), format: editing.format === 'none' ? null : editing.format };
+    const changes = { name: editing.name.trim(), format: editing.format === 'none' ? null : editing.format, level: editing.format === 'toeic' ? levelValue(editing.level) : null };
     if (await run(() => updateListeningTopic(editing.id, changes), 'Topic saved', 'Could not save the topic')) setEditing(null);
   }
 
@@ -152,6 +158,12 @@ export function ListeningTopicsPage({ eyebrow }) {
           <Label htmlFor="topic-format">Exercise type</Label>
           <FormatSelect id="topic-format" value={format} onChange={setFormat} />
         </div>
+        {format === 'toeic' ? (
+          <div className="space-y-2 sm:w-52">
+            <Label htmlFor="topic-level">Level</Label>
+            <LevelSelect id="topic-level" value={level} onChange={setLevel} />
+          </div>
+        ) : null}
         <Button type="submit" loading={busy} disabled={busy || !name.trim()} className="gap-2">
           <Plus className="h-4 w-4" />
           Add topic
@@ -176,8 +188,9 @@ export function ListeningTopicsPage({ eyebrow }) {
             <li key={topic.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
               <span className="min-w-0 flex-1 truncate font-medium">{topic.name}</span>
               <span className="font-mono text-xs text-muted-foreground">{topic.code}</span>
+              {topic.level ? <Badge variant="secondary">{PRACTICE_LEVEL_INFO[topic.level]?.label}</Badge> : null}
               <Badge variant={topic.hasEditor ? 'success' : 'outline'}>{formatLabel(topic.format)}</Badge>
-              <Button variant="ghost" size="icon" aria-label={`Edit ${topic.name}`} onClick={() => setEditing({ id: topic.id, name: topic.name, format: topic.format || 'none' })}>
+              <Button variant="ghost" size="icon" aria-label={`Edit ${topic.name}`} onClick={() => setEditing({ id: topic.id, name: topic.name, format: topic.format || 'none', level: topic.level || 'none' })}>
                 <Pencil className="h-4 w-4" />
               </Button>
               <Button variant="ghost" size="icon" aria-label={`Delete ${topic.name}`} title="Delete" onClick={() => setRemoving({ id: topic.id, name: topic.name })}>
@@ -203,6 +216,12 @@ export function ListeningTopicsPage({ eyebrow }) {
               <Label htmlFor="topic-edit-format">Exercise type</Label>
               <FormatSelect id="topic-edit-format" value={editing?.format || 'none'} onChange={(value) => setEditing({ ...editing, format: value })} />
             </div>
+            {editing?.format === 'toeic' ? (
+              <div className="space-y-2">
+                <Label htmlFor="topic-edit-level">Level</Label>
+                <LevelSelect id="topic-edit-level" value={editing.level || 'none'} onChange={(value) => setEditing({ ...editing, level: value })} />
+              </div>
+            ) : null}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>

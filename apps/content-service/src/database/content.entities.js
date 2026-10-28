@@ -131,6 +131,7 @@ export const ExamTypeEntity = new EntitySchema({
     code: { type: 'varchar', length: 40 },
     name: { type: 'varchar', length: 100 },
     format: { type: 'varchar', length: 20, nullable: true },
+    level: { type: 'varchar', length: 20, nullable: true },
     createdBy: { type: 'uuid', nullable: true },
     createdAt: { type: 'timestamptz', createDate: true },
     updatedAt: { type: 'timestamptz', updateDate: true },
@@ -233,12 +234,26 @@ export const ListeningTopicEntity = new EntitySchema({
   indices: [{ name: 'UQ_listening_topics_code', columns: ['code'], unique: true }],
 });
 
+export const ListeningTestEntity = new EntitySchema({
+  name: 'ListeningTest',
+  tableName: 'listening_tests',
+  columns: {
+    id: { type: 'uuid', primary: true, generated: 'uuid' },
+    topicId: { type: 'uuid' },
+    name: { type: 'varchar', length: 100 },
+    createdBy: { type: 'uuid', nullable: true },
+    createdAt: { type: 'timestamptz', createDate: true },
+    updatedAt: { type: 'timestamptz', updateDate: true },
+  },
+});
+
 export const ListeningExerciseEntity = new EntitySchema({
   name: 'ListeningExercise',
   tableName: 'listening_exercises',
   columns: {
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     topicId: { type: 'uuid' },
+    testId: { type: 'uuid', nullable: true },
     title: { type: 'varchar', length: 200 },
     level: { type: 'varchar', length: 2 },
     kind: { type: 'varchar', length: 20 },

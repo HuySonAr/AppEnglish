@@ -248,6 +248,18 @@ export class ContentGatewayController {
   deleteListeningTopic(id, request) {
     return this.forward('DeleteListeningTopic', request, { id });
   }
+  listListeningTests(request) {
+    return this.forward('ListListeningTests', request);
+  }
+  createListeningTest(body, request) {
+    return this.forward('CreateListeningTest', request, { body });
+  }
+  updateListeningTest(id, body, request) {
+    return this.forward('UpdateListeningTest', request, { id, body });
+  }
+  deleteListeningTest(id, request) {
+    return this.forward('DeleteListeningTest', request, { id });
+  }
   requestMockTranscribe(id, body, request) {
     return this.forward('RequestMockTranscribe', request, { id, body });
   }
@@ -428,6 +440,10 @@ const routes = [
   [Post, 'listening-topics', 'createListeningTopic', [Body(), Req()]],
   [Patch, 'listening-topics/:id', 'updateListeningTopic', [Param('id'), Body(), Req()]],
   [Delete, 'listening-topics/:id', 'deleteListeningTopic', [Param('id'), Req()]],
+  [Get, 'listening-tests', 'listListeningTests', [Req()]],
+  [Post, 'listening-tests', 'createListeningTest', [Body(), Req()]],
+  [Patch, 'listening-tests/:id', 'updateListeningTest', [Param('id'), Body(), Req()]],
+  [Delete, 'listening-tests/:id', 'deleteListeningTest', [Param('id'), Req()]],
   [Get, 'listening-exercises', 'listListeningExercises', [Req()]],
   [Post, 'listening-exercises', 'createListeningExercise', [Body(), Req()]],
   [Patch, 'listening-exercises/:id', 'updateListeningExercise', [Param('id'), Body(), Req()]],

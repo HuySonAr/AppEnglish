@@ -94,7 +94,8 @@ export const TestTrend = Object.freeze({
 export const MockAttemptKind = Object.freeze({ FULL: 'FULL', MINI: 'MINI' });
 
 export const VOCABULARY_PRACTICE_SIZE = 20;
-export const ListeningMode = Object.freeze({ FULL: 'full', BLANKS: 'blanks' });
+export const ListeningMode = Object.freeze({ FULL: 'full', BLANKS: 'blanks', HIDE_30: 'hide30', HIDE_50: 'hide50', HIDE_100: 'hide100' });
+export const LISTENING_HIDE_SHARE = Object.freeze({ [ListeningMode.HIDE_30]: 0.3, [ListeningMode.HIDE_50]: 0.5, [ListeningMode.HIDE_100]: 1 });
 export const PracticeDirection = Object.freeze({ MEANING: 'MEANING', WORD: 'WORD' });
 
 export const LESSON_TEST_DURATION_MINUTES = 25;

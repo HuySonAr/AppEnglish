@@ -9,6 +9,7 @@ export function createMemoryRepository() {
     units: [], lessons: [], versions: [], reviewVersions: [], media: [], placement: [], mockTests: [], mockVersions: [],
     listeningExercises: [], listeningVersions: [], timingJobs: [], adminNotices: [], noticeReads: [], contentEvents: [], processed: [], practicePrompts: [], practiceVersions: [],
     listeningTopics: [{ id: toeicTopicId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
+    listeningTests: [],
     examTypes: [{ id: toeicExamTypeId, code: 'toeic', name: 'TOEIC', format: 'toeic' }],
   };
   const copy = (row) => (row ? structuredClone(row) : null);
@@ -32,6 +33,10 @@ export function createMemoryRepository() {
     async findTopic(id) { return copy(tables.listeningTopics.find((item) => item.id === id)); },
     async saveTopic(topic) { return save('listeningTopics', topic); },
     async deleteTopic(id) { tables.listeningTopics = tables.listeningTopics.filter((item) => item.id !== id); },
+    async listTests() { return tables.listeningTests.map(copy); },
+    async findTest(id) { return copy(tables.listeningTests.find((item) => item.id === id)); },
+    async saveTest(test) { return save('listeningTests', test); },
+    async deleteTest(id) { tables.listeningTests = tables.listeningTests.filter((item) => item.id !== id); },
     async listExercises() { return tables.listeningExercises.map(copy); },
     async findExercise(id) { return copy(tables.listeningExercises.find((item) => item.id === id)); },
     async saveExercise(exercise) { return save('listeningExercises', exercise); },

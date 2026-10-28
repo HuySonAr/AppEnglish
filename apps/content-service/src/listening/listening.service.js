@@ -6,6 +6,7 @@ import {
   LISTENING_KINDS,
   LISTENING_MAX_SEGMENTS,
   LISTENING_SEGMENT_MAX_LENGTH,
+  ListeningFormat,
   SpeechQueue,
   SpeechTask,
   LessonVersionStatus,
@@ -71,6 +72,7 @@ export class ListeningService {
       code: topic.code,
       name: topic.name,
       format: topic.format,
+      level: topic.level || null,
       hasEditor: Boolean(LISTENING_KINDS[topic.format]),
     };
   }
@@ -88,13 +90,13 @@ export class ListeningService {
     return code;
   }
 
-  async createTopic(actor, { name, format = null }) {
+  async createTopic(actor, { name, format = null, level = null }) {
     this.assertTopicEditor(actor);
     const code = await this.assertTopicNameFree(name);
-    return { topic: this.topicView(await this.repository.saveTopic({ code, name, format, createdBy: actor.id })) };
+    return { topic: this.topicView(await this.repository.saveTopic({ code, name, format, level, createdBy: actor.id })) };
   }
 
-  async updateTopic(actor, topicId, { name, format }) {
+  async updateTopic(actor, topicId, { name, format, level }) {
     this.assertTopicEditor(actor);
     const topic = await this.repository.findTopic(topicId);
     if (!topic) throw contentErrors.listeningTopicNotFound();
@@ -107,7 +109,68 @@ export class ListeningService {
         throw contentErrors.listeningTopicInvalid('HAS_EXERCISES', 'The format of a topic with exercises cannot change');
       topic.format = format;
     }
+    if (level !== undefined) topic.level = level;
     return { topic: this.topicView(await this.repository.saveTopic(topic)) };
+  }
+
+  assertTestEditor(actor) {
+    if (![AccountRole.TEACHER, AccountRole.ADMIN, AccountRole.CONTENT_MANAGER].includes(actor.role)) throw contentErrors.forbiddenRole();
+  }
+
+  testView(test) {
+    return { id: test.id, topicId: test.topicId, name: test.name };
+  }
+
+  async listTests() {
+    return { tests: (await this.repository.listTests()).map((test) => this.testView(test)) };
+  }
+
+  async assertTestNameFree(topicId, name, exceptId) {
+    const clash = (await this.repository.listTests()).some((test) => test.topicId === topicId && test.id !== exceptId && test.name.toLowerCase() === name.toLowerCase());
+    if (clash) throw contentErrors.listeningTopicInvalid('NAME_TAKEN', 'A test with this name already exists');
+  }
+
+  async createTest(actor, { topicId, name }) {
+    this.assertTestEditor(actor);
+    const topic = await this.repository.findTopic(topicId);
+    if (!topic) throw contentErrors.listeningTopicNotFound();
+    if (topic.format !== ListeningFormat.TOEIC) throw contentErrors.listeningTopicInvalid('NOT_TOEIC', 'Tests belong to TOEIC topics');
+    await this.assertTestNameFree(topicId, name);
+    return { test: this.testView(await this.repository.saveTest({ topicId, name, createdBy: actor.id })) };
+  }
+
+  async findTestOrThrow(testId) {
+    const test = await this.repository.findTest(testId);
+    if (!test) throw contentErrors.listeningTopicInvalid('NO_TEST', 'The test was not found');
+    return test;
+  }
+
+  async updateTest(actor, testId, { name }) {
+    this.assertTestEditor(actor);
+    const test = await this.findTestOrThrow(testId);
+    await this.assertTestNameFree(test.topicId, name, testId);
+    test.name = name;
+    return { test: this.testView(await this.repository.saveTest(test)) };
+  }
+
+  async deleteTest(actor, testId) {
+    this.assertTestEditor(actor);
+    await this.findTestOrThrow(testId);
+    const count = (await this.repository.listExercises()).filter((exercise) => exercise.testId === testId).length;
+    if (count) throw contentErrors.listeningTopicInvalid('HAS_EXERCISES', `The test still has ${count} exercise${count === 1 ? '' : 's'}`, { exerciseCount: count });
+    await this.repository.deleteTest(testId);
+    return { deleted: { id: testId } };
+  }
+
+  async testFor(topic, testId, actor = null) {
+    if (topic.format !== ListeningFormat.TOEIC) return null;
+    if (!testId) {
+      const first = (await this.repository.listTests()).find((test) => test.topicId === topic.id);
+      return first || this.repository.saveTest({ topicId: topic.id, name: 'Test 1', createdBy: actor?.id || null });
+    }
+    const test = await this.findTestOrThrow(testId);
+    if (test.topicId !== topic.id) throw contentErrors.listeningTopicInvalid('TEST_MISMATCH', 'The test belongs to another topic');
+    return test;
   }
 
   async deleteTopic(actor, topicId) {
@@ -121,32 +184,35 @@ export class ListeningService {
     return { deleted: { id: topicId } };
   }
 
-  async exerciseView(exercise, topics) {
+  async exerciseView(exercise, topics, tests) {
     const topic = topics
       ? topics.find((item) => item.id === exercise.topicId)
       : await this.repository.findTopic(exercise.topicId);
+    const test = !exercise.testId ? null : tests ? tests.find((item) => item.id === exercise.testId) : await this.repository.findTest(exercise.testId);
     return {
       id: exercise.id,
       title: exercise.title,
       level: exercise.level,
       kind: exercise.kind,
       topic: topic ? { id: topic.id, code: topic.code, name: topic.name } : null,
+      test: test ? { id: test.id, name: test.name } : null,
     };
   }
 
   async listExercises(actor) {
     this.assertStaff(actor);
-    const [exercises, topics, versions] = await Promise.all([
+    const [exercises, topics, versions, tests] = await Promise.all([
       this.repository.listExercises(),
       this.repository.listTopics(),
       this.repository.listVersionSummaries(),
+      this.repository.listTests(),
     ]);
     return {
       exercises: await Promise.all(
         exercises.map(async (exercise) => {
           const own = versions.filter((version) => version.exerciseId === exercise.id);
           return {
-            ...(await this.exerciseView(exercise, topics)),
+            ...(await this.exerciseView(exercise, topics, tests)),
             createdAt: iso(exercise.createdAt),
             publishedVersionNumber: own.find((version) => version.id === exercise.publishedVersionId)?.versionNumber ?? null,
             hasDraft: own.some((version) => WORKING_VERSION_STATUSES.includes(version.status)),
@@ -165,7 +231,8 @@ export class ListeningService {
     if (!kinds) throw contentErrors.listeningTopicInvalid('NO_EDITOR', 'Exercises cannot be written for this topic yet');
     if (!kinds.some((kind) => kind.key === input.kind))
       throw contentErrors.listeningTopicInvalid('KIND_MISMATCH', 'This kind of exercise does not belong to the topic');
-    const exercise = await this.repository.saveExercise({ ...input, publishedVersionId: null, createdBy: actor.id });
+    const test = await this.testFor(topic, input.testId, actor);
+    const exercise = await this.repository.saveExercise({ ...input, testId: test?.id || null, publishedVersionId: null, createdBy: actor.id });
     const draft = await this.repository.saveVersion(this.contentService.newDraft(actor, { exerciseId: exercise.id, versionNumber: 1, content: listeningContentSchema.parse({}) }));
     return this.managedView(exercise, draft, null);
   }
@@ -179,6 +246,7 @@ export class ListeningService {
   async updateExercise(actor, exerciseId, changes) {
     this.assertTeacher(actor);
     const exercise = await this.findExerciseOrThrow(exerciseId);
+    if (changes.testId !== undefined) await this.testFor(await this.repository.findTopic(exercise.topicId), changes.testId || null, actor);
     for (const [field, value] of Object.entries(changes)) if (value !== undefined) exercise[field] = value;
     await this.repository.saveExercise(exercise);
     return { exercise: await this.exerciseView(exercise) };
@@ -484,16 +552,17 @@ export class ListeningService {
   }
 
   async listPublished() {
-    const [exercises, topics] = await Promise.all([this.repository.listExercises(), this.repository.listTopics()]);
+    const [exercises, topics, tests] = await Promise.all([this.repository.listExercises(), this.repository.listTopics(), this.repository.listTests()]);
     const published = exercises.filter((exercise) => exercise.publishedVersionId);
     return {
       topics: topics.map((topic) => this.topicView(topic)),
+      tests: tests.map((test) => this.testView(test)),
       exercises: await Promise.all(
         published.map(async (exercise) => {
           const version = await this.repository.findVersion(exercise.publishedVersionId);
           const { segments } = listeningContentSchema.parse(version.content);
           return {
-            ...(await this.exerciseView(exercise, topics)),
+            ...(await this.exerciseView(exercise, topics, tests)),
             segmentCount: segments.length,
             blankCount: exercise.kind === 'song' ? segments.reduce((sum, segment) => sum + lyricBlankCount(segment.text), 0) : 0,
           };

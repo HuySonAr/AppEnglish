@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ContentService } from '../src/content/content.service.js';
 import { ListeningService } from '../src/listening/listening.service.js';
-import { listeningContentSchema, listeningIssues } from '../src/listening/listening.schemas.js';
+import { listeningContentSchema, listeningExerciseCreateSchema, listeningIssues, listeningTopicCreateSchema } from '../src/listening/listening.schemas.js';
 import { LISTENING_TOEIC_KINDS, LISTENING_SONG_KIND, listeningKind } from '@appenglish/content-contracts';
 import { admin, createMemoryRepository, manager, student, submitted, teacher, toeicTopicId } from './memory-repository.js';
 
@@ -31,7 +31,7 @@ const sentence = (text, start = null, end = null, speaker = '') => ({ text, star
 
 test('topics: every role lists them, an Admin or a Content Manager adds and renames them', async () => {
   const { service } = await harness();
-  assert.deepEqual((await service.listTopics()).topics, [{ id: toeicTopicId, code: 'toeic', name: 'TOEIC', format: 'toeic', hasEditor: true }]);
+  assert.deepEqual((await service.listTopics()).topics, [{ id: toeicTopicId, code: 'toeic', name: 'TOEIC', format: 'toeic', level: null, hasEditor: true }]);
   await assert.rejects(() => service.createTopic(student, { name: 'Songs' }), { code: 26, status: 403 });
   const songs = (await service.createTopic(admin, { name: 'Songs' })).topic;
   assert.deepEqual([songs.code, songs.hasEditor], ['songs', false]);
@@ -39,6 +39,13 @@ test('topics: every role lists them, an Admin or a Content Manager adds and rena
   await assert.rejects(() => service.createTopic(manager, { name: 'SONGS' }), { code: 46, status: 409, data: { reason: 'NAME_TAKEN' } });
   await assert.rejects(() => service.updateTopic(admin, travel.id, { name: 'toeic' }), { code: 46 });
   assert.equal((await service.updateTopic(admin, travel.id, { name: 'Travel' })).topic.name, 'Travel');
+  await assert.rejects(() => service.createTopic(teacher, { name: 'Test 1', format: 'toeic' }), { code: 26 });
+  const test1 = (await service.createTopic(manager, { name: 'Test 1', format: 'toeic', level: 'basic' })).topic;
+  assert.equal(test1.level, 'basic');
+  assert.equal((await service.updateTopic(manager, test1.id, { level: 'advanced' })).topic.level, 'advanced');
+  assert.equal((await service.updateTopic(manager, test1.id, { name: 'Test one' })).topic.level, 'advanced');
+  assert.throws(() => listeningTopicCreateSchema.parse({ name: 'X', level: 'B1' }));
+  assert.equal(listeningExerciseCreateSchema.parse({ topicId: toeicTopicId, title: 'T', kind: 'part1' }).level, 'B1');
   await assert.rejects(
     () => service.createExercise(teacher, { topicId: songs.id, title: 'Song 1', level: 'A2', kind: 'part1' }),
     { code: 46, data: { reason: 'NO_EDITOR' } },
@@ -291,4 +298,29 @@ test('an admin is told when content is taken down and when speech jobs fail (D16
   assert.deepEqual(await service.markAdminNotificationsRead(admin, { ids: [byKind.CONTENT_UNPUBLISHED.id] }), { unread: 1 });
   assert.deepEqual(await service.markAdminNotificationsRead(admin, {}), { unread: 0 });
   assert.equal((await service.listAdminNotifications({ ...admin, id: '99999999-9999-4999-8999-999999999999' })).unread, 2);
+});
+
+test('a TOEIC topic holds tests; each exercise belongs to one test of its topic', async () => {
+  const { service } = await harness();
+  await assert.rejects(() => service.createTest(student, { topicId: toeicTopicId, name: 'Test 1' }), { code: 26 });
+  const first = (await service.createTest(teacher, { topicId: toeicTopicId, name: 'Test 1' })).test;
+  const second = (await service.createTest(manager, { topicId: toeicTopicId, name: 'Test 2' })).test;
+  await assert.rejects(() => service.createTest(teacher, { topicId: toeicTopicId, name: 'test 1' }), { code: 46, data: { reason: 'NAME_TAKEN' } });
+  const songs = (await service.createTopic(admin, { name: 'Songs', format: 'song' })).topic;
+  await assert.rejects(() => service.createTest(teacher, { topicId: songs.id, name: 'Test 1' }), { data: { reason: 'NOT_TOEIC' } });
+  assert.deepEqual((await service.listTests()).tests.map((test) => test.name), ['Test 1', 'Test 2']);
+
+  const one = (await service.createExercise(teacher, { topicId: toeicTopicId, title: 'Exercise 1', kind: 'part1', testId: first.id })).exercise;
+  const two = (await service.createExercise(teacher, { topicId: toeicTopicId, title: 'Exercise 2', kind: 'part1', testId: first.id })).exercise;
+  assert.deepEqual([one.test, two.test.name], [{ id: first.id, name: 'Test 1' }, 'Test 1']);
+  const moved = await service.updateExercise(teacher, two.id, { testId: second.id });
+  assert.equal(moved.exercise.test.name, 'Test 2');
+  await assert.rejects(() => service.updateExercise(teacher, two.id, { testId: '99999999-9999-4999-8999-999999999999' }), { data: { reason: 'NO_TEST' } });
+
+  assert.equal((await service.updateTest(teacher, second.id, { name: 'Test two' })).test.name, 'Test two');
+  await assert.rejects(() => service.deleteTest(teacher, second.id), { data: { reason: 'HAS_EXERCISES', exerciseCount: 1 } });
+  const third = (await service.createTest(teacher, { topicId: toeicTopicId, name: 'Test 3' })).test;
+  assert.deepEqual(await service.deleteTest(teacher, third.id), { deleted: { id: third.id } });
+  const listed = (await service.listExercises(teacher)).exercises;
+  assert.deepEqual(listed.map((exercise) => [exercise.title, exercise.test?.name]), [['Exercise 1', 'Test 1'], ['Exercise 2', 'Test two']]);
 });

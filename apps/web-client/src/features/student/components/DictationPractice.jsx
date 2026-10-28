@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check, ChevronLeft, ChevronRight, Eye, Pause, Play, RotateCcw, SkipForward } from 'lucide-react';
-import { ListeningMode } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { cn } from '../../../lib/utils.js';
@@ -8,7 +7,7 @@ import { useHeldPlayer } from '../../../hooks/use-held-player.js';
 import { Button, Input } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { checkListeningLine, checkListeningPractice } from '../api/practice-api.js';
-import { lineAnswers, lineBlanks, maskedWords, runningScore, sentenceLabel } from '../lib/listening-practice.js';
+import { fillsBlanks, isHideMode, lineAnswers, lineBlanks, maskedWords, runningScore, sentenceLabel } from '../lib/listening-practice.js';
 import { CheckedWords } from './ListeningMarks.jsx';
 import { SpeedSwitch, useAudioState } from './RecordingPanel.jsx';
 import { ScoreRing } from './ScoreRing.jsx';
@@ -29,24 +28,32 @@ function MaskedLine({ words }) {
   );
 }
 
-function BlankInputs({ pieces, answers, result, revealed, onAnswer, onEnter }) {
+export function BlankInputs({ pieces, answers, result, revealed, shownWords = {}, onAnswer, onEnter, onFocusBlank }) {
   const byBlank = new Map((result?.pieces || []).filter((piece) => 'blank' in piece).map((piece) => [piece.blank, piece]));
+  let number = 0;
   return (
     <p className="text-lg leading-[3rem]">
       {pieces.map((piece, index) => {
         if (!('blank' in piece)) return <span key={index}>{piece.text}</span>;
+        number += 1;
         const checked = byBlank.get(piece.blank);
         const value = revealed && checked ? checked.answer : answers[piece.blank] || '';
+        const given = shownWords[piece.blank];
         return (
           <Input
             key={index}
-            aria-label={`Blank ${piece.blank + 1}`}
-            className={cn('mx-1 inline-flex h-10 w-36 align-middle text-base', checked && (checked.correct ? 'border-success bg-success/10' : 'border-destructive bg-destructive/10'))}
+            aria-label={`Blank ${number}`}
+            className={cn(
+              'mx-1 inline-flex h-10 w-32 align-middle text-base',
+              given && 'border-warning bg-warning/10',
+              checked && !given && (checked.correct ? 'border-success bg-success/10' : 'border-destructive bg-destructive/10'),
+            )}
             autoComplete="off"
             spellCheck={false}
             maxLength={80}
-            readOnly={revealed || checked?.correct}
+            readOnly={revealed || given || checked?.correct}
             value={value}
+            onFocus={() => onFocusBlank?.(piece.blank)}
             onChange={(event) => onAnswer(piece.blank, event.target.value)}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
@@ -63,7 +70,10 @@ function BlankInputs({ pieces, answers, result, revealed, onAnswer, onEnter }) {
 
 export function DictationPractice({ exerciseId, data, onScored }) {
   const { segments, mode, exercise } = data;
-  const blanksMode = mode === ListeningMode.BLANKS;
+  const blanksMode = fillsBlanks(mode);
+  const hideMode = isHideMode(mode);
+  const [focused, setFocused] = useState(null);
+  const [shownWords, setShownWords] = useState({});
   const [index, setIndex] = useState(0);
   const [speed, setSpeed] = useState(1);
   const [answers, setAnswers] = useState({});
@@ -110,10 +120,32 @@ export function DictationPractice({ exerciseId, data, onScored }) {
     }
   }
 
+  async function showWord() {
+    if (busy || !segment) return;
+    const blanks = lineBlanks(segment);
+    const right = new Set((result?.pieces || []).filter((piece) => piece.correct).map((piece) => piece.blank));
+    const target = blanks.includes(focused) && !right.has(focused) && !shownWords[focused] ? focused : blanks.find((blank) => !right.has(blank) && !shownWords[blank]);
+    if (target === undefined) return;
+    setBusy(true);
+    try {
+      const checked = (await checkListeningLine(exerciseId, segment.id, lineAnswers(mode, segment, answers), mode)).data.segment;
+      const word = checked.pieces.find((piece) => piece.blank === target)?.answer;
+      if (word) {
+        setAnswers((state) => ({ ...state, [target]: word }));
+        setShownWords((state) => ({ ...state, [target]: true }));
+      }
+    } catch (error) {
+      notify({ title: 'Could not show the word', description: getApiErrorMessage(error), variant: 'destructive' });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function finish() {
     setBusy(true);
     try {
-      const scored = (await checkListeningPractice(exerciseId, answers, mode)).data;
+      const sent = hideMode ? Object.fromEntries(segments.flatMap(lineBlanks).map((blank) => [blank, answers[blank] || ''])) : answers;
+      const scored = (await checkListeningPractice(exerciseId, sent, mode)).data;
       setFinal(scored);
       onScored(scored);
       window.scrollTo({ top: 0 });
@@ -165,6 +197,8 @@ export function DictationPractice({ exerciseId, data, onScored }) {
     setAnswers({});
     setResults({});
     setRevealed({});
+    setShownWords({});
+    setFocused(null);
     setFinal(null);
     setTab('dictation');
   }
@@ -282,6 +316,8 @@ export function DictationPractice({ exerciseId, data, onScored }) {
                 answers={answers}
                 result={result}
                 revealed={shown}
+                shownWords={shownWords}
+                onFocusBlank={setFocused}
                 onEnter={onEnter}
                 onAnswer={(blank, text) => setAnswers((state) => ({ ...state, [blank]: text }))}
               />
@@ -342,10 +378,17 @@ export function DictationPractice({ exerciseId, data, onScored }) {
                     <Check className="h-4 w-4" />
                     Check
                   </Button>
-                  <Button variant="outline" disabled={busy} className="gap-1.5" onClick={() => checkLine({ reveal: true })}>
-                    <Eye className="h-4 w-4" />
-                    Show answer
-                  </Button>
+                  {hideMode ? (
+                    <Button variant="outline" disabled={busy} className="gap-1.5" onClick={showWord}>
+                      <Eye className="h-4 w-4" />
+                      Show word
+                    </Button>
+                  ) : (
+                    <Button variant="outline" disabled={busy} className="gap-1.5" onClick={() => checkLine({ reveal: true })}>
+                      <Eye className="h-4 w-4" />
+                      Show answer
+                    </Button>
+                  )}
                   <Button variant="ghost" disabled={busy || last} className="gap-1.5" onClick={() => go(index + 1)}>
                     <SkipForward className="h-4 w-4" />
                     Skip

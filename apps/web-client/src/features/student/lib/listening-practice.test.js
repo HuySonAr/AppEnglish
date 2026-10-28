@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { activeSentence, filterListeningPractice, isTimed, maskedWords, isTried, kindLabel, lineAnswers, lineBlanks, resultOf, runningScore, sentenceLabel, topicModes } from './listening-practice.js';
+import { TOEIC_MODES, activeSentence, filterListeningPractice, isTimed, maskedWords, isTried, kindLabel, lineAnswers, lineBlanks, partGroups, resultOf, runningScore, sentenceLabel, testLevel, toeicModeOf, topicModes } from './listening-practice.js';
 
 test('listening exercises are filtered by topic, searched and sorted', () => {
   const exercises = [
@@ -87,4 +87,17 @@ test('the transcript follows the sentence being played', () => {
   assert.equal(activeSentence(sentences, 5.9), 1);
   assert.equal(activeSentence(sentences, 7), 3);
   assert.equal(activeSentence([], 3), -1);
+});
+
+test('TOEIC tests use three hiding modes, keep a best per mode and group exercises by part', () => {
+  assert.deepEqual(TOEIC_MODES, ['hide30', 'hide50', 'hide100']);
+  assert.deepEqual(['hide50', 'nope', null].map(toeicModeOf), ['hide50', 'hide30', 'hide30']);
+  const exercise = { bestAccuracy: 70, checkCount: 1, hide30: { bestAccuracy: 90, checkCount: 2 }, hide50: { bestAccuracy: null, checkCount: 0 } };
+  assert.deepEqual([resultOf(exercise, 'hide30').bestAccuracy, resultOf(exercise, 'full').bestAccuracy], [90, 70]);
+  assert.equal(isTried({ checkCount: 0, hide50: { checkCount: 1 } }), true);
+  assert.deepEqual(lineAnswers('hide30', { id: 's', pieces: [{ text: 'A ' }, { blank: 's:2' }] }, {}), { 's:2': '' });
+  const groups = partGroups([{ id: 'b', kind: 'part3' }, { id: 'a', kind: 'part1' }, { id: 'c', kind: 'part3' }]);
+  assert.deepEqual(groups.map((group) => [group.kind.number, group.exercises.map((item) => item.id)]), [[1, ['a']], [3, ['b', 'c']]]);
+  assert.deepEqual(testLevel('basic'), { label: 'Basic', scores: 'TOEIC Listening below 250' });
+  assert.equal(testLevel(null), null);
 });

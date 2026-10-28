@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { ListeningPracticeService } from '../src/listening/listening.service.js';
 
 export function createListeningRepository() {
-  const tables = { results: [] };
+  const tables = { results: [], lines: [] };
   const copy = (row) => (row ? structuredClone(row) : null);
   const repository = {
     tables,
@@ -11,6 +11,14 @@ export function createListeningRepository() {
     },
     async findResult(accountId, exerciseId, mode) {
       return copy(tables.results.find((row) => row.accountId === accountId && row.exerciseId === exerciseId && row.mode === mode));
+    },
+    async listLines(accountId, exerciseId) {
+      return tables.lines.filter((row) => row.accountId === accountId && (!exerciseId || row.exerciseId === exerciseId)).map(copy);
+    },
+    async recordLine(accountId, exerciseId, segmentId, status, updatedAt) {
+      const row = tables.lines.find((item) => item.accountId === accountId && item.exerciseId === exerciseId && item.segmentId === segmentId);
+      if (row) Object.assign(row, { status, updatedAt });
+      else tables.lines.push({ accountId, exerciseId, segmentId, status, updatedAt });
     },
     async recordCheck(accountId, exerciseId, mode, accuracy, checkedAt) {
       const row = tables.results.find((item) => item.accountId === accountId && item.exerciseId === exerciseId && item.mode === mode);
@@ -22,20 +30,21 @@ export function createListeningRepository() {
   return repository;
 }
 
-export function listeningHarness() {
-  const toeic = { id: randomUUID(), code: 'toeic', name: 'TOEIC', format: 'toeic', hasEditor: true };
+export function listeningHarness({ random } = {}) {
+  const toeic = { id: randomUUID(), code: 'toeic', name: 'TOEIC', format: 'toeic', level: 'basic', hasEditor: true };
   const songs = { id: randomUUID(), code: 'songs', name: 'Songs', format: 'song', hasEditor: true };
   const news = { id: randomUUID(), code: 'news', name: 'News', format: null, hasEditor: false };
   const audio = randomUUID();
   const segment = (text, start = null, end = null, speaker = '') => ({ id: randomUUID(), text, start, end, speaker });
   const topic = { id: toeic.id, code: 'toeic', name: 'TOEIC' };
+  const test1 = { id: randomUUID(), topicId: toeic.id, name: 'Test 1' };
   const papers = [
     {
-      exercise: { id: randomUUID(), title: 'Photo', level: 'A2', kind: 'part1', topic },
+      exercise: { id: randomUUID(), title: 'Photo', level: 'A2', kind: 'part1', topic, test: { id: test1.id, name: 'Test 1' } },
       content: { audioMediaId: audio, segments: ['A man is reading.', 'A man is running.', 'A man is cooking.', 'A man is sleeping.'].map((text) => segment(text)) },
     },
     {
-      exercise: { id: randomUUID(), title: 'At the gate', level: 'B1', kind: 'part3', topic },
+      exercise: { id: randomUUID(), title: 'At the gate', level: 'B1', kind: 'part3', topic, test: { id: test1.id, name: 'Test 1' } },
       content: { audioMediaId: audio, segments: [segment("Excuse me, where's gate 5?", 0, 2, 'Man'), segment("It's next to the café.", 2, 4, 'Woman')] },
     },
     {
@@ -47,6 +56,7 @@ export function listeningHarness() {
     async listPublishedListeningExercises() {
       return structuredClone({
         topics: [toeic, songs, news],
+        tests: [test1, { id: randomUUID(), topicId: toeic.id, name: 'Empty test' }],
         exercises: papers.map((paper) => ({ ...paper.exercise, segmentCount: paper.content.segments.length })),
       });
     },
@@ -55,6 +65,6 @@ export function listeningHarness() {
     },
   };
   const repository = createListeningRepository();
-  const service = new ListeningPracticeService(repository, content, { now: () => new Date('2026-10-14T08:00:00Z') });
+  const service = new ListeningPracticeService(repository, content, { now: () => new Date('2026-10-14T08:00:00Z'), ...(random ? { random } : {}) });
   return { service, repository, content, papers };
 }

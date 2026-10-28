@@ -5,6 +5,7 @@ import {
   LISTENING_KINDS,
   LISTENING_SEGMENT_MAX_LENGTH,
   ListeningFormat,
+  PRACTICE_LEVELS,
   MediaKind,
   lyricPieces,
 } from '@appenglish/content-contracts';
@@ -18,13 +19,17 @@ export const markNoticesReadSchema = z.object({ ids: z.array(z.string().min(1).m
 
 export const mockTranscribeSchema = z.object({ audioMediaId: z.string().uuid() }).strict();
 
-export const listeningTopicCreateSchema = z.object({ name: requiredText(100), format: topicFormat.default(null) }).strict();
+const topicLevel = z.enum(PRACTICE_LEVELS).nullable();
+export const listeningTopicCreateSchema = z.object({ name: requiredText(100), format: topicFormat.default(null), level: topicLevel.default(null) }).strict();
 export const listeningTopicUpdateSchema = z
-  .object({ name: requiredText(100).optional(), format: topicFormat.optional() })
+  .object({ name: requiredText(100).optional(), format: topicFormat.optional(), level: topicLevel.optional() })
   .strict()
   .refine((value) => Object.values(value).some((field) => field !== undefined), {
     message: 'At least one field is required',
   });
+
+export const listeningTestCreateSchema = z.object({ topicId: z.string().uuid(), name: requiredText(100) }).strict();
+export const listeningTestUpdateSchema = z.object({ name: requiredText(100) }).strict();
 
 const level = z.enum(LISTENING_LEVELS);
 const exerciseTitle = requiredText(200);
@@ -32,12 +37,13 @@ export const listeningExerciseCreateSchema = z
   .object({
     topicId: z.string().uuid(),
     title: exerciseTitle,
-    level,
+    level: level.default('B1'),
     kind: z.enum(Object.values(LISTENING_KINDS).flat().map((kind) => kind.key)),
+    testId: z.string().uuid().nullable().default(null),
   })
   .strict();
 export const listeningExerciseUpdateSchema = z
-  .object({ title: exerciseTitle.optional(), level: level.optional() })
+  .object({ title: exerciseTitle.optional(), level: level.optional(), testId: z.string().uuid().optional() })
   .strict()
   .refine((value) => Object.values(value).some((field) => field !== undefined), {
     message: 'At least one field is required',

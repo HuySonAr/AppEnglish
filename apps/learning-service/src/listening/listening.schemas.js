@@ -10,9 +10,9 @@ export const listeningOpenSchema = z.object({ mode }).strict();
 export const lineAnswersSchema = z
   .object({ mode, segmentId: z.string().uuid(), answers: z.record(z.string().max(80), z.string().max(2000)).default({}) })
   .strict()
-  .refine((value) => Object.keys(value.answers).length <= 50, { message: 'Too many answers' });
+  .refine((value) => Object.keys(value.answers).length <= 120, { message: 'Too many answers' });
 
 export const dictationAnswersSchema = z
   .object({ mode, answers: z.record(z.string().max(80), z.string().max(2000)).default({}) })
   .strict()
-  .refine((value) => Object.keys(value.answers).length <= 200, { message: 'Too many answers' });
+  .refine((value) => Object.keys(value.answers).length <= 600, { message: 'Too many answers' });

@@ -7,11 +7,12 @@ test('every learner sees the published exercises by topic, with their results', 
   const { service, papers } = listeningHarness();
   await assert.rejects(() => service.listPractice(manager), { code: 26, status: 403 });
   const list = await service.listPractice(student);
-  assert.deepEqual(list.topics.map((topic) => [topic.name, topic.format]), [['TOEIC', 'toeic'], ['Songs', 'song']]);
-  assert.deepEqual(list.exercises.map((item) => [item.title, item.segmentCount, item.bestAccuracy, item.checkCount, item.blanks.checkCount]), [
+  assert.deepEqual(list.topics.map((topic) => [topic.name, topic.format, topic.level]), [['TOEIC', 'toeic', 'basic']]);
+  assert.deepEqual(list.tests.map((test) => test.name), ['Test 1']);
+  assert.equal(list.exercises[0].test.name, 'Test 1');
+  assert.deepEqual(list.exercises.map((item) => [item.title, item.segmentCount, item.bestAccuracy, item.checkCount, item.hide30.checkCount]), [
     ['Photo', 4, null, 0, 0],
     ['At the gate', 2, null, 0, 0],
-    ['Home', 2, null, 0, 0],
   ]);
 
   const exercise = await service.getExercise(student, papers[1].exercise.id);
@@ -59,7 +60,7 @@ test('a song is practised line by line or by filling in its blanks, each with it
 
   const lines = await service.check(student, id, { answers: { [song.content.segments[0].id]: 'I walked across an empty land' } });
   assert.deepEqual([lines.mode, lines.segments.map((segment) => segment.accuracy)], ['full', [100, 0]]);
-  const listed = (await service.listPractice(student)).exercises[2];
+  const listed = await service.getExercise(student, id);
   assert.deepEqual([listed.bestAccuracy, listed.checkCount, listed.blanks.bestAccuracy, listed.blanks.checkCount], [lines.accuracy, 1, 67, 1]);
 });
 
@@ -89,3 +90,66 @@ test('the full transcript comes with the translations; song brackets are removed
   await assert.rejects(() => service.getTranscript(manager, papers[1].exercise.id), { code: 26 });
 });
 
+
+test('TOEIC parts hide 30% or 50% of the words at random, content words first, and keep a best score per mode', async () => {
+  const { service, papers } = listeningHarness({ random: () => 0 });
+  const gate = papers[1];
+  const [first, second] = gate.content.segments;
+  const hide50 = await service.getExercise(student, gate.exercise.id, { mode: 'hide50' });
+  assert.equal(hide50.mode, 'hide50');
+  const blanks = hide50.segments.map((segment) => segment.pieces.filter((piece) => 'blank' in piece).map((piece) => piece.blank));
+  assert.deepEqual(blanks.map((list) => list.length), [3, 3]);
+  assert.equal(hide50.blankCount, 6);
+  const words = (segment, keys) => keys.map((key) => segment.text.split(/\s+/)[Number(key.split(':')[1]) / 2].replace(/[^\p{L}\p{N}']/gu, ''));
+  assert.ok(words(first, blanks[0]).every((word) => !['me'].includes(word.toLowerCase())));
+  assert.equal(hide50.segments[0].pieces.map((piece) => piece.text ?? '_').join('').replace(/_/g, '').length < first.text.length, true);
+  assert.equal(JSON.stringify(hide50.segments).includes('gate'), false);
+
+  const answers = {};
+  blanks.flat().forEach((key) => (answers[key] = ''));
+  const answerFor = (segment, key) => segment.text.split(/\s+/)[Number(key.split(':')[1]) / 2].replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+  blanks[0].forEach((key) => (answers[key] = answerFor(first, key)));
+  const line = await service.checkLine(student, gate.exercise.id, { mode: 'hide50', segmentId: first.id, answers });
+  assert.equal(line.segment.accuracy, 100);
+  assert.ok(line.segment.pieces.every((piece) => piece.correct && piece.answer));
+  const scored = await service.check(student, gate.exercise.id, { mode: 'hide50', answers });
+  assert.deepEqual([scored.mode, scored.accuracy, scored.segments.map((segment) => segment.accuracy)], ['hide50', 50, [100, 0]]);
+  assert.equal((await service.listPractice(student)).exercises[1].hide50.bestAccuracy, 50);
+  assert.equal((await service.listPractice(student)).exercises[1].hide30.checkCount, 0);
+
+  const missing = { ...answers };
+  delete missing[blanks[1][0]];
+  await assert.rejects(() => service.check(student, gate.exercise.id, { mode: 'hide50', answers: missing }), { code: 30 });
+  await assert.rejects(() => service.check(student, gate.exercise.id, { mode: 'hide50', answers: { ...answers, [`${second.id}:1`]: 'x', [`${second.id}:3`]: 'x' } }), { code: 30 });
+  await assert.rejects(() => service.getExercise(student, papers[2].exercise.id, { mode: 'hide30' }), { code: 30 });
+  const hide30 = await service.getExercise(student, papers[0].exercise.id, { mode: 'hide30' });
+  assert.deepEqual(hide30.segments.map((segment) => segment.pieces.filter((piece) => 'blank' in piece).length), [1, 1, 1, 1]);
+});
+
+test('each checked sentence keeps its latest status for the part progress and the redo list', async () => {
+  const { service, papers } = listeningHarness();
+  const gate = papers[1];
+  const [first, second] = gate.content.segments;
+  const right = await service.checkLine(student, gate.exercise.id, { segmentId: first.id, answers: { [first.id]: 'excuse me where is gate five' } });
+  assert.equal(right.status, 'done');
+  const wrong = await service.checkLine(student, gate.exercise.id, { segmentId: second.id, answers: { [second.id]: 'it is next' } });
+  assert.equal(wrong.status, 'wrong');
+  assert.deepEqual((await service.getExercise(student, gate.exercise.id)).lines, { [first.id]: 'done', [second.id]: 'wrong' });
+  assert.deepEqual((await service.listPractice(student)).exercises[1].lines, { done: 1, wrong: 1 });
+  await service.checkLine(student, gate.exercise.id, { segmentId: second.id, answers: { [second.id]: "it's next to the cafe" } });
+  assert.deepEqual((await service.listPractice(student)).exercises[1].lines, { done: 2, wrong: 0 });
+  assert.deepEqual((await service.listPractice(otherStudent)).exercises[1].lines, { done: 0, wrong: 0 });
+});
+
+test('Hide 100% gives one box per word with the word length, and keeps its own best', async () => {
+  const { service, papers } = listeningHarness();
+  const gate = papers[1];
+  const opened = await service.getExercise(student, gate.exercise.id, { mode: 'hide100' });
+  const firstLine = opened.segments[0].pieces;
+  assert.deepEqual(firstLine.filter((piece) => 'blank' in piece).map((piece) => piece.size), [6, 2, 7, 4, 1]);
+  assert.equal(firstLine.filter((piece) => 'text' in piece).map((piece) => piece.text).join(''), ' ,   ?');
+  const answers = Object.fromEntries(opened.segments.flatMap((segment) => segment.pieces.filter((piece) => 'blank' in piece).map((piece) => [piece.blank, ''])));
+  const scored = await service.check(student, gate.exercise.id, { mode: 'hide100', answers });
+  assert.equal(scored.mode, 'hide100');
+  assert.equal((await service.listPractice(student)).exercises[1].hide100.checkCount, 1);
+});

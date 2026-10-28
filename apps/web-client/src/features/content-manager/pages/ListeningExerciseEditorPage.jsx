@@ -33,6 +33,7 @@ import {
 } from '../components/ContentReview.jsx';
 import { useDraftMedia } from '../hooks/use-draft-media.js';
 import { useContentArea } from '../hooks/use-content-area.js';
+import { listListeningTests } from '../../../lib/api/listening-topics-api.js';
 import { lessonState, setIn } from '../lib/lesson-draft.js';
 import { keepSentenceExtras, listeningIssueLabel, listeningKindOf, translationPastePlan, workingListening } from '../lib/listening-draft.js';
 import { PasteDialog } from '../components/PasteDialog.jsx';
@@ -53,7 +54,8 @@ export function ListeningExerciseEditorPage() {
   const listPath = `${base}/listening`;
   const [state, setState] = useState('loading');
   const [exercise, setExercise] = useState(null);
-  const [details, setDetails] = useState({ title: '', level: 'B1' });
+  const [details, setDetails] = useState({ title: '', level: 'B1', testId: null });
+  const [tests, setTests] = useState([]);
   const navigate = useNavigate();
   const [status, setStatus] = useState(lessonState(null));
   const [content, setContent] = useState(null);
@@ -72,7 +74,7 @@ export function ListeningExerciseEditorPage() {
 
   function apply(data) {
     setExercise(data.exercise);
-    setDetails({ title: data.exercise.title, level: data.exercise.level });
+    setDetails({ title: data.exercise.title, level: data.exercise.level, testId: data.exercise.test?.id || null });
     draftMedia.setStored(data.media || {});
     setStatus(lessonState(data));
     setContent(workingListening(data, data.exercise.kind));
@@ -89,6 +91,9 @@ export function ListeningExerciseEditorPage() {
     setState('loading');
     try {
       await refresh();
+      listListeningTests()
+        .then((result) => setTests(result.data.tests))
+        .catch(() => setTests([]));
       setState('ready');
     } catch (error) {
       setState('error');
@@ -157,7 +162,7 @@ export function ListeningExerciseEditorPage() {
     event.preventDefault();
     setBusy('details');
     try {
-      setExercise((await updateListeningExercise(exerciseId, { title: details.title.trim(), level: details.level })).data.exercise);
+      setExercise((await updateListeningExercise(exerciseId, { title: details.title.trim(), level: details.level, ...(details.testId && details.testId !== exercise.test?.id ? { testId: details.testId } : {}) })).data.exercise);
       notify({ title: 'Details saved' });
     } catch (error) {
       notify({ title: 'Could not save the details', description: getApiErrorMessage(error), variant: 'destructive' });
@@ -182,7 +187,8 @@ export function ListeningExerciseEditorPage() {
   const locked = status.draftStatus === LessonVersionStatus.PENDING_REVIEW;
   const readOnly = !canAuthor || locked;
   const kind = listeningKindOf(exercise.kind);
-  const detailsChanged = details.title.trim() !== exercise.title || details.level !== exercise.level;
+  const detailsChanged = details.title.trim() !== exercise.title || details.level !== exercise.level || (details.testId || null) !== (exercise.test?.id || null);
+  const topicTests = tests.filter((test) => test.topicId === exercise.topic?.id);
   const kindName = kind.number ? `Part ${kind.number}: ${kind.title}` : kind.title;
   const removeExercise = async () => {
     await deleteListeningExercise(exerciseId);
@@ -191,13 +197,13 @@ export function ListeningExerciseEditorPage() {
 
   return (
     <section className="space-y-5">
-      <PageBreadcrumb items={[{ label: 'Listening exercises', to: listPath }, exercise.topic ? { label: exercise.topic.name } : null, { label: exercise.title }]} />
+      <PageBreadcrumb items={[{ label: 'Listening tests', to: listPath }, exercise.topic ? { label: exercise.topic.name } : null, exercise.test ? { label: exercise.test.name } : null, { label: exercise.title }]} />
 
       <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-lg font-semibold sm:text-xl">{exercise.title}</h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-            <span>{[exercise.topic?.name, kindName, exercise.level].filter(Boolean).join(' · ')}</span>
+            <span>{[exercise.topic?.name, exercise.test?.name, kindName, kind?.number ? null : exercise.level].filter(Boolean).join(' · ')}</span>
             {status.publishedVersion ? <Badge variant="success">Published v{status.publishedVersion}</Badge> : <Badge variant="outline">Not published</Badge>}
             {status.hasDraft ? <ReviewStatusBadge status={status.draftStatus} version={status.draftVersion} /> : null}
             {dirty ? <Badge variant="info">Unsaved</Badge> : null}
@@ -247,6 +253,29 @@ export function ListeningExerciseEditorPage() {
             <Label htmlFor="listening-title">Title</Label>
             <Input id="listening-title" value={details.title} maxLength={200} readOnly={locked} onChange={(event) => setDetails({ ...details, title: event.target.value })} />
           </div>
+          {kind?.number && topicTests.length ? (
+            <div className="space-y-2">
+              <Label>Test</Label>
+              <div className="flex flex-wrap gap-1">
+                {topicTests.map((test) => (
+                  <button
+                    key={test.id}
+                    type="button"
+                    aria-pressed={details.testId === test.id}
+                    disabled={locked}
+                    onClick={() => setDetails({ ...details, testId: test.id })}
+                    className={cn(
+                      'h-10 rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      details.testId === test.id ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
+                    )}
+                  >
+                    {test.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {kind?.number ? null : (
           <div className="space-y-2">
             <Label>Level</Label>
             <div className="flex flex-wrap gap-1">
@@ -267,6 +296,7 @@ export function ListeningExerciseEditorPage() {
               ))}
             </div>
           </div>
+          )}
           {locked ? null : (
             <Button type="submit" variant="outline" loading={busy === 'details'} disabled={Boolean(busy) || !details.title.trim() || !detailsChanged}>
               Save details

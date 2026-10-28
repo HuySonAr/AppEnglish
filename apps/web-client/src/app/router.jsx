@@ -43,10 +43,12 @@ import { ListeningExercisePage } from '../features/student/pages/ListeningExerci
 import { ListeningPracticePage } from '../features/student/pages/ListeningPracticePage.jsx';
 import { ListeningExerciseListPage } from '../features/student/pages/ListeningExerciseListPage.jsx';
 import { ListeningTopicPage } from '../features/student/pages/ListeningTopicPage.jsx';
+import { ListeningPartPage } from '../features/student/pages/ListeningPartPage.jsx';
 import { ProgressPage } from '../features/student/pages/ProgressPage.jsx';
 import { LeaderboardPage } from '../features/student/pages/LeaderboardPage.jsx';
 import { ListeningExerciseEditorPage } from '../features/content-manager/pages/ListeningExerciseEditorPage.jsx';
 import { ListeningExercisesPage } from '../features/content-manager/pages/ListeningExercisesPage.jsx';
+import { ListeningTestsPage } from '../features/content-manager/pages/ListeningTestsPage.jsx';
 import { ListeningTopicsPage } from '../features/content-manager/pages/ListeningTopicsPage.jsx';
 import { VocabularyPracticePage } from '../features/student/pages/VocabularyPracticePage.jsx';
 import { ScoreConversionPage } from '../features/admin/pages/ScoreConversionPage.jsx';
@@ -124,6 +126,7 @@ export function AppRouter() {
             <Route path="practice/writing/:promptId" element={<WritingPromptPage />} />
             <Route path="gemini-key" element={<GeminiKeyPage />} />
             <Route path="practice/listening/topics/:topicId" element={<ListeningTopicPage />} />
+            <Route path="practice/listening/tests/:testId/parts/:part" element={<ListeningPartPage />} />
             <Route path="practice/listening/topics/:topicId/:mode" element={<ListeningExerciseListPage />} />
             <Route path="practice/listening/:exerciseId" element={<ListeningExercisePage />} />
             <Route path="profile" element={<ProfilePage />} />
@@ -157,7 +160,8 @@ export function AppRouter() {
             <Route path="sw-tests" element={<SwTestsManagePage />} />
             <Route path="sw-tests/:swTestId" element={<SwTestEditorPage />} />
             <Route path="mock-tests/:mockTestId/results" element={<MockStatsPage />} />
-            <Route path="listening" element={<ListeningExercisesPage />} />
+            <Route path="listening" element={<ListeningTestsPage />} />
+            <Route path="listening/all" element={<ListeningExercisesPage />} />
             <Route path="listening/:exerciseId" element={<ListeningExerciseEditorPage />} />
             <Route path="listening-topics" element={<ListeningTopicsPage eyebrow="Content Manager" />} />
             <Route path="lessons/:lessonId" element={<LessonEditorPage />} />
@@ -181,7 +185,8 @@ export function AppRouter() {
             <Route path="mock-tests/:mockTestId" element={<MockTestEditorPage />} />
             <Route path="sw-tests" element={<SwTestsManagePage />} />
             <Route path="sw-tests/:swTestId" element={<SwTestEditorPage />} />
-            <Route path="listening" element={<ListeningExercisesPage />} />
+            <Route path="listening" element={<ListeningTestsPage />} />
+            <Route path="listening/all" element={<ListeningExercisesPage />} />
             <Route path="listening/:exerciseId" element={<ListeningExerciseEditorPage />} />
             <Route path="read-aloud" element={<TeacherPromptsPage key="read_aloud" kind="read_aloud" />} />
             <Route path="open-speaking" element={<TeacherPromptsPage key="open_speaking" kind="open_speaking" />} />

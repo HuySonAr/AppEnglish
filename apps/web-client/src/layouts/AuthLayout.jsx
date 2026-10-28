@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { GraduationLogo } from '../components/illustrations';
+import logoUrl from '../svg/graduation.svg';
 import { cn } from '../lib/utils.js';
 import { AuthShowcase } from './components/AuthShowcase.jsx';
 import { ThemeToggle } from './components/ThemeToggle.jsx';
@@ -16,7 +16,7 @@ export function AuthLayout() {
         <section className={cn('relative z-10 flex min-h-0 flex-col bg-card auth-scroll px-6 py-6 sm:px-10 sm:py-8 lg:overflow-y-auto short:py-5', SLIDE, swapped && 'lg:translate-x-full')}>
           <header className="flex items-center justify-between">
             <Link to="/login" className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 pr-4 text-base font-semibold tracking-tight transition-colors hover:bg-accent">
-              <GraduationLogo className="h-7 w-7" />
+              <img src={logoUrl} alt="" className="h-7 w-7" />
               AppEnglish
             </Link>
             <ThemeToggle />

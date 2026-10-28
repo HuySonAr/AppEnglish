@@ -150,7 +150,7 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       assert.equal((await call('PUT', `${lesson}/test/answers`, { body: { mode: 'all', answers: {} } })).status, 400);
 
       const listeningList = await call('GET', '/learning/practice/listening');
-      assert.deepEqual([listeningList.status, listeningList.json.data.exercises.length], [200, 3]);
+      assert.deepEqual([listeningList.status, listeningList.json.data.exercises.length], [200, 2]);
       const song = listening.papers[2].exercise.id;
       const blanks = await call('GET', `/learning/practice/listening/${song}?mode=blanks`);
       assert.deepEqual([blanks.status, blanks.json.data.mode, blanks.json.data.segments[0].pieces[1]], [200, 'blanks', { blank: 0 }]);
@@ -161,6 +161,8 @@ test('Gateway HTTP to learning-service gRPC contract for the lesson flow', async
       const oneLine = await call('POST', `/learning/practice/listening/${song}/check-line`, { body: { mode: 'blanks', segmentId: firstLine, answers: { 0: 'walked' } } });
       assert.deepEqual([oneLine.status, oneLine.json.data.segment.accuracy], [201, 50]);
       const photo = listening.papers[0];
+      const hidden = await call('GET', `/learning/practice/listening/${photo.exercise.id}?mode=hide30`);
+      assert.deepEqual([hidden.status, hidden.json.data.mode, hidden.json.data.blankCount], [200, 'hide30', 4]);
       assert.equal((await call('GET', `/learning/practice/listening/${photo.exercise.id}`)).json.data.segments.length, 4);
       const checked = await call('POST', `/learning/practice/listening/${photo.exercise.id}/check`, {
         body: { answers: Object.fromEntries(photo.content.segments.map((segment) => [segment.id, segment.text])) },

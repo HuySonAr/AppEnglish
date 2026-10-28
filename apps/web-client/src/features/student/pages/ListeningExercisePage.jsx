@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
-import { ListeningMode } from '@appenglish/learning-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { Badge, Button } from '../../../components/ui';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { getListeningPractice } from '../api/practice-api.js';
 import { DictationPractice } from '../components/DictationPractice.jsx';
-import { kindLabel, modeLabels } from '../lib/listening-practice.js';
+import { isHideMode, kindLabel, resultOf, toeicModeOf } from '../lib/listening-practice.js';
+import { ModeSwitch } from '../components/ListeningModeSwitch.jsx';
 
 const instructions = {
   part1: 'Write down the four statements, (A) to (D).',
@@ -20,12 +20,12 @@ const instructions = {
   talk: 'Write down each sentence.',
   song: 'Write down each line.',
 };
-const blanksInstruction = 'Type the missing words of each line.';
+const blanksInstruction = 'Type the missing words you hear.';
 
 export function ListeningExercisePage() {
   const { exerciseId } = useParams();
-  const [searchParams] = useSearchParams();
-  const mode = searchParams.get('mode') === ListeningMode.BLANKS ? ListeningMode.BLANKS : ListeningMode.FULL;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const mode = toeicModeOf(searchParams.get('mode'));
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
 
@@ -46,7 +46,7 @@ export function ListeningExercisePage() {
 
   const topicId = data?.exercise.topic?.id;
   const back = (
-    <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Listening', to: '/student/practice/listening' }, data?.exercise.topic ? { label: data.exercise.topic.name, to: `/student/practice/listening/topics/${topicId}/${mode}` } : null, { label: data?.exercise.title || 'Exercise' }]} />
+    <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Listening', to: '/student/practice/listening' }, data?.exercise.topic ? { label: data.exercise.topic.name, to: `/student/practice/listening/topics/${topicId}?mode=${mode}` } : null, { label: data?.exercise.title || 'Exercise' }]} />
   );
 
   if (state === 'loading') return <DetailPageSkeleton />;
@@ -61,9 +61,8 @@ export function ListeningExercisePage() {
     );
 
   const { exercise } = data;
-  const blanksMode = data.mode === ListeningMode.BLANKS;
-  const best = blanksMode ? data.blanks : data;
-  const song = exercise.kind === 'song';
+  const hidden = isHideMode(data.mode);
+  const best = resultOf(data, data.mode);
 
   return (
     <section className="space-y-6">
@@ -71,9 +70,10 @@ export function ListeningExercisePage() {
       <ExerciseHeader
         exercise={exercise}
         source={data.source}
-        badges={song ? <Badge variant="outline">{modeLabels[data.mode]}</Badge> : <span className="text-sm text-muted-foreground">{kindLabel(exercise.kind)}</span>}
-        instruction={blanksMode ? blanksInstruction : instructions[exercise.kind]}
+        badges={<span className="text-sm text-muted-foreground">{kindLabel(exercise.kind)}</span>}
+        instruction={hidden ? blanksInstruction : instructions[exercise.kind]}
         best={best}
+        modes={<ModeSwitch mode={data.mode} onChange={(value) => setSearchParams({ mode: value }, { replace: true })} />}
       />
       <DictationPractice
         key={`${exerciseId}-${data.mode}`}
@@ -82,7 +82,7 @@ export function ListeningExercisePage() {
         onScored={(scored) =>
           setData((current) => {
             const latest = { bestAccuracy: scored.bestAccuracy, lastAccuracy: scored.lastAccuracy, checkCount: scored.checkCount };
-            return blanksMode ? { ...current, blanks: latest } : { ...current, ...latest };
+            return hidden ? { ...current, [current.mode]: latest } : { ...current, ...latest };
           })
         }
       />
@@ -90,14 +90,11 @@ export function ListeningExercisePage() {
   );
 }
 
-function ExerciseHeader({ exercise, badges, instruction, best, source }) {
+function ExerciseHeader({ exercise, badges, instruction, best, source, modes }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0 space-y-2">
-        <h1 className="flex flex-wrap items-baseline gap-x-3 text-2xl font-bold sm:text-3xl">
-          {exercise.title}
-          <span className="text-base font-normal text-muted-foreground">Level: {exercise.level}</span>
-        </h1>
+        <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{exercise.title}</h1>
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
           {exercise.topic ? <Badge variant="secondary">{exercise.topic.name}</Badge> : null}
           {badges}
@@ -116,12 +113,15 @@ function ExerciseHeader({ exercise, badges, instruction, best, source }) {
           </p>
         ) : null}
       </div>
+      <div className="flex flex-wrap items-center gap-4">
+      {modes}
       {best?.checkCount ? (
         <div className="text-right">
           <p className="text-2xl font-bold tabular-nums text-success">{best.bestAccuracy}%</p>
           <p className="text-xs text-muted-foreground">your best</p>
         </div>
       ) : null}
+      </div>
     </div>
   );
 }
