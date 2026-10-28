@@ -112,6 +112,15 @@ Dùng lại theo thứ tự: `src/components/shared` → `src/components/ui` (sh
 | ScoreRing | vòng điểm; cung vẽ dần và số đếm lên (anime.js); `tone`: primary, success, destructive, inverse |
 | Reveal | `RevealGroup`/`RevealItem`: con xuất hiện lần lượt, lệch 0,07s (Motion) |
 | GridPattern | lưới SVG mờ cho khối màu chủ đạo |
+| AnswerProgress | thân hộp thoại nộp/rời bài (`TestExam`): nút X tròn góc phải; hàng đầu gồm hình minh hoạ trong ô `h-14 rounded-2xl` nền nhạt (`ClipboardAlert` màu `warning` khi còn câu chưa làm, `ClipboardCheck` màu `success` khi đủ, `DoorExit` màu `destructive` khi rời bài) cạnh tiêu đề `text-base font-semibold` và mô tả `text-xs`; dưới là "Answered n / N" và thanh `h-1.5`; các số câu chưa làm dạng viên tròn đỏ nhạt căn phải, tối đa 4 rồi "+N". Chân hộp thoại các nút chia đều, Submit màu `primary` có icon gửi |
+| Pronunciation | nút viên thuốc `rounded-full border bg-card p-1 shadow-sm`: cờ tròn (`country-flag-icons` 1x1, `h-5` → `sm:h-6`), nhãn US/UK chỉ từ `md` (≥768px), ô loa tròn `bg-muted` → `bg-primary/10 text-primary` khi đang phát; US đứng trước UK (D204) |
+
+### Hình minh hoạ SVG
+- Mỗi hình là một component riêng trong `src/components/illustrations/` (một file một hình, `index.js` export tất cả); trang chỉ import, không viết SVG thẳng vào component nghiệp vụ.
+- Khung `viewBox="0 0 48 48"`, nhận `className` để đặt cỡ, luôn `aria-hidden="true"` (chữ bên cạnh đã nói nội dung).
+- Màu theo token: nét và mảng chính dùng `currentColor` (`fill-current`, `stroke-current`, độ đậm nhạt bằng `fillOpacity`/`strokeOpacity`), phần "giấy" và viền cắt của huy hiệu dùng `fill-card`/`stroke-card` (`paintOrder="stroke"`), nên hình tự đổi theo trạng thái và chế độ tối. Không dùng mã màu cứng hay gradient.
+- Phần dùng chung giữa các hình tách thành component nội bộ (ví dụ `ClipboardBase`).
+- Hiện có: `ClipboardAlert`, `ClipboardCheck`, `DoorExit` (hộp thoại nộp/rời bài). Ba hình này do người dùng cung cấp (2026-10-28, file `canh-bao.svg`, `complete.svg`, `doorexit.svg`, vẽ lại từ ảnh bằng VTracer), chuyển nguyên sang JSX với `viewBox="0 0 512 512"` và **giữ màu gốc**, là ngoại lệ của quy tắc màu theo token ở trên.
 
 ## 5. Chuyển động
 

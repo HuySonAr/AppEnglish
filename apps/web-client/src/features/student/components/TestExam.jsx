@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Clock, LogOut } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, LogOut, Send } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
   Button,
 } from '../../../components/ui';
 import { PassageText } from '../../../components/shared/PassageText.jsx';
@@ -368,24 +365,18 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
       </div>
 
       <AlertDialog open={confirming} onOpenChange={setConfirming}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Submit the {name}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {retakeAllowed
-                ? 'You cannot change your answers after submitting.'
-                : 'You cannot change your answers or take the test again after submitting.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AnswerProgress answered={answered} total={total} unanswered={unanswered} />
-          <AlertDialogFooter>
+        <AlertDialogContent className="max-w-md rounded-2xl sm:rounded-2xl p-4">
+          <AnswerProgress title="Submit your answers?" note={retakeAllowed ? '' : ' No retake after this.'} answered={answered} total={total} unanswered={unanswered} />
+          <AlertDialogFooter className="flex-row flex-wrap gap-3 pt-1 sm:justify-center [&>*]:min-w-[8rem] [&>*]:flex-1">
             <AlertDialogCancel>Keep working</AlertDialogCancel>
             <AlertDialogAction
+              className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={() => {
                 submitted.current = true;
                 onSubmit(answers);
               }}
             >
+              <Send className="h-4 w-4" />
               Submit
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -393,45 +384,46 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
       </AlertDialog>
 
       <AlertDialog open={leaving} onOpenChange={setLeaving}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>You are taking the {name}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {onDiscard
-                ? `You cannot open another page during the test. Submit it, or leave without submitting${onLeaveForLater ? ' and continue later' : ': your answers are then thrown away'}.`
-                : 'You cannot open another page during the test, and the clock keeps running. Submit the test first if you want to leave.'}
-              {retakeAllowed ? '' : ' You cannot take the test again after submitting.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AnswerProgress answered={answered} total={total} unanswered={unanswered} />
-          <AlertDialogFooter className="flex-wrap gap-y-2">
+        <AlertDialogContent className="max-w-md rounded-2xl sm:rounded-2xl">
+          <AnswerProgress
+            title={`Leave the ${name}?`}
+            description={`${onDiscard ? (onLeaveForLater ? 'Submit now, or leave and continue later.' : 'Submit now, or leave and lose your answers.') : 'Submit before leaving. The clock keeps running.'}${retakeAllowed ? '' : ' No retake after submitting.'}`}
+            answered={answered}
+            total={total}
+            unanswered={unanswered}
+            leaving
+            closeDisabled={discarding}
+          />
+          <AlertDialogFooter className="flex-row flex-wrap gap-3 pt-1 sm:justify-center [&>*]:min-w-[8rem] [&>*]:flex-1">
             <AlertDialogCancel disabled={discarding}>Keep working</AlertDialogCancel>
             {leaveButtons}
             <AlertDialogAction
+              className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={discarding}
               onClick={() => {
                 submitted.current = true;
                 onSubmit(answers);
               }}
             >
-              Submit the test
+              <Send className="h-4 w-4" />
+              Submit
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       <AlertDialog open={exiting} onOpenChange={(open) => !discarding && setExiting(open)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Leave without submitting?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {onLeaveForLater
-                ? 'Continue later to keep your answers and resume this attempt from the page of the part. Discard to throw them away: the attempt will not count and will not appear in your history.'
-                : 'Your answers will be thrown away. The attempt will not count and will not appear in your history; next time the test starts again with the full time.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AnswerProgress answered={answered} total={total} unanswered={unanswered} />
-          <AlertDialogFooter className="flex-wrap gap-y-2">
+        <AlertDialogContent className="max-w-md rounded-2xl sm:rounded-2xl">
+          <AnswerProgress
+            title="Leave without submitting?"
+            description={onLeaveForLater ? 'Continue later keeps your answers. Discard throws them away and the attempt does not count.' : 'Your answers are thrown away and the attempt does not count.'}
+            answered={answered}
+            total={total}
+            unanswered={unanswered}
+            leaving
+            closeDisabled={discarding}
+          />
+          <AlertDialogFooter className="flex-row flex-wrap gap-3 pt-1 sm:justify-center [&>*]:min-w-[8rem] [&>*]:flex-1">
             <AlertDialogCancel disabled={discarding}>Keep working</AlertDialogCancel>
             {leaveButtons}
           </AlertDialogFooter>

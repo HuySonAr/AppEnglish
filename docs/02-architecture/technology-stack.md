@@ -8,7 +8,7 @@
 | Backend | 4 NestJS services + api-gateway trong apps/* | JavaScript/ESM skeleton; lockfile resolves NestJS `11.2.7` |
 | Web client | React `19.3.0` + Vite `7.3.7`, JavaScript/JSX | Đã tạo; không dùng Next.js |
 | Shared code | `packages/config`, `packages/backend-common` | Đã tạo |
-| UI styling/components/icons/charts | Tailwind CSS, shadcn/ui, lucide-react; biểu đồ dùng shadcn chart (Recharts `2.15.4`, D78) | Dùng cho web client; giữ component source trong repo và theo cấu hình Vite hiện có |
+| UI styling/components/icons/charts | Tailwind CSS, shadcn/ui, lucide-react; biểu đồ dùng shadcn chart (Recharts `2.15.4`, D78); cờ quốc gia dùng `country-flag-icons` `1.6.20` (MIT, SVG vuông `react/1x1`, D204) | Dùng cho web client; giữ component source trong repo và theo cấu hình Vite hiện có |
 | Public entrypoint/BFF | Gateway/BFF | Web client gọi public entrypoint; không gọi trực tiếp private service |
 | Synchronous service communication | gRPC | Tôn trọng proto/contracts hiện hữu; không tự chuyển sang REST giữa services |
 | Asynchronous messaging | RabbitMQ | Dùng event/message cho luồng async theo patterns hiện có. Đang dùng cho Auto-time (D97): hàng đợi `speech.autotime.requests`/`speech.autotime.results`, content-service dùng `amqplib`, speech-service dùng `pika` |

@@ -106,7 +106,7 @@ export function SidebarLayout({ role, side = 'left', drawerSide = side }) {
             {drawerRight ? drawer : null}
           </div>
         </header>
-        <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <main className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-5 sm:py-6">
           <Outlet />
         </main>
       </div>

@@ -7,8 +7,9 @@ export function stopOtherAudio(except, root = globalThis.document) {
   if (detached && detached !== except && !detached.paused) detached.pause();
 }
 
-export function playSound(url, { root = globalThis.document, create = (src) => new Audio(src) } = {}) {
+export function playSound(url, { root = globalThis.document, create = (src) => new Audio(src), onEnd } = {}) {
   const audio = create(url);
+  if (onEnd) for (const name of ['ended', 'pause', 'error']) audio.addEventListener(name, onEnd, { once: true });
   stopOtherAudio(audio, root);
   detached = audio;
   return audio.play();

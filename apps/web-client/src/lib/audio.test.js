@@ -48,3 +48,13 @@ test('a pronunciation stops the page players and the sound before it', async () 
   stopOtherAudio(later, root);
   assert.equal(sounds[1].paused, true);
 });
+
+test('a pronunciation reports when it stops', async () => {
+  const handlers = {};
+  const sound = { ...player(false), addEventListener: (name, handler) => (handlers[name] = handler) };
+  let ended = 0;
+  await playSound('a.mp3', { root: rootWith([]), create: () => sound, onEnd: () => ended++ });
+  assert.deepEqual(Object.keys(handlers).sort(), ['ended', 'error', 'pause']);
+  handlers.ended();
+  assert.equal(ended, 1);
+});

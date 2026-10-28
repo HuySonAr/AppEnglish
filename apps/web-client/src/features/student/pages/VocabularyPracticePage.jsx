@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Brain, CheckCircle2, Keyboard, Lightbulb, RotateCcw, Target, XCircle } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Brain,
+  CheckCircle2,
+  Keyboard,
+  Lightbulb,
+  RotateCcw,
+  Target,
+  XCircle,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
@@ -7,10 +17,16 @@ import { notify } from '../../../lib/notify.js';
 import { Badge, Button } from '../../../components/ui';
 import { cn } from '../../../lib/utils.js';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
-import { completeVocabularyPractice, getVocabularyPractice } from '../api/lessons-api.js';
+import {
+  completeVocabularyPractice,
+  getVocabularyPractice,
+} from '../api/lessons-api.js';
 import { Pronunciation } from '../components/VocabularyStudy.jsx';
 import { ScoreRing } from '../components/ScoreRing.jsx';
-import { practiceInstruction, practiceScore } from '../lib/vocabulary-practice.js';
+import {
+  practiceInstruction,
+  practiceScore,
+} from '../lib/vocabulary-practice.js';
 
 const optionLetters = ['A', 'B', 'C', 'D'];
 
@@ -18,33 +34,48 @@ function WordCard({ word }) {
   return (
     <div className="space-y-3">
       <div className="space-y-1.5 rounded-xl border bg-card p-4">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <span className="text-xl font-bold tracking-tight text-primary">{word.word}</span>
-          {word.phonetic ? <span className="text-muted-foreground text-sm">{word.phonetic}</span> : null}
+        <div className="flex items-center justify-between gap-x-3 gap-y-2">
+          <div className="flex items-center gap-1">
+            <span className="text-xl font-bold tracking-tight text-primary">
+              {word.word}
+            </span>
+            {word.phonetic ? (
+              <span className="text-muted-foreground text-xs sm:text-sm">
+                {word.phonetic}
+              </span>
+            ) : null}
+          </div>
           <span className="ml-auto flex gap-2">
-            <Pronunciation label="UK" url={word.audioUkUrl} />
             <Pronunciation label="US" url={word.audioUsUrl} />
+            <Pronunciation label="UK" url={word.audioUkUrl} />
           </span>
         </div>
         <p className="text-sm">
-          <span className="font-semibold text-primary">Part of speech:</span> {word.partOfSpeech}
+          <span className="font-semibold text-primary">Part of speech:</span>{' '}
+          {word.partOfSpeech}
         </p>
         <p className="text-sm">
-          <span className="font-semibold text-primary">Meaning:</span> {word.meaning}
+          <span className="font-semibold text-primary">Meaning:</span>{' '}
+          {word.meaning}
         </p>
       </div>
       {word.example ? (
         <div className="space-y-1 rounded-xl border bg-muted/40 p-4 text-sm">
           <p className="font-semibold text-primary">Example</p>
           <p>{word.example}</p>
-          {word.exampleMeaning ? <p className="italic text-muted-foreground">{word.exampleMeaning}</p> : null}
+          {word.exampleMeaning ? (
+            <p className="italic text-muted-foreground">
+              {word.exampleMeaning}
+            </p>
+          ) : null}
         </div>
       ) : null}
       {word.lessonTitle ? (
         <div className="flex items-start gap-2 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm">
           <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
           <p>
-            <span className="font-semibold">From your lesson:</span> {word.lessonTitle}
+            <span className="font-semibold">From your lesson:</span>{' '}
+            {word.lessonTitle}
           </p>
         </div>
       ) : null}
@@ -67,13 +98,20 @@ function RoundPanel({ questions, answers, index, score }) {
         </span>
         <div>
           <p className="font-semibold">Think first, then pick</p>
-          <p className="text-sm text-muted-foreground">The word, its sound and an example open here.</p>
+          <p className="text-sm text-muted-foreground">
+            The word, its sound and an example open here.
+          </p>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-2">
         {stats.map((stat) => (
-          <div key={stat.label} className="rounded-lg bg-muted/40 px-3 py-2 text-center">
-            <p className={cn('text-lg font-semibold tabular-nums', stat.tone)}>{stat.value}</p>
+          <div
+            key={stat.label}
+            className="rounded-lg bg-muted/40 px-3 py-2 text-center"
+          >
+            <p className={cn('text-lg font-semibold tabular-nums', stat.tone)}>
+              {stat.value}
+            </p>
             <p className="text-xs text-muted-foreground">{stat.label}</p>
           </div>
         ))}
@@ -86,8 +124,14 @@ function RoundPanel({ questions, answers, index, score }) {
               key={item.id}
               aria-label={`Question ${at + 1}`}
               className={cn(
-                'flex h-7 w-7 items-center justify-center rounded-md text-xs font-medium tabular-nums',
-                value === undefined ? (at === index ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground') : value === item.answer ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive',
+                'flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium tabular-nums',
+                value === undefined
+                  ? at === index
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground'
+                  : value === item.answer
+                    ? 'bg-success/15 text-success'
+                    : 'bg-destructive/15 text-destructive',
               )}
             >
               {at + 1}
@@ -113,7 +157,9 @@ function Header({ back, aside }) {
         </span>
         <div className="min-w-0 flex-1">
           <h1 className="sm:text-xl font-bold tracking-tight">Word memory</h1>
-          <p className="hidden sm:block text-sm text-muted-foreground">Choose the right answer to see the word, its sound and an example.</p>
+          <p className="hidden sm:block text-sm text-muted-foreground">
+            Choose the right answer to see the word, its sound and an example.
+          </p>
         </div>
         {aside}
       </div>
@@ -138,7 +184,11 @@ export function VocabularyPracticePage() {
       window.scrollTo({ top: 0 });
     } catch (error) {
       setState('error');
-      notify({ title: 'Could not load the practice', description: getApiErrorMessage(error), variant: 'destructive' });
+      notify({
+        title: 'Could not load the practice',
+        description: getApiErrorMessage(error),
+        variant: 'destructive',
+      });
     }
   }
 
@@ -160,7 +210,10 @@ export function VocabularyPracticePage() {
     if (answered) nextButton.current?.focus();
   }, [answered, index]);
 
-  const roundOver = Boolean(practice?.available) && questions.length > 0 && index >= questions.length;
+  const roundOver =
+    Boolean(practice?.available) &&
+    questions.length > 0 &&
+    index >= questions.length;
   useEffect(() => {
     if (roundOver) completeVocabularyPractice().catch(() => {});
   }, [roundOver, practice]);
@@ -169,13 +222,19 @@ export function VocabularyPracticePage() {
     if (state !== 'ready' || !question) return undefined;
     const onKey = (event) => {
       if (event.target.closest?.('input, textarea')) return;
-      if (answered && event.key === 'Enter' && !event.target.closest?.('button')) {
+      if (
+        answered &&
+        event.key === 'Enter' &&
+        !event.target.closest?.('button')
+      ) {
         event.preventDefault();
         setIndex((value) => value + 1);
         return;
       }
       const key = event.key.toUpperCase();
-      const at = ['1', '2', '3', '4'].includes(key) ? Number(key) - 1 : optionLetters.indexOf(key);
+      const at = ['1', '2', '3', '4'].includes(key)
+        ? Number(key) - 1
+        : optionLetters.indexOf(key);
       if (!answered && at >= 0 && question.options[at]) {
         event.preventDefault();
         choose(question.options[at]);
@@ -185,7 +244,14 @@ export function VocabularyPracticePage() {
     return () => window.removeEventListener('keydown', onKey);
   });
 
-  const back = <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Word memory' }]} />;
+  const back = (
+    <PageBreadcrumb
+      items={[
+        { label: 'Practice', to: '/student/practice' },
+        { label: 'Word memory' },
+      ]}
+    />
+  );
 
   if (state === 'loading') return <DetailPageSkeleton />;
   if (state === 'error')
@@ -204,13 +270,25 @@ export function VocabularyPracticePage() {
         <Header back={back} />
         <div className="space-y-4 rounded-xl border bg-card p-6 text-center">
           <p className="text-lg font-semibold">Not open yet</p>
-          <p className="text-sm text-muted-foreground">It opens at {practice.size} words from your completed lessons.</p>
+          <p className="text-sm text-muted-foreground">
+            It opens at {practice.size} words from your completed lessons.
+          </p>
           <div className="mx-auto max-w-sm space-y-1.5">
-            <div className="h-2 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-              <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${Math.min(100, (practice.wordCount * 100) / practice.size)}%` }} />
+            <div
+              className="h-2 overflow-hidden rounded-full bg-muted"
+              aria-hidden="true"
+            >
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{
+                  width: `${Math.min(100, (practice.wordCount * 100) / practice.size)}%`,
+                }}
+              />
             </div>
             <p className="text-xs tabular-nums text-muted-foreground">
-              {practice.wordCount} of {practice.size} words · {practice.completedLessonCount} lesson{practice.completedLessonCount === 1 ? '' : 's'} completed
+              {practice.wordCount} of {practice.size} words ·{' '}
+              {practice.completedLessonCount} lesson
+              {practice.completedLessonCount === 1 ? '' : 's'} completed
             </p>
           </div>
           <Button asChild>
@@ -221,24 +299,35 @@ export function VocabularyPracticePage() {
     );
 
   const score = practiceScore(questions, answers);
-  const finished = score.answered === questions.length && index >= questions.length;
+  const finished =
+    score.answered === questions.length && index >= questions.length;
 
   if (finished) {
-    const percent = questions.length ? Math.round((score.correct * 100) / questions.length) : 0;
+    const percent = questions.length
+      ? Math.round((score.correct * 100) / questions.length)
+      : 0;
     return (
       <section className="mx-auto max-w-4xl space-y-6">
         <Header back={back} />
         <div className="flex flex-col items-center gap-6 rounded-xl border bg-card p-6 sm:flex-row sm:p-8">
-          <ScoreRing percent={percent} tone={score.wrong.length ? 'primary' : 'success'} label={`${score.correct}/${questions.length}`} />
+          <ScoreRing
+            percent={percent}
+            tone={score.wrong.length ? 'primary' : 'success'}
+            label={`${score.correct}/${questions.length}`}
+          />
           <div className="flex-1 space-y-4 text-center sm:text-left">
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl border bg-success/5 p-3">
                 <p className="text-xs text-muted-foreground">Right</p>
-                <p className="text-2xl font-bold tabular-nums text-success">{score.correct}</p>
+                <p className="text-2xl font-bold tabular-nums text-success">
+                  {score.correct}
+                </p>
               </div>
               <div className="rounded-xl border bg-destructive/5 p-3">
                 <p className="text-xs text-muted-foreground">To review</p>
-                <p className="text-2xl font-bold tabular-nums text-destructive">{score.wrong.length}</p>
+                <p className="text-2xl font-bold tabular-nums text-destructive">
+                  {score.wrong.length}
+                </p>
               </div>
             </div>
             <div className="flex flex-wrap justify-center gap-3 sm:justify-start">
@@ -269,7 +358,9 @@ export function VocabularyPracticePage() {
   }
 
   const last = index === questions.length - 1;
-  const percent = questions.length ? Math.round((score.answered * 100) / questions.length) : 0;
+  const percent = questions.length
+    ? Math.round((score.answered * 100) / questions.length)
+    : 0;
 
   return (
     <section className="mx-auto max-w-6xl space-y-3">
@@ -281,7 +372,11 @@ export function VocabularyPracticePage() {
             <div className="text-sm">
               <p className="font-semibold">From your lessons</p>
               <p className="text-muted-foreground">
-                {questions.length} questions · <span className="font-medium text-success">{score.correct}</span> right
+                {questions.length} questions ·{' '}
+                <span className="font-medium text-success">
+                  {score.correct}
+                </span>{' '}
+                right
               </p>
             </div>
           </div>
@@ -292,18 +387,30 @@ export function VocabularyPracticePage() {
         <p className="shrink-0 font-medium tabular-nums">
           Question {index + 1} / {questions.length}
         </p>
-        <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-          <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${percent}%` }} />
+        <div
+          className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-muted"
+          aria-hidden="true"
+        >
+          <div
+            className="h-full rounded-full bg-primary transition-all"
+            style={{ width: `${percent}%` }}
+          />
         </div>
-        <p className="shrink-0 font-medium tabular-nums text-primary">{percent}%</p>
+        <p className="shrink-0 font-medium tabular-nums text-primary">
+          {percent}%
+        </p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
         <fieldset className="space-y-4 rounded-xl border bg-card p-4 sm:p-5">
           <legend className="sr-only">Question {index + 1}</legend>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Question {index + 1}</span>
-            <span className="text-sm text-muted-foreground">{practiceInstruction(question)}</span>
+          <div className="flex flex-wrap items-center gap-2 !mt-0">
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              Question {index + 1}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              {practiceInstruction(question)}
+            </span>
           </div>
           <div className="flex flex-wrap items-baseline gap-2">
             <p className="text-lg font-semibold">{question.prompt}</p>
@@ -323,7 +430,10 @@ export function VocabularyPracticePage() {
                     'flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default',
                     !answered && 'hover:border-primary/40 hover:bg-accent',
                     answered && isRight && 'border-success/50 bg-success/10',
-                    answered && picked && !isRight && 'border-destructive/50 bg-destructive/10',
+                    answered &&
+                      picked &&
+                      !isRight &&
+                      'border-destructive/50 bg-destructive/10',
                     answered && !isRight && !picked && 'opacity-50',
                   )}
                 >
@@ -331,14 +441,21 @@ export function VocabularyPracticePage() {
                     className={cn(
                       'flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold',
                       answered && isRight && 'bg-success text-white',
-                      answered && picked && !isRight && 'bg-destructive text-white',
+                      answered &&
+                        picked &&
+                        !isRight &&
+                        'bg-destructive text-white',
                     )}
                   >
                     {optionLetters[optionIndex]}
                   </span>
                   <span className="flex-1 font-medium">{option}</span>
-                  {answered && isRight ? <CheckCircle2 className="h-4 w-4 shrink-0 text-success" /> : null}
-                  {answered && picked && !isRight ? <XCircle className="h-4 w-4 shrink-0 text-destructive" /> : null}
+                  {answered && isRight ? (
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
+                  ) : null}
+                  {answered && picked && !isRight ? (
+                    <XCircle className="h-4 w-4 shrink-0 text-destructive" />
+                  ) : null}
                 </button>
               );
             })}
@@ -349,17 +466,32 @@ export function VocabularyPracticePage() {
           {answered ? (
             <WordCard word={question.word} />
           ) : (
-            <RoundPanel questions={questions} answers={answers} index={index} score={score} />
+            <RoundPanel
+              questions={questions}
+              answers={answers}
+              index={index}
+              score={score}
+            />
           )}
         </div>
       </div>
 
       <div className="sticky bottom-3 z-10 flex items-center justify-between gap-3 rounded-xl border bg-card p-2">
-        <Button variant="outline" className="gap-1.5" disabled={index === 0} onClick={() => setIndex(index - 1)}>
+        <Button
+          variant="outline"
+          className="gap-1.5"
+          disabled={index === 0}
+          onClick={() => setIndex(index - 1)}
+        >
           <ArrowLeft className="h-4 w-4" />
           Previous
         </Button>
-        <Button ref={nextButton} className="gap-1.5" disabled={!answered} onClick={() => setIndex(index + 1)}>
+        <Button
+          ref={nextButton}
+          className="gap-1.5"
+          disabled={!answered}
+          onClick={() => setIndex(index + 1)}
+        >
           {last ? 'See the results' : 'Next word'}
           <ArrowRight className="h-4 w-4" />
         </Button>
