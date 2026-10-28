@@ -77,7 +77,7 @@ Tham khảo: [login-page.webp](../assets/design/login-page.webp).
 
 - Nền ngoài `bg-muted/70`; một **khung lớn** `max-w-6xl rounded-[2.5rem] border bg-card shadow-2xl`, chia đôi **bằng nhau** trên màn hình rộng.
 - **Chiều cao cố định (D189):** từ `lg` khung cao `min(46rem, 100dvh − 4rem)`, trang không cuộn; mọi trang auth dùng cùng kích thước, nội dung dài cuộn trong nửa form. Form phải vừa khung mà không cuộn: tiêu đề `pb-6`, các ô cách nhau `space-y-4`, chân form `mt-6`, vùng nội dung `py-6`. Form đặt mật khẩu mới rộng `max-w-md`, hai ô mật khẩu nằm cạnh nhau từ `sm`. Màn hình rộng nhưng thấp (≥1024px, cao ≤820px) dùng biến thể Tailwind `short:` để thu nhỏ khoảng cách, tiêu đề `1.75rem` và ô OTP `h-12`; nửa form ẩn thanh cuộn (`auth-scroll`). Trang mã xác thực gộp "Resend code" vào chân form.
-- **Nửa form:** nhãn logo dạng viên thuốc (SVG `LogoMark`) + `ThemeToggle` trên cùng; form `max-w-sm` căn giữa; tiêu đề căn giữa `text-3xl`; liên kết chân form kiểu "Have an account? Sign in".
+- **Nửa form:** nhãn logo dạng viên thuốc (`GraduationLogo`) + `ThemeToggle` trên cùng; form `max-w-sm` căn giữa; tiêu đề căn giữa `text-3xl`; liên kết chân form kiểu "Have an account? Sign in".
 - **Nửa hình (`AuthShowcase`):** tấm `bg-primary` phẳng bo `rounded-[2rem]`, lưới SVG mờ, vòng tròn lan quanh micro, các thẻ trắng nổi (bài học với sóng âm, avatar chữ cái, điểm Writing, dải tuần có ngọn lửa streak). Chỉ hiện từ `lg`.
 - **Đổi phía:** `/register` và trang mã xác thực đến từ đăng ký (`state.authSide = 'right'`, hằng `AUTH_SIDE_RIGHT`) đặt form bên phải; hai nửa trượt đổi chỗ 0,7s. Các trang khác form bên trái.
 - Thành phần trong `features/auth/components/AuthCard.jsx`: `AuthCard`, `AuthFields` (hiện lần lượt), `FieldLabel` (nhãn nhỏ thụt `px-5`, có chỗ cho liên kết bên phải), `FieldError`, `PasswordRule`, `AuthLink`, class `authInput`, `authButton`.
@@ -120,6 +120,7 @@ Dùng lại theo thứ tự: `src/components/shared` → `src/components/ui` (sh
 - Khung `viewBox="0 0 48 48"`, nhận `className` để đặt cỡ, luôn `aria-hidden="true"` (chữ bên cạnh đã nói nội dung).
 - Màu theo token: nét và mảng chính dùng `currentColor` (`fill-current`, `stroke-current`, độ đậm nhạt bằng `fillOpacity`/`strokeOpacity`), phần "giấy" và viền cắt của huy hiệu dùng `fill-card`/`stroke-card` (`paintOrder="stroke"`), nên hình tự đổi theo trạng thái và chế độ tối. Không dùng mã màu cứng hay gradient.
 - Phần dùng chung giữa các hình tách thành component nội bộ (ví dụ `ClipboardBase`).
+- Logo ứng dụng: `GraduationLogo` (mũ tốt nghiệp nhiều màu, nguồn `src/svg/graduation.svg` do người dùng cung cấp, giữ màu gốc). Dùng ở `Brand` (sidebar, header di động, `h-9`, không còn ô nền `primary`) và nhãn logo trang auth (`h-7`). Biểu tượng tab trình duyệt: `index.html` trỏ `<link rel="icon" type="image/svg+xml" href="/src/svg/graduation.svg">`, Vite đóng gói file này khi build.
 - Hiện có: `ClipboardAlert`, `ClipboardCheck`, `DoorExit` (hộp thoại nộp/rời bài). Ba hình này do người dùng cung cấp (2026-10-28, file `canh-bao.svg`, `complete.svg`, `doorexit.svg`, vẽ lại từ ảnh bằng VTracer), chuyển nguyên sang JSX với `viewBox="0 0 512 512"` và **giữ màu gốc**, là ngoại lệ của quy tắc màu theo token ở trên.
 
 ## 5. Chuyển động
@@ -165,7 +166,7 @@ Phiên bản thư viện: xem mục "Hiệu ứng giao diện" trong [technology
 ## 6. Icon và hình
 
 - **Icon chức năng** (sidebar, nút, trạng thái): `lucide-react`, cỡ `h-4 w-4` trong hàng và nút, `h-5 w-5` trong ô biểu tượng.
-- **Hình trang trí** (khung auth, minh họa): SVG tự vẽ trong component (ví dụ `MicGlyph`, `BookGlyph`, `PenGlyph`, `FlameGlyph`, `LogoMark`, lưới `Pattern`), nét `strokeWidth 1.8`, đầu nét tròn, màu `currentColor`, có `aria-hidden="true"`.
+- **Hình trang trí** (khung auth, minh họa): SVG tự vẽ trong component (ví dụ `MicGlyph`, `BookGlyph`, `PenGlyph`, `FlameGlyph`, lưới `Pattern`), nét `strokeWidth 1.8`, đầu nét tròn, màu `currentColor`, có `aria-hidden="true"`.
 - Avatar không có ảnh dùng chữ cái đầu trên nền tông nhạt (`Avatar`).
 
 ## 7. Ảnh tham khảo

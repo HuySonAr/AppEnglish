@@ -1,17 +1,8 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import { GraduationLogo } from '../components/illustrations';
 import { cn } from '../lib/utils.js';
 import { AuthShowcase } from './components/AuthShowcase.jsx';
 import { ThemeToggle } from './components/ThemeToggle.jsx';
-
-function LogoMark(props) {
-  return (
-    <svg viewBox="0 0 32 32" aria-hidden="true" {...props}>
-      <rect width="32" height="32" rx="10" className="fill-primary" />
-      <path d="M8 21.5 16 9l8 12.5" fill="none" stroke="white" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M11.2 17h9.6" fill="none" stroke="white" strokeWidth="2.6" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 export const AUTH_SIDE_RIGHT = 'right';
 const SLIDE = 'transition-transform duration-700 [transition-timing-function:cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-none';
@@ -25,7 +16,7 @@ export function AuthLayout() {
         <section className={cn('relative z-10 flex min-h-0 flex-col bg-card auth-scroll px-6 py-6 sm:px-10 sm:py-8 lg:overflow-y-auto short:py-5', SLIDE, swapped && 'lg:translate-x-full')}>
           <header className="flex items-center justify-between">
             <Link to="/login" className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 pr-4 text-base font-semibold tracking-tight transition-colors hover:bg-accent">
-              <LogoMark className="h-7 w-7" />
+              <GraduationLogo className="h-7 w-7" />
               AppEnglish
             </Link>
             <ThemeToggle />
