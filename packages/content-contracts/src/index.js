@@ -72,6 +72,8 @@ export const PRACTICE_LIMITS = Object.freeze({
   title: 120,
   topic: 60,
   readAloudText: 500,
+  readAloudTranslation: 400,
+  readAloudSentences: 20,
   instructions: 1500,
   sampleAnswer: 4000,
   keyPoints: 10,
@@ -137,6 +139,34 @@ export const PartOfSpeech = Object.freeze({
 });
 
 export const FILL_IN_BLANK = '___';
+
+const NEVER_ENDS = new Set(['mr.', 'mrs.', 'ms.', 'dr.', 'st.', 'jr.', 'sr.', 'prof.', 'e.g.', 'i.e.', 'etc.', 'vs.', 'no.', 'approx.', 'dept.', 'ave.']);
+const TIME_ENDS = new Set(['a.m.', 'p.m.']);
+
+export function splitSentences(text) {
+  const words = String(text || '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+  const sentences = [];
+  let current = [];
+  words.forEach((word, index) => {
+    current.push(word);
+    const next = words[index + 1];
+    if (!next || !/[.!?]["')\]]*$/.test(word)) return;
+    const bare = word.toLowerCase().replace(/["')\]]+$/, '');
+    if (NEVER_ENDS.has(bare) || /^[a-z]\.$/i.test(bare)) return;
+    if (!/^["'(\[]?[A-Z0-9]/.test(next)) return;
+    if (TIME_ENDS.has(bare) && /^\d/.test(next)) return;
+    sentences.push(current.join(' '));
+    current = [];
+  });
+  if (current.length) sentences.push(current.join(' '));
+  return sentences;
+}
+
+export function readAloudSentences(text) {
+  return String(text || '')
+    .split(/\n+/)
+    .flatMap((line) => splitSentences(line));
+}
 
 export function countBlanks(text) {
   return (text || '').split(FILL_IN_BLANK).length - 1;
@@ -359,7 +389,8 @@ export const ContentUsageKind = Object.freeze({
   MOCK_TEST: 'mockTest',
   LISTENING_EXERCISE: 'listeningExercise',
   SW_TEST: 'swTest',
-  SW_TEST_VERSION: 'swTestVersion'
+  SW_TEST_VERSION: 'swTestVersion',
+  PRACTICE_PROMPT: 'practicePrompt'
 });
 
 export const ORPHAN_MEDIA_GRACE_MS = 60 * 60 * 1000;

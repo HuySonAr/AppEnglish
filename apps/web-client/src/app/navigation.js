@@ -1,4 +1,4 @@
-import { Activity, AudioLines, BookOpen, Brain, Calculator, ClipboardCheck, ClipboardList, Dumbbell, FileText, Headphones, Home, Inbox, Layers, LayoutDashboard, Library, Mic, MicVocal, PenLine, Tags, Timer, TrendingUp, Trophy, Users } from 'lucide-react';
+import { Activity, BookOpen, Brain, Calculator, ClipboardCheck, ClipboardList, Dumbbell, FileText, Headphones, Home, Inbox, Layers, LayoutDashboard, Library, Mic, MicVocal, PenLine, Tags, Timer, TrendingUp, Trophy, Users } from 'lucide-react';
 import { Roles } from '../constants/auth.js';
 
 const withItems = (config) => Object.freeze({ ...config, items: config.sections.flatMap((section) => section.items) });
@@ -94,8 +94,7 @@ export const navigation = Object.freeze({
       {
         label: 'Prompts',
         items: [
-          { to: '/teacher/read-aloud', label: 'Read aloud', icon: AudioLines },
-          { to: '/teacher/open-speaking', label: 'Open speaking', icon: Mic },
+          { to: '/teacher/speaking', label: 'Speaking', icon: Mic },
           { to: '/teacher/writing', label: 'Writing', icon: PenLine },
         ],
       },

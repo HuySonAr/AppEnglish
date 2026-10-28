@@ -28,6 +28,12 @@ export function createSpeakingRepository(events) {
     async findSubmission(id) {
       return copy(tables.submissions.find((row) => row.id === id));
     },
+    async listAllSubmissions(accountId, promptId) {
+      return tables.submissions.filter((row) => row.accountId === accountId && row.promptId === promptId).map(copy);
+    },
+    async deleteSubmissions(ids) {
+      tables.submissions = tables.submissions.filter((row) => !ids.includes(row.id));
+    },
     async saveWithEvent(submission, event) {
       const index = tables.submissions.findIndex((row) => row.id === submission.id);
       if (index >= 0) tables.submissions[index] = structuredClone(submission);

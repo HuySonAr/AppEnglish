@@ -386,7 +386,7 @@ contract with a stand-in for auth-service. Results are in
 
 ## Content usage (D118, D128)
 
-`GetContentUsage` (gateway-internal, no learner route): `payloadJson = { kind, ids[] }` with `kind` in `ContentUsageKind` (`lesson`, `mockTest`, `listeningExercise`, and the version kinds of D128). Answers `{ kind, counts: { [id]: n }, total }` from `lesson_test_attempts` + `lesson_progress`, `mock_attempts`, `listening_results`. The gateway refuses to delete content whose total is above 0. Code in `apps/learning-service/src/usage/`.
+`GetContentUsage` (gateway-internal, no learner route): `payloadJson = { kind, ids[] }` with `kind` in `ContentUsageKind` (`lesson`, `mockTest`, `listeningExercise`, the version kinds of D128, and `practicePrompt` counting `practice_submissions.promptId`, D214). Answers `{ kind, counts: { [id]: n }, total }` from `lesson_test_attempts` + `lesson_progress`, `mock_attempts`, `listening_results`. The gateway refuses to delete content whose total is above 0. Code in `apps/learning-service/src/usage/`.
 
 ## Speaking read aloud (F12, D177)
 
@@ -460,3 +460,7 @@ Migration `1730000018000-add-ai-key-settings.js` adds `ai_keys.model` and `ai_ke
 ## Sentence progress (D206)
 
 Table `listening_line_results` (`accountId`, `exerciseId`, `segmentId` primary key, `status` `done`/`wrong`, `updatedAt`; migration `1730000024000`). `checkLine` records the status of the checked sentence (`done` at 100%) and returns `status`; `listPractice` adds `lines: { done, wrong }` per exercise and `getExercise` adds `lines: { [segmentId]: status }`. Repository: `listLines`, `recordLine` (raw SQL upsert).
+
+## Deleting speaking attempts (D211)
+
+`DeleteSpeakingSubmission` (`DELETE /learning/speaking/submissions/:id`, students, own submission) deletes the submission, or the whole set when it has a `setId`, after `lockOf`: `SCORING` or a review that is not `EXPIRED` throws 409 code 79 `SUBMISSION_LOCKED`. `ClearSpeakingPrompt` (`DELETE /learning/speaking/prompts/:id/submissions`) deletes every unlocked set or single answer of the learner for the prompt and returns `{ deleted: [ids], kept }`. Recordings not yet purged are deleted first through `DeleteLearnerRecordings`; any failure throws 503 and keeps the rows. Repository: `listAllSubmissions`, `deleteSubmissions`. Tests: `test/speaking.test.js`.

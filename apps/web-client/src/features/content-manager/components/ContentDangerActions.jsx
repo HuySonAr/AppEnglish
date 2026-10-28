@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { EyeOff, Trash2 } from 'lucide-react';
-import { ContentResponseCode } from '@appenglish/content-contracts';
+import { ContentResponseCode, ContentUsageKind } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { reviewReasonMessage } from '../lib/content-area.js';
@@ -21,6 +21,8 @@ export function deleteRefusalMessage(error) {
   if (reason) return reason;
   if (errorCode(error) !== ContentResponseCode.CONTENT_IN_USE) return getApiErrorMessage(error);
   const data = error?.response?.data?.data || {};
+  if (data.kind === ContentUsageKind.PRACTICE_PROMPT)
+    return `Learners still have ${data.results} attempt${data.results === 1 ? '' : 's'} on this prompt. It can be deleted once they have removed them.`;
   const results = data.results ? `${data.results} learner result${data.results === 1 ? '' : 's'}` : 'learner results';
   return `Learners already have ${results} for this. It cannot be deleted; unpublish it instead so nobody new can open it.`;
 }

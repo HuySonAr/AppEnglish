@@ -36,6 +36,14 @@ export class SpeakingRepository {
     });
   }
 
+  async listAllSubmissions(accountId, promptId) {
+    return (await this.repo()).find({ where: { accountId, promptId } });
+  }
+
+  async deleteSubmissions(ids) {
+    if (ids.length) await (await this.repo()).delete({ id: In(ids) });
+  }
+
   async findSubmission(id) {
     return (await this.repo()).findOne({ where: { id } });
   }

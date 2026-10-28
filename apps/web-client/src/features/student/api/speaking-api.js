@@ -18,3 +18,9 @@ export async function submitSpeaking(id, { blob, durationSeconds, questionIndex,
 export async function getSpeakingSubmission(id) {
   return (await httpClient.get(`/learning/speaking/submissions/${id}`)).data;
 }
+export async function deleteSpeakingSubmission(id) {
+  return (await httpClient.delete(`/learning/speaking/submissions/${id}`)).data;
+}
+export async function clearSpeakingPrompt(id) {
+  return (await httpClient.delete(`/learning/speaking/prompts/${id}/submissions`)).data;
+}

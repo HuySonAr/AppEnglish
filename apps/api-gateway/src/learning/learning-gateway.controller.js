@@ -174,6 +174,12 @@ export class LessonGatewayController extends LearningRelay {
   getSpeakingSubmission(id, request) {
     return this.forward('GetSpeakingSubmission', request, { id });
   }
+  deleteSpeakingSubmission(id, request) {
+    return this.forward('DeleteSpeakingSubmission', request, { id });
+  }
+  clearSpeakingPrompt(id, request) {
+    return this.forward('ClearSpeakingPrompt', request, { id });
+  }
   listWritingPrompts(request) {
     return this.forward('ListWritingPrompts', request);
   }
@@ -344,6 +350,8 @@ const lessonRoutes = [
   [Post, 'sw-tests/:id/attempt/discard', 'discardSwAttempt', [Param('id'), Body(), Req()]],
   [Get, 'sw-tests/:id/result', 'getSwResult', [Param('id'), Query(), Req()]],
   [Get, 'speaking/submissions/:id', 'getSpeakingSubmission', [Param('id'), Req()]],
+  [Delete, 'speaking/submissions/:id', 'deleteSpeakingSubmission', [Param('id'), Req()]],
+  [Delete, 'speaking/prompts/:id/submissions', 'clearSpeakingPrompt', [Param('id'), Req()]],
   [Get, 'writing/prompts', 'listWritingPrompts', [Req()]],
   [Get, 'writing/prompts/:id', 'getWritingPrompt', [Param('id'), Req()]],
   [Post, 'writing/prompts/:id/submissions', 'submitWriting', [Param('id'), Body(), Req()]],

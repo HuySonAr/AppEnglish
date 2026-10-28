@@ -403,6 +403,7 @@ export class ListeningService {
     this.assertStaff(actor);
     const since = new Date(this.now().getTime() - SPEECH_NOTICE_DAYS * 86400000);
     const jobs = (await this.repository.listJobsRequestedBy(actor.id, since, SPEECH_NOTICE_LIMIT))
+      .filter((job) => !job.practicePromptId)
       .map((job) => ({ job, view: this.timingJobView(job) }))
       .filter(({ view }) => view.status === AutoTimeStatus.DONE || view.status === AutoTimeStatus.FAILED);
     const ids = (field) => [...new Set(jobs.map(({ job }) => job[field]).filter(Boolean))];

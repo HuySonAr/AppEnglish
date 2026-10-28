@@ -29,7 +29,7 @@ Mỗi đề có: loại, mức (Basic (TOEIC dưới 110), Intermediate (110–1
 
 ## Dạng câu ETS (D195)
 
-Mỗi đề có dạng câu ETS và mức điểm TOEIC.
+Mỗi đề có dạng câu ETS và mức điểm TOEIC. Giáo viên soạn Speaking theo Part 1–5 (Part 1 đọc to, 2 tả tranh, 3 trả lời câu hỏi, 4 trả lời theo thông tin, 5 nêu quan điểm); đề tạo trong Part nào thì mang sẵn dạng câu của Part đó (D209).
 
 | Kỹ năng | Dạng | Nội dung đề | Thời gian luyện mặc định |
 |---|---|---|---|
@@ -77,6 +77,7 @@ Mỗi đề có dạng câu ETS và mức điểm TOEIC.
 4. Lỗi nặng: Content Manager gỡ đề ngay; đề gỡ không hiện cho học viên, bài đã nộp vẫn xem được.
 5. Mỗi bài nộp lưu bản chụp đề lúc làm (nội dung, bài mẫu, ý chính, cấp), nên sửa hay gỡ đề không đổi bài đã chấm.
 6. Chỉ người soạn sửa đề của mình; Content Manager không sửa nội dung đề.
+7. Xóa đề (D214): giáo viên xóa đề nháp chưa từng xuất bản và không đang chờ duyệt. Đề đã từng xuất bản chỉ Content Manager xóa, khi đề đã gỡ và không còn bài làm nào của học viên (học viên tự xóa được lịch sử, trừ bài đã gửi giáo viên); còn bài làm thì từ chối và báo số bài còn lại.
 
 Trạng thái một bản đề: `DRAFT` → `PENDING_REVIEW` → `PUBLISHED` hoặc `RETURNED` (về lại `DRAFT` khi giáo viên sửa). Gỡ đề: `UNPUBLISHED`.
 
@@ -84,7 +85,7 @@ Trạng thái một bản đề: `DRAFT` → `PENDING_REVIEW` → `PUBLISHED` ho
 
 - Practice có thêm hai mục: Speaking và Writing. Danh sách đề có tìm kiếm, lọc theo mức, chủ đề, loại, trạng thái (chưa làm, đã làm, điểm cao nhất) và phân trang.
 - Mặc định mở ở mức Intermediate; nếu mức đó chưa có đề thì mở mức đầu tiên có đề, không bao giờ mở một danh sách trống khi đã có đề (D183, D201).
-- Speaking – đọc to: nghe mẫu, ghi âm trên trình duyệt (tối đa 45 giây, D195), nộp.
+- Speaking – đọc to: nghe mẫu, ghi âm trên trình duyệt (tối đa 45 giây, D195), nộp. Màn hình luyện: "Read sample" phát từ câu đầu đến hết câu cuối theo mốc của giáo viên và tô sáng câu đang đọc (D215), "Bilingual" hiện bản dịch tiếng Việt từng câu do giáo viên soạn; lịch sử lượt làm ở trang riêng (D212).
 - Speaking – nói mở: đọc yêu cầu, ghi âm (tối đa theo đề, không quá 2 phút), nộp.
 - Writing: viết trong ô soạn có đếm từ; nộp khi đủ số từ tối thiểu và không quá số từ tối đa.
 - Trang đề có hai tab: làm bài (đề, chỗ làm, kết quả lần vừa nộp) và lịch sử (danh sách các lần nộp và kết quả từng lần) (D185).

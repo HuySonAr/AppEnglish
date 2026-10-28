@@ -294,7 +294,7 @@ export class ContentGatewayController {
     return this.practice('UnpublishPracticePrompt', request, { id });
   }
   deletePracticePrompt(id, request) {
-    return this.forward('DeletePracticePrompt', request, { id });
+    return this.deleteUnused('DeletePracticePrompt', ContentUsageKind.PRACTICE_PROMPT, id, request);
   }
   createPracticeMachineAudio(body, request) {
     return this.forward('CreatePracticeMachineAudio', request, { body });
@@ -331,6 +331,12 @@ export class ContentGatewayController {
   }
   publishListeningExercise(id, request) {
     return this.forward('PublishListeningExercise', request, { id });
+  }
+  requestPracticeAutoTime(id, request) {
+    return this.forward('RequestPracticeAutoTime', request, { id });
+  }
+  getPracticeAutoTime(id, request) {
+    return this.forward('GetPracticeAutoTime', request, { id });
   }
   requestListeningAutoTime(id, request) {
     return this.forward('RequestListeningAutoTime', request, { id });
@@ -450,6 +456,8 @@ const routes = [
   [Get, 'listening-exercises/:id', 'getListeningExercise', [Param('id'), Req()]],
   [Put, 'listening-exercises/:id/draft', 'saveListeningExerciseDraft', [Param('id'), Body(), Req()]],
   [Post, 'listening-exercises/:id/publish', 'publishListeningExercise', [Param('id'), Req()]],
+  [Post, 'practice-prompts/:id/auto-time', 'requestPracticeAutoTime', [Param('id'), Req()]],
+  [Get, 'practice-prompts/:id/auto-time', 'getPracticeAutoTime', [Param('id'), Req()]],
   [Post, 'listening-exercises/:id/auto-time', 'requestListeningAutoTime', [Param('id'), Req()]],
   [Get, 'listening-exercises/:id/auto-time', 'getListeningAutoTime', [Param('id'), Req()]],
   [Post, 'listening-exercises/:id/transcribe', 'requestListeningTranscribe', [Param('id'), Req()]],

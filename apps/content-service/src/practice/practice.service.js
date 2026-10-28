@@ -1,5 +1,5 @@
 import { AccountRole } from '@appenglish/auth-contracts';
-import { Accent, MediaSection, PracticePromptStatus as Status, VOICE_SPEEDS, VoiceSpeed, practiceLevelOf } from '@appenglish/content-contracts';
+import { Accent, MediaSection, PracticePromptKind, PracticePromptStatus as Status, SpeechTask, VOICE_SPEEDS, VoiceSpeed, practiceLevelOf } from '@appenglish/content-contracts';
 import { contentErrors } from '../content/content.errors.js';
 import { practiceContentSchemas, practiceIssues, practiceMediaIds } from './practice.schemas.js';
 
@@ -12,10 +12,11 @@ const iso = (value) => (value ? new Date(value).toISOString() : null);
 const RECORDING_EXTENSIONS = { 'audio/webm': '.webm', 'audio/ogg': '.ogg', 'audio/mp4': '.m4a', 'audio/mpeg': '.mp3', 'audio/wav': '.wav', 'audio/x-wav': '.wav' };
 
 export class PracticeService {
-  constructor(repository, contentService, { now = () => new Date() } = {}) {
+  constructor(repository, contentService, { now = () => new Date(), listening = null } = {}) {
     this.repository = repository;
     this.contentService = contentService;
     this.now = now;
+    this.listening = listening;
   }
 
   isTeacher(actor) {
@@ -74,6 +75,7 @@ export class PracticeService {
       status: latest?.status || Status.DRAFT,
       versionNumber: latest?.versionNumber || 1,
       publishedVersionNumber: published?.versionNumber || null,
+      everPublished: versions.some((version) => EVER_PUBLISHED.has(version.status)),
       submittedAt: iso(latest?.submittedAt),
       updatedAt: iso(latest?.updatedAt || prompt.updatedAt),
     };
@@ -178,15 +180,38 @@ export class PracticeService {
   }
 
   async deletePrompt(actor, promptId) {
-    this.assertTeacher(actor);
     const state = await this.load(actor, promptId);
-    if (state.versions.some((version) => EVER_PUBLISHED.has(version.status)))
-      throw contentErrors.practicePromptState('WAS_PUBLISHED', 'A prompt learners have seen cannot be deleted');
-    if (state.latest.status === Status.PENDING_REVIEW) throw contentErrors.practicePromptState('PENDING_REVIEW', 'Withdraw the prompt from review before deleting it');
+    const wasPublished = state.versions.some((version) => EVER_PUBLISHED.has(version.status));
+    if (this.isReviewer(actor)) {
+      if (!wasPublished) throw contentErrors.forbiddenRole();
+      if (state.published) throw contentErrors.practicePromptState('PUBLISHED', 'Unpublish the prompt before deleting it');
+    } else {
+      if (wasPublished) throw contentErrors.practicePromptState('WAS_PUBLISHED', 'Only a content manager can delete a prompt learners have seen');
+      if (state.latest.status === Status.PENDING_REVIEW) throw contentErrors.practicePromptState('PENDING_REVIEW', 'Withdraw the prompt from review before deleting it');
+    }
     const mediaIds = state.versions.flatMap((version) => practiceMediaIds(version.content));
     await this.repository.deletePrompt(promptId);
     const removed = await this.contentService.removeUnusedMedia(mediaIds);
     return { deleted: { id: promptId }, removedMedia: removed.length };
+  }
+
+  async requestAutoTime(actor, promptId) {
+    this.assertTeacher(actor);
+    const { prompt, latest } = await this.load(actor, promptId);
+    if (prompt.kind !== PracticePromptKind.READ_ALOUD) throw contentErrors.autoTimeInvalid('NO_LINES', 'Only read-aloud prompts are timed');
+    const content = latest?.content || {};
+    return this.listening.queueSpeechJob(actor, {
+      owner: { practicePromptId: promptId },
+      task: SpeechTask.ALIGN,
+      kind: prompt.kind,
+      audioMediaId: content.audioMediaId,
+      segments: (content.sentences || []).map((sentence) => ({ id: sentence.id, text: sentence.text })),
+    });
+  }
+
+  async getAutoTime(actor, promptId) {
+    await this.load(actor, promptId);
+    return this.listening.latestSpeechJob({ practicePromptId: promptId });
   }
 
   async createMachineAudio(actor, { text, speed = VoiceSpeed.NORMAL }) {

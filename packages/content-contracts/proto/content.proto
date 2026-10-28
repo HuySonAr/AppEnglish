@@ -95,6 +95,8 @@ service ContentService {
   rpc ListPublishedListeningExercises(ContentRequest) returns (ContentReply);
   rpc GetListeningPaper(ContentRequest) returns (ContentReply);
   rpc RequestListeningAutoTime(ContentRequest) returns (ContentReply);
+  rpc RequestPracticeAutoTime(ContentRequest) returns (ContentReply);
+  rpc GetPracticeAutoTime(ContentRequest) returns (ContentReply);
   rpc GetListeningAutoTime(ContentRequest) returns (ContentReply);
   rpc RequestListeningTranscribe(ContentRequest) returns (ContentReply);
   rpc ListContentVersions(ContentRequest) returns (ContentReply);

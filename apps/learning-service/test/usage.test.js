@@ -41,6 +41,8 @@ test('usage counts learner rows per content id across the tables of its kind', a
   }));
   assert.deepEqual(await repository.countUsage('lesson', [lessonA, lessonB]), { [lessonA]: 3, [lessonB]: 1 });
   assert.deepEqual(await repository.countUsage('mockTest', [lessonB]), { [lessonB]: 0 });
+  const practice = new UsageRepository(fakeDataSource({ practice_submissions: [{ promptId: lessonA }, { promptId: lessonA }] }));
+  assert.deepEqual(await practice.countUsage('practicePrompt', [lessonA, lessonB]), { [lessonA]: 2, [lessonB]: 0 });
 });
 
 test('a stored version counts the attempts taken on it (D128)', async () => {

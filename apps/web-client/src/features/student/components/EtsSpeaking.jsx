@@ -10,11 +10,11 @@ import { scoreTone, toneText } from '../lib/practice.js';
 import { cn } from '../../../lib/utils.js';
 import { ModelAudio } from './ModelAudio.jsx';
 import { Countdown } from './EtsTimer.jsx';
-import { NoRecorder, RecordingMeter, SpeakingRecorder } from './SpeakingRecorder.jsx';
+import { NoRecorder, RecordingMeter, SpeakingRecorder, StartButton } from './SpeakingRecorder.jsx';
 import { SpeakingResult } from './SpeakingResult.jsx';
 import { TeacherReviewPanel } from './TeacherReviewPanel.jsx';
 
-export function TimedSpeakingTask({ prompt, submitting, onSubmit }) {
+export function TimedSpeakingTask({ prompt, submitting, onSubmit, startLabel = 'Start' }) {
   const [phase, setPhase] = useState('idle');
   const prepare = prepareSeconds(prompt);
   const speak = recordSeconds(prompt, 0, true);
@@ -69,17 +69,7 @@ export function TimedSpeakingTask({ prompt, submitting, onSubmit }) {
       </div>
     );
 
-  return (
-    <div className="flex flex-col items-center gap-3 py-2 text-center">
-      <Button className="gap-2" onClick={begin}>
-        <Play className="h-4 w-4" />
-        Start
-      </Button>
-      <p className="text-sm text-muted-foreground">
-        Prepare {prepare} s, then speak {speak} s.
-      </p>
-    </div>
-  );
+  return <StartButton label={startLabel} hint={`Prepare ${prepare} seconds · speak ${speak} seconds`} onClick={begin} />;
 }
 
 export function QuestionAudio({ url, times, onFinished }) {
@@ -139,7 +129,7 @@ export function QuestionAudio({ url, times, onFinished }) {
   );
 }
 
-export function SpeakingSet({ prompt, timed, onSubmitAnswer, onFinished }) {
+export function SpeakingSet({ prompt, timed, onSubmitAnswer, onFinished, startLabel = 'Start' }) {
   const [setId, setSetId] = useState(() => newSetId());
   const [phase, setPhase] = useState('intro');
   const [index, setIndex] = useState(0);
@@ -192,15 +182,7 @@ export function SpeakingSet({ prompt, timed, onSubmitAnswer, onFinished }) {
   if (!canRecord()) return <NoRecorder />;
 
   if (phase === 'intro')
-    return (
-      <div className="flex flex-col items-center gap-3 py-2 text-center">
-        <Button className="gap-2" onClick={begin}>
-          <Play className="h-4 w-4" />
-          Start
-        </Button>
-        <p className="text-sm text-muted-foreground">{timed ? `Answer ${ETS_SET_QUESTIONS} questions in a row.` : `Record an answer to each of the ${ETS_SET_QUESTIONS} questions.`}</p>
-      </div>
-    );
+    return <StartButton label={startLabel} hint={timed ? `Answer ${ETS_SET_QUESTIONS} questions in a row` : `Record an answer to each of the ${ETS_SET_QUESTIONS} questions`} onClick={begin} />;
 
   if (phase === 'reading')
     return (

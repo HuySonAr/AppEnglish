@@ -136,3 +136,34 @@ test('with a Gemini key a read-aloud score waits for feedback, which never chang
   await service.applyResult({ submissionId: silent.id, status: 'DONE', result: { ...scored, heard: ' ' } });
   assert.equal((await service.getSubmission(student, silent.id)).submission.status, 'DONE');
 });
+
+test('a learner deletes an attempt or every attempt of a prompt, but not one being scored or sent to a teacher', async () => {
+  const { service, readAloud, repository } = harness();
+  const removed = [];
+  service.contentClient.deleteLearnerRecordings = async (recordings) => {
+    removed.push(...recordings.map((item) => item.storageId));
+    return { deleted: recordings.map((item) => item.storageId), failed: [] };
+  };
+  const sent = new Set();
+  service.reviews = { reviewFor: async (id) => (sent.has(id) ? { status: 'WAITING' } : null), quotaOf: async () => null };
+  const first = (await service.submit(student, readAloud.id, audio())).submission;
+  await assert.rejects(() => service.deleteSubmission(student, first.id), { code: 79, data: { reason: 'SCORING' } });
+  await service.applyResult({ submissionId: first.id, status: 'DONE', result: scored });
+  await assert.rejects(() => service.deleteSubmission(other, first.id), { code: 66 });
+  assert.deepEqual(await service.deleteSubmission(student, first.id), { deleted: [first.id] });
+  assert.deepEqual(removed, ['rec-1']);
+  assert.equal(repository.tables.submissions.length, 0);
+
+  const kept = (await service.submit(student, readAloud.id, audio())).submission;
+  const gone = (await service.submit(student, readAloud.id, audio())).submission;
+  for (const item of [kept, gone]) await service.applyResult({ submissionId: item.id, status: 'DONE', result: scored });
+  sent.add(kept.id);
+  await assert.rejects(() => service.deleteSubmission(student, kept.id), { data: { reason: 'SENT' } });
+  assert.deepEqual(await service.clearPrompt(student, readAloud.id), { deleted: [gone.id], kept: 1 });
+  assert.deepEqual(repository.tables.submissions.map((row) => row.id), [kept.id]);
+
+  service.contentClient.deleteLearnerRecordings = async (recordings) => ({ deleted: [], failed: recordings.map((item) => item.storageId) });
+  sent.clear();
+  await assert.rejects(() => service.deleteSubmission(student, kept.id), { status: 503 });
+  assert.equal(repository.tables.submissions.length, 1);
+});

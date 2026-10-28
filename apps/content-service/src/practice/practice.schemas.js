@@ -21,7 +21,27 @@ const common = {
 
 export const practiceContentSchemas = Object.freeze({
   [PracticePromptKind.READ_ALOUD]: z
-    .object({ ...common, etsTask: z.literal(EtsSpeakingTask.READ_ALOUD).default(EtsSpeakingTask.READ_ALOUD), text: text(PRACTICE_LIMITS.readAloudText), audioMediaId: mediaId })
+    .object({
+      ...common,
+      etsTask: z.literal(EtsSpeakingTask.READ_ALOUD).default(EtsSpeakingTask.READ_ALOUD),
+      text: text(PRACTICE_LIMITS.readAloudText),
+      translations: z.array(text(PRACTICE_LIMITS.readAloudTranslation)).max(PRACTICE_LIMITS.readAloudSentences).optional(),
+      sentences: z
+        .array(
+          z
+            .object({
+              id: z.string().uuid(),
+              text: text(PRACTICE_LIMITS.readAloudText),
+              translation: text(PRACTICE_LIMITS.readAloudTranslation).default(''),
+              start: z.number().min(0).max(3600).nullable().default(null),
+              end: z.number().min(0).max(3600).nullable().default(null),
+            })
+            .strict(),
+        )
+        .max(PRACTICE_LIMITS.readAloudSentences)
+        .default([]),
+      audioMediaId: mediaId,
+    })
     .strict(),
   [PracticePromptKind.OPEN_SPEAKING]: z
     .object({

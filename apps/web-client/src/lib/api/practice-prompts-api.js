@@ -42,3 +42,9 @@ export async function uploadPracticeMedia(kind, file) {
 export async function createPracticeMachineAudio(text, speed) {
   return (await httpClient.post(`${base}/machine-audio`, speed ? { text, speed } : { text }, { timeout: 60000 })).data;
 }
+export async function requestPracticeAutoTime(id) {
+  return (await httpClient.post(`${base}/${id}/auto-time`, {})).data;
+}
+export async function getPracticeAutoTime(id) {
+  return (await httpClient.get(`${base}/${id}/auto-time`)).data;
+}

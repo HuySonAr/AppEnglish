@@ -136,6 +136,7 @@ export const LearningResponseCode = Object.freeze({
   SW_TEST_NOT_FOUND: 76,
   SW_ATTEMPT_NOT_IN_PROGRESS: 77,
   SW_ANSWER_LOCKED: 78,
+  SUBMISSION_LOCKED: 79,
 });
 
 export const LearningQueue = Object.freeze({

@@ -6,9 +6,10 @@ import tempfile
 import urllib.parse
 import urllib.request
 
-from .alignment import align_lines, split_lines
+from .alignment import align_lines, split_lines, tokens
 
 MAX_AUDIO_BYTES = 200 * 1024 * 1024
+MIN_HEARD_SHARE = 0.5
 
 
 def download(url: str) -> str:
@@ -30,6 +31,11 @@ def download(url: str) -> str:
     return path
 
 
+def heard_enough(lines: list[dict], words: list[dict]) -> bool:
+    expected = sum(len(tokens(line["text"])) for line in lines)
+    return len(words) >= expected * MIN_HEARD_SHARE
+
+
 def process(request: dict, transcribe, fetch=download, cache=None) -> dict:
     job_id = request.get("jobId")
     task = request.get("task", "align")
@@ -39,11 +45,12 @@ def process(request: dict, transcribe, fetch=download, cache=None) -> dict:
         if task == "align" and not lines:
             raise ValueError("No lines to time")
         words = cache.get(request["audioUrl"]) if cache else None
+        if words is not None and not heard_enough(lines, words):
+            words = None
         if words is None:
             path = fetch(request["audioUrl"])
-            prompt = " ".join(line["text"] for line in lines)[:800]
-            words = transcribe(path, request.get("language") or "en", prompt)
-            if words and cache:
+            words = transcribe(path, request.get("language") or "en", "")
+            if words and cache and heard_enough(lines, words):
                 cache.put(request["audioUrl"], words)
         if not words:
             return {"jobId": job_id, "status": "FAILED", "error": "No speech was heard in the recording."}

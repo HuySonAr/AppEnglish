@@ -31,7 +31,8 @@ import { Textarea } from '../../../components/ui/textarea.jsx';
 import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { PracticePromptView } from '../../../components/shared/PracticePromptView.jsx';
-import { approvePracticePrompt, getPracticePrompt, returnPracticePrompt, unpublishPracticePrompt } from '../../../lib/api/practice-prompts-api.js';
+import { approvePracticePrompt, deletePracticePrompt, getPracticePrompt, returnPracticePrompt, unpublishPracticePrompt } from '../../../lib/api/practice-prompts-api.js';
+import { ContentDangerActions } from '../components/ContentDangerActions.jsx';
 import { changedFields, etsTaskLabel, etsTaskOf, kindLabels, reviewAreaOf, reviewListPath, reviewPromptPath, statusInfo } from '../../../lib/practice-prompts.js';
 import { Avatar } from '../../../components/shared/Avatar.jsx';
 
@@ -122,6 +123,16 @@ export function PracticeReviewDetailPage() {
               <EyeOff className="h-4 w-4" />
               Take down
             </Button>
+          ) : null}
+          {!published && prompt.everPublished ? (
+            <ContentDangerActions
+              noun="prompt"
+              busy={Boolean(busy)}
+              onDelete={async () => {
+                await deletePracticePrompt(promptId);
+                navigate(reviewListPath(reviewAreaOf(prompt.kind)), { replace: true });
+              }}
+            />
           ) : null}
           {pending ? (
             <>

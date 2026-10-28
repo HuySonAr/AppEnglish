@@ -44,6 +44,7 @@ export function reviewReasonMessage(reason) {
   if (reason === 'PENDING_REVIEW') return 'It is waiting for review. Withdraw it first to change it.';
   if (reason === 'NOT_IN_REVIEW') return 'It is no longer waiting for review. Reload to see its state.';
   if (reason === 'PUBLISHED_BEFORE') return 'It was published before, so only a Content Manager can delete it.';
+  if (reason === 'PUBLISHED') return 'Unpublish it first, then delete it.';
   return null;
 }
 

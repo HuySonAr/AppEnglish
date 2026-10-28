@@ -31,7 +31,7 @@ const PAGE_SIZE = 12;
 const DEFAULTS = { search: '', level: '', topic: 'all', kind: 'all', etsTask: 'all', tried: PracticeTried.ALL, sort: PracticeSort.LEVEL };
 const labelOf = (kindLabel, prompt) => etsTaskLabel(prompt.etsTask, typeof kindLabel === 'function' ? kindLabel(prompt) : kindLabel);
 
-export function PracticePromptList({ title, description, icon, kindLabel, basePath, load: loadPrompts, maxScore = 10, notice }) {
+export function PracticePromptList({ title, description, icon, kindLabel, basePath, load: loadPrompts, maxScore = 10, notice, select, crumbs, eyebrow = 'Practice', hideTaskType = false, banner = null }) {
   const [state, setState] = useState('loading');
   const [data, setData] = useState(null);
   const { filters, setFilters, setFilter, page, setPage } = useListState(DEFAULTS);
@@ -52,7 +52,7 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
     load();
   }, []);
 
-  const back = <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: title }]} />;
+  const back = <PageBreadcrumb items={crumbs || [{ label: 'Practice', to: '/student/practice' }, { label: title }]} />;
   if (state === 'loading') return <ListPageSkeleton />;
   if (state === 'error')
     return (
@@ -64,7 +64,7 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
       </div>
     );
 
-  const prompts = data.prompts;
+  const prompts = select ? data.prompts.filter(select) : data.prompts;
   const level = filters.level || defaultPracticeLevel(prompts);
   const levels = levelCounts(prompts);
   const shown = paginate(filterPracticePrompts(prompts, { ...filters, level }), page, PAGE_SIZE);
@@ -73,7 +73,7 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
   return (
     <section className="space-y-6">
       {back}
-      <PageHeader eyebrow="Practice" title={title} description={description} />
+      {banner || <PageHeader eyebrow={eyebrow} title={title} description={description} />}
       {notice ? notice(data) : null}
       {prompts.length === 0 ? (
         <EmptyState icon={icon} title="No prompts yet" description="Prompts will appear here when they are published." />
@@ -96,7 +96,7 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search by title or topic" />
             <FilterSelect label="Topic" value={filters.topic} onChange={setFilter('topic')} options={practiceTopicOptions(prompts)} className="w-full sm:w-40" />
-            <FilterSelect label="Task type" value={filters.etsTask} onChange={setFilter('etsTask')} options={etsTaskOptions(prompts)} className="w-full sm:w-52" />
+            {hideTaskType ? null : <FilterSelect label="Task type" value={filters.etsTask} onChange={setFilter('etsTask')} options={etsTaskOptions(prompts)} className="w-full sm:w-52" />}
             <FilterSelect label="Tried" value={filters.tried} onChange={setFilter('tried')} options={practiceTriedOptions} />
             <FilterSelect label="Sort by" value={filters.sort} onChange={setFilter('sort')} options={practiceSortOptions} />
           </div>

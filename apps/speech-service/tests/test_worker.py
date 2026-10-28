@@ -22,7 +22,7 @@ class ProcessTest(unittest.TestCase):
             ]
 
         answer = process(REQUEST, transcribe, fetch=lambda url: f"local:{url}")
-        self.assertEqual(calls, [("local:https://media.test/a.mp3", "en", "Hello there. Good morning.")])
+        self.assertEqual(calls, [("local:https://media.test/a.mp3", "en", "")])
         self.assertEqual(answer["jobId"], "job-1")
         self.assertEqual(answer["status"], "DONE")
         self.assertEqual([(line["id"], line["start"], line["end"]) for line in answer["lines"]], [("a", 0.9, 2.1), ("b", 2.4, 3.6)])
@@ -73,6 +73,27 @@ class ProcessTest(unittest.TestCase):
             self.assertEqual((first["status"], second["status"]), ("DONE", "DONE"))
             self.assertEqual(second["lines"][0]["start"], 0.9)
             self.assertIsNone(WordCache(directory, "base.en").get(REQUEST["audioUrl"]))
+
+    def test_a_transcript_that_misses_most_of_the_text_is_not_kept(self):
+        import tempfile
+
+        from speech_service.cache import WordCache
+
+        short = [{"word": " morning.", "start": 2.8, "end": 3.4}]
+        full = [
+            {"word": " Hello", "start": 1.0, "end": 1.4}, {"word": " there.", "start": 1.4, "end": 1.9},
+            {"word": " Good", "start": 2.5, "end": 2.8}, {"word": " morning.", "start": 2.8, "end": 3.4},
+        ]
+        heard = [short, full]
+
+        with tempfile.TemporaryDirectory() as directory:
+            cache = WordCache(directory, "small.en")
+            cache.put(REQUEST["audioUrl"], short)
+            first = process(REQUEST, lambda *args: heard.pop(0), fetch=lambda url: "x", cache=cache)
+            self.assertIsNone(first["lines"][0]["start"])
+            second = process(REQUEST, lambda *args: heard.pop(0), fetch=lambda url: "x", cache=cache)
+            self.assertEqual([line["start"] for line in second["lines"]], [0.9, 2.4])
+            self.assertEqual(cache.get(REQUEST["audioUrl"]), full)
 
 
 if __name__ == "__main__":

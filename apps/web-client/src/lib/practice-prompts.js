@@ -116,8 +116,8 @@ export const kindSlugs = {
   [PracticePromptKind.WRITING]: 'writing',
 };
 export const kindFromSlug = (slug) => Object.keys(kindSlugs).find((kind) => kindSlugs[kind] === slug) || null;
-export const teacherListPath = (kind) => `/teacher/${kindSlugs[kind]}`;
-export const teacherPromptPath = (kind, id) => `${teacherListPath(kind)}/${id}`;
+export const teacherListPath = (kind) => (kind === PracticePromptKind.WRITING ? `/teacher/${kindSlugs[kind]}` : '/teacher/speaking');
+export const teacherPromptPath = (kind, id) => `/teacher/${kindSlugs[kind]}/${id}`;
 
 export const ReviewArea = Object.freeze({ SPEAKING: 'speaking', WRITING: 'writing' });
 export const reviewAreaOf = (kind) => (kind === PracticePromptKind.WRITING ? ReviewArea.WRITING : ReviewArea.SPEAKING);
@@ -252,3 +252,14 @@ export function etsTaskOptions(prompts, allLabel = 'All task types') {
 }
 
 export const matchesEtsTask = (prompt, task = 'all') => task === 'all' || (prompt.etsTask || NO_ETS_TASK) === task;
+
+export const SPEAKING_PARTS = Object.freeze(
+  [
+    { number: 1, kind: PracticePromptKind.READ_ALOUD, etsTask: EtsSpeakingTask.READ_ALOUD, questions: 'Questions 1–2', firstQuestion: 1 },
+    { number: 2, kind: PracticePromptKind.OPEN_SPEAKING, etsTask: EtsSpeakingTask.DESCRIBE_PICTURE, questions: 'Questions 3–4', firstQuestion: 3 },
+    { number: 3, kind: PracticePromptKind.OPEN_SPEAKING, etsTask: EtsSpeakingTask.RESPOND_QUESTIONS, questions: 'Questions 5–7', firstQuestion: 5 },
+    { number: 4, kind: PracticePromptKind.OPEN_SPEAKING, etsTask: EtsSpeakingTask.RESPOND_INFO, questions: 'Questions 8–10', firstQuestion: 8 },
+    { number: 5, kind: PracticePromptKind.OPEN_SPEAKING, etsTask: EtsSpeakingTask.EXPRESS_OPINION, questions: 'Question 11', firstQuestion: 11 },
+  ].map((part) => Object.freeze({ ...part, title: etsTaskLabels[part.etsTask] })),
+);
+export const speakingPartOf = (prompt) => (prompt?.kind === PracticePromptKind.WRITING ? null : SPEAKING_PARTS.find((part) => part.etsTask === etsTaskOf(prompt.kind, prompt)) || null);

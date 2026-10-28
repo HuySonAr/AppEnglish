@@ -5,6 +5,7 @@ import {
   LessonTestAttemptEntity,
   ListeningResultEntity,
   MockAttemptEntity,
+  PracticeSubmissionEntity,
   SwAttemptEntity,
   UnitReviewAttemptEntity,
 } from '../database/learning.entities.js';
@@ -23,6 +24,7 @@ const sources = Object.freeze({
   [ContentUsageKind.LISTENING_EXERCISE]: [{ entity: ListeningResultEntity, column: 'exerciseId' }],
   [ContentUsageKind.SW_TEST]: [{ entity: SwAttemptEntity, column: 'testId' }],
   [ContentUsageKind.SW_TEST_VERSION]: [{ entity: SwAttemptEntity, column: 'versionId' }],
+  [ContentUsageKind.PRACTICE_PROMPT]: [{ entity: PracticeSubmissionEntity, column: 'promptId' }],
 });
 
 export class UsageRepository {

@@ -68,6 +68,8 @@ service LearningService {
   rpc GetSpeakingPrompt(LearningRequest) returns (LearningReply);
   rpc SubmitSpeaking(RecordingRequest) returns (LearningReply);
   rpc GetSpeakingSubmission(LearningRequest) returns (LearningReply);
+  rpc DeleteSpeakingSubmission(LearningRequest) returns (LearningReply);
+  rpc ClearSpeakingPrompt(LearningRequest) returns (LearningReply);
   rpc ListWritingPrompts(LearningRequest) returns (LearningReply);
   rpc GetWritingPrompt(LearningRequest) returns (LearningReply);
   rpc SubmitWriting(LearningRequest) returns (LearningReply);

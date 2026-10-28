@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
+import wordMemoryArt from '../../../svg/Word Memory.svg';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { Badge, Button } from '../../../components/ui';
@@ -151,10 +152,8 @@ function Header({ back, aside }) {
   return (
     <div className="space-y-2">
       {back}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <Brain className="h-5 w-5" />
-        </span>
+      <div className="flex flex-wrap items-center gap-2.5">
+        <img src={wordMemoryArt} alt="" aria-hidden="true" draggable="false" className="h-11 w-11 shrink-0 select-none rounded-lg border" />
         <div className="min-w-0 flex-1">
           <h1 className="sm:text-xl font-bold tracking-tight">Word memory</h1>
           <p className="hidden sm:block text-sm text-muted-foreground">

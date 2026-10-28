@@ -384,6 +384,7 @@ export const ListeningTimingJobEntity = new EntitySchema({
     id: { type: 'uuid', primary: true, generated: 'uuid' },
     exerciseId: { type: 'uuid', nullable: true },
     mockTestId: { type: 'uuid', nullable: true },
+    practicePromptId: { type: 'uuid', nullable: true },
     audioMediaId: { type: 'uuid', nullable: true },
     task: { type: 'varchar', length: 16, default: 'align' },
     status: { type: 'varchar', length: 16 },

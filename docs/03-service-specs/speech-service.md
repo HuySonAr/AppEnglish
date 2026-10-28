@@ -21,7 +21,7 @@ Code: `apps/speech-service/` (Python 3.12).
 |---|---|
 | `speech_service/alignment.py` | Pure: tokens (case, punctuation, contractions, numbers as digits), `align_lines` (difflib matching, line span from first to last matched word, small padding, no overlap) and `split_lines` for Transcribe: speech by sentence (ends, pauses of 1.2 s, at most 30 words); songs in phrases started by Whisper's capitals (a bare "I" after six words unless a joining word comes before, a long pause of 1.5 s), short phrases put together up to 14 words (D99) |
 | `speech_service/cache.py` | `WordCache`: the words heard, by recording address and model, as JSON files (D99) |
-| `speech_service/worker.py` | One request end to end: download (200 MB cap), transcribe with the transcript as prompt, align; answer DONE or FAILED |
+| `speech_service/worker.py` | One request end to end: download (200 MB cap), transcribe without a prompt, align; answer DONE or FAILED. Words that cover less than `MIN_HEARD_SHARE` (0.5) of the line tokens are neither cached nor reused from the cache (D214) |
 | `speech_service/transcriber.py` | faster-whisper, model loaded on the first request |
 | `speech_service/broker.py` | pika loop: one request at a time (prefetch 1), work in a thread while heartbeats go on, answer RUNNING then DONE/FAILED, ack after answering, reconnect on failure |
 | `speech_service/config.py` | Environment |

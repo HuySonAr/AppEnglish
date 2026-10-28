@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { ContentService } from '../src/content/content.service.js';
 import { PracticeService } from '../src/practice/practice.service.js';
 import { practiceContentSchemas, practiceReturnSchema } from '../src/practice/practice.schemas.js';
-import { practiceLevelOf } from '@appenglish/content-contracts';
+import { practiceLevelOf, splitSentences } from '@appenglish/content-contracts';
 import { admin, createMemoryRepository, manager, student, teacher } from './memory-repository.js';
 const otherTeacher = { id: '66666666-6666-4666-8666-666666666666', role: 'TEACHER' };
 
@@ -65,9 +65,12 @@ test('a teacher writes a prompt, sends it for review, and a content manager publ
   const second = await service.approvePrompt(manager, id);
   assert.deepEqual([second.prompt.publishedVersionNumber, second.published.content.title], [2, 'Ask for Friday off']);
 
+  await assert.rejects(() => service.deletePrompt(manager, id), { code: 41, data: { reason: 'PUBLISHED' } });
   const down = await service.unpublishPrompt(manager, id);
   assert.equal(down.published, null);
   await assert.rejects(() => service.deletePrompt(teacher, id), { code: 41, data: { reason: 'WAS_PUBLISHED' } });
+  assert.deepEqual(await service.deletePrompt(manager, id), { deleted: { id }, removedMedia: 0 });
+  assert.deepEqual((await service.listPrompts(manager)).prompts, []);
 });
 
 test('read-aloud and open speaking prompts check their own fields; a never-published prompt can be deleted with its files', async () => {
@@ -80,6 +83,7 @@ test('read-aloud and open speaking prompts check their own fields; a never-publi
   assert.equal(saved.media[audio].fileName, 'model.mp3');
   assert.equal((await service.submitPrompt(teacher, read.prompt.id)).prompt.status, 'PENDING_REVIEW');
   await service.withdrawPrompt(teacher, read.prompt.id);
+  await assert.rejects(() => service.deletePrompt(manager, read.prompt.id), { code: 40 });
   const removed = await service.deletePrompt(teacher, read.prompt.id);
   assert.deepEqual([removed.removedMedia, deleted], [1, ['model.mp3']]);
 
@@ -137,4 +141,14 @@ test('practice levels are TOEIC targets and old CEFR levels map onto them', () =
   assert.equal(schema.parse({ level: 'B1' }).level, 'intermediate');
   assert.equal(schema.parse({}).level, 'intermediate');
   assert.throws(() => schema.parse({ level: 'expert' }));
+});
+
+test('a read-aloud prompt keeps one Vietnamese translation per sentence', () => {
+  const schema = practiceContentSchemas.read_aloud;
+  const parsed = schema.parse({ text: 'Attention, please. The 10:15 train is late!', translations: ['Xin chú ý.', 'Chuyến tàu 10:15 bị trễ!'] });
+  assert.deepEqual(parsed.translations, ['Xin chú ý.', 'Chuyến tàu 10:15 bị trễ!']);
+  assert.equal(schema.parse({}).translations, undefined);
+  assert.deepEqual(schema.parse({}).sentences, []);
+  assert.throws(() => schema.parse({ translations: ['x'.repeat(401)] }));
+  assert.deepEqual(splitSentences('Attention, please. The 10:15 train is late! Thank you'), ['Attention, please.', 'The 10:15 train is late!', 'Thank you']);
 });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, CheckCircle2, Headphones, Image, Megaphone, MessagesSquare, Users } from 'lucide-react';
+import { ArrowRight, AudioLines, BarChart3, CheckCircle2, FileText, Headphones, Image, Megaphone, MessagesSquare, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LISTENING_TOEIC_KINDS } from '@appenglish/content-contracts';
 import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
@@ -10,7 +10,8 @@ import { cn } from '../../../lib/utils.js';
 import { Button } from '../../../components/ui';
 import { CountUp } from '../../../components/shared/CountUp.jsx';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
-import { PageHeader } from '../../../components/shared/PageHeader.jsx';
+import { PracticeBanner } from '../../../components/shared/PracticeBanner.jsx';
+import listeningArt from '../../../svg/Listening Education.svg';
 import { CardGridPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { ProgressBar } from '../../../components/shared/ProgressBar.jsx';
 import { RevealGroup, RevealItem } from '../../../components/shared/Reveal.jsx';
@@ -158,7 +159,19 @@ export function ListeningPracticePage() {
   return (
     <section className="space-y-6">
       {back}
-      <PageHeader eyebrow="Practice" title="TOEIC Listening" description="Pick a part of a test and fill in the words you hear." />
+      <PracticeBanner
+        eyebrow="Practice"
+        eyebrowIcon={Headphones}
+        title="TOEIC"
+        accent="Listening"
+        description="Pick a part of a test and fill in the words you hear."
+        image={listeningArt}
+        features={[
+          { icon: AudioLines, title: 'Real audio', note: 'Like the real test', tone: 'destructive' },
+          { icon: FileText, title: 'Varied topics', note: 'Daily practice' },
+          { icon: BarChart3, title: 'Improve skills', note: 'Step by step', tone: 'success' },
+        ]}
+      />
       {tests.length === 0 ? (
         <EmptyState icon={Headphones} title="No listening tests yet" description="Tests will appear here when they are published." />
       ) : (

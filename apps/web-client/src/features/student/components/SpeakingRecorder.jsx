@@ -7,6 +7,24 @@ export function NoRecorder() {
   return <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">This browser cannot record audio. Try Chrome, Edge or Safari.</p>;
 }
 
+export function StartButton({ label, hint, onClick, disabled = false }) {
+  return (
+    <div className="flex flex-col items-center gap-2 py-3 text-center">
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        aria-label={label}
+        className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm ring-8 ring-primary/15 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-primary/40 disabled:opacity-50"
+      >
+        <Mic className="h-8 w-8" />
+      </button>
+      <p className="mt-2 font-semibold">{label}</p>
+      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
+    </div>
+  );
+}
+
 export function RecordingMeter({ elapsed, limit, onStop, label = 'Recording' }) {
   return (
     <div className="space-y-4 text-center">
@@ -28,7 +46,7 @@ export function RecordingMeter({ elapsed, limit, onStop, label = 'Recording' }) 
   );
 }
 
-export function SpeakingRecorder({ maxSeconds, submitting = false, onSubmit, submitLabel = 'Submit' }) {
+export function SpeakingRecorder({ maxSeconds, submitting = false, onSubmit, submitLabel = 'Submit', startLabel = 'Start recording' }) {
   const recorder = useRecorder();
 
   if (!canRecord()) return <NoRecorder />;
@@ -52,17 +70,5 @@ export function SpeakingRecorder({ maxSeconds, submitting = false, onSubmit, sub
       </div>
     );
 
-  return (
-    <div className="flex flex-col items-center gap-3 py-2 text-center">
-      <button
-        type="button"
-        onClick={() => recorder.start(maxSeconds)}
-        aria-label="Start recording"
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      >
-        <Mic className="h-5 w-5" />
-      </button>
-      <p className="text-sm text-muted-foreground">Tap to record, up to {maxSeconds} seconds.</p>
-    </div>
-  );
+  return <StartButton label={startLabel} hint={`Speak up to ${maxSeconds} seconds`} onClick={() => recorder.start(maxSeconds)} />;
 }

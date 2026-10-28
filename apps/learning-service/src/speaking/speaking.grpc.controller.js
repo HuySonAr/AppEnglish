@@ -12,6 +12,8 @@ const rpcs = {
   ListSpeakingPrompts: { run: (service, { actor }) => service.listPrompts(actor) },
   GetSpeakingPrompt: { id: true, run: (service, { actor, id }) => service.getPrompt(actor, id) },
   GetSpeakingSubmission: { id: true, run: (service, { actor, id }) => service.getSubmission(actor, id) },
+  DeleteSpeakingSubmission: { id: true, run: (service, { actor, id }) => service.deleteSubmission(actor, id) },
+  ClearSpeakingPrompt: { id: true, run: (service, { actor, id }) => service.clearPrompt(actor, id) },
   SubmitSpeaking: {
     id: true,
     payload: submitSpeakingSchema,

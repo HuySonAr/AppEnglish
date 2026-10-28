@@ -68,6 +68,7 @@ export class SpeakingService {
     return {
       ...common,
       text: content.text,
+      sentences: (content.sentences || []).map(({ text, translation, start, end }) => ({ text, translation: translation || '', start, end })),
       audioUrl: (content.audioMediaId && media[content.audioMediaId]?.url) || null,
       maxSeconds: RECORDING_LIMITS.readAloudSeconds,
     };
@@ -306,6 +307,58 @@ export class SpeakingService {
       status: SubmissionStatus.DONE,
       result: { ...heard, gemini, ets: etsOf(submission.prompt.etsTask, etsScore), scores: openSpeakingScores({ criteria: gemini.criteria, fluency, pronunciation }) },
     });
+  }
+
+  async lockOf(submission) {
+    if (submission.status === SubmissionStatus.SCORING) return 'SCORING';
+    const review = this.reviews ? await this.reviews.reviewFor(submission.id) : null;
+    return review && review.status !== 'EXPIRED' ? 'SENT' : null;
+  }
+
+  async removeSubmissions(submissions) {
+    const recordings = submissions.filter((item) => item.recording && !item.recordingDeletedAt).map((item) => ({ storage: item.recording.storage, storageId: item.recording.storageId }));
+    if (recordings.length) {
+      const answer = await this.contentClient.deleteLearnerRecordings(recordings);
+      if (answer?.failed?.length) throw speakingErrors.recordingsKept();
+    }
+    await this.repository.deleteSubmissions(submissions.map((item) => item.id));
+    return submissions.map((item) => item.id);
+  }
+
+  setsOf(submissions) {
+    const groups = new Map();
+    for (const item of submissions) {
+      const key = item.prompt?.setId || item.id;
+      groups.set(key, [...(groups.get(key) || []), item]);
+    }
+    return [...groups.values()];
+  }
+
+  async deleteSubmission(actor, submissionId) {
+    this.assertStudent(actor);
+    const submission = await this.repository.findSubmission(submissionId);
+    if (!submission || submission.accountId !== actor.id || !READY_KINDS.has(submission.kind)) throw speakingErrors.submissionNotFound();
+    const setId = submission.prompt?.setId;
+    const group = setId ? (await this.repository.listAllSubmissions(actor.id, submission.promptId)).filter((item) => item.prompt?.setId === setId) : [submission];
+    for (const item of group) {
+      const lock = await this.lockOf(item);
+      if (lock === 'SCORING') throw speakingErrors.locked('SCORING', 'Wait until the answer is scored');
+      if (lock === 'SENT') throw speakingErrors.locked('SENT', 'An answer sent to a teacher cannot be deleted');
+    }
+    return { deleted: await this.removeSubmissions(group) };
+  }
+
+  async clearPrompt(actor, promptId) {
+    this.assertStudent(actor);
+    const all = (await this.repository.listAllSubmissions(actor.id, promptId)).filter((item) => READY_KINDS.has(item.kind));
+    const removable = [];
+    let kept = 0;
+    for (const group of this.setsOf(all)) {
+      const locks = await Promise.all(group.map((item) => this.lockOf(item)));
+      if (locks.some(Boolean)) kept += 1;
+      else removable.push(...group);
+    }
+    return { deleted: await this.removeSubmissions(removable), kept };
   }
 
   async purgeRecordings(limit = 100) {

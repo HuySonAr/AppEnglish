@@ -36,8 +36,9 @@ import {
   createPracticeMachineAudio,
   withdrawPracticePrompt,
 } from '../../../lib/api/practice-prompts-api.js';
-import { applyEtsTask, countWords, etsFields, etsTaskLabel, etsTaskOf, etsTasksOf, fieldLabel, kindFromSlug, kindLabels, levelLabel, levelScores, statusInfo, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
+import { applyEtsTask, countWords, etsFields, etsTaskLabel, etsTaskOf, etsTasksOf, fieldLabel, kindFromSlug, kindLabels, levelLabel, levelScores, speakingPartOf, statusInfo, teacherListPath, teacherPromptPath } from '../../../lib/practice-prompts.js';
 import { Choice, Field, MediaInput, QuestionRows, TaskTypePicker, VoiceSpeedPicker } from '../components/PromptEditorParts.jsx';
+import { SentenceTimes, syncSentences } from '../components/SentenceTimes.jsx';
 import { kindPages } from './TeacherPromptsPage.jsx';
 
 const EDITABLE = new Set([PracticePromptStatus.DRAFT, PracticePromptStatus.RETURNED, PracticePromptStatus.PUBLISHED, PracticePromptStatus.ARCHIVED, PracticePromptStatus.UNPUBLISHED]);
@@ -58,7 +59,8 @@ export function PromptEditorPage() {
 
   function apply(result) {
     setData(result);
-    setContent(result.latest.content);
+    const loaded = result.latest.content;
+    setContent(result.prompt.kind === PracticePromptKind.READ_ALOUD ? { ...loaded, sentences: syncSentences(loaded.text, loaded.sentences, loaded.translations) } : loaded);
     setMedia(result.media || {});
     setDirty(false);
   }
@@ -86,6 +88,11 @@ export function PromptEditorPage() {
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
   }, [dirty]);
+
+  const setText = (value) => {
+    setContent((current) => ({ ...current, text: value, sentences: syncSentences(value, current.sentences, current.translations) }));
+    setDirty(true);
+  };
 
   const set = (field) => (value) => {
     setContent((current) => ({ ...current, [field]: value }));
@@ -163,15 +170,17 @@ export function PromptEditorPage() {
   const pending = status === PracticePromptStatus.PENDING_REVIEW;
   const editable = EDITABLE.has(status);
   const canSubmit = status === PracticePromptStatus.DRAFT || status === PracticePromptStatus.RETURNED || (dirty && editable);
-  const neverPublished = !data.published && !data.prompt.publishedVersionNumber;
+  const neverPublished = !data.published && !data.prompt.everPublished;
   const words = countWords(content.sampleAnswer);
   const task = etsTaskOf(kind, content);
+  const part = speakingPartOf({ kind, etsTask: task });
+  const listPath = part ? `${teacherListPath(kind)}?part=${part.number}` : teacherListPath(kind);
   const fields = kind === PracticePromptKind.READ_ALOUD ? null : task ? etsFields(kind, task) : null;
   const show = (name) => (fields ? fields[name] : !['context', 'info', 'questions', 'keywords', 'email'].includes(name));
 
   return (
     <section className="space-y-5">
-      <PageBreadcrumb items={[{ label: kindPages[kind].title, to: teacherListPath(kind) }, { label: content.title || 'Untitled prompt' }]} />
+      <PageBreadcrumb items={[{ label: kind === PracticePromptKind.WRITING ? kindPages[kind].title : 'Speaking prompts', to: listPath }, part ? { label: `Part ${part.number}`, to: listPath } : null, { label: content.title || 'Untitled prompt' }]} />
 
       <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
         <div className="min-w-0 flex-1">
@@ -258,8 +267,9 @@ export function PromptEditorPage() {
           <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
             <TaskTypePicker tasks={etsTasksOf[kind]} current={task} fixed />
             <Field id="prompt-text" label="Text to read" hint={`${content.text.length}/${PRACTICE_LIMITS.readAloudText}`}>
-              <Textarea id="prompt-text" rows={4} maxLength={PRACTICE_LIMITS.readAloudText} value={content.text} onChange={(event) => set('text')(event.target.value)} />
+              <Textarea id="prompt-text" rows={5} maxLength={PRACTICE_LIMITS.readAloudText} placeholder={'One sentence per line.\nAttention, passengers on the 10:15 train.'} value={content.text} onChange={(event) => setText(event.target.value)} />
             </Field>
+            <p className="-mt-2 text-xs text-muted-foreground">Put each sentence on its own line; learners see one paragraph.</p>
             <MediaInput
               id="prompt-audio"
               label="Model audio (optional)"
@@ -280,10 +290,21 @@ export function PromptEditorPage() {
                 </Button>
               </div>
             ) : null}
+            <SentenceTimes
+              promptId={promptId}
+              sentences={content.sentences || []}
+              audioUrl={content.audioMediaId ? media[content.audioMediaId]?.url || null : null}
+              disabled={Boolean(busy) || pending}
+              onChange={set('sentences')}
+              beforeJob={async () => {
+                const saved = (await savePracticePromptDraft(promptId, content)).data;
+                if (saved?.prompt) apply(saved);
+              }}
+            />
           </div>
         ) : (
           <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
-            <TaskTypePicker tasks={etsTasksOf[kind]} current={task} onPick={pickTask} />
+            <TaskTypePicker tasks={etsTasksOf[kind]} current={task} onPick={pickTask} fixed={Boolean(data.latest.content.etsTask)} />
             <Field id="prompt-instructions" label={fields && !fields.instructionsRequired ? 'Instructions (optional)' : 'Instructions'} hint={`${content.instructions.length}/${PRACTICE_LIMITS.instructions}`}>
               <Textarea id="prompt-instructions" rows={4} maxLength={PRACTICE_LIMITS.instructions} value={content.instructions} onChange={(event) => set('instructions')(event.target.value)} />
             </Field>
@@ -424,7 +445,7 @@ export function PromptEditorPage() {
               disabled={Boolean(busy)}
               onClick={async (event) => {
                 event.preventDefault();
-                if (await run('delete', () => deletePracticePrompt(promptId), 'Prompt deleted')) navigate(teacherListPath(kind), { replace: true });
+                if (await run('delete', () => deletePracticePrompt(promptId), 'Prompt deleted')) navigate(listPath, { replace: true });
               }}
             >
               {busy === 'delete' ? 'Deleting…' : 'Delete prompt'}

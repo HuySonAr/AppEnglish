@@ -99,7 +99,7 @@ export function TaskTypePicker({ tasks, current, onPick, fixed = false }) {
         </p>
       ) : null}
       <div className="flex flex-wrap gap-1.5">
-        {tasks.map((task) =>
+        {(fixed ? tasks.filter((task) => !current || task === current) : tasks).map((task) =>
           fixed ? (
             <span key={task} className="inline-flex h-9 items-center rounded-md border border-primary bg-primary px-3 text-sm font-medium text-primary-foreground">
               {etsTaskLabels[task]}

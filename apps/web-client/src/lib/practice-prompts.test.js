@@ -20,6 +20,8 @@ import {
   reviewAreaOf,
   reviewPromptPath,
   statusCounts,
+  SPEAKING_PARTS,
+  speakingPartOf,
   teacherListPath,
   teacherPromptPath,
 } from './practice-prompts.js';
@@ -44,7 +46,8 @@ test('prompts are searched, filtered and counted by status', () => {
 });
 
 test('each prompt kind has its own teacher page', () => {
-  assert.equal(teacherListPath('open_speaking'), '/teacher/open-speaking');
+  assert.equal(teacherListPath('open_speaking'), '/teacher/speaking');
+  assert.equal(teacherListPath('writing'), '/teacher/writing');
   assert.equal(teacherPromptPath('read_aloud', 'p1'), '/teacher/read-aloud/p1');
   assert.deepEqual(['writing', 'read-aloud', 'nope'].map(kindFromSlug), ['writing', 'read_aloud', null]);
 });
@@ -110,4 +113,19 @@ test('task types can be filtered and issue paths are named', () => {
   assert.equal(fieldLabel('questions'), 'Questions');
   assert.equal(fieldLabel('keywords'), 'Words to use');
   assert.deepEqual(changedFields({ title: 'A', email: 'x' }, { title: 'A', email: 'y' }), ['Email']);
+});
+
+test('speaking prompts sort into Part 1 to Part 5 by their task type', () => {
+  assert.deepEqual(SPEAKING_PARTS.map((part) => [part.number, part.etsTask]), [
+    [1, 'read_aloud'],
+    [2, 'describe_picture'],
+    [3, 'respond_questions'],
+    [4, 'respond_info'],
+    [5, 'express_opinion'],
+  ]);
+  assert.equal(speakingPartOf({ kind: 'read_aloud' }).number, 1);
+  assert.equal(speakingPartOf({ kind: 'open_speaking', etsTask: 'respond_info' }).number, 4);
+  assert.equal(speakingPartOf({ kind: 'open_speaking', etsTask: null }), null);
+  assert.equal(speakingPartOf({ kind: 'writing', etsTask: 'respond_email' }), null);
+  assert.equal(teacherPromptPath('open_speaking', 'p1'), '/teacher/open-speaking/p1');
 });

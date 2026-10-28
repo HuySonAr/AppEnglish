@@ -1,32 +1,33 @@
 import { useEffect, useState } from 'react';
-import { KeyRound, Mic } from 'lucide-react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, History, KeyRound, Mic, Trash2 } from 'lucide-react';
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { etsTaskLabel, kindLabels, levelLabel } from '../../../lib/practice-prompts.js';
-import { PassageText } from '../../../components/shared/PassageText.jsx';
+import { etsTaskLabel, kindLabels, levelLabel, speakingPartOf } from '../../../lib/practice-prompts.js';
 import { Badge, Button } from '../../../components/ui';
 import { EmptyState } from '../../../components/shared/EmptyState.jsx';
 import { PageBreadcrumb } from '../../../components/shared/PageBreadcrumb.jsx';
 import { DetailPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
-import { getSpeakingPrompt, getSpeakingSubmission, submitSpeaking } from '../api/speaking-api.js';
+import { deleteSpeakingSubmission, getSpeakingPrompt, getSpeakingSubmission, submitSpeaking } from '../api/speaking-api.js';
+import { ConfirmDelete } from '../components/ConfirmDelete.jsx';
 import { SetResults, SpeakingSet, TimedSpeakingTask } from '../components/EtsSpeaking.jsx';
-import { ModelAudio } from '../components/ModelAudio.jsx';
-import { TimerSwitch, TimingBadges } from '../components/EtsTimer.jsx';
+import { TimerSwitch } from '../components/EtsTimer.jsx';
+import { SpeakingTaskCard } from '../components/SpeakingTaskCard.jsx';
 import { PracticeAttempts } from '../components/PracticeAttempts.jsx';
 import { useNoTimer } from '../hooks/use-no-timer.js';
 import { useSubmissionGroup } from '../hooks/use-submission-group.js';
 import { groupBySet, hasTimer, isSetPrompt } from '../lib/ets-practice.js';
-import { PracticeTabs } from '../components/PracticeTabs.jsx';
+import { PracticeHistory } from '../components/PracticeTabs.jsx';
 import { SpeakingRecorder } from '../components/SpeakingRecorder.jsx';
 import { SpeakingResult } from '../components/SpeakingResult.jsx';
 import { SpeakingResultScreen } from '../components/SpeakingResultScreen.jsx';
 import { useSubmission } from '../hooks/use-submission.js';
 
-export function SpeakingPromptPage() {
+export function SpeakingPromptPage({ view = 'practice' }) {
   const { promptId } = useParams();
   const [params, setParams] = useSearchParams();
   const [state, setState] = useState('loading');
+  const [deleting, setDeleting] = useState(null);
   const [data, setData] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [recorderKey, setRecorderKey] = useState(0);
@@ -36,19 +37,33 @@ export function SpeakingPromptPage() {
   const latestSet = useSubmissionGroup(getSpeakingSubmission, { onSettled: () => refresh().catch(() => {}) });
   const viewingSet = useSubmissionGroup(getSpeakingSubmission, { onSettled: () => refresh().catch(() => {}) });
   const [noTimer, setNoTimer] = useNoTimer();
-  const tab = params.get('tab') === 'history' ? 'history' : 'practice';
+  const historyView = view === 'history';
   const resultId = params.get('result');
   const resultSet = params.get('resultSet');
 
   function showSet(id, list) {
     const group = groupBySet(list || data?.submissions || []).find((item) => item.id === id);
     if (group) viewingSet.openMany(group.answers.map((answer) => answer.id));
-    setParams({ tab: 'history', set: id }, { replace: true });
+    setParams({ set: id }, { replace: true });
+  }
+
+  async function removeAttempt() {
+    try {
+      await deleteSpeakingSubmission(deleting.id);
+      notify({ title: deleting.set ? 'Attempt deleted (all three answers)' : 'Attempt deleted' });
+      viewing.setSubmission(null);
+      viewingSet.setItems([]);
+      setParams({}, { replace: true });
+      setDeleting(null);
+      await refresh();
+    } catch (error) {
+      notify({ title: 'Could not delete the attempt', description: getApiErrorMessage(error), variant: 'destructive' });
+    }
   }
 
   function showAttempt(id) {
     viewing.open(id);
-    setParams({ tab: 'history', submission: id }, { replace: true });
+    setParams({ submission: id }, { replace: true });
   }
 
   async function load() {
@@ -59,12 +74,13 @@ export function SpeakingPromptPage() {
       setState('ready');
       const wanted = params.get('submission');
       const wantedSet = params.get('set');
-      if (resultSet) {
+      if (historyView) {
+        if (wantedSet) showSet(wantedSet, result.submissions);
+        else if (wanted) showAttempt(wanted);
+      } else if (resultSet) {
         const group = groupBySet(result.submissions).find((item) => item.id === resultSet);
         if (group) latestSet.openMany(group.answers.map((answer) => answer.id));
       } else if (resultId) latest.open(resultId);
-      else if (wantedSet) showSet(wantedSet, result.submissions);
-      else if (wanted) showAttempt(wanted);
     } catch (error) {
       setState(error?.response?.status === 404 ? 'missing' : 'error');
       if (error?.response?.status !== 404) notify({ title: 'Could not load the prompt', description: getApiErrorMessage(error), variant: 'destructive' });
@@ -77,7 +93,7 @@ export function SpeakingPromptPage() {
     latestSet.setItems([]);
     viewingSet.setItems([]);
     load();
-  }, [promptId]);
+  }, [promptId, view]);
 
   async function submit(take) {
     setSubmitting(true);
@@ -114,7 +130,14 @@ export function SpeakingPromptPage() {
     setData((value) => ({ ...value, reviewQuota: quota }));
   }
 
-  const back = <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Speaking', to: '/student/practice/speaking' }, data ? { label: data.prompt.title } : null]} />;
+  const promptPart = data ? speakingPartOf(data.prompt) : null;
+  if (!historyView && params.get('tab') === 'history') {
+    const keep = new URLSearchParams(params);
+    keep.delete('tab');
+    return <Navigate to={`/student/practice/speaking/${promptId}/history${keep.toString() ? `?${keep}` : ''}`} replace />;
+  }
+  const partCrumb = promptPart ? { label: `Part ${promptPart.number}`, to: `/student/practice/speaking?part=${promptPart.number}` } : null;
+  const back = <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Speaking', to: '/student/practice/speaking' }, partCrumb, data ? { label: data.prompt.title } : null]} />;
   if (state === 'loading') return <DetailPageSkeleton />;
   if (state === 'missing')
     return (
@@ -155,50 +178,27 @@ export function SpeakingPromptPage() {
       </p>
     ) : null;
 
-  const label = 'text-xs font-semibold uppercase tracking-wider text-muted-foreground';
-  const task = setTask ? (
-    <div className="space-y-3">
-      <p className={label}>Task</p>
-      {prompt.instructions ? <p className="whitespace-pre-line leading-relaxed">{prompt.instructions}</p> : null}
-      {prompt.context ? <p className="whitespace-pre-line leading-relaxed sm:text-lg">{prompt.context}</p> : null}
-      {prompt.info ? (
-        <div className="rounded-lg border bg-background p-3 text-sm">
-          <PassageText text={prompt.info} />
-        </div>
-      ) : null}
-    </div>
-  ) : openTask ? (
-    <div className="space-y-3">
-      <p className={label}>Task</p>
-      <p className="whitespace-pre-line leading-relaxed sm:text-lg">{prompt.instructions}</p>
-      {prompt.imageUrl ? <img src={prompt.imageUrl} alt="" className="max-h-[50dvh] w-full rounded-lg border bg-background object-contain" /> : null}
-    </div>
-  ) : (
-    <div className="space-y-3">
-      <p className={label}>Read this aloud</p>
-      <p className="text-base leading-relaxed sm:text-lg sm:leading-relaxed">{prompt.text}</p>
-      {prompt.audioUrl ? <ModelAudio src={prompt.audioUrl} label="Model reading" /> : null}
-    </div>
-  );
-
+  const startLabel = setTask ? `Start ${promptPart?.questions?.toLowerCase() || 'the questions'}` : `Start question ${promptPart?.firstQuestion || 1}`;
   const practice = (
-    <div className="grid items-start gap-4 lg:h-[calc(100dvh-12rem-var(--player-h,0px))] lg:min-h-[24rem] lg:grid-cols-[minmax(0,1fr)_23rem]">
-      <div className="rounded-xl border bg-card p-4 sm:p-5 lg:max-h-full lg:overflow-y-auto">{task}</div>
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="rounded-xl border bg-card p-4 sm:p-5">
+        <SpeakingTaskCard prompt={prompt} part={promptPart} />
+      </div>
 
-      <div className="space-y-3 lg:max-h-full lg:overflow-y-auto lg:pr-1">
+      <div className="space-y-3 lg:sticky lg:top-20">
         <div className="space-y-3 rounded-xl border bg-card p-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className={label}>{setTask ? 'Your answers' : 'Your recording'}</p>
-            {hasTimer(prompt) ? <TimerSwitch checked={noTimer} onChange={setNoTimer} /> : null}
-          </div>
-          {timed ? <TimingBadges task={prompt.etsTask} /> : openTask && !setTask ? <p className="text-sm text-muted-foreground">Speak for up to {prompt.maxSeconds} seconds.</p> : null}
           {setTask ? (
-            <SpeakingSet key={`${recorderKey}-${timed}`} prompt={prompt} timed={timed} onSubmitAnswer={submitAnswer} onFinished={(setId) => setParams({ resultSet: setId })} />
+            <SpeakingSet key={`${recorderKey}-${timed}`} prompt={prompt} timed={timed} startLabel={startLabel} onSubmitAnswer={submitAnswer} onFinished={(setId) => setParams({ resultSet: setId })} />
           ) : timed ? (
-            <TimedSpeakingTask key={`${recorderKey}-timed`} prompt={prompt} submitting={submitting} onSubmit={submit} />
+            <TimedSpeakingTask key={`${recorderKey}-timed`} prompt={prompt} submitting={submitting} startLabel={startLabel} onSubmit={submit} />
           ) : (
-            <SpeakingRecorder key={recorderKey} maxSeconds={prompt.maxSeconds} submitting={submitting} onSubmit={submit} />
+            <SpeakingRecorder key={recorderKey} maxSeconds={prompt.maxSeconds} submitting={submitting} startLabel={startLabel} onSubmit={submit} />
           )}
+          {hasTimer(prompt) ? (
+            <div className="flex justify-center border-t pt-3">
+              <TimerSwitch checked={noTimer} onChange={setNoTimer} />
+            </div>
+          ) : null}
           {keyNote}
         </div>
       </div>
@@ -214,7 +214,15 @@ export function SpeakingPromptPage() {
       />
       <div className="space-y-4">
         {selectedSet && viewingSet.items.length ? (
-          <SetResults hasKey={hasKey} answers={[...viewingSet.items].sort(byQuestion)} questions={prompt.questions} quota={data.reviewQuota} onReview={reviewed} />
+          <>
+            <div className="flex justify-end">
+              <Button variant="outline" size="sm" className="gap-1.5 text-muted-foreground hover:text-destructive" onClick={() => setDeleting({ id: viewingSet.items[0].id, set: true })}>
+                <Trash2 className="h-4 w-4" />
+                Delete this attempt
+              </Button>
+            </div>
+            <SetResults hasKey={hasKey} answers={[...viewingSet.items].sort(byQuestion)} questions={prompt.questions} quota={data.reviewQuota} onReview={reviewed} />
+          </>
         ) : (
           <EmptyState icon={Mic} title="Choose an attempt" description="Pick one on the left to see its answers." />
         )}
@@ -222,17 +230,36 @@ export function SpeakingPromptPage() {
     </div>
   ) : null;
 
+  const historyPath = `/student/practice/speaking/${promptId}/history`;
+  const attemptCount = setTask ? groups.length : submissions.length;
   const toolbar = (
-    <div className="min-w-0 flex-1 space-y-1">
-      <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Speaking', to: '/student/practice/speaking' }]} />
-      <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-        <h1 className="truncate text-lg font-semibold tracking-tight">{prompt.title}</h1>
-        <Badge variant="secondary">{levelLabel(prompt.level)}</Badge>
-        <span className="truncate text-sm text-muted-foreground">
-          {etsTaskLabel(prompt.etsTask, kindLabels[prompt.kind])}
-          {prompt.topic ? ` · ${prompt.topic}` : ''}
-        </span>
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="min-w-0 flex-1 space-y-1">
+        <PageBreadcrumb items={[{ label: 'Practice', to: '/student/practice' }, { label: 'Speaking', to: '/student/practice/speaking' }, partCrumb, historyView ? { label: 'Your attempts' } : null]} />
+        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+          {historyView ? <h1 className="mr-1 text-lg font-semibold tracking-tight text-foreground">Your attempts</h1> : null}
+          <Badge variant="secondary">{levelLabel(prompt.level)}</Badge>
+          <span className="truncate">
+            {etsTaskLabel(prompt.etsTask, kindLabels[prompt.kind])}
+            {prompt.topic ? ` · ${prompt.topic}` : ''}
+          </span>
+        </div>
       </div>
+      {historyView ? (
+        <Button asChild variant="outline" size="sm" className="gap-1.5">
+          <Link to={`/student/practice/speaking/${promptId}`}>
+            <ArrowLeft className="h-4 w-4" />
+            Back to practice
+          </Link>
+        </Button>
+      ) : attemptCount ? (
+        <Button asChild variant="ghost" size="sm" className="gap-1.5">
+          <Link to={historyPath}>
+            <History className="h-4 w-4" />
+            Your attempts ({attemptCount})
+          </Link>
+        </Button>
+      ) : null}
     </div>
   );
 
@@ -249,29 +276,48 @@ export function SpeakingPromptPage() {
           quota={data.reviewQuota}
           onReview={reviewed}
           onAgain={practiseAgain}
-          listPath="/student/practice/speaking"
+          listPath={partCrumb?.to || "/student/practice/speaking"}
         />
       </section>
     );
   }
 
+  const confirm = (
+    <ConfirmDelete
+      open={Boolean(deleting)}
+      title="Delete this attempt?"
+      description={deleting?.set ? 'All three answers and their recordings are deleted for good.' : 'The answer, its score and its recording are deleted for good.'}
+      onOpenChange={(open) => !open && setDeleting(null)}
+      onConfirm={removeAttempt}
+    />
+  );
+
+  if (historyView)
+    return (
+      <section className="space-y-5">
+        {toolbar}
+        {submissions.length ? (
+          <PracticeHistory
+            submissions={submissions}
+            viewing={viewing.submission}
+            onOpen={showAttempt}
+            renderResult={(submission) => <SpeakingResult submission={submission} hasKey={hasKey} />}
+            quota={data.reviewQuota}
+            onReview={reviewed}
+            history={setHistory}
+            onDelete={(submission) => setDeleting({ id: submission.id, set: false })}
+          />
+        ) : (
+          <EmptyState icon={Mic} title="No attempts yet" description="Your attempts appear here after you submit." />
+        )}
+        {confirm}
+      </section>
+    );
+
   return (
-    <section className="pb-[var(--player-h,0px)]">
-      <PracticeTabs
-        tab={tab}
-        onTab={(next) => setParams(next === 'history' ? { tab: 'history', ...(setTask ? (selectedSet ? { set: selectedSet } : {}) : viewing.submission ? { submission: viewing.submission.id } : {}) } : {}, { replace: true })}
-        practiceLabel={openTask ? 'Speak' : 'Read aloud'}
-        history={setHistory}
-        historyCount={setTask ? groups.length : undefined}
-        practice={practice}
-        submissions={submissions}
-        viewing={viewing.submission}
-        onOpen={showAttempt}
-        renderResult={(submission) => <SpeakingResult submission={submission} hasKey={hasKey} />}
-        quota={data.reviewQuota}
-        onReview={reviewed}
-        toolbar={toolbar}
-      />
+    <section className="space-y-4 pb-[var(--player-h,0px)]">
+      {toolbar}
+      {practice}
     </section>
   );
 }

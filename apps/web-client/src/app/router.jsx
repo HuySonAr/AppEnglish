@@ -58,6 +58,8 @@ import { UnitReviewEditorPage } from '../features/content-manager/pages/UnitRevi
 import { UnitReviewPage } from '../features/student/pages/UnitReviewPage.jsx';
 import { TeacherDashboardPage } from '../features/teacher/pages/TeacherDashboardPage.jsx';
 import { TeacherPromptsPage } from '../features/teacher/pages/TeacherPromptsPage.jsx';
+import { TeacherSpeakingPage } from '../features/teacher/pages/TeacherSpeakingPage.jsx';
+import { SpeakingPartPage } from '../features/student/pages/SpeakingPartPage.jsx';
 import { PromptEditorPage } from '../features/teacher/pages/PromptEditorPage.jsx';
 import { TeacherReviewQueuePage } from '../features/teacher/pages/TeacherReviewQueuePage.jsx';
 import { TeacherReviewPage } from '../features/teacher/pages/TeacherReviewPage.jsx';
@@ -121,6 +123,8 @@ export function AppRouter() {
             <Route path="practice/vocabulary" element={<VocabularyPracticePage />} />
             <Route path="practice/listening" element={<ListeningPracticePage />} />
             <Route path="practice/speaking" element={<SpeakingPromptsPage />} />
+            <Route path="practice/speaking/parts/:part" element={<SpeakingPartPage />} />
+            <Route path="practice/speaking/:promptId/history" element={<SpeakingPromptPage view="history" />} />
             <Route path="practice/speaking/:promptId" element={<SpeakingPromptPage />} />
             <Route path="practice/writing" element={<WritingPromptsPage />} />
             <Route path="practice/writing/:promptId" element={<WritingPromptPage />} />
@@ -188,8 +192,9 @@ export function AppRouter() {
             <Route path="listening" element={<ListeningTestsPage />} />
             <Route path="listening/all" element={<ListeningExercisesPage />} />
             <Route path="listening/:exerciseId" element={<ListeningExerciseEditorPage />} />
-            <Route path="read-aloud" element={<TeacherPromptsPage key="read_aloud" kind="read_aloud" />} />
-            <Route path="open-speaking" element={<TeacherPromptsPage key="open_speaking" kind="open_speaking" />} />
+            <Route path="speaking" element={<TeacherSpeakingPage />} />
+            <Route path="read-aloud" element={<Navigate to="/teacher/speaking?part=1" replace />} />
+            <Route path="open-speaking" element={<Navigate to="/teacher/speaking?part=2" replace />} />
             <Route path="writing" element={<TeacherPromptsPage key="writing" kind="writing" />} />
             <Route path=":kindSlug/:promptId" element={<PromptEditorPage />} />
             <Route path="prompts" element={<Navigate to="/teacher" replace />} />

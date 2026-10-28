@@ -73,8 +73,8 @@ Module({
     },
     {
       provide: PracticeService,
-      useFactory: (dataSource, contentService) => new PracticeService(new PracticeRepository(dataSource), contentService),
-      inject: [CONTENT_DATA_SOURCE, ContentService],
+      useFactory: (dataSource, contentService, listening) => new PracticeService(new PracticeRepository(dataSource), contentService, { listening }),
+      inject: [CONTENT_DATA_SOURCE, ContentService, ListeningService],
     },
     {
       provide: SwTestService,

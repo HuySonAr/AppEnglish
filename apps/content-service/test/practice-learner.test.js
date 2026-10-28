@@ -1,7 +1,9 @@
 import test from 'node:test';
+import { readAloudSentences } from '@appenglish/content-contracts';
 import assert from 'node:assert/strict';
 import { ContentService } from '../src/content/content.service.js';
 import { PracticeService } from '../src/practice/practice.service.js';
+import { ListeningService } from '../src/listening/listening.service.js';
 import { learnerRecordingsSchema, practiceMachineAudioSchema } from '../src/practice/practice.schemas.js';
 import { createMemoryRepository, manager, student } from './memory-repository.js';
 import { validateMediaUpload } from '../src/media/media.validator.js';
@@ -24,7 +26,8 @@ function harness(pronunciationSource) {
     },
   };
   const content = new ContentService(repository, storage, pronunciationSource);
-  return { repository, uploads, deleted, service: new PracticeService(repository.practice, content) };
+  const listening = new ListeningService(repository.listening, content);
+  return { repository, uploads, deleted, listening, service: new PracticeService(repository.practice, content, { listening }) };
 }
 
 const readAloud = { title: 'Train times', level: 'A2', topic: 'Travel', text: 'The train leaves at nine.', audioMediaId: null };
@@ -104,4 +107,28 @@ test('machine audio reports an unavailable voice', async () => {
     },
   });
   await assert.rejects(() => service.createMachineAudio(teacher, { text: 'Hello' }), { status: 503 });
+});
+
+test('a teacher times each read-aloud sentence with Auto-time from the model audio', async () => {
+  const { service, repository, listening } = harness();
+  const { prompt } = await service.createPrompt(teacher, { kind: 'read_aloud' });
+  const audioId = '11111111-1111-4111-8111-111111111111';
+  repository.tables.media.push({ id: audioId, kind: 'audio', fileName: 'a.mp3', url: 'https://media.test/a.mp3', storage: 'r2' });
+  const sentences = [
+    { id: '22222222-2222-4222-8222-222222222222', text: 'The gate opens at 8 a.m.', translation: 'Cổng mở lúc 8 giờ sáng.', start: null, end: null },
+    { id: '33333333-3333-4333-8333-333333333333', text: 'Thank you.', translation: '', start: null, end: null },
+  ];
+  await assert.rejects(() => service.requestAutoTime(teacher, prompt.id), { data: { reason: 'NO_AUDIO' } });
+  await service.saveDraft(teacher, prompt.id, { content: { ...readAloud, text: 'The gate opens at 8 a.m.\nThank you.', audioMediaId: audioId, sentences } });
+  await assert.rejects(() => service.requestAutoTime(student, prompt.id), { code: 26 });
+  const { job } = await service.requestAutoTime(teacher, prompt.id);
+  assert.equal(job.status, 'QUEUED');
+  const event = repository.tables.contentEvents.at(-1);
+  assert.deepEqual(event.payload.lines, sentences.map(({ id, text }) => ({ id, text })));
+  assert.equal(event.payload.audioUrl, 'https://media.test/a.mp3');
+  await listening.applyAutoTimeResult({ jobId: job.id, status: 'DONE', lines: [{ id: sentences[0].id, start: 0.2, end: 2.1, matched: 1 }, { id: sentences[1].id, start: 2.6, end: 3.4, matched: 1 }] });
+  const done = (await service.getAutoTime(teacher, prompt.id)).job;
+  assert.deepEqual([done.status, done.lines.map((line) => [line.start, line.end])], ['DONE', [[0.2, 2.1], [2.6, 3.4]]]);
+  assert.equal((await listening.listNotifications(teacher)).notifications.some((item) => item.kind === 'SPEECH_JOB'), false);
+  assert.deepEqual(readAloudSentences('The gate opens at 8 a.m. and closes at 9 p.m.\nThank you. Bye!'), ['The gate opens at 8 a.m. and closes at 9 p.m.', 'Thank you.', 'Bye!']);
 });
