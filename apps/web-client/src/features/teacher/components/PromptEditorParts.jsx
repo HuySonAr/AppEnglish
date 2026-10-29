@@ -12,19 +12,29 @@ import { FileDropzone } from '../../../components/shared/FileDropzone.jsx';
 import { FileRow } from '../../../components/shared/FileRow.jsx';
 import { SentenceTimes, syncSentences } from './SentenceTimes.jsx';
 
-export function Field({ id, label, hint, children, className }) {
+export function Field({ id, label, hint, children, className, actions }) {
   return (
     <div className={cn('space-y-2', className)}>
-      <div className="flex items-baseline justify-between gap-2">
-        <Label htmlFor={id}>{label}</Label>
-        {hint ? <span className="text-xs tabular-nums text-muted-foreground">{hint}</span> : null}
-      </div>
+      {actions ? (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-baseline gap-2">
+            <Label htmlFor={id}>{label}</Label>
+            {hint ? <span className="text-xs tabular-nums text-muted-foreground">{hint}</span> : null}
+          </div>
+          {actions}
+        </div>
+      ) : (
+        <div className="flex items-baseline justify-between gap-2">
+          <Label htmlFor={id}>{label}</Label>
+          {hint ? <span className="text-xs tabular-nums text-muted-foreground">{hint}</span> : null}
+        </div>
+      )}
       {children}
     </div>
   );
 }
 
-export function Choice({ value, current, onPick, children }) {
+export function Choice({ value, current, onPick, children, className }) {
   return (
     <button
       type="button"
@@ -33,6 +43,7 @@ export function Choice({ value, current, onPick, children }) {
       className={cn(
         'h-9 rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         value === current ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
+        className,
       )}
     >
       {children}
@@ -101,20 +112,20 @@ export function EtsTiming({ task, className }) {
 export function TaskTypePicker({ tasks, current, onPick, fixed = false }) {
   return (
     <div className="space-y-2">
-      <Label>Task type</Label>
       {!current && !fixed ? (
         <p role="status" className="rounded-lg border border-warning/50 bg-warning/10 px-3 py-2 text-sm">
           Choose a task type.
         </p>
       ) : null}
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Label className="mr-1">Task type:</Label>
         {(fixed ? tasks.filter((task) => !current || task === current) : tasks).map((task) =>
           fixed ? (
-            <span key={task} className="inline-flex h-9 items-center rounded-md border border-primary bg-primary px-3 text-sm font-medium text-primary-foreground">
+            <span key={task} className="text-sm font-medium">
               {etsTaskLabels[task]}
             </span>
           ) : (
-            <Choice key={task} value={task} current={current} onPick={onPick}>
+            <Choice key={task} value={task} current={current} onPick={onPick} className="h-7 px-2.5 text-xs">
               {etsTaskLabels[task]}
             </Choice>
           ),
@@ -130,10 +141,10 @@ const VOICE_SPEED_LABELS = { [VoiceSpeed.SLOW]: 'Slow', [VoiceSpeed.NORMAL]: 'No
 export function VoiceSpeedPicker({ speed, onPick }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-sm text-muted-foreground">Machine voice speed</span>
-      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Machine voice speed">
+      <span className="text-xs text-muted-foreground">Machine voice speed</span>
+      <div className="flex flex-wrap gap-1" role="group" aria-label="Machine voice speed">
         {Object.values(VoiceSpeed).map((value) => (
-          <Choice key={value} value={value} current={speed} onPick={onPick}>
+          <Choice key={value} value={value} current={speed} onPick={onPick} className="h-7 px-2.5 text-xs">
             {VOICE_SPEED_LABELS[value]}
           </Choice>
         ))}

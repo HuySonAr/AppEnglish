@@ -2,12 +2,19 @@ import { Input, Label } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { useReadOnly } from './ReadOnly.jsx';
 
-export function TextField({ id, label, value, onChange, multiline = false, ...props }) {
+export function TextField({ id, label, value, onChange, multiline = false, actions = null, ...props }) {
   const readOnly = useReadOnly();
   const Field = multiline ? Textarea : Input;
   return (
     <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
+      {actions ? (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Label htmlFor={id}>{label}</Label>
+          {actions}
+        </div>
+      ) : (
+        <Label htmlFor={id}>{label}</Label>
+      )}
       <Field id={id} value={value} onChange={(event) => onChange(event.target.value)} {...props} readOnly={readOnly || props.readOnly} />
     </div>
   );

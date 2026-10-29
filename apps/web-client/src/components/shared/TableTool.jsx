@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
-import { Bold, FileUp, Italic, Plus, Table2, TableCellsMerge, TableCellsSplit, Trash2, X } from 'lucide-react';
-import { MERGE_MARK, TABLE_LIMITS, cellForEditing, parseDelimited, passageTables, tableRows, withTable } from '../../lib/passage.js';
+import { AlignCenter, AlignLeft, AlignRight, Bold, FileUp, Italic, PencilLine, Plus, Table2, TableCellsMerge, TableCellsSplit, Trash2, X } from 'lucide-react';
+import { MERGE_MARK, TABLE_LIMITS, alignLines, cellForEditing, parseDelimited, passageTables, tableRows, withTable, wrapSelection } from '../../lib/passage.js';
 import { notify } from '../../lib/notify.js';
 import { cn } from '../../lib/utils.js';
 import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui';
@@ -16,6 +16,10 @@ const tooBig = (rows) => rows.length > TABLE_LIMITS.rows || rows.some((row) => r
 const clamp = (rows) => rows.slice(0, TABLE_LIMITS.rows).map((row) => row.slice(0, TABLE_LIMITS.columns));
 const limitNote = () => notify({ title: `Only ${TABLE_LIMITS.rows} rows and ${TABLE_LIMITS.columns} columns are kept` });
 const isMerged = (cell) => cell.trim() === MERGE_MARK;
+const toolButton = 'h-7 gap-1 px-2 text-xs';
+const COLUMN_WIDTH = 160;
+const MIN_COLUMN_WIDTH = 80;
+const MAX_COLUMN_WIDTH = 480;
 const removeButton = 'mx-auto flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-30';
 
 function TableDialog({ editing, onClose, onSave, onRemove }) {
@@ -24,6 +28,37 @@ function TableDialog({ editing, onClose, onSave, onRemove }) {
   const fileRef = useRef(null);
   const cellRefs = useRef({});
   const columns = rows[0]?.length || 0;
+  const [widths, setWidths] = useState([]);
+  const widthOf = (column) => widths[column] ?? COLUMN_WIDTH;
+
+  function startResize(event, column) {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = widthOf(column);
+    const move = (moved) => {
+      const next = Math.min(MAX_COLUMN_WIDTH, Math.max(MIN_COLUMN_WIDTH, startWidth + moved.clientX - startX));
+      setWidths((current) => {
+        const copy = [...current];
+        copy[column] = next;
+        return copy;
+      });
+    };
+    const stop = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', stop);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', stop);
+  }
+
+  function addColumn() {
+    setRows((current) => current.map((cells) => [...cells, '']));
+  }
+
+  function removeColumn(column) {
+    setRows((current) => current.map((cells) => cells.filter((_, at) => at !== column)));
+    setWidths((current) => current.filter((_, at) => at !== column));
+  }
 
   const setCell = (row, column, value) => setRows((current) => current.map((cells, at) => (at === row ? cells.map((cell, index) => (index === column ? value : cell)) : cells)));
   const ownerOf = (row, column) => {
@@ -46,17 +81,15 @@ function TableDialog({ editing, onClose, onSave, onRemove }) {
     const { row, column } = focused;
     const element = cellRefs.current[`${row}-${column}`];
     const value = rows[row][column];
-    let start = element?.selectionStart ?? 0;
-    let end = element?.selectionEnd ?? value.length;
-    if (start === end) {
-      start = 0;
-      end = value.length;
-    }
-    const picked = value.slice(start, end);
-    if (!picked.trim()) return;
-    const marked = picked.length > mark.length * 2 && picked.startsWith(mark) && picked.endsWith(mark);
-    setCell(row, column, value.slice(0, start) + (marked ? picked.slice(mark.length, -mark.length) : `${mark}${picked}${mark}`) + value.slice(end));
-    requestAnimationFrame(() => element?.focus());
+    const start = element?.selectionStart ?? 0;
+    const end = element?.selectionEnd ?? value.length;
+    const wrapped = start === end ? wrapSelection(value, 0, value.length, mark) : wrapSelection(value, start, end, mark);
+    if (!wrapped) return;
+    setCell(row, column, wrapped.value);
+    requestAnimationFrame(() => {
+      element?.focus();
+      element?.setSelectionRange(wrapped.start, wrapped.end);
+    });
   }
 
   function mergeRight() {
@@ -121,10 +154,10 @@ function TableDialog({ editing, onClose, onSave, onRemove }) {
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>{editing.index === null ? 'Add a table' : `Edit table ${editing.index + 1}`}</DialogTitle>
-          <DialogDescription>Paste cells from Excel or Google Sheets, or upload a CSV file. The first row is the header.</DialogDescription>
+          <DialogDescription>Paste cells from Excel or Google Sheets, or upload a CSV file.</DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <input
             ref={fileRef}
             type="file"
@@ -135,32 +168,37 @@ function TableDialog({ editing, onClose, onSave, onRemove }) {
               event.target.value = '';
             }}
           />
-          <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => fileRef.current?.click()}>
-            <FileUp className="h-4 w-4" />
+          <Button type="button" variant="outline" size="sm" className="h-8 gap-1.5 px-2.5 text-xs" onClick={() => fileRef.current?.click()}>
+            <FileUp className="h-3.5 w-3.5" />
             Upload CSV
           </Button>
-          <Button type="button" variant="outline" size="sm" className="gap-1.5" disabled={rows.length >= TABLE_LIMITS.rows} onClick={() => setRows((current) => [...current, Array(columns).fill('')])}>
-            <Plus className="h-4 w-4" />
-            Row
-          </Button>
-          <Button type="button" variant="outline" size="sm" className="gap-1.5" disabled={columns >= TABLE_LIMITS.columns} onClick={() => setRows((current) => current.map((cells) => [...cells, '']))}>
-            <Plus className="h-4 w-4" />
-            Column
-          </Button>
-          <span className="mx-1 hidden h-5 w-px bg-border sm:block" />
-          <div className="flex items-center gap-1" role="group" aria-label="Format the selected cell">
-            <Button type="button" variant="ghost" size="icon" className="h-8 w-8" aria-label="Bold" title="Bold" disabled={!focused} onMouseDown={keepFocus} onClick={() => wrap('**')}>
-              <Bold className="h-4 w-4" />
+          <div className="flex items-center gap-0.5 rounded-md border p-0.5" role="group" aria-label="Rows and columns">
+            <Button type="button" variant="ghost" size="sm" className={toolButton} disabled={rows.length >= TABLE_LIMITS.rows} onClick={() => setRows((current) => [...current, Array(columns).fill('')])}>
+              <Plus className="h-3.5 w-3.5" />
+              Row
             </Button>
-            <Button type="button" variant="ghost" size="icon" className="h-8 w-8" aria-label="Italic" title="Italic" disabled={!focused} onMouseDown={keepFocus} onClick={() => wrap('*')}>
-              <Italic className="h-4 w-4" />
+            <Button type="button" variant="ghost" size="sm" className={toolButton} disabled={columns >= TABLE_LIMITS.columns} onClick={addColumn}>
+              <Plus className="h-3.5 w-3.5" />
+              Column
             </Button>
-            <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5" disabled={nextFree === null} onMouseDown={keepFocus} onClick={mergeRight}>
-              <TableCellsMerge className="h-4 w-4" />
+          </div>
+          <div className="flex items-center gap-0.5 rounded-md border p-0.5" role="group" aria-label="Format the selected cell">
+            <Button type="button" variant="ghost" size="sm" className={toolButton} disabled={!focused} onMouseDown={keepFocus} onClick={() => wrap('**')}>
+              <Bold className="h-3.5 w-3.5" />
+              Bold
+            </Button>
+            <Button type="button" variant="ghost" size="sm" className={toolButton} disabled={!focused} onMouseDown={keepFocus} onClick={() => wrap('*')}>
+              <Italic className="h-3.5 w-3.5" />
+              Italic
+            </Button>
+          </div>
+          <div className="flex items-center gap-0.5 rounded-md border p-0.5" role="group" aria-label="Merge cells">
+            <Button type="button" variant="ghost" size="sm" className={toolButton} disabled={nextFree === null} onMouseDown={keepFocus} onClick={mergeRight}>
+              <TableCellsMerge className="h-3.5 w-3.5" />
               Merge →
             </Button>
-            <Button type="button" variant="ghost" size="sm" className="h-8 gap-1.5" disabled={!canUnmerge} onMouseDown={keepFocus} onClick={unmerge}>
-              <TableCellsSplit className="h-4 w-4" />
+            <Button type="button" variant="ghost" size="sm" className={toolButton} disabled={!canUnmerge} onMouseDown={keepFocus} onClick={unmerge}>
+              <TableCellsSplit className="h-3.5 w-3.5" />
               Unmerge
             </Button>
           </div>
@@ -170,21 +208,35 @@ function TableDialog({ editing, onClose, onSave, onRemove }) {
         </div>
 
         <div className="max-h-[55dvh] overflow-auto rounded-lg border">
-          <table className="w-full border-collapse text-sm">
+          <table className="table-fixed border-collapse text-sm" style={{ width: 32 + Array.from({ length: columns }, (_, column) => widthOf(column)).reduce((sum, value) => sum + value, 0) }}>
+            <colgroup>
+              <col style={{ width: 32 }} />
+              {Array.from({ length: columns }, (_, column) => (
+                <col key={column} style={{ width: widthOf(column) }} />
+              ))}
+            </colgroup>
             <thead>
               <tr>
-                <th className="w-8 bg-muted/40" />
+                <th className="bg-muted/40" />
                 {Array.from({ length: columns }, (_, column) => (
-                  <th key={column} className="bg-muted/40 px-1 py-1">
+                  <th key={column} className="relative bg-muted/40 px-1 py-1">
                     <button
                       type="button"
                       className={removeButton}
                       aria-label={`Remove column ${column + 1}`}
                       disabled={columns <= 1}
-                      onClick={() => setRows((current) => current.map((cells) => cells.filter((_, at) => at !== column)))}
+                      onClick={() => removeColumn(column)}
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>
+                    <span
+                      role="separator"
+                      aria-orientation="vertical"
+                      aria-label={`Resize column ${column + 1}`}
+                      title="Drag to resize"
+                      className="absolute inset-y-0 -right-1 z-10 w-2 cursor-col-resize touch-none rounded transition-colors hover:bg-primary/40"
+                      onPointerDown={(event) => startResize(event, column)}
+                    />
                   </th>
                 ))}
               </tr>
@@ -192,7 +244,7 @@ function TableDialog({ editing, onClose, onSave, onRemove }) {
             <tbody>
               {rows.map((cells, row) => (
                 <tr key={row} className="border-t">
-                  <td className="w-8 px-1 text-center align-top pt-2">
+                  <td className="px-1 pt-2 text-center align-top">
                     <button type="button" className={removeButton} aria-label={`Remove row ${row + 1}`} disabled={rows.length <= 1} onClick={() => setRows((current) => current.filter((_, at) => at !== row))}>
                       <X className="h-3.5 w-3.5" />
                     </button>
@@ -202,7 +254,7 @@ function TableDialog({ editing, onClose, onSave, onRemove }) {
                       {isMerged(cell) ? (
                         <button
                           type="button"
-                          className="flex h-8 w-full min-w-[7rem] items-center justify-center rounded-md border border-dashed text-xs text-muted-foreground transition-colors hover:bg-muted/50"
+                          className="flex h-8 w-full items-center justify-center rounded-md border border-dashed text-xs text-muted-foreground transition-colors hover:bg-muted/50"
                           onClick={() => focusCell(row, ownerOf(row, column))}
                         >
                           ← merged
@@ -216,8 +268,8 @@ function TableDialog({ editing, onClose, onSave, onRemove }) {
                           rows={Math.max(1, cell.split('\n').length)}
                           placeholder={row === 0 ? 'Header' : ''}
                           className={cn(
-                            'min-h-8 min-w-[7rem] resize-none px-3 py-1.5 text-sm leading-5',
-                            row === 0 && 'bg-muted/50 font-semibold',
+                            'min-h-8 w-full resize-none px-3 py-1.5 text-sm leading-5',
+                            row === 0 && 'bg-muted/50',
                             focus?.row === row && focus?.column === column && 'ring-2 ring-ring ring-offset-0',
                             isMerged(cells[column + 1] ?? '') && 'border-primary/50',
                           )}
@@ -258,7 +310,7 @@ function TableDialog({ editing, onClose, onSave, onRemove }) {
   );
 }
 
-export function TableTool({ value, onChange, maxLength, disabled = false, className }) {
+export function TableTool({ value, onChange, maxLength, disabled = false, className, targetId }) {
   const [editing, setEditing] = useState(null);
   const tables = passageTables(value);
 
@@ -269,14 +321,68 @@ export function TableTool({ value, onChange, maxLength, disabled = false, classN
     setEditing(null);
   }
 
+  function align(side) {
+    const element = targetId ? document.getElementById(targetId) : null;
+    if (!element) return;
+    const aligned = alignLines(value, element.selectionStart, element.selectionEnd, side);
+    if (maxLength && aligned.value.length > maxLength) return notify({ title: 'The text is too long', description: `Keep it under ${maxLength} characters.`, variant: 'destructive' });
+    onChange(aligned.value);
+    requestAnimationFrame(() => {
+      element.focus();
+      element.setSelectionRange(aligned.start, aligned.end);
+    });
+  }
+
+  function format(mark) {
+    const element = targetId ? document.getElementById(targetId) : null;
+    if (!element) return;
+    const wrapped = wrapSelection(value, element.selectionStart, element.selectionEnd, mark);
+    if (!wrapped) return notify({ title: 'Select the words first' });
+    if (maxLength && wrapped.value.length > maxLength) return notify({ title: 'The text is too long', description: `Keep it under ${maxLength} characters.`, variant: 'destructive' });
+    onChange(wrapped.value);
+    requestAnimationFrame(() => {
+      element.focus();
+      element.setSelectionRange(wrapped.start, wrapped.end);
+    });
+  }
+
+  const keepFocus = (event) => event.preventDefault();
+
   return (
     <div className={cn('flex flex-wrap items-center gap-1.5', className)}>
-      <Button type="button" variant="outline" size="sm" className="h-8 gap-1.5" disabled={disabled} onClick={() => setEditing({ index: null, rows: blankRows(3, 3) })}>
-        <Table2 className="h-4 w-4" />
+      {targetId ? (
+        <div className="flex items-center gap-0.5 rounded-md border p-0.5" role="group" aria-label="Format the selected words">
+          <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs" title="Select words, then make them bold" disabled={disabled} onMouseDown={keepFocus} onClick={() => format('**')}>
+            <Bold className="h-3.5 w-3.5" />
+            Bold
+          </Button>
+          <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs" title="Select words, then make them italic" disabled={disabled} onMouseDown={keepFocus} onClick={() => format('*')}>
+            <Italic className="h-3.5 w-3.5" />
+            Italic
+          </Button>
+        </div>
+      ) : null}
+      {targetId ? (
+        <div className="flex items-center gap-0.5 rounded-md border p-0.5" role="group" aria-label="Align the selected lines">
+          {[
+            ['left', AlignLeft, 'Left'],
+            ['center', AlignCenter, 'Center'],
+            ['right', AlignRight, 'Right'],
+          ].map(([side, Icon, label]) => (
+            <Button key={side} type="button" variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs" title={`Align the selected lines ${side}`} disabled={disabled} onMouseDown={keepFocus} onClick={() => align(side)}>
+              <Icon className="h-3.5 w-3.5" />
+              {label}
+            </Button>
+          ))}
+        </div>
+      ) : null}
+      <Button type="button" variant="outline" size="sm" className="h-8 gap-1.5 px-2.5 text-xs" disabled={disabled} onClick={() => setEditing({ index: null, rows: blankRows(3, 3) })}>
+        <Table2 className="h-3.5 w-3.5" />
         Add table
       </Button>
       {tables.map((table, index) => (
-        <Button key={`${index}-${table.start}`} type="button" variant="ghost" size="sm" className="h-8" disabled={disabled} onClick={() => setEditing({ index, rows: table.rows })}>
+        <Button key={`${index}-${table.start}`} type="button" variant="outline" size="sm" className="h-8 gap-1.5 px-2.5 text-xs" disabled={disabled} onClick={() => setEditing({ index, rows: table.rows })}>
+          <PencilLine className="h-3.5 w-3.5" />
           Edit table {index + 1}
         </Button>
       ))}

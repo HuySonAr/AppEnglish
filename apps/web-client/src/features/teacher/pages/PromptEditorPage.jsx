@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AutoTimeTarget, ContentResponseCode, EtsSpeakingTask, PRACTICE_LEVELS, PRACTICE_LIMITS, PracticePromptKind, PracticePromptStatus, SAMPLE_READING_TASKS, VoiceSpeed } from '@appenglish/content-contracts';
 import { errorCode, getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
-import { hasTable } from '../../../lib/passage.js';
+import { needsPreview } from '../../../lib/passage.js';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -296,7 +296,7 @@ export function PromptEditorPage() {
             <Label>Level</Label>
             <div className="flex flex-wrap gap-1.5">
               {PRACTICE_LEVELS.map((level) => (
-                <Choice key={level} value={level} current={content.level} onPick={set('level')}>
+                <Choice key={level} value={level} current={content.level} onPick={set('level')} className="h-7 px-2.5 text-xs">
                   {levelLabel(level)} <span className="ml-1 font-normal opacity-75">{levelScores(level)}</span>
                 </Choice>
               ))}
@@ -370,11 +370,15 @@ export function PromptEditorPage() {
             ) : null}
             {show('info') ? (
               <div className="space-y-2">
-                <Field id="prompt-info" label="Information" hint={`${(content.info || '').length}/${PRACTICE_LIMITS.info}`}>
+                <Field
+                  id="prompt-info"
+                  label="Information"
+                  hint={`${(content.info || '').length}/${PRACTICE_LIMITS.info}`}
+                  actions={<TableTool targetId="prompt-info" value={content.info || ''} maxLength={PRACTICE_LIMITS.info} disabled={pending} onChange={set('info')} />}
+                >
                   <Textarea id="prompt-info" rows={8} maxLength={PRACTICE_LIMITS.info} className="font-mono text-sm" placeholder="| Time | Event |" value={content.info || ''} onChange={(event) => set('info')(event.target.value)} />
                 </Field>
-                <TableTool value={content.info || ''} maxLength={PRACTICE_LIMITS.info} disabled={pending} onChange={set('info')} />
-                {hasTable(content.info) ? (
+                {needsPreview(content.info) ? (
                   <div className="rounded-lg border bg-background p-3 text-sm">
                     <PassageText text={content.info} />
                   </div>

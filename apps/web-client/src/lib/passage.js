@@ -148,3 +148,50 @@ export function withTable(passage, index, rows) {
   const next = [...lines.slice(0, table.start), ...(text ? text.split('\n') : []), ...lines.slice(table.end + 1)].join('\n');
   return text ? next : next.replace(/\n{3,}/g, '\n\n').replace(/^\n+|\n+$/g, '');
 }
+
+export function wrapSelection(value, start, end, mark) {
+  const text = String(value || '');
+  let from = start;
+  let to = end;
+  while (from < to && /\s/.test(text[from])) from += 1;
+  while (to > from && /\s/.test(text[to - 1])) to -= 1;
+  if (from === to) return null;
+  const picked = text.slice(from, to);
+  const size = mark.length;
+  if (picked.length > size * 2 && picked.startsWith(mark) && picked.endsWith(mark)) {
+    const inner = picked.slice(size, -size);
+    return { value: text.slice(0, from) + inner + text.slice(to), start: from, end: from + inner.length };
+  }
+  if (text.slice(from - size, from) === mark && text.slice(to, to + size) === mark) {
+    return { value: text.slice(0, from - size) + picked + text.slice(to + size), start: from - size, end: to - size };
+  }
+  return { value: `${text.slice(0, from)}${mark}${picked}${mark}${text.slice(to)}`, start: from, end: to + size * 2 };
+}
+
+const ALIGNED = /^<(center|right)>([\s\S]*)<\/\1>$/i;
+
+export function lineAlign(line) {
+  const match = ALIGNED.exec(String(line ?? '').trim());
+  return match ? { align: match[1].toLowerCase(), text: match[2] } : { align: 'left', text: String(line ?? '') };
+}
+
+export function alignLines(value, start, end, align) {
+  const text = String(value || '');
+  const lineStart = start > 0 ? text.lastIndexOf('\n', start - 1) + 1 : 0;
+  const last = end > start && text[end - 1] === '\n' ? end - 1 : end;
+  const found = text.indexOf('\n', last);
+  const lineEnd = found === -1 ? text.length : found;
+  const middle = text
+    .slice(lineStart, lineEnd)
+    .split('\n')
+    .map((line) => {
+      if (!line.trim() || isRow(line)) return line;
+      const inner = lineAlign(line).text;
+      return align === 'left' ? inner : `<${align}>${inner}</${align}>`;
+    })
+    .join('\n');
+  return { value: text.slice(0, lineStart) + middle + text.slice(lineEnd), start: lineStart, end: lineStart + middle.length };
+}
+
+export const needsPreview = (passage) =>
+  hasTable(passage) || inlineParts(passage).some((part) => part.bold || part.italic) || String(passage || '').split('\n').some((line) => lineAlign(line).align !== 'left');

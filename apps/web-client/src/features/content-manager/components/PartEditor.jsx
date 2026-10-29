@@ -2,7 +2,7 @@ import { FILL_IN_BLANK, MediaKind, Skill } from '@appenglish/content-contracts';
 import { PassageText } from '../../../components/shared/PassageText.jsx';
 import { TableTool } from '../../../components/shared/TableTool.jsx';
 import { Badge } from '../../../components/ui';
-import { hasTable } from '../../../lib/passage.js';
+import { needsPreview } from '../../../lib/passage.js';
 import { LESSON_PASTE_PARTS, lessonPasteDescription, lessonPastePlan } from '../lib/lesson-paste.js';
 import { MediaField } from './MediaField.jsx';
 import { QuestionCard } from './MockPartEditor.jsx';
@@ -74,10 +74,10 @@ export function PartEditor({ spec, part, edit, media }) {
               multiline
               rows={8}
               onChange={(value) => edit([...base, 'passage'], value)}
+              actions={!spec.group.blanks && !readOnly ? <TableTool targetId={`${spec.key}-passage`} value={part.passage || ''} maxLength={10000} onChange={(value) => edit([...base, 'passage'], value)} /> : null}
             />
           ) : null}
-          {spec.group.passage && !spec.group.blanks && !readOnly ? <TableTool value={part.passage || ''} maxLength={10000} onChange={(value) => edit([...base, 'passage'], value)} /> : null}
-          {spec.group.passage && !spec.group.blanks && hasTable(part.passage) ? (
+          {spec.group.passage && !spec.group.blanks && needsPreview(part.passage) ? (
             <div className="space-y-2">
               <p className="text-sm font-medium">Preview</p>
               <div className="rounded-xl border bg-background p-4 leading-relaxed">

@@ -15,7 +15,7 @@ import { PassageText } from '../../../components/shared/PassageText.jsx';
 import { TableTool } from '../../../components/shared/TableTool.jsx';
 import { Badge, Button, Input, Label } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
-import { hasTable } from '../../../lib/passage.js';
+import { needsPreview } from '../../../lib/passage.js';
 import { cn } from '../../../lib/utils.js';
 import { withCorrectOption } from '../lib/lesson-draft.js';
 import { MOCK_FIRST_QUESTION_NUMBERS, MOCK_PASTE_PARTS, graphicQuestion, mockQuestionNumber, withGraphicOn, withGroup, withQuestion, withoutGroup, withoutQuestion } from '../lib/mock-draft.js';
@@ -286,10 +286,10 @@ export function MockPartEditor({ spec, part, edit, updatePart, media, speech, ta
                       multiline
                       rows={6}
                       onChange={(value) => edit([...path, 'passage'], value)}
+                      actions={!spec.group.blanks && !readOnly ? <TableTool targetId={`${spec.key}-${group.id}-passage`} value={group.passage || ''} maxLength={10000} onChange={(value) => edit([...path, 'passage'], value)} /> : null}
                     />
                   )}
-                  {!groupAudio && !spec.group.blanks && !readOnly ? <TableTool value={group.passage || ''} maxLength={10000} onChange={(value) => edit([...path, 'passage'], value)} /> : null}
-                  {!groupAudio && !spec.group.blanks && hasTable(group.passage) ? (
+                  {!groupAudio && !spec.group.blanks && needsPreview(group.passage) ? (
                     <div className="space-y-2">
                       <p className="text-sm font-medium">Preview</p>
                       <div className="rounded-xl border bg-card p-4 leading-relaxed">
