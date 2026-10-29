@@ -248,7 +248,7 @@ export function ListeningExerciseEditorPage() {
       ) : null}
 
       {canAuthor ? (
-        <form onSubmit={onSaveDetails} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm lg:flex-row lg:items-end">
+        <form onSubmit={onSaveDetails} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs lg:flex-row lg:items-end">
           <div className="min-w-0 flex-1 space-y-2">
             <Label htmlFor="listening-title">Title</Label>
             <Input id="listening-title" value={details.title} maxLength={200} readOnly={locked} onChange={(event) => setDetails({ ...details, title: event.target.value })} />
@@ -265,7 +265,7 @@ export function ListeningExerciseEditorPage() {
                     disabled={locked}
                     onClick={() => setDetails({ ...details, testId: test.id })}
                     className={cn(
-                      'h-10 rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      'h-10 rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                       details.testId === test.id ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
                     )}
                   >
@@ -287,7 +287,7 @@ export function ListeningExerciseEditorPage() {
                   disabled={locked}
                   onClick={() => setDetails({ ...details, level })}
                   className={cn(
-                    'h-10 min-w-11 rounded-md border px-2.5 text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'h-10 min-w-11 rounded-md border px-2.5 text-sm font-medium tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                     details.level === level ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
                   )}
                 >
@@ -339,7 +339,7 @@ export function ListeningExerciseEditorPage() {
             />
           }
           aside={
-            <div className="space-y-3 rounded-xl border bg-card p-4 shadow-sm">
+            <div className="space-y-3 rounded-xl border bg-card p-4 shadow-xs">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Source</p>
               <div className="space-y-1.5">
                 <Label htmlFor="listening-source-name" className="text-xs">

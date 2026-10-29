@@ -34,8 +34,8 @@ export function SpeedSwitch({ speed, onChange }) {
           aria-pressed={speed === value}
           onClick={() => onChange(value)}
           className={cn(
-            'rounded-full px-3 py-1 text-xs font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-            speed === value ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+            'rounded-full px-3 py-1 text-xs font-medium tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+            speed === value ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground',
           )}
         >
           {value}×
@@ -74,7 +74,7 @@ export function RecordingPanel({ audioRef, audioUrl, held, follow = false, sente
   }
 
   return (
-    <aside className={cn('space-y-4 rounded-2xl border bg-card p-4 shadow-sm', className)}>
+    <aside className={cn('space-y-4 rounded-2xl border bg-card p-4 shadow-xs', className)}>
       <audio ref={audioRef} src={audioUrl || undefined} preload="metadata" className="hidden" />
       {showSentence && sentence ? (
         <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export function RecordingPanel({ audioRef, audioUrl, held, follow = false, sente
           aria-label={playing ? 'Pause' : held ? 'Play the sentence' : 'Play'}
           disabled={!audioUrl}
           onClick={toggle}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md transition-transform hover:scale-105 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
         >
           {playing ? <Pause className="h-6 w-6" /> : <Play className="ml-0.5 h-6 w-6" />}
         </button>
@@ -124,7 +124,7 @@ export function RecordingPanel({ audioRef, audioUrl, held, follow = false, sente
                   title={`Sentence ${index + 1}`}
                   onClick={() => onSelect(index, { play: true })}
                   className={cn(
-                    'absolute inset-y-0 rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'absolute inset-y-0 rounded-sm transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                     index === current && (held || follow) ? 'bg-primary' : doneIds.has(item.id) ? 'bg-success' : 'bg-muted-foreground/25 hover:bg-muted-foreground/45',
                   )}
                   style={{ left: `${(item.start / total) * 100}%`, width: `max(3px, calc(${((item.end - item.start) / total) * 100}% - 2px))` }}

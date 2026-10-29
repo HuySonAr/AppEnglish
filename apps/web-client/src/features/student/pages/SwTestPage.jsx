@@ -33,7 +33,7 @@ function AttemptHistory({ testId, section, history, total, page, onPage }) {
           <li key={attempt.attemptNumber}>
             <Link
               to={swResultPath(testId, section, attempt.attemptNumber)}
-              className="group flex items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+              className="group flex items-center gap-3 px-4 py-3 text-sm transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             >
               <span className="min-w-0 flex-1">
                 <span className="block font-medium">Attempt {attempt.attemptNumber}</span>

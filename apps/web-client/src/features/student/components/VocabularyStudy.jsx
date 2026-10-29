@@ -31,7 +31,7 @@ export function Pronunciation({ label, url }) {
       aria-label={`Play the ${name} pronunciation (${label})`}
       aria-pressed={playing}
       onClick={play}
-      className="group inline-flex items-center gap-1.5 rounded-full border bg-card p-1 shadow-sm transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:gap-2 md:pl-1.5"
+      className="group inline-flex items-center gap-1.5 rounded-full border bg-card p-1 shadow-xs transition-colors hover:border-primary/40 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring md:gap-2 md:pl-1.5"
     >
       <span className="flex h-4 w-4 shrink-0 overflow-hidden rounded-full ring-1 ring-border sm:h-5 sm:w-5">
         <Flag title="" className="h-full w-full" />
@@ -51,7 +51,7 @@ export function VocabularyStudy({ vocabulary, done, busy, onAllOpened }) {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="h-2 min-w-[8rem] flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+        <div className="h-2 min-w-32 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
           <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${vocabulary.length ? (opened.size * 100) / vocabulary.length : 0}%` }} />
         </div>
         <span className="text-sm tabular-nums text-muted-foreground">

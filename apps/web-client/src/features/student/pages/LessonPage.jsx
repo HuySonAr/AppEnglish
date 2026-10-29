@@ -33,7 +33,7 @@ const stepHints = {
 
 function StepCard({ title, hint, children }) {
   return (
-    <div className="space-y-5 rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
+    <div className="space-y-5 rounded-2xl border bg-card p-5 shadow-xs sm:p-6">
       <div>
         <h2 className="text-lg font-semibold">{title}</h2>
         {hint ? <p className="text-sm text-muted-foreground">{hint}</p> : null}
@@ -108,7 +108,7 @@ export function LessonPage() {
     <section className="space-y-6">
       <PageBreadcrumb items={[{ label: 'Lessons', to: back.to, state: back.state }, { label: `Unit ${lesson.unitNumber}: ${lesson.unitTitle}` }, { label: `Lesson ${lesson.number}: ${lesson.title}` }]} />
 
-      <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
+      <div className="flex flex-wrap items-end justify-between gap-4 rounded-2xl border bg-card p-5 shadow-xs sm:p-6">
         <div className="min-w-0 space-y-1.5">
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">
             Unit {lesson.unitNumber} · {lesson.unitTitle}

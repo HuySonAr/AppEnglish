@@ -95,7 +95,7 @@ function StatusPill({ account, onStatus, onAction }) {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className={cn('inline-flex h-7 max-w-full items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring', look.className)}
+          className={cn('inline-flex h-7 max-w-full items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring', look.className)}
           aria-label={`Status: ${statusLabels[account.status]}. Change`}
         >
           <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -141,11 +141,11 @@ function AccountRow({ account, isMe, onRole, onStatus, onAction }) {
   const actions = availableActions(account);
   return (
     <TableRow className="group">
-      <TableCell className="min-w-[14rem]">
+      <TableCell className="min-w-56">
         <div className="flex items-center gap-3">
           <Avatar account={account} size="md" />
           <div className="min-w-0">
-            <Link to={`/admin/accounts/${account.id}`} className="block truncate font-medium hover:underline focus-visible:outline-none focus-visible:underline">
+            <Link to={`/admin/accounts/${account.id}`} className="block truncate font-medium hover:underline focus-visible:outline-hidden focus-visible:underline">
               {displayNameOf(account)}
               {isMe ? <span className="ml-2 text-xs font-normal text-muted-foreground">you</span> : null}
             </Link>
@@ -272,7 +272,7 @@ export function AdminAccountsPage() {
       />
 
       <div className="space-y-3">
-        <div className="flex flex-col gap-3 rounded-xl border bg-card p-3 shadow-sm lg:flex-row lg:items-center">
+        <div className="flex flex-col gap-3 rounded-xl border bg-card p-3 shadow-xs lg:flex-row lg:items-center">
           <SearchField label="Search accounts" placeholder="Search by email or name…" value={filters.search} onChange={setFilter('search')} />
           <FilterSelect
             label="Role"
@@ -295,7 +295,7 @@ export function AdminAccountsPage() {
           </label>
         </div>
 
-        <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+        <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
           {list.state === 'loading' ? (
             <RowsSkeleton />
           ) : list.state === 'error' ? (

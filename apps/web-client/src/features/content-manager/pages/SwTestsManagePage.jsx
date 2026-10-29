@@ -76,7 +76,7 @@ function SwTestRow({ test, base, linkState }) {
       <Link
         to={`${base}/sw-tests/${test.id}`}
         state={linkState(test.id)}
-        className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <MicVocal className="h-5 w-5" />
@@ -145,7 +145,7 @@ export function SwTestsManagePage() {
         <EmptyState icon={MicVocal} title="No S&W tests yet" description={canAuthor ? 'Create the first test.' : 'Tests appear here once teachers create them.'} action={newButton} />
       ) : (
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
             <div className="space-y-3 border-b bg-muted/30 p-3">
               <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
                 <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search by title" />

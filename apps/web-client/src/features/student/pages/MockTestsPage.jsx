@@ -74,8 +74,8 @@ export function MockTestsPage() {
         <EmptyState icon={FileText} title="No mock tests yet" description="Mock tests will appear here when they are published." />
       ) : (
         <>
-          <div className="flex flex-wrap items-center gap-4 rounded-2xl border bg-card p-5 shadow-sm">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+          <div className="flex flex-wrap items-center gap-4 rounded-2xl border bg-card p-5 shadow-xs">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xs">
               <Sparkles className="h-6 w-6" />
             </span>
             <div className="min-w-0 flex-1">
@@ -117,12 +117,12 @@ export function MockTestsPage() {
                 <Link
                   to={`/student/mock-tests/${mockTest.id}`}
                   className={cn(
-                    'group flex h-full flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'group flex h-full flex-col overflow-hidden rounded-2xl border bg-card shadow-xs transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                     mockTest.recommended && 'border-primary/50 ring-1 ring-primary/30',
                   )}
                 >
                   <div className="flex items-center gap-3 border-b bg-card px-5 py-4">
-                    <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+                    <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs">
                       <span className="text-[10px] font-medium uppercase leading-none opacity-80">Level</span>
                       <span className="text-lg font-bold leading-none">{mockTest.level}</span>
                     </span>

@@ -115,7 +115,7 @@ export function GlideCards({ items, label, className }) {
           key={item.to}
           to={item.to}
           data-glide-card=""
-          className="flex min-w-0 flex-col items-start gap-3 rounded-2xl border bg-background p-3.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex min-w-0 flex-col items-start gap-3 rounded-2xl border bg-background p-3.5 text-left focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         >
           <span className={cn('flex h-9 w-9 items-center justify-center rounded-xl', tones[item.tone || 'primary'])}>
             <item.icon className="h-4 w-4" />

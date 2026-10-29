@@ -88,7 +88,7 @@ export function ScoreConversionPage() {
         title="Estimated score table"
         description="Set how raw results turn into estimated TOEIC scores."
       />
-      <form onSubmit={onSubmit} className="space-y-5 rounded-xl border bg-card p-6 shadow-sm">
+      <form onSubmit={onSubmit} className="space-y-5 rounded-xl border bg-card p-6 shadow-xs">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-semibold">Listening & Reading</h2>

@@ -50,7 +50,7 @@ export function FileDropzone({ id, accept, maxBytes, kindLabel, onFile, disabled
       onDragLeave={() => setOver(false)}
       onDrop={onDrop}
       className={cn(
-        'flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
         compact ? 'gap-2 px-4 py-4' : 'gap-3 px-6 py-8',
         over ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:border-primary/60 hover:bg-muted/50',
         disabled && 'cursor-not-allowed opacity-60',
@@ -82,7 +82,7 @@ export function FileDropzone({ id, accept, maxBytes, kindLabel, onFile, disabled
       </span>
       <Button
         type="button"
-        variant={over ? 'default' : 'outline'}
+        variant={over ? 'default' : 'outline-solid'}
         size="sm"
         disabled={disabled}
         onClick={(event) => {

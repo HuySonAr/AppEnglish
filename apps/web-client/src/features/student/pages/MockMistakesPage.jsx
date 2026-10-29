@@ -26,7 +26,7 @@ function StreakDots({ streak, need }) {
 function QuestionView({ question, result, busy, onPick, need }) {
   const chosen = result?.optionId;
   return (
-    <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+    <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs">
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <Badge variant="secondary">
           Part {question.partNumber} · {question.partTitle}
@@ -59,7 +59,7 @@ function QuestionView({ question, result, busy, onPick, need }) {
               disabled={Boolean(result) || busy}
               onClick={() => onPick(option.id)}
               className={cn(
-                'flex items-center gap-3 rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default',
+                'flex items-center gap-3 rounded-xl border p-3 text-left text-sm transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default',
                 !result && 'hover:bg-accent',
                 right && 'border-success bg-success/10',
                 wrong && 'border-destructive bg-destructive/10',
@@ -161,7 +161,7 @@ export function MockMistakesPage() {
       return (
         <section className="space-y-6">
           {breadcrumb}
-          <div className="flex flex-col items-center gap-3 rounded-2xl border bg-card p-8 text-center shadow-sm">
+          <div className="flex flex-col items-center gap-3 rounded-2xl border bg-card p-8 text-center shadow-xs">
             <Trophy className="h-10 w-10 text-success" />
             <p className="text-xl font-bold">Review finished</p>
             <p className="text-muted-foreground tabular-nums">
@@ -224,7 +224,7 @@ export function MockMistakesPage() {
           }
         />
       ) : (
-        <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+        <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs">
           <p className="text-3xl font-bold tabular-nums">
             {summary.total}
             <span className="text-base font-medium text-muted-foreground"> question{summary.total === 1 ? '' : 's'} to review</span>
@@ -237,7 +237,7 @@ export function MockMistakesPage() {
                 aria-pressed={part === item.key}
                 onClick={() => setPart(item.key)}
                 className={cn(
-                  'flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  'flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                   part === item.key ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
                 )}
               >

@@ -58,7 +58,7 @@ export function TestProgression({ attempts, progression, passPercent }) {
   const latest = attempts.at(-1);
   const previous = attempts.at(-2);
   return (
-    <div className="space-y-4 rounded-xl border bg-card p-5 shadow-sm">
+    <div className="space-y-4 rounded-xl border bg-card p-5 shadow-xs">
       <div className={cn('flex items-center gap-3 rounded-lg border px-4 py-3', trend.tone)}>
         <trend.icon className="h-6 w-6 shrink-0" />
         <div>

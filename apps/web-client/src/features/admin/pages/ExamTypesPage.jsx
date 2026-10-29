@@ -80,7 +80,7 @@ export function ExamTypesPage() {
         description="The kinds of exam the content is written for. Mock tests are grouped and filtered by exam type."
       />
 
-      <form onSubmit={onAdd} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-end">
+      <form onSubmit={onAdd} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs sm:flex-row sm:items-end">
         <div className="flex-1 space-y-2">
           <Label htmlFor="exam-type-name">New exam type</Label>
           <Input id="exam-type-name" placeholder="e.g. IELTS" value={name} maxLength={100} onChange={(event) => setName(event.target.value)} />
@@ -103,12 +103,12 @@ export function ExamTypesPage() {
           Try again
         </Button>
       ) : (
-        <ul className="divide-y overflow-hidden rounded-xl border bg-card shadow-sm">
+        <ul className="divide-y overflow-hidden rounded-xl border bg-card shadow-xs">
           {examTypes.map((examType) => (
             <li key={examType.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
               <span className="min-w-0 flex-1 truncate font-medium">{examType.name}</span>
               <span className="font-mono text-xs text-muted-foreground">{examType.code}</span>
-              <Badge variant={examType.hasEditor ? 'success' : 'outline'}>
+              <Badge variant={examType.hasEditor ? 'success' : 'outline-solid'}>
                 {examType.hasEditor ? 'Editor available' : 'No editor yet'}
               </Badge>
               <Button

@@ -149,7 +149,7 @@ export function ListeningTopicsPage({ eyebrow }) {
         description="The topics learners choose from in the listening practice. Exercises are grouped and filtered by topic."
       />
 
-      <form onSubmit={onAdd} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-end">
+      <form onSubmit={onAdd} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs sm:flex-row sm:items-end">
         <div className="flex-1 space-y-2">
           <Label htmlFor="topic-name">New topic</Label>
           <Input id="topic-name" placeholder="e.g. Songs" value={name} maxLength={100} onChange={(event) => setName(event.target.value)} />
@@ -183,13 +183,13 @@ export function ListeningTopicsPage({ eyebrow }) {
           Try again
         </Button>
       ) : (
-        <ul className="divide-y overflow-hidden rounded-xl border bg-card shadow-sm">
+        <ul className="divide-y overflow-hidden rounded-xl border bg-card shadow-xs">
           {topics.map((topic) => (
             <li key={topic.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
               <span className="min-w-0 flex-1 truncate font-medium">{topic.name}</span>
               <span className="font-mono text-xs text-muted-foreground">{topic.code}</span>
               {topic.level ? <Badge variant="secondary">{PRACTICE_LEVEL_INFO[topic.level]?.label}</Badge> : null}
-              <Badge variant={topic.hasEditor ? 'success' : 'outline'}>{formatLabel(topic.format)}</Badge>
+              <Badge variant={topic.hasEditor ? 'success' : 'outline-solid'}>{formatLabel(topic.format)}</Badge>
               <Button variant="ghost" size="icon" aria-label={`Edit ${topic.name}`} onClick={() => setEditing({ id: topic.id, name: topic.name, format: topic.format || 'none', level: topic.level || 'none' })}>
                 <Pencil className="h-4 w-4" />
               </Button>

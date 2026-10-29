@@ -68,7 +68,7 @@ export function NotificationBell() {
           ) : null}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[22rem] max-w-[calc(100vw-2rem)] p-0">
+      <DropdownMenuContent align="end" className="w-88 max-w-[calc(100vw-2rem)] p-0">
         <div className="flex items-center justify-between gap-2 border-b px-3 py-2.5">
           <p className="text-sm font-semibold">Notifications</p>
           <Button variant="ghost" size="sm" className="h-7 gap-1 px-2 text-xs" disabled={!data.unread} onClick={() => markRead(null)}>
@@ -84,7 +84,7 @@ export function NotificationBell() {
             {state === 'loading' ? 'Loading…' : 'Nothing new.'}
           </div>
         ) : (
-          <div className="max-h-[26rem] overflow-y-auto py-1">
+          <div className="max-h-104 overflow-y-auto py-1">
             {data.notifications.map((item) => {
               const view = describeNotification(item);
               return (

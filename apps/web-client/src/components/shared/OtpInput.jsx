@@ -59,7 +59,7 @@ export function OtpInput({ id, value, onChange, onComplete, disabled = false, au
             }}
             className={cn(
               'h-12 w-full min-w-0 rounded-2xl border bg-muted/60 text-center text-xl font-semibold tabular-nums transition-all sm:h-14 sm:text-2xl short:h-12',
-              'focus:-translate-y-0.5 focus:border-primary/40 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50',
+              'focus:-translate-y-0.5 focus:border-primary/40 focus:bg-background focus:outline-hidden focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50',
               digit ? 'border-primary/30 bg-background' : 'border-transparent',
               invalid && 'border-destructive focus:border-destructive focus:ring-destructive/25',
             )}

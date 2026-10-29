@@ -11,8 +11,8 @@ export function ModeSwitch({ mode, onChange, className }) {
           aria-pressed={mode === value}
           onClick={() => onChange(value)}
           className={cn(
-            'rounded-full px-2.5 py-0.5 text-[11px] font-semibold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-            mode === value ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+            'rounded-full px-2.5 py-0.5 text-[11px] font-semibold tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+            mode === value ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground',
           )}
         >
           {toeicModeLabels[value]}

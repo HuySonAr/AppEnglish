@@ -3,7 +3,7 @@ import { cn } from '../../../lib/utils.js';
 
 export function SectionNav({ label, groups, active, onChoose }) {
   return (
-    <nav aria-label={label} className="rounded-xl border bg-card p-2 shadow-sm lg:sticky lg:top-36">
+    <nav aria-label={label} className="rounded-xl border bg-card p-2 shadow-xs lg:sticky lg:top-36">
       {groups.map((group) => (
         <div key={group.label} className="py-1">
           <p className="px-2 pb-1 pt-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{group.label}</p>
@@ -17,7 +17,7 @@ export function SectionNav({ label, groups, active, onChoose }) {
                   aria-current={current ? 'true' : undefined}
                   onClick={() => onChoose(item.key)}
                   className={cn(
-                    'w-full space-y-1.5 rounded-lg px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'w-full space-y-1.5 rounded-lg px-2.5 py-2 text-left transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                     current ? 'bg-primary/10 text-primary' : 'hover:bg-accent',
                   )}
                 >

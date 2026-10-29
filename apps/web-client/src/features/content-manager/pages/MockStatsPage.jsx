@@ -24,7 +24,7 @@ const rateTone = (rate) => (rate === null ? 'bg-muted' : rate < 30 ? 'bg-destruc
 
 function Stat({ label, value, note }) {
   return (
-    <div className="space-y-1 rounded-xl border bg-card p-4 shadow-sm">
+    <div className="space-y-1 rounded-xl border bg-card p-4 shadow-xs">
       <p className="text-sm text-muted-foreground">{label}</p>
       <p className="text-2xl font-bold tabular-nums">{value}</p>
       {note ? <p className="text-xs text-muted-foreground tabular-nums">{note}</p> : null}
@@ -167,7 +167,7 @@ export function MockStatsPage() {
       ) : (
         <>
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
-            <div className="space-y-3 rounded-xl border bg-card p-5 shadow-sm">
+            <div className="space-y-3 rounded-xl border bg-card p-5 shadow-xs">
               <div>
                 <h2 className="font-semibold">Correct answers per part</h2>
                 <p className="text-sm text-muted-foreground tabular-nums">{stats.skills.map((skill) => `${skill.skill === 'LISTENING' ? 'Listening' : 'Reading'} ${skill.rate ?? '—'}%`).join(' · ')}</p>
@@ -185,7 +185,7 @@ export function MockStatsPage() {
               </ChartContainer>
             </div>
 
-            <div className="space-y-3 rounded-xl border bg-card p-5 shadow-sm">
+            <div className="space-y-3 rounded-xl border bg-card p-5 shadow-xs">
               <div className="flex items-center justify-between gap-2">
                 <h2 className="font-semibold">Questions to check</h2>
                 <Badge variant={flagged.length ? 'warning' : 'secondary'} className="tabular-nums">
@@ -211,7 +211,7 @@ export function MockStatsPage() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
             <div className="flex flex-col gap-2 border-b bg-muted/30 p-3 lg:flex-row lg:items-center">
               <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search questions" />
               <div className="grid grid-cols-2 gap-2 sm:flex">

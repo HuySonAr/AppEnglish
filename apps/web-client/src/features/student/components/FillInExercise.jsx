@@ -65,7 +65,7 @@ export function FillInExercise({ lessonId, fillIn, onPassed }) {
 
   return (
     <div className="space-y-4">
-      <div className="sticky top-16 z-10 rounded-2xl border bg-card/95 p-3 shadow-sm backdrop-blur">
+      <div className="sticky top-16 z-10 rounded-2xl border bg-card/95 p-3 shadow-xs backdrop-blur-sm">
         <div className="mb-2 flex items-center gap-3 px-1">
           <span className="text-xs font-semibold uppercase tracking-wide text-primary">Words</span>
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
@@ -85,7 +85,7 @@ export function FillInExercise({ lessonId, fillIn, onPassed }) {
                   disabled={passed}
                   onClick={() => onChip(chip)}
                   className={cn(
-                    'rounded-full border-2 px-4 py-1.5 text-base font-medium shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'rounded-full border-2 px-4 py-1.5 text-base font-medium shadow-xs transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                     state.selectedChip === chip ? 'scale-105 border-primary bg-primary text-primary-foreground' : 'bg-background hover:border-primary/40 hover:bg-accent',
                     passed && 'opacity-60',
                   )}
@@ -100,7 +100,7 @@ export function FillInExercise({ lessonId, fillIn, onPassed }) {
         </ul>
       </div>
 
-      <div className="whitespace-pre-wrap rounded-2xl border bg-card p-5 text-lg leading-[3.2] shadow-sm sm:p-7">
+      <div className="whitespace-pre-wrap rounded-2xl border bg-card p-5 text-lg leading-[3.2] shadow-xs sm:p-7">
         {pieces.map((piece, index) => {
           if (index === pieces.length - 1) return <span key={index}>{piece}</span>;
           const chip = state.placed[index];
@@ -116,7 +116,7 @@ export function FillInExercise({ lessonId, fillIn, onPassed }) {
                 disabled={passed}
                 onClick={() => onBlank(index)}
                 className={cn(
-                  'mx-1 inline-flex h-10 min-w-[7rem] items-center justify-center rounded-lg border-2 px-3 align-middle text-base font-medium leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  'mx-1 inline-flex h-10 min-w-28 items-center justify-center rounded-lg border-2 px-3 align-middle text-base font-medium leading-none transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                   chip === null ? 'border-dashed text-muted-foreground hover:bg-accent' : 'border-primary/50 bg-primary/5 hover:bg-primary/10',
                   selected && 'border-primary ring-2 ring-primary/40',
                   state.selectedChip !== null && 'border-primary/70 hover:bg-primary/10',

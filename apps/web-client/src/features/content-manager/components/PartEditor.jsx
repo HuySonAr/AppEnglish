@@ -28,7 +28,7 @@ export function PartEditor({ spec, part, edit, media }) {
   const readOnly = useReadOnly();
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-start gap-3 rounded-xl border bg-card p-4 shadow-sm">
+      <div className="flex flex-wrap items-start gap-3 rounded-xl border bg-card p-4 shadow-xs">
         <div className="min-w-0 flex-1 space-y-1">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary">
             {skillLabels[spec.skill]} · {questionRange(spec, 'Questions ')}
@@ -39,7 +39,7 @@ export function PartEditor({ spec, part, edit, media }) {
           {lettersOnly ? <p className="text-sm text-muted-foreground">One recording reads the questions and options; learners see only the letters.</p> : null}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant={answered === part.questions.length ? 'success' : 'outline'} className="tabular-nums">
+          <Badge variant={answered === part.questions.length ? 'success' : 'outline-solid'} className="tabular-nums">
             {answered}/{part.questions.length} answered
           </Badge>
           {LESSON_PASTE_PARTS.includes(spec.key) && !readOnly ? (
@@ -58,7 +58,7 @@ export function PartEditor({ spec, part, edit, media }) {
       </div>
 
       {spec.group.audio || spec.group.passage ? (
-        <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
+        <div className="space-y-4 rounded-xl border bg-card p-4 shadow-xs">
           {spec.group.audio ? (
             <div className="grid gap-3 md:grid-cols-2">
               <MediaField id={`${spec.key}-group-audio`} label="Recording" kind={MediaKind.AUDIO} path={[...base, 'audioMediaId']} mediaId={part.audioMediaId} media={media} />

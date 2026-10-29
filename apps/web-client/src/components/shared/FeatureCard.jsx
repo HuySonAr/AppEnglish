@@ -38,13 +38,13 @@ export function FeatureCard({
       <p className="mt-1 text-sm text-muted-foreground">{description}</p>
     </>
   );
-  const frame = 'block rounded-xl border bg-card p-5 shadow-sm';
+  const frame = 'block rounded-xl border bg-card p-5 shadow-xs';
   return to ? (
     <Link
       to={to}
       className={cn(
         frame,
-        'group transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'group transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
       )}
     >
       {body}

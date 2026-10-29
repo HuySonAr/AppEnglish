@@ -19,7 +19,7 @@ function LearnerWork({ data }) {
   const result = ai.result;
   return (
     <div className="space-y-5">
-      <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+      <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-xs">
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Prompt</p>
         {review.kind === 'read_aloud' ? (
           <>
@@ -37,7 +37,7 @@ function LearnerWork({ data }) {
         )}
       </div>
 
-      <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+      <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs">
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Learner&apos;s answer</p>
         {work.recordingUrl ? <audio controls src={work.recordingUrl} className="w-full" /> : null}
         {work.answer ? <AnnotatedText title={`Text · ${work.words} words`} text={work.answer} errors={result?.errors || []} /> : null}
@@ -61,7 +61,7 @@ function LearnerWork({ data }) {
         {ai.status === 'FAILED' ? <p className="text-sm text-muted-foreground">AI could not score it: {ai.error}</p> : null}
       </div>
 
-      <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+      <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs">
         <PromptReference sampleAnswer={prompt.sampleAnswer} keyPoints={prompt.keyPoints} />
         {!prompt.sampleAnswer && !prompt.keyPoints.length ? <p className="text-sm text-muted-foreground">This prompt has no sample answer.</p> : null}
       </div>
@@ -159,7 +159,7 @@ export function TeacherReviewPage() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <LearnerWork data={data} />
-        <aside className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm lg:sticky lg:top-20 lg:self-start">
+        <aside className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs lg:sticky lg:top-20 lg:self-start">
           <div className="flex items-baseline justify-between gap-2">
             <p className="font-semibold">Your score</p>
             <span className="text-2xl font-bold tabular-nums">

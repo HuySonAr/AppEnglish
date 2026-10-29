@@ -50,7 +50,7 @@ function Calendar({ value, min, today, onPick }) {
               disabled={disabled}
               onClick={() => onPick(day.iso)}
               className={cn(
-                'flex aspect-square items-center justify-center rounded-md text-sm tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                'flex aspect-square items-center justify-center rounded-md text-sm tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                 !day.inMonth && 'text-muted-foreground/50',
                 disabled ? 'cursor-not-allowed opacity-40' : 'hover:bg-accent',
                 isToday && !selected && 'font-semibold text-primary ring-1 ring-inset ring-primary/40',
@@ -86,7 +86,7 @@ export function DatePicker({ id, value, onChange, min, placeholder = 'Pick a dat
         id={id}
         type="button"
         onClick={openPicker}
-        className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-md border border-input bg-background px-3 text-left text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-md border border-input bg-background px-3 text-left text-sm transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
       >
         <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
         <span className={cn('truncate', !value && 'text-muted-foreground')}>{value ? formatLongDay(value) : placeholder}</span>
@@ -99,7 +99,7 @@ export function DatePicker({ id, value, onChange, min, placeholder = 'Pick a dat
       ) : null}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-[22rem] gap-4 p-5">
+        <DialogContent className="max-w-88 gap-4 p-5">
           <DialogHeader className="text-left">
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{draft ? `${formatLongDay(draft)} · in ${daysBetween(today, draft)} days` : 'No date chosen yet.'}</DialogDescription>

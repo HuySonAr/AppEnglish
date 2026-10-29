@@ -30,7 +30,7 @@ export function MicCheck({ starting, onStart, onCancel }) {
     );
 
   return (
-    <div className="mx-auto max-w-xl space-y-6 rounded-3xl border bg-card p-6 shadow-sm sm:p-8">
+    <div className="mx-auto max-w-xl space-y-6 rounded-3xl border bg-card p-6 shadow-xs sm:p-8">
       <div className="flex items-center gap-3">
         <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <Mic className="h-5 w-5" />
@@ -52,7 +52,7 @@ export function MicCheck({ starting, onStart, onCancel }) {
       ) : null}
 
       <div className="flex flex-wrap gap-2">
-        <Button variant={recorder.take && !empty ? 'outline' : 'default'} className="gap-2" disabled={recorder.phase === 'recording' || starting} onClick={() => recorder.start(CHECK_SECONDS)}>
+        <Button variant={recorder.take && !empty ? 'outline-solid' : 'default'} className="gap-2" disabled={recorder.phase === 'recording' || starting} onClick={() => recorder.start(CHECK_SECONDS)}>
           {recorder.take ? <RotateCcw className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
           {recorder.take ? 'Record again' : `Record ${CHECK_SECONDS} seconds`}
         </Button>
@@ -128,11 +128,11 @@ function SpeakingQuestion({ item, total, pending, onTake, onNoAnswer, onRetry, o
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div className="space-y-4 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
+      <div className="space-y-4 rounded-3xl border bg-card p-5 shadow-xs sm:p-6">
         <TaskHeading item={item} total={total} />
         <SwPrompt item={item} />
       </div>
-      <div className="rounded-3xl border bg-card p-5 shadow-sm sm:p-6">{panel}</div>
+      <div className="rounded-3xl border bg-card p-5 shadow-xs sm:p-6">{panel}</div>
     </div>
   );
 }
@@ -204,7 +204,7 @@ export function SwSpeakingExam({ testId, attempt, onDone, onExpired, onDiscard }
     <section className="space-y-6">
       <ExamBar section="Speaking" number={Math.min(index + 1, items.length)} total={items.length} onLeave={leave.open} />
       {finishing ? (
-        <div className="mx-auto max-w-xl space-y-4 rounded-3xl border bg-card p-6 text-center shadow-sm">
+        <div className="mx-auto max-w-xl space-y-4 rounded-3xl border bg-card p-6 text-center shadow-xs">
           <p className="font-medium">{finishing === 'failed' ? 'The test was not submitted.' : 'Submitting your test…'}</p>
           {finishing === 'failed' ? (
             <Button onClick={finish}>Try again</Button>

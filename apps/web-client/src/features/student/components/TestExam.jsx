@@ -21,7 +21,7 @@ export function Question({ question, chosen, onChoose, blankNumber, showAudio = 
   return (
     <fieldset
       id={`question-${question.number}`}
-      className={cn('scroll-mt-36 rounded-2xl border-2 bg-card p-4 shadow-sm transition-colors sm:p-5', chosen ? 'border-primary/30' : 'border-transparent')}
+      className={cn('scroll-mt-36 rounded-2xl border-2 bg-card p-4 shadow-xs transition-colors sm:p-5', chosen ? 'border-primary/30' : 'border-transparent')}
     >
       <legend className="sr-only">Question {question.number}</legend>
       <p className="flex items-start gap-3 font-medium">
@@ -184,7 +184,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
 
   return (
     <section className="space-y-6">
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-5 sm:px-5">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur-sm sm:-mx-5 sm:px-5">
         {phaseLabel ? <span className="rounded-full border px-3 py-1.5 text-sm font-semibold">{phaseLabel}</span> : null}
         {attempt.expiresAt ? (
           <span
@@ -204,7 +204,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
             No time limit
           </span>
         )}
-        <div className="flex min-w-[10rem] flex-1 items-center gap-2 sm:max-w-xs">
+        <div className="flex min-w-40 flex-1 items-center gap-2 sm:max-w-xs">
           <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
             <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${total ? (answered * 100) / total : 0}%` }} />
           </div>
@@ -227,7 +227,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
         <aside className="lg:order-2 lg:sticky lg:top-36 lg:self-start">
-          <div className="rounded-2xl border bg-card p-4 shadow-sm">
+          <div className="rounded-2xl border bg-card p-4 shadow-xs">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm font-medium">Questions</p>
               <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
@@ -253,7 +253,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
                         aria-label={`Question ${question.number}, ${done ? 'answered' : 'not answered'}`}
                         onClick={() => showQuestion(index, question.number)}
                         className={cn(
-                          'flex h-9 w-9 items-center justify-center rounded-full border text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+                          'flex h-9 w-9 items-center justify-center rounded-full border text-sm font-medium tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring',
                           done
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-input text-muted-foreground hover:bg-accent',
@@ -282,7 +282,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
                   aria-current={index === partIndex ? 'step' : undefined}
                   onClick={() => showPart(index)}
                   className={cn(
-                    'flex flex-col items-start rounded-xl border-2 px-3 py-1.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'flex flex-col items-start rounded-xl border-2 px-3 py-1.5 text-left transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                     index === partIndex
                       ? 'border-primary bg-primary text-primary-foreground'
                       : done
@@ -300,7 +300,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
           </nav>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-3 rounded-2xl border bg-card p-4 shadow-sm">
+            <div className="flex items-center gap-3 rounded-2xl border bg-card p-4 shadow-xs">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">{part.number}</span>
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-widest text-primary">{skillLabels[part.skill]}</p>
@@ -308,7 +308,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
               </div>
             </div>
             {part.audioUrl ? (
-              <div className="rounded-2xl border bg-card p-4 shadow-sm">
+              <div className="rounded-2xl border bg-card p-4 shadow-xs">
                 <p className="mb-2 text-sm text-muted-foreground">
                   Listen, then answer the question{part.questions.length === 1 ? '' : 's'} of this part.
                 </p>
@@ -318,7 +318,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
             {partSections(part).map((section) => (
               <div key={section.id} className="space-y-4">
                 {section.audioUrl ? (
-                  <div className="rounded-2xl border bg-card p-4 shadow-sm">
+                  <div className="rounded-2xl border bg-card p-4 shadow-xs">
                     <p className="mb-2 text-sm text-muted-foreground">
                       Listen, then answer question{section.questions.length === 1 ? '' : 's'}{' '}
                       {section.questions.map((question) => question.number).join(', ')}.
@@ -328,7 +328,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
                 ) : null}
                 {section.imageUrl ? <img src={section.imageUrl} alt="" className="max-h-96 rounded-lg border" /> : null}
                 {section.passage ? (
-                  <div className="whitespace-pre-wrap rounded-2xl border bg-card p-5 text-[15px] leading-relaxed shadow-sm sm:p-6">
+                  <div className="whitespace-pre-wrap rounded-2xl border bg-card p-5 text-[15px] leading-relaxed shadow-xs sm:p-6">
                     {section.blanks ? numberBlanks(section.passage, section.questions[0].number) : <PassageText text={section.passage} />}
                   </div>
                 ) : null}
@@ -367,7 +367,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
       <AlertDialog open={confirming} onOpenChange={setConfirming}>
         <AlertDialogContent className="max-w-md rounded-2xl sm:rounded-2xl p-4">
           <AnswerProgress title="Submit your answers?" note={retakeAllowed ? '' : ' No retake after this.'} answered={answered} total={total} unanswered={unanswered} />
-          <AlertDialogFooter className="flex-row flex-wrap gap-3 pt-1 sm:justify-center [&>*]:min-w-[8rem] [&>*]:flex-1">
+          <AlertDialogFooter className="flex-row flex-wrap gap-3 pt-1 sm:justify-center *:min-w-32 *:flex-1">
             <AlertDialogCancel>Keep working</AlertDialogCancel>
             <AlertDialogAction
               className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
@@ -394,7 +394,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
             leaving
             closeDisabled={discarding}
           />
-          <AlertDialogFooter className="flex-row flex-wrap gap-3 pt-1 sm:justify-center [&>*]:min-w-[8rem] [&>*]:flex-1">
+          <AlertDialogFooter className="flex-row flex-wrap gap-3 pt-1 sm:justify-center *:min-w-32 *:flex-1">
             <AlertDialogCancel disabled={discarding}>Keep working</AlertDialogCancel>
             {leaveButtons}
             <AlertDialogAction
@@ -423,7 +423,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
             leaving
             closeDisabled={discarding}
           />
-          <AlertDialogFooter className="flex-row flex-wrap gap-3 pt-1 sm:justify-center [&>*]:min-w-[8rem] [&>*]:flex-1">
+          <AlertDialogFooter className="flex-row flex-wrap gap-3 pt-1 sm:justify-center *:min-w-32 *:flex-1">
             <AlertDialogCancel disabled={discarding}>Keep working</AlertDialogCancel>
             {leaveButtons}
           </AlertDialogFooter>

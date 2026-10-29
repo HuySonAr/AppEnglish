@@ -52,7 +52,7 @@ export function SidebarLayout({ role, side = 'left', drawerSide = 'right' }) {
           <Link
             to={`${dashboardPathForRole(role)}/profile`}
             onClick={onNavigate}
-            className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Avatar account={account} size="sm" />
             <span className="min-w-0 flex-1 leading-tight">
@@ -96,7 +96,7 @@ export function SidebarLayout({ role, side = 'left', drawerSide = 'right' }) {
       </aside>
 
       <div className={right ? 'lg:pr-64' : 'lg:pl-64'}>
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
           {drawerRight ? null : drawer}
           <Brand to={home} compact className="lg:hidden" />
           <div className="ml-auto flex items-center gap-1 sm:gap-2">

@@ -142,7 +142,7 @@ export function UnitReviewPage() {
           <div className="space-y-3">
             <h2 className="text-lg font-semibold">Your attempts ({data.attempts.length})</h2>
             {data.attempts.length ? (
-              <ul className="divide-y overflow-hidden rounded-xl border bg-card text-sm shadow-sm">
+              <ul className="divide-y overflow-hidden rounded-xl border bg-card text-sm shadow-xs">
                 {data.attempts.map((attempt) => (
                   <li key={attempt.attemptNumber} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
                     <div className="min-w-0 flex-1">
@@ -150,7 +150,7 @@ export function UnitReviewPage() {
                       <p className="text-xs text-muted-foreground">{new Date(attempt.submittedAt).toLocaleString()}</p>
                     </div>
                     <span className="text-base font-bold tabular-nums">{attempt.scorePercent}%</span>
-                    <Badge variant={attempt.passed ? 'success' : 'outline'}>{attempt.passed ? 'Passed' : 'Not passed'}</Badge>
+                    <Badge variant={attempt.passed ? 'success' : 'outline-solid'}>{attempt.passed ? 'Passed' : 'Not passed'}</Badge>
                   </li>
                 ))}
               </ul>

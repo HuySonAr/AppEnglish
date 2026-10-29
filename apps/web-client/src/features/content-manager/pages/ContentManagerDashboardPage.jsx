@@ -31,7 +31,7 @@ const tools = [
 
 function Panel({ title, description, to, linkLabel, className, children }) {
   return (
-    <div className={cn('space-y-4 rounded-xl border bg-card p-5 shadow-sm', className)}>
+    <div className={cn('space-y-4 rounded-xl border bg-card p-5 shadow-xs', className)}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-0.5">
           <h2 className="font-semibold">{title}</h2>
@@ -54,7 +54,7 @@ function Panel({ title, description, to, linkLabel, className, children }) {
 function Stat({ icon: Icon, label, published, total, note, to }) {
   const share = total ? (published * 100) / total : 0;
   return (
-    <Link to={to} className="group space-y-3 rounded-xl border bg-card p-4 shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+    <Link to={to} className="group space-y-3 rounded-xl border bg-card p-4 shadow-xs transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
       <div className="flex items-center justify-between gap-2">
         <span className="flex items-center gap-2 text-sm font-medium">
           <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -197,7 +197,7 @@ export function ContentManagerDashboardPage() {
       {data.partial ? <p className="text-sm text-muted-foreground">Some areas could not be loaded; reload to see all numbers.</p> : null}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="space-y-4 rounded-xl border bg-card p-5 shadow-sm">
+        <div className="space-y-4 rounded-xl border bg-card p-5 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">Ready for learners</p>
@@ -236,7 +236,7 @@ export function ContentManagerDashboardPage() {
           </ul>
         </div>
 
-        <div className="space-y-3 rounded-xl border bg-card p-5 shadow-sm">
+        <div className="space-y-3 rounded-xl border bg-card p-5 shadow-xs">
           <Link to={`${MANAGER_BASE}/reviews`} className="group flex items-center justify-between gap-2">
             <span className="min-w-0">
               <span className="block font-semibold">Waiting for review</span>
@@ -260,7 +260,7 @@ export function ContentManagerDashboardPage() {
                         {item.submittedAt ? ` · ${timeAgo(item.submittedAt)}` : ''}
                       </span>
                     </span>
-                    <Badge variant={item.live ? 'success' : 'outline'}>{item.live ? 'Live' : 'New'}</Badge>
+                    <Badge variant={item.live ? 'success' : 'outline-solid'}>{item.live ? 'Live' : 'New'}</Badge>
                   </Link>
                 </li>
               ))}
@@ -296,7 +296,7 @@ export function ContentManagerDashboardPage() {
             <Link
               key={tool.to}
               to={tool.to}
-              className="group flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="group flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
             >
               <tool.icon className="h-4 w-4 text-primary" aria-hidden="true" />
               <span className="flex-1">{tool.title}</span>

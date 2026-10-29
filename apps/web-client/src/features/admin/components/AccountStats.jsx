@@ -14,7 +14,7 @@ export const statusTone = {
 
 export function Tile({ icon: Icon, label, value, detail, tone = 'bg-primary/10 text-primary' }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border bg-card p-4 shadow-sm">
+    <div className="flex items-start gap-3 rounded-xl border bg-card p-4 shadow-xs">
       <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', tone)}>
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
@@ -59,7 +59,7 @@ export function SignupsChart({ points }) {
               <div className="rounded-lg border bg-background px-3 py-2 text-xs shadow-xl">
                 <p className="font-medium">{longDay(point.day)}</p>
                 <p className="mt-0.5 flex items-center gap-1.5 text-muted-foreground">
-                  <span className="h-2 w-2 rounded-full bg-[var(--color-count)]" aria-hidden="true" />
+                  <span className="h-2 w-2 rounded-full bg-(--color-count)" aria-hidden="true" />
                   <span className="font-semibold tabular-nums text-foreground">{point.count}</span> sign-up{point.count === 1 ? '' : 's'}
                 </p>
               </div>

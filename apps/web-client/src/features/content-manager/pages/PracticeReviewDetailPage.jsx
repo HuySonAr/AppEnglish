@@ -178,15 +178,15 @@ export function PracticeReviewDetailPage() {
               )}
             </div>
           </div>
-          <TabsContent value="new" className="rounded-xl border bg-card p-5 shadow-sm">
+          <TabsContent value="new" className="rounded-xl border bg-card p-5 shadow-xs">
             <PracticePromptView kind={prompt.kind} content={latest.content} media={media} />
           </TabsContent>
-          <TabsContent value="live" className="rounded-xl border bg-card p-5 shadow-sm">
+          <TabsContent value="live" className="rounded-xl border bg-card p-5 shadow-xs">
             <PracticePromptView kind={prompt.kind} content={published.content} media={media} />
           </TabsContent>
         </Tabs>
       ) : (
-        <div className="rounded-xl border bg-card p-5 shadow-sm">
+        <div className="rounded-xl border bg-card p-5 shadow-xs">
           <PracticePromptView kind={prompt.kind} content={latest.content} media={media} />
         </div>
       )}

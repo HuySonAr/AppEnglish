@@ -36,7 +36,7 @@ function SectionScore({ icon: Icon, label, score, margin, correct, total }) {
 function ToeicScore({ label, attempt }) {
   const { estimated } = attempt;
   return (
-    <div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
+    <div className="overflow-hidden rounded-2xl border bg-card shadow-xs">
       <div className="space-y-5 p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -78,7 +78,7 @@ function ToeicScore({ label, attempt }) {
 
 function PercentScore({ label, attempt }) {
   return (
-    <div className="flex flex-col items-center gap-6 rounded-2xl border bg-card p-6 shadow-sm sm:flex-row sm:p-8">
+    <div className="flex flex-col items-center gap-6 rounded-2xl border bg-card p-6 shadow-xs sm:flex-row sm:p-8">
       <ScoreRing percent={attempt.scorePercent} label="correct" />
       <div className="text-center sm:text-left">
         <p className="text-xs font-semibold uppercase tracking-widest text-primary">

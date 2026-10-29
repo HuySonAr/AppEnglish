@@ -109,7 +109,7 @@ export function TeacherSpeakingPage() {
                     title={`${item.title} · ${item.questions}`}
                     onClick={() => choose(item.number)}
                     className={cn(
-                      'flex min-w-0 flex-col items-center gap-1 rounded-xl border px-1 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:items-start sm:gap-0.5 sm:px-3 sm:py-2.5 sm:text-left',
+                      'flex min-w-0 flex-col items-center gap-1 rounded-xl border px-1 py-2 text-center transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring sm:items-start sm:gap-0.5 sm:px-3 sm:py-2.5 sm:text-left',
                       active ? 'border-primary bg-primary/5' : 'bg-card hover:bg-accent',
                     )}
                   >
@@ -179,7 +179,7 @@ export function TeacherSpeakingPage() {
                       <li key={prompt.id}>
                         <Link
                           to={teacherPromptPath(prompt.kind, prompt.id)}
-                          className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                          className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                         >
                           <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-md bg-muted text-sm font-semibold" title={levelScores(prompt.level)}>
                             {levelShort(prompt.level)}

@@ -145,7 +145,7 @@ export function WritingPromptPage() {
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start">
         <aside className="space-y-4 lg:sticky lg:top-24">
-          <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+          <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs">
             <div className="flex items-center gap-2.5">
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <ClipboardList className="h-4 w-4" />
@@ -203,7 +203,7 @@ export function WritingPromptPage() {
           ) : null}
         </aside>
 
-        <form className="overflow-hidden rounded-2xl border bg-card shadow-sm transition-shadow focus-within:ring-2 focus-within:ring-ring/30" onSubmit={submit}>
+        <form className="overflow-hidden rounded-2xl border bg-card shadow-xs transition-shadow focus-within:ring-2 focus-within:ring-ring/30" onSubmit={submit}>
           <div className="flex items-center justify-between gap-3 border-b px-5 py-3">
             <label htmlFor="writing-text" className="font-semibold">
               Your text
@@ -221,7 +221,7 @@ export function WritingPromptPage() {
             ) : null}
           </div>
           {waiting ? (
-            <div className="flex min-h-[22rem] flex-col items-center justify-center gap-3 px-5 py-8 text-center">
+            <div className="flex min-h-88 flex-col items-center justify-center gap-3 px-5 py-8 text-center">
               <Countdown label="Time to write" left={writeSeconds} total={writeSeconds} />
               <Button size="lg" className="gap-2" onClick={() => setStarted(true)}>
                 <Play className="h-4 w-4" />
@@ -239,7 +239,7 @@ export function WritingPromptPage() {
             autoFocus={timed && started}
             placeholder="Start writing here…"
             spellCheck
-            className="min-h-[22rem] resize-y rounded-none border-0 bg-transparent px-5 py-4 text-base leading-7 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="min-h-88 resize-y rounded-none border-0 bg-transparent px-5 py-4 text-base leading-7 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
           />
           )}
           {locked ? <p className="border-t bg-destructive/10 px-5 py-2 text-sm">Time is up. Submit your text.</p> : null}

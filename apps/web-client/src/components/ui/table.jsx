@@ -27,7 +27,7 @@ export function TableBody({ className, ...props }) {
 export function TableFooter({ className, ...props }) {
   return (
     <tfoot
-      className={cn('border-t bg-muted/50 font-medium [&>tr]:last:border-b-0', className)}
+      className={cn('border-t bg-muted/50 font-medium last:[&>tr]:border-b-0', className)}
       {...props}
     />
   );
@@ -49,7 +49,7 @@ export function TableHead({ className, ...props }) {
   return (
     <th
       className={cn(
-        'h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
+        'h-12 px-4 text-left align-middle font-medium text-muted-foreground has-[[role=checkbox]]:pr-0',
         className
       )}
       {...props}
@@ -60,7 +60,7 @@ export function TableHead({ className, ...props }) {
 export function TableCell({ className, ...props }) {
   return (
     <td
-      className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)}
+      className={cn('p-4 align-middle has-[[role=checkbox]]:pr-0', className)}
       {...props}
     />
   );

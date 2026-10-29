@@ -14,7 +14,7 @@ Mọi giá trị dưới đây lấy từ code hiện có (xác minh 2026-10-24)
 
 ## 2. Token
 
-Nguồn: `src/styles/index.css` (biến CSS) và `tailwind.config.js`. Dùng class Tailwind theo token, không viết mã màu trực tiếp.
+Nguồn: `src/styles/index.css` (biến CSS HSL trong `:root` / `.dark`, ánh xạ sang màu Tailwind trong `@theme inline`, D222; không còn `tailwind.config.js`). Dùng class Tailwind theo token, không viết mã màu trực tiếp.
 
 | Nhóm | Giá trị |
 |---|---|
@@ -39,7 +39,8 @@ Thang bo góc đang dùng:
 | `rounded-full` | Ô nhập, nút, nhãn logo, "Code sent to" ở trang auth; avatar |
 
 ### Thanh cuộn
-- Toàn site (`src/styles/index.css`): Chrome/Edge/Safari dùng `::-webkit-scrollbar` rộng 3px, rãnh trong suốt, thanh `hsl(var(--primary) / 0.5)` bo tròn, hover `hsl(var(--primary))`, không có nút mũi tên. Firefox (`@supports not selector(::-webkit-scrollbar)`) dùng `scrollbar-width: thin` cùng màu. Không đặt `scrollbar-width`/`scrollbar-color` cho trình duyệt có `::-webkit-scrollbar`, vì Chrome/Edge 121+ sẽ bỏ qua phần webkit. Trang auth vẫn ẩn thanh cuộn (`auth-scroll`).
+- Thanh cuộn chính của trang theo kiểu ChatGPT: `html { scrollbar-width: thin; scrollbar-color: hsl(var(--primary) / 0.5) transparent }`; trình duyệt tự vẽ thanh mảnh khoảng 10px, thanh kéo bo tròn, rãnh trong suốt, trên Windows có mũi tên nhỏ hai đầu (không tự vẽ mũi tên bằng ảnh vì ảnh SVG không đọc được token màu).
+- Vùng cuộn bên trong (Chrome/Edge/Safari): `::-webkit-scrollbar` 3px, thanh `hsl(var(--primary) / 0.5)` bo tròn, hover `hsl(var(--primary))`, không nút mũi tên; `body * { scrollbar-color: auto }` (trong `@supports selector(::-webkit-scrollbar)`) để màu của `html` không truyền xuống, vì Chrome/Edge 121+ bỏ qua `::-webkit-scrollbar` khi phần tử có `scrollbar-color`/`scrollbar-width`. Firefox (`@supports not selector(::-webkit-scrollbar)`) dùng `scrollbar-width: thin` cùng màu cho mọi vùng. Trang auth vẫn ẩn thanh cuộn (`auth-scroll`).
 
 ## 3. Bố cục
 

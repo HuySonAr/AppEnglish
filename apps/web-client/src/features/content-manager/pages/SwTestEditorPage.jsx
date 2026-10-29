@@ -402,7 +402,7 @@ export function SwTestEditorPage() {
       {canManage ? <ChangesFromPublished kind={KIND} draft={compare.draft} published={compare.published} /> : null}
 
       {canAuthor ? (
-        <form onSubmit={onSaveTitle} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-end">
+        <form onSubmit={onSaveTitle} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs sm:flex-row sm:items-end">
           <div className="min-w-0 flex-1 space-y-2">
             <Label htmlFor="sw-test-title">Title</Label>
             <Input id="sw-test-title" value={title} maxLength={200} readOnly={locked} onChange={(event) => setTitle(event.target.value)} />
@@ -441,7 +441,7 @@ export function SwTestEditorPage() {
       <div className="grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start">
         <SectionNav label="Questions" groups={groups} active={active} onChoose={setActive} />
 
-        <div className="min-w-0 space-y-4 rounded-xl border bg-card p-4 shadow-sm sm:p-5">
+        <div className="min-w-0 space-y-4 rounded-xl border bg-card p-4 shadow-xs sm:p-5">
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">
               {sectionLabels[block.section]} · {numbersLabel(block)}

@@ -103,7 +103,7 @@ function AuditTrail({ audits }) {
     <ol className="relative space-y-4 border-l pl-5">
       {audits.map((audit) => (
         <li key={audit.id} className="relative">
-          <span className="absolute -left-[1.6rem] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-primary" aria-hidden="true" />
+          <span className="absolute left-[-1.6rem] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-primary" aria-hidden="true" />
           <p className="text-sm font-medium">{auditDescription(audit, { status: statusLabels, role: RoleLabels })}</p>
           {audit.reason ? <p className="mt-0.5 text-sm text-muted-foreground">“{audit.reason}”</p> : null}
           <p className="mt-0.5 text-xs text-muted-foreground" title={dateTime(audit.createdAt)}>

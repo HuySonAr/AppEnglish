@@ -40,7 +40,7 @@ function PresetChips({ presets, value, onPick, label }) {
           aria-pressed={value === preset}
           onClick={() => onPick(preset)}
           className={cn(
-            'h-9 rounded-md border px-3 text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            'h-9 rounded-md border px-3 text-sm font-medium tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
             value === preset ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
           )}
         >
@@ -205,7 +205,7 @@ export function TodayPlanCard({ tasks }) {
                 <Link
                   to={task.to}
                   state={task.state}
-                  className="group flex items-center gap-3 rounded-2xl border bg-background p-3 transition-colors hover:border-primary/30 hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="group flex items-center gap-3 rounded-2xl border bg-background p-3 transition-colors hover:border-primary/30 hover:bg-accent/60 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">{index + 1}</span>
                   <span className="min-w-0 flex-1">
@@ -305,7 +305,7 @@ function SwGoal({ summary }) {
             {now ? (
               <Link
                 to={swResultPath(now.swTestId, key, now.attemptNumber)}
-                className="block rounded-md text-xs text-muted-foreground underline-offset-4 hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="block rounded-md text-xs text-muted-foreground underline-offset-4 hover:text-primary hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Now: <span className="font-semibold tabular-nums text-foreground">{now.scaled}</span>
                 {now.reviewed ? ' · Reviewed by teacher' : ''}

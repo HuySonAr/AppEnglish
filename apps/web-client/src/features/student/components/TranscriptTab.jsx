@@ -107,7 +107,7 @@ export function TranscriptTab({ exerciseId, audioRef, audioUrl, speed }) {
     audio.currentTime = ((event.clientX - box.left) / box.width) * duration;
   }
 
-  const panel = 'rounded-b-2xl rounded-tr-2xl border border-t-0 bg-card p-4 shadow-sm sm:p-5';
+  const panel = 'rounded-b-2xl rounded-tr-2xl border border-t-0 bg-card p-4 shadow-xs sm:p-5';
   if (state === 'loading')
     return (
       <div className={panel}>
@@ -145,7 +145,7 @@ export function TranscriptTab({ exerciseId, audioRef, audioUrl, speed }) {
                 type="button"
                 aria-label={playing ? 'Pause' : 'Play'}
                 onClick={() => (playing ? audioRef.current?.pause() : playFrom(selected))}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {playing ? <Pause className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}
               </button>
@@ -159,12 +159,12 @@ export function TranscriptTab({ exerciseId, audioRef, audioUrl, speed }) {
                 type="button"
                 aria-label={muted ? 'Sound on' : 'Mute'}
                 onClick={() => setMuted(!muted)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </button>
             </div>
-            <div className="flex min-h-[14rem] flex-1 flex-col items-center justify-center gap-4 px-4 py-8 text-center">
+            <div className="flex min-h-56 flex-1 flex-col items-center justify-center gap-4 px-4 py-8 text-center">
               <p className="text-2xl leading-snug sm:text-[1.7rem]">
                 {sentence?.speaker ? <span className="mr-1 font-semibold">{sentence.speaker}:</span> : null}
                 {sentence?.text}
@@ -176,7 +176,7 @@ export function TranscriptTab({ exerciseId, audioRef, audioUrl, speed }) {
             <button type="button" aria-label="Previous sentence" disabled={selected === 0} onClick={() => playFrom(selected - 1)} className="rounded-full p-1.5 hover:bg-accent disabled:opacity-40">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <span className="min-w-[4rem] text-center text-lg tabular-nums">
+            <span className="min-w-16 text-center text-lg tabular-nums">
               {selected + 1} / {segments.length}
             </span>
             <button type="button" aria-label="Next sentence" disabled={selected === segments.length - 1} onClick={() => playFrom(selected + 1)} className="rounded-full p-1.5 hover:bg-accent disabled:opacity-40">
@@ -186,13 +186,13 @@ export function TranscriptTab({ exerciseId, audioRef, audioUrl, speed }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <ol ref={listRef} className="relative h-[24rem] divide-y overflow-y-auto rounded-xl border lg:h-auto lg:max-h-[30rem] lg:min-h-full">
+          <ol ref={listRef} className="relative h-96 divide-y overflow-y-auto rounded-xl border lg:h-auto lg:max-h-120 lg:min-h-full">
             {segments.map((item, index) => (
               <li key={item.id} ref={(element) => (rows.current[index] = element)}>
                 <button
                   type="button"
                   onClick={() => playFrom(index)}
-                  className={cn('flex w-full items-center gap-4 px-4 py-3.5 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring', index === selected && 'bg-accent')}
+                  className={cn('flex w-full items-center gap-4 px-4 py-3.5 text-left transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring', index === selected && 'bg-accent')}
                 >
                   <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2', index === selected ? 'border-primary text-primary' : 'border-muted-foreground/60 text-muted-foreground')}>
                     {index === selected && playing ? <Pause className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}

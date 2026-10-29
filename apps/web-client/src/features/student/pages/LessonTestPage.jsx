@@ -146,7 +146,7 @@ export function LessonTestPage() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-6">
           {review?.attempt ? (
-            <div className="rounded-2xl border bg-card p-6 text-center shadow-sm sm:p-8">
+            <div className="rounded-2xl border bg-card p-6 text-center shadow-xs sm:p-8">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 Attempt {review.attempt.attemptNumber}
               </p>
@@ -204,7 +204,7 @@ export function LessonTestPage() {
           {test.attempts.length ? (
             <div className="space-y-2">
               <h2 className="text-lg font-semibold">My attempts</h2>
-              <ul className="divide-y overflow-hidden rounded-xl border bg-card text-sm shadow-sm">
+              <ul className="divide-y overflow-hidden rounded-xl border bg-card text-sm shadow-xs">
                 {test.attempts.map((attempt, index) => {
                   const change = index ? attempt.correctCount - test.attempts[index - 1].correctCount : 0;
                   const shown = review?.attempt?.attemptNumber === attempt.attemptNumber;
@@ -243,12 +243,12 @@ export function LessonTestPage() {
                             {-change}
                           </span>
                         ) : null}
-                        <Badge variant={attempt.passed ? 'success' : 'outline'}>
+                        <Badge variant={attempt.passed ? 'success' : 'outline-solid'}>
                           {attempt.passed ? 'Passed' : 'Not passed'}
                         </Badge>
                       </div>
                       <Button
-                        variant={shown ? 'secondary' : 'outline'}
+                        variant={shown ? 'secondary' : 'outline-solid'}
                         size="sm"
                         disabled={busy || shown}
                         onClick={() => onReview(attempt.attemptNumber)}

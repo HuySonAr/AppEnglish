@@ -12,7 +12,7 @@ export const SheetDescription = SheetPrimitive.Description;
 export function SheetContent({ className, children, side = 'left', ...props }) {
   return (
     <SheetPrimitive.Portal>
-      <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+      <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
       <SheetPrimitive.Content
         className={cn(
           'fixed inset-y-0 z-50 flex w-72 max-w-[85vw] flex-col bg-card shadow-xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
@@ -24,7 +24,7 @@ export function SheetContent({ className, children, side = 'left', ...props }) {
         {...props}
       >
         {children}
-        <SheetPrimitive.Close className="absolute right-3 top-3 rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+        <SheetPrimitive.Close className="absolute right-3 top-3 rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:outline-hidden focus:ring-2 focus:ring-ring">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </SheetPrimitive.Close>

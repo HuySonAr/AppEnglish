@@ -106,7 +106,7 @@ export function QuestionCard({ spec, question, number, path, edit, media, speech
   const answered = question.options.some((option) => option.isCorrect);
   const readOnly = useReadOnly();
   return (
-    <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
+    <div className="space-y-4 rounded-xl border bg-card p-4 shadow-xs">
       <div className="flex items-center gap-3">
         <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-muted px-2 text-sm font-semibold tabular-nums">{number}</span>
         <p className="font-medium">
@@ -146,7 +146,7 @@ export function QuestionCard({ spec, question, number, path, edit, media, speech
                   aria-label={`Option ${letter} is correct`}
                   onClick={() => edit(path, withCorrectOption(question, option.id))}
                   className={cn(
-                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-sm font-semibold transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                     option.isCorrect ? 'bg-success text-white' : 'bg-muted hover:bg-accent',
                     lettersOnly ? 'w-full' : '',
                   )}
@@ -227,7 +227,7 @@ export function MockPartEditor({ spec, part, edit, updatePart, media, speech, ta
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-start gap-3 rounded-xl border bg-card p-4 shadow-sm">
+      <div className="flex flex-wrap items-start gap-3 rounded-xl border bg-card p-4 shadow-xs">
         <div className="min-w-0 flex-1 space-y-1">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary">
             {skillLabels[spec.skill]} · Questions {firstNumber}–{firstNumber + target - 1}
@@ -238,7 +238,7 @@ export function MockPartEditor({ spec, part, edit, updatePart, media, speech, ta
           {shownHint ? <p className="text-sm text-muted-foreground">{shownHint}</p> : null}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant={part.questions.length >= target ? 'success' : 'outline'} className="tabular-nums">
+          <Badge variant={part.questions.length >= target ? 'success' : 'outline-solid'} className="tabular-nums">
             {part.questions.length}/{target} questions
           </Badge>
           {paste && !readOnly && MOCK_PASTE_PARTS.includes(spec.key) ? (

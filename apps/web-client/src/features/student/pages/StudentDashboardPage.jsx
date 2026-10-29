@@ -100,7 +100,7 @@ function percentValue(percent) {
 
 function Hero({ hero, lessons, lessonPercent, failed, onRetry }) {
   return (
-    <div className="relative h-full overflow-hidden rounded-[2rem] bg-primary p-6 text-primary-foreground sm:p-8">
+    <div className="relative h-full overflow-hidden rounded-4xl bg-primary p-6 text-primary-foreground sm:p-8">
       <GridPattern className="text-primary-foreground/[0.07]" />
       <div className="relative flex h-full flex-col gap-6 sm:flex-row sm:items-center">
         <div className="min-w-0 flex-1 space-y-4">

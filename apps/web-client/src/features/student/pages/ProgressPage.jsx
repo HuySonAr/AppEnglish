@@ -15,7 +15,7 @@ const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
 
 function RingCard({ icon: Icon, title, percent, tone, detail }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl border bg-card p-5 text-center shadow-sm">
+    <div className="flex flex-col items-center gap-3 rounded-2xl border bg-card p-5 text-center shadow-xs">
       <p className="flex items-center gap-1.5 text-sm font-medium">
         <Icon className="h-4 w-4 text-primary" />
         {title}
@@ -79,7 +79,7 @@ export function ProgressPage() {
         />
         <RingCard icon={Headphones} title="Listening" percent={skills.listening.percent} detail={skillDetail(skills.listening)} />
         <RingCard icon={BookOpen} title="Reading" percent={skills.reading.percent} detail={skillDetail(skills.reading)} />
-        <div className="flex flex-col justify-between gap-3 rounded-2xl border bg-card p-5 shadow-sm">
+        <div className="flex flex-col justify-between gap-3 rounded-2xl border bg-card p-5 shadow-xs">
           <p className="flex items-center gap-1.5 text-sm font-medium">
             <Trophy className="h-4 w-4 text-warning" />
             XP
@@ -120,7 +120,7 @@ export function ProgressPage() {
           }
         />
       ) : (
-        <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+        <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-xs">
           <div className="flex items-center justify-between gap-3">
             <h2 className="flex items-center gap-2 font-semibold">
               <BookOpen className="h-4 w-4 text-primary" />
@@ -161,7 +161,7 @@ export function ProgressPage() {
       )}
 
       {xp?.entries?.length ? (
-        <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+        <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-xs">
           <h2 className="flex items-center gap-2 font-semibold">
             <Trophy className="h-4 w-4 text-warning" />
             XP from mock tests

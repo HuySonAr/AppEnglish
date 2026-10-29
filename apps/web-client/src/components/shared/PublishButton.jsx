@@ -32,7 +32,7 @@ export function PublishButton({ state = 'idle', disabled = false, onClick, label
       aria-busy={loading || undefined}
       aria-live="polite"
       onClick={onClick}
-      className={cn('min-w-[7.5rem] gap-2 transition-all', done && 'disabled:opacity-100', className)}
+      className={cn('min-w-30 gap-2 transition-all', done && 'disabled:opacity-100', className)}
     >
       <span className="relative flex h-5 w-5 shrink-0 items-center justify-center" aria-hidden="true">
         {done ? (

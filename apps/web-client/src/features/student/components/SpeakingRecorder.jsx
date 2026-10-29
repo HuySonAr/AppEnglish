@@ -15,7 +15,7 @@ export function StartButton({ label, hint, onClick, disabled = false }) {
         onClick={onClick}
         disabled={disabled}
         aria-label={label}
-        className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm ring-8 ring-primary/15 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-primary/40 disabled:opacity-50"
+        className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xs ring-8 ring-primary/15 transition-transform hover:scale-105 focus-visible:outline-hidden focus-visible:ring-primary/40 disabled:opacity-50"
       >
         <Mic className="h-8 w-8" />
       </button>

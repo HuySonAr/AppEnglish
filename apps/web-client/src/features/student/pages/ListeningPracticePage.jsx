@@ -51,7 +51,7 @@ function PartTile({ testId, kind, exercises }) {
       <Link
         to={`/student/practice/listening/tests/${testId}/parts/${kind.key}`}
         className={cn(
-          'group flex h-full flex-col gap-4 rounded-xl border bg-background p-4 transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'group flex h-full flex-col gap-4 rounded-xl border bg-background p-4 transition-colors hover:border-primary/40 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
           complete && 'border-success/30',
         )}
       >
@@ -106,7 +106,7 @@ function TestCard({ test, exercises }) {
             </p>
           </div>
         </div>
-        <div className="ml-auto flex min-w-[10rem] flex-1 items-center gap-3 sm:max-w-xs">
+        <div className="ml-auto flex min-w-40 flex-1 items-center gap-3 sm:max-w-xs">
           <ProgressBar value={done} total={total} className="h-1.5" />
           <span className="w-10 shrink-0 text-right text-sm font-semibold tabular-nums">{percent}%</span>
         </div>

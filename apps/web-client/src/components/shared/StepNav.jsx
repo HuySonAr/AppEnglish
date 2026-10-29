@@ -20,7 +20,7 @@ export function StepNav({ steps, active, onSelect, label }) {
                 aria-current={current ? 'step' : undefined}
                 onClick={() => onSelect(step.key)}
                 className={cn(
-                  'group flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  'group flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                   current ? 'bg-primary/10 text-foreground' : locked ? 'cursor-not-allowed text-muted-foreground opacity-60' : 'text-muted-foreground hover:bg-accent hover:text-foreground',
                 )}
               >

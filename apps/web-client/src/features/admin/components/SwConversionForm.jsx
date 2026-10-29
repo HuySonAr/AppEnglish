@@ -43,7 +43,7 @@ export function SwConversionForm({ initial }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6 rounded-xl border bg-card p-6 shadow-sm">
+    <form onSubmit={onSubmit} className="space-y-6 rounded-xl border bg-card p-6 shadow-xs">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="font-semibold">Speaking & Writing</h2>

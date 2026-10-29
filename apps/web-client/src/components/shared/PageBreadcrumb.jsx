@@ -4,7 +4,7 @@ import { cn } from '../../lib/utils.js';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '../ui/breadcrumb.jsx';
 
 const chip = 'inline-flex h-7 min-w-0 items-center gap-1 rounded-md px-2 text-xs transition-colors';
-const quiet = 'bg-muted/60 text-muted-foreground shadow-sm dark:shadow-none';
+const quiet = 'bg-muted/60 text-muted-foreground shadow-xs dark:shadow-none';
 
 export function PageBreadcrumb({ items }) {
   const shown = items.filter((item) => item && item.label);
@@ -22,9 +22,9 @@ export function PageBreadcrumb({ items }) {
           );
           return (
             <Fragment key={`${index}-${item.label}`}>
-              <BreadcrumbItem className={last ? 'max-w-[16rem] sm:max-w-md' : 'max-w-[10rem] sm:max-w-xs'}>
+              <BreadcrumbItem className={last ? 'max-w-[16rem] sm:max-w-md' : 'max-w-40 sm:max-w-xs'}>
                 {item.to && !last ? (
-                  <BreadcrumbLink asChild className={cn(chip, quiet, 'hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring')}>
+                  <BreadcrumbLink asChild className={cn(chip, quiet, 'hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring')}>
                     <Link to={item.to} state={item.state}>
                       {content}
                     </Link>

@@ -63,7 +63,7 @@ function ReviewRow({ item }) {
     <li>
       <Link
         to={contentItemPath(MANAGER_BASE, item.kind, item.id)}
-        className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <Icon className="h-4 w-4" aria-hidden="true" />
@@ -153,7 +153,7 @@ export function ContentReviewQueuePage() {
         <EmptyState icon={Inbox} title={empty.title} description={empty.description} />
       ) : (
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
             <div className="flex flex-col gap-2 border-b bg-muted/30 p-3 sm:flex-row sm:items-center">
               <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search by title" />
               <FilterSelect label="Sort by" value={filters.sort} onChange={setFilter('sort')} options={reviewSortOptions} className="w-full sm:w-40" />

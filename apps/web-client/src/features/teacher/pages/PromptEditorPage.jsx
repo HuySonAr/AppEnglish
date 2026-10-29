@@ -285,7 +285,7 @@ export function PromptEditorPage() {
       ) : null}
 
       <fieldset disabled={pending} className="min-w-0 space-y-5">
-        <div className="grid grid-cols-1 gap-4 rounded-xl border bg-card p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_14rem]">
+        <div className="grid grid-cols-1 gap-4 rounded-xl border bg-card p-4 shadow-xs md:grid-cols-[minmax(0,1fr)_14rem]">
           <Field id="prompt-title" label="Title" hint={`${content.title.length}/${PRACTICE_LIMITS.title}`}>
             <Input id="prompt-title" maxLength={PRACTICE_LIMITS.title} value={content.title} onChange={(event) => set('title')(event.target.value)} />
           </Field>
@@ -305,7 +305,7 @@ export function PromptEditorPage() {
         </div>
 
         {kind === PracticePromptKind.READ_ALOUD ? (
-          <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
+          <div className="space-y-4 rounded-xl border bg-card p-4 shadow-xs">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <TaskTypePicker tasks={etsTasksOf[kind]} current={task} fixed />
               <VoiceSpeedPicker speed={voiceSpeed} onPick={setVoiceSpeed} />
@@ -313,7 +313,7 @@ export function PromptEditorPage() {
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_17rem]">
               <div className="flex flex-col gap-1.5">
                 <Field id="prompt-text" label="Text to read" hint={`${content.text.length}/${PRACTICE_LIMITS.readAloudText}`} className="flex flex-1 flex-col">
-                  <Textarea id="prompt-text" rows={5} className="min-h-[7rem] flex-1 resize-none" maxLength={PRACTICE_LIMITS.readAloudText} placeholder={'One sentence per line.\nAttention, passengers on the 10:15 train.'} value={content.text} onChange={(event) => setText(event.target.value)} />
+                  <Textarea id="prompt-text" rows={5} className="min-h-28 flex-1 resize-none" maxLength={PRACTICE_LIMITS.readAloudText} placeholder={'One sentence per line.\nAttention, passengers on the 10:15 train.'} value={content.text} onChange={(event) => setText(event.target.value)} />
                 </Field>
                 <p className="text-xs text-muted-foreground">Put each sentence on its own line; learners see one paragraph.</p>
               </div>
@@ -330,7 +330,7 @@ export function PromptEditorPage() {
             />
           </div>
         ) : (
-          <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
+          <div className="space-y-4 rounded-xl border bg-card p-4 shadow-xs">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <TaskTypePicker tasks={etsTasksOf[kind]} current={task} onPick={pickTask} fixed={Boolean(data.latest.content.etsTask)} />
               {speaking ? <VoiceSpeedPicker speed={voiceSpeed} onPick={setVoiceSpeed} /> : null}
@@ -441,7 +441,7 @@ export function PromptEditorPage() {
         )}
 
         {kind !== PracticePromptKind.READ_ALOUD && (show('sampleAnswer') || show('keyPoints')) ? (
-          <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
+          <div className="space-y-4 rounded-xl border bg-card p-4 shadow-xs">
             {show('sampleAnswer') && show('sampleReading') ? (
               <SampleReadingFields
                 id="prompt-sample"

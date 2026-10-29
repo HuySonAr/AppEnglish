@@ -24,7 +24,7 @@ export function PassageText({ text }) {
               {block.text.split('\n').map((line, lineIndex) => {
                 const { align, text: shown } = lineAlign(line);
                 return (
-                  <p key={lineIndex} className={cn('min-h-[1lh] whitespace-pre-wrap', align === 'center' && 'text-center', align === 'right' && 'text-right')}>
+                  <p key={lineIndex} className={cn('min-h-lh whitespace-pre-wrap', align === 'center' && 'text-center', align === 'right' && 'text-right')}>
                     <InlineText text={shown} />
                   </p>
                 );

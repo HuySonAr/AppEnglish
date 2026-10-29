@@ -17,8 +17,8 @@ export function LanguageSwitch({ lang, onChange }) {
           aria-pressed={lang === item.value}
           onClick={() => onChange(item.value)}
           className={cn(
-            'rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-            lang === item.value ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+            'rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+            lang === item.value ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground',
           )}
         >
           {item.label}

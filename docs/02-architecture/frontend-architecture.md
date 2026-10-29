@@ -229,4 +229,5 @@ Ngôn ngữ thiết kế (token, bo góc, bố cục, thành phần, chuyển đ
 React page → feature hook/API → shared HTTP client → HTTP Gateway/BFF → backend. Browser không giao tiếp trực tiếp với gRPC hoặc database.
 
 ## Lưu ý cấu hình shadcn + Tailwind
+Từ 2026-10-29 (D222) dùng Tailwind v4: cấu hình nằm trong `src/styles/index.css` (`@import 'tailwindcss'`, `@import 'tw-animate-css'`, `@custom-variant dark` theo class `.dark`, `@custom-variant short`, `@theme inline` cho màu, font, bán kính), build qua plugin `@tailwindcss/vite`; không có `tailwind.config.js`, `postcss.config.js`, autoprefixer. Tên class theo v4: `shadow-xs` (bóng nhỏ cũ), `outline-hidden` (thay `outline-none`), `ring-3` (vòng 3px). `components.json` của shadcn để `tailwind.config` rỗng.
 Vite, Tailwind và shadcn có thể thay đổi cấu hình giữa các major versions. AI phải kiểm tra version/package hiện tại và dùng đúng hướng dẫn tương ứng; không ghép cấu hình Tailwind v3 với v4. Đảm bảo alias import, components.json, Vite plugin và CSS entrypoint cùng trỏ đúng source.

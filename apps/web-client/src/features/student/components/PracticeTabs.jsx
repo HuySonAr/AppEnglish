@@ -7,7 +7,7 @@ import { TeacherReviewPanel } from './TeacherReviewPanel.jsx';
 
 export function ResultCard({ submission, title = 'Result', action = null, children }) {
   return (
-    <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+    <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{submission.teacherReview ? 'AI score' : title}</p>
         <span className="flex items-center gap-2 text-xs text-muted-foreground">

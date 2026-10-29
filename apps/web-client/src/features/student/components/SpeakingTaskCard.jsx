@@ -140,7 +140,7 @@ export function ReadingBlock({ heading, sentences, audioUrl, compact = false, ch
   return (
     <div className={compact ? 'space-y-2' : 'space-y-3'}>
       <div className="flex flex-wrap items-center gap-2">
-        {heading ? <div className="min-w-[10rem] flex-1">{heading}</div> : null}
+        {heading ? <div className="min-w-40 flex-1">{heading}</div> : null}
         {audioUrl ? (
           <span className="flex items-center gap-1">
             <audio ref={audioRef} data-reading="" src={audioUrl} preload="metadata" className="hidden" onEnded={() => audioRef.current && (audioRef.current.currentTime = 0)} />
@@ -154,7 +154,7 @@ export function ReadingBlock({ heading, sentences, audioUrl, compact = false, ch
           </span>
         ) : null}
         {hasTranslation ? (
-          <Button variant={bilingual ? 'default' : 'outline'} size="sm" className={cn('gap-1.5', buttonSize)} aria-pressed={bilingual} onClick={() => setBilingual(!bilingual)}>
+          <Button variant={bilingual ? 'default' : 'outline-solid'} size="sm" className={cn('gap-1.5', buttonSize)} aria-pressed={bilingual} onClick={() => setBilingual(!bilingual)}>
             <Languages className="h-3.5 w-3.5" />
             Bilingual
           </Button>
@@ -170,7 +170,7 @@ function SampleBlock({ label, note, noteTranslation, sample }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="rounded-lg border bg-muted/30">
-      <button type="button" aria-expanded={open} onClick={() => setOpen(!open)} className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <button type="button" aria-expanded={open} onClick={() => setOpen(!open)} className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-muted/60 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
         <span className="min-w-0 flex-1">
           <span className="block text-xs font-semibold uppercase tracking-wider text-primary">{label}</span>
           {note ? <span className="mt-0.5 block text-sm font-medium">{note}</span> : null}

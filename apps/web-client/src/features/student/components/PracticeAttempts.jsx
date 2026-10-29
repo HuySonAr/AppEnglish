@@ -13,7 +13,7 @@ const statusBadges = {
 
 export function PracticeAttempts({ submissions, currentId, onOpen, maxScore = 10 }) {
   return (
-    <aside className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm lg:self-start">
+    <aside className="space-y-3 rounded-2xl border bg-card p-5 shadow-xs lg:self-start">
       <p className="font-semibold">Your attempts</p>
       {submissions.length ? (
         <ul className="-mx-2 space-y-1">
@@ -23,7 +23,7 @@ export function PracticeAttempts({ submissions, currentId, onOpen, maxScore = 10
                 type="button"
                 onClick={() => onOpen(item.id)}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  'flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                   currentId === item.id && 'bg-accent',
                 )}
               >
@@ -37,7 +37,7 @@ export function PracticeAttempts({ submissions, currentId, onOpen, maxScore = 10
                 {item.status === SubmissionStatus.DONE ? (
                   <span className={cn('font-semibold tabular-nums', toneText[scoreTone(item.total, maxScore)])}>{item.total === null || item.total === undefined ? '—' : item.total.toFixed(1)}</span>
                 ) : (
-                  <Badge variant={statusBadges[item.status]?.variant || 'outline'}>{statusBadges[item.status]?.label || item.status}</Badge>
+                  <Badge variant={statusBadges[item.status]?.variant || 'outline-solid'}>{statusBadges[item.status]?.label || item.status}</Badge>
                 )}
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </button>

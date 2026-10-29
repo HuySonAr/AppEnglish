@@ -31,7 +31,7 @@ export function TeacherReviewPanel({ submission, quota, onRequested }) {
   if (review) {
     const max = reviewMaxScore(submission.kind);
     return (
-      <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+      <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs">
         <div className="flex items-center justify-between gap-2">
           <Badge variant="success" className="gap-1">
             <GraduationCap className="h-3.5 w-3.5" />

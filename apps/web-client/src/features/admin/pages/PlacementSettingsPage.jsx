@@ -91,7 +91,7 @@ export function PlacementSettingsPage() {
         title="Placement"
         description={`New learners take a ${durationMinutes}-minute placement test once. Their score decides the unit they start at.`}
       />
-      <form onSubmit={onSubmit} className="max-w-xl space-y-5 rounded-xl border bg-card p-6 shadow-sm">
+      <form onSubmit={onSubmit} className="max-w-xl space-y-5 rounded-xl border bg-card p-6 shadow-xs">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="unit2">Start at unit 2 from (%)</Label>

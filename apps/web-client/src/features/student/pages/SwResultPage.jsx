@@ -49,7 +49,7 @@ function TeacherPart({ data, section, swTestId, onChange }) {
 
   if (teacherReview)
     return (
-      <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+      <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-xs">
         <div className="flex items-center justify-between gap-2">
           <Badge variant="success" className="gap-1">
             <GraduationCap className="h-3.5 w-3.5" />
@@ -239,7 +239,7 @@ export function SwResultPage() {
 
       <ol className="space-y-4">
         {items.map((item) => (
-          <li key={item.number} className="space-y-4 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
+          <li key={item.number} className="space-y-4 rounded-3xl border bg-card p-5 shadow-xs sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <TaskHeading item={item} />
               <SwItemScore item={item} reviewed={reviewed} />

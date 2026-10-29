@@ -58,7 +58,7 @@ export function AuthShowcase() {
   }, []);
 
   return (
-    <div className="relative flex h-full overflow-hidden rounded-[2rem] bg-primary text-primary-foreground">
+    <div className="relative flex h-full overflow-hidden rounded-4xl bg-primary text-primary-foreground">
       <GridPattern className="text-primary-foreground/[0.07]" />
 
       <div className="absolute inset-0 flex items-center justify-center">

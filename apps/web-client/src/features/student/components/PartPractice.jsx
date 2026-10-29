@@ -88,7 +88,7 @@ function WordInputs({ pieces, answers, result, shownWords, onAnswer, onFocusBlan
               }
             }}
             className={cn(
-              'h-7 max-w-full rounded-md border bg-background px-1 text-center text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20',
+              'h-7 max-w-full rounded-md border bg-background px-1 text-center text-sm outline-hidden transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20',
               given && 'border-warning/60 bg-warning/10',
               checked && !given && (checked.correct ? 'border-success/60 bg-success/10' : 'border-destructive/60 bg-destructive/10'),
             )}
@@ -402,7 +402,7 @@ export function PartPractice({ kindKey, exercises, mode, onMode, onProgress }) {
                   type="button"
                   aria-label={audio.playing ? 'Pause' : 'Play the sentence'}
                   onClick={() => (audio.playing ? audioRef.current?.pause() : playLine())}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xs transition-transform hover:scale-105 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {audio.playing ? <Pause className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}
                 </button>
@@ -418,8 +418,8 @@ export function PartPractice({ kindKey, exercises, mode, onMode, onProgress }) {
                     aria-pressed={speed === value}
                     onClick={() => setSpeed(value)}
                     className={cn(
-                      'rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-3',
-                      speed === value ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+                      'rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring sm:px-3',
+                      speed === value ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground',
                     )}
                   >
                     {value}x

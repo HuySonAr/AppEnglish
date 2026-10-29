@@ -210,7 +210,7 @@ export function AdminDashboardPage() {
           {[0, 1, 2, 3].map((item) => <Skeleton key={item} className="h-[88px] rounded-xl" />)}
         </div>
       ) : stats.state === 'error' ? (
-        <div className="flex items-center justify-between gap-3 rounded-xl border bg-card p-4 text-sm shadow-sm">
+        <div className="flex items-center justify-between gap-3 rounded-xl border bg-card p-4 text-sm shadow-xs">
           <span className="text-muted-foreground">The account numbers could not be loaded.</span>
           <Button variant="outline" size="sm" onClick={loadStats}>
             Try again

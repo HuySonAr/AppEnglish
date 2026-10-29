@@ -31,7 +31,7 @@ function ItemCard({ item, section, value, invalid, disabled, onChange }) {
   const readAloud = item.task === EtsSpeakingTask.READ_ALOUD;
   const set = (key) => (next) => onChange({ ...value, [key]: next });
   return (
-    <li className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+    <li className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs">
       <div className="flex items-start justify-between gap-3">
         <TaskHeading item={item} />
         <SwItemScore item={item} />
@@ -116,7 +116,7 @@ export function SwReviewView({ reviewId, data, back, releasing, onRelease }) {
             />
           ))}
         </ol>
-        <aside className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm lg:sticky lg:top-20 lg:self-start">
+        <aside className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs lg:sticky lg:top-20 lg:self-start">
           <div className="flex items-baseline justify-between gap-2">
             <p className="font-semibold">Raw score</p>
             <span className="text-2xl font-bold tabular-nums">

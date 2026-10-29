@@ -11,7 +11,7 @@ export function VocabularyCard({ item, index, edit, update, media, fillState, on
   const filled = item.phonetic && item.audioUkMediaId && item.audioUsMediaId;
   const readOnly = useReadOnly();
   return (
-    <div className="space-y-4 rounded-xl border bg-card p-4 shadow-sm">
+    <div className="space-y-4 rounded-xl border bg-card p-4 shadow-xs">
       <div className="flex items-center gap-3">
         <span className="flex h-8 min-w-8 items-center justify-center rounded-full bg-muted px-2 text-sm font-semibold tabular-nums">{index + 1}</span>
         <p className="min-w-0 flex-1 truncate font-medium">{item.word.trim() || 'New word'}</p>

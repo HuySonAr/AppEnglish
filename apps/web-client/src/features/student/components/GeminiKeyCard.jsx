@@ -74,7 +74,7 @@ export function GeminiKeyCard({ showGuideLink = true }) {
   }
 
   return (
-    <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+    <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs">
       <div className="flex items-start gap-3">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <KeyRound className="h-4 w-4" />

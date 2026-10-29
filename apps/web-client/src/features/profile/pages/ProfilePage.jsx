@@ -29,7 +29,7 @@ const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
 
 function Stat({ icon: Icon, label, value, detail, tone = 'text-primary bg-primary/10' }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border bg-card p-4 shadow-sm">
+    <div className="flex items-start gap-3 rounded-xl border bg-card p-4 shadow-xs">
       <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', tone)}>
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
@@ -203,7 +203,7 @@ export function ProfilePage() {
     <Card className={cn(student && 'lg:sticky lg:top-20')}>
       <CardContent className="space-y-5 pt-6">
         <div className="flex flex-col items-center gap-3 text-center">
-          <Avatar account={account} size="lg" className="shadow-sm" />
+          <Avatar account={account} size="lg" className="shadow-xs" />
           <div className="min-w-0 space-y-1.5">
             <h2 className="truncate text-xl font-bold">{name}</h2>
             <Badge variant="secondary" className="gap-1">

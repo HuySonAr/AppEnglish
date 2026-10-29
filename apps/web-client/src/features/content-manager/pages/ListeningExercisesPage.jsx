@@ -104,7 +104,7 @@ function NewExerciseDialog({ open, onOpenChange, topics, initialTopicId, base })
                   aria-pressed={form.topicId === topic.id}
                   onClick={() => chooseTopic(topic)}
                   className={cn(
-                    'rounded-lg border px-3 py-2 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'rounded-lg border px-3 py-2 text-left text-sm transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                     form.topicId === topic.id ? 'border-primary bg-primary/5 font-medium text-primary' : 'hover:bg-accent',
                   )}
                 >
@@ -130,7 +130,7 @@ function NewExerciseDialog({ open, onOpenChange, topics, initialTopicId, base })
                   aria-pressed={form.level === level}
                   onClick={() => setForm({ ...form, level })}
                   className={cn(
-                    'h-9 min-w-12 rounded-md border px-3 text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'h-9 min-w-12 rounded-md border px-3 text-sm font-medium tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                     form.level === level ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
                   )}
                 >
@@ -178,7 +178,7 @@ function ExerciseRow({ exercise, showTopic, base }) {
     <li>
       <Link
         to={`${base}/listening/${exercise.id}`}
-        className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-md bg-muted text-sm font-semibold tabular-nums">{exercise.level}</span>
         <span className="min-w-0 flex-1">
@@ -281,7 +281,7 @@ export function ListeningExercisesPage() {
             </TabsList>
           </Tabs>
 
-          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
             <div className="space-y-3 border-b bg-muted/30 p-3">
               <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
                 <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search by title" />

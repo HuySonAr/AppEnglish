@@ -75,7 +75,7 @@ function TimeInput({ id, label, value, onChange, readOnly }) {
 }
 
 function TimeStepper({ label, value, onChange }) {
-  const stepButton = 'flex h-4 w-6 items-center justify-center text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring';
+  const stepButton = 'flex h-4 w-6 items-center justify-center text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring';
   return (
     <div className="flex h-8 flex-col overflow-hidden border-y border-r border-input bg-background">
       <button type="button" className={cn(stepButton, 'border-b border-input')} aria-label={`${label} later by 0.1 s`} onClick={() => onChange(nudged(value, TIME_STEP))}>
@@ -109,7 +109,7 @@ export function TimeField({ id, label, name, value, onChange, onHere, canHere, r
 
 function Panel({ title, children }) {
   return (
-    <div className="space-y-3 rounded-xl border bg-card p-4 shadow-sm">
+    <div className="space-y-3 rounded-xl border bg-card p-4 shadow-xs">
       {title ? <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</p> : null}
       {children}
     </div>
@@ -419,7 +419,7 @@ export function RecordingEditor({ ownerId, kind, content, title, edit, setSegmen
           <Badge variant="secondary" className="tabular-nums">
             {timedCount}/{segments.length} timed
           </Badge>
-          {song ? <Badge variant={blankCount ? 'secondary' : 'outline'}>{blankCount} blank{blankCount === 1 ? '' : 's'}</Badge> : null}
+          {song ? <Badge variant={blankCount ? 'secondary' : 'outline-solid'}>{blankCount} blank{blankCount === 1 ? '' : 's'}</Badge> : null}
           {canAdd ? (
             <Button variant="outline" size="sm" className="ml-auto gap-1.5" onClick={addSegment}>
               <Plus className="h-4 w-4" />
@@ -444,7 +444,7 @@ export function RecordingEditor({ ownerId, kind, content, title, edit, setSegmen
                 <li
                   key={segment.id}
                   id={id}
-                  className={cn('rounded-xl border bg-card p-3 shadow-sm transition-colors', playing && 'border-primary bg-primary/5', check && !playing && 'border-warning')}
+                  className={cn('rounded-xl border bg-card p-3 shadow-xs transition-colors', playing && 'border-primary bg-primary/5', check && !playing && 'border-warning')}
                 >
                   <div className="flex gap-3">
                     <span

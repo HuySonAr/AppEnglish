@@ -119,7 +119,7 @@ export function PracticePromptList({ title, description, icon, kindLabel, basePa
                 <li key={prompt.id}>
                   <Link
                     to={`${basePath}/${prompt.id}`}
-                    className="group flex h-full flex-col gap-4 rounded-2xl border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="group flex h-full flex-col gap-4 rounded-2xl border bg-card p-5 shadow-xs transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <div className="flex items-start gap-3">
                       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-sm font-bold text-primary" title={levelScores(prompt.level)}>{levelShort(prompt.level)}</span>

@@ -9,7 +9,7 @@ const skillLabels = { LISTENING: 'Listening', READING: 'Reading' };
 
 function Transcript({ text }) {
   return (
-    <details className="rounded-xl border bg-card p-4 text-sm shadow-sm">
+    <details className="rounded-xl border bg-card p-4 text-sm shadow-xs">
       <summary className="cursor-pointer font-medium">Transcript</summary>
       <p className="mt-3 whitespace-pre-wrap leading-relaxed text-muted-foreground">{text}</p>
     </details>
@@ -21,7 +21,7 @@ function ReviewedQuestion({ question, blank }) {
   const right = question.chosenOptionId === correct?.id;
   return (
     <div
-      className={cn('rounded-xl border bg-card p-4 shadow-sm', right ? 'border-success/40' : 'border-destructive/40')}
+      className={cn('rounded-xl border bg-card p-4 shadow-xs', right ? 'border-success/40' : 'border-destructive/40')}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <p className="font-medium">
@@ -97,7 +97,7 @@ export function TestReview({ parts }) {
                 {section.transcript ? <Transcript text={section.transcript} /> : null}
                 {section.imageUrl ? <img src={section.imageUrl} alt="" className="max-h-96 rounded-lg border" /> : null}
                 {section.passage ? (
-                  <div className="whitespace-pre-wrap rounded-xl border bg-card p-4 leading-relaxed shadow-sm">
+                  <div className="whitespace-pre-wrap rounded-xl border bg-card p-4 leading-relaxed shadow-xs">
                     {section.blanks ? numberBlanks(section.passage, section.questions[0].number) : <PassageText text={section.passage} />}
                   </div>
                 ) : null}

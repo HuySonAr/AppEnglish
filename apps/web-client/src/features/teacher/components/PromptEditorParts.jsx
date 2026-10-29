@@ -41,7 +41,7 @@ export function Choice({ value, current, onPick, children, className }) {
       aria-pressed={value === current}
       onClick={() => onPick(value)}
       className={cn(
-        'h-9 rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'h-9 rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
         value === current ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
         className,
       )}
@@ -210,7 +210,7 @@ export function SampleReadingFields({
         rows={rows}
         maxLength={PRACTICE_LIMITS.sampleAnswer}
         placeholder="One sentence per line."
-        className={sideBySide ? 'min-h-[5.5rem] flex-1 resize-none' : undefined}
+        className={sideBySide ? 'min-h-22 flex-1 resize-none' : undefined}
         value={text}
         onChange={(event) => onText(event.target.value)}
       />
@@ -257,7 +257,7 @@ export function QuestionRows({ questions, media, onMedia, onQuestion: update, vo
                   id={`question-${index}-text`}
                   rows={2}
                   maxLength={PRACTICE_LIMITS.question}
-                  className={questionAudio ? 'min-h-[4.5rem] flex-1 resize-none' : undefined}
+                  className={questionAudio ? 'min-h-18 flex-1 resize-none' : undefined}
                   value={question.text}
                   onChange={(event) => update(index, { text: event.target.value })}
                 />

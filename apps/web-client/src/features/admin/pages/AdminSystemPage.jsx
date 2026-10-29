@@ -23,7 +23,7 @@ function Figure({ label, value }) {
 function ServiceCard({ service }) {
   const down = service.status !== 'ok';
   return (
-    <div className={cn('space-y-3 rounded-xl border bg-card p-4 shadow-sm', down && 'border-destructive/50')}>
+    <div className={cn('space-y-3 rounded-xl border bg-card p-4 shadow-xs', down && 'border-destructive/50')}>
       <div className="flex items-center justify-between gap-2">
         <p className="flex items-center gap-2 font-semibold">
           <Server className="h-4 w-4 text-muted-foreground" />
@@ -146,7 +146,7 @@ export function AdminSystemPage() {
       {header}
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <div className="flex items-center gap-3 rounded-xl border bg-card p-4 shadow-sm">
+        <div className="flex items-center gap-3 rounded-xl border bg-card p-4 shadow-xs">
           {up === data.services.length ? <CheckCircle2 className="h-6 w-6 text-success" /> : <AlertTriangle className="h-6 w-6 text-destructive" />}
           <div>
             <p className="text-sm text-muted-foreground">Services up</p>
@@ -155,14 +155,14 @@ export function AdminSystemPage() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-xl border bg-card p-4 shadow-sm">
+        <div className="flex items-center gap-3 rounded-xl border bg-card p-4 shadow-xs">
           <Activity className={cn('h-6 w-6', health.retrying ? 'text-warning' : 'text-success')} />
           <div>
             <p className="text-sm text-muted-foreground">Waiting to retry</p>
             <p className="text-xl font-bold tabular-nums">{health.retrying}</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 rounded-xl border bg-card p-4 shadow-sm">
+        <div className="flex items-center gap-3 rounded-xl border bg-card p-4 shadow-xs">
           <Inbox className={cn('h-6 w-6', health.dead ? 'text-destructive' : 'text-success')} />
           <div>
             <p className="text-sm text-muted-foreground">Dead letters</p>
@@ -177,7 +177,7 @@ export function AdminSystemPage() {
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+      <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
         <div className="flex items-center justify-between gap-2 border-b px-4 py-3">
           <h2 className="font-semibold">Broker queues</h2>
           <span className="text-xs text-muted-foreground">Checked {new Date(data.checkedAt).toLocaleTimeString()}</span>
@@ -201,7 +201,7 @@ export function AdminSystemPage() {
                     <td className="px-4 py-2">
                       <span className="font-mono text-xs">{queue.name}</span>
                       {queue.kind !== 'main' ? (
-                        <Badge variant={queue.kind === 'dead' ? (queue.ready ? 'destructive' : 'outline') : 'secondary'} className="ml-2">
+                        <Badge variant={queue.kind === 'dead' ? (queue.ready ? 'destructive' : 'outline-solid') : 'secondary'} className="ml-2">
                           {queue.kind}
                         </Badge>
                       ) : null}

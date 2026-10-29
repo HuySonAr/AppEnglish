@@ -2,10 +2,10 @@ import { cn } from '../../../lib/utils.js';
 
 export function TestStartCard({ icon: Icon, eyebrow, title, badges, stats, note, children, className }) {
   return (
-    <div className={cn('overflow-hidden rounded-2xl border bg-card shadow-sm', className)}>
+    <div className={cn('overflow-hidden rounded-2xl border bg-card shadow-xs', className)}>
       <div className="flex items-center gap-4 bg-primary/5 px-6 py-5">
         {Icon ? (
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xs">
             <Icon className="h-6 w-6" />
           </span>
         ) : null}

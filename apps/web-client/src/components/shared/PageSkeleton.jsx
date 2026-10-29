@@ -161,7 +161,7 @@ export function DashboardPageSkeleton() {
         <Skeleton className="h-8 w-72 max-w-full" />
       </div>
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem]">
-        <Skeleton className="h-60 w-full rounded-[2rem]" />
+        <Skeleton className="h-60 w-full rounded-4xl" />
         <Skeleton className="h-60 w-full rounded-3xl" />
       </div>
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_21rem]">

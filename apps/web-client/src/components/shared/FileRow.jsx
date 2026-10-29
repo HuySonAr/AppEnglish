@@ -14,7 +14,7 @@ export function FileRow({ name, type, sizeBytes, status = 'done', note, error, o
         .filter(Boolean)
         .join(' · ');
   return (
-    <div className={cn('rounded-xl border bg-card p-3 text-sm shadow-sm', failed && 'border-destructive/40', className)}>
+    <div className={cn('rounded-xl border bg-card p-3 text-sm shadow-xs', failed && 'border-destructive/40', className)}>
       <div className="flex items-center gap-3">
         <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-lg', failed ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary')}>
           <Icon className="h-5 w-5" aria-hidden="true" />

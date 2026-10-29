@@ -32,7 +32,7 @@ export function BlankInputs({ pieces, answers, result, revealed, shownWords = {}
   const byBlank = new Map((result?.pieces || []).filter((piece) => 'blank' in piece).map((piece) => [piece.blank, piece]));
   let number = 0;
   return (
-    <p className="text-lg leading-[3rem]">
+    <p className="text-lg leading-12">
       {pieces.map((piece, index) => {
         if (!('blank' in piece)) return <span key={index}>{piece.text}</span>;
         number += 1;
@@ -208,7 +208,7 @@ export function DictationPractice({ exerciseId, data, onScored }) {
   if (final)
     return (
       <div className="space-y-6">
-        <div className="flex flex-col items-center gap-6 rounded-2xl border bg-card p-6 shadow-sm sm:flex-row">
+        <div className="flex flex-col items-center gap-6 rounded-2xl border bg-card p-6 shadow-xs sm:flex-row">
           <ScoreRing percent={final.accuracy} tone={final.accuracy >= 80 ? 'success' : 'primary'} label="this time" />
           <div className="flex-1 space-y-3 text-center sm:text-left">
             <p className="text-lg font-semibold">
@@ -221,7 +221,7 @@ export function DictationPractice({ exerciseId, data, onScored }) {
             </Button>
           </div>
         </div>
-        <ol className="divide-y rounded-2xl border bg-card shadow-sm">
+        <ol className="divide-y rounded-2xl border bg-card shadow-xs">
           {final.segments.map((line, at) => (
             <li key={line.id} className="space-y-1 px-5 py-3">
               <div className="flex items-center gap-2 text-sm">
@@ -256,7 +256,7 @@ export function DictationPractice({ exerciseId, data, onScored }) {
               setTab(key);
             }}
             className={cn(
-              '-mb-px rounded-t-lg border px-5 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              '-mb-px rounded-t-lg border px-5 py-2.5 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
               tab === key ? 'border-border border-b-card bg-card text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground',
             )}
           >
@@ -270,13 +270,13 @@ export function DictationPractice({ exerciseId, data, onScored }) {
       {tab === 'transcript' ? (
         <TranscriptTab exerciseId={exerciseId} audioRef={audioRef} audioUrl={data.audioUrl} speed={speed} />
       ) : (
-        <div className="space-y-5 rounded-b-2xl rounded-tr-2xl border border-t-0 bg-card p-5 shadow-sm sm:p-6">
+        <div className="space-y-5 rounded-b-2xl rounded-tr-2xl border border-t-0 bg-card p-5 shadow-xs sm:p-6">
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
               aria-label={audio.playing ? 'Pause' : 'Play the sentence'}
               onClick={() => (audio.playing ? audioRef.current?.pause() : playLine())}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xs transition-transform hover:scale-105 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
             >
               {audio.playing ? <Pause className="h-5 w-5" /> : <Play className="ml-0.5 h-5 w-5" />}
             </button>
@@ -284,7 +284,7 @@ export function DictationPractice({ exerciseId, data, onScored }) {
               <Button variant="ghost" size="icon" className="rounded-full" aria-label="Previous sentence" disabled={index === 0} onClick={() => go(index - 1)}>
                 <ChevronLeft className="h-5 w-5" />
               </Button>
-              <span className="min-w-[4.5rem] text-center font-semibold tabular-nums">
+              <span className="min-w-18 text-center font-semibold tabular-nums">
                 {index + 1} / {segments.length}
               </span>
               <Button variant="ghost" size="icon" className="rounded-full" aria-label="Next sentence" disabled={last} onClick={() => go(index + 1)}>

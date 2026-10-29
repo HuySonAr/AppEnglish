@@ -86,11 +86,11 @@ export function TeacherReviewQueuePage() {
     <section className="space-y-6">
       {header}
       <div className="grid grid-cols-2 gap-3 sm:max-w-md">
-        <div className="rounded-xl border bg-card p-4 shadow-sm">
+        <div className="rounded-xl border bg-card p-4 shadow-xs">
           <p className="text-sm text-muted-foreground">Waiting</p>
           <p className="text-2xl font-bold tabular-nums">{data.reviews.length}</p>
         </div>
-        <div className="rounded-xl border bg-card p-4 shadow-sm">
+        <div className="rounded-xl border bg-card p-4 shadow-xs">
           <p className="text-sm text-muted-foreground">Graded this week</p>
           <p className="text-2xl font-bold tabular-nums">{data.doneThisWeek}</p>
         </div>
@@ -99,7 +99,7 @@ export function TeacherReviewQueuePage() {
         <EmptyState icon={ClipboardCheck} title="Nothing to grade" description="New answers appear here when learners send them." />
       ) : (
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
             <div className="flex flex-col gap-2 border-b bg-muted/30 p-3 sm:flex-row">
               <FilterSelect label="Kind" value={filters.kind} onChange={setFilter('kind')} options={kindOptions} className="w-full sm:w-44" />
               <FilterSelect label="AI score" value={filters.ai} onChange={setFilter('ai')} options={aiOptions} className="w-full sm:w-56" />
@@ -121,9 +121,9 @@ export function TeacherReviewQueuePage() {
                     </span>
                     <span className="hidden shrink-0 gap-1.5 sm:flex">
                       {item.mine ? <Badge variant="info">Yours</Badge> : null}
-                      <Badge variant={item.hasAi ? 'secondary' : 'outline'}>{item.hasAi ? 'AI score' : 'No AI score'}</Badge>
+                      <Badge variant={item.hasAi ? 'secondary' : 'outline-solid'}>{item.hasAi ? 'AI score' : 'No AI score'}</Badge>
                     </span>
-                    <Button size="sm" variant={item.mine ? 'default' : 'outline'} loading={taking === item.id} disabled={Boolean(taking)} onClick={() => take(item)}>
+                    <Button size="sm" variant={item.mine ? 'default' : 'outline-solid'} loading={taking === item.id} disabled={Boolean(taking)} onClick={() => take(item)}>
                       {item.mine ? 'Continue' : 'Take'}
                     </Button>
                   </li>

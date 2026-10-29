@@ -403,7 +403,7 @@ export function VocabularyPracticePage() {
       <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
         <fieldset className="space-y-4 rounded-xl border bg-card p-4 sm:p-5">
           <legend className="sr-only">Question {index + 1}</legend>
-          <div className="flex flex-wrap items-center gap-2 !mt-0">
+          <div className="flex flex-wrap items-center gap-2 mt-0!">
             <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
               Question {index + 1}
             </span>
@@ -426,7 +426,7 @@ export function VocabularyPracticePage() {
                   disabled={answered}
                   onClick={() => choose(option)}
                   className={cn(
-                    'flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default',
+                    'flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left text-sm transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default',
                     !answered && 'hover:border-primary/40 hover:bg-accent',
                     answered && isRight && 'border-success/50 bg-success/10',
                     answered &&

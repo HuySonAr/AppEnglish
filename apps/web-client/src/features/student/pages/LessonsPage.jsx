@@ -23,7 +23,7 @@ function Node({ tone, children, last }) {
   return (
     <span className="relative flex w-10 shrink-0 justify-center self-stretch">
       {last ? null : <span aria-hidden="true" className="absolute left-1/2 top-10 h-[calc(100%-1.25rem)] w-0.5 -translate-x-1/2 bg-border" />}
-      <span className={cn('relative z-[1] mt-1 flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ring-4 ring-card', tone)}>{children}</span>
+      <span className={cn('relative z-1 mt-1 flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ring-4 ring-card', tone)}>{children}</span>
     </span>
   );
 }
@@ -52,7 +52,7 @@ function PathRow({ to, linkState, locked, tone, node, title, detail, last, curre
           {body}
         </div>
       ) : (
-        <Link to={to} state={linkState} className={cn(frame, 'transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring', current && 'bg-primary/5')}>
+        <Link to={to} state={linkState} className={cn(frame, 'transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring', current && 'bg-primary/5')}>
           {body}
         </Link>
       )}
@@ -154,8 +154,8 @@ export function LessonsPage() {
       {curriculum.units.length ? (
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_16rem]">
           {next ? (
-            <div className="flex flex-wrap items-center gap-4 rounded-2xl border bg-card p-5 shadow-sm">
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+            <div className="flex flex-wrap items-center gap-4 rounded-2xl border bg-card p-5 shadow-xs">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xs">
                 <Sparkles className="h-6 w-6" />
               </span>
               <div className="min-w-0 flex-1">
@@ -172,12 +172,12 @@ export function LessonsPage() {
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-3 rounded-2xl border bg-card p-5 shadow-sm">
+            <div className="flex items-center gap-3 rounded-2xl border bg-card p-5 shadow-xs">
               <CheckCircle2 className="h-6 w-6 text-success" />
               <p className="font-medium">{curriculum.placementRequired ? 'Your lessons open after the placement test.' : 'Every open lesson is done.'}</p>
             </div>
           )}
-          <div className="rounded-2xl border bg-card p-5 shadow-sm">
+          <div className="rounded-2xl border bg-card p-5 shadow-xs">
             <p className="text-sm text-muted-foreground">Lessons completed</p>
             <p className="mt-1 text-3xl font-bold tabular-nums">
               {completed}
@@ -202,7 +202,7 @@ export function LessonsPage() {
           {shown.items.map((unit) => {
             const progress = unitProgress(fullUnit(unit.id) || unit);
             return (
-              <div key={unit.id} id={`focus-${unit.id}`} className="scroll-mt-24 overflow-hidden rounded-2xl border bg-card shadow-sm">
+              <div key={unit.id} id={`focus-${unit.id}`} className="scroll-mt-24 overflow-hidden rounded-2xl border bg-card shadow-xs">
                 <div className="flex flex-wrap items-center gap-4 border-b px-5 py-4">
                   <span className={cn('flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-lg font-bold', progress.complete ? 'bg-success/15 text-success' : 'bg-primary/10 text-primary')}>
                     {progress.complete ? <CheckCircle2 className="h-6 w-6" /> : unit.number}

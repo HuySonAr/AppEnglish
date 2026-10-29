@@ -147,7 +147,7 @@ export function SwPrompt({ item, compact = false, showText }) {
   if (item.task === EtsWritingTask.RESPOND_EMAIL)
     return (
       <div className="space-y-3">
-        <div className={cn('overflow-y-auto whitespace-pre-wrap rounded-xl border bg-muted/40 p-4 text-sm leading-relaxed', compact ? 'max-h-48' : 'max-h-[28rem]')}>{item.email}</div>
+        <div className={cn('overflow-y-auto whitespace-pre-wrap rounded-xl border bg-muted/40 p-4 text-sm leading-relaxed', compact ? 'max-h-48' : 'max-h-112')}>{item.email}</div>
         {item.instructions ? <p className="whitespace-pre-wrap text-sm font-medium leading-relaxed">{item.instructions}</p> : null}
       </div>
     );

@@ -25,7 +25,7 @@
 **VERIFIED:** root manifests, six app directories, two shared packages,
 `docker-compose.yml`, `.env.example` và PostgreSQL script đã được tạo và install
 thành công. Lockfile resolves NestJS `11.2.7`, TypeORM `0.3.31`, React `19.3.0`,
-Vite `7.3.7`, Tailwind `3.4.19`, gRPC `1.14.6`, amqplib `0.10.9`, ioredis
+Vite `7.3.7`, Tailwind `4.3.3` (plugin `@tailwindcss/vite`, `tw-animate-css` `1.4.0`; D222), gRPC `1.14.6`, amqplib `0.10.9`, ioredis
 `5.11.1`, and pg `8.23.1`. gRPC/RabbitMQ/Redis client dependencies are present
 in service manifests.
 

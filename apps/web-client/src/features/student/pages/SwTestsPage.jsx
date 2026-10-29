@@ -36,11 +36,11 @@ function SectionRow({ test, section, icon: Icon, onTake }) {
         </p>
       </div>
       {latest ? (
-        <Link to={swResultPath(test.id, section, latest.attemptNumber)} className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <Link to={swResultPath(test.id, section, latest.attemptNumber)} className="rounded-full focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
           <SwAttemptBadge attempt={latest} />
         </Link>
       ) : null}
-      <Button size="sm" variant={latest ? 'outline' : 'default'} onClick={onTake}>
+      <Button size="sm" variant={latest ? 'outline-solid' : 'default'} onClick={onTake}>
         Take {sectionInfo[section].label}
       </Button>
     </div>
@@ -99,8 +99,8 @@ export function SwTestsPage() {
           {shown.total === 0 ? <EmptyState icon={MicVocal} title="No test matches" description="Try another search or filter." /> : null}
           <ul className="grid gap-4 lg:grid-cols-2">
             {shown.items.map((test) => (
-              <li key={test.id} className="flex flex-col gap-4 rounded-3xl border bg-card p-5 shadow-sm">
-                <Link to={`/student/sw-tests/${test.id}`} className="group flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <li key={test.id} className="flex flex-col gap-4 rounded-3xl border bg-card p-5 shadow-xs">
+                <Link to={`/student/sw-tests/${test.id}`} className="group flex items-center gap-3 rounded-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                     <MicVocal className="h-5 w-5" />
                   </span>

@@ -69,7 +69,7 @@ export function TeacherDashboardPage() {
   return (
     <section className="space-y-6">
       {header}
-      <Link to="/teacher/reviews" className="flex flex-wrap items-center gap-4 rounded-xl border bg-card p-4 shadow-sm transition-colors hover:bg-accent">
+      <Link to="/teacher/reviews" className="flex flex-wrap items-center gap-4 rounded-xl border bg-card p-4 shadow-xs transition-colors hover:bg-accent">
         <span className="min-w-0 flex-1">
           <span className="block text-sm text-muted-foreground">Answers waiting to be graded</span>
           <span className="block text-2xl font-bold tabular-nums">{queue?.reviews.length ?? 0}</span>
@@ -79,7 +79,7 @@ export function TeacherDashboardPage() {
       </Link>
 
       {content ? (
-        <div className="space-y-3 rounded-xl border bg-card p-5 shadow-sm">
+        <div className="space-y-3 rounded-xl border bg-card p-5 shadow-xs">
           <div className="flex items-center justify-between gap-2">
             <h2 className="font-semibold">Content in progress</h2>
             <Link to={`${TEACHER_BASE}/units`} className="text-sm text-primary underline-offset-4 hover:underline">
@@ -114,7 +114,7 @@ export function TeacherDashboardPage() {
         {Object.entries(kindPages).map(([kind, page]) => {
           const counts = statusCounts(prompts.filter((prompt) => prompt.kind === kind));
           return (
-            <div key={kind} className="space-y-3 rounded-xl border bg-card p-4 shadow-sm">
+            <div key={kind} className="space-y-3 rounded-xl border bg-card p-4 shadow-xs">
               <Link to={teacherListPath(kind)} className="group flex items-center gap-2 font-semibold">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <page.icon className="h-4 w-4" />
@@ -135,7 +135,7 @@ export function TeacherDashboardPage() {
         })}
       </div>
 
-      <div className="space-y-3 rounded-xl border bg-card p-5 shadow-sm">
+      <div className="space-y-3 rounded-xl border bg-card p-5 shadow-xs">
         <h2 className="font-semibold">To finish</h2>
         {attention.length ? (
           <ul className="divide-y">

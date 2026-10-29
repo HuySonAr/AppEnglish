@@ -400,7 +400,7 @@ export function LessonEditorPage() {
             event.preventDefault();
             if (!locked) onRename();
           }}
-          className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm sm:flex-row sm:items-end"
+          className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs sm:flex-row sm:items-end"
         >
           <div className="min-w-0 flex-1 space-y-2">
             <Label htmlFor="lesson-title">Title</Label>
@@ -437,7 +437,7 @@ export function LessonEditorPage() {
           <div className="min-w-0 space-y-4">
             {tab === 'vocabulary' ? (
               <>
-                <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card p-4 shadow-sm">
+                <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card p-4 shadow-xs">
                   <div className="min-w-0 flex-1">
                     <h2 className="text-lg font-semibold">Vocabulary</h2>
                     {readOnly ? null : <p className="text-sm text-muted-foreground">Auto-fill adds the IPA and audio a word is missing.</p>}
@@ -459,12 +459,12 @@ export function LessonEditorPage() {
 
             {tab === 'fillIn' ? (
               <>
-                <div className="rounded-xl border bg-card p-4 shadow-sm">
+                <div className="rounded-xl border bg-card p-4 shadow-xs">
                   <h2 className="text-lg font-semibold">Fill-in</h2>
                   {readOnly ? null : <p className="text-sm text-muted-foreground">Type {FILL_IN_BLANK} for each blank, then its answer.</p>}
                 </div>
                 <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_16rem]">
-                  <div className="rounded-xl border bg-card p-4 shadow-sm">
+                  <div className="rounded-xl border bg-card p-4 shadow-xs">
                     <TextField
                       id="fill-in-passage"
                       label="Passage"
@@ -475,7 +475,7 @@ export function LessonEditorPage() {
                       onChange={(value) => update((current) => ({ ...current, fillIn: withFillInPassage(current.fillIn, value) }))}
                     />
                   </div>
-                  <div className="space-y-2 rounded-xl border bg-card p-4 shadow-sm">
+                  <div className="space-y-2 rounded-xl border bg-card p-4 shadow-xs">
                     <p className="text-sm font-medium">Answers</p>
                     {blanks === 0 ? (
                       <p className="text-sm text-muted-foreground">No blank yet.</p>

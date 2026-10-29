@@ -16,7 +16,7 @@ export function GeminiKeyPage() {
       <PageHeader eyebrow="Writing" title="Get your Gemini key" description="Follow three steps to have your writing scored." />
       <ol className="grid gap-3 md:grid-cols-3">
         {steps.map((step, index) => (
-          <li key={step.title} className="flex gap-3 rounded-2xl border bg-card p-4 shadow-sm">
+          <li key={step.title} className="flex gap-3 rounded-2xl border bg-card p-4 shadow-xs">
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">{index + 1}</span>
             <div className="min-w-0 space-y-1">
               <p className="font-medium">{step.title}</p>

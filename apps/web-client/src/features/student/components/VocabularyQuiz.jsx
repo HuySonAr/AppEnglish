@@ -98,7 +98,7 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
               aria-current={index === at ? 'step' : undefined}
               onClick={() => setAt(index)}
               className={cn(
-                'flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold tabular-nums transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                'flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold tabular-nums transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                 itemLight === QuizLight.RIGHT
                   ? 'border-success bg-success text-white'
                   : itemLight === QuizLight.WRONG
@@ -142,7 +142,7 @@ export function VocabularyQuiz({ lessonId, kind, onPassed }) {
                   disabled={passed}
                   onClick={() => choose(question, option)}
                   className={cn(
-                    'flex items-center gap-3 rounded-xl border-2 px-4 py-3.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default',
+                    'flex items-center gap-3 rounded-xl border-2 px-4 py-3.5 text-left transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default',
                     selected ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/40 hover:bg-accent',
                   )}
                 >

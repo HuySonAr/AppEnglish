@@ -5,7 +5,7 @@ import { PasswordInput } from '../../../components/shared/PasswordInput.jsx';
 import { focusOnEnter } from '../flow/auth-flow.js';
 
 export const authInput = 'h-12 rounded-full border-transparent bg-muted/60 px-5 text-[15px] shadow-none transition-colors hover:bg-muted focus-visible:border-primary/40 focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-0';
-export const authButton = 'h-12 w-full rounded-full text-[15px] font-semibold shadow-sm transition-transform active:scale-[0.99]';
+export const authButton = 'h-12 w-full rounded-full text-[15px] font-semibold shadow-xs transition-transform active:scale-[0.99]';
 
 export function AuthCard({ title, description, children, footer, className }) {
   return (

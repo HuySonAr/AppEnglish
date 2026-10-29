@@ -35,12 +35,12 @@ function PromptCard({ prompt, number, onClear }) {
   const style = levelStyle[level] || levelStyle[PracticeLevel.INTERMEDIATE];
   const LevelIcon = style.icon;
   const tried = prompt.attempts > 0;
-  const iconButton = 'flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40';
+  const iconButton = 'flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40';
   return (
     <motion.div {...lift} className={cn('flex h-full flex-col overflow-hidden rounded-xl border bg-card transition-colors hover:border-primary/40', tried && 'border-success/40')}>
-      <Link to={`/student/practice/speaking/${prompt.id}`} className="group flex flex-1 flex-col gap-2 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
+      <Link to={`/student/practice/speaking/${prompt.id}`} className="group flex flex-1 flex-col gap-2 p-4 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
         {prompt.imageUrl ? (
-          <div className="-mx-4 -mt-4 mb-1 aspect-[16/9] overflow-hidden border-b bg-muted">
+          <div className="-mx-4 -mt-4 mb-1 aspect-video overflow-hidden border-b bg-muted">
             <img src={prompt.imageUrl} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
           </div>
         ) : null}
@@ -182,7 +182,7 @@ export function SpeakingPromptsPage() {
                 title={`${item.title} · ${item.questions}`}
                 onClick={() => update({ part: String(item.number), level: 'all', topic: 'all' })}
                 className={cn(
-                  'relative whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  'relative whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                   active ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground',
                 )}
               >

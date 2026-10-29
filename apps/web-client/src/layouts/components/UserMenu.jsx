@@ -23,9 +23,9 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={`Account menu for ${name}`}
-        className="rounded-full ring-offset-background transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="rounded-full ring-offset-background transition hover:opacity-90 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
-        <Avatar account={account} size="md" className="border shadow-sm" />
+        <Avatar account={account} size="md" className="border shadow-xs" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="space-y-0.5">

@@ -29,12 +29,12 @@ function PodiumPlace({ entry }) {
   return (
     <li className={cn('flex flex-col items-center gap-1 text-center', first ? 'order-2' : entry.rank === 2 ? 'order-1 sm:mt-8' : 'order-3 sm:mt-8')}>
       <span className="relative">
-        <Avatar account={entry} size="lg" className={cn('shadow-sm', first ? 'h-24 w-24' : 'h-16 w-16 text-2xl', entry.isYou && 'ring-2 ring-primary ring-offset-2 ring-offset-card')} />
+        <Avatar account={entry} size="lg" className={cn('shadow-xs', first ? 'h-24 w-24' : 'h-16 w-16 text-2xl', entry.isYou && 'ring-2 ring-primary ring-offset-2 ring-offset-card')} />
         <span className={cn('absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-card', medals[entry.rank])} aria-label={`Rank ${entry.rank}`}>
           {first ? <Crown className="h-3.5 w-3.5" /> : <span className="text-xs font-bold">{entry.rank}</span>}
         </span>
       </span>
-      <p className={cn('mt-2 max-w-[10rem] truncate font-semibold', first ? 'text-lg' : 'text-base')}>{entry.displayName || 'Learner'}</p>
+      <p className={cn('mt-2 max-w-40 truncate font-semibold', first ? 'text-lg' : 'text-base')}>{entry.displayName || 'Learner'}</p>
       {entry.isYou ? <Badge variant="info">You</Badge> : null}
       <p className="text-sm text-muted-foreground">{tests(entry.mockCount)}</p>
       <p className="flex items-center gap-1 font-semibold tabular-nums">
@@ -119,7 +119,7 @@ export function LeaderboardPage() {
     <section className="mx-auto max-w-3xl space-y-6">
       {header}
 
-      <div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
+      <div className="overflow-hidden rounded-2xl border bg-card shadow-xs">
         <div className="flex flex-wrap items-start justify-between gap-3 px-6 pt-6">
           <div>
             <h2 className="text-xl font-bold">Top learners</h2>
@@ -160,7 +160,7 @@ export function LeaderboardPage() {
 
       {rest.length ? <Pagination page={shown.page} pageCount={shown.pageCount} total={rest.length} noun="learner" onChange={setPage} /> : null}
 
-      <div className="flex flex-wrap items-center gap-3 rounded-2xl border bg-card p-4 shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 rounded-2xl border bg-card p-4 shadow-xs">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-warning/10 text-warning">
           <Trophy className="h-5 w-5" />
         </span>

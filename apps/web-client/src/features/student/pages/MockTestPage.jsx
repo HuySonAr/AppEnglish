@@ -260,7 +260,7 @@ export function MockTestPage() {
                 const latest = part.mini.attempts.at(-1);
                 const trend = part.mini.progression ? trendIcons[part.mini.progression.trend] : null;
                 return (
-                  <li key={part.key} className="flex flex-col gap-3 rounded-2xl border bg-card p-4 shadow-sm">
+                  <li key={part.key} className="flex flex-col gap-3 rounded-2xl border bg-card p-4 shadow-xs">
                     <div className="flex items-start gap-3">
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 font-bold text-primary">{part.number}</span>
                       <div className="min-w-0">

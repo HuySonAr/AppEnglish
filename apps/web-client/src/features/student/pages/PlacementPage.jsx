@@ -47,7 +47,7 @@ function PlacementResult({ placement }) {
   const skipped = placement.status === PlacementStatus.SKIPPED;
   return (
     <section className="mx-auto max-w-xl space-y-6 text-center">
-      <div className="rounded-2xl border bg-card p-8 shadow-sm sm:p-10">
+      <div className="rounded-2xl border bg-card p-8 shadow-xs sm:p-10">
         <p className="text-xs font-semibold uppercase tracking-widest text-primary">
           Placement test
         </p>
@@ -141,7 +141,7 @@ export function PlacementPage() {
         description="A short Reading and Listening test that decides the unit you start at."
       />
       {placement.available ? (
-        <div className="rounded-2xl border bg-card p-6 shadow-sm sm:p-8">
+        <div className="rounded-2xl border bg-card p-6 shadow-xs sm:p-8">
           <ul className="grid gap-5 sm:grid-cols-3">
             <Fact
               icon={ListChecks}

@@ -67,7 +67,7 @@ function LessonRow({ lesson, index, count, linkState, unitId, busy, reorderable,
       <Link
         to={`${base}/lessons/${lesson.id}`}
         state={linkState(unitId)}
-        className="flex min-w-0 flex-1 items-center gap-3 px-4 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        className="flex min-w-0 flex-1 items-center gap-3 px-4 py-2.5 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-muted px-1.5 text-xs font-semibold tabular-nums text-muted-foreground">{lesson.position}</span>
         <span className="min-w-0 flex-1 truncate font-medium">{lesson.title}</span>
@@ -200,7 +200,7 @@ export function ContentUnitsPage() {
         <EmptyState icon={Library} title="No units yet" description={canAuthor ? 'Create the first unit.' : 'Units appear here once teachers create them.'} action={newButton} />
       ) : (
         <>
-          <div className="space-y-3 rounded-xl border bg-card p-3 shadow-sm">
+          <div className="space-y-3 rounded-xl border bg-card p-3 shadow-xs">
             <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
               <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search units and lessons" />
               <div className="grid grid-cols-2 gap-2 sm:flex">
@@ -231,7 +231,7 @@ export function ContentUnitsPage() {
                 const isPublished = unit.status === UnitStatus.PUBLISHED;
                 const share = unit.lessonCount ? (unit.publishedCount * 100) / unit.lessonCount : 0;
                 return (
-                  <article key={unit.id} id={`focus-${unit.id}`} className="scroll-mt-24 overflow-hidden rounded-xl border bg-card shadow-sm">
+                  <article key={unit.id} id={`focus-${unit.id}`} className="scroll-mt-24 overflow-hidden rounded-xl border bg-card shadow-xs">
                     <header className="flex flex-wrap items-start gap-4 p-4">
                       <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-primary/10 leading-none text-primary">
                         <span className="text-[10px] font-semibold uppercase tracking-wider">Unit</span>
@@ -240,7 +240,7 @@ export function ContentUnitsPage() {
                       <div className="min-w-0 flex-1 space-y-1.5">
                         <div className="flex flex-wrap items-center gap-2">
                           <h2 className="text-lg font-semibold">{unit.title}</h2>
-                          <Badge variant={isPublished ? 'success' : 'outline'}>{isPublished ? 'Published' : 'Not published'}</Badge>
+                          <Badge variant={isPublished ? 'success' : 'outline-solid'}>{isPublished ? 'Published' : 'Not published'}</Badge>
                         </div>
                         {unit.description ? <p className="line-clamp-2 text-sm text-muted-foreground">{unit.description}</p> : null}
                         <div className="flex max-w-sm items-center gap-2 text-xs text-muted-foreground">
@@ -329,7 +329,7 @@ export function ContentUnitsPage() {
                       <Link
                         to={`${base}/units/${unit.id}/review`}
                         state={linkState(unit.id)}
-                        className="group flex items-center gap-3 border-t px-4 py-2.5 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                        className="group flex items-center gap-3 border-t px-4 py-2.5 transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                       >
                         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-info/10 text-info">
                           <ClipboardCheck className="h-4 w-4" />

@@ -245,7 +245,7 @@ export function ListeningExam({ attempt, title, saveAnswers, onFinish, onDiscard
     return (
       <section className="space-y-6">
         {audio}
-        <div className="mx-auto max-w-2xl space-y-6 rounded-3xl border bg-card p-6 shadow-sm sm:p-8">
+        <div className="mx-auto max-w-2xl space-y-6 rounded-3xl border bg-card p-6 shadow-xs sm:p-8">
           <div className="flex items-start gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <Headphones className="h-6 w-6" />
@@ -301,7 +301,7 @@ export function ListeningExam({ attempt, title, saveAnswers, onFinish, onDiscard
   return (
     <section className="space-y-6">
       {audio}
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-5 sm:px-5">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur-sm sm:-mx-5 sm:px-5">
         <span className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary">
           <Headphones className="h-4 w-4" />
           Listening
@@ -316,7 +316,7 @@ export function ListeningExam({ attempt, title, saveAnswers, onFinish, onDiscard
       </div>
 
       <div className="mx-auto max-w-3xl space-y-4">
-        <div className="flex items-center gap-3 rounded-2xl border bg-card p-4 shadow-sm">
+        <div className="flex items-center gap-3 rounded-2xl border bg-card p-4 shadow-xs">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">{item.partNumber}</span>
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-widest text-primary">Part {item.partNumber}</p>
@@ -324,7 +324,7 @@ export function ListeningExam({ attempt, title, saveAnswers, onFinish, onDiscard
           </div>
         </div>
 
-        <div className="space-y-3 rounded-2xl border bg-card p-4 shadow-sm" aria-live="polite">
+        <div className="space-y-3 rounded-2xl border bg-card p-4 shadow-xs" aria-live="polite">
           {stage === Stage.PLAYING ? (
             <>
               <div className="flex flex-wrap items-center justify-between gap-2">

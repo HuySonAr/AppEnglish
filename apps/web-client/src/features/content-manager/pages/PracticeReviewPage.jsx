@@ -86,7 +86,7 @@ export function PracticeReviewPage({ area }) {
               </TabsList>
             </div>
           </Tabs>
-          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
             <div className="space-y-3 border-b bg-muted/30 p-3">
               <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center">
                 <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search by title or topic" />
@@ -119,7 +119,7 @@ export function PracticeReviewPage({ area }) {
                   <li key={prompt.id}>
                     <Link
                       to={reviewPromptPath(prompt.kind, prompt.id)}
-                      className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                      className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                     >
                       <span className="flex h-9 w-11 shrink-0 items-center justify-center rounded-md bg-muted text-sm font-semibold" title={levelScores(prompt.level)}>{levelShort(prompt.level)}</span>
                       <span className="min-w-0 flex-1">

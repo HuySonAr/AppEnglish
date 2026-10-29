@@ -43,7 +43,7 @@ function ChoiceButton({ selected, onClick, className, children }) {
       aria-pressed={selected}
       onClick={onClick}
       className={cn(
-        'rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
         selected ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
         className,
       )}
@@ -167,7 +167,7 @@ function MockTestRow({ mockTest, base }) {
     <li>
       <Link
         to={`${base}/mock-tests/${mockTest.id}`}
-        className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span className="flex h-10 w-12 shrink-0 flex-col items-center justify-center rounded-md bg-muted leading-none">
           <span className="text-[10px] uppercase text-muted-foreground">Level</span>
@@ -243,7 +243,7 @@ export function MockTestsManagePage() {
         <EmptyState icon={FileText} title="No mock tests yet" description={canAuthor ? 'Create the first mock test.' : 'Mock tests appear here once teachers create them.'} action={newButton} />
       ) : (
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
             <div className="space-y-3 border-b bg-muted/30 p-3">
               <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
                 <SearchField value={filters.search} onChange={setFilter('search')} placeholder="Search by title" />

@@ -111,7 +111,7 @@ export function SwWritingExam({ testId, attempt, onDone, onExpired, onDiscard })
   if (finishing || groupIndex >= groups.length)
     return (
       <section className="space-y-6">
-        <div className="mx-auto max-w-xl space-y-4 rounded-3xl border bg-card p-6 text-center shadow-sm">
+        <div className="mx-auto max-w-xl space-y-4 rounded-3xl border bg-card p-6 text-center shadow-xs">
           <p className="font-medium">{finishing === 'failed' ? 'The test was not submitted.' : 'Submitting your test…'}</p>
           {finishing === 'failed' ? <Button onClick={finish}>Try again</Button> : null}
         </div>
@@ -147,7 +147,7 @@ export function SwWritingExam({ testId, attempt, onDone, onExpired, onDiscard })
                     aria-selected={index === position}
                     onClick={() => setPosition(index)}
                     className={cn(
-                      'flex h-9 w-9 items-center justify-center rounded-full border text-sm font-semibold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      'flex h-9 w-9 items-center justify-center rounded-full border text-sm font-semibold tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                       index === position ? 'border-primary bg-primary text-primary-foreground' : done ? 'border-primary/40 bg-primary/10 text-primary' : 'hover:bg-accent',
                     )}
                   >
@@ -159,11 +159,11 @@ export function SwWritingExam({ testId, attempt, onDone, onExpired, onDiscard })
           ) : null}
 
           <div className={cn('mx-auto grid max-w-5xl gap-6', item.task === EtsWritingTask.RESPOND_EMAIL && 'lg:grid-cols-2')}>
-            <div className="space-y-4 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
+            <div className="space-y-4 rounded-3xl border bg-card p-5 shadow-xs sm:p-6">
               <TaskHeading item={item} total={items.length} />
               <SwPrompt item={item} />
             </div>
-            <div className="space-y-3 rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
+            <div className="space-y-3 rounded-3xl border bg-card p-5 shadow-xs sm:p-6">
               <label htmlFor={`sw-answer-${number}`} className="text-sm font-medium">
                 {guidance[item.task]}
               </label>

@@ -18,7 +18,7 @@ function Change({ value, unit }) {
 
 export function AttemptList({ attempts, shownNumber, busy, onReview }) {
   return (
-    <ul className="divide-y overflow-hidden rounded-2xl border bg-card text-sm shadow-sm">
+    <ul className="divide-y overflow-hidden rounded-2xl border bg-card text-sm shadow-xs">
       {attempts.map((attempt, index) => {
         const before = attempts[index - 1];
         const shown = shownNumber === attempt.attemptNumber;
@@ -48,7 +48,7 @@ export function AttemptList({ attempts, shownNumber, busy, onReview }) {
                 {new Date(attempt.submittedAt).toLocaleDateString()}
               </p>
             </div>
-            <Button variant={shown ? 'secondary' : 'outline'} size="sm" disabled={busy || shown} onClick={() => onReview(attempt.attemptNumber)}>
+            <Button variant={shown ? 'secondary' : 'outline-solid'} size="sm" disabled={busy || shown} onClick={() => onReview(attempt.attemptNumber)}>
               {shown ? 'Shown below' : 'View answers'}
             </Button>
           </li>

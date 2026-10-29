@@ -268,7 +268,7 @@ export function SetResults({ answers, questions = [], quota, onReview, hasKey })
       {answers.map((answer) => {
         const number = (answer.questionIndex ?? 0) + 1;
         return (
-          <div key={answer.id} className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
+          <div key={answer.id} className="space-y-4 rounded-2xl border bg-card p-5 shadow-xs">
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Question {number}</p>
               <p className="font-medium">{answer.prompt?.question || questions[number - 1]?.text || ''}</p>

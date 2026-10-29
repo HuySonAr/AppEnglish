@@ -329,7 +329,7 @@ export function MockTestEditorPage() {
       {canManage ? <ChangesFromPublished kind={KIND} draft={compare.draft} published={compare.published} /> : null}
 
       {canAuthor ? (
-        <form onSubmit={onSaveDetails} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm lg:flex-row lg:items-end">
+        <form onSubmit={onSaveDetails} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs lg:flex-row lg:items-end">
           <div className="min-w-0 flex-1 space-y-2">
             <Label htmlFor="mock-title">Title</Label>
             <Input id="mock-title" value={details.title} maxLength={200} readOnly={locked} onChange={(event) => setDetails({ ...details, title: event.target.value })} />
@@ -345,7 +345,7 @@ export function MockTestEditorPage() {
                   disabled={locked}
                   onClick={() => setDetails({ ...details, level: String(level) })}
                   className={cn(
-                    'h-10 min-w-11 rounded-md border px-2.5 text-sm font-medium tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                    'h-10 min-w-11 rounded-md border px-2.5 text-sm font-medium tabular-nums transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                     details.level === String(level) ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent',
                   )}
                 >
@@ -371,7 +371,7 @@ export function MockTestEditorPage() {
                     })
                   }
                   className={cn(
-                    'h-10 rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed',
+                    'h-10 rounded-md border px-3 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed',
                     details.format === format ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-accent disabled:opacity-50 disabled:hover:bg-transparent',
                   )}
                 >
