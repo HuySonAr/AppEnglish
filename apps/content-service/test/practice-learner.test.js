@@ -86,14 +86,14 @@ test('a teacher makes the model audio of a read-aloud text with the British mach
   const { media } = await service.createMachineAudio(teacher, { text: 'The train leaves at nine.' });
   await service.createMachineAudio(teacher, { text: 'Slowly, please.', speed: 'slow' });
   assert.deepEqual(asked, [
-    ['The train leaves at nine.', { accents: ['uk'], speed: { wordsPerMinute: 145, sentencePauseSeconds: 0.45 }, timeoutMs: 55000 }],
-    ['Slowly, please.', { accents: ['uk'], speed: { wordsPerMinute: 130, sentencePauseSeconds: 0.8 }, timeoutMs: 55000 }],
+    ['The train leaves at nine.', { accents: ['uk'], speed: { wordsPerMinute: 145, sentencePauseSeconds: 0.45 }, timeoutMs: 120000 }],
+    ['Slowly, please.', { accents: ['uk'], speed: { wordsPerMinute: 130, sentencePauseSeconds: 0.8 }, timeoutMs: 120000 }],
   ]);
   assert.equal(media.kind, 'audio');
   assert.equal(media.fileName, 'read-aloud-uk-normal.mp3');
   assert.equal(media.url, 'https://media.test/1/read-aloud-uk-normal.mp3');
   assert.equal(repository.tables.media.length, 2);
-  assert.throws(() => practiceMachineAudioSchema.parse({ text: 'x'.repeat(501) }));
+  assert.throws(() => practiceMachineAudioSchema.parse({ text: 'x'.repeat(1001) }));
   assert.equal(practiceMachineAudioSchema.parse({ text: 'Hi' }).speed, 'normal');
   assert.throws(() => practiceMachineAudioSchema.parse({ text: 'Hi', speed: 'fast' }));
 });
@@ -131,4 +131,35 @@ test('a teacher times each read-aloud sentence with Auto-time from the model aud
   assert.deepEqual([done.status, done.lines.map((line) => [line.start, line.end])], ['DONE', [[0.2, 2.1], [2.6, 3.4]]]);
   assert.equal((await listening.listNotifications(teacher)).notifications.some((item) => item.kind === 'SPEECH_JOB'), false);
   assert.deepEqual(readAloudSentences('The gate opens at 8 a.m. and closes at 9 p.m.\nThank you. Bye!'), ['The gate opens at 8 a.m. and closes at 9 p.m.', 'Thank you.', 'Bye!']);
+});
+
+test('picture and question prompts time their sample reading with Auto-time; picture instructions are optional', async () => {
+  const { service, repository, listening } = harness();
+  const audioId = '44444444-4444-4444-8444-444444444444';
+  const imageId = '55555555-5555-4555-8555-555555555556';
+  repository.tables.media.push({ id: audioId, kind: 'audio', fileName: 's.mp3', url: 'https://media.test/s.mp3', storage: 'r2' });
+  repository.tables.media.push({ id: imageId, kind: 'image', fileName: 'p.png', url: 'https://media.test/p.png', storage: 'r2' });
+  const sentence = { id: '66666666-6666-4666-8666-666666666666', text: 'A man is reading.', translation: 'Một người đàn ông đang đọc.', start: null, end: null };
+  const picture = (await service.createPrompt(teacher, { kind: 'open_speaking' })).prompt;
+  await service.saveDraft(teacher, picture.id, {
+    content: { title: 'Park', topic: 'Daily life', etsTask: 'describe_picture', instructions: '', imageMediaId: imageId, sampleAnswer: 'A man is reading.', sampleAudioMediaId: audioId, sampleSentences: [sentence] },
+  });
+  assert.equal((await service.submitPrompt(teacher, picture.id)).prompt.status, 'PENDING_REVIEW');
+  await assert.rejects(() => service.requestAutoTime(teacher, picture.id, { target: 'text' }), { data: { reason: 'NO_LINES' } });
+  await service.withdrawPrompt(teacher, picture.id);
+  const { job } = await service.requestAutoTime(teacher, picture.id, { target: 'sample' });
+  assert.deepEqual(repository.tables.contentEvents.at(-1).payload.lines, [{ id: sentence.id, text: sentence.text }]);
+  await listening.applyAutoTimeResult({ jobId: job.id, status: 'DONE', lines: [{ id: sentence.id, start: 0.1, end: 1.5, matched: 1 }] });
+  assert.deepEqual((await service.getAutoTime(teacher, picture.id)).job.lines.map((line) => [line.start, line.end]), [[0.1, 1.5]]);
+  await service.submitPrompt(teacher, picture.id);
+  await service.approvePrompt(manager, picture.id);
+  assert.equal((await service.listPublished()).prompts.find((item) => item.id === picture.id).imageUrl, 'https://media.test/p.png');
+
+  const set = (await service.createPrompt(teacher, { kind: 'open_speaking' })).prompt;
+  const question = (text) => ({ text, sampleAnswer: 'Twice a year.', audioMediaId: null, sampleAudioMediaId: audioId, sampleSentences: [{ ...sentence, text: 'Twice a year.' }] });
+  await service.saveDraft(teacher, set.id, { content: { title: 'Travel', topic: 'Travel', etsTask: 'respond_questions', context: 'A survey about travel.', questions: [question('How often?'), question('Who with?'), question('Where?')] } });
+  await service.requestAutoTime(teacher, set.id, { target: 'question', index: 2 });
+  assert.deepEqual(repository.tables.contentEvents.at(-1).payload.lines, [{ id: sentence.id, text: 'Twice a year.' }]);
+  const { media } = await service.getPrompt(teacher, set.id);
+  assert.equal(media[audioId].url, 'https://media.test/s.mp3');
 });

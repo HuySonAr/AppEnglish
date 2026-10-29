@@ -21,7 +21,7 @@ import { useExamLeaveGuard } from './TestExam.jsx';
 
 export function ExamBar({ section, number, total, clock, lowTime = false, onLeave }) {
   return (
-    <div className="sticky top-16 z-10 -mx-4 space-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+    <div className="sticky top-16 z-10 -mx-4 space-y-2 border-b bg-background px-4 py-3 sm:-mx-5 sm:px-5">
       <div className="flex flex-wrap items-center gap-3">
         <span className="rounded-full border px-3 py-1.5 text-sm font-semibold">{section}</span>
         <span className="text-sm font-medium tabular-nums text-muted-foreground">

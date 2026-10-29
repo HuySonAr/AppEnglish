@@ -56,6 +56,7 @@ import {
 import { EditorPageSkeleton } from '../../../components/shared/PageSkeleton.jsx';
 import { VersionHistory } from '../components/VersionHistory.jsx';
 import { useReturnTo } from '../../../hooks/use-return-to.js';
+import { useSpeechTasks } from '../../../hooks/use-speech-tasks.js';
 
 const KIND = ContentReviewKind.LESSON;
 const saveErrorMessage = (error) =>
@@ -77,7 +78,7 @@ export function LessonEditorPage() {
   const [issues, setIssues] = useState([]);
   const [tab, setTab] = useState('vocabulary');
   const [partTab, setPartTab] = useState(LESSON_TEST_PARTS[0].key);
-  const [filling, setFilling] = useState(null);
+  const fills = useSpeechTasks();
 
   function apply(data) {
     setLesson(data.lesson);
@@ -135,12 +136,15 @@ export function LessonEditorPage() {
   });
   const { media } = draftMedia;
 
-  async function onAutofill(item) {
+  function onAutofill(item) {
+    fills.start(item.id, () => autofill(item));
+  }
+
+  async function autofill(item) {
     const missing = [
       item.audioUkMediaId ? null : Accent.UK,
       item.audioUsMediaId ? null : Accent.US,
     ].filter(Boolean);
-    setFilling(item.id);
     try {
       const { found, phonetic, audio } = (
         await autofillPronunciation(item.word.trim(), missing, lessonId)
@@ -193,8 +197,6 @@ export function LessonEditorPage() {
         description: getApiErrorMessage(error),
         variant: 'destructive',
       });
-    } finally {
-      setFilling(null);
     }
   }
 
@@ -343,7 +345,7 @@ export function LessonEditorPage() {
     <section className="space-y-5">
       <PageBreadcrumb items={[{ label: 'Units and lessons', to: back.to, state: back.state }, { label: lesson?.title || 'Lesson' }]} />
 
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-5 sm:px-5">
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-lg font-semibold sm:text-xl">
             Lesson {lesson.position}: {lesson.title}
@@ -369,10 +371,10 @@ export function LessonEditorPage() {
                 exportData={() => exportLesson(content, { number: lesson.position, title: lesson.title })}
                 fileName={jsonFileName(lesson.title)}
               />
-              <Button loading={busy === 'save'} variant="outline" disabled={Boolean(busy) || !dirty} onClick={onSave}>
+              <Button loading={busy === 'save'} variant="outline" disabled={Boolean(busy) || fills.busy || !dirty} onClick={onSave}>
                 Save draft
               </Button>
-              <SubmitForReviewButton loading={busy === 'submit'} disabled={Boolean(busy) || !canSubmit} onClick={onSubmit} />
+              <SubmitForReviewButton loading={busy === 'submit'} disabled={Boolean(busy) || fills.busy || !canSubmit} onClick={onSubmit} />
               {status.hasDraft ? <DiscardDraftButton kind="lesson" id={lessonId} noun="lesson" disabled={Boolean(busy)} onDiscarded={load} size="icon" /> : null}
             </>
           ) : null}
@@ -444,7 +446,7 @@ export function LessonEditorPage() {
                 </div>
                 {content.vocabulary.length === 0 ? <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">No word yet.</p> : null}
                 {content.vocabulary.map((item, index) => (
-                  <VocabularyCard key={item.id} item={item} index={index} edit={edit} update={update} media={media} filling={filling} onAutofill={onAutofill} />
+                  <VocabularyCard key={item.id} item={item} index={index} edit={edit} update={update} media={media} fillState={fills.isRunning(item.id) ? 'running' : fills.isWaiting(item.id) ? 'waiting' : null} onAutofill={onAutofill} />
                 ))}
                 {readOnly ? null : (
                   <Button variant="outline" className="w-full gap-1.5 border-dashed" onClick={() => update((current) => ({ ...current, vocabulary: [...current.vocabulary, newVocabulary()] }))}>

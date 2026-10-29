@@ -301,7 +301,7 @@ export function ListeningExam({ attempt, title, saveAnswers, onFinish, onDiscard
   return (
     <section className="space-y-6">
       {audio}
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-5 sm:px-5">
         <span className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary">
           <Headphones className="h-4 w-4" />
           Listening

@@ -202,7 +202,7 @@ test('Gateway HTTP to content-service gRPC contract', async (t) => {
       const ok = await upload('teacher', 'audio', 'q.mp3', 'audio/mpeg', new Uint8Array([1, 2, 3]));
       assert.equal(ok.status, 201);
       assert.equal(ok.json.data.media.sizeBytes, 3);
-      assert.equal('url' in ok.json.data.media, false);
+      assert.equal(ok.json.data.media.url, null);
       const image = await upload('teacher', 'image', 'photo.png', 'image/png', new Uint8Array([1, 2, 3, 4]));
       assert.equal(image.status, 201);
       assert.equal(image.json.data.media.kind, 'image');

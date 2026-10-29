@@ -101,7 +101,7 @@ export function PracticeReviewDetailPage() {
     <section className="space-y-5">
       <PageBreadcrumb items={[{ label: reviewAreaOf(prompt.kind) === 'writing' ? 'Writing prompts' : 'Speaking prompts', to: reviewListPath(reviewAreaOf(prompt.kind)) }, { label: latest.content.title || 'Untitled prompt' }]} />
 
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-5 sm:px-5">
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-lg font-semibold sm:text-xl">{latest.content.title || 'Untitled prompt'}</h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">

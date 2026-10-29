@@ -24,7 +24,7 @@ import { NotificationBell } from './components/NotificationBell.jsx';
 import { ThemeToggle } from './components/ThemeToggle.jsx';
 import { UserMenu } from './components/UserMenu.jsx';
 
-export function SidebarLayout({ role, side = 'left', drawerSide = side }) {
+export function SidebarLayout({ role, side = 'left', drawerSide = 'right' }) {
   const { home, sections } = navigation[role];
   const label = RoleLabels[role];
   const right = side === 'right';
@@ -73,7 +73,7 @@ export function SidebarLayout({ role, side = 'left', drawerSide = side }) {
   const drawer = (
     <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+        <Button variant="ghost" size="icon" className="lg:hidden size-5 ml-2" aria-label="Open menu">
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>

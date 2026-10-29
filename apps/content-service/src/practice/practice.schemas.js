@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DEFAULT_PRACTICE_LEVEL, ETS_SET_QUESTIONS, ETS_SET_TASKS, EtsSpeakingTask, EtsWritingTask, PRACTICE_LIMITS, PRACTICE_LEVELS, PracticePromptKind, VoiceSpeed, WritingTaskType, practiceLevelOf } from '@appenglish/content-contracts';
+import { AutoTimeTarget, DEFAULT_PRACTICE_LEVEL, ETS_SET_QUESTIONS, ETS_SET_TASKS, EtsSpeakingTask, EtsWritingTask, PRACTICE_LIMITS, PRACTICE_LEVELS, PracticePromptKind, VoiceSpeed, WritingTaskType, practiceLevelOf } from '@appenglish/content-contracts';
 
 const text = (max) => z.string().trim().max(max).default('');
 const mediaId = z.string().uuid().nullable().default(null);
@@ -8,8 +8,30 @@ const keyPoints = z.preprocess(
   z.array(z.string().trim().min(1).max(PRACTICE_LIMITS.keyPoint)).max(PRACTICE_LIMITS.keyPoints).default([]),
 );
 
+const timedSentences = z
+  .array(
+    z
+      .object({
+        id: z.string().uuid(),
+        text: text(PRACTICE_LIMITS.readAloudText),
+        translation: text(PRACTICE_LIMITS.readAloudTranslation).default(''),
+        start: z.number().min(0).max(3600).nullable().default(null),
+        end: z.number().min(0).max(3600).nullable().default(null),
+      })
+      .strict(),
+  )
+  .max(PRACTICE_LIMITS.readAloudSentences)
+  .default([]);
+
 const setQuestion = z
-  .object({ text: text(PRACTICE_LIMITS.question), sampleAnswer: text(PRACTICE_LIMITS.sampleAnswer), audioMediaId: mediaId })
+  .object({
+    text: text(PRACTICE_LIMITS.question),
+    translation: text(PRACTICE_LIMITS.question),
+    sampleAnswer: text(PRACTICE_LIMITS.sampleAnswer),
+    audioMediaId: mediaId,
+    sampleAudioMediaId: mediaId,
+    sampleSentences: timedSentences,
+  })
   .strict();
 const openTasks = Object.values(EtsSpeakingTask).filter((task) => task !== EtsSpeakingTask.READ_ALOUD);
 
@@ -26,20 +48,7 @@ export const practiceContentSchemas = Object.freeze({
       etsTask: z.literal(EtsSpeakingTask.READ_ALOUD).default(EtsSpeakingTask.READ_ALOUD),
       text: text(PRACTICE_LIMITS.readAloudText),
       translations: z.array(text(PRACTICE_LIMITS.readAloudTranslation)).max(PRACTICE_LIMITS.readAloudSentences).optional(),
-      sentences: z
-        .array(
-          z
-            .object({
-              id: z.string().uuid(),
-              text: text(PRACTICE_LIMITS.readAloudText),
-              translation: text(PRACTICE_LIMITS.readAloudTranslation).default(''),
-              start: z.number().min(0).max(3600).nullable().default(null),
-              end: z.number().min(0).max(3600).nullable().default(null),
-            })
-            .strict(),
-        )
-        .max(PRACTICE_LIMITS.readAloudSentences)
-        .default([]),
+      sentences: timedSentences,
       audioMediaId: mediaId,
     })
     .strict(),
@@ -54,6 +63,8 @@ export const practiceContentSchemas = Object.freeze({
       imageMediaId: mediaId,
       maxSeconds: z.number().int().min(PRACTICE_LIMITS.speakingSeconds.min).max(PRACTICE_LIMITS.speakingSeconds.max).default(60),
       sampleAnswer: text(PRACTICE_LIMITS.sampleAnswer),
+      sampleAudioMediaId: mediaId,
+      sampleSentences: timedSentences,
       keyPoints,
     })
     .strict(),
@@ -93,7 +104,7 @@ export function practiceIssues(kind, content) {
   if (kind !== PracticePromptKind.READ_ALOUD) {
     need('etsTask', content.etsTask, 'Choose a task type');
     if (!set) {
-      need('instructions', content.instructions, 'Required');
+      if (content.etsTask !== EtsSpeakingTask.DESCRIBE_PICTURE) need('instructions', content.instructions, 'Required');
       need('sampleAnswer', content.sampleAnswer, 'Required');
     }
   }
@@ -119,10 +130,14 @@ export function practiceIssues(kind, content) {
 }
 
 export function practiceMediaIds(content) {
-  return [content?.audioMediaId, content?.imageMediaId, ...(content?.questions || []).map((question) => question.audioMediaId)].filter(Boolean);
+  return [content?.audioMediaId, content?.imageMediaId, content?.sampleAudioMediaId, ...(content?.questions || []).flatMap((question) => [question.audioMediaId, question.sampleAudioMediaId])].filter(Boolean);
 }
 
-export const practiceMachineAudioSchema = z.object({ text: z.string().trim().min(1).max(PRACTICE_LIMITS.readAloudText), speed: z.enum(Object.values(VoiceSpeed)).default(VoiceSpeed.NORMAL) }).strict();
+export const practiceAutoTimeSchema = z
+  .object({ target: z.enum(Object.values(AutoTimeTarget)).default(AutoTimeTarget.TEXT), index: z.number().int().min(0).max(ETS_SET_QUESTIONS - 1).default(0) })
+  .strict();
+
+export const practiceMachineAudioSchema = z.object({ text: z.string().trim().min(1).max(PRACTICE_LIMITS.machineVoiceText), speed: z.enum(Object.values(VoiceSpeed)).default(VoiceSpeed.NORMAL) }).strict();
 
 export const learnerRecordingsSchema = z
   .object({

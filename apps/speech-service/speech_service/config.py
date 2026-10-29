@@ -28,6 +28,8 @@ OPEN_SPEAKING_SCORING = {
 }
 
 DEFAULT_VOICES = {"uk": "en_GB-cori-medium", "us": "en_US-lessac-medium"}
+DEFAULT_PRONOUNCE_WORKERS = 2
+MAX_PRONOUNCE_WORKERS = 3
 
 
 @dataclass(frozen=True)
@@ -40,6 +42,8 @@ class Settings:
     cache_dir: str
     voices_dir: str
     voices: dict
+    pronounce_workers: int = 2
+    audio_cache_dir: str = ""
 
 
 def load_settings() -> Settings:
@@ -56,4 +60,13 @@ def load_settings() -> Settings:
         whisper_compute_type=os.environ.get("WHISPER_COMPUTE_TYPE", "int8"),
         vad_filter=os.environ.get("WHISPER_VAD_FILTER", "false").lower() == "true",
         cache_dir=os.environ.get("SPEECH_CACHE_DIR", os.path.join(os.path.dirname(os.path.dirname(__file__)), ".cache", "words")),
+        pronounce_workers=pronounce_workers(os.environ.get("PRONOUNCE_WORKERS")),
+        audio_cache_dir=os.environ.get("SPEECH_AUDIO_CACHE_DIR", os.path.join(root, ".cache", "audio")),
     )
+
+
+def pronounce_workers(value: str | None) -> int:
+    try:
+        return min(MAX_PRONOUNCE_WORKERS, max(1, int(value or DEFAULT_PRONOUNCE_WORKERS)))
+    except ValueError:
+        return DEFAULT_PRONOUNCE_WORKERS

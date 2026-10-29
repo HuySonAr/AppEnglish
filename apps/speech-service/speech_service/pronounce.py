@@ -115,11 +115,15 @@ def wav_to_mp3(wav_bytes: bytes, bit_rate: int = 64000) -> bytes:
     return out.getvalue()
 
 
+AUDIO_CACHE_VERSION = 1
+
+
 class Pronouncer:
 
-    def __init__(self, settings: Settings):
+    def __init__(self, settings: Settings, cache=None):
         self.settings = settings
         self.voices: dict = {}
+        self.cache = cache
 
     def voice(self, accent: str):
         if accent not in self.voices:
@@ -137,6 +141,17 @@ class Pronouncer:
         return self.voices[accent]
 
     def __call__(self, text: str, accent: str, speed: dict | None = None) -> tuple[str, bytes]:
+        if not self.cache:
+            return self.synthesize(text, accent, speed)
+        key = self.cache.key(AUDIO_CACHE_VERSION, self.settings.voices.get(accent), accent, speed, text)
+        found = self.cache.get(key)
+        if found:
+            return found
+        ipa, mp3 = self.synthesize(text, accent, speed)
+        self.cache.put(key, ipa, mp3)
+        return ipa, mp3
+
+    def synthesize(self, text: str, accent: str, speed: dict | None = None) -> tuple[str, bytes]:
         voice = self.voice(accent)
         ipa = format_ipa(voice.phonemize(text))
         if not speed:

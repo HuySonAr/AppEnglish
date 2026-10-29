@@ -5,7 +5,7 @@ import { MediaField } from './MediaField.jsx';
 import { TextField } from './TextField.jsx';
 import { useReadOnly } from './ReadOnly.jsx';
 
-export function VocabularyCard({ item, index, edit, update, media, filling, onAutofill }) {
+export function VocabularyCard({ item, index, edit, update, media, fillState, onAutofill }) {
   const path = ['vocabulary', index];
   const complete = item.word.trim() && item.partOfSpeech && item.meaning.trim() && item.example.trim();
   const filled = item.phonetic && item.audioUkMediaId && item.audioUsMediaId;
@@ -63,12 +63,12 @@ export function VocabularyCard({ item, index, edit, update, media, filling, onAu
             <Button
               variant="outline"
               className="gap-1.5"
-              loading={filling === item.id}
-              disabled={!item.word.trim() || filling !== null || Boolean(filled)}
+              loading={fillState === 'running'}
+              disabled={!item.word.trim() || Boolean(fillState) || Boolean(filled)}
               onClick={() => onAutofill(item)}
             >
               <Wand2 className="h-4 w-4" />
-              {filling === item.id ? 'Generating…' : 'Auto-fill'}
+              {fillState === 'running' ? 'Generating…' : fillState === 'waiting' ? 'Waiting…' : 'Auto-fill'}
             </Button>
           )}
         </div>

@@ -9,6 +9,7 @@ import {
   PRACTICE_LIMITS,
   PracticePromptKind,
   PracticePromptStatus,
+  SAMPLE_READING_TASKS,
   WritingTaskType,
   practiceLevelOf,
 } from '@appenglish/content-contracts';
@@ -190,7 +191,11 @@ export function etsFields(kind, task) {
   return {
     image: !set && task !== EtsWritingTask.RESPOND_EMAIL,
     imageRequired: task === EtsSpeakingTask.DESCRIBE_PICTURE || task === EtsWritingTask.PICTURE_SENTENCE,
-    instructionsRequired: !set,
+    instructions: !set && task !== EtsSpeakingTask.DESCRIBE_PICTURE,
+    imageWithSample: task === EtsSpeakingTask.DESCRIBE_PICTURE,
+    instructionsRequired: !set && task !== EtsSpeakingTask.DESCRIBE_PICTURE,
+    sampleReading: SAMPLE_READING_TASKS.includes(task),
+    questionAudio: task === EtsSpeakingTask.RESPOND_INFO,
     context: task === EtsSpeakingTask.RESPOND_QUESTIONS,
     info: task === EtsSpeakingTask.RESPOND_INFO,
     questions: set,
@@ -211,7 +216,7 @@ const writingTaskTypes = {
 
 export const PICTURE_SENTENCE_WORDS = Object.freeze({ min: 1, max: 40 });
 
-const blankQuestion = () => ({ text: '', sampleAnswer: '', audioMediaId: null });
+const blankQuestion = () => ({ text: '', translation: '', sampleAnswer: '', audioMediaId: null, sampleAudioMediaId: null, sampleSentences: [] });
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 export function applyEtsTask(kind, content, task) {

@@ -12,6 +12,7 @@ import {
   Skill,
 } from '@appenglish/content-contracts';
 import { PassageText } from '../../../components/shared/PassageText.jsx';
+import { TableTool } from '../../../components/shared/TableTool.jsx';
 import { Badge, Button, Input, Label } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { hasTable } from '../../../lib/passage.js';
@@ -287,6 +288,7 @@ export function MockPartEditor({ spec, part, edit, updatePart, media, speech, ta
                       onChange={(value) => edit([...path, 'passage'], value)}
                     />
                   )}
+                  {!groupAudio && !spec.group.blanks && !readOnly ? <TableTool value={group.passage || ''} maxLength={10000} onChange={(value) => edit([...path, 'passage'], value)} /> : null}
                   {!groupAudio && !spec.group.blanks && hasTable(group.passage) ? (
                     <div className="space-y-2">
                       <p className="text-sm font-medium">Preview</p>

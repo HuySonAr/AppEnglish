@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { AccountRole } from '@appenglish/auth-contracts';
-import { ETS_SET_TASKS, ETS_TASK_TIMING, EtsSpeakingTask, PracticePromptKind, practiceLevelOf } from '@appenglish/content-contracts';
+import { DESCRIBE_PICTURE_INSTRUCTIONS, ETS_SET_TASKS, ETS_TASK_TIMING, EtsSpeakingTask, PracticePromptKind, SAMPLE_READING_TASKS, practiceLevelOf } from '@appenglish/content-contracts';
 import { currentRequestId } from '@appenglish/backend-common/observability';
 import {
   LearningEventType,
@@ -54,22 +54,27 @@ export class SpeakingService {
   learnerPrompt(prompt) {
     const { content, media = {} } = prompt;
     const etsTask = isOpen(prompt.kind) ? content.etsTask || null : EtsSpeakingTask.READ_ALOUD;
+    const urlOf = (id) => (id && media[id]?.url) || null;
+    const timed = (sentences) => (sentences || []).map(({ text, translation, start, end }) => ({ text, translation: translation || '', start, end }));
+    const withSample = SAMPLE_READING_TASKS.includes(etsTask);
+    const sampleOf = (text, audioMediaId, sentences) => (withSample && text ? { text, audioUrl: urlOf(audioMediaId), sentences: timed(sentences) } : null);
     const common = { id: prompt.id, kind: prompt.kind, versionNumber: prompt.versionNumber, title: content.title, level: content.level, topic: content.topic, etsTask, timing: ETS_TASK_TIMING[etsTask] || null };
     if (isOpen(prompt.kind))
       return {
         ...common,
-        instructions: content.instructions,
+        instructions: etsTask === EtsSpeakingTask.DESCRIBE_PICTURE ? DESCRIBE_PICTURE_INSTRUCTIONS : ETS_SET_TASKS.includes(etsTask) ? '' : content.instructions,
         context: content.context || '',
         info: content.info || '',
-        questions: (content.questions || []).map((question) => ({ text: question.text, audioUrl: (question.audioMediaId && media[question.audioMediaId]?.url) || null })),
-        imageUrl: (content.imageMediaId && media[content.imageMediaId]?.url) || null,
-        maxSeconds: Math.min(RECORDING_LIMITS.openSpeakingSeconds, content.maxSeconds || RECORDING_LIMITS.openSpeakingSeconds),
+        questions: (content.questions || []).map((question) => ({ text: question.text, translation: question.translation || '', audioUrl: etsTask === EtsSpeakingTask.RESPOND_QUESTIONS ? null : urlOf(question.audioMediaId), sample: sampleOf(question.sampleAnswer, question.sampleAudioMediaId, question.sampleSentences) })),
+        imageUrl: urlOf(content.imageMediaId),
+        sample: ETS_SET_TASKS.includes(etsTask) ? null : sampleOf(content.sampleAnswer, content.sampleAudioMediaId, content.sampleSentences),
+        maxSeconds: ETS_TASK_TIMING[etsTask] ? Math.max(...ETS_TASK_TIMING[etsTask].respondSeconds) : Math.min(RECORDING_LIMITS.openSpeakingSeconds, content.maxSeconds || RECORDING_LIMITS.openSpeakingSeconds),
       };
     return {
       ...common,
       text: content.text,
-      sentences: (content.sentences || []).map(({ text, translation, start, end }) => ({ text, translation: translation || '', start, end })),
-      audioUrl: (content.audioMediaId && media[content.audioMediaId]?.url) || null,
+      sentences: timed(content.sentences),
+      audioUrl: urlOf(content.audioMediaId),
       maxSeconds: RECORDING_LIMITS.readAloudSeconds,
     };
   }
@@ -131,6 +136,7 @@ export class SpeakingService {
             title: prompt.title,
             level: prompt.level,
             topic: prompt.topic,
+            imageUrl: prompt.imageUrl || null,
             etsTask: prompt.etsTask || (prompt.kind === PracticePromptKind.READ_ALOUD ? EtsSpeakingTask.READ_ALOUD : null),
             attempts: mine?.attempts || 0,
             bestTotal: mine?.bestTotal ?? null,
@@ -161,12 +167,13 @@ export class SpeakingService {
     const isSet = isOpen(prompt.kind) && ETS_SET_TASKS.includes(prompt.content.etsTask);
     const question = isSet ? prompt.content.questions?.[questionIndex] : null;
     if (isSet && (!question || !setId)) throw speakingErrors.recordingInvalid('SET_ANSWER', 'Say which question of the set this answer is for');
-    this.checkRecording(type, data, durationSeconds, this.learnerPrompt(prompt).maxSeconds);
+    const view = this.learnerPrompt(prompt);
+    const limit = (isSet ? ETS_TASK_TIMING[prompt.content.etsTask]?.respondSeconds?.[questionIndex] : null) || view.maxSeconds;
+    this.checkRecording(type, data, durationSeconds, limit);
     const { recording } = await this.contentClient.storeLearnerRecording(type, data);
     const at = this.now();
     const id = randomUUID();
-    const view = this.learnerPrompt(prompt);
-    const snapshot = { ...prompt.content, versionId: prompt.versionId, versionNumber: prompt.versionNumber, audioUrl: view.audioUrl || null, imageUrl: view.imageUrl || null, maxSeconds: view.maxSeconds };
+    const snapshot = { ...prompt.content, instructions: view.instructions ?? prompt.content.instructions, versionId: prompt.versionId, versionNumber: prompt.versionNumber, audioUrl: view.audioUrl || null, imageUrl: view.imageUrl || null, maxSeconds: limit };
     if (isSet)
       Object.assign(snapshot, {
         setId,

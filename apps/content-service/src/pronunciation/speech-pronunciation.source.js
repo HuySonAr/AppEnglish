@@ -2,7 +2,7 @@ import { Accent, SpeechQueue } from '@appenglish/content-contracts';
 import { PronunciationUnavailableError } from './dictionary-pronunciation.source.js';
 
 export class SpeechPronunciationSource {
-  constructor(broker, { timeoutMs = 30_000, ipaAccent = Accent.UK } = {}) {
+  constructor(broker, { timeoutMs = 120_000, ipaAccent = Accent.UK } = {}) {
     this.broker = broker;
     this.timeoutMs = timeoutMs;
     this.ipaAccent = ipaAccent;

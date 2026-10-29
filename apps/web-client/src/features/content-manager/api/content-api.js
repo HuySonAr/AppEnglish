@@ -118,7 +118,7 @@ export async function publishPlacementTest() {
   return (await httpClient.post('/content/placement/publish')).data;
 }
 export async function autofillPronunciation(word, accents, lessonId) {
-  return (await httpClient.post('/content/pronunciation', { word, accents, lessonId }, { timeout: 90000 })).data;
+  return (await httpClient.post('/content/pronunciation', { word, accents, lessonId }, { timeout: 125000 })).data;
 }
 export async function deleteMedia(id) {
   return (await httpClient.delete(`/content/media/${id}`)).data;

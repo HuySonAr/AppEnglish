@@ -1,5 +1,6 @@
 import { FILL_IN_BLANK, MediaKind, Skill } from '@appenglish/content-contracts';
 import { PassageText } from '../../../components/shared/PassageText.jsx';
+import { TableTool } from '../../../components/shared/TableTool.jsx';
 import { Badge } from '../../../components/ui';
 import { hasTable } from '../../../lib/passage.js';
 import { LESSON_PASTE_PARTS, lessonPasteDescription, lessonPastePlan } from '../lib/lesson-paste.js';
@@ -75,6 +76,7 @@ export function PartEditor({ spec, part, edit, media }) {
               onChange={(value) => edit([...base, 'passage'], value)}
             />
           ) : null}
+          {spec.group.passage && !spec.group.blanks && !readOnly ? <TableTool value={part.passage || ''} maxLength={10000} onChange={(value) => edit([...base, 'passage'], value)} /> : null}
           {spec.group.passage && !spec.group.blanks && hasTable(part.passage) ? (
             <div className="space-y-2">
               <p className="text-sm font-medium">Preview</p>

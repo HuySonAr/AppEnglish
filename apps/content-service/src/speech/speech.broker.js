@@ -145,6 +145,7 @@ export class SpeechBroker {
         contentType: 'application/json',
         correlationId,
         replyTo: this.replyQueue,
+        expiration: String(timeoutMs),
       });
     });
   }

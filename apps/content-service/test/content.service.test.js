@@ -274,7 +274,8 @@ test('media upload stores the asset and maps storage validation errors', async (
   const { service, repository, uploads } = await harness();
   const before = repository.tables.media.length;
   const { media } = await service.uploadMedia(teacher, { kind: 'audio', fileName: 'q.mp3', mimeType: 'audio/mpeg', data: Buffer.from([1, 2, 3]) });
-  assert.deepEqual(Object.keys(media), ['id', 'kind', 'fileName', 'mimeType', 'sizeBytes']);
+  assert.deepEqual(Object.keys(media), ['id', 'kind', 'fileName', 'mimeType', 'sizeBytes', 'url']);
+  assert.equal(media.url, null);
   assert.equal(uploads.at(-1).sizeBytes, 3);
   const row = repository.tables.media.at(-1);
   assert.equal(row.storageId, `stored-${uploads.length}`);

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { SpeechQueue } from '@appenglish/content-contracts';
 import { ContentService } from '../src/content/content.service.js';
 import { SpeechPronunciationSource } from '../src/pronunciation/speech-pronunciation.source.js';
+import { SpeechBroker } from '../src/speech/speech.broker.js';
 import { createMemoryRepository, teacher } from './memory-repository.js';
 
 const mp3 = (accent) => Buffer.from(`mp3-${accent}`);
@@ -80,3 +81,15 @@ test('the editor call stores the generated audio as lesson media and reports it'
   assert.deepEqual(Object.keys(one.audio), ['us']);
   assert.equal(one.audio.us.fileName, 'get-in-touch-us.mp3');
 });
+
+test('a request expires in the queue when nobody waits for it any more', async () => {
+  const broker = new SpeechBroker('amqp://test');
+  const sent = [];
+  broker.channel = { sendToQueue: (queue, body, options) => sent.push([queue, options]) };
+  broker.replyQueue = 'reply';
+  await assert.rejects(() => broker.request(SpeechQueue.PRONOUNCE_REQUESTS, { word: 'hi' }, 20), /did not answer within/);
+  assert.equal(sent[0][1].expiration, '20');
+  assert.equal(sent[0][1].replyTo, 'reply');
+  assert.equal(new SpeechPronunciationSource(broker).timeoutMs, 120000);
+});
+

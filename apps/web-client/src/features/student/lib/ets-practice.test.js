@@ -11,6 +11,7 @@ import {
   readNoTimer,
   readSeconds,
   recordSeconds,
+  setIntroHint,
   remainingSeconds,
   setTotal,
   timerStorageKey,
@@ -30,8 +31,8 @@ test('set prompts run three questions with their own timing', () => {
   assert.equal(isSetPrompt({ ...info, questions: [] }), false);
   assert.equal(isSetPrompt({ etsTask: 'express_opinion', questions: [] }), false);
   assert.deepEqual([0, 1, 2].map((index) => recordSeconds(info, index)), [15, 15, 30]);
-  assert.equal(recordSeconds(info, 2, false), 60);
-  assert.equal(recordSeconds({ ...info, maxSeconds: 20 }, 2), 20);
+  assert.equal(recordSeconds({ ...info, maxSeconds: 60 }, 2), 30);
+  assert.equal(recordSeconds({ ...info, maxSeconds: 20 }, 0), 15);
   assert.deepEqual([0, 1, 2].map((index) => playCount(info, index)), [1, 1, 2]);
   assert.deepEqual([prepareSeconds(info), readSeconds(info)], [3, 45]);
   assert.deepEqual(nextSetStep(0), { phase: 'question', index: 1 });
@@ -96,3 +97,12 @@ test('history groups the answers of one try', () => {
   assert.equal(groups[2].total, 5);
   assert.equal(setTotal([{ total: 7 }, { total: null }]), null);
 });
+
+test('the set intro says the ETS order: read, hear, prepare, answer', () => {
+  const heard = { ...info, questions: info.questions.map((question) => ({ ...question, audioUrl: 'q.mp3' })) };
+  assert.equal(setIntroHint(heard, 8), '45 s to read, then hear 3 questions (question 10 twice): prepare 3 s, answer 15 / 15 / 30 s.');
+  assert.equal(setIntroHint(heard, 8, false), 'Hear 3 questions (question 10 twice), up to 15 / 15 / 30 s each.');
+  const asked = { etsTask: 'respond_questions', timing: { prepareSeconds: 3, respondSeconds: [15, 15, 30] }, questions: [{ text: 'a' }, { text: 'b' }, { text: 'c' }] };
+  assert.equal(setIntroHint(asked, 5), 'Answer 3 questions one by one: prepare 3 s, answer 15 / 15 / 30 s.');
+});
+

@@ -20,7 +20,7 @@ Code: `apps/speech-service/` (Python 3.12).
 | File | Role |
 |---|---|
 | `speech_service/alignment.py` | Pure: tokens (case, punctuation, contractions, numbers as digits), `align_lines` (difflib matching, line span from first to last matched word, small padding, no overlap) and `split_lines` for Transcribe: speech by sentence (ends, pauses of 1.2 s, at most 30 words); songs in phrases started by Whisper's capitals (a bare "I" after six words unless a joining word comes before, a long pause of 1.5 s), short phrases put together up to 14 words (D99) |
-| `speech_service/cache.py` | `WordCache`: the words heard, by recording address and model, as JSON files (D99) |
+| `speech_service/cache.py` | `WordCache`: the words heard, by recording address and model, as JSON files (D99). `AudioCache`: machine voices (`<key>.mp3` + `<key>.json` with the IPA), key = sha256 of cache version, voice, accent, speed and text (D220) |
 | `speech_service/worker.py` | One request end to end: download (200 MB cap), transcribe without a prompt, align; answer DONE or FAILED. Words that cover less than `MIN_HEARD_SHARE` (0.5) of the line tokens are neither cached nor reused from the cache (D214) |
 | `speech_service/transcriber.py` | faster-whisper, model loaded on the first request |
 | `speech_service/broker.py` | pika loop: one request at a time (prefetch 1), work in a thread while heartbeats go on, answer RUNNING then DONE/FAILED, ack after answering, reconnect on failure |
@@ -49,6 +49,8 @@ Queue names and statuses are in `@appenglish/content-contracts` (`SpeechQueue`,
 | `SPEECH_CACHE_DIR` | `apps/speech-service/.cache/words` | Words heard by recording (D99); delete it to make the service listen again |
 | `PIPER_VOICE_UK`, `PIPER_VOICE_US` | `en_GB-cori-medium`, `en_US-lessac-medium` | Piper voices for pronunciation (D123) |
 | `PIPER_VOICES_DIR` | `apps/speech-service/.cache/voices` | Where the voices are kept; a missing voice is downloaded from Hugging Face on first use (about 60 MB each) |
+| `PRONOUNCE_WORKERS` | `2` (1–3) | Processes that make machine voices and pronunciations in parallel (D220) |
+| `SPEECH_AUDIO_CACHE_DIR` | `apps/speech-service/.cache/audio` | Machine voices already made, by voice, accent, speed and text (D220); delete it to make them again |
 
 The model is downloaded from Hugging Face on first use (about 480 MB for
 `small.en`) and cached in the user's profile.
@@ -116,3 +118,12 @@ The speaking loop runs on its own thread and connection, one recording at a time
 ## Accuracy evaluation (F16, D181)
 
 `speech_service/evaluate.py` (`pnpm --filter @appenglish/speech-service evaluate -- --root <speechocean762>`): `load_speechocean` (resource/scores.json, `test/text`, WAVE files), seeded `sample`, `run` with the real transcriber and `score_read_aloud`, `compare` (Pearson, Spearman, MAE). See `docs/05-operations/ai-evaluation.md`. Tests: `tests/test_evaluate.py`.
+
+## Parallel machine voices (D220)
+
+- `speech.pronounce.requests` is served by `PRONOUNCE_WORKERS` separate processes (`multiprocessing` spawn), each with its own Piper voices and `prefetch_count=1`; RabbitMQ hands requests round robin. Processes, not threads, because Piper phonemizes with espeak-ng, which is not safe across threads.
+- A supervisor thread in the main process starts them and starts a stopped one again every 10 s; each worker exits when the main process is gone (it waits on `multiprocessing.parent_process()`), so a hard kill leaves no worker behind. `__main__.py` runs only under `if __name__ == "__main__"` so the spawned workers do not start the service again.
+- Measured on the development machine (8 logical CPUs, 4 sample answers at 145 words per minute): 1 worker 16.9 s, 2 workers 10.7 s, 3 workers 14.3 s, 4 workers 20.5 s; limiting onnxruntime threads per worker was slower. Hence the default 2 and the cap 3.
+- `Pronouncer(settings, cache)` reads and writes `AudioCache`; a cached voice comes back in about 0.03 s instead of 4–6 s.
+- content-service waits 120 s for an answer and publishes each request with `expiration` = that wait, so a request nobody waits for any more leaves the queue instead of being made.
+

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AudioLines, FileClock, Loader2, MoveHorizontal, Play, Plus, Trash2, Wand2 } from 'lucide-react';
+import { AudioLines, ChevronDown, ChevronUp, FileClock, Loader2, MoveHorizontal, Play, Plus, Trash2, Wand2 } from 'lucide-react';
 import { LISTENING_MAX_SEGMENTS, MediaKind, lyricBlankCount } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
@@ -35,6 +35,10 @@ const pasteExample = {
   song: 'I [walked] across an [empty] land\nI knew the pathway like the back of my [hand]',
 };
 
+const TIME_STEP = 0.1;
+const TIME_BIG_STEP = 1;
+const nudged = (value, delta) => Math.max(0, Math.round(((value ?? 0) + delta) * 10) / 10);
+
 function TimeInput({ id, label, value, onChange, readOnly }) {
   const [text, setText] = useState(formatSeconds(value));
   const [invalid, setInvalid] = useState(false);
@@ -49,9 +53,18 @@ function TimeInput({ id, label, value, onChange, readOnly }) {
       inputMode="decimal"
       readOnly={readOnly}
       placeholder="m:ss.s"
+      title={readOnly ? undefined : '↑ ↓ change by 0.1 s, Shift for 1 s'}
       value={text}
       className={cn('h-8 w-20 rounded-r-none px-2 text-sm tabular-nums', invalid && 'border-destructive')}
       onChange={(event) => setText(event.target.value)}
+      onKeyDown={(event) => {
+        if (readOnly || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) return;
+        event.preventDefault();
+        const typed = parseSeconds(text);
+        const base = typed === null || Number.isNaN(typed) ? value : typed;
+        const step = event.shiftKey ? TIME_BIG_STEP : TIME_STEP;
+        onChange(nudged(base, event.key === 'ArrowUp' ? step : -step));
+      }}
       onBlur={() => {
         const seconds = parseSeconds(text);
         if (Number.isNaN(seconds)) setInvalid(true);
@@ -61,7 +74,21 @@ function TimeInput({ id, label, value, onChange, readOnly }) {
   );
 }
 
-function TimeField({ id, label, name, value, onChange, onHere, canHere, readOnly }) {
+function TimeStepper({ label, value, onChange }) {
+  const stepButton = 'flex h-4 w-6 items-center justify-center text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring';
+  return (
+    <div className="flex h-8 flex-col overflow-hidden border-y border-r border-input bg-background">
+      <button type="button" className={cn(stepButton, 'border-b border-input')} aria-label={`${label} later by 0.1 s`} onClick={() => onChange(nudged(value, TIME_STEP))}>
+        <ChevronUp className="h-3 w-3" />
+      </button>
+      <button type="button" className={stepButton} aria-label={`${label} earlier by 0.1 s`} disabled={!value} onClick={() => onChange(nudged(value, -TIME_STEP))}>
+        <ChevronDown className="h-3 w-3" />
+      </button>
+    </div>
+  );
+}
+
+export function TimeField({ id, label, name, value, onChange, onHere, canHere, readOnly }) {
   return (
     <div className="flex items-center gap-1.5">
       <Label htmlFor={id} className="w-9 text-xs text-muted-foreground">
@@ -69,6 +96,7 @@ function TimeField({ id, label, name, value, onChange, onHere, canHere, readOnly
       </Label>
       <div className="flex">
         <TimeInput id={id} label={label} value={value} onChange={onChange} readOnly={readOnly} />
+        {readOnly ? null : <TimeStepper label={label} value={value} onChange={onChange} />}
         {readOnly ? null : (
           <Button variant="outline" size="sm" className="h-8 rounded-l-none border-l-0 px-2 text-xs" disabled={!canHere} onClick={onHere}>
             Here

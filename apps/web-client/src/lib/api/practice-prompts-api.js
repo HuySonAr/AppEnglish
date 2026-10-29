@@ -40,10 +40,10 @@ export async function uploadPracticeMedia(kind, file) {
   return (await httpClient.post('/content/media', form, { timeout: 180000 })).data;
 }
 export async function createPracticeMachineAudio(text, speed) {
-  return (await httpClient.post(`${base}/machine-audio`, speed ? { text, speed } : { text }, { timeout: 60000 })).data;
+  return (await httpClient.post(`${base}/machine-audio`, speed ? { text, speed } : { text }, { timeout: 125000 })).data;
 }
-export async function requestPracticeAutoTime(id) {
-  return (await httpClient.post(`${base}/${id}/auto-time`, {})).data;
+export async function requestPracticeAutoTime(id, target = {}) {
+  return (await httpClient.post(`${base}/${id}/auto-time`, target)).data;
 }
 export async function getPracticeAutoTime(id) {
   return (await httpClient.get(`${base}/${id}/auto-time`)).data;

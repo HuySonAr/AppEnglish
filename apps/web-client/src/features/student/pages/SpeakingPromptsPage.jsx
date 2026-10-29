@@ -39,6 +39,11 @@ function PromptCard({ prompt, number, onClear }) {
   return (
     <motion.div {...lift} className={cn('flex h-full flex-col overflow-hidden rounded-xl border bg-card transition-colors hover:border-primary/40', tried && 'border-success/40')}>
       <Link to={`/student/practice/speaking/${prompt.id}`} className="group flex flex-1 flex-col gap-2 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
+        {prompt.imageUrl ? (
+          <div className="-mx-4 -mt-4 mb-1 aspect-[16/9] overflow-hidden border-b bg-muted">
+            <img src={prompt.imageUrl} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+          </div>
+        ) : null}
         <p className="line-clamp-2 font-semibold leading-snug group-hover:text-primary">{prompt.title || 'Untitled prompt'}</p>
         <p className="mt-auto flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
           <span className={cn('flex shrink-0 items-center gap-1 font-medium', style.tone)}>

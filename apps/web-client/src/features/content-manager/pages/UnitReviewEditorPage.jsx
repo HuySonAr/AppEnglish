@@ -184,7 +184,7 @@ export function UnitReviewEditorPage() {
     <section className="space-y-5">
       <PageBreadcrumb items={[{ label: 'Units and lessons', to: back.to, state: back.state }, { label: `Unit ${unit.position}: ${unit.title}` }, { label: 'Unit review' }]} />
 
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-5 sm:px-5">
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-lg font-semibold sm:text-xl">Unit review: {unit.title}</h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">

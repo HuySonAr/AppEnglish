@@ -184,7 +184,7 @@ export function TestExam({ attempt, saveAnswers, onSubmit, submitting, name, ret
 
   return (
     <section className="space-y-6">
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur sm:-mx-5 sm:px-5">
         {phaseLabel ? <span className="rounded-full border px-3 py-1.5 text-sm font-semibold">{phaseLabel}</span> : null}
         {attempt.expiresAt ? (
           <span

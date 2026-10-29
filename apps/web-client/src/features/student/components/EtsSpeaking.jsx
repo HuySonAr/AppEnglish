@@ -5,10 +5,9 @@ import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { Button } from '../../../components/ui';
 import { canRecord, useCountdown, useRecorder } from '../hooks/use-recorder.js';
-import { newSetId, nextSetStep, playCount, prepareSeconds, readSeconds, recordSeconds, setTotal } from '../lib/ets-practice.js';
+import { newSetId, nextSetStep, playCount, prepareSeconds, readSeconds, recordSeconds, setIntroHint, setTotal } from '../lib/ets-practice.js';
 import { scoreTone, toneText } from '../lib/practice.js';
 import { cn } from '../../../lib/utils.js';
-import { ModelAudio } from './ModelAudio.jsx';
 import { Countdown } from './EtsTimer.jsx';
 import { NoRecorder, RecordingMeter, SpeakingRecorder, StartButton } from './SpeakingRecorder.jsx';
 import { SpeakingResult } from './SpeakingResult.jsx';
@@ -17,7 +16,7 @@ import { TeacherReviewPanel } from './TeacherReviewPanel.jsx';
 export function TimedSpeakingTask({ prompt, submitting, onSubmit, startLabel = 'Start' }) {
   const [phase, setPhase] = useState('idle');
   const prepare = prepareSeconds(prompt);
-  const speak = recordSeconds(prompt, 0, true);
+  const speak = recordSeconds(prompt, 0);
   const recorder = useRecorder();
   const startRecording = async () => {
     if (await recorder.start(speak)) setPhase('recording');
@@ -129,14 +128,15 @@ export function QuestionAudio({ url, times, onFinished }) {
   );
 }
 
-export function SpeakingSet({ prompt, timed, onSubmitAnswer, onFinished, startLabel = 'Start' }) {
+export function SpeakingSet({ prompt, timed, onSubmitAnswer, onFinished, startLabel = 'Start', firstQuestion = 1 }) {
   const [setId, setSetId] = useState(() => newSetId());
   const [phase, setPhase] = useState('intro');
   const [index, setIndex] = useState(0);
   const [sending, setSending] = useState(false);
   const [failedTake, setFailedTake] = useState(null);
   const question = prompt.questions[index];
-  const speak = recordSeconds(prompt, index, timed);
+  const listening = phase === 'question' && Boolean(question?.audioUrl);
+  const speak = recordSeconds(prompt, index);
   const prepare = prepareSeconds(prompt);
   const read = readSeconds(prompt);
 
@@ -182,7 +182,7 @@ export function SpeakingSet({ prompt, timed, onSubmitAnswer, onFinished, startLa
   if (!canRecord()) return <NoRecorder />;
 
   if (phase === 'intro')
-    return <StartButton label={startLabel} hint={timed ? `Answer ${ETS_SET_QUESTIONS} questions in a row` : `Record an answer to each of the ${ETS_SET_QUESTIONS} questions`} onClick={begin} />;
+    return <StartButton label={startLabel} hint={setIntroHint(prompt, firstQuestion, timed)} onClick={begin} />;
 
   if (phase === 'reading')
     return (
@@ -209,13 +209,25 @@ export function SpeakingSet({ prompt, timed, onSubmitAnswer, onFinished, startLa
     <div className="space-y-4">
       <div className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-          Question {index + 1} of {ETS_SET_QUESTIONS}
+          Question {firstQuestion + index} <span className="font-normal normal-case tracking-normal text-muted-foreground">· {index + 1} of {ETS_SET_QUESTIONS}</span>
         </p>
-        <p className="text-lg font-medium leading-relaxed">{question.text}</p>
+        {listening ? null : (
+          <>
+            <p className="text-sm font-medium leading-relaxed sm:text-base">{question.text}</p>
+            {question.translation ? <p className="text-xs italic text-muted-foreground sm:text-sm">{question.translation}</p> : null}
+          </>
+        )}
       </div>
-      {timed && phase === 'question' ? <QuestionAudio key={`${setId}-${index}`} url={question.audioUrl} times={playCount(prompt, index)} onFinished={() => setPhase(prepare ? 'prepare' : 'recording-start')} /> : null}
-      {!timed && question.audioUrl ? <ModelAudio key={`${setId}-${index}`} src={question.audioUrl} label={`Question ${index + 1}`} /> : null}
-      {timed && phase === 'prepare' ? <Countdown label="Prepare" left={prepareLeft} total={prepare} /> : null}
+      {phase === 'question' ? (
+        <QuestionAudio key={`${setId}-${index}`} url={question.audioUrl} times={playCount(prompt, index)} onFinished={() => setPhase(timed ? (prepare ? 'prepare' : 'recording-start') : 'answer')} />
+      ) : null}
+      {timed && phase === 'prepare' ? (
+        <Countdown label="Prepare" left={prepareLeft} total={prepare}>
+          <Button variant="outline" size="sm" onClick={startRecording}>
+            Start speaking now
+          </Button>
+        </Countdown>
+      ) : null}
       {timed && phase === 'recording-start' ? <AutoStart onStart={startRecording} /> : null}
       {timed && recorder.phase === 'recording' ? <RecordingMeter label="Speak now" elapsed={recorder.elapsed} limit={speak} onStop={recorder.stop} /> : null}
       {timed && sending ? <p className="text-center text-sm text-muted-foreground">Sending your answer…</p> : null}
@@ -227,7 +239,7 @@ export function SpeakingSet({ prompt, timed, onSubmitAnswer, onFinished, startLa
           </Button>
         </div>
       ) : null}
-      {!timed && phase !== 'failed' ? (
+      {!timed && phase === 'answer' ? (
         <SpeakingRecorder key={`${setId}-${index}`} maxSeconds={speak} submitting={sending} submitLabel={index + 1 < ETS_SET_QUESTIONS ? 'Submit and continue' : 'Submit answer'} onSubmit={send} />
       ) : null}
     </div>

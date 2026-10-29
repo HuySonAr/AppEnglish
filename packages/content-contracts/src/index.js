@@ -74,6 +74,7 @@ export const PRACTICE_LIMITS = Object.freeze({
   readAloudText: 500,
   readAloudTranslation: 400,
   readAloudSentences: 20,
+  machineVoiceText: 1000,
   instructions: 1500,
   sampleAnswer: 4000,
   keyPoints: 10,
@@ -104,6 +105,9 @@ export const SW_WRITING_LAYOUT = Object.freeze({ pictureSentences: 5, emails: 2,
 export const SW_WRITING_GROUPS = Object.freeze([Object.freeze([1, 2, 3, 4, 5]), Object.freeze([6]), Object.freeze([7]), Object.freeze([8])]);
 export const SW_SECTION_MAX_MINUTES = Object.freeze({ speaking: 30, writing: 70 });
 export const ETS_SET_TASKS = Object.freeze([EtsSpeakingTask.RESPOND_QUESTIONS, EtsSpeakingTask.RESPOND_INFO]);
+export const SAMPLE_READING_TASKS = Object.freeze([EtsSpeakingTask.DESCRIBE_PICTURE, EtsSpeakingTask.RESPOND_QUESTIONS, EtsSpeakingTask.RESPOND_INFO]);
+export const DESCRIBE_PICTURE_INSTRUCTIONS = 'Describe a picture.';
+export const AutoTimeTarget = Object.freeze({ TEXT: 'text', SAMPLE: 'sample', QUESTION: 'question' });
 export const ETS_SET_QUESTIONS = 3;
 export const ETS_TASK_TIMING = Object.freeze({
   [EtsSpeakingTask.READ_ALOUD]: Object.freeze({ prepareSeconds: 45, respondSeconds: Object.freeze([45]) }),

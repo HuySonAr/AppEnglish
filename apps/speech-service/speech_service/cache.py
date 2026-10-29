@@ -28,3 +28,34 @@ class WordCache:
         with open(f"{path}.tmp", "w", encoding="utf-8") as file:
             json.dump(words, file)
         os.replace(f"{path}.tmp", path)
+
+
+class AudioCache:
+    def __init__(self, directory: str):
+        self.directory = directory
+
+    @staticmethod
+    def key(*parts) -> str:
+        return hashlib.sha256(json.dumps(parts, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+    def get(self, key: str) -> tuple[str, bytes] | None:
+        base = os.path.join(self.directory, key)
+        try:
+            with open(f"{base}.json", encoding="utf-8") as file:
+                ipa = json.load(file)["ipa"]
+            with open(f"{base}.mp3", "rb") as file:
+                return ipa, file.read()
+        except (OSError, ValueError, KeyError):
+            return None
+
+    def put(self, key: str, ipa: str, mp3: bytes) -> None:
+        os.makedirs(self.directory, exist_ok=True)
+        base = os.path.join(self.directory, key)
+        suffix = f".{os.getpid()}.tmp"
+        with open(f"{base}.mp3{suffix}", "wb") as file:
+            file.write(mp3)
+        os.replace(f"{base}.mp3{suffix}", f"{base}.mp3")
+        with open(f"{base}.json{suffix}", "w", encoding="utf-8") as file:
+            json.dump({"ipa": ipa}, file)
+        os.replace(f"{base}.json{suffix}", f"{base}.json")
+

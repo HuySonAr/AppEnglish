@@ -232,7 +232,7 @@ Removed by D190 (2026-10-26): the `course` module, its RPCs (`GetListeningCourse
 
 ## Speaking/Writing ETS tasks (D195)
 
-Learner prompt views add `etsTask` and `timing` (`ETS_TASK_TIMING`), open speaking adds `context`, `info`, `questions` [{ text, audioUrl }], writing adds `keywords`, `email`. `SubmitSpeaking` takes `questionIndex` and `setId` (required for `respond_questions`/`respond_info`, else 400 code 67 reason `SET_ANSWER`); the submission's prompt snapshot then carries `setId`, `questionIndex`, `question`, `instructions` = context or information + the question, and that question's `sampleAnswer`, so Whisper/Gemini scoring is unchanged. Summaries add `setId` and `questionIndex`. Writing grading instructions add the two words (`picture_sentence`) or the email text (`respond_email`). `RECORDING_LIMITS.readAloudSeconds` is 45.
+Learner prompt views add `etsTask` and `timing` (`ETS_TASK_TIMING`), open speaking adds `context`, `info`, `questions` [{ text, translation, audioUrl, sample }] (`audioUrl` always null for `respond_questions`; `sample` also for `respond_info`, D219; `instructions` empty for both set tasks), `sample` (D217: for `describe_picture` and `respond_questions` the sample answer as `{ text, audioUrl, sentences }`, otherwise null; `describe_picture` instructions are always `DESCRIBE_PICTURE_INSTRUCTIONS` in the view and the submission snapshot; with an ETS task `maxSeconds` is the ETS response time (the longest one for a set) and `SubmitSpeaking` checks each answer against `ETS_TASK_TIMING[task].respondSeconds[questionIndex]` (+1 s), which also becomes the snapshot `maxSeconds` (D221)), writing adds `keywords`, `email`. `SubmitSpeaking` takes `questionIndex` and `setId` (required for `respond_questions`/`respond_info`, else 400 code 67 reason `SET_ANSWER`); the submission's prompt snapshot then carries `setId`, `questionIndex`, `question`, `instructions` = context or information + the question, and that question's `sampleAnswer`, so Whisper/Gemini scoring is unchanged. Summaries add `setId` and `questionIndex`. Writing grading instructions add the two words (`picture_sentence`) or the email text (`respond_email`). `RECORDING_LIMITS.readAloudSeconds` is 45.
 
 ## S&W test scoring (D198)
 
@@ -396,7 +396,7 @@ contract with a stand-in for auth-service. Results are in
 ### API
 | Method | Path | RPC | Notes |
 |---|---|---|---|
-| GET | `/learning/speaking/prompts` | `ListSpeakingPrompts` | Students; published read-aloud prompts with `attempts`, `bestTotal`, `lastSubmittedAt` |
+| GET | `/learning/speaking/prompts` | `ListSpeakingPrompts` | Students; published read-aloud prompts with `attempts`, `bestTotal`, `lastSubmittedAt`, `imageUrl` (picture of the published version or null) |
 | GET | `/learning/speaking/prompts/:id` | `GetSpeakingPrompt` | Prompt (text, model `audioUrl`, `maxSeconds` 30; no sample answer) and the last 20 submissions; 404 code 65 |
 | POST | `/learning/speaking/prompts/:id/submissions` | `SubmitSpeaking` (`RecordingRequest` with bytes) | Multipart field `audio` plus `durationSeconds`; code 67 for a wrong type, empty, over 5 MB or over 30 s (+1 s); answers the `SCORING` submission |
 | GET | `/learning/speaking/submissions/:id` | `GetSpeakingSubmission` | Own submissions only (66 otherwise); the page polls it every 2 s while `SCORING` |

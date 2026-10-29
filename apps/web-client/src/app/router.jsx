@@ -102,7 +102,7 @@ export function AppRouter() {
           path="/student"
           element={<RoleRoute allowedRole={Roles.STUDENT} />}
         >
-          <Route element={<SidebarLayout role={Roles.STUDENT} drawerSide="right" />}>
+          <Route element={<SidebarLayout role={Roles.STUDENT} />}>
             <Route index element={<StudentDashboardPage />} />
             <Route path="placement" element={<PlacementPage />} />
             <Route path="lessons" element={<LessonsPage />} />

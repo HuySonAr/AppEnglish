@@ -581,6 +581,7 @@ export class ContentService {
         fileName: asset.fileName,
         mimeType: asset.mimeType,
         sizeBytes: asset.sizeBytes,
+        url: asset.storage === 'local' ? null : asset.url,
       },
     };
   }

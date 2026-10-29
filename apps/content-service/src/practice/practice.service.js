@@ -1,9 +1,9 @@
 import { AccountRole } from '@appenglish/auth-contracts';
-import { Accent, MediaSection, PracticePromptKind, PracticePromptStatus as Status, SpeechTask, VOICE_SPEEDS, VoiceSpeed, practiceLevelOf } from '@appenglish/content-contracts';
+import { Accent, AutoTimeTarget, MediaSection, PracticePromptKind, PracticePromptStatus as Status, SpeechTask, VOICE_SPEEDS, VoiceSpeed, practiceLevelOf } from '@appenglish/content-contracts';
 import { contentErrors } from '../content/content.errors.js';
 import { practiceContentSchemas, practiceIssues, practiceMediaIds } from './practice.schemas.js';
 
-const MACHINE_AUDIO_TIMEOUT_MS = 55_000;
+const MACHINE_AUDIO_TIMEOUT_MS = 120_000;
 const withLevel = (content) => (content ? { ...content, level: practiceLevelOf(content.level) } : content);
 
 const OPEN_EDIT = new Set([Status.DRAFT, Status.RETURNED]);
@@ -195,17 +195,24 @@ export class PracticeService {
     return { deleted: { id: promptId }, removedMedia: removed.length };
   }
 
-  async requestAutoTime(actor, promptId) {
+  timingSource(kind, content, { target = AutoTimeTarget.TEXT, index = 0 } = {}) {
+    if (target === AutoTimeTarget.TEXT && kind === PracticePromptKind.READ_ALOUD) return { audioMediaId: content.audioMediaId, sentences: content.sentences };
+    if (target === AutoTimeTarget.SAMPLE && kind === PracticePromptKind.OPEN_SPEAKING) return { audioMediaId: content.sampleAudioMediaId, sentences: content.sampleSentences };
+    const question = target === AutoTimeTarget.QUESTION && kind === PracticePromptKind.OPEN_SPEAKING ? content.questions?.[index] : null;
+    if (question) return { audioMediaId: question.sampleAudioMediaId, sentences: question.sampleSentences };
+    throw contentErrors.autoTimeInvalid('NO_LINES', 'There is nothing to time here');
+  }
+
+  async requestAutoTime(actor, promptId, target = {}) {
     this.assertTeacher(actor);
     const { prompt, latest } = await this.load(actor, promptId);
-    if (prompt.kind !== PracticePromptKind.READ_ALOUD) throw contentErrors.autoTimeInvalid('NO_LINES', 'Only read-aloud prompts are timed');
-    const content = latest?.content || {};
+    const source = this.timingSource(prompt.kind, latest?.content || {}, target);
     return this.listening.queueSpeechJob(actor, {
       owner: { practicePromptId: promptId },
       task: SpeechTask.ALIGN,
       kind: prompt.kind,
-      audioMediaId: content.audioMediaId,
-      segments: (content.sentences || []).map((sentence) => ({ id: sentence.id, text: sentence.text })),
+      audioMediaId: source.audioMediaId,
+      segments: (source.sentences || []).map((sentence) => ({ id: sentence.id, text: sentence.text })),
     });
   }
 
@@ -234,6 +241,9 @@ export class PracticeService {
   async listPublished() {
     const prompts = (await this.repository.listPrompts({})).filter((prompt) => prompt.publishedVersionId);
     const versions = await this.repository.listVersions(prompts.map((prompt) => prompt.id));
+    const live = new Set(prompts.map((prompt) => prompt.publishedVersionId));
+    const imageIds = [...new Set(versions.filter((version) => live.has(version.id)).map((version) => version.content?.imageMediaId).filter(Boolean))];
+    const images = new Map((imageIds.length ? await this.contentService.repository.findMediaByIds(imageIds) : []).map((asset) => [asset.id, asset.storage === 'local' ? null : asset.url]));
     return {
       prompts: prompts
         .map((prompt) => {
@@ -248,6 +258,7 @@ export class PracticeService {
             etsTask: version.content.etsTask || null,
             level: practiceLevelOf(version.content.level),
             topic: version.content.topic,
+            imageUrl: images.get(version.content.imageMediaId) || null,
             publishedAt: iso(version.reviewedAt),
           };
         })

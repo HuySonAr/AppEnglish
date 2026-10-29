@@ -6,7 +6,7 @@ import { CONTENT_GRPC_SERVICE } from '@appenglish/content-contracts/grpc';
 import { ContentError } from '../content/content.errors.js';
 import { actorSchema, idSchema } from '../content/content.schemas.js';
 import { PracticeService } from './practice.service.js';
-import { learnerRecordingsSchema, practiceCreateSchema, practiceDraftSchema, practiceMachineAudioSchema, practiceReturnSchema } from './practice.schemas.js';
+import { learnerRecordingsSchema, practiceAutoTimeSchema, practiceCreateSchema, practiceDraftSchema, practiceMachineAudioSchema, practiceReturnSchema } from './practice.schemas.js';
 
 const rpcs = {
   ListPracticePrompts: { run: (service, { actor }) => service.listPrompts(actor) },
@@ -20,7 +20,7 @@ const rpcs = {
   UnpublishPracticePrompt: { id: true, run: (service, { actor, id }) => service.unpublishPrompt(actor, id) },
   DeletePracticePrompt: { id: true, run: (service, { actor, id }) => service.deletePrompt(actor, id) },
   CreatePracticeMachineAudio: { payload: practiceMachineAudioSchema, run: (service, { actor, payload }) => service.createMachineAudio(actor, payload) },
-  RequestPracticeAutoTime: { id: true, run: (service, { actor, id }) => service.requestAutoTime(actor, id) },
+  RequestPracticeAutoTime: { id: true, payload: practiceAutoTimeSchema, run: (service, { actor, id, payload }) => service.requestAutoTime(actor, id, payload) },
   GetPracticeAutoTime: { id: true, run: (service, { actor, id }) => service.getAutoTime(actor, id) },
   ListPublishedPracticePrompts: { internal: true, run: (service) => service.listPublished() },
   GetPracticePaper: { internal: true, id: true, run: (service, { id }) => service.paper(id) },

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { hasTable, passageBlocks, tableRowFromTabs } from './passage.js';
+import { cellForEditing, hasTable, inlineParts, parseDelimited, passageBlocks, passageTables, tableLayout, tableRowFromTabs, tableText, withTable } from './passage.js';
 
 test('a passage is split into its text and its tables', () => {
   const passage = 'Conference Room Schedule\n\n| Room | Time | Event |\n| A101 | 9:00 A.M. | Sales meeting |\n|B204|1:30 P.M.||\n\nPlease contact Ms. Lee.\nThank you.';
@@ -25,3 +25,36 @@ test('lines copied from a table become table rows', () => {
   assert.equal(tableRowFromTabs('Subject:\tCard expiration'), 'Subject: Card expiration');
   assert.equal(tableRowFromTabs('| Room | Time |'), '| Room | Time |');
 });
+
+test('rows copied from a spreadsheet or saved as CSV become table rows', () => {
+  assert.deepEqual(parseDelimited('Time\tEvent\tRoom\r\n9:00\tOpening\tA\n\n'), [['Time', 'Event', 'Room'], ['9:00', 'Opening', 'A']]);
+  assert.deepEqual(parseDelimited('﻿Name,Price\n"Lunch, buffet","$12 ""special"""\nTea,'), [['Name', 'Price'], ['Lunch, buffet', '$12 "special"'], ['Tea', '']]);
+  assert.deepEqual(parseDelimited('A;B;C\n1;2;3'), [['A', 'B', 'C'], ['1', '2', '3']]);
+  assert.equal(tableText([['Room', 'Note', ''], ['A | B', 'two\nlines ', ''], ['', '', '']]), '| Room | Note |\n| A / B | two<br>lines |');
+  assert.deepEqual(parseDelimited('Name,Address\nAnna,"12 Main St\nBoston"'), [['Name', 'Address'], ['Anna', '12 Main St<br>Boston']]);
+  assert.equal(cellForEditing('12 Main St<br>Boston'), '12 Main St\nBoston');
+});
+
+test('a table in a passage is added, replaced or removed in place', () => {
+  const passage = 'Schedule\n\n| Time | Event |\n| 9:00 | Opening |\n\nCall Ms. Lee.';
+  assert.deepEqual(passageTables(passage), [{ start: 2, end: 3, rows: [['Time', 'Event'], ['9:00', 'Opening']] }]);
+  assert.equal(withTable(passage, 0, [['Time', 'Event'], ['9:30', 'Welcome']]), 'Schedule\n\n| Time | Event |\n| 9:30 | Welcome |\n\nCall Ms. Lee.');
+  assert.equal(withTable(passage, 0, null), 'Schedule\n\nCall Ms. Lee.');
+  assert.equal(withTable('Notice', null, [['A', 'B']]), 'Notice\n\n| A | B |');
+  assert.equal(withTable('', null, [['A', 'B']]), '| A | B |');
+});
+
+test('a cell marked < joins the cell on its left and a row of one wide cell spans the table', () => {
+  assert.deepEqual(tableLayout([['Day', 'Time', 'Room'], ['Monday', '<', '<'], ['Tue', '9:00', 'A']]), [
+    { cells: [{ text: 'Day', span: 1 }, { text: 'Time', span: 1 }, { text: 'Room', span: 1 }], full: false },
+    { cells: [{ text: 'Monday', span: 3 }], full: true },
+    { cells: [{ text: 'Tue', span: 1 }, { text: '9:00', span: 1 }, { text: 'A', span: 1 }], full: false },
+  ]);
+  assert.deepEqual(tableLayout([['Morning', '<', 'Afternoon'], ['B204', '1:30']])[1].cells.map((cell) => cell.text), ['B204', '1:30', '']);
+});
+
+test('cells keep bold, italic and line breaks', () => {
+  assert.deepEqual(inlineParts('**Fee:** $20<br>*members free*'), [{ text: 'Fee:', bold: true }, { text: ' $20' }, { br: true }, { text: 'members free', italic: true }]);
+  assert.deepEqual(inlineParts('2 * 3 * 4'), [{ text: '2 * 3 * 4' }]);
+});
+

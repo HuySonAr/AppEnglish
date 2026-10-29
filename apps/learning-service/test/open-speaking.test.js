@@ -135,8 +135,9 @@ test('a three-question set saves one submission per answer with its own question
   });
   open.media.q1 = { kind: 'audio', url: 'https://media.test/q1.mp3' };
   const opened = (await service.getPrompt(student, open.id)).prompt;
-  assert.deepEqual([opened.etsTask, opened.timing.respondSeconds, opened.questions.map((question) => question.audioUrl)], ['respond_questions', [15, 15, 30], ['https://media.test/q1.mp3', null, null]]);
-  assert.equal(JSON.stringify(opened).includes('About twice a year'), false);
+  assert.deepEqual([opened.etsTask, opened.timing.respondSeconds, opened.questions.map((question) => question.audioUrl)], ['respond_questions', [15, 15, 30], [null, null, null]]);
+  assert.deepEqual(opened.questions[0].sample, { text: 'About twice a year.', audioUrl: null, sentences: [] });
+  assert.equal(opened.sample, null);
   await assert.rejects(() => service.submit(student, open.id, recording(10)), (error) => error.code === 67 && error.data.reason === 'SET_ANSWER');
   const setId = randomUUID();
   const { submission } = await service.submit(student, open.id, { ...recording(12), questionIndex: 2, setId });
@@ -167,4 +168,64 @@ test('an answer without an ETS task has no TOEIC score', async () => {
   assert.equal(eventRepository.tables.events.find((event) => event.type === LearningEventType.SPEAKING_GRADING_REQUESTED).payload.etsTask, null);
   await service.applyGrading({ submissionId: submission.id, status: 'DONE', result: graded });
   assert.equal((await service.getSubmission(student, submission.id)).submission.result.ets, null);
+});
+
+test('a picture prompt shows its sample reading and always has the default instructions', async () => {
+  const { service, open } = harness();
+  Object.assign(open.content, {
+    etsTask: 'describe_picture',
+    instructions: 'Old directions.',
+    sampleAnswer: 'A man is reading.',
+    sampleAudioMediaId: 's1',
+    sampleSentences: [{ id: '11111111-1111-4111-8111-111111111111', text: 'A man is reading.', translation: 'Một người đàn ông đang đọc.', start: 0.2, end: 1.6 }],
+  });
+  open.media.s1 = { kind: 'audio', url: 'https://media.test/s1.mp3' };
+  const opened = (await service.getPrompt(student, open.id)).prompt;
+  assert.equal(opened.instructions, 'Describe a picture.');
+  assert.deepEqual(opened.sample, { text: 'A man is reading.', audioUrl: 'https://media.test/s1.mp3', sentences: [{ text: 'A man is reading.', translation: 'Một người đàn ông đang đọc.', start: 0.2, end: 1.6 }] });
+  Object.assign(open.content, { etsTask: 'express_opinion', instructions: 'Give your opinion.' });
+  assert.equal((await service.getPrompt(student, open.id)).prompt.sample, null);
+});
+
+test('an information prompt shows question translations and samples but no instructions', async () => {
+  const { service, open } = harness();
+  Object.assign(open.content, {
+    etsTask: 'respond_info',
+    instructions: 'Old directions.',
+    info: '| Time | Event |\n| 9:00 | Opening |',
+    questions: [
+      { text: 'When does it start?', translation: 'Khi nào bắt đầu?', sampleAnswer: 'At nine.', audioMediaId: 'q1', sampleAudioMediaId: null, sampleSentences: [] },
+      { text: 'Is lunch free?', sampleAnswer: 'No, it costs ten dollars.', audioMediaId: null },
+      { text: 'What happens in the morning?', sampleAnswer: 'There is an opening.', audioMediaId: null },
+    ],
+  });
+  open.media.q1 = { kind: 'audio', url: 'https://media.test/q1.mp3' };
+  const opened = (await service.getPrompt(student, open.id)).prompt;
+  assert.equal(opened.instructions, '');
+  assert.deepEqual(opened.questions.map((question) => [question.translation, question.audioUrl, question.sample?.text]), [
+    ['Khi nào bắt đầu?', 'https://media.test/q1.mp3', 'At nine.'],
+    ['', null, 'No, it costs ten dollars.'],
+    ['', null, 'There is an opening.'],
+  ]);
+});
+
+test('ETS prompts limit each answer to the ETS response time of its question', async () => {
+  const { service, open } = harness();
+  Object.assign(open.content, {
+    etsTask: 'respond_questions',
+    context: 'A survey about travel.',
+    maxSeconds: 60,
+    questions: [
+      { text: 'How often do you travel?', sampleAnswer: 'Twice a year.', audioMediaId: null },
+      { text: 'Who with?', sampleAnswer: 'My family.', audioMediaId: null },
+      { text: 'Describe your last trip.', sampleAnswer: 'I went to Hue.', audioMediaId: null },
+    ],
+  });
+  const setId = randomUUID();
+  await assert.rejects(() => service.submit(student, open.id, { ...recording(20), questionIndex: 0, setId }), (error) => error.code === 67 && error.data.reason === 'TOO_LONG');
+  const { submission } = await service.submit(student, open.id, { ...recording(28), questionIndex: 2, setId });
+  assert.equal(submission.status, 'SCORING');
+  Object.assign(open.content, { etsTask: 'describe_picture', questions: [] });
+  assert.equal((await service.getPrompt(student, open.id)).prompt.maxSeconds, 30);
+  await assert.rejects(() => service.submit(student, open.id, recording(40)), (error) => error.data.reason === 'TOO_LONG');
 });

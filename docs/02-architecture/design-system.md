@@ -41,11 +41,15 @@ Thang bo góc đang dùng:
 ## 3. Bố cục
 
 ### Trang trong ứng dụng (`SidebarLayout`)
+- Trên màn hình nhỏ, nút mở menu (drawer) nằm bên phải header cho mọi vai trò (học viên, giáo viên, Content Manager, admin); sidebar máy tính vẫn bên trái.
 - Sidebar rộng `w-64` (`lg:pl-64`), header cao `h-16` dính trên cùng, viền dưới.
 - Sidebar chia **mục có tiêu đề** (`text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80`), khai báo trong `src/app/navigation.js` (`sections`).
 - Hàng sidebar: `rounded-xl px-3 py-2.5 text-sm font-medium`; đang chọn `bg-primary/10 text-primary`, hover `bg-accent`.
 - Nhóm có mục con (Practice): **bấm để mở/đóng**, không mở khi hover; tự mở khi đang ở trang con. Mục con treo trên **một đường kẻ thẳng** (`ml-5 border-l pl-3`), mục đang mở có chevron phải. Mở/đóng bằng chuyển `grid-template-rows` 200ms.
 - Chân sidebar một hàng: avatar + tên + email (dẫn tới Profile), nút giao diện sáng/tối và đăng xuất dạng icon.
+- Lề nội dung `main`: `px-4` (điện thoại), `sm:px-5`. Thanh dính đầu trình soạn/trang thi kéo ra đúng bằng lề đó (`-mx-4 px-4 sm:-mx-5 sm:px-5`); kéo rộng hơn sẽ sinh thanh cuộn ngang.
+- `<fieldset>` bọc khung soạn phải có `min-w-0`: mặc định `fieldset` rộng tối thiểu bằng nội dung (bảng, chuỗi dài) và đẩy trang tràn ngang trên điện thoại.
+- Lưới chứa ô tải file hoặc chữ dài phải khai báo cột (`grid-cols-1` trên điện thoại, rồi `lg:grid-cols-[minmax(0,1fr)_…]`): lưới không khai báo cột tự nới theo tên file dài và đẩy trang tràn ngang.
 - Đầu trang dùng `PageHeader` (eyebrow chữ hoa màu `primary`, `h1` `text-2xl sm:text-3xl font-bold`, mô tả một câu, nút hành động bên phải).
 
 ### Home học viên (D187)
@@ -59,11 +63,21 @@ Thứ bậc từ trên xuống, cột phải `21rem` trên màn hình rộng:
 
 Khu vực dùng `SectionCard` (`rounded-3xl border bg-card p-5 sm:p-6`, tiêu đề có ô biểu tượng `bg-primary/10`, liên kết bên phải là `ArrowLink`). Ô bên trong dùng `rounded-2xl border bg-background`. Trang học viên khác dùng lại khung này khi được làm lại.
 
+### Trình soạn đề Speaking (D217)
+- Trang danh sách đề Speaking của giáo viên: 5 Part trên **một hàng** `grid-cols-5` ở mọi cỡ màn hình; điện thoại mỗi ô chỉ "Part n" + số đề (ô đang chọn viền `primary`, số trên nền `primary`), dòng dưới ghi "Part n: tên dạng câu · Questions …"; từ `sm` mỗi ô thêm tên dạng câu và số câu.
+- Thanh đầu trình soạn (dính trên cùng): dưới `sm` chỉ hai hàng — hàng 1 tiêu đề `text-base` (chấm `info` khi chưa lưu) và các nút dạng icon (Preview, Save) cùng nút "Send"; hàng 2 là dạng câu · mức · v{n} và nhãn trạng thái. Từ `sm` giữ tiêu đề `text-xl`, nhãn "Unsaved" và nút đủ chữ.
+- Mỗi khung `rounded-xl border bg-card p-4`; hàng đầu là dạng câu (trái) và tốc độ giọng máy (phải). Ô chữ và ô tải lên đặt cùng hàng từ `lg` (`grid lg:grid-cols-[minmax(0,1fr)_17rem]`): Part 1 "Text to read" + audio mẫu; Part 2 hai cột `lg:grid-cols-[minmax(0,1fr)_20rem]`: trái là Sample answer, dưới là audio đọc mẫu; phải là ảnh (`MediaInput fill`) cao bằng cột trái (ô tải lên hoặc ảnh xem trước co giãn theo, tối thiểu `min-h-48`); không có Instructions; Part 3 câu hỏi chiếm cả hàng (không có audio câu hỏi), bài mẫu + audio đọc mẫu; Part 4 có câu hỏi (kèm ô "Bản dịch tiếng Việt" bên dưới) + audio câu hỏi trên một hàng cao bằng nhau (`AudioSlot stretch`), rồi bài mẫu + audio đọc mẫu như Part 3; Part 3–4 không có Instructions (D219). Ô audio (`AudioSlot`) có nút "Machine voice" khi chưa có file; nút đổi thành "Making…" (vòng xoay) hoặc "Waiting…" khi đang chờ lượt, các nút khác vẫn bấm được, Save / Send tạm khoá tới khi xong (D220). Khi ô chữ và ô audio đứng cạnh nhau (Part 1 "Text to read", bài mẫu Part 3) hai cột cao bằng nhau: ô chữ giãn theo (`flex-1 resize-none`, tối thiểu 5,5–7rem), ô tải lên giãn theo khi ô chữ cao hơn (`AudioSlot stretch`). Dưới bài mẫu là danh sách câu (`SentenceTimes`) theo cách của trình soạn Listening (`RecordingEditor`): hàng đầu "Sentences" + nhãn "n/N timed" + nút Auto-time; trình phát audio hiện rõ kèm "Player at m:ss.s" (ô tải lên không hiện trình phát thứ hai); Auto-time xong hiện khung kết quả "Auto-time found x of N sentences" với **Apply times** / **Dismiss**, chưa tự điền; mỗi câu có bản dịch, ô Start/End dạng `m:ss.s` với nút tăng/giảm 0,1 giây (hai mũi tên nhỏ xếp dọc giữa ô và nút Here) và nút **Here** lấy giờ đang phát; trong ô, phím ↑/↓ đổi 0,1 giây, Shift+↑/↓ đổi 1 giây, không xuống dưới 0 (`TimeField` dùng chung với trình soạn Listening, End Here điền luôn Start câu sau nếu trống), nút Play từng câu, viền `primary` khi đang phát, viền `warning` + nhãn "Check timing" khi Auto-time không chắc. Key points là lưới `sm:grid-cols-2 lg:grid-cols-4`, mỗi ô có số thứ tự và nút xoá, ô cuối là nút thêm viền đứt.
+
 ### Trang luyện Speaking (đề đang làm)
+- Đầu trang có nút "Exit" (icon X, `outline sm`) bên phải, cạnh "Your attempts", về đúng danh sách Part của đề (`?part=n`); breadcrumb "Speaking" và "Part n" cũng về Part đó, kể cả từ màn hình kết quả và trang lịch sử.
+- Cột đề không lặp tên đề (đã có ở `h1`) và không hiện yêu cầu "Describe a picture." của Part 2 (đã có trong dòng "Question 3: Describe a picture").
+- Thẻ đề trong danh sách Speaking: đề có ảnh (Part 2) hiện ảnh đầu thẻ `aspect-[16/9] object-cover`, phóng nhẹ khi hover.
+- Cột phải bộ 3 câu: câu hỏi `text-sm sm:text-base font-medium`, bản dịch `text-xs sm:text-sm` nghiêng; bước chuẩn bị có nút "Start speaking now". Bài mẫu Part 3/4 ẩn sau một nút `outline sm` "Sample answers (3)" (mũi tên xoay, danh sách mở bằng hiệu ứng cao 0→auto) (D221).
+- Bài mẫu Part 2–3 (D217) nằm trong cột đề, dưới ảnh/bối cảnh: khối `rounded-lg border bg-muted/30`, mặc định **thu gọn**; cả hàng tiêu đề (nhãn "Sample answer" hoặc "Sample · Question n" kèm câu hỏi) là nút bấm với chữ Show/Hide và icon mắt bên phải. Mở ra thì dưới đường kẻ là `ReadingBlock` gọn (Read sample `h-7`, tốc độ, Bilingual, chữ `text-sm sm:text-base`); ẩn đi thì audio dừng; phát một khối thì các khối khác dừng. Tiêu đề trong `ReadingBlock` rộng tối thiểu `10rem` để các nút xuống hàng trên màn hẹp thay vì đè lên chữ.
 - Đầu trang gọn: `PageBreadcrumb` (Practice › Speaking), rồi một hàng gồm tiêu đề đề `h1 text-lg font-semibold` (cắt dòng khi dài), nhãn mức và dạng câu · chủ đề; tab Practice/History nằm bên phải cùng hàng (`PracticeTabs` nhận `toolbar`).
-- Từ `lg`: hai cột trong vùng cao vừa màn hình (`h-[calc(100dvh-12rem-var(--player-h))]`, tối thiểu `24rem`), trang không cuộn. Khung chỉ cao theo nội dung (`items-start`, `max-h-full`), cuộn bên trong khi dài. Khung gọn: `rounded-xl border bg-card p-4 sm:p-5`, không đổ bóng. Cột trái là đề (đoạn đọc `text-lg sm:text-xl`, hoặc yêu cầu và hình `max-h-[50dvh]`, hoặc bối cảnh và bảng thông tin); cột phải rộng `23rem` gồm khu ghi âm (công tắc bỏ đếm giờ, mốc thời gian ETS, nút micro `h-12`) và kết quả mới nhất.
+- Từ `lg`: hai cột trong vùng cao vừa màn hình (`h-[calc(100dvh-12rem)]`, tối thiểu `24rem`), trang không cuộn. Khung chỉ cao theo nội dung (`items-start`, `max-h-full`), cuộn bên trong khi dài. Khung gọn: `rounded-xl border bg-card p-4 sm:p-5`, không đổ bóng. Cột trái là đề (đoạn đọc `text-lg sm:text-xl`, hoặc yêu cầu và hình `max-h-[50dvh]`, hoặc bối cảnh và bảng thông tin); cột phải rộng `23rem` gồm khu ghi âm (công tắc bỏ đếm giờ, mốc thời gian ETS, nút micro `h-12`) và kết quả mới nhất.
 - Dưới `lg`: các khối xếp dọc theo thứ tự đề → ghi âm → kết quả.
-- Audio mẫu đọc to và audio câu hỏi khi luyện không đếm giờ phát ở **thanh phát cố định cuối màn hình** kiểu trình nghe nhạc (`ModelAudio`): `fixed bottom-0`, chừa sidebar từ `lg` (`lg:left-64`), cao `4rem`, `border-t bg-card`, ba vùng: trái là tên (Model reading / Question n), giữa là nút lùi 3 giây và nút phát tròn `h-8` (`bg-foreground`) trên một thanh tiến độ mảnh `h-1` có thời gian hai bên (hover: thanh đổi `primary`, hiện núm), phải là `SpeedSwitch`. Trên điện thoại ẩn phần tên. Thanh đặt biến CSS `--player-h` để trang chừa chỗ dưới cùng; ẩn khi sang tab History. Audio ghi âm của học viên vẫn phát tại chỗ.
+- Không có thanh phát cố định cuối màn hình (bỏ `ModelAudio` ngày 2026-10-29, D221): audio mẫu đọc to phát bằng nút "Read sample" trong đề; audio câu hỏi bộ 3 câu tự phát trong khung ghi âm (`QuestionAudio`), không nghe lại ở thanh dưới.
 - Màn hình kết quả (`SpeakingResultScreen`, D203): cùng đầu trang gọn; trong lúc chấm là khung chờ `max-w-md` căn giữa (spinner, danh sách bước có trạng thái xong / đang làm / chờ); xong thì kết quả `max-w-3xl` với nút "Other prompts" và "Practice again". Nhận xét AI có `LanguageSwitch` English / Tiếng Việt (viên thuốc như `SpeedSwitch`).
 
 ### Banner trang luyện Listening / Speaking / Writing (D216)
@@ -124,6 +138,8 @@ Dùng lại theo thứ tự: `src/components/shared` → `src/components/ui` (sh
 | ScoreRing | vòng điểm; cung vẽ dần và số đếm lên (anime.js); `tone`: primary, success, destructive, inverse |
 | Reveal | `RevealGroup`/`RevealItem`: con xuất hiện lần lượt, lệch 0,07s (Motion) |
 | GridPattern | lưới SVG mờ cho khối màu chủ đạo |
+| PassageText | đoạn chữ `whitespace-pre-wrap`; bảng viền bo `rounded-lg`, hàng đầu nền `muted/50` chữ `font-semibold`, ô gộp ngang căn giữa, hàng một ô trải hết bảng nền `muted/30` chữ đậm, `**…**` đậm, `*…*` nghiêng, `<br>` xuống dòng |
+| TableTool | ô soạn bảng dưới ô tài liệu: nút "Add table" (`outline sm`, icon bảng) và "Edit table n" (`ghost`); hộp thoại `max-w-4xl`: hàng nút (Upload CSV, + Row, + Column, kích thước "r × c" bên phải), lưới ô `Input h-8 min-w-[7rem]` trong khung cuộn `max-h-[55dvh]`, hàng đầu nền `muted` chữ đậm, thanh định dạng cho ô đang chọn (B, I, "Merge →", "Unmerge"), ô là `Textarea` một dòng tự cao theo số dòng (Enter xuống dòng), ô đã gộp hiện khung viền đứt "← merged", nút X xoá cột ở trên và xoá hàng bên trái, chân hộp thoại "Remove table" (đỏ, trái) và Cancel / Insert table hoặc Save table (phải) |
 | AnswerProgress | thân hộp thoại nộp/rời bài (`TestExam`): nút X tròn góc phải; hàng đầu gồm hình minh hoạ trong ô `h-14 rounded-2xl` nền nhạt (`ClipboardAlert` màu `warning` khi còn câu chưa làm, `ClipboardCheck` màu `success` khi đủ, `DoorExit` màu `destructive` khi rời bài) cạnh tiêu đề `text-base font-semibold` và mô tả `text-xs`; dưới là "Answered n / N" và thanh `h-1.5`; các số câu chưa làm dạng viên tròn đỏ nhạt căn phải, tối đa 4 rồi "+N". Chân hộp thoại các nút chia đều, Submit màu `primary` có icon gửi |
 | Pronunciation | nút viên thuốc `rounded-full border bg-card p-1 shadow-sm`: cờ tròn (`country-flag-icons` 1x1, `h-5` → `sm:h-6`), nhãn US/UK chỉ từ `md` (≥768px), ô loa tròn `bg-muted` → `bg-primary/10 text-primary` khi đang phát; US đứng trước UK (D204) |
 
@@ -155,6 +171,10 @@ Chia việc theo D187: CSS cho hiệu ứng trang auth và các hiệu ứng cũ
 | `Stat` hover (Motion) | nâng 3px, lò xo | — | Ô chỉ số |
 | Kế hoạch hôm nay (Motion) | trượt từ trái 10px, lần lượt | 0,45s, lệch 0,08s | Việc trong `TodayPlanCard` |
 | Ngày streak (Motion) | bật từ 60%, lò xo | lệch 0,05s | `StreakCard` |
+| Trang luyện Speaking (Motion) | đầu trang hạ xuống 6px; cột đề và cột ghi âm `RevealGroup/Item`; ảnh đề phóng từ 98% | 0,4–0,55s | `SpeakingPromptPage`, `SpeakingTaskCard` |
+| Bài mẫu Show/Hide (Motion) | cao 0→auto + mờ→rõ, mũi tên xoay 180° | 0,35s (cao), 0,25s (mờ) | `SampleBlock` |
+| Đổi Bilingual / bật tắt giờ (Motion) | `AnimatePresence mode="wait"`: mờ + lệch 6–8px | 0,22–0,25s | `ReadAloudText`, khung ghi âm |
+| Tô câu đang đọc | `transition-colors duration-300` | 0,3s | `ReadAloudText` |
 | `CountUp` (anime.js) | số đếm lên, `outExpo` | 1,1s | Số trên Home |
 | `ScoreRing` (anime.js) | cung vẽ dần + số đếm | 1,3s | Vòng điểm mọi trang |
 | `circle-swap`, `arrow-link`, `glide-cards` (MicroKit, CSS) | chấm/mũi tên trượt, lớp sáng trượt | 0,3–0,42s | Nút và liên kết |

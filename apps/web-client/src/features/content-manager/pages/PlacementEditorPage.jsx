@@ -175,7 +175,7 @@ export function PlacementEditorPage() {
 
   return (
     <section className="space-y-5">
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-5 sm:px-5">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">{eyebrow}</p>
           <h1 className="truncate text-lg font-semibold sm:text-xl">Placement test</h1>

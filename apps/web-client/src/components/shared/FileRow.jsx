@@ -5,7 +5,7 @@ import { Button } from '../ui/button.jsx';
 
 const icons = { audio: FileAudio, video: FileVideo, image: FileImage, json: FileJson, text: FileText };
 
-export function FileRow({ name, type, sizeBytes, status = 'done', note, error, onRemove, onRetry, children, className }) {
+export function FileRow({ name, type, sizeBytes, status = 'done', note, error, onRemove, onRetry, children, className, bodyClassName }) {
   const Icon = icons[fileKind(name, type)] || FileText;
   const failed = status === 'failed';
   const detail = failed
@@ -41,7 +41,7 @@ export function FileRow({ name, type, sizeBytes, status = 'done', note, error, o
           />
         </div>
       )}
-      {children ? <div className="mt-3">{children}</div> : null}
+      {children ? <div className={cn('mt-3', bodyClassName)}>{children}</div> : null}
     </div>
   );
 }

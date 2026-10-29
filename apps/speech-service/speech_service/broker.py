@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 import logging
+import multiprocessing
+import os
 import threading
 import time
 import uuid
@@ -193,9 +195,51 @@ def _keep_serving_speaking(settings: Settings, transcribe) -> None:
             time.sleep(RETRY_SECONDS)
 
 
-def run(settings: Settings, transcribe, cache=None, pronounce=None, speaking=True) -> None:
-    if pronounce is not None:
-        threading.Thread(target=_keep_serving_pronounce, args=(settings, pronounce), daemon=True).start()
+def serve_pronounce_process(settings: Settings) -> None:
+    from .cache import AudioCache
+    from .pronounce import Pronouncer
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(processName)s %(message)s")
+    logging.getLogger("pika").setLevel(logging.CRITICAL)
+    parent = multiprocessing.parent_process()
+    if parent is not None:
+        threading.Thread(target=_exit_with, args=(parent,), daemon=True).start()
+    _keep_serving_pronounce(settings, Pronouncer(settings, AudioCache(settings.audio_cache_dir) if settings.audio_cache_dir else None))
+
+
+def _exit_with(parent) -> None:
+    parent.join()
+    os._exit(0)
+
+
+def supervise_pronounce(settings: Settings, start=None, rounds=None, pause=RETRY_SECONDS) -> None:
+    context = multiprocessing.get_context("spawn")
+    start = start or (lambda index: _start_pronounce_process(context, settings, index))
+    workers = [None] * settings.pronounce_workers
+    log.info("Starting %d pronunciation workers", len(workers))
+    while rounds is None or rounds > 0:
+        for index, worker in enumerate(workers):
+            if worker is not None and worker.is_alive():
+                continue
+            if worker is not None:
+                log.warning("Pronunciation worker %d stopped (exit %s); starting it again", index + 1, worker.exitcode)
+            workers[index] = start(index)
+        if rounds is not None:
+            rounds -= 1
+            if rounds == 0:
+                return
+        time.sleep(pause)
+
+
+def _start_pronounce_process(context, settings: Settings, index: int):
+    worker = context.Process(target=serve_pronounce_process, args=(settings,), name=f"pronounce-{index + 1}", daemon=True)
+    worker.start()
+    return worker
+
+
+def run(settings: Settings, transcribe, cache=None, pronounce=True, speaking=True) -> None:
+    if pronounce:
+        threading.Thread(target=supervise_pronounce, args=(settings,), daemon=True).start()
     if speaking:
         threading.Thread(target=_keep_serving_speaking, args=(settings, transcribe), daemon=True).start()
     while True:

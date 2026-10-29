@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { AudioLines, Timer } from 'lucide-react';
-import { PRACTICE_LIMITS, VoiceSpeed } from '@appenglish/content-contracts';
+import { AudioLines, Plus, Timer, X } from 'lucide-react';
+import { AutoTimeTarget, PRACTICE_LIMITS, VoiceSpeed } from '@appenglish/content-contracts';
 import { getApiErrorMessage } from '../../../lib/api/response.js';
 import { notify } from '../../../lib/notify.js';
 import { cn } from '../../../lib/utils.js';
@@ -10,10 +10,11 @@ import { Button, Input, Label } from '../../../components/ui';
 import { Textarea } from '../../../components/ui/textarea.jsx';
 import { FileDropzone } from '../../../components/shared/FileDropzone.jsx';
 import { FileRow } from '../../../components/shared/FileRow.jsx';
+import { SentenceTimes, syncSentences } from './SentenceTimes.jsx';
 
-export function Field({ id, label, hint, children }) {
+export function Field({ id, label, hint, children, className }) {
   return (
-    <div className="space-y-2">
+    <div className={cn('space-y-2', className)}>
       <div className="flex items-baseline justify-between gap-2">
         <Label htmlFor={id}>{label}</Label>
         {hint ? <span className="text-xs tabular-nums text-muted-foreground">{hint}</span> : null}
@@ -39,7 +40,7 @@ export function Choice({ value, current, onPick, children }) {
   );
 }
 
-export function MediaInput({ id, label, kind, mediaId, media, onChange }) {
+export function MediaInput({ id, label, kind, mediaId, media, onChange, fill = false, preview = true }) {
   const [uploading, setUploading] = useState(false);
   const asset = mediaId ? media[mediaId] : null;
   async function choose(file) {
@@ -54,16 +55,24 @@ export function MediaInput({ id, label, kind, mediaId, media, onChange }) {
     }
   }
   return (
-    <Field id={id} label={label}>
+    <Field id={id} label={label} className={fill ? 'flex h-full flex-col space-y-0 gap-2' : undefined}>
       {mediaId ? (
-        <FileRow name={asset?.fileName || 'File attached'} status="done" note="Uploaded" onRemove={() => onChange(null)}>
-          {asset?.url && kind === 'audio' ? <audio controls src={asset.url} className="w-full" /> : null}
-          {asset?.url && kind === 'image' ? <img src={asset.url} alt="" className="max-h-48 rounded-md" /> : null}
+        <FileRow
+          name={asset?.fileName || 'File attached'}
+          status="done"
+          note="Uploaded"
+          onRemove={() => onChange(null)}
+          className={fill ? 'flex flex-1 flex-col' : undefined}
+          bodyClassName={fill ? 'relative min-h-48 flex-1' : undefined}
+        >
+          {preview && asset?.url && kind === 'audio' ? <audio controls src={asset.url} className="w-full" /> : null}
+          {asset?.url && kind === 'image' ? <img src={asset.url} alt="" className={fill ? 'absolute inset-0 h-full w-full rounded-md bg-muted/30 object-contain' : 'max-h-48 rounded-md'} /> : null}
         </FileRow>
       ) : (
         <FileDropzone
           id={id}
           compact
+          className={fill ? 'min-h-48 flex-1' : undefined}
           disabled={uploading}
           accept={kind === 'audio' ? '.mp3,.m4a,.mp4,audio/mpeg,audio/mp4' : '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp'}
           kindLabel={uploading ? 'Uploading…' : kind === 'audio' ? 'MP3, MP4 or M4A' : 'JPEG, PNG or WebP'}
@@ -133,50 +142,214 @@ export function VoiceSpeedPicker({ speed, onPick }) {
   );
 }
 
-export function QuestionRows({ questions, media, onMedia, onQuestion: update, busy, onVoice, voiceSpeed, onVoiceSpeed }) {
+export function AudioSlot({ id, label, mediaId, media, onMedia, onChange, voiceText = '', voices, busyKey, onVoice, preview = true, stretch = false }) {
+  const making = voices?.isRunning(busyKey);
+  const queued = voices?.isWaiting(busyKey);
+  return (
+    <div className={stretch ? 'flex h-full flex-col gap-2' : 'space-y-2'}>
+      <MediaInput
+        id={id}
+        label={label}
+        kind="audio"
+        fill={stretch && !mediaId}
+        preview={preview}
+        mediaId={mediaId}
+        media={media}
+        onChange={(next, asset) => {
+          if (asset) onMedia(next, asset);
+          onChange(next);
+        }}
+      />
+      {!mediaId && onVoice ? (
+        <Button type="button" variant="outline" size="sm" className="w-full gap-1.5" loading={making} disabled={making || queued || !voiceText.trim()} onClick={() => onVoice(voiceText.trim(), onChange, busyKey)}>
+          <AudioLines className="h-4 w-4" />
+          {queued ? 'Waiting…' : making ? 'Making…' : 'Machine voice'}
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
+export function SampleReadingFields({
+  id,
+  label = 'Sample answer',
+  hint,
+  text,
+  onText,
+  audioMediaId,
+  onAudio,
+  sentences,
+  onSentences,
+  media,
+  onMedia,
+  voices,
+  onVoice,
+  promptId,
+  target,
+  beforeJob,
+  disabled,
+  rows = 4,
+  extra = null,
+}) {
+  const sideBySide = !extra;
+  const textField = (
+    <Field id={`${id}-text`} label={label} hint={hint} className={sideBySide ? 'flex h-full flex-col' : undefined}>
+      <Textarea
+        id={`${id}-text`}
+        rows={rows}
+        maxLength={PRACTICE_LIMITS.sampleAnswer}
+        placeholder="One sentence per line."
+        className={sideBySide ? 'min-h-[5.5rem] flex-1 resize-none' : undefined}
+        value={text}
+        onChange={(event) => onText(event.target.value)}
+      />
+    </Field>
+  );
+  const audioSlot = (
+    <AudioSlot stretch={sideBySide} preview={false} id={`${id}-audio`} label="Sample reading (optional)" mediaId={audioMediaId} media={media} onMedia={onMedia} onChange={onAudio} voiceText={text} voices={voices} busyKey={`voice-${id}`} onVoice={onVoice} />
+  );
+  return (
+    <div className="space-y-3">
+      {extra ? (
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_20rem]">
+          <div className="space-y-3">
+            {textField}
+            {audioSlot}
+          </div>
+          {extra}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_17rem]">
+          {textField}
+          {audioSlot}
+        </div>
+      )}
+      <SentenceTimes promptId={promptId} target={target} sentences={sentences || []} audioUrl={audioMediaId ? media[audioMediaId]?.url || null : null} disabled={disabled} onChange={onSentences} beforeJob={beforeJob} />
+    </div>
+  );
+}
+
+export function QuestionRows({ questions, media, onMedia, onQuestion: update, voices, onVoice, sampleReading = false, questionAudio = true, promptId, beforeJob, disabled }) {
   return (
     <div className="space-y-3">
       <Label>Questions</Label>
-      {questions.some((question) => !question.audioMediaId) ? <VoiceSpeedPicker speed={voiceSpeed} onPick={onVoiceSpeed} /> : null}
       {questions.map((question, index) => (
         <div key={index} className="space-y-3 rounded-xl border bg-background p-3">
           <div className="flex items-center gap-2">
             <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-muted text-xs font-semibold">{index + 1}</span>
             <span className="text-sm font-medium">Question {index + 1}</span>
           </div>
-          <Field id={`question-${index}-text`} label="Question" hint={`${question.text.length}/${PRACTICE_LIMITS.question}`}>
-            <Input id={`question-${index}-text`} maxLength={PRACTICE_LIMITS.question} value={question.text} onChange={(event) => update(index, { text: event.target.value })} />
-          </Field>
-          <Field id={`question-${index}-sample`} label="Sample answer">
-            <Textarea id={`question-${index}-sample`} rows={3} maxLength={PRACTICE_LIMITS.sampleAnswer} value={question.sampleAnswer} onChange={(event) => update(index, { sampleAnswer: event.target.value })} />
-          </Field>
-          <MediaInput
-            id={`question-${index}-audio`}
-            label="Audio (optional)"
-            kind="audio"
-            mediaId={question.audioMediaId}
-            media={media}
-            onChange={(id, asset) => {
-              if (asset) onMedia(id, asset);
-              update(index, { audioMediaId: id });
-            }}
-          />
-          {!question.audioMediaId ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-1.5"
-              loading={busy === `voice-${index}`}
-              disabled={Boolean(busy) || !question.text.trim()}
-              onClick={() => onVoice(question.text.trim(), (id) => update(index, { audioMediaId: id }), `voice-${index}`)}
-            >
-              <AudioLines className="h-4 w-4" />
-              Machine voice
-            </Button>
-          ) : null}
+          <div className={cn('grid grid-cols-1 gap-3', questionAudio && 'lg:grid-cols-[minmax(0,1fr)_17rem]')}>
+            <div className="flex flex-col gap-2">
+              <Field id={`question-${index}-text`} label="Question" hint={`${question.text.length}/${PRACTICE_LIMITS.question}`} className={questionAudio ? 'flex flex-1 flex-col' : undefined}>
+                <Textarea
+                  id={`question-${index}-text`}
+                  rows={2}
+                  maxLength={PRACTICE_LIMITS.question}
+                  className={questionAudio ? 'min-h-[4.5rem] flex-1 resize-none' : undefined}
+                  value={question.text}
+                  onChange={(event) => update(index, { text: event.target.value })}
+                />
+              </Field>
+              <Input
+                aria-label={`Translation of question ${index + 1}`}
+                maxLength={PRACTICE_LIMITS.question}
+                placeholder="Bản dịch tiếng Việt"
+                className="h-9 text-sm"
+                value={question.translation || ''}
+                onChange={(event) => update(index, { translation: event.target.value })}
+              />
+            </div>
+            {questionAudio ? (
+              <AudioSlot
+                stretch
+                id={`question-${index}-audio`}
+                label="Question audio (optional)"
+                mediaId={question.audioMediaId}
+                media={media}
+                onMedia={onMedia}
+                onChange={(id) => update(index, { audioMediaId: id })}
+                voiceText={question.text}
+                voices={voices}
+                busyKey={`voice-${index}`}
+                onVoice={onVoice}
+              />
+            ) : null}
+          </div>
+          {sampleReading ? (
+            <SampleReadingFields
+              id={`question-${index}-sample`}
+              rows={3}
+              text={question.sampleAnswer}
+              onText={(value) =>
+                update(index, {
+                  sampleAnswer: value,
+                  sampleSentences: syncSentences(value, question.sampleSentences),
+                })
+              }
+              audioMediaId={question.sampleAudioMediaId || null}
+              onAudio={(id) => update(index, { sampleAudioMediaId: id })}
+              sentences={question.sampleSentences}
+              onSentences={(value) => update(index, { sampleSentences: value })}
+              media={media}
+              onMedia={onMedia}
+              voices={voices}
+              onVoice={onVoice}
+              promptId={promptId}
+              target={{ target: AutoTimeTarget.QUESTION, index }}
+              beforeJob={beforeJob}
+              disabled={disabled}
+            />
+          ) : (
+            <Field id={`question-${index}-sample`} label="Sample answer">
+              <Textarea id={`question-${index}-sample`} rows={3} maxLength={PRACTICE_LIMITS.sampleAnswer} value={question.sampleAnswer} onChange={(event) => update(index, { sampleAnswer: event.target.value })} />
+            </Field>
+          )}
         </div>
       ))}
+    </div>
+  );
+}
+
+export function KeyPointsGrid({ points, onChange }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-baseline justify-between gap-2">
+        <Label>Key points (optional)</Label>
+        <span className="text-xs tabular-nums text-muted-foreground">
+          {points.length}/{PRACTICE_LIMITS.keyPoints}
+        </span>
+      </div>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {points.map((point, index) => (
+          <div key={index} className="flex items-center gap-1 rounded-lg border bg-background py-1 pl-1.5 pr-0.5">
+            <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-muted text-[11px] font-semibold">{index + 1}</span>
+            <Input
+              aria-label={`Key point ${index + 1}`}
+              maxLength={PRACTICE_LIMITS.keyPoint}
+              className="h-8 border-0 px-1.5 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              value={point}
+              onChange={(event) => onChange(points.map((item, at) => (at === index ? event.target.value : item)))}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 shrink-0 text-muted-foreground"
+              aria-label={`Remove key point ${index + 1}`}
+              onClick={() => onChange(points.filter((_, at) => at !== index))}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        ))}
+        {points.length < PRACTICE_LIMITS.keyPoints ? (
+          <Button type="button" variant="outline" className="h-auto min-h-10 gap-1.5 border-dashed text-muted-foreground" onClick={() => onChange([...points, ''])}>
+            <Plus className="h-4 w-4" />
+            Add a key point
+          </Button>
+        ) : null}
+      </div>
     </div>
   );
 }

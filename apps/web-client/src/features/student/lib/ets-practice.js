@@ -7,15 +7,25 @@ export const isSetPrompt = (prompt) => Boolean(prompt) && ETS_SET_TASKS.includes
 
 export const hasTimer = (prompt) => Boolean(prompt?.timing);
 
-export function recordSeconds(prompt, index = 0, timed = true) {
-  const max = prompt.maxSeconds;
-  const planned = timed ? prompt.timing?.respondSeconds?.[index] : null;
-  return planned ? Math.min(planned, max) : max;
+export function recordSeconds(prompt, index = 0) {
+  return prompt.timing?.respondSeconds?.[index] || prompt.maxSeconds;
 }
 
 export const prepareSeconds = (prompt) => prompt.timing?.prepareSeconds || 0;
 export const readSeconds = (prompt) => prompt.timing?.readSeconds || 0;
 export const playCount = (prompt, index) => (prompt.timing?.playTwice?.includes(index) ? 2 : 1);
+
+export function setIntroHint(prompt, firstQuestion = 1, timed = true) {
+  const count = (prompt.questions || []).length || ETS_SET_QUESTIONS;
+  const answers = (prompt.timing?.respondSeconds || []).join(' / ');
+  const listen = (prompt.questions || []).some((question) => question.audioUrl);
+  const twice = listen ? (prompt.timing?.playTwice || []).map((index) => firstQuestion + index) : [];
+  const questions = listen ? `hear ${count} questions${twice.length ? ` (question ${twice.join(', ')} twice)` : ''}` : `answer ${count} questions one by one`;
+  if (!timed) return `${questions[0].toUpperCase()}${questions.slice(1)}, up to ${answers} s each.`;
+  const read = readSeconds(prompt);
+  const steps = `prepare ${prepareSeconds(prompt)} s, answer ${answers} s.`;
+  return read ? `${read} s to read, then ${questions}: ${steps}` : `${questions[0].toUpperCase()}${questions.slice(1)}: ${steps}`;
+}
 
 export function remainingSeconds(startedAt, totalSeconds, now) {
   if (startedAt === null || startedAt === undefined) return totalSeconds;

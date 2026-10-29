@@ -95,30 +95,44 @@ export function TeacherSpeakingPage() {
         </Button>
       ) : (
         <div className="space-y-4">
-          <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-5" role="tablist" aria-label="Parts">
-            {SPEAKING_PARTS.map((item) => {
-              const count = speaking.filter((prompt) => speakingPartOf(prompt)?.number === item.number).length;
-              return (
-                <button
-                  key={item.number}
-                  type="button"
-                  role="tab"
-                  aria-selected={current === item.number}
-                  onClick={() => choose(item.number)}
-                  className={cn(
-                    'flex flex-col items-start gap-0.5 rounded-xl border px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                    current === item.number ? 'border-primary bg-primary/5' : 'bg-card hover:bg-accent',
-                  )}
-                >
-                  <span className="flex w-full items-center justify-between gap-2">
-                    <span className={cn('text-sm font-semibold', current === item.number && 'text-primary')}>Part {item.number}</span>
-                    <span className="rounded-full bg-muted px-2 text-xs tabular-nums text-muted-foreground">{count}</span>
-                  </span>
-                  <span className="truncate text-xs text-muted-foreground">{item.title}</span>
-                  <span className="text-[11px] text-muted-foreground/80">{item.questions}</span>
-                </button>
-              );
-            })}
+          <div className="space-y-2">
+            <div className="grid grid-cols-5 gap-1.5 sm:gap-2" role="tablist" aria-label="Parts">
+              {SPEAKING_PARTS.map((item) => {
+                const count = speaking.filter((prompt) => speakingPartOf(prompt)?.number === item.number).length;
+                const active = current === item.number;
+                return (
+                  <button
+                    key={item.number}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    title={`${item.title} · ${item.questions}`}
+                    onClick={() => choose(item.number)}
+                    className={cn(
+                      'flex min-w-0 flex-col items-center gap-1 rounded-xl border px-1 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:items-start sm:gap-0.5 sm:px-3 sm:py-2.5 sm:text-left',
+                      active ? 'border-primary bg-primary/5' : 'bg-card hover:bg-accent',
+                    )}
+                  >
+                    <span className="flex w-full flex-col items-center gap-1 sm:flex-row sm:justify-between sm:gap-2">
+                      <span className={cn('whitespace-nowrap text-sm font-semibold', active && 'text-primary')}>
+                        Part {item.number}
+                      </span>
+                      <span className={cn('rounded-full px-2 text-xs tabular-nums', active ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground')}>{count}</span>
+                    </span>
+                    <span className="hidden w-full truncate text-xs text-muted-foreground sm:block">{item.title}</span>
+                    <span className="hidden text-[11px] text-muted-foreground/80 sm:block">{item.questions}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {part ? (
+              <p className="text-sm text-muted-foreground sm:hidden">
+                <span className="font-medium text-foreground">
+                  Part {part.number}: {part.title}
+                </span>{' '}
+                · {part.questions}
+              </p>
+            ) : null}
           </div>
           {unsorted.length ? (
             <button

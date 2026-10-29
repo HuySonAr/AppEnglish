@@ -24,6 +24,7 @@ import { useDraftMedia } from '../hooks/use-draft-media.js';
 import { lessonState, setIn } from '../lib/lesson-draft.js';
 import { blockId, blockProgress, numbersLabel, sectionLabels, swBlockOf, swBlocks, swIssueBlock, swIssueLabel, workingSwTest } from '../lib/sw-test-draft.js';
 import { deleteSwTest, getSwTest, saveSwTestDraft, submitContentReview, unpublishSwTest, updateSwTest } from '../api/content-api.js';
+import { useSpeechTasks } from '../../../hooks/use-speech-tasks.js';
 
 const KIND = ContentReviewKind.SW_TEST;
 const saveErrorMessage = (error) => `${error?.fileName ? `${error.fileName}: ` : ''}${reviewErrorMessage(error)}`;
@@ -40,13 +41,13 @@ function Numbered({ number, title, children }) {
   );
 }
 
-function VoiceButton({ text, busy, onMake }) {
+function VoiceButton({ text, state, onMake }) {
   const readOnly = useReadOnly();
   if (readOnly) return null;
   return (
-    <Button type="button" variant="outline" size="sm" className="gap-1.5" loading={busy} disabled={busy || !text.trim()} onClick={onMake}>
+    <Button type="button" variant="outline" size="sm" className="gap-1.5" loading={state === 'running'} disabled={Boolean(state) || !text.trim()} onClick={onMake}>
       <AudioLines className="h-4 w-4" />
-      Machine voice
+      {state === 'waiting' ? 'Waiting…' : state === 'running' ? 'Making…' : 'Machine voice'}
     </Button>
   );
 }
@@ -56,7 +57,7 @@ function AskedQuestion({ id, number, item, path, edit, media, voice }) {
     <Numbered number={number} title={`Question ${number}`}>
       <TextField id={`${id}-text`} label="Question" value={item.text} maxLength={PRACTICE_LIMITS.question} onChange={(value) => edit([...path, 'text'], value)} />
       <MediaField id={`${id}-audio`} label="Question audio" kind={MediaKind.AUDIO} path={[...path, 'audioMediaId']} mediaId={item.audioMediaId} media={media} />
-      {item.audioMediaId ? null : <VoiceButton text={item.text} busy={voice.busy === path.join('.')} onMake={() => voice.make(path, item.text)} />}
+      {item.audioMediaId ? null : <VoiceButton text={item.text} state={voice.state(path)} onMake={() => voice.make(path, item.text)} />}
     </Numbered>
   );
 }
@@ -129,7 +130,7 @@ function BlockEditor({ block, content, edit, media, voice }) {
       <Numbered number={block.first} title={`Question ${block.first}`}>
         <TextField id="sw-opinion" label="Question" multiline rows={3} value={speaking.opinion.text} maxLength={PRACTICE_LIMITS.instructions} onChange={(value) => edit([...base, 'text'], value)} />
         <MediaField id="sw-opinion-audio" label="Question audio (optional)" kind={MediaKind.AUDIO} path={[...base, 'audioMediaId']} mediaId={speaking.opinion.audioMediaId} media={media} />
-        {speaking.opinion.audioMediaId ? null : <VoiceButton text={speaking.opinion.text} busy={voice.busy === base.join('.')} onMake={() => voice.make(base, speaking.opinion.text)} />}
+        {speaking.opinion.audioMediaId ? null : <VoiceButton text={speaking.opinion.text} state={voice.state(base)} onMake={() => voice.make(base, speaking.opinion.text)} />}
       </Numbered>
     );
 
@@ -188,7 +189,7 @@ export function SwTestEditorPage() {
   const [compare, setCompare] = useState({ draft: null, published: null });
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [voiceBusy, setVoiceBusy] = useState(null);
+  const voices = useSpeechTasks();
   const [issues, setIssues] = useState([]);
   const [active, setActive] = useState(blockId(swBlocks[0]));
 
@@ -294,20 +295,18 @@ export function SwTestEditorPage() {
   }
 
   const voice = {
-    busy: voiceBusy,
-    async make(path, text) {
-      const key = path.join('.');
-      setVoiceBusy(key);
-      try {
-        const { media: made } = (await createPracticeMachineAudio(text.trim())).data;
-        draftMedia.setStored((current) => ({ ...current, [made.id]: { kind: MediaKind.AUDIO, fileName: made.fileName, url: made.url } }));
-        edit([...path, 'audioMediaId'], made.id);
-        notify({ title: 'Audio made' });
-      } catch (error) {
-        notify({ title: 'Could not make the audio', description: getApiErrorMessage(error), variant: 'destructive' });
-      } finally {
-        setVoiceBusy(null);
-      }
+    state: (path) => (voices.isRunning(path.join('.')) ? 'running' : voices.isWaiting(path.join('.')) ? 'waiting' : null),
+    make(path, text) {
+      voices.start(path.join('.'), async () => {
+        try {
+          const { media: made } = (await createPracticeMachineAudio(text.trim())).data;
+          draftMedia.setStored((current) => ({ ...current, [made.id]: { kind: MediaKind.AUDIO, fileName: made.fileName, url: made.url } }));
+          edit([...path, 'audioMediaId'], made.id);
+          notify({ title: 'Audio made' });
+        } catch (error) {
+          notify({ title: 'Could not make the audio', description: getApiErrorMessage(error), variant: 'destructive' });
+        }
+      });
     },
   };
 
@@ -326,7 +325,7 @@ export function SwTestEditorPage() {
 
   const locked = status.draftStatus === LessonVersionStatus.PENDING_REVIEW;
   const readOnly = !canAuthor || locked;
-  const working = Boolean(busy) || Boolean(voiceBusy);
+  const working = Boolean(busy) || voices.busy;
   const block = swBlockOf(active) || swBlocks[0];
   const issuesOf = (id) => issues.filter((issue) => swIssueBlock(issue.path) === id).length;
   const groups = [SwSection.SPEAKING, SwSection.WRITING].map((section) => ({
@@ -359,7 +358,7 @@ export function SwTestEditorPage() {
     <section className="space-y-5">
       <PageBreadcrumb items={[{ label: 'S&W tests', to: listPath }, { label: swTest.title }]} />
 
-      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+      <div className="sticky top-16 z-10 -mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b bg-background px-4 py-3 sm:-mx-5 sm:px-5">
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-lg font-semibold sm:text-xl">{swTest.title}</h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
